@@ -37,7 +37,7 @@ class Shop_Specialprice_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_specialprice_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_specialprice.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

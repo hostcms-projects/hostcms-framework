@@ -34,7 +34,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$this->getField('text')->wysiwyg(TRUE);
 
@@ -64,7 +64,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('style' => 'float: left;'))
 			->style("width: 220px;");
 
-		$oRadioType = Core::factory('Admin_Form_Entity_Select')
+		$oRadioType = Admin_Form_Entity::factory('Select')
 			->name('grade')
 			->id('grade')
 			->caption(Core::_('Comment.grade'))
@@ -89,7 +89,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				 $oParentComment = Core_Entity::factory('Comment', $object->parent_id);
 			}
 
-			$oAdmin_Form_Entity_Input = new Admin_Form_Entity_Input();
+			$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 			$oAdmin_Form_Entity_Input
 				->name('shop_item_id')
 				->value()

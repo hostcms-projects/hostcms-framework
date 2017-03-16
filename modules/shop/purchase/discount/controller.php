@@ -19,7 +19,8 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 	protected $_allowedProperties = array(
 		'amount', // сумма заказа
 		'quantity', // количество товаров в заказе
-		'couponText' // текст купона, если есть
+		'couponText', // текст купона, если есть
+		'siteuserId' // Идентификатор пользователя сайта, нужен для расчета накопительных скидок
 	);
 
 	/**
@@ -99,10 +100,32 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 				&& ($quantity < $oShop_Purchase_Discount->max_count || $oShop_Purchase_Discount->max_count == 0)
 				&& (!$oShop_Purchase_Discount->coupon || $oShop_Purchase_Discount->id == $shop_purchase_discount_id);
 
+			$bCheckOrdersSum = FALSE;
+
+			if($oShop_Purchase_Discount->mode == 2 && $this->siteuserId)
+			{
+				$oSiteuser = Core_Entity::factory('Siteuser')->find($this->siteuserId);
+				if(!is_null($oSiteuser))
+				{
+					$fSum = 0.0;
+
+					$oShop_Orders = $oSiteuser->Shop_Orders->getAllBypaid(1);
+					foreach($oShop_Orders as $oShop_Order)
+					{
+						$fSum += $oShop_Order->getAmount(); 
+					}
+
+					$bCheckOrdersSum = $fSum >= $min_amount
+					&& ($fSum < $max_amount || $max_amount == 0)
+					&& (!$oShop_Purchase_Discount->coupon || $oShop_Purchase_Discount->id == $shop_purchase_discount_id);
+				}
+			}
+
 			// И
-			if ($oShop_Purchase_Discount->type == 0 && $bCheckAmount && $bCheckQuantity
+			if ($oShop_Purchase_Discount->mode == 0 && $bCheckAmount && $bCheckQuantity
 			// ИЛИ
-			|| $oShop_Purchase_Discount->type == 1 && ($bCheckAmount || $bCheckQuantity))
+			|| $oShop_Purchase_Discount->mode == 1 && ($bCheckAmount || $bCheckQuantity)
+			|| $oShop_Purchase_Discount->mode == 2 && $bCheckOrdersSum)
 			{
 				// Учитываем перерасчет суммы скидки в валюту магазина
 				$discount = $fCoefficient * $oShop_Purchase_Discount->type == 0

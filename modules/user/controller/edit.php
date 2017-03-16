@@ -26,7 +26,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oAdditionalTab->delete($this->getField('user_group_id'));
 
-		$oSelect_User_Groups = new Admin_Form_Entity_Select();
+		$oSelect_User_Groups = Admin_Form_Entity::factory('Select');
 
 		$user_group_id = is_null($this->_object->user_group_id)
 			? intval(Core_Array::getGet('user_group_id', 0))
@@ -50,7 +50,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			'maxlen' => array('value' => 255)
 		);
 
-		$oPasswordFirst = new Admin_Form_Entity_Password();
+		$oPasswordFirst = Admin_Form_Entity::factory('Password');
 		$oPasswordFirst
 			->caption(Core::_('User.password'))
 			->id('password_first')
@@ -65,7 +65,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab->addAfter($oPasswordFirst, $oSelect_User_Groups);
 
-		$oPasswordSecond = new Admin_Form_Entity_Password();
+		$oPasswordSecond = Admin_Form_Entity::factory('Password');
 		$oPasswordSecond
 			->caption(Core::_('User.password_second'))
 			->name('password_second');
@@ -87,7 +87,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->addAfter($oPasswordSecond, $oPasswordFirst);
 		$oMainTab->delete($this->getField('settings'));
 
-		$oPersonalDataTab = Core::factory('Admin_Form_Entity_Tab')
+		$oPersonalDataTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('User.users_type_form_tab_2'))
 			->name('tab_personal_data');
 

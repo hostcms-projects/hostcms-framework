@@ -67,6 +67,24 @@ abstract class Core_Http
 	}
 
 	/**
+	 * Additional headers
+	 * @var array
+	 */
+	protected $_additionalHeaders = array();
+
+	/**
+	 * Add additional headers
+	 * @param string $name Header name
+	 * @param string $value Value
+	 * @return self
+	 */
+	public function additionalHeader($name, $value)
+	{
+		$this->_additionalHeaders[$name] = $value;
+		return $this;
+	}
+
+	/**
 	 * Send request
 	 * @param string $host host
 	 * @param string $path path
@@ -95,6 +113,12 @@ abstract class Core_Http
 			->timeout(10)
 			->port(80)
 			->contentType('application/x-www-form-urlencoded');
+
+		$this
+			->additionalHeader('Accept-Charset', 'windows-1251,utf-8;q=0.7,*;q=0.7')
+			->additionalHeader('Accept-Language', 'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3')
+			//->additionalHeader('Keep-Alive', '300')
+			->additionalHeader('Accept', 'text/html,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,**;q=0.5');
 
 		return $this;
 	}
@@ -243,7 +267,7 @@ abstract class Core_Http
 	protected $_headers = NULL;
 
 	/**
-	 * Get request headers
+	 * Get headers
 	 * @return string
 	 */
 	public function getHeaders()
@@ -258,11 +282,35 @@ abstract class Core_Http
 	protected $_body = NULL;
 
 	/**
-	 * Get request body
+	 * Get body
 	 * @return string
 	 */
 	public function getBody()
 	{
+		return $this->_body;
+	}
+
+	/**
+	 * Get decompressed body
+	 * @return string
+	 */
+	public function getDecompressedBody()
+	{
+		$aHeaders = array_change_key_case($this->parseHeaders(), CASE_LOWER);;
+
+		if (isset($aHeaders['content-encoding']))
+		{
+			switch ($aHeaders['content-encoding'])
+			{
+				case 'gzip':
+					return gzinflate(substr($this->_body, 10));
+				break;
+				default:
+					throw new Core_Exception('Core_Http unsupported compression method "%name"', array('%name' =>
+					$aHeaders['content-encoding']));
+			}
+		}
+
 		return $this->_body;
 	}
 

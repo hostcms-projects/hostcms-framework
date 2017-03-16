@@ -21,7 +21,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	{
 		$modelName = $object->getModelName();
 
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -44,20 +44,20 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 				$oAdditionalTab = $this->getTab('additional');
 
-				$oInformationsystemTabSorting = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabSorting = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem.information_systems_form_tab_2'))
 					->name('Sorting');
 
-				$oInformationsystemTabFormats = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabFormats = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem.information_systems_form_tab_3'))
 					->name('Formats');
 
-				$oInformationsystemTabImage = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabImage = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem.information_systems_form_tab_4'))
 					->name('Image');
 
 				// Получаем экземпляр класса разделителя
-				$oSeparatorField = new Admin_Form_Entity_Separator();
+				$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 				$this
 					->addTabAfter($oInformationsystemTabSorting, $oMainTab)
@@ -96,7 +96,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				$oUser_Controller_Edit = new User_Controller_Edit($this->_Admin_Form_Action);
 
 				// Список сайтов
-				$oSelect_Sites = new Admin_Form_Entity_Select();
+				$oSelect_Sites = Admin_Form_Entity::factory('Select');
 				$oSelect_Sites
 					->options($oUser_Controller_Edit->fillSites())
 					->name('site_id')
@@ -112,7 +112,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 				$Structure_Controller_Edit = new Structure_Controller_Edit($this->_Admin_Form_Action);
 
-				$oSelect_Structure = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Structure = Admin_Form_Entity::factory('Select')
 					->name('structure_id')
 					->caption(Core::_('Informationsystem.structure_name'))
 					->options
@@ -138,7 +138,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					$aSiteuser_Groups = array();
 				}
 
-				$oSelect_SiteUserGroup = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_SiteUserGroup = Admin_Form_Entity::factory('Select')
 					->name('siteuser_group_id')
 					->caption(Core::_('Informationsystem.siteuser_group_id'))
 					->options
@@ -158,7 +158,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				// Тип формирования URL информационных элементов
 				$oMainTab->delete($this->getField('url_type'));
 
-				$oSelect_UrlType = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_UrlType = Admin_Form_Entity::factory('Select')
 				->name('url_type')
 				->caption(Core::_('Informationsystem.url_type'))
 				->options(
@@ -177,7 +177,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				->delete($this->getField('groups_sorting_field'))
 				->delete($this->getField('groups_sorting_direction'));
 
-				$oSelect_ItemsSortingField = new Admin_Form_Entity_Select();
+				$oSelect_ItemsSortingField = Admin_Form_Entity::factory('Select');
 
 				// Список полей сортировки элементов
 				$oSelect_ItemsSortingField
@@ -192,7 +192,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 
 				// Направление сортировки элементов
-				$oSelect_ItemsSortingDirection = new Admin_Form_Entity_Select();
+				$oSelect_ItemsSortingDirection = Admin_Form_Entity::factory('Select');
 
 				$oSelect_ItemsSortingDirection
 					->options(array(Core::_('Informationsystem.sort_to_increase'),
@@ -204,7 +204,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 
 				// Список полей сортировки групп
-				$oSelect_GroupsSortingField = new Admin_Form_Entity_Select();
+				$oSelect_GroupsSortingField = Admin_Form_Entity::factory('Select');
 
 				$oSelect_GroupsSortingField
 					->options(array(Core::_('Informationsystem.show_information_groups_name'),
@@ -215,7 +215,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->caption(Core::_('Informationsystem.is_sort_field_group_title'));
 
 				// Направление сортировки групп
-				$oSelect_GroupsSortingDirection = new Admin_Form_Entity_Select();
+				$oSelect_GroupsSortingDirection = Admin_Form_Entity::factory('Select');
 
 				$oSelect_GroupsSortingDirection
 					->options(array(Core::_('Informationsystem.sort_to_increase'),
@@ -301,7 +301,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->move($this->getField('typograph_default_groups'), $oInformationsystemTabFormats);
 
 				// Изображение
-				$oWatermarkFileField = new Admin_Form_Entity_File();
+				$oWatermarkFileField = Admin_Form_Entity::factory('File');
 
 				$watermarkPath =
 					is_file($this->_object->getWatermarkFilePath())
@@ -398,12 +398,55 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	}
 
 	/**
+	 * Executes the business logic.
+	 * @param mixed $operation Operation name
+	 * @return self
+	 */
+	public function execute($operation = NULL)
+	{
+		if (!is_null($operation))
+		{
+			$modelName = $this->_object->getModelName();
+
+			if ($modelName == 'informationsystem')
+			{
+				$oInformationsystem = Core_Entity::factory('Informationsystem');
+
+				$iStructureId = intval(Core_Array::get($this->_formValues, 'structure_id'));
+
+				$oInformationsystem->queryBuilder()
+					->where('informationsystems.structure_id', '=', $iStructureId);
+
+				$aInformationsystems = $oInformationsystem->findAll();
+				
+				$iCount = count($aInformationsystems);
+				
+				if ($iStructureId && $iCount && (is_null($this->_object->id) || $iCount > 1 || $aInformationsystems[0]->id != $this->_object->id))
+				{
+					$oStructure = Core_Entity::factory('Structure', $iStructureId);
+
+					$this->addMessage(
+						Core_Message::get(
+							Core::_('Informationsystem.structureIsExist', $oStructure->name),
+							'error'
+						)
+					);
+
+					return TRUE;
+				}
+			}
+		}
+
+		return parent::execute($operation);
+	}
+
+	/**
 	 * Processing of the form. Apply object fields.
 	 */
 	protected function _applyObjectProperty()
 	{
 		parent::_applyObjectProperty();
-
+		
 		if(
 			// Поле файла существует
 			!is_null($aFileData = Core_Array::getFiles('watermark_file', NULL))

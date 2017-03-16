@@ -16,7 +16,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * Return data
 	 * @var array
 	 */
-	private $_aReturn = array(
+	protected $_aReturn = array(
 		'insertDirCount' => 0,
 		'insertItemCount' => 0,
 		'updateDirCount' => 0,
@@ -27,13 +27,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * XML
 	 * @var SimpleXMLElement
 	 */
-	private $_oSimpleXMLElement = NULL;
+	protected $_oSimpleXMLElement = NULL;
 
 	/**
 	 * List of predefined base properties
 	 * @var array
 	 */
-	private $aPredefinedBaseProperties = array(
+	protected $aPredefinedBaseProperties = array(
 		"HOSTCMS_TITLE",
 		"HOSTCMS_DESCRIPTION",
 		"HOSTCMS_KEYWORDS",
@@ -47,13 +47,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * List of base properties
 	 * @var array
 	 */
-	private $aBaseProperties = array();
+	protected $aBaseProperties = array();
 
 	/**
 	 * List of additional properties
 	 * @var array
 	 */
-	private $aAdditionalProperties = array();
+	protected $aAdditionalProperties = array();
 
 	/**
 	 * Allowed object properties
@@ -96,7 +96,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param int $iParentId parent ID
 	 * @return self
 	 */
-	private function _importGroups($oXMLNode, $iParentId = 0)
+	protected function _importGroups($oXMLNode, $iParentId = 0)
 	{
 		foreach($oXMLNode->xpath('Группа') as $oXMLGroupNode)
 		{
@@ -130,7 +130,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param SimpleXMLElement $oTax tax
 	 * @return Shop_Tax
 	 */
-	private function _addTax($oTax)
+	protected function _addTax($oTax)
 	{
 		$sTaxName = strval($oTax->Наименование);
 		$sTaxRate = strval($oTax->Ставка);
@@ -160,7 +160,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param string $sPropertyGUID property GUID
 	 * @param string $sValue property value
 	 */
-	private function _addItemProperty($oShopItem, $sPropertyGUID, $sValue)
+	protected function _addItemProperty($oShopItem, $sPropertyGUID, $sValue)
 	{
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 		$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE);
@@ -195,7 +195,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			
 		if($oProperty->type == 7)
 		{
-			mb_strtoupper($sPropertyValue) == 'ДА' ? $sPropertyValue = 1 : $sPropertyValue = 0;
+			mb_strtoupper($sPropertyValue) == 'ДА' ? $sPropertyValue = 1 : $sPropertyValue = intval($sPropertyValue);
 		}
 			
 		$this->_setPropertyValue($oProperty_Value, $sPropertyValue);
@@ -206,7 +206,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param Shop_Item_Model $oItem item
 	 * @param SimpleXMLElement $oProperty
 	 */
-	private function _importProperties(Shop_Item_Model $oItem, SimpleXMLElement $oProperty)
+	protected function _importProperties(Shop_Item_Model $oItem, SimpleXMLElement $oProperty)
 	{
 		$sValue = strval($oProperty->Значение);
 
@@ -746,12 +746,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$sTaxGUID = md5(mb_strtoupper($oPrice->Налог->Наименование));
 					$oShopTax = Core_Entity::factory('Shop_Tax')->getByGuid($sTaxGUID, FALSE);
 
-					if (!is_null($oShopTax))
+					/*if (!is_null($oShopTax))
 					{
+						// В связи с разницей логик HostCMS и 1С по хранению налогов, поле "учтено в сумме" больше не будет импортироваться
 						$iInSum = strval($oPrice->Налог->УчтеноВСумме);
 						strtoupper($iInSum) == 'TRUE' ? $oShopTax->tax_is_included = 1 : $oShopTax->tax_is_included = 0;
 						$oShopTax->save();
-					}
+					}*/
 
 					$this->sShopDefaultPriceGUID = $oShopPrice->guid;
 				}
@@ -790,6 +791,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							$oModificationItem = Core_Entity::factory('Shop_Item')
 								->guid($sGUIDmod)
 								->modification_id($oShopItem->id)
+								->shop_id($this->iShopId)
 								->shop_group_id(0)
 								->save();
 						}
@@ -1018,7 +1020,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 					$oShopProperty = $oShop_Item_Property_List->Properties->getByGuid(strval($oXmlPropertyValue->attributes()->ИдентификаторСвойства), FALSE);
 					
-					if (!is_null($oShopProperty) && $oShopProperty->type == 1)
+					if (!is_null($oShopProperty) && $oShopProperty->type != 2 && $oShopProperty->type != 3)
 					{
 						if (is_null(Core_Entity::factory('Shop', $this->iShopId)
 							->Shop_Item_Property_For_Groups
@@ -1111,7 +1113,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							->save();
 					}
 					$oProperty_Value->setValue($oListItem->id);
-				}
+				} 
 			break;
 			case 8:
 				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $value))

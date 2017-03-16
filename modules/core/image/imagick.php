@@ -149,22 +149,22 @@ class Core_Image_Imagick extends Core_Image
 				$oImagick->destroy();
 				return FALSE;
 			}
-			
+
 			$oImagick->resizeimage($destX, $destY, 0, 1, FALSE);
-			
-			if (is_array($this->_config['sharpenImage']))
+
+			if (is_array(self::$_config['imagick']['sharpenImage']))
 			{
-				$this->_config['sharpenImage'] += array('radius' => 0, 'sigma' => 1);
-				
-				$oImagick->sharpenImage(floatval($this->_config['sharpenImage']['radius']), floatval($this->_config['sharpenImage']['sigma']));
+				self::$_config['imagick']['sharpenImage'] += array('radius' => 0, 'sigma' => 1);
+
+				$oImagick->sharpenImage(floatval(self::$_config['imagick']['sharpenImage']['radius']), floatval(self::$_config['imagick']['sharpenImage']['sigma']));
 			}
-			elseif(is_array($this->_config['adaptiveSharpenImage']))
+			elseif(is_array(self::$_config['imagick']['adaptiveSharpenImage']))
 			{
-				$this->_config['adaptiveSharpenImage'] += array('radius' => 0, 'sigma' => 1);
-				
-				$oImagick->adaptiveSharpenImage(floatval($this->_config['adaptiveSharpenImage']['radius']), floatval($this->_config['adaptiveSharpenImage']['sigma']));
+				self::$_config['imagick']['adaptiveSharpenImage'] += array('radius' => 0, 'sigma' => 1);
+
+				$oImagick->adaptiveSharpenImage(floatval(self::$_config['imagick']['adaptiveSharpenImage']['radius']), floatval(self::$_config['imagick']['adaptiveSharpenImage']['sigma']));
 			}
-			
+
 			// Удаляем метаданные
 			$oImagick->stripImage();
 			if ($preserveAspectRatio)

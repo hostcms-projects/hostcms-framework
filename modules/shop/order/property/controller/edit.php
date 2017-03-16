@@ -31,7 +31,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 			case 'property':
 
 				// Префикс				
-				$oShopPrefixInput = new Admin_Form_Entity_Input();
+				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
 				$oShopPrefixInput
 					->caption(Core::_('Shop_Order.prefix'))
 					->style('width: 100px')					
@@ -43,7 +43,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 					->add($oShopPrefixInput);					
 
 				// Способ отображения в фильтре				
-				$oShopFilterSelect = new Admin_Form_Entity_Select();
+				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
 				$oShopFilterSelect
 					->caption(Core::_('Shop_Order.display'))
 					->style('width: 250px')

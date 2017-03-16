@@ -22,9 +22,9 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$modelName = $object->getModelName();
 
-		$oAdminFormEntitySelect = new Admin_Form_Entity_Select();
+		$oAdminFormEntitySelect = Admin_Form_Entity::factory('Select');
 
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$oAdminFormEntitySelect->caption(Core::_('Shop_Dir.parent_id'));
 
@@ -81,18 +81,18 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			parent::setObject($object);
 
 			// Получаем экземпляр класса разделителя
-			$oSeparatorField = new Admin_Form_Entity_Separator();
+			$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
-			$oShopTabFormats = Core::factory('Admin_Form_Entity_Tab')
+			$oShopTabFormats = Admin_Form_Entity::factory('Tab')
 				->caption(Core::_('Shop.tab_formats'))
 				->name('Formats');
-			$oShopTabExport = Core::factory('Admin_Form_Entity_Tab')
+			$oShopTabExport = Admin_Form_Entity::factory('Tab')
 				->caption(Core::_('Shop.tab_export'))
 				->name('Export');
-			$oShopTabWatermark = Core::factory('Admin_Form_Entity_Tab')
+			$oShopTabWatermark = Admin_Form_Entity::factory('Tab')
 				->caption(Core::_('Shop.tab_watermark'))
 				->name('Watermark');
-			$oShopTabOrders = Core::factory('Admin_Form_Entity_Tab')
+			$oShopTabOrders = Admin_Form_Entity::factory('Tab')
 				->caption(Core::_('Shop.tab_sort'))
 				->name('Orders');
 
@@ -454,7 +454,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->divAttr(array('style' => 'float: left')));
 
 
-			$oWatermarkFileField = new Admin_Form_Entity_File();
+			$oWatermarkFileField = Admin_Form_Entity::factory('File');
 
 			$watermarkPath =
 				is_file($this->_object->getWatermarkFilePath())
@@ -598,27 +598,39 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Executes the business logic.
-	 * @param mixed $operation Operation for action
-	 * @return boolean
+	 * @param mixed $operation Operation name
+	 * @return self
 	 */
 	public function execute($operation = NULL)
 	{
 		if (!is_null($operation))
 		{
-			// Проверка существования другого магазина, связанного с этим же узлом структуры
-			$structure_id = Core_Array::getPost('structure_id');
+			$modelName = $this->_object->getModelName();
 
-			if ($structure_id)
+			if ($modelName == 'shop')
 			{
-				$oShopSameStructure = Core_Entity::factory('Shop')
-					->getByStructureId($structure_id);
+				$oShop = Core_Entity::factory('Shop');
 
-				if (!is_null($oShopSameStructure) && $oShopSameStructure->id != Core_Array::getPost('id'))
+				$iStructureId = intval(Core_Array::get($this->_formValues, 'structure_id'));
+
+				$oShop->queryBuilder()
+					->where('shops.structure_id', '=', $iStructureId);
+
+				$aShop = $oShop->findAll();
+				
+				$iCount = count($aShop);
+				
+				if ($iStructureId && $iCount && (is_null($this->_object->id) || $iCount > 1 || $aShop[0]->id != $this->_object->id))
 				{
-					$this->addMessage
-					(
-						Core_Message::get(Core::_('Shop.error_isset_shop_with_structure'), 'error')
+					$oStructure = Core_Entity::factory('Structure', $iStructureId);
+
+					$this->addMessage(
+						Core_Message::get(
+							Core::_('Shop.structureIsExist', $oStructure->name),
+							'error'
+						)
 					);
+
 					return TRUE;
 				}
 			}

@@ -188,12 +188,6 @@ abstract class Core_DataBase
 	abstract public function current($bCache = TRUE);
 
 	/**
-	 * Get number of rows in result
-	 * @return integer|null number of rows or NULL
-	 */
-	abstract public function getNumRows();
-
-	/**
 	 * Get the ID generated in the last query
 	 * @return integer|null
 	 */
@@ -318,6 +312,7 @@ abstract class Core_DataBase
 			'password' => '',
 			'database' => '',
 			'charset' => 'UTF8',
+			'attr' => array(),
 			//'cache' => 'memory'
 		);
 
@@ -400,7 +395,7 @@ abstract class Core_DataBase
 			}*/
 
 			// escape and add quote just for string value
-			return "'" . $this->escape($value) . "'";
+			return $this->escape($value);
 		}
 		// bool true -> 1
 		elseif ($value === TRUE)
@@ -462,49 +457,50 @@ abstract class Core_DataBase
 			->execute()
 			->asAssoc();
 
-		$iNumRows = $oCore_QueryBuilderSelect->getNumRows();
-		if ($iNumRows > 0)
+		$sInsertInto = "INSERT INTO {$sColumnName} VALUES ";
+		$search = array("'", "\\", "\x00", "\x0a", "\x0d", "\x1a");
+		$replace = array("''", "\\\\", '\0', '\n', '\r', '\Z');
+
+		$i = 0;
+		while($row = $oCore_QueryBuilderSelect->current())
 		{
-			$stdOut->write("LOCK TABLES {$sColumnName} WRITE; \r\n");
-
-			$sInsertInto = "INSERT INTO {$sColumnName} VALUES ";
-			$stdOut->write($sInsertInto);
-
-			$search = array("'", "\\", "\x00", "\x0a", "\x0d", "\x1a");
-			$replace = array("''", "\\\\", '\0', '\n', '\r', '\Z');
-
-			$i = 0;
-			while($row = $oCore_QueryBuilderSelect->current())
+			if ($i == 0)
 			{
-				$i++;
+				$stdOut->write("LOCK TABLES {$sColumnName} WRITE; \r\n");
+				$stdOut->write($sInsertInto);
+			}
+			else
+			{
+				$i % 100 == 0
+					? $stdOut->write(";\r\n" . $sInsertInto)
+					: $stdOut->write(",\r\n");
+			}
 
-				$values = array();
-				foreach ($row as $sRowName => $rowValue)
+			$values = array();
+			foreach ($row as $sRowName => $rowValue)
+			{
+				if (is_null($rowValue))
 				{
-					if (is_null($rowValue))
-					{
-						$values[] = 'NULL';
-					}
-					// is_numeric нельзя использовать, т.к. 4e998516 истина
-					elseif (is_int($rowValue))
-					{
-						$values[] = $rowValue;
-					}
-					else
-					{
-						$values[] = "'" . str_replace($search, $replace, $rowValue) . "'";
-					}
+					$values[] = 'NULL';
 				}
-
-				$stdOut->write('(' . implode(',', $values) . ")");
-				if ($i < $iNumRows)
+				// is_numeric нельзя использовать, т.к. 4e998516 истина
+				elseif (is_int($rowValue))
 				{
-					$i % 100 == 0
-						? $stdOut->write(";\r\n" . $sInsertInto)
-						: $stdOut->write(",\r\n");
+					$values[] = $rowValue;
+				}
+				else
+				{
+					$values[] = "'" . str_replace($search, $replace, $rowValue) . "'";
 				}
 			}
 
+			$stdOut->write('(' . implode(',', $values) . ")");
+
+			$i++;
+		}
+
+		if ($i > 0)
+		{
 			$stdOut->write(";\r\n");
 			$stdOut->write("UNLOCK TABLES;");
 		}

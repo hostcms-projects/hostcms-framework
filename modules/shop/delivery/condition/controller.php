@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 {
@@ -51,6 +51,7 @@ class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 				->where('shop_country_location_id', '=', $shop_country_location_id)
 				->where('shop_country_location_city_id', '=', $shop_country_location_city_id)
 				->where('shop_country_location_city_area_id', '=', $shop_country_location_city_area_id)
+				->where('active', '=', 1)
 				// Основная обрезка по характеристикам заказа
 				->where('min_weight', '<=', $this->totalWeight)
 				->open()

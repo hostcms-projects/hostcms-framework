@@ -32,24 +32,24 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparator = new Admin_Form_Entity_Separator();
+		$oSeparator = Admin_Form_Entity::factory('Separator');
 
 		$this
 			->addTabAfter
 				(
-					$oDescriptionTab = Core::factory('Admin_Form_Entity_Tab')
+					$oDescriptionTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab3'))
 						->name('Description'), $oMainTab
 				)
 			->addTabAfter
 				(
-					$oContactsTab = Core::factory('Admin_Form_Entity_Tab')
+					$oContactsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab2'))
 						->name('Contacts'), $oMainTab
 				)
 			->addTabAfter
 				(
-					$oDocumentsTab = Core::factory('Admin_Form_Entity_Tab')
+					$oDocumentsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab4'))
 						->name('Documents'), $oContactsTab
 				);
@@ -102,7 +102,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oAdditionalTab
 			->moveAfter($oSiteuseridField = $this->getField('siteuser_id'), $oDatetimeField, $oMainTab);
 
-		$oOrderSumTextBox = Core::factory('Admin_Form_Entity_Input')
+		$oOrderSumTextBox = Admin_Form_Entity::factory('Input')
 			->name("sum")
 			->style("width: 150px");
 
@@ -117,7 +117,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$oSiteuser = $this->_object->Siteuser;
 
-			$oSiteuserLink = Core::factory('Admin_Form_Entity_Link');
+			$oSiteuserLink = Admin_Form_Entity::factory('Link');
 			$oSiteuserLink
 				->divAttr(array('style' => 'float: left'))
 				->a
@@ -169,7 +169,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('shop_currency_id')
 		);
 
-		$oCurrencySelect = new Admin_Form_Entity_Select();
+		$oCurrencySelect = Admin_Form_Entity::factory('Select');
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
 		$oCurrencySelect
@@ -193,7 +193,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$sShopOrderItemsPath = '/admin/shop/order/item/index.php';
 		$sAdditionalParams = "shop_id={$shop_id}&shop_group_id={$shop_group_id}&shop_dir_id={$shop_dir_id}&shop_order_id={$shop_order_id}";
 
-		$oItemsLink = Core::factory('Admin_Form_Entity_Link');
+		$oItemsLink = Admin_Form_Entity::factory('Link');
 		$oItemsLink
 			->divAttr(array('style' => 'float: left'))
 			->a
@@ -220,7 +220,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('shop_payment_system_id')
 		);
 
-		$oShopPaymentSystemsSelect = new Admin_Form_Entity_Select();
+		$oShopPaymentSystemsSelect = Admin_Form_Entity::factory('Select');
 
 		$oShopPaymentSystemsSelect
 			->caption(Core::_('Shop_Order.system_of_pay'))
@@ -239,7 +239,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oPaymentdatetimeField
 			->divAttr(array('style' => 'float: left'));
 
-		$oPrintLink = Core::factory('Admin_Form_Entity_Link');
+		$oPrintLink = Admin_Form_Entity::factory('Link');
 		$oPrintLink->div->style("width: 100px");
 		$oPrintLink
 			->a
@@ -253,7 +253,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->src('/admin/images/printer.gif');
 		$oDocumentsTab->add($oPrintLink);
 
-		$oOrderCardLink = Core::factory('Admin_Form_Entity_Link');
+		$oOrderCardLink = Admin_Form_Entity::factory('Link');
 		$oOrderCardLink
 			->a
 				->href(
@@ -268,36 +268,36 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->src('/admin/images/new_window.gif');
 		$oOrderCardLink->divAttr(array('style' => 'width: 200px'));
 		$oDocumentsTab->add($oOrderCardLink);
-		
-		$oActLink = Core::factory('Admin_Form_Entity_Link');
+
+		$oActLink = Admin_Form_Entity::factory('Link');
 		$oActLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/acceptance/report/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_('Shop_Order.acceptance_report_form'))->target('_blank');
 		$oActLink->img->src('/admin/images/new_window.gif');
 		$oActLink->divAttr(array('style' => 'width: 80px; float: left'));
 		$oDocumentsTab->add($oActLink);
-		
-		$oNaklLink = Core::factory('Admin_Form_Entity_Link');
+
+		$oNaklLink = Admin_Form_Entity::factory('Link');
 		$oNaklLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/torg12/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_("Shop_Order.torg12_title"))->target('_blank');
 		$oNaklLink->img->src('/admin/images/new_window.gif');
 		$oNaklLink->divAttr(array('style' => 'width: 100px; float: left'));
 		$oDocumentsTab->add($oNaklLink);
-		
+
 		$oMainTab->delete($this->getField('acceptance_report'));
-		$oAdmin_Form_Entity_Input = Core::factory('Admin_Form_Entity_Input');
+		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 		$oAdmin_Form_Entity_Input
 			->name('acceptance_report')
 			->caption('&nbsp;')
 			->value($this->_object->acceptance_report)
 			->style("width: 100px; margin-left: 0");
 		$oDocumentsTab->add($oAdmin_Form_Entity_Input);
-		
-		$oFactLink = Core::factory('Admin_Form_Entity_Link');
+
+		$oFactLink = Admin_Form_Entity::factory('Link');
 		$oFactLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/vat/invoice/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_('Shop_Order.acceptance_report_invoice'))->target('_blank');
 		$oFactLink->img->src('/admin/images/new_window.gif');
 		$oFactLink->divAttr(array('style' => 'width: 180px; float: left'));
 		$oDocumentsTab->add($oFactLink);
-		
+
 		$oMainTab->delete($this->getField('vat_invoice'));
-		$oAdmin_Form_Entity_Input = Core::factory('Admin_Form_Entity_Input');
+		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 		$oAdmin_Form_Entity_Input
 			->name('vat_invoice')
 			->caption('&nbsp;')
@@ -309,7 +309,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('shop_order_status_id')
 		);
 
-		$oShopOrderStatusesSelect = new Admin_Form_Entity_Select();
+		$oShopOrderStatusesSelect = Admin_Form_Entity::factory('Select');
 
 		$oShopOrderStatusesSelect
 			->caption(Core::_('Shop_Order.show_order_status'))
@@ -341,7 +341,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oShopDelivery = Core_Entity::factory('Shop_Delivery_Condition', $this->_object->shop_delivery_condition_id)->Shop_Delivery;
 
-		$oShopDeliveryTypeSelect = new Admin_Form_Entity_Select();
+		$oShopDeliveryTypeSelect = Admin_Form_Entity::factory('Select');
 
 		$oShopDeliveryTypeSelect
 			->caption(Core::_('Shop_Order.type_of_delivery'))
@@ -362,14 +362,18 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('shop_delivery_condition_id')
 		);
 
-		$oShopDeliveryConditionsTypeSelect = new Admin_Form_Entity_Select();
+		$oShopDeliveryConditionsTypeSelect = Admin_Form_Entity::factory('Select');
+
+		$iShop_Delivery_Conditions = $oShopDelivery->Shop_Delivery_Conditions->getCount();
 
 		$oShopDeliveryConditionsTypeSelect
 			->caption(Core::_('Shop_Order.shop_delivery_condition_id'))
 			->id('shop_delivery_condition_id')
 			->style("width: 300px")
 			->options(
-				$this->_fillDeliveryConditions($oShopDelivery->id)
+				$iShop_Delivery_Conditions <= 250
+					? $this->_fillDeliveryConditions($oShopDelivery->id)
+					: array($this->_object->shop_delivery_condition_id => $this->_object->Shop_Delivery_Condition->name)
 			)
 			->name('shop_delivery_condition_id')
 			->value($this->_object->shop_delivery_condition_id);
@@ -415,7 +419,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$iOrderId = intval($this->_object->id);
 		$sOrderPath = '/admin/shop/order/index.php';
 
-		$oRecalcDeliveryPriceLink = Core::factory('Admin_Form_Entity_Link');
+		$oRecalcDeliveryPriceLink = Admin_Form_Entity::factory('Link');
 		$oRecalcDeliveryPriceLink
 			->a
 				->href($this->_Admin_Form_Controller->getAdminActionLoadHref
@@ -436,18 +440,18 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oRecalcDeliveryPriceLink->div->style("width: 350px");
 
 		$oMainTab->addAfter($oRecalcDeliveryPriceLink, $oShopDeliveryConditionsTypeSelect);
-		
+
 		$oTinField = $this->getField('tin');
 		$oTinField
 			->style("width: 190px")
 			->divAttr(array('style' => 'float: left'));
 		$oKppField = $this->getField('kpp');
 		$oKppField->style("width: 190px");
-		
+
 		$oMainTab->moveAfter($oTinField, $oEmailField, $oContactsTab);
 		$oMainTab->moveAfter($oKppField, $this->getField('tin'), $oContactsTab);
-		
-		$oPropertyTab = Core::factory('Admin_Form_Entity_Tab')
+
+		$oPropertyTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_("Shop_Order.tab_properties"))
 			->name('Property');
 
@@ -464,7 +468,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					? $this->_object->Shop->Structure->template_id
 					: 0)
 			->fillTab();
-		
+
 		$title = $this->_object->id
 			? Core::_('Shop_Order.order_edit_form_title')
 			: Core::_('Shop_Order.order_add_form_title');
@@ -503,7 +507,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		parent::_applyObjectProperty();
-		
+
 		// ---- Дополнительные свойства
 		$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
 		$oProperty_Controller_Tab
@@ -557,8 +561,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$iDeliveryId = intval($iDeliveryId);
 
 		$oObject->queryBuilder()
-				->where("shop_delivery_id", "=", $iDeliveryId)
-				->orderBy("id");
+			->where("shop_delivery_id", "=", $iDeliveryId)
+			->orderBy("id");
 
 		$aObjects = $oObject->findAll();
 

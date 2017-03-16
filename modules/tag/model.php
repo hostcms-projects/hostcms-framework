@@ -126,7 +126,7 @@ class Tag_Model extends Core_Entity{
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event tag_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event tag.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

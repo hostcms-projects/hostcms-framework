@@ -953,6 +953,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 						->type('text/javascript')
 						->value(
 							'(function($){' .
+							'$("body").addClass("backendBody");' .
 							'$(".hostcmsPanel").applyShadow();' .
 							'$(".hostcmsPanel").draggable({containment: "document"});' .
 							'$("*[hostcms\\\\:id]").hostcmsEditable({path: "/edit-in-place.php"});'.

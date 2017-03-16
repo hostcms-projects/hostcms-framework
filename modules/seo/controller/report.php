@@ -23,7 +23,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->title(Core::_('Seo.report_title', Core_Entity::factory('Site', $this->_object->site_id)->name));
 
-		$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+		$oMainTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('admin_form.form_forms_tab_1'))
 			->name('main');
 		$this->addTab($oMainTab);
@@ -36,7 +36,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		->add($this->getField('datetime')
 			->caption(Core::_('Seo.end_datetime'))
 		)
-		->add(Core::factory('Admin_Form_Entity_Input')
+		->add(Admin_Form_Entity::factory('Input')
 			->caption(Core::_('Seo.count'))
 			->name('count')
 			->style('width: 150px')
@@ -47,71 +47,71 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				)
 			)
 		)
-		->add(Core::factory('Admin_Form_Entity_Checkbox')
+		->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.tcy'))
 			->name('tcy')
 			->value(1)
 		)
-		->add(Core::factory('Admin_Form_Entity_Checkbox')
+		->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.pr'))
 			->name('pr')
 			->value(1)
 		);
 
 		// Закладка обратных ссылок
-		$oLinksTab = Core::factory('Admin_Form_Entity_Tab')
+		$oLinksTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_links'))
 			->name('links');
 		$this->addTabAfter($oLinksTab, $oMainTab);
 
 		// Закладка обратных ссылок
-		$oLinksTab->add(Core::factory('Admin_Form_Entity_Checkbox')
+		$oLinksTab->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_links')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_links')
 				->value(1))
-			/*->add(Core::factory('Admin_Form_Entity_Checkbox')
+			/*->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yahoo'))
 				->name('yahoo_links')
 				->value(1))*/
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.bing'))
 				->name('bing_links')
 				->value(1));
 
 		// Закладка проиндексированных страниц
-		$oIndexedTab = Core::factory('Admin_Form_Entity_Tab')
+		$oIndexedTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_indexed'))
 			->name('indexed');
 		$this->addTabAfter($oIndexedTab, $oLinksTab);
 
 		// Закладка проиндексированных страниц
-		$oIndexedTab->add(Core::factory('Admin_Form_Entity_Checkbox')
+		$oIndexedTab->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_indexed')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_indexed')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yahoo'))
 				->name('yahoo_indexed')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.bing'))
 				->name('bing_indexed')
 				->value(1))
-			/*->add(Core::factory('Admin_Form_Entity_Checkbox')
+			/*->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.rambler'))
 				->name('rambler_indexed')
 				->value(1))*/;
 
 		// Закладка каталогов
-		$oCatalogTab = Core::factory('Admin_Form_Entity_Tab')
+		$oCatalogTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_catalog'))
 			->name('catalog');
 		$this->addTabAfter($oCatalogTab, $oIndexedTab);
@@ -124,7 +124,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->add($this->getField('mail_catalog')->value(1));
 
 		// Закладка счетчиков
-		$oCounterTab = Core::factory('Admin_Form_Entity_Tab')
+		$oCounterTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_counter'))
 			->name('counter');
 		$this->addTabAfter($oCounterTab, $oCatalogTab);
@@ -137,28 +137,28 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->add($this->getField('mail_counter')->value(1));
 
 		// Позиции в поисковых системах
-		$oPositionTab = Core::factory('Admin_Form_Entity_Tab')
+		$oPositionTab = Admin_Form_Entity::factory('Tab')
 			->caption('Позиции в поисковых системах')
 			->name('position');
 		$this->addTabAfter($oPositionTab, $oCounterTab);
 
-		$oPositionTab->add(Core::factory('Admin_Form_Entity_Checkbox')
+		$oPositionTab->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_position')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.rambler'))
 				->name('rambler_position')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_position')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yahoo'))
 				->name('yahoo_position')
 				->value(1))
-			->add(Core::factory('Admin_Form_Entity_Checkbox')
+			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.bing'))
 				->name('bing_position')
 				->value(1));
@@ -173,10 +173,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	protected function _addButtons()
 	{
 		// Кнопки
-		$oAdmin_Form_Entity_Buttons = new Admin_Form_Entity_Buttons();
+		$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');
 
 		// Кнопка "Отправить"
-		$oAdmin_Form_Entity_Button_Send = Core::factory('Admin_Form_Entity_Button')
+		$oAdmin_Form_Entity_Button_Send = Admin_Form_Entity::factory('Button')
 			->name('generate')
 			->class('applyButton')
 			->value(Core::_('Seo.generate'))
@@ -208,7 +208,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				ob_start();
 
 				// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
-				Core::factory('Admin_Form_Entity_Title')
+				Admin_Form_Entity::factory('Title')
 					->name($this->title)
 					->execute();
 

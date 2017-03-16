@@ -10,7 +10,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class User_Setting_Model extends Core_Entity{
+class User_Setting_Model extends Core_Entity
+{
 	/**
 	 * Disable markDeleted()
 	 * @var mixed
@@ -28,7 +29,11 @@ class User_Setting_Model extends Core_Entity{
 	 * Belongs to relations
 	 * @var array
 	 */
-	protected $_belongsTo = array(		'user' => array(),		'module' => array()	);
+	protected $_belongsTo = array(
+		'user' => array(),
+		'module' => array()
+	);
+
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
@@ -43,7 +48,7 @@ class User_Setting_Model extends Core_Entity{
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 		}
 	}
-	
+
 	/**
 	 * Get settings by module ID
 	 * @param int $module_id module ID
@@ -57,12 +62,30 @@ class User_Setting_Model extends Core_Entity{
 
 		return $this->findAll();
 	}
-	
+
 	/**
 	 * Get user settings
 	 * @param int $module_id module ID
 	 * @param int $type type
 	 * @param int $entity_id entity ID
 	 * @return Users_Setting
-	 */	public function getByModuleIdAndTypeAndEntityId($module_id, $type, $entity_id = 0)	{		$this->queryBuilder()			//->clear()			->where('module_id', '=', $module_id)			->where('type', '=', $type)
-			->where('entity_id', '=', $entity_id)			->limit(1);		$aUsers_Setting = $this->findAll();		if (isset($aUsers_Setting[0]))		{			return $aUsers_Setting[0];		}		return NULL;	}}
+	 */
+	public function getByModuleIdAndTypeAndEntityId($module_id, $type, $entity_id = 0)
+	{
+		$this->queryBuilder()
+			//->clear()
+			->where('module_id', '=', $module_id)
+			->where('type', '=', $type)
+			->where('entity_id', '=', $entity_id)
+			->limit(1);
+
+		$aUsers_Setting = $this->findAll();
+
+		if (isset($aUsers_Setting[0]))
+		{
+			return $aUsers_Setting[0];
+		}
+
+		return NULL;
+	}
+}

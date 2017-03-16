@@ -42,7 +42,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				// Добавляем вкладку условий доставки
 				$this->addTabAfter
 				(
-					$oConditionsTab = Core::factory('Admin_Form_Entity_Tab')
+					$oConditionsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Delivery_Condition.cond_of_delivery_tab'))
 						->name('Conditions'),
 					$oMainTab = $this->getTab('main')
@@ -52,7 +52,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 
 				$oAdditionalTab = $this->getTab('additional');
 
-				$oSeparator = new Admin_Form_Entity_Separator();
+				$oSeparator = Admin_Form_Entity::factory('Separator');
 
 				// Переносим поля на другую вкладку
 				$oMainTab
@@ -61,6 +61,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->moveAfter($oMinPriceField = $this->getField('min_price'), $oMaxWeightField, $oConditionsTab)
 					->moveAfter($oMaxPriceField = $this->getField('max_price'), $oMinPriceField, $oConditionsTab)
 					->moveAfter($oPriceField = $this->getField('price'), $oMaxPriceField, $oConditionsTab);
+					
 
 				// Настраиваем внешний вид
 				$oPriceField
@@ -82,7 +83,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					$this->getField('shop_currency_id')
 				);
 
-				$oCurrenciesSelect = new Admin_Form_Entity_Select();
+				$oCurrenciesSelect = Admin_Form_Entity::factory('Select');
 
 				// Создаем экземпляр контроллера магазина
 				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
@@ -110,7 +111,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				);
 
 				// Создаем поле налогов как выпадающий список
-				$oTaxSelect = new Admin_Form_Entity_Select();
+				$oTaxSelect = Admin_Form_Entity::factory('Select');
 
 				// Создаем экземпляр класса контроллера товара/группы
 				$Shop_Item_Controller_Edit = new Shop_Item_Controller_Edit($this->_Admin_Form_Action);
@@ -169,7 +170,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				$Shop_Delivery_Controller_Edit = new Shop_Delivery_Controller_Edit($this->_Admin_Form_Action);
 
 				// Создаем поле типов доставок как выпадающий список
-				$DeliverySelectField = Core::factory('Admin_Form_Entity_Select')
+				$DeliverySelectField = Admin_Form_Entity::factory('Select')
 					->name('shop_delivery_id')
 					->caption(Core::_('Shop_Delivery_Condition.shop_delivery_id'))
 					->style('width: 500px')
@@ -184,7 +185,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_delivery_condition_dir_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Delivery_Condition_Dir.parent_id'))
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_delivery_id))
 					->name('shop_delivery_condition_dir_id')
@@ -193,7 +194,9 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->filter(TRUE);
 
 				// Добавляем группу товаров
-				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
+				$oMainTab
+					->addAfter($oGroupSelect, $this->getField('name'))
+					->moveBefore($this->getField('delivery_time'), $oGroupSelect);
 
 				// Заголовок формы
 				$title = $this->_object->id
@@ -217,7 +220,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Delivery_Condition_Dir.parent_id'))
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_delivery_id))
 					->name('parent_id')
@@ -298,7 +301,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
 		// Создаем поле стран как выпадающий список
-		$CountriesSelectField = Core::factory('Admin_Form_Entity_Select')
+		$CountriesSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_id')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
 			->style('width: 300px')
@@ -320,7 +323,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		}
 
 		// Создаем поле местоположений как выпадающий список
-		$CountryLocationsSelectField = Core::factory('Admin_Form_Entity_Select')
+		$CountryLocationsSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_location_id')
 			->id('list2')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
@@ -335,7 +338,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		$tab->addAfter($CountryLocationsSelectField, $CountriesSelectField);
 
 		// Создаем поле городов как выпадающий список
-		$CountryLocationCitiesSelectField = Core::factory('Admin_Form_Entity_Select')
+		$CountryLocationCitiesSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_location_city_id')
 			->id('list3')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
@@ -351,7 +354,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		$tab->addAfter($CountryLocationCitiesSelectField, $CountryLocationsSelectField);
 
 		// Создаем поле районов как выпадающий список
-		$CountryLocationCityAreasSelectField = Core::factory('Admin_Form_Entity_Select')
+		$CountryLocationCityAreasSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_location_city_area_id')
 			->id('list4')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))

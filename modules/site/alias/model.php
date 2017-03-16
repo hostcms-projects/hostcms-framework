@@ -215,7 +215,7 @@ class Site_Alias_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event site_alias_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event site_alias.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

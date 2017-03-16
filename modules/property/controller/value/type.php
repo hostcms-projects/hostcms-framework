@@ -17,7 +17,7 @@ abstract class Property_Controller_Value_Type
 	 * @var Property_Model
 	 */
 	protected $_property = NULL;
-	
+
 	/**
 	 * Set property
 	 * @param Property_Model $oProperty property
@@ -37,7 +37,7 @@ abstract class Property_Controller_Value_Type
 	{
 		return $this->_modelName;
 	}
-	
+
 	/**
 	 * Get Property_Value as object
 	 * @return object
@@ -47,7 +47,7 @@ abstract class Property_Controller_Value_Type
 		$pluralName = Core_Inflection::getPlural($this->_modelName);
 		return $this->_property->$pluralName;
 	}
-	
+
 	/**
 	 * Get all values for entity
 	 * @param int $entityId entity ID
@@ -110,9 +110,10 @@ abstract class Property_Controller_Value_Type
 	 * Get Property_Value by value
 	 * @param string $value value
 	 * @param string $condition condition
+	 * @param boolean $bCache use cache
 	 * @return array
 	 */
-	public function getValuesByValue($value, $condition = '=')
+	public function getValuesByValue($value, $condition = '=', $bCache = TRUE)
 	{
 		$pluralName = Core_Inflection::getPlural($this->_modelName);
 
@@ -122,6 +123,6 @@ abstract class Property_Controller_Value_Type
 			->queryBuilder()
 			->where('value', $condition, $value);
 
-		return $oProperty_Values->findAll();
+		return $oProperty_Values->findAll($bCache);
 	}
 }

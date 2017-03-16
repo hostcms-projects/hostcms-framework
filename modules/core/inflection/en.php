@@ -271,4 +271,13 @@ class Core_Inflection_En extends Core_Inflection
 
 		return $word;
 	}
+	
+	/**
+	 * Number to str
+	 * @param float $float
+	 */
+	protected function _num2str($float)
+	{
+		return '_num2str is undefined';
+	}
 }

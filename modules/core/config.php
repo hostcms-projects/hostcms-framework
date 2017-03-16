@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Config
 {
@@ -40,9 +40,10 @@ class Core_Config
 	/**
 	 * Get config, e.g. 'Core_DataBase' requires modules/core/config/database.php
 	 * @param string $key
+	 * @param mixed $defaultValue
 	 * @return mixed Config or NULL
 	 */
-	public function get($key)
+	public function get($key, $defaultValue = NULL)
 	{
 		$key = strtolower($key);
 		$key = basename($key);
@@ -61,7 +62,7 @@ class Core_Config
 
 			$this->_values[$key] = is_file($path)
 				? require_once($path)
-				: NULL;
+				: $defaultValue;
 		}
 
 		return $this->_values[$key];

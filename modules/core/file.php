@@ -570,8 +570,8 @@ class Core_File
 
 		if (!is_file($file))
 		{
-			throw new Core_Exception("The file '%fileName' does not exist.",
-				array('%fileName' => Core_Exception::cutRootPath($fileName)));
+			throw new Core_Exception("The file '%file' does not exist.",
+				array('%file' => Core_Exception::cutRootPath($file)));
 		}
 
 		$fileName = str_replace(array("\r", "\n"), '', $fileName);
@@ -1000,12 +1000,14 @@ class Core_File
 
 			if (self::isValidExtension($small_image_name, $aCore_Config['availableExtension']))
 			{
+				self::upload($small_image_source, $small_image_target);
+
 				// Если не передан флаг ватермарка для маленькой картинки - то копируем ее до наложения ватермарка
 				if (!$small_image_watermark || $watermark_file_path == '')
 				{
 					if (self::isValidExtension($small_image_target, self::$resizeExtensions))
 					{
-						if (!Core_Image::instance()->resizeImage($small_image_source, $small_image_max_width, $small_image_max_height, $small_image_target, NULL, $small_image_preserve_aspect_ratio))
+						if (!Core_Image::instance()->resizeImage($small_image_target, $small_image_max_width, $small_image_max_height, $small_image_target, NULL, $small_image_preserve_aspect_ratio))
 						{
 							throw new Core_Exception(Core::_('Core.error_resize'));
 						}
@@ -1017,7 +1019,7 @@ class Core_File
 				// Применить ватермарк к малой картинке
 				else
 				{
-					$flag_success = Core_Image::instance()->addWatermark($small_image_source, $small_image_target, $watermark_file_path, $watermark_position_x, $watermark_position_y);
+					$flag_success = Core_Image::instance()->addWatermark($small_image_target, $small_image_target, $watermark_file_path, $watermark_position_x, $watermark_position_y);
 
 					if ($flag_success)
 					{

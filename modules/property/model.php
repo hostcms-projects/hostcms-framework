@@ -179,13 +179,14 @@ class Property_Model extends Core_Entity
 	 * Получить значение свойства объекта по значению в таблице значений
 	 * @param string $value значение
 	 * @param string $condition condition
+	 * @param boolean $bCache use cache
 	 * @return mixed array of objects or NULL
 	 */
-	public function getValuesByValue($value, $condition = '=')
+	public function getValuesByValue($value, $condition = '=', $bCache = TRUE)
 	{
 		return Property_Controller_Value::factory($this->type)
 			->setProperty($this)
-			->getValuesByValue($value, $condition);
+			->getValuesByValue($value, $condition, $bCache);
 	}
 
 	/**
@@ -314,23 +315,55 @@ class Property_Model extends Core_Entity
 	}
 
 	/**
+	 * Config
+	 * @var array
+	 */
+	protected $_config = array();
+
+	/**
+	 * Set config
+	 * @param array $config
+	 * @return self
+	 */
+	public function setConfig(array $config)
+	{
+		$this->_config = $config;
+		return $this;
+	}
+
+	/**
+	 * Get config
+	 * @return array
+	 */
+	public function getConfig()
+	{
+		return $this->_config;
+	}
+
+	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
+		$bIsList = $this->type == 3 && $this->list_id != 0 && Core::moduleIsActive('list');
+
+		$this->setConfig(
+			Core_Config::instance()->get('property_config', array()) + array('add_list_items' => TRUE)
+		);
+
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags();
 
 		// List
-		if ($this->type == 3 && $this->list_id != 0 && Core::moduleIsActive('list'))
+		if ($bIsList)
 		{
 			$this
 				->addEntity($this->List->clearEntities());
 
-			$this->List->addEntities(
+			$this->_config['add_list_items'] && $this->List->addEntities(
 				$this->List->List_Items->getAllByActive(1)
 			);
 		}

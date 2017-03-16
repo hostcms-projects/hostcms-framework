@@ -36,7 +36,7 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		parent::setObject($object);
 
-		$oSeparator = new Admin_Form_Entity_Separator();
+		$oSeparator = Admin_Form_Entity::factory('Separator');
 
 		$oMainTab = $this->getTab('main');
 
@@ -78,7 +78,7 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->style("width: 220px;");
 
 		// Добавляем новое поле типа файл
-		$oImageField = new Admin_Form_Entity_File();
+		$oImageField = Admin_Form_Entity::factory('File');
 
 		$oLargeFilePath = is_file($this->_object->getLargeFilePath())
 			? $this->_object->getLargeFileHref()

@@ -148,7 +148,7 @@ class Affiliate_Plan_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event affiliate_plan_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event affiliate_plan.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

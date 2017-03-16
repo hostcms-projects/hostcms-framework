@@ -35,7 +35,7 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем группу товаров
 				$oMainTab->delete($this->getField('constant_dir_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Constant_Dir.parent_id'))
 					->options(array(' … ') + $this->fillDir(0))
 					->name('constant_dir_id')
@@ -70,7 +70,7 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Constant_Dir.parent_id'))
 					->options(array(' … ') + $this->fillDir(0))
 					->name('parent_id')

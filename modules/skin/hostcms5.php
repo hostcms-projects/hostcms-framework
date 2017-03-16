@@ -150,7 +150,7 @@ class Skin_Hostcms5 extends Core_Skin
 <link rel="shortcut icon" href="/admin/favicon.ico"></link>
 <?php $this->showHead()?>
 </head>
-<body class="hostcmsWindow">
+<body class="hostcmsWindow backendBody">
 <div id="header">
 <div class="left_box">
 
@@ -626,8 +626,12 @@ if (Core_Auth::logged())
 					$oHOSTCMS_UPDATE_NUMBER = Core_Entity::factory('Constant')->getByName('HOSTCMS_UPDATE_NUMBER');
 					$update_id = is_null($oHOSTCMS_UPDATE_NUMBER) ? 0 : $oHOSTCMS_UPDATE_NUMBER->value;
 
-					$domain = $oSite->getCurrentAlias();
+					$oSite_Alias = $oSite->getCurrentAlias();
 
+					$domain = $oSite_Alias
+						? $oSite_Alias->name
+						: '';
+					
 					if (!$update->GetUpdate(array (
 							'login' => $login,
 							'contract' => $contract,
@@ -641,7 +645,7 @@ if (Core_Auth::logged())
 							'update_server' => HOSTCMS_UPDATE_SERVER
 					)))
 					{
-						Core_Message::show(sprintf($GLOBALS['MSG_update']['error_write_file_update'], $update_file), 'error');
+						Core_Message::show(Core::_('Update.error_write_file_update', $update_file), 'error');
 					}
 				}
 
@@ -937,5 +941,23 @@ if (Core_Auth::logged())
 
 		?></tr></table><?php
 		return $this;
+	}
+
+	/**
+	 * Get message.
+	 *
+	 * <code>
+	 * echo Core_Message::get(Core::_('constant.name'));
+	 * echo Core_Message::get(Core::_('constant.message', 'value1', 'value2'));
+	 * </code>
+	 * @param $message Message text
+	 * @param $type Message type
+	 * @see Core_Message::show()
+	 * @return string
+	 */
+	public function getMessage($message, $type = 'message')
+	{
+		$return = '<div id="' . $type . '">' . $message . '</div>';
+		return $return;
 	}
 }

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Socket extends Core_Http
 {
@@ -31,13 +31,16 @@ class Core_Http_Socket extends Core_Http
 		}
 
 		$out = "{$this->_method} {$path}{$query} HTTP/1.0\r\n";
-		$out .= "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7\r\n";
-		$out .= "Accept-Language: ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3\r\n";
 		$out .= "Content-Type: {$this->_contentType}\r\n";
-		$out .= "Keep-Alive: 300\r\n";
 		$out .= "Referer: {$this->_referer}\r\n";
 		$out .= "User-Agent: {$this->_userAgent}\r\n";
-		$out .= "Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,**;q=0.5\r\n";
+
+		// Additional headers
+		foreach ($this->_additionalHeaders as $name => $value)
+		{
+			$out .= "{$name}: {$value}\r\n";
+		}
+
 		$out .= "Host: {$host}\r\n";
 
 		$bIsPost = count($this->_data) > 0;
@@ -45,7 +48,7 @@ class Core_Http_Socket extends Core_Http
 		if ($bIsPost)
 		{
 			$aData = array();
-			foreach($this->_data as $key => $value)
+			foreach ($this->_data as $key => $value)
 			{
 				$aData[] = urlencode($key) . '=' . urlencode($value);
 			}

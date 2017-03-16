@@ -261,8 +261,8 @@ class Lib_Model extends Core_Entity
 
 	/**
 	 * Executes the business logic.
-	 * @hostcms-event lib_model.onBeforeExecute
-	 * @hostcms-event lib_model.onAfterExecute
+	 * @hostcms-event lib.onBeforeExecute
+	 * @hostcms-event lib.onAfterExecute
 	 */
 	public function execute()
 	{

@@ -223,6 +223,12 @@ class Shop_Controller_Show extends Core_Controller
 			'page' => '\d+',
 			'producer' => '\d+',
 		);
+
+		if ($this->favorite && isset($_SESSION))
+		{
+			$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
+			count($hostcmsFavorite) && $this->addCacheSignature('hostcmsFavorite=' . implode(',', $hostcmsFavorite));
+		}
 	}
 
 	/**
@@ -629,7 +635,7 @@ class Shop_Controller_Show extends Core_Controller
 			foreach ($aProperty_Dirs as $oProperty_Dir)
 			{
 				$oProperty_Dir->clearEntities();
-				$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir->clearEntities();
+				$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
 			}
 
 			// Список свойств товаров
@@ -972,7 +978,7 @@ class Shop_Controller_Show extends Core_Controller
 			// страница с 404 ошибкой не найдена
 			if (is_null($oStructure->id))
 			{
-				throw new Core_Exception('Group not found');
+				throw new Core_Exception('Structure not found');
 			}
 
 			if ($oStructure->type == 0)
@@ -1413,6 +1419,71 @@ class Shop_Controller_Show extends Core_Controller
 				->queryBuilder()
 				->where('shop_groups.active', '=', $this->groupsActivity == 'inactive' ? 0 : 1);
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Add minimum and maximum price
+	 * @return self
+	 */
+	public function addMinMaxPrice()
+	{
+		$oShop = $this->getEntity();
+
+		$iCurrentShopGroup = intval($this->group);
+
+		$aShop_Currencies = Core_Entity::factory('Shop_Currency')->findAll();
+
+		$query_currency_switch = 'price';
+		foreach ($aShop_Currencies as $oShop_Currency)
+		{
+			// Получаем коэффициент пересчета для каждой валюты
+			$currency_coefficient = Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+				$oShop_Currency, $oShop->Shop_Currency
+			);
+
+			$query_currency_switch = "IF (`shop_items`.`shop_currency_id` = '{$oShop_Currency->id}', IF (shop_discounts.percent, price * (100 - shop_discounts.percent) * {$currency_coefficient} / 100, shop_items.price * {$currency_coefficient}), {$query_currency_switch})";
+		}
+
+		$current_date = date('Y-m-d H:i:s');
+
+		$oSubMinMaxQueryBuilder = Core_QueryBuilder::select(array(Core_QueryBuilder::expression($query_currency_switch), 'absolute_price'))
+			->from('shop_items')
+			->where('shop_items.shop_id', '=', $oShop->id)
+			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
+			->leftJoin('shop_item_discounts', 'shop_items.id', '=', 'shop_item_discounts.shop_item_id')
+			->leftJoin('shop_discounts', 'shop_item_discounts.shop_discount_id', '=', 'shop_discounts.id', array(
+				array('AND (' => array('shop_discounts.end_datetime', '>=', $current_date)),
+				array('OR' => array('shop_discounts.end_datetime', '=', '0000-00-00 00:00:00')),
+				array('AND' => array('shop_discounts.start_datetime', '<=', $current_date)),
+				array(')' => NULL)
+			))
+			->groupBy('shop_items.id');
+
+		$oMinMaxQueryBuilder = Core_QueryBuilder::select(
+			array(Core_QueryBuilder::expression('MIN(t.absolute_price)'), 'min'),
+			array(Core_QueryBuilder::expression('MAX(t.absolute_price)'), 'max')
+		)
+		->from(array($oSubMinMaxQueryBuilder, 't'));
+
+		$rows = $oMinMaxQueryBuilder->asAssoc()->execute()->current();
+
+		$oShop_Controller = Shop_Controller::instance();
+
+		$this->addEntity(
+			Core::factory('Core_Xml_Entity')
+				->name('min_price')
+				->value(
+					round($rows['min'])
+				)
+		)->addEntity(
+			Core::factory('Core_Xml_Entity')
+				->name('max_price')
+				->value(
+					round($rows['max'])
+				)
+		);
 
 		return $this;
 	}

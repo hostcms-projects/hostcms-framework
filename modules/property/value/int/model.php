@@ -66,9 +66,30 @@ class Property_Value_Int_Model extends Core_Entity
 	protected $_tagName = 'property_value';
 
 	/**
+	 * Module config
+	 */
+	static public $aConfig = NULL;
+
+	/**
+	 * Constructor.
+	 * @param string $primaryKey
+	 */
+	public function __construct($primaryKey = NULL)
+	{
+		parent::__construct($primaryKey);
+
+		if (is_null(self::$aConfig))
+		{
+			self::$aConfig = Core_Config::instance()->get('property_config', array()) + array(
+				'recursive_properties' => TRUE,
+			);
+		}
+	}
+
+	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_value_int_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_int.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -112,7 +133,9 @@ class Property_Value_Int_Model extends Core_Entity
 				$aItemProperties = $oInformationsystem_Item_Property_List->Properties->findAll();
 				foreach ($aItemProperties as $oItemProperty)
 				{
-					($oItemProperty->type != 5 || $oItemProperty->informationsystem_id != $oProperty->informationsystem_id) && $aTmp[] = $oItemProperty->id;
+					($oItemProperty->type != 5
+						|| self::$aConfig['recursive_properties'] && $oItemProperty->informationsystem_id != $oProperty->informationsystem_id
+					) && $aTmp[] = $oItemProperty->id;
 				}
 
 				$oInformationsystem_Item = $this->Informationsystem_Item;

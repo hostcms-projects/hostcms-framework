@@ -85,16 +85,16 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 	/**
 	 * Tab
-	 * @var Admin_Form_Entity_Tab
+	 * @var Skin_Default_Admin_Form_Entity_Tab
 	 */
 	protected $_tab = NULL;
 
 	/**
 	 * Set tab
-	 * @param Admin_Form_Entity_Tab $tab tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $tab tab
 	 * @return self
 	 */
-	public function setTab(Admin_Form_Entity_Tab $tab)
+	public function setTab(Skin_Default_Admin_Form_Entity_Tab $tab)
 	{
 		$this->_tab = $tab;
 		return $this;
@@ -127,7 +127,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->class('pointer left5px img_line')
 			->onclick("{$function}('{$windowId}', '{$oProperty->id}')")
 			->execute();
-		$oAdmin_Form_Entity_Code = Core::factory('Admin_Form_Entity_Code')->html(ob_get_clean());
+		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code')->html(ob_get_clean());
 
 		return $oAdmin_Form_Entity_Code;
 	}
@@ -147,7 +147,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->onclick($onclick)
 			->execute();
 
-		$oAdmin_Form_Entity_Code = Core::factory('Admin_Form_Entity_Code')
+		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code')
 			->html(ob_get_clean());
 
 		return $oAdmin_Form_Entity_Code;
@@ -179,7 +179,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 		$aProperties = $oProperties->findAll();
 
-		$oAdmin_Form_Entity_Section = Core::factory('Admin_Form_Entity_Section')
+		$oAdmin_Form_Entity_Section = Admin_Form_Entity::factory('Section')
 			->caption($parent_id == 0
 				? Core::_('Property_Dir.main_section')
 				: Core_Entity::factory('Property_Dir', $parent_id)->name
@@ -216,7 +216,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						case 10: // Hidden field
 						case 11: // Float
 						default:
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Input')
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input')
 								->style('width: 340px');
 						break;
 
@@ -257,7 +257,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								$smallImage['preserve_aspect_ratio_checkbox_checked'] = $this->linkedObject->preserveAspectRatioOfSmallImage();
 							}
 
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_File')
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('File')
 								->style('width: 340px')
 								->largeImage($largeImage)
 								->smallImage($smallImage);
@@ -276,7 +276,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 									$aOptions[$oListItem->id] = $oListItem->value;
 								}
 
-								$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Select')
+								$oAdmin_Form_Entity = Admin_Form_Entity::factory('Select')
 									->options($aOptions)
 									->style('width: 340px');
 
@@ -285,22 +285,24 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						break;
 
 						case 4: // Textarea
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Textarea')
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Textarea')
 								->style('width: 340px');
 						break;
 
 						case 6: // Wysiwyg
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Textarea')
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Textarea')
 								->wysiwyg(TRUE)
 								->template_id($this->template_id);
 						break;
 
 						case 7: // Checkbox
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Checkbox');
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Checkbox');
+
+							count($aProperty_Values) && $oAdmin_Form_Entity->postingUnchecked(TRUE);
 						break;
 
 						case 8: // Date
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Date');
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Date');
 						break;
 
 						case 9: // Datetime
@@ -412,7 +414,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				case 5: // ИС
 
 					// Директории
-					$oAdmin_Form_Entity_InfGroups = Core::factory('Admin_Form_Entity_Select')
+					$oAdmin_Form_Entity_InfGroups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
 						->style('width: 340px')
 						->divAttr(array(
@@ -421,7 +423,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						));
 
 					// Элементы
-					$oAdmin_Form_Entity_InfItems = Core::factory('Admin_Form_Entity_Select')
+					$oAdmin_Form_Entity_InfItems = Admin_Form_Entity::factory('Select')
 						->style('width: 340px')
 						->name("property_{$oProperty->id}[]")
 						->value($oProperty->default_value)
@@ -615,6 +617,13 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 					// New values of property
 					$aNewValue = Core_Array::getPost("property_{$oProperty->id}", array());
+
+					// Checkbox, значений раньше не было и не пришло новых значений
+					if ($oProperty->type == 7 && count($aProperty_Values) == 0
+						&& is_array($aNewValue) && !count($aNewValue))
+					{
+						$aNewValue = array(0);
+					}
 
 					// New values of property
 					if (is_array($aNewValue))
@@ -850,14 +859,14 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			if ($bSmallImageIsCorrect
 				&& Core_File::isValidExtension($aSmallFileData['name'], $aCore_Config['availableExtension']))
 			{
-				// Для инфогруппы ранее задано изображение
+				// задано изображение
 				if ($oFileValue->file != '')
 				{
 					// Существует ли большое изображение
 					$param['large_image_isset'] = TRUE;
 					$create_large_image = FALSE;
 				}
-				else // Для информационной группы ранее не задано большое изображение
+				else // ранее не было задано большое изображение
 				{
 					$create_large_image = empty($large_image);
 				}

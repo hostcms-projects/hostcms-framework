@@ -32,7 +32,7 @@ class Shop_Item_Digital_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 		$oMainTab = $this->getTab('main');
 
-		$oImageField = new Admin_Form_Entity_File();
+		$oImageField = Admin_Form_Entity::factory('File');
 
 		$sFilePath = is_file($this->_object->getFullFilePath()) ? $this->_object->getFullFilePath() : '';
 

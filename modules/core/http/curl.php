@@ -32,10 +32,7 @@ class Core_Http_Curl extends Core_Http
 		}
 		else
 		{
-			if (isset($query))
-			{
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
-			}
+			count($this->_data) && curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_data);
 
 			curl_setopt($curl, CURLOPT_POST, TRUE);
 			curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
@@ -74,7 +71,7 @@ class Core_Http_Curl extends Core_Http
 				$rch = curl_copy_handle($curl);
 				curl_setopt($rch, CURLOPT_HEADER, TRUE);
 				curl_setopt($rch, CURLOPT_NOBODY, TRUE);
-				curl_setopt($rch, CURLOPT_FORBID_REUSE, FALSE);
+				curl_setopt($rch, CURLOPT_FORBID_REUSE, TRUE);
 				curl_setopt($rch, CURLOPT_RETURNTRANSFER, TRUE);
 				do {
 					curl_setopt($rch, CURLOPT_URL, $newurl);
@@ -113,6 +110,17 @@ class Core_Http_Curl extends Core_Http
 				}
 				curl_setopt($curl, CURLOPT_URL, $newurl);
 			}
+		}
+
+		// Additional headers
+		if (count($this->_additionalHeaders))
+		{
+			$aTmp = array();
+			foreach ($this->_additionalHeaders as $name => $value)
+			{
+				$aTmp[] = "{$name}: {$value}";
+			}
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $aTmp);
 		}
 
 		// Get the target contents

@@ -182,7 +182,9 @@ class Core_Servant_Properties
 		{
 			foreach ($this->_allowedProperties as $key => $value)
 			{
-				$return[] = $key . '=' . (is_array($this->$value) ? implode('', $this->$value): $this->$value);
+				$return[] = $key . '=' . (is_array($this->$value)
+					? Core_Array::implode('', $this->$value)
+					: $this->$value);
 			}
 
 			return implode(",", $return);

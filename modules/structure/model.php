@@ -618,8 +618,8 @@ class Structure_Model extends Core_Entity
 
 	/**
 	 * Executes the business logic.
-	 * @hostcms-event structure_model.onBeforeExecute
-	 * @hostcms-event structure_model.onAfterExecute
+	 * @hostcms-event structure.onBeforeExecute
+	 * @hostcms-event structure.onAfterExecute
 	 */
 	public function execute()
 	{
@@ -652,7 +652,7 @@ class Structure_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event structure_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event structure.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -694,10 +694,14 @@ class Structure_Model extends Core_Entity
 	/**
 	 * Search indexation
 	 * @return Search_Page
+	 * @hostcms-event structure.onBeforeIndexing
+	 * @hostcms-event structure.onAfterIndexing
 	 */
 	public function indexing()
 	{
 		$oSearch_Page = Core_Entity::factory('Search_Page');
+
+		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
 		$oSearch_Page->text = $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path;
 
@@ -783,6 +787,9 @@ class Structure_Model extends Core_Entity
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 0; // search_page_module_value_type
 		$oSearch_Page->module_value_id = 0; // search_page_module_value_id
+
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+
 		$oSearch_Page->save();
 
 		Core_QueryBuilder::delete('search_page_siteuser_groups')
@@ -824,23 +831,31 @@ class Structure_Model extends Core_Entity
 
 	/**
 	 * Get related object by type
+	 * @hostcms-event structure.onBeforeGetRelatedObjectByType
+	 * @hostcms-event structure.onAfterGetRelatedObjectByType
 	 * @return object
 	 */
 	public function getRelatedObjectByType()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeGetRelatedObjectByType', $this);
+
 		// Статичная страница
 		if ($this->type == 0)
 		{
-			return $this->Document->Document_Versions->getCurrent();
+			$return = $this->Document->Document_Versions->getCurrent();
 		}
 		elseif ($this->type == 1)
 		{
-			return $this;
+			$return = $this;
 		}
 		else
 		{
 			// Типовая динамическая страница
-			return $this->Lib;
+			$return = $this->Lib;
 		}
+
+		Core_Event::notify($this->_modelName . '.onAfterGetRelatedObjectByType', $this, array(& $return));
+
+		return $return;
 	}
 }

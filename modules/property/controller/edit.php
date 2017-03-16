@@ -44,7 +44,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -58,7 +58,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$this->_object->property_dir_id = Core_Array::getGet('property_dir_id');
 				}
 
-				$oFormatTab = Core::factory('Admin_Form_Entity_Tab')
+				$oFormatTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Property.tab_format'))
 					->name('Format');
 
@@ -103,7 +103,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Селектор с группой
-				$oSelect_Type = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Type = Admin_Form_Entity::factory('Select')
 					->options($aListTypes)
 					->name('type')
 					->value($this->_object->type)
@@ -140,7 +140,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oList_Controller_Edit = new List_Controller_Edit($this->_Admin_Form_Action);
 					// Селектор с группой
-					$oSelect_Lists = Core::factory('Admin_Form_Entity_Select')
+					$oSelect_Lists = Admin_Form_Entity::factory('Select')
 						->options(
 							array(' … ') + $oList_Controller_Edit->fillLists(CURRENT_SITE)
 						)
@@ -162,7 +162,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oInformationsystem_Controller_Edit = new Informationsystem_Controller_Edit($this->_Admin_Form_Action);
 					// Селектор с группой
-					$oSelect_Informationsystems = Core::factory('Admin_Form_Entity_Select')
+					$oSelect_Informationsystems = Admin_Form_Entity::factory('Select')
 						->options(
 							array(' … ') + $oInformationsystem_Controller_Edit->fillInformationsystems(CURRENT_SITE)
 						)
@@ -192,12 +192,12 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->style('width: 220px');
 
 				$oMainTab
-					->addAfter(Core::factory('Admin_Form_Entity_Separator'), $this->getField('sorting'));
+					->addAfter(Admin_Form_Entity::factory('Separator'), $this->getField('sorting'));
 
 				$this->getField('default_value')
 					->divAttr(array('id' => 'default_value'));
 
-				$oDefault_Value_Date = Core::factory('Admin_Form_Entity_Date')
+				$oDefault_Value_Date = Admin_Form_Entity::factory('Date')
 					->value($this->_object->default_value)
 					->name('default_value_date')
 					->caption(Core::_('Property.default_value'))
@@ -206,7 +206,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab
 					->addAfter($oDefault_Value_Date, $this->getField('default_value'));
 
-				$oDefault_Value_DateTime = Core::factory('Admin_Form_Entity_DateTime')
+				$oDefault_Value_DateTime = Admin_Form_Entity::factory('DateTime')
 					->value($this->_object->default_value)
 					->name('default_value_datetime')
 					->caption(Core::_('Property.default_value'))
@@ -215,7 +215,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab
 					->addAfter($oDefault_Value_DateTime, $this->getField('default_value'));
 
-				$oDefault_Value_Checkbox = Core::factory('Admin_Form_Entity_Checkbox')
+				$oDefault_Value_Checkbox = Admin_Form_Entity::factory('Checkbox')
 					->value($this->_object->default_value)
 					->caption(Core::_('Property.default_value'))
 					->name('default_value_checked')
@@ -251,7 +251,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('hide_small_image'), $oFormatTab)
 					;
 
-				$oAdmin_Form_Entity_Code = new Admin_Form_Entity_Code();
+				$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 				$oAdmin_Form_Entity_Code->html(
 					"<script>ShowPropertyRows('{$windowId}', " . intval($this->_object->type) . ")</script>"
 				);

@@ -41,13 +41,8 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 
-		/*$oMainTab->move(
-			$this->getField('timestamp')
-			//->divAttr(array('style' => 'display: none'))
-			, $oAdditionalTab
-		);*/
-
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
+		$oSelect_Templates = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -56,11 +51,11 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					? Core::_('Template.title_edit', $this->_object->name)
 					: Core::_('Template.title_add');
 
-				$oTemplateTab = Core::factory('Admin_Form_Entity_Tab')
+				$oTemplateTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Template.tab_1'))
 					->name('Template');
 
-				$oCssTab = Core::factory('Admin_Form_Entity_Tab')
+				$oCssTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Template.tab_2'))
 					->name('Css');
 
@@ -86,10 +81,28 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oSelect_Dirs, $this->getField('name')
 				);
 
+				// Удаляем стандартный <input>
+				$oAdditionalTab->delete(
+					 $this->getField('template_id')
+				);
+
+				// Селектор с родительским макетом
+				$oSelect_Templates
+					->options(
+						array(' … ') + $this->fillTemplateParent()
+					)
+					->name('template_id')
+					->value($this->_object->template_id)
+					->caption(Core::_('Template.template_id'));
+
+				$oMainTab->addAfter(
+					$oSelect_Templates, $oSelect_Dirs
+				);
+
 				$this->getField('sorting')
 					->style('width: 220px');
 
-				$oTemplate_Textarea = new Admin_Form_Entity_Textarea();
+				$oTemplate_Textarea = Admin_Form_Entity::factory('Textarea');
 
 				$oTemplate_Textarea
 					->value(
@@ -102,7 +115,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oTemplateTab->add($oTemplate_Textarea);
 
-				$oCss_Textarea = new Admin_Form_Entity_Textarea();
+				$oCss_Textarea = Admin_Form_Entity::factory('Textarea');
 
 				$oCss_Textarea
 					->value(
@@ -240,6 +253,44 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$aReturn[$childrenDir->id] = str_repeat('  ', $iLevel) . $childrenDir->name;
 					$aReturn += $this->fillTemplateDir($childrenDir->id, $bExclude, $iLevel + 1);
+				}
+			}
+		}
+
+		return $aReturn;
+	}
+
+	/**
+	 * Create visual tree of the directories
+	 * @param int $iTemplateParentId parent template ID
+	 * @param boolean $bExclude exclude template ID
+	 * @param int $iLevel current nesting level
+	 * @return array
+	 */
+	public function fillTemplateParent($iTemplateParentId = 0, $bExclude = FALSE, $iLevel = 0)
+	{
+		$iTemplateParentId = intval($iTemplateParentId);
+		$iLevel = intval($iLevel);
+
+		$oTemplate_Parent = Core_Entity::factory('Template', $iTemplateParentId);
+
+		$aReturn = array();
+
+		// Дочерние макеты
+		$childrenTemplates = $oTemplate_Parent->Templates;
+		$childrenTemplates->queryBuilder()
+			->where('site_id', '=', CURRENT_SITE);
+
+		$childrenTemplates = $childrenTemplates->findAll();
+
+		if (count($childrenTemplates))
+		{
+			foreach ($childrenTemplates as $childrenTemplate)
+			{
+				if ($bExclude != $childrenTemplate->id)
+				{
+					$aReturn[$childrenTemplate->id] = str_repeat('  ', $iLevel) . $childrenTemplate->name;
+					$aReturn += $this->fillTemplateParent($childrenTemplate->id, $bExclude, $iLevel + 1);
 				}
 			}
 		}

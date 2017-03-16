@@ -530,7 +530,7 @@ class Core
 	 */
 	static public function httpsUses()
 	{
-		return Core_Array::get($_SERVER, 'SERVER_PORT') == 443 || strtolower(Core_Array::get($_SERVER, 'HTTPS')) == 'on';
+		return Core_Array::get($_SERVER, 'SERVER_PORT') == 443 || strtolower(Core_Array::get($_SERVER, 'HTTPS')) == 'on' || strtolower(Core_Array::get($_SERVER, 'HTTP_X_FORWARDED_PROTO')) == 'https';
 	}
 
 	/**

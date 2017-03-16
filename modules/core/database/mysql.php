@@ -178,7 +178,7 @@ class Core_DataBase_Mysql extends Core_DataBase
 				mysql_errno($this->_connection));
 		}
 
-		return $escapedString;
+		return "'" . $escapedString . "'";
 	}
 
 	/**

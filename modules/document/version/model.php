@@ -61,8 +61,8 @@ class Document_Version_Model extends Core_Entity
 	/**
 	 * Show document version.
 	 *
-	 * @hostcms-event document_version_model.onBeforeExecute
-	 * @hostcms-event document_version_model.onAfterExecute
+	 * @hostcms-event document_version.onBeforeExecute
+	 * @hostcms-event document_version.onAfterExecute
 	 * <code>
 	 * Core_Entity::factory('Document', 123)->Document_Versions->getCurrent()->execute();
 	 * </code>

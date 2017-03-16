@@ -28,7 +28,7 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$this->getField('level')
 			->divAttr(array('style' => 'float: left'))
@@ -50,7 +50,7 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 			->divAttr(array('style' => 'float: left'))
 			->style('width: 100px;');
 
-		$oTypeField = new Admin_Form_Entity_Select();
+		$oTypeField = Admin_Form_Entity::factory('Select');
 		$oTypeField
 			->name('type')
 			->class('large')
@@ -69,7 +69,7 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 			$this->getField('affiliate_plan_id')
 		);
 
-		$oAffiliatePlanField = new Admin_Form_Entity_Select();
+		$oAffiliatePlanField = Admin_Form_Entity::factory('Select');
 		$oAffiliatePlanField
 			->name('affiliate_plan_id')
 			->caption(Core::_('Affiliate_Plan_Level.affiliate_plan_id'))

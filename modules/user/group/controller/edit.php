@@ -33,7 +33,7 @@ class User_Group_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oUser_Controller_Edit = new User_Controller_Edit($this->_Admin_Form_Action);
 		
 		// Селектор с сайтами
-		$oSelect_Sites = new Admin_Form_Entity_Select();
+		$oSelect_Sites = Admin_Form_Entity::factory('Select');
 		$oSelect_Sites
 			->options($oUser_Controller_Edit->fillSites())
 			->name('site_id')

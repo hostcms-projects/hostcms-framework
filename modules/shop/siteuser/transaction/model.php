@@ -115,7 +115,7 @@ class Shop_Siteuser_Transaction_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_siteuser_transaction_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_siteuser_transaction.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

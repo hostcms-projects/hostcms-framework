@@ -32,7 +32,7 @@ class Shop_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$this->getField('start_datetime')->divAttr(array('style' => 'float: left; width: 150px'));
 		$oEnd_Time = $this->getField('end_datetime');
 		$oEnd_Time->divAttr(array('style' => 'float: left; width: 150px'));
-		$this->getTab('main')->addAfter(new Admin_Form_Entity_Separator(), $oEnd_Time);
+		$this->getTab('main')->addAfter(Admin_Form_Entity::factory('Separator'), $oEnd_Time);
 		$this->getField('percent')->divAttr(array('style' => 'width: 150px'));
 		
 		$title = $this->_object->id

@@ -567,7 +567,7 @@ class Informationsystem_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event informationsystem_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event informationsystem.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

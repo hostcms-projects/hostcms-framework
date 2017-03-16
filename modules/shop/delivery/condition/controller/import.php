@@ -48,7 +48,7 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 
 			// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
 			array_unshift($this->_children,
-				Core::factory('Admin_Form_Entity_Title')
+				Admin_Form_Entity::factory('Title')
 					->name($this->title)
 				);
 
@@ -161,6 +161,9 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 						case 12:
 							$oShopDeliveryCondition->description = $data;
 						break;
+						case 13:
+							$oShopDeliveryCondition->marking = $data;
+						break;
 						default:
 					}
 				}
@@ -187,21 +190,21 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 		parent::setObject($object);
 
 		// Очищаем основную вкладку
-		$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+		$oMainTab = Admin_Form_Entity::factory('Tab')
 				->caption('Main')
 				->name('main');
 
 		$this->addTab($oMainTab);
 
 		// Очищаем дополнительную вкладку
-		$oAdditionalTab = Core::factory('Admin_Form_Entity_Tab')
+		$oAdditionalTab = Admin_Form_Entity::factory('Tab')
 				->caption('Additional')
 				->name('additional');
 
 		$this->addTab($oAdditionalTab);
 
 		// Добавляем поле типа "Файл"
-		$oCSVFileField = Core::factory('Admin_Form_Entity_File')
+		$oCSVFileField = Admin_Form_Entity::factory('File')
 			->caption(Core::_("Shop_Delivery_Condition.import_price_list_file_type"))
 			->style("width: 400px;")
 			->name("csvfile")
@@ -224,10 +227,10 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 	protected function _addButtons()
 	{
 		// Кнопки
-		$oAdmin_Form_Entity_Buttons = new Admin_Form_Entity_Buttons();
+		$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');
 
 		// Кнопка "Отправить"
-		$oAdmin_Form_Entity_Button_Send = Core::factory('Admin_Form_Entity_Button')
+		$oAdmin_Form_Entity_Button_Send = Admin_Form_Entity::factory('Button')
 			->name('doImport')
 			->class('applyButton')
 			->value(Core::_('Shop_Delivery_Condition.import_button'))

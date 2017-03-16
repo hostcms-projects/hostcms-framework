@@ -25,7 +25,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -57,7 +57,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oSelect_Dirs, $this->getField('name')
 				);
 
-				$oTextarea_Xsl = new Admin_Form_Entity_Textarea();
+				$oTextarea_Xsl = Admin_Form_Entity::factory('Textarea');
 
 				$oTextarea_Xsl
 					->value(
@@ -73,7 +73,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab->addAfter($oTextarea_Xsl, $oSelect_Dirs);
 
 				// Объект вкладки 'Комментарий'
-				$oDescriptionTab = Core::factory('Admin_Form_Entity_Tab')
+				$oDescriptionTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Xsl.tab2'))
 					->name('tab_xsl_description');
 

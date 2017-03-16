@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Скидки от суммы заказа',
@@ -26,6 +26,7 @@ return array(
 	'shop_currency_id' => "<acronym title=\"Валюта цены\">Валюта</acronym>",
 	'order_discount_case_and' => 'И',
 	'order_discount_case_or' => 'ИЛИ',
+	'order_discount_case_accumulative' => 'Накопительная',
 	'min_count' => '<acronym title="Начальный интервал количества товара в корзине">Начальный интервал кол-ва</acronym>',
 	'max_count' => '<acronym title="Конечный интервал количества товара в корзине">Конечный интервал кол-ва</acronym>',
 	'form_edit_affiliate_values_type_percent' => 'Процент',

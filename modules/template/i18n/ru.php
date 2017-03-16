@@ -5,7 +5,7 @@
  * @package HostCMS 6\Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Макеты сайта',
@@ -23,7 +23,7 @@ return array(
 	'template_dir_id' => '<acronym title="Раздел макетов, которой принадлежит макет">Раздел макетов</acronym>',
 	'sorting' => '<acronym title="Поле, по которому производится сортировка">Сортировка</acronym>',
 	'site_id' => 'Идентификатор сайта',
-	'template_id' => 'Идентификатор родительского макета',
+	'template_id' => 'Родительский макет',
 	'template' => '<acronym title="Код макета">Макет</acronym>',
 	'css' => '<acronym title="Описание стилей">CSS</acronym>',
 	'copy_success' => 'Макет успешно скопирован!',

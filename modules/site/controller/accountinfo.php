@@ -21,7 +21,7 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 	{
 		parent::setObject($object);
 
-		$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+		$oMainTab = Admin_Form_Entity::factory('Tab')
 				->caption('Main')
 				->name('main');
 
@@ -30,7 +30,7 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 		$this->title(Core::_('Site.accountinfo_title'));
 
 		$oMainTab->add(
-			Core::factory('Admin_Form_Entity_Input')
+			Admin_Form_Entity::factory('Input')
 				->caption(Core::_("Site.accountinfo_login"))
 				->style("width: 400px;")
 				->name("HOSTCMS_USER_LOGIN")
@@ -39,7 +39,7 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 					: ''
 				)
 		)->add(
-			Core::factory('Admin_Form_Entity_Input')
+			Admin_Form_Entity::factory('Input')
 				->caption(Core::_("Site.accountinfo_contract_number"))
 				->style("width: 400px;")
 				->name("HOSTCMS_CONTRACT_NUMBER")
@@ -48,7 +48,7 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 					: ''
 				)
 		)->add(
-			Core::factory('Admin_Form_Entity_Input')
+			Admin_Form_Entity::factory('Input')
 				->caption(Core::_("Site.accountinfo_pin_code"))
 				->style("width: 400px;")
 				->name("HOSTCMS_PIN_CODE")
@@ -93,13 +93,13 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 			$oConstantPin->active = 1;
 		}
 
-		$oConstantLogin->value = Core_Array::getPost('HOSTCMS_USER_LOGIN');
+		$oConstantLogin->value = trim(Core_Array::getPost('HOSTCMS_USER_LOGIN'));
 		$oConstantLogin->save();
 
-		$oConstantNumber->value = Core_Array::getPost('HOSTCMS_CONTRACT_NUMBER');
+		$oConstantNumber->value = trim(Core_Array::getPost('HOSTCMS_CONTRACT_NUMBER'));
 		$oConstantNumber->save();
 
-		$oConstantPin->value = Core_Array::getPost('HOSTCMS_PIN_CODE');
+		$oConstantPin->value = trim(Core_Array::getPost('HOSTCMS_PIN_CODE'));
 		$oConstantPin->save();
 	}
 }

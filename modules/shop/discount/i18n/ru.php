@@ -23,6 +23,7 @@ return array(
 	'shop_id' => "Идентификатор магазина",
 	'id' => "Идентификатор",
 	'shop_apply_modification_discount' => "Применить к модификациям",
+	'shop_not_apply_modification_discount' => "Отменить у модификаций",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
 'edit_success' => "Данные о скидке успешно обновлены!",

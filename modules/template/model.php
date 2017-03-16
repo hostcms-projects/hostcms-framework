@@ -70,8 +70,8 @@ class Template_Model extends Core_Entity
 
 	/**
 	 * Executes the business logic.
-	 * @hostcms-event template_model.onBeforeExecute
-	 * @hostcms-event template_model.onAfterExecute
+	 * @hostcms-event template.onBeforeExecute
+	 * @hostcms-event template.onAfterExecute
 	 */
 	public function execute()
 	{

@@ -120,11 +120,12 @@ class Structure_Controller_Show extends Core_Controller
 
 		$this->_Structure
 			->queryBuilder()
-			->where('active', '=', 1)
-			->where('siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+			->select('structures.*')
+			->where('structures.active', '=', 1)
+			->where('structures.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 			->clearOrderBy()
-			->orderBy('sorting')
-			->orderBy('name');
+			->orderBy('structures.sorting')
+			->orderBy('structures.name');
 
 		$this->showProperties = $this->showInformationsystemGroups = $this->showInformationsystemItems = $this->showShopGroups = $this->showShopItems = $this->showInformationsystemGroupProperties = $this->showInformationsystemItemProperties = $this->showShopGroupProperties = $this->showShopItemProperties = FALSE;
 		$this->cache = TRUE;

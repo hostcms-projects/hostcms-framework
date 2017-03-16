@@ -66,7 +66,7 @@ class Property_Value_Float_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_value_float_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_float.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

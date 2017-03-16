@@ -326,7 +326,7 @@ abstract class Shop_Payment_System_Handler
 
 					$oShop_Item_Controller->count($oShop_Cart->quantity);
 
-					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
+					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item, FALSE);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
 					$oShop_Order_Item->price = $aPrices['price_discount'] - $aPrices['tax'];
 					$oShop_Order_Item->rate = $aPrices['rate'];
@@ -878,7 +878,7 @@ abstract class Shop_Payment_System_Handler
 				->to($to)
 				->subject($user_subject)
 				->message($sInvoice)
-				->contentType($this->_adminMailContentType)
+				->contentType($this->_siteuserMailContentType)
 				->header('X-HostCMS-Reason', 'OrderConfirm')
 				->header('Precedence', 'bulk')
 				->send();

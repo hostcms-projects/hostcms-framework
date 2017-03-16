@@ -36,7 +36,7 @@ return array(
 	'edit_success' => "Группа товаров успешно добавлена!",
 	'copy_success' => "Группа товаров успешно скопирована!",	
 	'markDeleted_success' => "Группа товаров успешно удалена!",
-	'changeStatus_success' => "Информация успешно изменена",
+	'changeActive_success' => "Информация успешно изменена",
 	'shops_add_form_link_properties_for_group' => "Свойства групп",
 	'list_of_property_for_group' => "Список свойств групп товаров",
 	'tab_properties' => "Дополнительные свойства",

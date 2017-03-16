@@ -150,11 +150,11 @@ class Skin_Default extends Core_Skin
 <link rel="shortcut icon" href="/admin/favicon.ico"></link>
 <?php $this->showHead()?>
 </head>
-<body class="hostcms6">
+<body class="hostcms6 backendBody">
 
 <div id="top">
 		<div id="hostCmsLogo">
-			<a href="/admin/"><img id="hostCmsLogoImg" src="/modules/skin/<?php echo $this->_skinName?>/images/logo.png" alt="(^) HostCMS" title="HostCMS<?php echo Core_Auth::logged() ? ' v. ' . htmlspecialchars(CURRENT_VERSION) : ''?>"></img></a>
+			<a href="/admin/"><img id="hostCmsLogoImg" src="<?php echo $this->getImageHref()?>logo.png" alt="(^) HostCMS" title="HostCMS<?php echo Core_Auth::logged() ? ' v. ' . htmlspecialchars(CURRENT_VERSION) : ''?>"></img></a>
 		</div>
 		<?php if (Core_Auth::logged() && defined('CURRENT_SITE'))
 		{ ?>
@@ -171,7 +171,7 @@ class Skin_Default extends Core_Skin
 			</div>
 
 			<div id="viewSite">
-				<a target="_blank"><img src="/modules/skin/<?php echo $this->_skinName?>/images/external-link.png" alt="<?php echo Core::_('Admin.viewSite')?>" title="<?php echo Core::_('Admin.viewSite')?>"></img></a>
+				<a target="_blank"><img src="<?php echo $this->getImageHref()?>external-link.png" alt="<?php echo Core::_('Admin.viewSite')?>" title="<?php echo Core::_('Admin.viewSite')?>"></img></a>
 			</div>
 		</div>
 		<?php
@@ -179,13 +179,13 @@ class Skin_Default extends Core_Skin
 		?><div id="taskBar">
 			<div id="subTaskBar">
 				<div class="nav" onclick="$.tasksScroll(-42)">
-					<img src="/modules/skin/<?php echo $this->_skinName?>/images/taskbar_left.png"></img>
+					<img src="<?php echo $this->getImageHref()?>taskbar_left.png"></img>
 				</div>
 				<div id="tasks">
 					<div id="tasksScroll"></div>
 				</div>
 				<div class="nav" onclick="$.tasksScroll(42)">
-					<img src="/modules/skin/<?php echo $this->_skinName?>/images/taskbar_right.png"></img>
+					<img src="<?php echo $this->getImageHref()?>taskbar_right.png"></img>
 				</div>
 			</div>
 		</div>
@@ -211,7 +211,7 @@ class Skin_Default extends Core_Skin
 		<?php if (Core_Auth::logged())
 		{
 		?><div id="logout">
-			<div><a href="/admin/logout.php"><img src="/modules/skin/<?php echo $this->_skinName?>/images/logout.png"></img></a></div>
+			<div><a href="/admin/logout.php"><img src="<?php echo $this->getImageHref()?>logout.png"></img></a></div>
 			<div id="login"><a href="/admin/logout.php"><?php echo Core_Entity::factory('User')->getCurrent()->login?></a></div>
 		</div><?php
 		}
@@ -314,7 +314,7 @@ class Skin_Default extends Core_Skin
 							if ($oAdmin_Language->active)
 							{
 								$oCore_Html_Entity_Img = Core::factory('Core_Html_Entity_Img')
-									->src("/modules/skin/{$this->_skinName}/images/flags/{$oAdmin_Language->shortname}.png")
+									->src($this->getImageHref() . "/flags/{$oAdmin_Language->shortname}.png")
 									->id("{$oAdmin_Language->shortname}Lng")
 									->alt($oAdmin_Language->shortname)
 									->title($oAdmin_Language->name)
@@ -333,7 +333,7 @@ class Skin_Default extends Core_Skin
 				</form>
 			</div>
 			<div id="rightImage">
-				<img src="/modules/skin/<?php echo $this->_skinName?>/images/lock_authorization.png"></img>
+				<img src="<?php echo $this->getImageHref()?>lock_authorization.png"></img>
 
 				<div id="theme" class="disableSelect"><p><span><?php echo Core::_('Admin.themes')?></span> ▼</p></div>
 			</div>
@@ -375,7 +375,7 @@ class Skin_Default extends Core_Skin
 						foreach ($aLng as $shortname => $name)
 						{
 							$oCore_Html_Entity_Img = Core::factory('Core_Html_Entity_Img')
-								->src("/modules/skin/{$this->_skinName}/images/flags/{$shortname}.png")
+								->src($this->getImageHref() . "/flags/{$shortname}.png")
 								->id("{$shortname}Lng")
 								->alt($shortname)
 								->title($name)
@@ -619,7 +619,7 @@ class Skin_Default extends Core_Skin
 											->class('shortcut')
 											->add(
 												Core::factory('Core_Html_Entity_Img')
-													->src('/modules/skin/' . $this->_skinName . '/images/module/' . (
+													->src($this->getImageHref() . 'module/' . (
 														empty($aMenu['image'])
 															? 'default.png'
 															: $aMenu['image'])
@@ -710,14 +710,14 @@ class Skin_Default extends Core_Skin
 
 			<!-- Контекстное меню рабочего стола -->
 			<div id="desktop_context" class="mbmenu">
-				<a class="{action: '$(\'<div>\').appendTo(\'body\').createNote({isNew: true})', img: '/modules/skin/<?php echo $this->_skinName?>/images/note_add.png'}"><?php echo Core::_('Core.addNote')?></a>
-				<a class="{menu: 'submenuWidgets', img: '/modules/skin/<?php echo $this->_skinName?>/images/module/module.png'}"><?php echo Core::_('Core.widgets')?></a>
-				<a class="{menu: 'submenuSites', img: '/modules/skin/<?php echo $this->_skinName?>/images/module/site.png'}"><?php echo Core::_('Site.model_name')?></a>
+				<a class="{action: '$(\'<div>\').appendTo(\'body\').createNote({isNew: true})', img: '<?php echo $this->getImageHref()?>note_add.png'}"><?php echo Core::_('Core.addNote')?></a>
+				<a class="{menu: 'submenuWidgets', img: '<?php echo $this->getImageHref()?>module/module.png'}"><?php echo Core::_('Core.widgets')?></a>
+				<a class="{menu: 'submenuSites', img: '<?php echo $this->getImageHref()?>module/site.png'}"><?php echo Core::_('Site.model_name')?></a>
 			</div>
 
 			<div id="submenuWidgets" class="mbmenu">
-				<a class="{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId=0&type=1\' })', img: '/modules/skin/<?php echo $this->_skinName?>/images/module/eventlog.png'}"><?php echo Core::_('Admin.index_systems_events')?></a>
-				<a class="{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId=0&type=2\' })', img: '/modules/skin/<?php echo $this->_skinName?>/images/module/info.png'}"><?php echo Core::_('Admin.index_systems_characteristics')?></a>
+				<a class="{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId=0&type=1\' })', img: '<?php echo $this->getImageHref()?>module/eventlog.png'}"><?php echo Core::_('Admin.index_systems_events')?></a>
+				<a class="{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId=0&type=2\' })', img: '<?php echo $this->getImageHref()?>module/info.png'}"><?php echo Core::_('Admin.index_systems_characteristics')?></a>
 				<?php
 
 				// Other modules
@@ -774,8 +774,8 @@ class Skin_Default extends Core_Skin
 			<div id="note_conext" class="mbmenu">
 				<!-- <a rel="text">Заметка</a>
 				<a rel="separator"> </a> -->
-				<a class="{action: '$($.mbMenu.lastContextMenuEl).destroyNote()', img: '/modules/skin/<?php echo $this->_skinName?>/images/note_delete.png'}"><?php echo Core::_('Core.deleteNote')?></a>
-				<a class="{action: '$(\'<div>\').appendTo(\'body\').createNote({isNew: true})', img: '/modules/skin/<?php echo $this->_skinName?>/images/note_add.png'}"><?php echo Core::_('Core.addNote')?></a>
+				<a class="{action: '$($.mbMenu.lastContextMenuEl).destroyNote()', img: '<?php echo $this->getImageHref()?>note_delete.png'}"><?php echo Core::_('Core.deleteNote')?></a>
+				<a class="{action: '$(\'<div>\').appendTo(\'body\').createNote({isNew: true})', img: '<?php echo $this->getImageHref()?>note_add.png'}"><?php echo Core::_('Core.addNote')?></a>
 			</div>
 
 		</div>
@@ -863,5 +863,23 @@ class Skin_Default extends Core_Skin
 		</div>
 	</body>
 	</html><?php
+	}
+
+	/**
+	 * Get message.
+	 *
+	 * <code>
+	 * echo Core_Message::get(Core::_('constant.name'));
+	 * echo Core_Message::get(Core::_('constant.message', 'value1', 'value2'));
+	 * </code>
+	 * @param $message Message text
+	 * @param $type Message type
+	 * @see Core_Message::show()
+	 * @return string
+	 */
+	public function getMessage($message, $type = 'message')
+	{
+		$return = '<div id="' . $type . '">' . $message . '</div>';
+		return $return;
 	}
 }

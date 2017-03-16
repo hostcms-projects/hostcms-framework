@@ -82,7 +82,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 
 		$this->getField('sorting')->style("width: 110px");
 
-		$Admin_Form_Entity_Textarea = new Admin_Form_Entity_Textarea();
+		$Admin_Form_Entity_Textarea = Admin_Form_Entity::factory('Textarea');
 
 		$Admin_Form_Entity_Textarea
 			->value(

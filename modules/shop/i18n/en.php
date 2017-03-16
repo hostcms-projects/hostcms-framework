@@ -76,7 +76,7 @@ return array(
 	'id' => 'Id',
 	'site_id' => 'Site id',
 	'markDeleted_success' => "Online store information deleted successfully!",
-	'error_isset_shop_with_structure' => "Error! A store with a structure node you selected already exists. Only one store can be linked to a structure node.",
+	'structureIsExist' => "Error! A store with a structure node you selected already exists. Only one store can be linked to a structure node.",
 	'copy_from' => ' [Copy of %s]',
 	'recount_success' => 'Count of elements and groups recalculated successfully',
 	'copy_success' => 'Online stores information copied successfully',

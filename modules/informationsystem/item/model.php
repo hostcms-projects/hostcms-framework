@@ -38,7 +38,8 @@ class Informationsystem_Item_Model extends Core_Entity
 		'informationsystem_item' => array('foreign_key' => 'shortcut_id'),
 		'tag' => array('through' => 'tag_informationsystem_item'),
 		'tag_informationsystem_item' => array(),
-		'comment' => array('through' => 'comment_informationsystem_item')
+		'comment' => array('through' => 'comment_informationsystem_item'),
+		'vote' => array('through' => 'vote_informationsystem_item')
 	);
 
 	/**
@@ -128,15 +129,19 @@ class Informationsystem_Item_Model extends Core_Entity
 		foreach ($aTags as $tag_name)
 		{
 			$tag_name = trim($tag_name);
-			$oTag = Core_Entity::factory('Tag')->getByName($tag_name, FALSE);
 
-			if (is_null($oTag))
+			if ($tag_name != '')
 			{
-				$oTag = Core_Entity::factory('Tag');
-				$oTag->name = $oTag->path = $tag_name;
-				$oTag->save();
+				$oTag = Core_Entity::factory('Tag')->getByName($tag_name, FALSE);
+
+				if (is_null($oTag))
+				{
+					$oTag = Core_Entity::factory('Tag');
+					$oTag->name = $oTag->path = $tag_name;
+					$oTag->save();
+				}
+				$this->add($oTag);
 			}
-			$this->add($oTag);
 		}
 
 		return $this;
@@ -833,10 +838,14 @@ class Informationsystem_Item_Model extends Core_Entity
 	/**
 	 * Search indexation
 	 * @return Search_Page_Model
+	 * @hostcms-event informationsystem_item.onBeforeIndexing
+	 * @hostcms-event informationsystem_item.onAfterIndexing
 	 */
 	public function indexing()
 	{
 		$oSearch_Page = Core_Entity::factory('Search_Page');
+
+		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
 		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path . ' ';
 
@@ -907,6 +916,9 @@ class Informationsystem_Item_Model extends Core_Entity
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 2; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+
 		$oSearch_Page->save();
 
 		Core_QueryBuilder::delete('search_page_siteuser_groups')
@@ -1062,7 +1074,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event informationsystem_item_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event informationsystem_item.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -1099,6 +1111,25 @@ class Informationsystem_Item_Model extends Core_Entity
 				->addXmlTag('text', $aParts[$this->_showXmlPart - 1]);
 
 			unset($aParts);
+		}
+
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$aRate = Vote_Controller::instance()->getRateByObject($this);
+
+			$this->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('rate')
+					->value($aRate['rate'])
+					->addAttribute('likes', $aRate['likes'])
+					->addAttribute('dislikes', $aRate['dislikes'])
+			);
+
+			if (!is_null($oCurrentSiteuser = Core_Entity::factory('Siteuser')->getCurrent()))
+			{
+				$oVote = $this->Votes->getBySiteuser_Id($oCurrentSiteuser->id);
+				!is_null($oVote) && $this->addEntity($oVote);
+			}
 		}
 
 		if ($this->_showXmlSiteuser && $this->siteuser_id && Core::moduleIsActive('siteuser'))
@@ -1208,7 +1239,6 @@ class Informationsystem_Item_Model extends Core_Entity
 				$this->addEntities($aProperty_Values);
 			}
 		}
-
 		return parent::getXml();
 	}
 
@@ -1217,8 +1247,8 @@ class Informationsystem_Item_Model extends Core_Entity
 	 * @param int $parent_id parent comment id
 	 * @param Core_Entity $parentObject object
 	 * @return self
-	 * @hostcms-event informationsystem_item_model.onBeforeAddComments
-	 * @hostcms-event informationsystem_item_model.onAfterAddComments
+	 * @hostcms-event informationsystem_item.onBeforeAddComments
+	 * @hostcms-event informationsystem_item.onAfterAddComments
 	 */
 	protected function _addComments($parent_id, $parentObject)
 	{

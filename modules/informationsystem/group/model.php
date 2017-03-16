@@ -759,10 +759,14 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Search indexation
 	 * @return Search_Page
+	 * @hostcms-event informationsystem_group.onBeforeIndexing
+	 * @hostcms-event informationsystem_group.onAfterIndexing
 	 */
 	public function indexing()
 	{
 		$oSearch_Page = Core_Entity::factory('Search_Page');
+
+		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
 		$oSearch_Page->text = $this->name . ' ' . $this->description . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path;
 
@@ -815,6 +819,9 @@ class Informationsystem_Group_Model extends Core_Entity
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 1; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+
 		$oSearch_Page->save();
 
 		Core_QueryBuilder::delete('search_page_siteuser_groups')
@@ -851,7 +858,7 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event informationsystem_group_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event informationsystem_group.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

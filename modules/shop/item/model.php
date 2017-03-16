@@ -88,6 +88,7 @@ class Shop_Item_Model extends Core_Entity
 		'tag_shop_item' => array(),
 		'shop_warehouse' => array('through' => 'shop_warehouse_item'),
 		'shop_warehouse_item' => array(),
+		'vote' => array('through' => 'vote_shop_item')
 	);
 
 	/**
@@ -180,15 +181,19 @@ class Shop_Item_Model extends Core_Entity
 		foreach ($aTags as $tag_name)
 		{
 			$tag_name = trim($tag_name);
-			$oTag = Core_Entity::factory('Tag')->getByName($tag_name, FALSE);
 
-			if (is_null($oTag))
+			if ($tag_name != '')
 			{
-				$oTag = Core_Entity::factory('Tag');
-				$oTag->name = $oTag->path = $tag_name;
-				$oTag->save();
+				$oTag = Core_Entity::factory('Tag')->getByName($tag_name, FALSE);
+
+				if (is_null($oTag))
+				{
+					$oTag = Core_Entity::factory('Tag');
+					$oTag->name = $oTag->path = $tag_name;
+					$oTag->save();
+				}
+				$this->add($oTag);
 			}
-			$this->add($oTag);
 		}
 
 		return $this;
@@ -476,17 +481,34 @@ class Shop_Item_Model extends Core_Entity
 	{
 		$oShop = $this->Shop;
 
-		// Search the same item or group
-		$oSameShopItem = $oShop->Shop_Items->getByGroupIdAndPath($this->shop_group_id, $this->path);
-		if (!is_null($oSameShopItem) && $oSameShopItem->id != $this->id)
+		if (!$this->modification_id)
 		{
-			$this->path = Core_Guid::get();
-		}
+			// Search the same item or group
+			$oSameShopItem = $oShop->Shop_Items->getByGroupIdAndPath($this->shop_group_id, $this->path);
+			if (!is_null($oSameShopItem) && $oSameShopItem->id != $this->id)
+			{
+				$this->path = Core_Guid::get();
+			}
 
-		$oSameShopGroup = $oShop->Shop_Groups->getByParentIdAndPath($this->shop_group_id, $this->path);
-		if (!is_null($oSameShopGroup))
+			$oSameShopGroup = $oShop->Shop_Groups->getByParentIdAndPath($this->shop_group_id, $this->path);
+			if (!is_null($oSameShopGroup))
+			{
+				$this->path = Core_Guid::get();
+			}
+		}
+		else
 		{
-			$this->path = Core_Guid::get();
+			$oParenItem = $this->Modification;
+
+			$aSameItems = $oParenItem->Modifications->getAllByPath($this->path);
+			foreach ($aSameItems as $oSameItem)
+			{
+				if ($oSameItem->id != $this->id)
+				{
+					$this->path = Core_Guid::get();
+					break;
+				}
+			}
 		}
 
 		return $this;
@@ -644,7 +666,7 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$newObject->add(clone $oShop_Item_Price);
 		}
-		
+
 		// Получаем список специальных цен для копируемого товара
 		$aShop_Specialprices = $this->Shop_Specialprices->findAll();
 		foreach($aShop_Specialprices as $oShop_Specialprice)
@@ -694,8 +716,9 @@ class Shop_Item_Model extends Core_Entity
 
 	/**
 	 * Change item status
+	 * @return self
 	 */
-	public function changeStatus()
+	public function changeActive()
 	{
 		$this->active = 1 - $this->active;
 		return $this->save();
@@ -808,10 +831,14 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Search indexation
 	 * @return Search_Page
+	 * @hostcms-event shop_item.onBeforeIndexing
+	 * @hostcms-event shop_item.onAfterIndexing
 	 */
 	public function indexing()
 	{
 		$oSearch_Page = Core_Entity::factory('Search_Page');
+
+		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
 		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path . ' ' . $this->price . ' ' . $this->vendorcode . ' ' . $this->marking . ' ';
 
@@ -896,6 +923,9 @@ class Shop_Item_Model extends Core_Entity
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 2; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+
 		$oSearch_Page->save();
 
 		Core_QueryBuilder::delete('search_page_siteuser_groups')
@@ -1422,7 +1452,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_item_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_item.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -1445,6 +1475,25 @@ class Shop_Item_Model extends Core_Entity
 				: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
 
 		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getItemHref());
+
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$aRate = Vote_Controller::instance()->getRateByObject($this);
+
+			$this->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('rate')
+					->value($aRate['rate'])
+					->addAttribute('likes', $aRate['likes'])
+					->addAttribute('dislikes', $aRate['dislikes'])
+			);
+
+			if (!is_null($oCurrentSiteuser = Core_Entity::factory('Siteuser')->getCurrent()))
+			{
+				$oVote = $this->Votes->getBySiteuser_Id($oCurrentSiteuser->id);
+				!is_null($oVote) && $this->addEntity($oVote);
+			}
+		}
 
 		if ($this->_showXmlSiteuser && $this->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
@@ -1554,16 +1603,22 @@ class Shop_Item_Model extends Core_Entity
 						$oShop_Items_Modification->addForbiddenTag($tagName);
 					}
 
+					$oShop_Items_Modification
+						->showXmlComments($this->_showXmlComments)
+						->showXmlAssociatedItems(FALSE)
+						->showXmlModifications(FALSE)
+						->showXmlSpecialprices($this->_showXmlSpecialprices)
+						->showXmlTags($this->_showXmlTags)
+						->showXmlWarehousesItems($this->_showXmlWarehousesItems)
+						->showXmlSiteuser($this->_showXmlSiteuser)
+						->showXmlProperties($this->_showXmlProperties);
+
+					Core_Event::notify($this->_modelName . '.onBeforeAddModification', $this, array(
+						$oShop_Items_Modification
+					));
+
 					$oModificationEntity->addEntity(
 						$oShop_Items_Modification
-							->showXmlComments($this->_showXmlComments)
-							->showXmlAssociatedItems(FALSE)
-							->showXmlModifications(FALSE)
-							->showXmlSpecialprices($this->_showXmlSpecialprices)
-							->showXmlTags($this->_showXmlTags)
-							->showXmlWarehousesItems($this->_showXmlWarehousesItems)
-							->showXmlSiteuser($this->_showXmlSiteuser)
-							->showXmlProperties($this->_showXmlProperties)
 					);
 				}
 			}
@@ -1725,8 +1780,8 @@ class Shop_Item_Model extends Core_Entity
 	 * @param int $parent_id parent comment id
 	 * @param Core_Entity $parentObject object
 	 * @return self
-	 * @hostcms-event shop_item_model.onBeforeAddComments
-	 * @hostcms-event shop_item_model.onAfterAddComments
+	 * @hostcms-event shop_item.onBeforeAddComments
+	 * @hostcms-event shop_item.onAfterAddComments
 	 */
 	protected function _addComments($parent_id, $parentObject)
 	{

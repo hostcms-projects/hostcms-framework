@@ -28,7 +28,7 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$oAdditionalTab->delete(
 			$this->getField('site_id')
@@ -40,7 +40,7 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 
 		$Site_Controller_Edit = new Site_Controller_Edit($this->_Admin_Form_Action);
 
-		$oSiteField = new Admin_Form_Entity_Select();
+		$oSiteField = Admin_Form_Entity::factory('Select');
 		$oSiteField
 			->name('site_id')
 			->caption(Core::_('Affiliate_Plan.site_id'))
@@ -59,7 +59,7 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			$aSiteuser_Groups = array();
 		}
 
-		$oSiteUserGroupField = new Admin_Form_Entity_Select();
+		$oSiteUserGroupField = Admin_Form_Entity::factory('Select');
 		$oSiteUserGroupField
 			->name('siteuser_group_id')
 			->caption(Core::_('Affiliate_Plan.siteuser_group_id'))

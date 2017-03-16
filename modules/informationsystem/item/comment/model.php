@@ -36,4 +36,11 @@ class Informationsystem_Item_Comment_Model extends Comment_Model{
 	 * @return Core_Entity
 	 */
 	public function copy()
-	{		$newObject = parent::copy();		$aNewComment_Informationsystem_Item = clone $this->Comment_Informationsystem_Item;		$newObject->add($aNewComment_Informationsystem_Item);		return $newObject;	}}
+	{
+		// save original _nameColumn
+		$nameColumn = $this->_nameColumn;
+		$this->_nameColumn = 'subject';
+		$newObject = parent::copy();		$aNewComment_Informationsystem_Item = clone $this->Comment_Informationsystem_Item;		$newObject->add($aNewComment_Informationsystem_Item);
+		// restore original _nameColumn
+		$this->_nameColumn = $nameColumn;
+		return $newObject;	}}

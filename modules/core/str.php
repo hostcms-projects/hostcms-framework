@@ -287,13 +287,6 @@ class Core_Str
 	}
 
 	/**
-	 * Регулярное выражение для стоп-слов. Пробелы до и после слова должны обязательно быть указаны
-	 *
-	 * @var string
-	 */
-	static protected $_stopWords = '/ (и|в|во|не|что|он|на|я|с|со|как|а|то|все|всё|она|так|его|но|да|ты|к|у|же|вы|за|бы|по|только|её|ее|мне|было|вот|от|меня|ещё|еще|нет|о|из|то|ему|теперь|когда|даже|ну|вдруг|ли|если|уже|или|ни|быть|был|него|до|вас|нибудь|опять|уж|вам|сказал|ведь|там|потом|себя|ничего|ей|может|они|тут|где|есть|надо|ней|для|мы|тебя|их|чем|была|сам|чтоб|без|будто|человек|чего|раз|тоже|себе|под|жизнь|будет|ж|тогда|кто|этот|говорил|того|потому|этого|какой|совсем|ним|здесь|этом|один|почти|мой|тем|чтобы|нее|кажется|сейчас|были|куда|зачем|сказать|всех|никогда|сегодня|можно|при|наконец|два|об|другой|хоть|после|над|больше|тот|через|эти|нас|про|всего|них|какая|много|разве|сказала|три|эту|моя|впрочем|хорошо|свою|этой|перед|иногда|лучше|чуть|том|нельзя|такой|им|более|всегда|конечно|всю|между) /u';
-
-	/**
 	 * Метод очищает HTML от ненужных тегов, хеширует и возвращает массив хэшей слов
 	 *
 	 * @param string $text исходный текст;
@@ -304,13 +297,12 @@ class Core_Str
 	 */
 	static public function getHashes($text, $param = array())
 	{
+		$aConfig = Core::$config->get('core_str');
+
 		$text = strip_tags($text);
 		$text = mb_strtolower($text);
 
-		if (!isset ($param['hash_function']))
-		{
-			$param['hash_function'] = 'md5';
-		}
+		!isset($param['hash_function']) && $param['hash_function'] = 'md5';
 
 		$replace = array(
 			"/([a-zA-Zа-яА-ЯёЁ])([0-9])/iu" => '\\1 \\2',
@@ -320,11 +312,9 @@ class Core_Str
 		$text = preg_replace(array_keys($replace), array_values($replace), $text);
 		$text = str_replace(array("\n", "\r"), array(' ', ''), $text);
 
-		// Дополняем пробелами для правильного удаления стоп-слов '<пробел><стоп-слово><пробел>'
-		$text = ' ' . $text . ' ';
-
-		// Удаляем из текста стоп слова
-		$text = preg_replace(self::$_stopWords, ' ', $text);
+		// Дополняем пробелами для правильного удаления стоп-слов '<пробел><стоп-слово><пробел>',
+		// удаляем из текста стоп слова
+		$text = preg_replace($aConfig['stopWords'], ' ', ' ' . $text . ' ');
 
 		$text = str_replace('\\', '', $text);
 
@@ -345,8 +335,6 @@ class Core_Str
 		"'&(copy|#169);'i",
 		"'&(laquo|#171);'i",
 		"'&(raquo|#187);'i",
-		"'-|--|[.,!?:;^&@)(><\"\'#}{\$/|_]'i",
-		"/&#(\d+);/e",
 		"'[ ]+ '");
 
 		$replace = array (/*" ",
@@ -365,19 +353,13 @@ class Core_Str
 		"©",
 		"«",
 		"»",
-		" ",
-		"chr(\\1)",
 		" ");
 
 		$text = preg_replace($search, $replace, $text);
 
-		// 0xC2A0 (C2 A0) - NO-BREAK SPACE, http://www.utf8-chartable.de/
-		$search = array(
-			"\"", "&", "<", ">", ".", ",", ";", "*",
-			":", "'", "-", "=", "{", "}", "(", ")",
-			"«", "»", chr(0xC2).chr(0xA0)
-		);
-		$text = str_replace($search, ' ', $text);
+		$text = preg_replace_callback('(&#(\d+);)', create_function('$matches', 'return chr($matches[1]);'), $text);
+
+		$text = str_replace($aConfig['separators'], ' ', $text);
 
 		// Убираем двойные пробелы
 		while (stristr($text, '  '))
@@ -397,14 +379,14 @@ class Core_Str
 			{
 				case '' :
 					$result[$key] = $word;
-					break;
+				break;
 				default:
 				case 'md5' :
 					$result[$key] = md5($word);
-					break;
+				break;
 				case 'crc32' :
 					$result[$key] = Core::crc32($word);
-					break;
+				break;
 			}
 		}
 

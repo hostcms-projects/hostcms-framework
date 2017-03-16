@@ -19,7 +19,17 @@ class Shop_Payment_System_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop' => array(),
 		'shop_currency' => array()
+
 	);
+
+	/**
+	 * One-to-many or many-to-many relations
+	 * @var array
+	 */
+	protected $_hasMany = array(
+		'shop_delivery_payment_system' => array()
+	);
+
 
 	/**
 	 * List of preloaded values
@@ -105,6 +115,8 @@ class Shop_Payment_System_Model extends Core_Entity
 		{
 			Core_File::delete($this->getPaymentSystemFilePath());
 		} catch (Exception $e) {}
+
+		$this->Shop_Delivery_Payment_Systems->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

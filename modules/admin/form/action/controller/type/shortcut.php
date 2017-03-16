@@ -74,7 +74,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 			$oCore_Html_Entity_Form->action($this->_Admin_Form_Controller->getPath())
 				->method('post');
 
-			$oAdmin_Form_Entity_Select = Core::factory('Admin_Form_Entity_Select')
+			$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select')
 				->name('destinationId')
 				->id('destinationId')
 				->style('width: 280px; float: left')
@@ -95,7 +95,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 				foreach ($checkedItems as $key => $value)
 				{
 					$oCore_Html_Entity_Form->add(
-						 Core::factory('Admin_Form_Entity_Input')
+						 Admin_Form_Entity::factory('Input')
 							->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
 							->value(1)
 							->type('hidden')
@@ -104,7 +104,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 				}
 			}
 
-			$oAdmin_Form_Entity_Button = Core::factory('Admin_Form_Entity_Button')
+			$oAdmin_Form_Entity_Button = Admin_Form_Entity::factory('Button')
 				->name('apply')
 				->type('submit')
 				->class('applyButton')

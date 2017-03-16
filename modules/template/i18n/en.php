@@ -5,7 +5,7 @@
  * @package HostCMS 6\Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Тemplates',
@@ -24,6 +24,7 @@ return array(
 	'sorting' => '<acronym title="Field according to which it should be sorted">Sorting</acronym>',
 	'site_id' => 'Site Id',
 	'template_id' => 'Parent template Id',
+	'template_id' => 'Parent template',
 	'template' => '<acronym title="Template code">Template</acronym>',
 	'css' => '<acronym title="Styles description">CSS</acronym>',
 	'copy_success' => 'Template copied successfully!',

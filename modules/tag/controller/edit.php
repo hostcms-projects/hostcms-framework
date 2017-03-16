@@ -25,7 +25,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -66,7 +66,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						 $this->getField('name')
 					);
 
-					$oTextarea_TagName = new Admin_Form_Entity_Textarea();
+					$oTextarea_TagName = Admin_Form_Entity::factory('Textarea');
 
 					$oTextarea_TagName
 						//->value()
@@ -79,7 +79,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 				
 				// Tags SEO
-				$this->addTabAfter($seoTab = Core::factory('Admin_Form_Entity_Tab')
+				$this->addTabAfter($seoTab = Admin_Form_Entity::factory('Tab')
 					->caption('SEO')
 					->name('SEO'), $oMainTab);
 				$oMainTab

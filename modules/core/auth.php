@@ -192,6 +192,8 @@ class Core_Auth
 	 */
 	static public function systemInit()
 	{
+		Core_Event::notify('Core_Auth.onBeforeSystemInit');
+
 		// Если не используется HTTPS-доступ
 		if (defined('USE_ONLY_HTTPS_AUTHORIZATION') && !Core::httpsUses())
 		{
@@ -249,6 +251,8 @@ class Core_Auth
 		$cur_lng_id = ($oAdmin_Language->active == 1) ? $oAdmin_Language->id : 0;
 
 		define("CURRENT_LANGUAGE_ID", $cur_lng_id);
+
+		Core_Event::notify('Core_Auth.onAfterSystemInit');
 	}
 
 	/**
@@ -289,6 +293,8 @@ class Core_Auth
 	 */
 	static public function setCurrentSite()
 	{
+		Core_Event::notify('Core_Auth.onBeforeSetCurrentSite');
+
 		// Выполняем только после регистрации пользователя
 		if (self::logged())
 		{
@@ -359,6 +365,8 @@ class Core_Auth
 				define('CURRENT_SITE', $_SESSION['current_site_id']);
 			}
 		}
+
+		Core_Event::notify('Core_Auth.onAfterSetCurrentSite');
 	}
 
 	/**
@@ -374,6 +382,8 @@ class Core_Auth
 	 */
 	static public function login($login, $password, $assignSessionToIp = TRUE)
 	{
+		Core_Event::notify('Core_Auth.onBeforeLogin', NULL, array($login));
+
 		$error_admin_access = false;
 
 		$timestamp = time();
@@ -480,6 +490,8 @@ class Core_Auth
 
 			return FALSE;
 		}
+
+		Core_Event::notify('Core_Auth.onAfterLogin', NULL, array($login));
 
 		return TRUE;
 	}

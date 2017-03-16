@@ -29,7 +29,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 
-		$oImportExportTab = Core::factory('Admin_Form_Entity_Tab')
+		$oImportExportTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Shop_Price.import_export_tab'))
 			->name('ImportExport');
 
@@ -59,7 +59,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		// Создаем поле групп пользователей сайта как выпадающий список
-		$oSiteUserGroupSelect = new Admin_Form_Entity_Select();
+		$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select');
 		$oSiteUserGroupSelect
 			->caption(Core::_("Shop_Item.siteuser_group_id"))
 			->options(
@@ -74,28 +74,29 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->addAfter(
 				$oSiteUserGroupSelect, $this->getField('name')
 			);
-			
-		$oAdditionalCheckbox = new Admin_Form_Entity_Checkbox();
-		if (is_null($object->id))
+
+		$oApplyForAll = Admin_Form_Entity::factory('Checkbox');
+		$oApplyForAll->name('apply_for_all')->caption(Core::_("Shop_Item.prices_add_form_apply_for_all"));
+		$oApplyForAll->value(is_null($object->id) ? 1 : 0);
+		$oMainTab->addAfter($oApplyForAll, $this->getField('percent'));
+
+		if (!is_null($object->id))
 		{
-			$oAdditionalCheckbox->name('apply_for_all')->caption(Core::_("Shop_Item.prices_add_form_apply_for_all"));
+			$oRecalculatePrice = Admin_Form_Entity::factory('Checkbox');
+			$oRecalculatePrice->name('recalculate_price')->caption(Core::_("Shop_Item.prices_add_form_recalculate"));
+			$oRecalculatePrice->value(1);
+			$oMainTab->addAfter($oRecalculatePrice, $oApplyForAll);
 		}
-		else
-		{
-			$oAdditionalCheckbox->name('recalculate_price')->caption(Core::_("Shop_Item.prices_add_form_recalculate"));
-		}
-		$oAdditionalCheckbox->value(1);
-		$oMainTab->addAfter($oAdditionalCheckbox, $this->getField('percent'));
 
 		$title = $this->_object->id
-					? Core::_('Shop_Price.prices_edit_form_title')
-					: Core::_('Shop_Price.prices_add_form_title');
+			? Core::_('Shop_Price.prices_edit_form_title')
+			: Core::_('Shop_Price.prices_add_form_title');
 
 		$this->title($title);
 
 		return $this;
 	}
-	
+
 	/**
 	 * Processing of the form. Apply object fields.
 	 * @return self
@@ -103,19 +104,25 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	protected function _applyObjectProperty()
 	{
 		parent::_applyObjectProperty();
-		
+
 		if(!is_null(Core_Array::getPost('apply_for_all')))
 		{
 			$aShop_Items = $this->_object->Shop->Shop_Items->findAll(FALSE);
 			foreach ($aShop_Items as $oShop_Item)
 			{
-				$oShop_Item_Price = Core_Entity::factory('Shop_Item_Price');
-				$oShop_Item_Price->value = $oShop_Item->price / 100 * $this->_object->percent;
-				$oShop_Item_Price->shop_price_id = $this->_object->id;
-				$oShop_Item->add($oShop_Item_Price);
+				$oShop_Item_Price = $oShop_Item->Shop_Item_Prices->getByShop_price_id($this->_object->id, FALSE);
+
+				if (is_null($oShop_Item_Price))
+				{
+					$oShop_Item_Price = Core_Entity::factory('Shop_Item_Price');
+					$oShop_Item_Price->value = $oShop_Item->price / 100 * $this->_object->percent;
+					$oShop_Item_Price->shop_price_id = $this->_object->id;
+					$oShop_Item->add($oShop_Item_Price);
+				}
 			}
 		}
-		elseif(!is_null(Core_Array::getPost('recalculate_price')))
+
+		if (!is_null(Core_Array::getPost('recalculate_price')))
 		{
 			$aShop_Item_Prices = $this->_object->Shop_Item_Prices->findAll(FALSE);
 			foreach ($aShop_Item_Prices as $oShop_Item_Price)
@@ -124,7 +131,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShop_Item_Price->save();
 			}
 		}
-		
+
 		return $this;
 	}
 }

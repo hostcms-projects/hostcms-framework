@@ -7,7 +7,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
- * - itemsProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию NULL
+ * - itemsProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
  * - itemsPropertiesList(TRUE) выводить список дополнительных свойств товаров, по умолчанию TRUE
  *
  * <code>
@@ -52,6 +52,12 @@ class Shop_Cart_Controller_Show extends Core_Controller
 	protected $_aItem_Property_Dirs = array();
 
 	/**
+	 * Current Siteuser
+	 * @var Siteuser_Model|NULL
+	 */
+	protected $_oSiteuser = NULL;
+
+	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
 	 */
@@ -59,17 +65,13 @@ class Shop_Cart_Controller_Show extends Core_Controller
 	{
 		parent::__construct($oShop->clearEntities());
 
-		$siteuser_id = '';
 		if (Core::moduleIsActive('siteuser'))
 		{
 			// Если есть модуль пользователей сайта, $siteuser_id равен 0 или ID авторизованного
-			$siteuser_id = 0;
-			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
+			$this->_oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
-			if ($oSiteuser)
+			if ($this->_oSiteuser)
 			{
-				$siteuser_id = $oSiteuser->id;
-
 				// Move goods from cookies to session
 				$Shop_Cart_Controller = Shop_Cart_Controller::instance();
 				$Shop_Cart_Controller->moveTemporaryCart($oShop);
@@ -79,7 +81,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		$this->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('siteuser_id')
-				->value($siteuser_id)
+				->value($this->_oSiteuser ? $this->_oSiteuser->id : 0)
 		);
 
 		$this->itemsProperties = FALSE;
@@ -178,6 +180,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			->amount($amount)
 			->quantity($quantity)
 			->couponText($this->couponText)
+			->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0)
 			;
 
 		$totalDiscount = 0;

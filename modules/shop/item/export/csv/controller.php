@@ -23,6 +23,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		'exportItemExternalProperties',
 		'exportGroupExternalProperties',
 		'exportItemModifications',
+		'exportOrders',
 		'shopId'
 	);
 
@@ -94,7 +95,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	 */
 	private $_aCurrentData;
 
-	/**
+	/** 
 	 * Data pointer
 	 * @var int
 	 */
@@ -106,12 +107,14 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	 * @param boolean $bItemPropertiesExport export item properties mode
 	 * @param boolean $bGroupPropertiesExport export group properties mode
 	 * @param boolean $bExportItemModifications export item modifications
+	 * @param boolean $bExportOrders export orders instead of catalog
 	 */
 	public function __construct(
 		$iShopId,
 		$bItemPropertiesExport = TRUE,
 		$bGroupPropertiesExport = TRUE,
-		$bExportItemModifications = TRUE)
+		$bExportItemModifications = TRUE,
+		$bExportOrders = FALSE)
 	{
 		parent::__construct();
 
@@ -121,120 +124,125 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		$this->exportItemModifications = $bExportItemModifications;
 		$this->_iItem_Properties_Count = 0;
 		$this->_iGroup_Properties_Count = 0;
+		
+		$this->exportOrders = $bExportOrders;
 
 		// Устанавливаем лимит времени выполнения в 1 час
 		(!defined('DENY_INI_SET') || !DENY_INI_SET) && function_exists('set_time_limit') && ini_get('safe_mode') != 1 && @set_time_limit(3600);
 
-		// Заполняем склады
-		$this->_aShopWarehouses = Core_Entity::factory('Shop', $this->shopId)->Shop_Warehouses->findAll(FALSE);
-		// Заполняем дополнительные свойства товара
-		$this->exportItemExternalProperties && $this->_aItem_Properties = Core_Entity::factory('Shop_Item_Property_List', $this->shopId)->Properties->findAll(FALSE);
-		// Заполняем дополнительные свойства групп товаров
-		$this->exportGroupExternalProperties && $this->_aGroup_Properties = Core_Entity::factory('Shop_Group_Property_List', $this->shopId)->Properties->findAll(FALSE);
-
-		$this->_aSpecialPriceBase_Properties = array(
-			"", "", "", ""
-		);
-
-		$this->_aGroupBase_Properties = array(
-			"","","","","","","","",""
-		);
-
-		$this->_aItemBase_Properties = array(
-			"","","","","","","","","",""
-			,"","","","","","","","","",""
-			,"","","","","","","","","",""
-			,"",""
-		);
-
-		$this->_iCurrentDataPosition = 0;
-
-		$this->_aShopPrices = Core_Entity::factory('Shop', $this->shopId)->Shop_prices->findAll(FALSE);
-
-		// 0-вая строка - заголовок CSV-файла
-		$this->_aCurrentData[$this->_iCurrentDataPosition] = array(
-			'"Название раздела"',
-			'"CML GROUP ID идентификатор группы товаров"',
-			'"CML GROUP ID идентификатор родительской группы товаров"',
-			'"Заголовок раздела(title)"',
-			'"Описание раздела(description)"',
-			'"Ключевые слова раздела(keywords)"',
-			'"Описание раздела"',
-			'"Путь для раздела"',
-			'"Порядок сортировки раздела"',
-			'"Артикул товара"',
-			'"Артикул родительского товара"',
-			'"Название товара"',
-			'"Описание товара"',
-			'"Текст для товара"',
-			'"Вес товара"',
-			'"Тип товара"',
-			'"Метки"',
-			'"Цена товара"',
-			'"Активность товара"',
-			'"Порядок сортировки товара"',
-			'"Путь к товару"',
-			'"Идентификатор налога для товара"',
-			'"Идентификатор валюты"',
-			'"Название продавца"',
-			'"Название производителя"',
-			'"Название единицы измерения"',
-			'"Заголовок (title)"',
-			'"Значение мета-тега description для страницы с товаром"',
-			'"Значение мета-тега keywords для страницы с товаром"',
-			'"Флаг индексации"',
-			'"Флаг ""Экспортировать в Яндекс.Маркет"""',
-			'"Яндекс.Маркет основная расценка"',
-			'"Яндекс.Маркет расценка для карточек моделей"',
-			'"Дата"',
-			'"Дата публикации"',
-			'"Дата завершения публикации"',
-			'"Файл изображения для товара"',
-			'"Файл малого изображения для товара"',
-			'"Количество товара от"',
-			'"Количество товара до"',
-			'"Значение цены"',
-			'"Процент от цены"',
-			'"CML ID идентификатор товара"',
-			'"Идентификатор пользователя сайта"'
-		);
-
-		// Добавляем в заголовок информацию о свойствах товара
-		foreach($this->_aItem_Properties as $oItem_Property)
+		if(!$this->exportOrders)
 		{
-			$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oItem_Property->name));
-			$this->_iItem_Properties_Count++;
+			// Заполняем склады
+			$this->_aShopWarehouses = Core_Entity::factory('Shop', $this->shopId)->Shop_Warehouses->findAll(FALSE);
+			// Заполняем дополнительные свойства товара
+			$this->exportItemExternalProperties && $this->_aItem_Properties = Core_Entity::factory('Shop_Item_Property_List', $this->shopId)->Properties->findAll(FALSE);
+			// Заполняем дополнительные свойства групп товаров
+			$this->exportGroupExternalProperties && $this->_aGroup_Properties = Core_Entity::factory('Shop_Group_Property_List', $this->shopId)->Properties->findAll(FALSE);
 
-			if($oItem_Property->type == 2)
+			$this->_aSpecialPriceBase_Properties = array(
+				"", "", "", ""
+			);
+
+			$this->_aGroupBase_Properties = array(
+				"","","","","","","","",""
+			);
+
+			$this->_aItemBase_Properties = array(
+				"","","","","","","","","",""
+				,"","","","","","","","","",""
+				,"","","","","","","","","",""
+				,"",""
+			);
+
+			$this->_iCurrentDataPosition = 0;
+
+			$this->_aShopPrices = Core_Entity::factory('Shop', $this->shopId)->Shop_prices->findAll(FALSE);
+
+			// 0-вая строка - заголовок CSV-файла
+			$this->_aCurrentData[$this->_iCurrentDataPosition] = array(
+				'"Название раздела"',
+				'"CML GROUP ID идентификатор группы товаров"',
+				'"CML GROUP ID идентификатор родительской группы товаров"',
+				'"Заголовок раздела(title)"',
+				'"Описание раздела(description)"',
+				'"Ключевые слова раздела(keywords)"',
+				'"Описание раздела"',
+				'"Путь для раздела"',
+				'"Порядок сортировки раздела"',
+				'"Артикул товара"',
+				'"Артикул родительского товара"',
+				'"Название товара"',
+				'"Описание товара"',
+				'"Текст для товара"',
+				'"Вес товара"',
+				'"Тип товара"',
+				'"Метки"',
+				'"Цена товара"',
+				'"Активность товара"',
+				'"Порядок сортировки товара"',
+				'"Путь к товару"',
+				'"Идентификатор налога для товара"',
+				'"Идентификатор валюты"',
+				'"Название продавца"',
+				'"Название производителя"',
+				'"Название единицы измерения"',
+				'"Заголовок (title)"',
+				'"Значение мета-тега description для страницы с товаром"',
+				'"Значение мета-тега keywords для страницы с товаром"',
+				'"Флаг индексации"',
+				'"Флаг ""Экспортировать в Яндекс.Маркет"""',
+				'"Яндекс.Маркет основная расценка"',
+				'"Яндекс.Маркет расценка для карточек моделей"',
+				'"Дата"',
+				'"Дата публикации"',
+				'"Дата завершения публикации"',
+				'"Файл изображения для товара"',
+				'"Файл малого изображения для товара"',
+				'"Количество товара от"',
+				'"Количество товара до"',
+				'"Значение цены"',
+				'"Процент от цены"',
+				'"CML ID идентификатор товара"',
+				'"Идентификатор пользователя сайта"'
+			);
+
+			// Добавляем в заголовок информацию о свойствах товара
+			foreach($this->_aItem_Properties as $oItem_Property)
 			{
-				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oItem_Property->name));
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oItem_Property->name));
 				$this->_iItem_Properties_Count++;
+
+				if($oItem_Property->type == 2)
+				{
+					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oItem_Property->name));
+					$this->_iItem_Properties_Count++;
+				}
 			}
-		}
 
-		// Добавляем в заголовок информацию о свойствах группы товаров
-		foreach($this->_aGroup_Properties as $oGroup_Property)
-		{
-			$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oGroup_Property->name));
-			$this->_iGroup_Properties_Count++;
-
-			if($oGroup_Property->type == 2)
+			// Добавляем в заголовок информацию о свойствах группы товаров
+			foreach($this->_aGroup_Properties as $oGroup_Property)
 			{
-				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oGroup_Property->name));
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oGroup_Property->name));
 				$this->_iGroup_Properties_Count++;
+
+				if($oGroup_Property->type == 2)
+				{
+					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oGroup_Property->name));
+					$this->_iGroup_Properties_Count++;
+				}
 			}
-		}
 
-		// Добавляем в заголовок информацию о складах
-		foreach($this->_aShopWarehouses as $oWarehouse)
-		{
-			$this->_aCurrentData[$this->_iCurrentDataPosition][] = Core::_('Shop_Item.warehouse_import_field', str_replace('"', '""', $oWarehouse->name));
-		}
+			// Добавляем в заголовок информацию о складах
+			foreach($this->_aShopWarehouses as $oWarehouse)
+			{
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = Core::_('Shop_Item.warehouse_import_field', str_replace('"', '""', $oWarehouse->name));
+			}
 
-		// Добавляем информацию о ценах на группы пользователя
-		foreach($this->_aShopPrices as $oShopPrice)
-		{
-			$this->_aCurrentData[$this->_iCurrentDataPosition][] = $oShopPrice->name;
+			// Добавляем информацию о ценах на группы пользователя
+			foreach($this->_aShopPrices as $oShopPrice)
+			{
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = $oShopPrice->name;
+			}
 		}
 	}
 
@@ -369,134 +377,309 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		header("Content-Type: application/force-download");
 		header("Content-Disposition: attachment; filename = " . 'CSV_' .date("Y_m_d_H_i_s").'.csv'. ";");
 		header("Content-Transfer-Encoding: binary");
-
-		foreach($this->_aCurrentData as $aData)
+		
+		if(!$this->exportOrders)
 		{
-			$this->_printRow($aData);
-		}
-		$this->_aCurrentData = array();
-
-		if ($this->parentGroup == 0)
-		{
-			$oShop_Groups = Core_Entity::factory('Shop', $this->shopId)->Shop_Groups;
-			$oShop_Groups->queryBuilder()->where('parent_id', '=', 0);
-		}
-		else
-		{
-			$oShop_Groups = Core_Entity::factory('Shop_Group', $this->parentGroup)->Shop_Groups;
-		}
-
-		$aShopGroupsId = array_merge(array($this->parentGroup), $oShop_Groups->getGroupChildrenId());
-
-		foreach($aShopGroupsId as $iShopGroupId)
-		{
-			$aTmpArray = array();
-
-			$oShopGroup = Core_Entity::factory('Shop_Group', $iShopGroupId);
-
-			$oShopItems = $oShopGroup->Shop_Items;
-			$oShopItems->queryBuilder()->where('modification_id', '=', 0);
-
-			if($iShopGroupId != 0)
+			foreach($this->_aCurrentData as $aData)
 			{
-				$aTmpArray = array(
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->guid)),
-					sprintf('"%s"', str_replace('"', '""', is_null($oShopGroup->Shop_Group->id) ? 'ID00000000' : $oShopGroup->Shop_Group->guid)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_title)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_description)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_keywords)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->description)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->path)),
-					sprintf('"%s"', str_replace('"', '""', $oShopGroup->sorting))
-				);
+				$this->_printRow($aData);
+			}
+			$this->_aCurrentData = array();
 
-				// Пропускаем поля товара
-				foreach($this->_aItemBase_Properties as $sNullData)
-				{
-					$aTmpArray[] = $sNullData;
-				}
-
-				// Пропускаем поля специальных цен товара
-				foreach($this->_aSpecialPriceBase_Properties as $sNullData)
-				{
-					$aTmpArray[] = $sNullData;
-				}
-
-				// Пропускаем поля дополнительных свойств товара
-				for($i = 0; $i < $this->_iItem_Properties_Count; $i++)
-				{
-					$aTmpArray[] = "";
-				}
-
-				// Выводим данные о дополнительных свойствах групп
-				foreach($this->_aGroup_Properties as $oGroup_Property)
-				{
-					$aProperty_Values = $oGroup_Property->getValues($oShopGroup->id);
-					$iProperty_Values_Count = count($aProperty_Values);
-
-					$aTmpArray[] = sprintf('"%s"', str_replace('"', '""', $iProperty_Values_Count > 0 ? ($oGroup_Property->type != 2
-						? ($oGroup_Property->type == 3 && $aProperty_Values[0]->value != 0 && Core::moduleIsActive('list')
-							? $aProperty_Values[0]->List_Item->value
-							: ($oGroup_Property->type == 8
-								? Core_Date::sql2date($aProperty_Values[0]->value)
-								: ($oGroup_Property->type == 9
-									? Core_Date::sql2datetime($aProperty_Values[0]->value)
-									: $aProperty_Values[0]->value)))
-									: ($aProperty_Values[0]->file == ''
-										? ''
-										: $aProperty_Values[0]->setHref($oShopGroup->getGroupHref())->getLargeFileHref()))
-											: ''));
-
-					if($oGroup_Property->type == 2)
-					{
-						$aTmpArray[] = $iProperty_Values_Count
-							? ($aProperty_Values[0]->file_small == ''
-								? ''
-								: $aProperty_Values[0]->setHref($oShopGroup->getGroupHref())->getSmallFileHref()
-							)
-							: '';
-					}
-				}
-
-				$this->_printRow($aTmpArray);
+			if ($this->parentGroup == 0)
+			{
+				$oShop_Groups = Core_Entity::factory('Shop', $this->shopId)->Shop_Groups;
+				$oShop_Groups->queryBuilder()->where('parent_id', '=', 0);
 			}
 			else
 			{
-				$oShopItems->queryBuilder()->where('shop_id', '=', $this->shopId);
+				$oShop_Groups = Core_Entity::factory('Shop_Group', $this->parentGroup)->Shop_Groups;
 			}
 
-			$offset = 0;
-			$limit = 100;
+			$aShopGroupsId = array_merge(array($this->parentGroup), $oShop_Groups->getGroupChildrenId());
 
-			do {
-				$oShopItems->queryBuilder()->offset($offset)->limit($limit);
-				$aShopItems = $oShopItems->findAll(FALSE);
+			foreach($aShopGroupsId as $iShopGroupId)
+			{
+				$aTmpArray = array();
 
-				foreach($aShopItems as $oShopItem)
+				$oShopGroup = Core_Entity::factory('Shop_Group', $iShopGroupId);
+
+				$oShopItems = $oShopGroup->Shop_Items;
+				$oShopItems->queryBuilder()->where('modification_id', '=', 0)->where('shortcut_id', '=', 0);
+
+				if($iShopGroupId != 0)
 				{
-					$this->_printRow(
-						$this->getItemData($oShopItem)
+					$aTmpArray = array(
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->name)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->guid)),
+						sprintf('"%s"', str_replace('"', '""', is_null($oShopGroup->Shop_Group->id) ? 'ID00000000' : $oShopGroup->Shop_Group->guid)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_title)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_description)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_keywords)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->description)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->path)),
+						sprintf('"%s"', str_replace('"', '""', $oShopGroup->sorting))
 					);
 
-					$this->getSpecialPriceData($oShopItem);
-
-					$aItemModifications = array();
-
-					// Получаем список всех модификаций
-					$this->exportItemModifications && $aItemModifications = $oShopItem->Modifications->findAll(FALSE);
-
-					// Добавляем информацию о модификациях
-					foreach($aItemModifications as $oItemModification)
+					// Пропускаем поля товара
+					foreach($this->_aItemBase_Properties as $sNullData)
 					{
-						$this->_printRow(
-							$this->getItemData($oItemModification)
-						);
+						$aTmpArray[] = $sNullData;
 					}
+
+					// Пропускаем поля специальных цен товара
+					foreach($this->_aSpecialPriceBase_Properties as $sNullData)
+					{
+						$aTmpArray[] = $sNullData;
+					}
+
+					// Пропускаем поля дополнительных свойств товара
+					for($i = 0; $i < $this->_iItem_Properties_Count; $i++)
+					{
+						$aTmpArray[] = "";
+					}
+
+					// Выводим данные о дополнительных свойствах групп
+					foreach($this->_aGroup_Properties as $oGroup_Property)
+					{
+						$aProperty_Values = $oGroup_Property->getValues($oShopGroup->id);
+						$iProperty_Values_Count = count($aProperty_Values);
+
+						$aTmpArray[] = sprintf('"%s"', str_replace('"', '""', $iProperty_Values_Count > 0 ? ($oGroup_Property->type != 2
+							? ($oGroup_Property->type == 3 && $aProperty_Values[0]->value != 0 && Core::moduleIsActive('list')
+								? $aProperty_Values[0]->List_Item->value
+								: ($oGroup_Property->type == 8
+									? Core_Date::sql2date($aProperty_Values[0]->value)
+									: ($oGroup_Property->type == 9
+										? Core_Date::sql2datetime($aProperty_Values[0]->value)
+										: $aProperty_Values[0]->value)))
+										: ($aProperty_Values[0]->file == ''
+											? ''
+											: $aProperty_Values[0]->setHref($oShopGroup->getGroupHref())->getLargeFileHref()))
+												: ''));
+
+						if($oGroup_Property->type == 2)
+						{
+							$aTmpArray[] = $iProperty_Values_Count
+								? ($aProperty_Values[0]->file_small == ''
+									? ''
+									: $aProperty_Values[0]->setHref($oShopGroup->getGroupHref())->getSmallFileHref()
+								)
+								: '';
+						}
+					}
+
+					$this->_printRow($aTmpArray);
 				}
-				$offset += $limit;
+				else
+				{
+					$oShopItems->queryBuilder()->where('shop_id', '=', $this->shopId);
+				}
+
+				$offset = 0;
+				$limit = 100;
+
+				do {
+					$oShopItems->queryBuilder()->offset($offset)->limit($limit);
+					$aShopItems = $oShopItems->findAll(FALSE);
+
+					foreach($aShopItems as $oShopItem)
+					{
+						$this->_printRow($this->getItemData($oShopItem));
+						
+						$iPropertyFieldOffset = count($this->_aSpecialPriceBase_Properties) + count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties) - 1;
+						$aCurrentPropertyLine = array();
+						for($i = 0;$i<$iPropertyFieldOffset;$i++)
+						{
+							$aCurrentPropertyLine[] = '""';
+						}
+						
+						$aCurrentPropertyLine[$iPropertyFieldOffset-2] = $oShopItem->guid;
+						
+						foreach ($this->_aItem_Properties as $oItem_Property)
+						{
+							$aProperty_Values = $oItem_Property->getValues($oShopItem->id, FALSE);
+							array_shift($aProperty_Values);
+							
+							if(count($aProperty_Values))
+							{
+								foreach($aProperty_Values as $oProperty_Value)
+								{
+									$aCurrentPropertyLine[$iPropertyFieldOffset] = sprintf('"%s"', str_replace('"', '""', ($oItem_Property->type != 2
+										? ($oItem_Property->type == 3 && $oProperty_Value->value != 0 && Core::moduleIsActive('list')
+											? $oProperty_Value->List_Item->value
+											: ($oItem_Property->type == 8
+												? Core_Date::sql2date($oProperty_Value->value)
+												: ($oItem_Property->type == 9
+													? Core_Date::sql2datetime($oProperty_Value->value)
+													: $oProperty_Value->value)))
+													: ($oProperty_Value->file == '' ? '' : $oProperty_Value->setHref($oShopItem->getItemHref())->getLargeFileHref())
+													)));
+									
+									if($oItem_Property->type == 2)
+									{
+										$aCurrentPropertyLine[$iPropertyFieldOffset+1] = sprintf('"%s"', str_replace('"', '""', $oProperty_Value->setHref($oShopItem->getItemHref())->getSmallFileHref()));
+									}
+									
+									$this->_printRow($aCurrentPropertyLine);
+								}
+							}
+							
+							if($oItem_Property->type==2)
+							{
+								$aCurrentPropertyLine[$iPropertyFieldOffset] = '""';
+								$aCurrentPropertyLine[$iPropertyFieldOffset+1] = '""';
+								$iPropertyFieldOffset+=2;
+							}
+							else
+							{
+								$aCurrentPropertyLine[$iPropertyFieldOffset] = '""';
+								$iPropertyFieldOffset++;
+							}
+						}
+
+						$this->getSpecialPriceData($oShopItem);
+
+						$aItemModifications = array();
+
+						// Получаем список всех модификаций
+						$this->exportItemModifications && $aItemModifications = $oShopItem->Modifications->findAll(FALSE);
+
+						// Добавляем информацию о модификациях
+						foreach($aItemModifications as $oItemModification)
+						{
+							$this->_printRow(
+								$this->getItemData($oItemModification)
+							);
+						}
+					}
+					$offset += $limit;
+				}
+				while (count($aShopItems));
 			}
-			while (count($aShopItems));
+		} 
+		else
+		{
+			$this->_aCurrentData[0] = array(
+				'"GUID заказа"',
+				'"Номер заказа"',
+				'"Страна"',
+				'"Область"',
+				'"Город"',
+				'"Район"',
+				'"Имя заказчика"',
+				'"Фамилия заказчика"',
+				'"Отчество заказчика"',
+				'"E-mail заказчика"',
+				'"Акт"',
+				'"Счет-фактура"',
+				'"Название компании"',
+				'"ИНН"',
+				'"КПП"',
+				'"Телефон"',
+				'"Факс"',
+				'"Адрес"',
+				'"Статус заказа"',
+				'"Валюта заказа"',
+				'"Идентификатор платежной системы"',
+				'"Дата заказа"',
+				'"Статус оплаты заказа"',
+				'"Дата оплаты заказа"',
+				'"Описание заказа"',
+				'"Информация о заказе"',
+				'"Заказ отменен"',
+				'"Дата изменения статуса заказа"',
+				'"Информация о доставке"',
+				'"Артикул товара заказа"',
+				'"Название товара заказа"',
+				'"Количество товара заказа"',
+				'"Цена товара заказа"',
+				'"Налог на товар заказа"',
+				'"Тип товара"');
+				
+			$aShop_Orders = Core_Entity::factory('Shop', $this->shopId)->Shop_Orders->findAll();
+			foreach($aShop_Orders as $oShop_Order)
+			{
+				$this->_aCurrentData[] = array(
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->guid)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->invoice)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location_City->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location_City_Area->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->surname)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->patronymic)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->email)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->acceptance_report)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->vat_invoice)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->company)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->tin)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->kpp)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->phone)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->fax)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->address)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Order_Status->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Currency->name)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->shop_payment_system_id)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->datetime)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->paid)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->payment_datetime)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->description)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->system_information)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->canceled)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->status_datetime)),
+					sprintf('"%s"', str_replace('"', '""', $oShop_Order->delivery_information))
+				);
+				
+				// Получаем все товары заказа
+				$aShop_Order_Items = $oShop_Order->Shop_Order_Items->findAll();
+				foreach($aShop_Order_Items as $oShop_Order_Item)
+				{
+					$this->_aCurrentData[] = array(
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order->guid)),
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						'""',
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->marking)),
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->name)),
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->quantity)),
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->price)),
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->rate)),
+						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->type))
+					);
+				}
+			}
+			
+			foreach($this->_aCurrentData as $aCurrentLine)
+			{
+				$this->_printRow($aCurrentLine);
+			}
 		}
 
 		exit();

@@ -37,7 +37,7 @@ class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			->format($aFormat);
 
 		$oMainTab->addAfter(
-			Core::factory('Admin_Form_Entity_Separator'), $this->getField('rambler')
+			Admin_Form_Entity::factory('Separator'), $this->getField('rambler')
 				->style('width: 300px;')
 				->format($aFormat));
 
@@ -47,7 +47,7 @@ class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			->format($aFormat);
 
 		$oMainTab->addAfter(
-			Core::factory('Admin_Form_Entity_Separator'), $this->getField('yahoo')
+			Admin_Form_Entity::factory('Separator'), $this->getField('yahoo')
 			->style('width: 300px;')
 			->format($aFormat));
 

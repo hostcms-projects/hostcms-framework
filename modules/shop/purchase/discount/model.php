@@ -177,7 +177,7 @@ class Shop_Purchase_Discount_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_purchase_discount_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_purchase_discount.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

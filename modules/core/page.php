@@ -206,8 +206,9 @@ class Core_Page extends Core_Servant_Properties
 			}
 			else
 			{
+				$sPath = CMS_FOLDER . ltrim($css, DIRECTORY_SEPARATOR);
 				$sReturn .= "<style type=\"text/css\">\n";
-				is_file($this->CSS) && $sReturn .= Core_File::read($css);
+				is_file($sPath) && $sReturn .= Core_File::read($sPath);
 				$sReturn .= "\n</style>\n";
 			}
 		}

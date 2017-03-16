@@ -32,9 +32,9 @@ abstract class Core_Skin
 	 * @var string
 	 */
 	protected $_skinName = 'default';
-	
+
 	/**
-	 * Set skin name 
+	 * Set skin name
 	 * @param string $skinName skin name
 	 * @return self
 	 */
@@ -43,10 +43,10 @@ abstract class Core_Skin
 		$this->_skinName = $skinName;
 		return $this;
 	}
-	
+
 	/**
 	 * Get skin name
-	 * @return string 
+	 * @return string
 	 */
 	public function getSkinName()
 	{
@@ -58,7 +58,7 @@ abstract class Core_Skin
 	 * @var string
 	 */
 	protected $_mode = NULL;
-	
+
 	/**
 	 * Set mode
 	 * @param string $mode mode
@@ -84,7 +84,7 @@ abstract class Core_Skin
 	 * @var string
 	 */
 	protected $_title;
-	
+
 	/**
 	 * Set title
 	 * @param string $title title
@@ -101,7 +101,7 @@ abstract class Core_Skin
 	 * @var array
 	 */
 	protected $_js = array();
-	
+
 	/**
 	 * Add JS file path
 	 * @param string $path file path
@@ -127,7 +127,7 @@ abstract class Core_Skin
 	 * @var array
 	 */
 	protected $_css = array();
-	
+
 	/**
 	 * Add CSS file path
 	 * @param string $path file path
@@ -176,7 +176,9 @@ abstract class Core_Skin
 	 */
 	static public function instance($name = NULL)
 	{
-		is_null($name) && $name = Core::$mainConfig['skin'];
+		is_null($name) && $name = isset($_SESSION['skin'])
+			? $_SESSION['skin']
+			: Core::$mainConfig['skin'];
 
 		if (!is_string($name))
 		{
@@ -187,6 +189,9 @@ abstract class Core_Skin
 		{
 			$skin = 'Skin_' . ucfirst($name);
 			self::$instance[$name] = new $skin();
+
+			// Set skinname
+			self::$instance[$name]->skinName($name);
 		}
 
 		return self::$instance[$name];
@@ -256,10 +261,10 @@ abstract class Core_Skin
 	 * @var string
 	 */
 	protected $_lng = NULL;
-	
+
 	/**
 	 * Get language
-	 * @return string 
+	 * @return string
 	 */
 	public function getLng()
 	{
@@ -280,7 +285,7 @@ abstract class Core_Skin
 	}
 
 	/**
-	 * Set language 
+	 * Set language
 	 * @param string $lng language
 	 * @return self
 	 */
@@ -288,5 +293,14 @@ abstract class Core_Skin
 	{
 		$this->_lng = $lng;
 		return $this;
+	}
+
+	/**
+	 * Get image href
+	 * @return string
+	 */
+	public function getImageHref()
+	{
+		return "/modules/skin/{$this->_skinName}/images/";
 	}
 }

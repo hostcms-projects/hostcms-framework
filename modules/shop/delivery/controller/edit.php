@@ -39,7 +39,7 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$oShop = $this->_object->Shop;
 
 		// Добавляем новое поле типа файл
-			$oImageField = new Admin_Form_Entity_File();
+			$oImageField = Admin_Form_Entity::factory('File');
 
 		$oLargeFilePath = is_file($this->_object->getDeliveryFilePath())
 			? $this->_object->getDeliveryFileHref()
@@ -75,15 +75,99 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				)
 			);
 
-			$oMainTab->addAfter(
-				$oImageField, $this->getField('description')
-			);
+		$oMainTab->addAfter(
+			$oImageField, $this->getField('description')
+		);
 
 		$title = $this->_object->id
 					? Core::_('Shop_Delivery.type_of_delivery_edit_form_title')
 					: Core::_('Shop_Delivery.type_of_delivery_add_form_title');
 
 		$this->title($title);
+
+		// Создаем вкладку
+		$oShopDeliveryTabPaymentSystems = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Shop_Delivery.payment_systems'))
+					->name('PaymentSystems');
+
+		$this->addTabAfter($oShopDeliveryTabPaymentSystems, $oMainTab);
+
+		// Заполняем вкладку платежных систем
+
+		// Получаем платежные системы, связанные с доставкой
+		$aShop_Delivery_Payment_Systems = $this->_object->Shop_Payment_Systems->findAll();
+
+		// Массив идентификаторов платежных систем, связанных с доставкой
+		$aDelivery_Payment_Systems = array();
+
+		foreach($aShop_Delivery_Payment_Systems as $oShop_Delivery_Payment_System)
+		{
+			$aDelivery_Payment_Systems[] = $oShop_Delivery_Payment_System->id;
+		}
+
+		// Получаем список платежных систем магазина
+		$aShop_Payment_Systems = $oShop->Shop_Payment_Systems->findAll();
+
+		foreach($aShop_Payment_Systems as $oShop_Payment_System)
+		{
+			$oShop_Payment_System_Checkbox = Admin_Form_Entity::factory('Checkbox')
+				->caption($oShop_Payment_System->name)
+				->name('shop_payment_system_' . $oShop_Payment_System->id);
+
+			(!$this->_object->id || in_array($oShop_Payment_System->id, $aDelivery_Payment_Systems))
+			&& $oShop_Payment_System_Checkbox->value(1);
+
+			$oShopDeliveryTabPaymentSystems->add($oShop_Payment_System_Checkbox);
+		}
+
+
+		$oMainTab->delete($this->getField('type'));
+		$oTypeRadio = Admin_Form_Entity::factory('Radiogroup');
+		$oTypeRadio->radio(array(
+				Core::_('Shop_Delivery.option0'),
+				Core::_('Shop_Delivery.option1')
+			))
+			->divAttr(array('id' => 'import_types'))
+			->value($this->_object->type)
+			->name('type');
+			
+		$oMainTab
+		->addAfter($oTypeRadio, $this->getField('name'))
+		->addAfter(Admin_Form_Entity::factory('Code')
+			->html("<script>$(function() {
+				$('#{$windowId} #import_types').buttonset();
+				if(!{$this->_object->type})
+				{
+					$('#{$windowId} #code').hide();
+				}
+				else
+				{
+					$('#{$windowId} #code').show();
+				}
+				
+				$('#{$windowId} #import_types input:radio').change(
+					function()
+					{
+						if(!($(this).val()%2))
+						{
+							$('#{$windowId} #code').hide();
+						}
+						else
+						{	
+							$('#{$windowId} #code').show();
+						}
+					}
+				);
+			});</script>"), $oTypeRadio);
+			
+		
+	$oMainTab->addAfter(
+		Admin_Form_Entity::factory('Textarea')
+			->caption(Core::_('Shop_Delivery.handler'))
+			->name('code')
+			->value($this->_object->loadHandlerFile())
+			->divAttr(array('id' => 'code')), 
+		$oTypeRadio);
 
 		return $this;
 	}
@@ -125,7 +209,11 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 		$oShop = $this->_object->Shop;
 
-		//////////////////////////////////////////
+		if(Core_Array::getRequest('type') == 1)
+		{
+			$this->_object->saveHandlerFile(Core_Array::getRequest('code'));
+		}
+
 		// Обработка картинок
 		$param = array();
 
@@ -244,6 +332,44 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			}
 
 			$this->_object->save();
+		}
+
+		// Получаем платежные системы, связанные с доставкой
+		$aShop_Delivery_Payment_Systems = $this->_object->Shop_Payment_Systems->findAll();
+
+		// Массив идентификаторов платежных систем, связанных с доставкой
+		$aDelivery_Payment_Systems = array();
+
+		foreach($aShop_Delivery_Payment_Systems as $oShop_Delivery_Payment_System)
+		{
+			$aDelivery_Payment_Systems[] = $oShop_Delivery_Payment_System->id;
+		}
+
+		$aShop_Payment_Systems = $oShop->Shop_Payment_Systems->findAll();
+
+		foreach($aShop_Payment_Systems as $oShop_Payment_System)
+		{
+			$iShopPaymentSystemChecked = Core_Array::getPost('shop_payment_system_' . $oShop_Payment_System->id, 0) ? 1 : 0;
+
+			// Платежная система выбрана
+			if ($iShopPaymentSystemChecked)
+			{
+				// Платежная система не связана с доставкой. Добавляем платежную систему доставке
+				if (!in_array($oShop_Payment_System->id, $aDelivery_Payment_Systems))
+				{
+					$this->_object->add($oShop_Payment_System);
+				}
+			}
+			else // Платежная система не выбрана
+			{
+				// Платежная система связана с доставкой. Удаляем связь платежной системы с доставкой
+				if (in_array($oShop_Payment_System->id, $aDelivery_Payment_Systems))
+				{
+					$oShop_Delivery_Payment_Systems = $this->_object->Shop_Delivery_Payment_Systems->getByShop_payment_system_id($oShop_Payment_System->id);
+
+					!is_null($oShop_Delivery_Payment_Systems) && $oShop_Delivery_Payment_Systems->delete();
+				}
+			}
 		}
 	}
 }

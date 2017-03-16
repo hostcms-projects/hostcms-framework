@@ -34,7 +34,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$oAdditionalTab = $this->getTab('additional');
 
 		// Объект вкладки 'Атрибуты документа'
-		$oAttrTab = Core::factory('Admin_Form_Entity_Tab')
+		$oAttrTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Document.tab_1'))
 			->name('tab_1');
 
@@ -49,7 +49,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			$this->_object->document_id = Core_Array::getGet('document_id');
 		}
 
-		$oDocument_Name = Core::factory('Admin_Form_Entity_Input')
+		$oDocument_Name = Admin_Form_Entity::factory('Input')
 			->value(
 				$this->_object->Document->Name
 			)
@@ -59,7 +59,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 
 		$oMainTab->add($oDocument_Name);
 
-		$oTextarea_Document = Core::factory('Admin_Form_Entity_Textarea')
+		$oTextarea_Document = Admin_Form_Entity::factory('Textarea')
 			->value(
 				!is_null($this->_object->id)
 					? $this->_object->loadFile()
@@ -82,14 +82,14 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 				Typograph_Controller::instance()->eraseOpticalAlignment($oTextarea_Document->value)
 			);
 
-			$oUseTypograph = new Admin_Form_Entity_Checkbox();
+			$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 			$oUseTypograph
 				->name("use_typograph")
 				->caption(Core::_('Document.use_typograph'))
 				->value(1)
 				->divAttr(array('style' => 'float: left;'));
 
-			$oUseTrailingPunctuation = new Admin_Form_Entity_Checkbox();
+			$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 			$oUseTrailingPunctuation
 				->name("use_trailing_punctuation")
 				->caption(Core::_('Document.use_trailing_punctuation'))
@@ -99,7 +99,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			$oMainTab
 				->addAfter($oUseTypograph, $oTextarea_Document)
 				->addAfter($oUseTrailingPunctuation, $oUseTypograph)
-				->addAfter(Core::factory('Admin_Form_Entity_Separator'), $oUseTrailingPunctuation);
+				->addAfter(Admin_Form_Entity::factory('Separator'), $oUseTrailingPunctuation);
 		}
 
 		// Выбор макета
@@ -109,7 +109,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->Document->site_id);
 
 		// Warning: TO DO: dynamic chain list template_dir -> template like Documents
-		$oSelect_Template_Id = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 			->options(
 				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 			)
@@ -125,7 +125,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 
 		$oAttrTab
 			->add($oSelect_Template_Id)
-			->add(Core::factory('Admin_Form_Entity_Separator'));
+			->add(Admin_Form_Entity::factory('Separator'));
 
 		$oMainTab
 			->move($this->getField('current'), $oAttrTab)

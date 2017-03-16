@@ -39,6 +39,24 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 	}
 
 	/**
+	 * Create and return an object of model
+	 * @param string $className name of class
+	 * @return object
+	 */
+	static public function factory($className)
+	{
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__ . '_' . ucfirst($className);
+
+		if (!class_exists($className))
+		{
+			throw new Core_Exception("Class '%className' does not exist",
+					array('%className' => $className));
+		}
+
+		return new $className();
+	}
+
+	/**
 	 * Move entity to another tab
 	 * @param Admin_Form_Entity $oAdmin_Form_Entity entity you want to move
 	 * @param Admin_Form_Entity $oTabTo target tab

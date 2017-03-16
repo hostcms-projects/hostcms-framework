@@ -23,7 +23,10 @@ class Shop_Delivery_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_hasMany = array(
-		'shop_delivery_condition' => array()
+		'shop_delivery_condition' => array(),
+		'shop_delivery_payment_system' => array(),
+		'shop_payment_system' => array('through' => 'shop_delivery_payment_system')
+
 	);
 
 	/**
@@ -39,7 +42,9 @@ class Shop_Delivery_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_preloadValues = array(
-		'sorting' => 0
+		'type' => 0,
+		'sorting' => 0,
+		'active' => 1
 	);
 
 	/**
@@ -166,6 +171,7 @@ class Shop_Delivery_Model extends Core_Entity
 		try
 		{
 			Core_File::copy($this->getDeliveryFilePath(), $newObject->getDeliveryFilePath());
+			Core_File::copy($this->getHandlerFilePath(), $newObject->getHandlerFilePath());
 		} catch (Exception $e) {}
 
 		$aShop_Delivery_Conditions = $this->Shop_Delivery_Conditions->findAll();
@@ -192,12 +198,65 @@ class Shop_Delivery_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aShop_Delivery_Conditions = $this->Shop_Delivery_Conditions->findAll();
-		foreach($aShop_Delivery_Conditions as $oShop_Delivery_Condition)
+		// Удаляем картинку
+		$this->deleteImage();
+
+		// Удаляем обработчик
+		if(is_file($this->getHandlerFilePath()))
 		{
-			$oShop_Delivery_Condition->delete();
+			try
+			{
+				Core_File::delete($this->getHandlerFilePath());
+			} catch (Exception $e) {}
 		}
 
+		$this->Shop_Delivery_Conditions->deleteAll(FALSE);
+		$this->Shop_Delivery_Payment_Systems->deleteAll(FALSE);
+
 		return parent::delete($primaryKey);
+	}
+
+	/**
+	 * Get path to handler file
+	 * @return string
+	 */
+	public function getHandlerFilePath()
+	{
+		return CMS_FOLDER . "hostcmsfiles/shop/delivery/handler" . intval($this->id) . '.php';
+	}
+
+	/**
+	 * Load content of handler
+	 * @return mixed
+	 */
+	public function loadHandlerFile()
+	{
+		$path = $this->getHandlerFilePath();
+		return is_file($path) ? Core_File::read($path) : NULL;
+	}
+
+	/**
+	 * Save content of handler
+	 * @param string $content content
+	 * @return self
+	 */
+	public function saveHandlerFile($content)
+	{
+		$this->save();
+
+		$sFilePath = $this->getHandlerFilePath();
+		Core_File::mkdir(dirname($sFilePath), CHMOD, TRUE);
+		Core_File::write($sFilePath, trim($content));
+
+		return $this;
+	}
+
+	/**
+	 * Change status
+	 */
+	public function changeStatus()
+	{
+		$this->active = 1 - $this->active;
+		return $this->save();
 	}
 }

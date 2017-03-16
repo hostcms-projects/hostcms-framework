@@ -200,7 +200,7 @@ class Property_Value_File_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_value_file_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_file.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

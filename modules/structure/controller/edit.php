@@ -32,15 +32,15 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 
-		$oSeoTab = Core::factory('Admin_Form_Entity_Tab')
+		$oSeoTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Structure.seo_tab'))
 			->name('Seo');
 
-		$oSitemapTab = Core::factory('Admin_Form_Entity_Tab')
+		$oSitemapTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Structure.sitemap_tab'))
 			->name('Sitemap');
 
-		$oPropertyTab = Core::factory('Admin_Form_Entity_Tab')
+		$oPropertyTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Structure.additional_params_tab'))
 			->name('Property');
 
@@ -58,7 +58,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->delete($this->getField('changefreq'))
 			->delete($this->getField('priority'));
 
-		$oSelect_changefreq = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_changefreq = Admin_Form_Entity::factory('Select')
 			->options(
 				array(
 					0 => Core::_('Structure.sitemap_refrashrate_always'),
@@ -75,7 +75,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Structure.changefreq'))
 			->style('width: 220px');
 
-		$oSelect_priority = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_priority = Admin_Form_Entity::factory('Select')
 			->options(
 				array(
 					'0' => Core::_('Structure.sitemap_priority_small'),
@@ -106,7 +106,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			;
 
 		// Выбор родительского раздела
-		$oSelect_Parent_Id = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_Parent_Id = Admin_Form_Entity::factory('Select')
 			->options(
 				array(' … ') + $this->fillStructureList($this->_object->site_id, 0, $this->_object->id)
 			)
@@ -119,7 +119,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		// Выбор меню
 		$aMenu = $this->_fillMenuList($this->_object->site_id);
 
-		$oSelect_Menu_Id = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_Menu_Id = Admin_Form_Entity::factory('Select')
 			->options(
 				count($aMenu) ? $aMenu : array(' … ')
 			)
@@ -135,7 +135,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab
 			->addAfter($oSelect_Parent_Id, $this->getField('name'))
 			->addAfter($oSelect_Menu_Id, $oSelect_Parent_Id)
-			->addAfter(Core::factory('Admin_Form_Entity_Separator'), $this->getField('show'));
+			->addAfter(Admin_Form_Entity::factory('Separator'), $this->getField('show'));
 
 		// Выбор макета
 		$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
@@ -143,7 +143,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
 
 		// Warning: TO DO: dynamic chain list template_dir -> template like Documents
-		$oSelect_Template_Id = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 			->options(
 				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 			)
@@ -156,7 +156,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oAdditionalTab->delete($this->getField('template_id'));
 		$oMainTab
 			->addBefore($oSelect_Template_Id, $this->getField('path'))
-			->addAfter(Core::factory('Admin_Form_Entity_Separator'), $oSelect_Template_Id);
+			->addAfter(Admin_Form_Entity::factory('Separator'), $oSelect_Template_Id);
 
 		$this->getField('path')
 			->divAttr(array('style' => 'float: left'))
@@ -195,7 +195,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$aSiteuser_Groups = array();
 		}
 
-		$oSelect_SiteUserGroup = Core::factory('Admin_Form_Entity_Select')
+		$oSelect_SiteUserGroup = Admin_Form_Entity::factory('Select')
 			->name('siteuser_group_id')
 			->caption(Core::_('Structure.siteuser_group_id'))
 			->style('width: 110px')
@@ -211,7 +211,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab
 			->addAfter($oSelect_SiteUserGroup, $this->getField('sorting'))
-			->addAfter(Core::factory('Admin_Form_Entity_Separator'), $oSelect_SiteUserGroup);
+			->addAfter(Admin_Form_Entity::factory('Separator'), $oSelect_SiteUserGroup);
 
 		// Structure type
 		$oMainTab->delete($this->getField('type'));
@@ -221,7 +221,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$iLibId = 0;
 		$iLibDirId = 0;
 
-		$oRadio_Type = Core::factory('Admin_Form_Entity_Radiogroup')
+		$oRadio_Type = Admin_Form_Entity::factory('Radiogroup')
 			->name('type')
 			->id('structureType' . time())
 			->caption(Core::_('Structure.type'))
@@ -239,7 +239,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab
 			->add($oRadio_Type)
-			->add(Core::factory('Admin_Form_Entity_Code')
+			->add(Admin_Form_Entity::factory('Code')
 				->html("<script>$(function() {
 					$('#{$windowId} #structure_types').buttonset();
 				});</script>")
@@ -253,7 +253,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		// Контроллер редактирования документа
 		$Document_Controller_Edit = new Document_Controller_Edit($this->_Admin_Form_Action);
 
-		$Select_DocumentDir = Core::factory('Admin_Form_Entity_Select')
+		$Select_DocumentDir = Admin_Form_Entity::factory('Select')
 			->name('document_dir_id')
 			->id('document_dir_id')
 			->caption(Core::_('Structure.document_dir_id'))
@@ -285,7 +285,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$sDocumentEditImg = ob_get_clean();
 
-		$Select_Document = Core::factory('Admin_Form_Entity_Select')
+		$Select_Document = Admin_Form_Entity::factory('Select')
 			->name('document_id')
 			->id('document_id')
 			->caption(Core::_('Structure.document_id'))
@@ -294,7 +294,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->options($aDocumentForDir)
 			->value($this->_object->document_id)
 			->add(
-				Core::factory('Admin_Form_Entity_Code')->html($sDocumentEditImg)
+				Admin_Form_Entity::factory('Code')->html($sDocumentEditImg)
 			);
 
 		$oMainTab
@@ -308,7 +308,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oLib = Core_Entity::factory('Lib', $this->_object->lib_id);
 
-		$Select_LibDir = Core::factory('Admin_Form_Entity_Select')
+		$Select_LibDir = Admin_Form_Entity::factory('Select')
 			->name('lib_dir_id')
 			->caption(Core::_('Structure.lib_dir_id'))
 			->style('width: 500px')
@@ -328,7 +328,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$aLibForDir[$oTmpLib->id] = $oTmpLib->name;
 		}
 		$objectId = intval($this->_object->id);
-		$Select_Lib = Core::factory('Admin_Form_Entity_Select')
+		$Select_Lib = Admin_Form_Entity::factory('Select')
 			->name('lib_id')
 			->id('lib_id')
 			->caption(Core::_('Structure.lib_id'))
@@ -339,7 +339,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")
 			;
 
-		$Div_Lib_Properies = Core::factory('Admin_Form_Entity_Code');
+		$Div_Lib_Properies = Admin_Form_Entity::factory('Code');
 
 		ob_start();
 		// DIV для св-в типовой дин. страницы
@@ -363,7 +363,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			;
 
 		// Динамическая страница
-		$oTextarea_Structure_Source = Core::factory('Admin_Form_Entity_Textarea')
+		$oTextarea_Structure_Source = Admin_Form_Entity::factory('Textarea')
 			->name('structure_source')
 			->divAttr(array('id' => 'structure_source'))
 			->caption(Core::_('Structure.structure_source'))
@@ -372,7 +372,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->style('height: 400px; width: 100%')
 			->class('codepress php');
 
-		$oTextarea_StructureConfig_Source = Core::factory('Admin_Form_Entity_Textarea')
+		$oTextarea_StructureConfig_Source = Admin_Form_Entity::factory('Textarea')
 			->name('structure_config_source')
 			->divAttr(array('id' => 'structure_config_source'))
 			->caption(Core::_('Structure.structure_config_source'))
@@ -418,7 +418,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->execute();
 
 		$oMainTab->add(
-			Core::factory('Admin_Form_Entity_Code')->html(ob_get_clean())
+			Admin_Form_Entity::factory('Code')->html(ob_get_clean())
 		);
 
 		return $this;

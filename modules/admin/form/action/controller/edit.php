@@ -31,7 +31,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 		$oMainTab = $this->getTab('main');
 
-		$oNameTab = Core::factory('Admin_Form_Entity_Tab')
+		$oNameTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Admin_Form_Action.admin_form_tab_0'))
 			->name('Name');
 
@@ -45,7 +45,9 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		{
 			foreach ($aAdmin_Languages as $oAdmin_Language)
 			{
-				$oAdmin_Word_Value = $this->_object->Admin_Word->getWordByLanguage($oAdmin_Language->id);
+				$oAdmin_Word_Value = $this->_object->id
+					? $this->_object->Admin_Word->getWordByLanguage($oAdmin_Language->id)
+					: NULL;
 
 				if ($oAdmin_Word_Value)
 				{
@@ -58,7 +60,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					$description = '';
 				}
 
-				$oAdmin_Form_Entity_Input_Name = Core::factory('Admin_Form_Entity_Input')
+				$oAdmin_Form_Entity_Input_Name = Admin_Form_Entity::factory('Input')
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Action.action_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
@@ -70,7 +72,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 						)
 					);
 
-				$oAdmin_Form_Entity_Textarea_Description = Core::factory('Admin_Form_Entity_Textarea')
+				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Action.action_lng_description') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($description)
@@ -89,8 +91,8 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		$this->getField('dataset')
 			//->divAttr(array('style' => 'float: left'))
 			->style('width: 220px');
-		
-		
+
+
 		//
 		$oAdmin_Word_Value = $this->_object->Admin_Word->getWordByLanguage(CURRENT_LANGUAGE_ID);
 		$form_name = $oAdmin_Word_Value ? $oAdmin_Word_Value->name : '';

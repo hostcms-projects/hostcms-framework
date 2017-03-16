@@ -22,6 +22,7 @@ class Core_Sitemap extends Core_Servant_Properties
 		'showInformationsystemItems',
 		'showShopGroups',
 		'showShopItems',
+		'showModifications',
 	);
 
 	/**
@@ -201,6 +202,13 @@ class Core_Sitemap extends Core_Servant_Properties
 						->where('shop_items.active', '=', 1)
 						->where('shop_items.shortcut_id', '=', 0)
 						->where('shop_items.indexing', '=', 1);
+						
+						//Modifications
+						if (!$this->showModifications)
+						{
+							$oShop_Items->queryBuilder()
+								->where('shop_items.modification_id', '=', 0);
+						}
 
 					$aShop_Items = $oShop_Items->findAll();
 					foreach ($aShop_Items as $oShop_Item)

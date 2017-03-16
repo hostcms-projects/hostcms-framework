@@ -87,7 +87,7 @@ class Shop_Cart_Model extends Core_Entity{
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_cart_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_cart.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -104,7 +104,7 @@ class Shop_Cart_Model extends Core_Entity{
 		{
 			$oModification = Core_Entity::factory('Shop_Item')->find($this->Shop_Item->modification_id);
 			!is_null($oModification) && $oShop_Item->addEntity(
-				$oModification
+				$oModification->showXmlProperties($this->_showXmlProperties)
 			);
 		}
 

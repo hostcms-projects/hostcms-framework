@@ -55,7 +55,8 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 		'max_price' => 0.00,
 		'min_price' => 0.00,
 		'price' => 0.00,
-		'sorting' => 0
+		'sorting' => 0,
+		'active' => 1
 	);
 
 	/**
@@ -152,7 +153,7 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_delivery_condition_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_delivery_condition.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -164,5 +165,14 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 			->addXmlTag('price', $aPrices['price_tax']);
 
 		return parent::getXml();
+	}
+
+	/**
+	 * Change status
+	 */
+	public function changeStatus()
+	{
+		$this->active = 1 - $this->active;
+		return $this->save();
 	}
 }

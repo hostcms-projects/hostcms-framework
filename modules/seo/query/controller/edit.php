@@ -32,7 +32,7 @@ class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		//	При редактировании запроса выводит <input> вместо <textarea>
 		if ($this->_object->id)
 		{
-			$oAdmin_Form_Entity_Input_Value = new Admin_Form_Entity_Input();
+			$oAdmin_Form_Entity_Input_Value = Admin_Form_Entity::factory('Input');
 			$oAdmin_Form_Entity_Input_Value
 				->name('query')
 				->value($this->_object->query)

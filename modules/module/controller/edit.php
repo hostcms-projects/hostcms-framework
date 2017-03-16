@@ -31,7 +31,7 @@ class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('style' => 'float: left'));
 
 		// Объект вкладки 'Настройки модуля'
-		$oSettingsTab = Core::factory('Admin_Form_Entity_Tab')
+		$oSettingsTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Module.tab_parameters'))
 			->name('parameters');
 
@@ -39,7 +39,7 @@ class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this->addTabAfter($oSettingsTab, $oMainTab);
 
 		// Создаем текстовое поле "PHP-код с параметрами модуля"
-		$oParameters = new Admin_Form_Entity_Textarea();
+		$oParameters = Admin_Form_Entity::factory('Textarea');
 
 		$oParameters
 			->value(

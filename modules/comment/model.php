@@ -30,6 +30,7 @@ class Comment_Model extends Core_Entity
 	 */
 	protected $_hasMany = array(
 		'comment' => array('foreign_key' => 'parent_id'),
+		'vote' => array('through' => 'vote_comment')
 	);
 
 	/**
@@ -251,7 +252,7 @@ class Comment_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event comment_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event comment.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -259,8 +260,7 @@ class Comment_Model extends Core_Entity
 
 		$this->clearXmlTags()
 			->addXmlTag('date', Core_Date::sql2date($this->datetime))
-			->addXmlTag('datetime', Core_Date::sql2datetime($this->datetime))
-			;
+			->addXmlTag('datetime', Core_Date::sql2datetime($this->datetime));
 
 		if ($this->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
@@ -268,6 +268,25 @@ class Comment_Model extends Core_Entity
 				->clearEntities()
 				->showXmlProperties($this->_showXmlProperties)
 			);
+		}
+
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$aRate = Vote_Controller::instance()->getRateByObject($this);
+
+			$this->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('rate')
+					->value($aRate['rate'])
+					->addAttribute('likes', $aRate['likes'])
+					->addAttribute('dislikes', $aRate['dislikes'])
+			);
+
+			if (!is_null($oCurrentSiteuser = Core_Entity::factory('Siteuser')->getCurrent()))
+			{
+				$oVote = $this->Votes->getBySiteuser_Id($oCurrentSiteuser->id);
+				!is_null($oVote) && $this->addEntity($oVote);
+			}
 		}
 
 		return parent::getXml();

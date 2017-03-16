@@ -408,9 +408,11 @@ class Core_ORM
 			unset($this->_modelColumns[$this->_primaryKey]);
 		}
 
-		if ($Core_DataBase->getNumRows() == 1)
+		$aCurrent = $Core_DataBase->current($bCache);
+
+		if ($aCurrent !== FALSE)
 		{
-			$this->setValues($this->_modelColumns + $Core_DataBase->current($bCache));
+			$this->setValues($this->_modelColumns + $aCurrent);
 
 			$Core_DataBase->free();
 
@@ -495,11 +497,25 @@ class Core_ORM
 	 */
 	public function deleteAll($bCache = TRUE)
 	{
-		$aObjects = $this->findAll($bCache);
-		foreach ($aObjects as $oObject)
-		{
-			$oObject->delete();
-		}
+		$limit = 100;
+		$offset = 0;
+
+		$this->queryBuilder()
+			->limit($limit)
+			->offset($offset);
+
+		do {
+			$aObjects = $this->findAll($bCache);
+			foreach ($aObjects as $oObject)
+			{
+				$oObject->delete();
+			}
+
+			$offset += $limit;
+
+			$this->queryBuilder()->offset($offset);
+		} while(count($aObjects) == $limit);
+
 		return $this;
 	}
 
@@ -1382,7 +1398,9 @@ class Core_ORM
 					case 'string':
 						$strlen = mb_strlen($value);
 
-						if (!is_null($aField['max_length']) && $strlen > $aField['max_length'])
+						if (!is_null($aField['max_length'])
+							&& $aField['datatype'] != 'enum'
+							&& $strlen > $aField['max_length'])
 						{
 							if ($exception)
 							{

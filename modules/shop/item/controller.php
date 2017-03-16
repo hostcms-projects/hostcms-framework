@@ -62,11 +62,12 @@ class Shop_Item_Controller extends Core_Servant_Properties
 	 * Calculate the cost with tax and discounts
 	 * @param float $price price
 	 * @param Shop_Item_Model $oShop_Item item
+	 * @param boolean $bRound round prices
 	 * @return array
 	 * @hostcms-event Shop_Item_Controller.onBeforeCalculatePrice
 	 * @hostcms-event Shop_Item_Controller.onAfterCalculatePrice
 	 */
-	public function calculatePrice($price, Shop_Item_Model $oShop_Item)
+	public function calculatePrice($price, Shop_Item_Model $oShop_Item, $bRound = TRUE)
 	{
 		$oShop = $oShop_Item->Shop;
 
@@ -134,7 +135,7 @@ class Shop_Item_Controller extends Core_Servant_Properties
 				{
 					// То считаем цену с налогом
 					$this->_aPrice['tax'] = $oShop_Tax->rate / 100 * $this->_aPrice['price_discount'];
-					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] + $this->_aPrice['tax'];
+					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] = $this->_aPrice['price_discount'] + $this->_aPrice['tax'];
 				}
 				else
 				{
@@ -142,6 +143,10 @@ class Shop_Item_Controller extends Core_Servant_Properties
 					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
 					$this->_aPrice['price'] -= $this->_aPrice['tax'];
 				}
+			}
+			else
+			{
+				$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
 			}
 		}
 		else
@@ -154,10 +159,13 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		Core_Event::notify(get_class($this) . '.onAfterCalculatePrice', $this, array($oShop_Item));
 
 		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
-		$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
-		$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
-		$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
-		$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
+		if ($bRound)
+		{
+			$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
+			$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
+			$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
+			$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
+		}
 
 		return $this->_aPrice;
 	}
@@ -206,6 +214,7 @@ class Shop_Item_Controller extends Core_Servant_Properties
 	 * Определение цены товара для заданного пользователя $this->siteuser
 	 *
 	 * @param Shop_Item_Model $oShop_Item товар
+	 * @param boolean $bRound round prices
 	 * @return array возвращает массив значений цен для данного пользователя
 	 * - $price['tax'] сумма налога
 	 * - $price['rate'] размер налога
@@ -213,7 +222,7 @@ class Shop_Item_Controller extends Core_Servant_Properties
 	 * - $price['price_tax'] цена с учетом налога
 	 * - $price['price_discount'] цена с учетом налога и со скидкой
 	 */
-	public function getPrices(Shop_Item_Model $oShop_Item)
+	public function getPrices(Shop_Item_Model $oShop_Item, $bRound = TRUE)
 	{
 		if (is_null($oShop_Item->id))
 		{
@@ -235,6 +244,6 @@ class Shop_Item_Controller extends Core_Servant_Properties
 			}
 		}
 
-		return $this->calculatePrice($price, $oShop_Item);
+		return $this->calculatePrice($price, $oShop_Item, $bRound);
 	}
 }

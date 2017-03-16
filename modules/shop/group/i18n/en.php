@@ -34,9 +34,9 @@ return array(
 	'id' => "Id",
 	'shop_id' => "Shop id",
 	'edit_success' => "Products group added successfully!",
-	'copy_success' => "Products group copied successfully!",	
+	'copy_success' => "Products group copied successfully!",
 	'markDeleted_success' => "Products group deleted successfully!",
-	'changeStatus_success' => "Products group has been changed",
+	'changeActive_success' => "Products group has been changed",
 	'shops_add_form_link_properties_for_group' => "Groups properties",
 	'list_of_property_for_group' => "Properties list of product group",
 	'tab_properties' => "Additional properties",
@@ -47,5 +47,5 @@ return array(
 	'apply_success' => "Information has been successfully changed",
 	'move_success' => 'Product groups transferred successfully',
 	'items_catalog_image' => "<acronym title=\"Group image\">Group image</acronym>",
-	'items_catalog_image_small' => "<acronym title=\"Small group image\">Small group image</acronym>",	
+	'items_catalog_image_small' => "<acronym title=\"Small group image\">Small group image</acronym>",
 );

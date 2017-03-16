@@ -33,7 +33,7 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 		//parent::setObject($object);
 		$this->_object = $object;
 
-		$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+		$oMainTab = Admin_Form_Entity::factory('Tab')
 			->caption('main')
 			->name('main');
 
@@ -48,7 +48,7 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 			throw new Core_Exception('File %file not found', array('%file' => $this->_object->name));
 		}
 
-		$oFile_Content = Core::factory('Admin_Form_Entity_Textarea')
+		$oFile_Content = Admin_Form_Entity::factory('Textarea')
 			->value(
 				Core_File::read($filePath)
 			)

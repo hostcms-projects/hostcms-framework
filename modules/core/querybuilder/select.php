@@ -86,7 +86,7 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	protected $_groupBy = array();
 
 	/**
-	 * HAVING 
+	 * HAVING
 	 * @var array
 	 */
 	protected $_having = array();
@@ -96,6 +96,18 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	 * @var array
 	 */
 	protected $_union = array();
+
+	/**
+	 * UNION LIMIT
+	 * @var mixed
+	 */
+	protected $_unionLimit = NULL;
+
+	/**
+	 * UNION OFFSET
+	 * @var mixed
+	 */
+	protected $_unionOffset = NULL;
 
 	/**
 	 * DataBase Query Type
@@ -472,7 +484,29 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	 */
 	public function union(Core_QueryBuilder_Select $object)
 	{
-		$this->_union[] = $object;
+		$this->_union[] = array('', $object);
+		return $this;
+	}
+
+	/**
+	 * UNION ALL is used to combine the result from multiple SELECT statements into a single result set.
+	 *
+	 * <code>
+	 * // (SELECT `id2`, `name2` FROM `tablename2`)
+	 * // UNION ALL
+	 * // (SELECT `id`, `name` FROM `tablename` LIMIT 10 OFFSET 0)
+	 * $select1 = Core_QueryBuilder::select('id', 'name')->from('tablename')
+	 * 	->limit(0, 10);
+	 *
+	 * $select2 = Core_QueryBuilder::select('id2', 'name2')->from('tablename2')
+	 * 	->unionAll($select1);
+	 * </code>
+	 * @param Core_QueryBuilder_Select $object
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function unionAll(Core_QueryBuilder_Select $object)
+	{
+		$this->_union[] = array('ALL', $object);
 		return $this;
 	}
 
@@ -491,7 +525,30 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	 * @param string $arg1 offset
 	 * @param string $arg2 count
 	 */
-	public function unionLimit($arg1, $arg2 = NULL) {}
+	public function unionLimit($arg1, $arg2 = NULL)
+	{
+		if (!is_null($arg2))
+		{
+			$this->_unionLimit = intval($arg2);
+			return $this->unionOffset($arg1);
+		}
+
+		$this->_unionLimit = intval($arg1);
+
+		return $this;
+	}
+
+	/**
+	 * Set UNION offset
+	 *
+	 * @param int $offset offset
+	 * @return Core_QueryBuilder_Selection
+	 */
+	public function unionOffset($offset)
+	{
+		$this->_unionOffset = intval($offset);
+		return $this;
+	}
 
 	/**
 	 * Build the SQL query
@@ -576,14 +633,29 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 		// Unions
 		if (!empty($this->_union))
 		{
-			$aUnion = array($sql);
+			$aUnion = array('(', $sql);
 
-			foreach ($this->_union as $oUnion)
+			foreach ($this->_union as $aTmpUnion)
 			{
+				list($unionType, $oUnion) = $aTmpUnion;
+
+				$aUnion[] = ") \nUNION {$unionType}\n(";
 				$aUnion[] = $oUnion->build();
 			}
 
-			$sql = '(' . implode(") \nUNION \n(", $aUnion) . ')';
+			$aUnion[] = ')';
+
+			if (!is_null($this->_unionLimit))
+			{
+				$aUnion[] = ' LIMIT ' . $this->_unionLimit;
+			}
+
+			if (!is_null($this->_unionOffset))
+			{
+				$aUnion[] = ' OFFSET ' . $this->_unionOffset;
+			}
+
+			$sql = implode('', $aUnion);
 		}
 
 		return $sql;
@@ -627,7 +699,7 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	{
 		$this->_distinct = FALSE;
 
-		$this->_highPriority = $this->_straightJoin
+		$this->_unionLimit = $this->_unionOffset = $this->_highPriority = $this->_straightJoin
 			= $this->_sqlCalcFoundRows = NULL;
 
 		$this->_select = $this->_from

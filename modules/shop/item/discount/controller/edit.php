@@ -30,23 +30,40 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 
 		parent::setObject($object);
 
-		$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+		$oMainTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Shop_Item.tab_description'))
 			->name('main');
 
 		$this
 			->addTab($oMainTab);
 
-		$oMainTab->add(Core::factory('Admin_Form_Entity_Select')
+		$oMainTab->add(Admin_Form_Entity::factory('Select')
 			->caption(Core::_('Shop_Discount.item_discount_name'))
 			->options($this->_fillDiscounts($oShop->id))
 			->name('shop_discount_id')
 			->value($this->_object->id));
 
-		$oMainTab->add(Core::factory('Admin_Form_Entity_Checkbox')
+		$windowId =  $this->_Admin_Form_Controller->getWindowId();
+			
+		$oMainTab->add(Admin_Form_Entity::factory('Radiogroup')
+			->radio(array(
+				'—',
+				Core::_("Shop_Discount.shop_apply_modification_discount"),
+				Core::_("Shop_Discount.shop_not_apply_modification_discount")
+			))
+			//->caption('Caption')
+			->name('apply_for_modifications')
+			->divAttr(array('id' => 'import_types'))
+		)
+		->add(Admin_Form_Entity::factory('Code')
+			->html("<script>$(function() {
+				$('#{$windowId} #import_types').buttonset();
+			});</script>")
+		);
+		/*$oMainTab->add(Admin_Form_Entity::factory('Checkbox')
 			->value(1)
 			->caption(Core::_("Shop_Discount.shop_apply_modification_discount"))
-			->name("apply_for_modifications"));
+			->name("apply_for_modifications"));*/
 
 		$title = $this->_object->id
 					? Core::_('Shop_Discount.item_discount_edit_form_title')
@@ -91,13 +108,30 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			$oShopItem->add($oShopDiscount);
 		}
 
-		if (Core_Array::getPost('apply_for_modifications'))
+		/*if (Core_Array::getPost('apply_for_modifications'))
 		{
 			$aModifications = $oShopItem->Modifications->findAll();
 			foreach ($aModifications as $oModification)
 			{
 				$oModification->add($oShopDiscount);
 			}
+		}*/
+		switch(Core_Array::getPost('apply_for_modifications'))
+		{
+			case 1:
+				$aModifications = $oShopItem->Modifications->findAll();
+				foreach ($aModifications as $oModification)
+				{
+					$oModification->add($oShopDiscount);
+				}
+			break;
+			case 2:
+				$aModifications = $oShopItem->Modifications->findAll();
+				foreach ($aModifications as $oModification)
+				{
+					$oModification->remove($oShopDiscount);
+				}
+			break;
 		}
 
 		//parent::_applyObjectProperty();

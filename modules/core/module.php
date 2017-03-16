@@ -17,13 +17,13 @@ abstract class Core_Module
 	 * @var string
 	 */
 	public $version = NULL;
-	
+
 	/**
 	 * Module date
 	 * @var date
 	 */
 	public $date = NULL;
-	
+
 	/**
 	 * Module menu
 	 * @var array
@@ -51,7 +51,7 @@ abstract class Core_Module
 	 * @var array
 	 */
 	protected $_adminPages = array();
-	
+
 	/**
 	 * Get list of admin pages
 	 * @return array
@@ -65,4 +65,28 @@ abstract class Core_Module
 	 * Constructor.
 	 */
 	public function __construct() {}
+
+	/**
+	 * Install module
+	 * @return self
+	 * @hostcms-event Core_Module.onBeforeInstall
+	 */
+	public function install()
+	{
+		Core_Event::notify(get_class($this) . '.onBeforeInstall', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Uninstall module
+	 * @return self
+	 * @hostcms-event Core_Module.onBeforeUninstall
+	 */
+	public function uninstall()
+	{
+		Core_Event::notify(get_class($this) . '.onBeforeUninstall', $this);
+
+		return $this;
+	}
 }

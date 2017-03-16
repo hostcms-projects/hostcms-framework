@@ -26,6 +26,15 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 
+		// Создаем вкладку
+		$oShopItemTabExportImport = Admin_Form_Entity::factory('Tab')
+			->caption(Core::_('Shop_Item.tab_export'))
+			->name('ExportImport');
+
+		// Добавляем вкладку
+		$this
+			->addTabAfter($oShopItemTabExportImport, $oMainTab);
+
 		switch($modelName)
 		{
 			case 'property':
@@ -33,8 +42,11 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 				// Создаем экземпляр контроллера магазина
 				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
+				//Переносим GUID на "Экспорт/Импорт"
+				$oAdditionalTab->move($this->getField('guid'), $oShopItemTabExportImport);
+				
 				// Создаем поле единиц измерения как выпадающий список
-				$oShopMeasuresSelect = new Admin_Form_Entity_Select();
+				$oShopMeasuresSelect = Admin_Form_Entity::factory('Select');
 
 				$oShopMeasuresSelect
 					->caption(Core::_("Shop_Item.shop_measure_id"))
@@ -43,26 +55,26 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 						$Shop_Controller_Edit->fillMeasures()
 					)
 					->name('shop_measure_id')
-					->value($this->_object->Shop_Item_Property->shop_measure_id)					
+					->value($this->_object->Shop_Item_Property->shop_measure_id)
 					->divAttr(array('style' => 'float: left'));
 
 				$oMainTab
 					->add($oShopMeasuresSelect);
 
-				// Префикс				
-				$oShopPrefixInput = new Admin_Form_Entity_Input();
+				// Префикс
+				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
 				$oShopPrefixInput
 					->caption(Core::_('Shop_Item.property_prefix'))
-					->style('width: 100px')					
+					->style('width: 100px')
 					->name('prefix')
 					->value($this->_object->Shop_Item_Property->prefix)
 					->divAttr(array('style' => 'float: left'));
-				
-				$oMainTab
-					->add($oShopPrefixInput);					
 
-				// Способ отображения в фильтре				
-				$oShopFilterSelect = new Admin_Form_Entity_Select();
+				$oMainTab
+					->add($oShopPrefixInput);
+
+				// Способ отображения в фильтре
+				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
 				$oShopFilterSelect
 					->caption(Core::_('Shop_Item.property_filter'))
 					->style('width: 250px')
@@ -77,7 +89,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 						7 => Core::_('Shop_Item.properties_show_kind_listbox'))
 					)
 					->name('filter')
-					->value($this->_object->Shop_Item_Property->filter)					
+					->value($this->_object->Shop_Item_Property->filter)
 					->divAttr(array('style' => 'float: left'));
 
 				$oMainTab

@@ -70,7 +70,7 @@ abstract class Core_Inflection
 	 * @var array
 	 */
 	protected $_pluralCache = array();
-	
+
 	/**
 	 * Get plural form by singular
 	 * @param string $word word
@@ -97,7 +97,7 @@ abstract class Core_Inflection
 	 * @var array
 	 */
 	protected $_singularCache = array();
-	
+
 	/**
 	 * Get singular form by plural
 	 * @param string $word word
@@ -117,5 +117,16 @@ abstract class Core_Inflection
 		}
 
 		return $this->_singularCache[$word] = $this->_getSingular($word, $count);
+	}
+
+	/**
+	 * Number to str
+	 * @param float $float
+	 * @param string $lng
+	 * @return string
+	 */
+	static public function num2str($float, $lng = 'en')
+	{
+		return self::_getDriver($lng)->_num2str($float);
 	}
 }

@@ -125,26 +125,58 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 		);
 
 		// Выбираем все типы доставки для данного магазина
-		$aShop_Deliveries = $oShop->Shop_Deliveries->findAll();
+		$aShop_Deliveries = $oShop->Shop_Deliveries->getAllByActive(1);
 
 		foreach ($aShop_Deliveries as $oShop_Delivery)
 		{
-			$oShop_Delivery_Condition_Controller = new Shop_Delivery_Condition_Controller();
-			$oShop_Delivery_Condition_Controller
-				->shop_country_id($this->shop_country_id)
-				->shop_country_location_id($this->shop_country_location_id)
-				->shop_country_location_city_id($this->shop_country_location_city_id)
-				->shop_country_location_city_area_id($this->shop_country_location_city_area_id)
-				->totalWeight($this->totalWeight)
-				->totalAmount($this->totalAmount);
+			if ($oShop_Delivery->type == 0)
+			{
+				$oShop_Delivery_Condition_Controller = new Shop_Delivery_Condition_Controller();
+				$oShop_Delivery_Condition_Controller
+					->shop_country_id($this->shop_country_id)
+					->shop_country_location_id($this->shop_country_location_id)
+					->shop_country_location_city_id($this->shop_country_location_city_id)
+					->shop_country_location_city_area_id($this->shop_country_location_city_area_id)
+					->totalWeight($this->totalWeight)
+					->totalAmount($this->totalAmount);
 
-			// Условие доставки, подходящее под ограничения
-			$oShop_Delivery_Condition = $oShop_Delivery_Condition_Controller->getShopDeliveryCondition($oShop_Delivery);
+				// Условие доставки, подходящее под ограничения
+				$oShop_Delivery_Condition = $oShop_Delivery_Condition_Controller->getShopDeliveryCondition($oShop_Delivery);
+			}
+			else
+			{
+				//
+				
+				try
+				{
+					$sPrice = Shop_Delivery_Handler::factory($oShop_Delivery)->country($this->shop_country_id)->location($this->shop_country_location_id)->city($this->shop_country_location_city_id)->weight($this->totalWeight)->execute();
+					$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition');
+					$oShop_Delivery_Condition->shop_delivery_id = $oShop_Delivery->id;
+					$oShop_Delivery_Condition->shop_currency_id = $oShop_Delivery->Shop->shop_currency_id;
+					$oShop_Delivery_Condition->price = $sPrice;
+				}
+				catch (Exception $e) 
+				{echo '<br/>'.$e->getMessage();
+					$oShop_Delivery_Condition = NULL;
+				}
+				
+				
+				/*if (found)
+				{
+					$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition');
+					$oShop_Delivery_Condition->price = 123;
+				}
+				else
+				{
+					$oShop_Delivery_Condition = NULL;
+				}*/
+			}
 
 			if (!is_null($oShop_Delivery_Condition))
 			{
-				$this->addEntity($oShop_Delivery->clearEntities());
-				$oShop_Delivery->addEntity($oShop_Delivery_Condition);
+				$this->addEntity(
+					$oShop_Delivery->clearEntities()->addEntity($oShop_Delivery_Condition)
+				);
 			}
 		}
 

@@ -129,6 +129,16 @@ class Core_Response
 	}
 
 	/**
+	 * Get response status
+	 *
+	 * @return int status
+	 */
+	public function getStatus()
+	{
+		return $this->_status;
+	}
+
+	/**
 	 * Add response body
 	 *
 	 * <code>

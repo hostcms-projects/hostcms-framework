@@ -28,7 +28,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparator = new Admin_Form_Entity_Separator();
+		$oSeparator = Admin_Form_Entity::factory('Separator');
 
 		$oValueField = $this->getField('value');
 
@@ -40,7 +40,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 		$oMainTab->delete($this->getField('mode'));
 
-		$oTypeSelectField = new Admin_Form_Entity_Select();
+		$oTypeSelectField = Admin_Form_Entity::factory('Select');
 
 		$oTypeSelectField
 			->name('type')
@@ -69,7 +69,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
-		$oCurrencySelectField = new Admin_Form_Entity_Select();
+		$oCurrencySelectField = Admin_Form_Entity::factory('Select');
 
 		$oCurrencySelectField
 			->name('shop_currency_id')
@@ -80,14 +80,15 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$oMainTab->addAfter($oCurrencySelectField, $oMaxAmountField);
 
-		$oLogicSwitcherField = new Admin_Form_Entity_Radiogroup();
+		$oLogicSwitcherField = Admin_Form_Entity::factory('Radiogroup');
 
 		$oLogicSwitcherField
 			->name('mode')
 			->value($this->_object->mode)
 			->radio(array(
 				Core::_('Shop_Purchase_Discount.order_discount_case_and'),
-				Core::_('Shop_Purchase_Discount.order_discount_case_or')
+				Core::_('Shop_Purchase_Discount.order_discount_case_or'),
+				Core::_('Shop_Purchase_Discount.order_discount_case_accumulative')
 			))
 			->divAttr(array('style' => 'font-weight: bold;'));
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Wysiwyg
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Wysiwyg_Filemanager_File extends Core_Entity
 {
@@ -23,43 +23,49 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 * @var string
 	 */
 	public $hash = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $name = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $type = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $datetime = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $size = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $mode = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $path = NULL;
-	
+
+	/**
+	 * Backend property
+	 * @var int
+	 */
+	public $user_id = 0;
+
 	/**
 	 * Backend property
 	 * @var int
@@ -80,10 +86,10 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 * @var string
 	 */
 	protected $_sortField = NULL;
-	
+
 	/**
-	 * Set sorting field 
-	 * @param string $sortField 
+	 * Set sorting field
+	 * @param string $sortField
 	 */
 	public function setSortField($sortField)
 	{
@@ -163,7 +169,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	public function getTableColums()
 	{
 		return array_flip(
-			array('hash', 'name', 'type', 'datetime', 'size', 'mode')
+			array('hash', 'name', 'type', 'datetime', 'size', 'mode', 'user_id')
 		);
 	}
 

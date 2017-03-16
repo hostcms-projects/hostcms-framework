@@ -415,15 +415,15 @@ class shop
 					}
 				break 2; // (!)
 				default:
-					if (is_numeric($value))
+					if (is_numeric($sOriginalValue))
 					{
-						$value = intval($value);
-						$queryBuilder->where(Core_QueryBuilder::expression($value), '=', $value);
+						$sOriginalValue = intval($sOriginalValue);
+						$queryBuilder->where(Core_QueryBuilder::expression($sOriginalValue), '=', $sOriginalValue);
 					}
 					// осталось 3 аргумента для where при конструкции "AND property_value_ints.value >= 61"
 					elseif ($iCount - $key == 3)
 					{
-						$queryBuilder->where($value, $aStr[$key + 1], $aStr[$key + 2]);
+						$queryBuilder->where($sOriginalValue, $aStr[$key + 1], $aStr[$key + 2]);
 					}
 				break 2; // (!)
 			}

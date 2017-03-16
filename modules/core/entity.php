@@ -578,8 +578,13 @@ class Core_Entity extends Core_ORM
 	protected function _getCopiedName()
 	{
 		$nameColumn = $this->_nameColumn;
+
+		$prefix = defined('XSL_PREFIX')
+			? XSL_PREFIX
+			: '';
+
 		return $this->_changeCopiedName
-			? Core::_('Admin.copy', $this->$nameColumn, date('d.m.Y H:i:s'))
+			? Core::_('Admin.copy', $prefix . $this->$nameColumn, date('d.m.Y H:i:s'))
 			: $this->$nameColumn;
 	}
 
@@ -612,7 +617,7 @@ class Core_Entity extends Core_ORM
 	{
 		$this->_loadColumns();
 
-		// Implement a getByXXX() methods
+		// Implement a getByXXX($value, $bCache, $compare = '=') methods
 		if (count($arguments) > 0)
 		{
 			if (strpos($name, 'getBy') === 0)
@@ -620,19 +625,19 @@ class Core_Entity extends Core_ORM
 				$field_name = strtolower(substr($name, 5));
 
 				$this->queryBuilder()
-					->where($this->_tableName . '.' . $field_name, '=', $arguments[0])
+					->where($this->_tableName . '.' . $field_name, isset($arguments[2]) ? $arguments[2] : '=', $arguments[0])
 					->limit(1);
 
 				$aObjects = $this->findAll(isset($arguments[1]) ? $arguments[1] : TRUE);
 				return isset($aObjects[0]) ? $aObjects[0] : NULL;
 			}
-			// Implement a getAllByXXX() methods
+			// Implement a getAllByXXX($value, $bCache, $compare = '=') methods
 			elseif (strpos($name, 'getAllBy') === 0)
 			{
 				$field_name = strtolower(substr($name, 8));
 
 				$this->queryBuilder()
-					->where($this->_tableName . '.' . $field_name, '=', $arguments[0]);
+					->where($this->_tableName . '.' . $field_name, isset($arguments[2]) ? $arguments[2] : '=', $arguments[0]);
 
 				return $this->findAll(isset($arguments[1]) ? $arguments[1] : TRUE);
 			}

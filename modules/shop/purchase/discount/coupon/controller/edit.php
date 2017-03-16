@@ -27,7 +27,7 @@ class Shop_Purchase_Discount_Coupon_Controller_Edit extends Admin_Form_Action_Co
 
 		$oAdditionalTab->delete($this->getField('shop_purchase_discount_id'));
 
-		$oCouponSelect = new Admin_Form_Entity_Select();
+		$oCouponSelect = Admin_Form_Entity::factory('Select');
 
 		$aOptions = $this->_fillShopPurchaseDiscounts(Core_Array::getGet('shop_id', 0));
 		

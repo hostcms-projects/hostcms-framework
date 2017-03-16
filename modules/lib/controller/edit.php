@@ -23,7 +23,7 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		$oAdmin_Form_Entity_Select = new Admin_Form_Entity_Select();
+		$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
 
 		$oAdmin_Form_Entity_Select
 			->options(
@@ -47,13 +47,13 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdditionalTab = $this->getTab('additional');
 
 				// Настройки типовой дин. страницы
-				$oAdmin_Form_Tab_Entity_Lib_Config = Core::factory('Admin_Form_Entity_Tab')
+				$oAdmin_Form_Tab_Entity_Lib_Config = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Lib.lib_php_code_config'))
 					->name('tab_lib_php_code_config');
 
 				$this->addTabBefore($oAdmin_Form_Tab_Entity_Lib_Config, $oAdditionalTab);
 
-				$oAdmin_Form_Entity_Textarea_Lib_Config = new Admin_Form_Entity_Textarea();
+				$oAdmin_Form_Entity_Textarea_Lib_Config = Admin_Form_Entity::factory('Textarea');
 
 				$oAdmin_Form_Entity_Textarea_Lib_Config
 					->value(
@@ -67,13 +67,13 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdmin_Form_Tab_Entity_Lib_Config->add($oAdmin_Form_Entity_Textarea_Lib_Config);
 
 				// Код типовой дин. страницы
-				$oAdmin_Form_Tab_Entity_Lib = Core::factory('Admin_Form_Entity_Tab')
+				$oAdmin_Form_Tab_Entity_Lib = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Lib.lib_php_code'))
 					->name('tab_lib_php_code');
 
 				$this->addTabBefore($oAdmin_Form_Tab_Entity_Lib, $oAdditionalTab);
 
-				$oAdmin_Form_Entity_Textarea_Lib = new Admin_Form_Entity_Textarea();
+				$oAdmin_Form_Entity_Textarea_Lib = Admin_Form_Entity::factory('Textarea');
 
 				$oAdmin_Form_Entity_Textarea_Lib
 					->value(

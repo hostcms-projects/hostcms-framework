@@ -41,7 +41,7 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			: Core::_('Lib_Property.lib_property_form_title_add'));
 
 		// Создаем элемент <select>
-		$oHtmlFormSelect = new Admin_Form_Entity_Select();
+		$oHtmlFormSelect = Admin_Form_Entity::factory('Select');
 
 		$oHtmlFormSelect
 			->options
@@ -84,7 +84,7 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 
 		$oMainTab->addAfter($oHtmlFormSelect, $this->getField('varible_name'));
 
-		$oAdmin_Form_Entity_Code = new Admin_Form_Entity_Code();
+		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 		$oAdmin_Form_Entity_Code->html(
 			"<script>ShowRowsLibProperty('{$windowId}', " . intval($this->_object->type) . ")</script>"
 		);

@@ -29,6 +29,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 		try
 		{
+			$return = NULL;
 
 			$Site_Controller_Template = Site_Controller_Template::instance()
 				->templatePath(CMS_FOLDER . TMP_DIR)
@@ -42,7 +43,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 					// Операция для кнопки
 					$this->_formOperation = 'chooseTemplate';
 
-					$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+					$oMainTab = Admin_Form_Entity::factory('Tab')
 						->caption('Main')
 						->name('main');
 
@@ -113,7 +114,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 					<?php
 
 					$oMainTab->add(
-						Core::factory('Admin_Form_Entity_Code')->html(
+						Admin_Form_Entity::factory('Code')->html(
 							ob_get_clean()
 						)
 					);
@@ -124,7 +125,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 					// Операция для кнопки
 					$this->_formOperation = 'chooseTemplateType';
 
-					$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+					$oMainTab = Admin_Form_Entity::factory('Tab')
 						->caption('Main')
 						->name('main');
 
@@ -179,7 +180,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 							<?php
 
 							$oMainTab->add(
-								Core::factory('Admin_Form_Entity_Code')->html(
+								Admin_Form_Entity::factory('Code')->html(
 									ob_get_clean()
 								)
 							);
@@ -194,7 +195,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 					// Операция для кнопки
 					$this->_formOperation = 'createSite';
 
-					$oMainTab = Core::factory('Admin_Form_Entity_Tab')
+					$oMainTab = Admin_Form_Entity::factory('Tab')
 						->caption('Main')
 						->name('main');
 
@@ -366,7 +367,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 					}
 
 					$oMainTab->add(
-						Core::factory('Admin_Form_Entity_Code')->html(
+						Admin_Form_Entity::factory('Code')->html(
 							ob_get_clean()
 						)
 					);
@@ -491,9 +492,9 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 	protected function _addButtons()
 	{
 		// Кнопки
-		$oAdmin_Form_Entity_Buttons = new Admin_Form_Entity_Buttons();
+		$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');
 
-		$oAdmin_Form_Entity_Button_Save = Core::factory('Admin_Form_Entity_Button')
+		$oAdmin_Form_Entity_Button_Save = Admin_Form_Entity::factory('Button')
 			->name($this->_formOperation)
 			->class('applyButton')
 			->value(Core::_('Install.next'))

@@ -326,7 +326,7 @@ class Shop_Producer_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_producer_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_producer.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

@@ -21,6 +21,12 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	protected $_aInsertedGroups = array();
 
 	/**
+	 * Array of property values
+	 * @var array
+	 */
+	protected $_aClearedPropertyValues = array();
+
+	/**
 	 * Array of updated groups
 	 * @var array
 	 */
@@ -98,6 +104,18 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 * @var Shop_Item_Model
 	 */
 	protected $_oCurrentItem;
+
+	/**
+	 * Current order
+	 * @var Shop_Item_Model
+	 */
+	protected $_oCurrentOrder;
+
+	/**
+	 * Current order item
+	 * @var Shop_Order_Item_Model
+	 */
+	protected $_oCurrentOrderItem;
 
 	/**
 	 * Current tags
@@ -194,7 +212,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		// 2 - не обновлять существующие товары
 		'importAction',
 		// Флаг, указывающий, включена ли индексация
-		'searchIndexation'
+		'searchIndexation',
+		'deleteImage'
 	);
 
 	/**
@@ -225,13 +244,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 * Path of the big image
 	 * @var string
 	 */
-	protected $_sBigImageFile = NULL;
+	protected $_sBigImageFile = '';
 
 	/**
 	 * Path of the small image
 	 * @var string
 	 */
-	protected $_sSmallImageFile = NULL;
+	protected $_sSmallImageFile = '';
 
 	/**
 	 * Increment inserted groups
@@ -318,6 +337,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		// Инициализация текущей специальной цены для товара
 		$this->_oCurrentShopSpecialPrice = Core_Entity::factory('Shop_Specialprice');
 
+		$this->_oCurrentOrder = NULL;
+		$this->_oCurrentOrderItem = NULL;
+
 		$this->_InsertedItemsCount = 0;
 		$this->_UpdatedItemsCount = 0;
 		$this->_InsertedGroupsCount = 0;
@@ -386,6 +408,292 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 				switch($this->csv_fields[$iKey])
 				{
+					//=================ЗАКАЗЫ=================//
+					case 'order_guid':
+						if (strval($sData))
+						{
+							$this->_oCurrentOrder = $this->_oCurrentShop->Shop_Orders->getByGUID($sData, FALSE);
+
+							if(is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder = Core_Entity::factory('Shop_Order');
+								$this->_oCurrentOrder->guid = $sData;
+							}
+						}
+					break;
+					case 'order_invoice':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->invoice = $sData;
+						}
+					break;
+					case 'order_shop_country_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Country = Core_Entity::factory('Shop_Country')->getByName($sData);
+
+							if(!is_null($oShop_Country))
+							{
+								$this->_oCurrentOrder->shop_country_id = $oShop_Country->id;
+							}
+						}
+					break;
+					case 'order_shop_country_location_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Country_Location = Core_Entity::factory('Shop_Country', $this->_oCurrentOrder->shop_country_id)->Shop_Country_Locations->getByName($sData);
+
+							if(!is_null($oShop_Country_Location))
+							{
+								$this->_oCurrentOrder->shop_country_location_id = $oShop_Country_Location->id;
+							}
+						}
+					break;
+					case 'order_shop_country_location_city_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Country_Location_City = Core_Entity::factory('Shop_Country_Location', $this->_oCurrentOrder->shop_country_location_id)->Shop_Country_Location_Cities->getByName($sData);
+
+							if(!is_null($oShop_Country_Location_City))
+							{
+								$this->_oCurrentOrder->shop_country_location_city_id = $oShop_Country_Location_City->id;
+							}
+						}
+					break;
+					case 'order_shop_country_location_city_area_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Country_Location_City_Area = Core_Entity::factory('Shop_Country_Location_City', $this->_oCurrentOrder->shop_country_location_city_id)->Shop_Country_Location_City_Areas->getByName($sData);
+
+							if(!is_null($oShop_Country_Location_City_Area))
+							{
+								$this->_oCurrentOrder->shop_country_location_city_area_id = $oShop_Country_Location_City_Area->id;
+							}
+						}
+					break;
+					case 'order_name':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->name = $sData;
+						}
+					break;
+					case 'order_surname':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->surname = $sData;
+						}
+					break;
+					case 'order_patronymic':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->patronymic = $sData;
+						}
+					break;
+					case 'order_email':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->email = $sData;
+						}
+					break;
+					case 'order_acceptance_report':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->acceptance_report = $sData;
+						}
+					break;
+					case 'order_vat_invoice':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->vat_invoice = $sData;
+						}
+					break;
+					case 'order_company':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->company = $sData;
+						}
+					break;
+					case 'order_tin':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->tin = $sData;
+						}
+					break;
+					case 'order_kpp':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->kpp = $sData;
+						}
+					break;
+					case 'order_phone':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->phone = $sData;
+						}
+					break;
+					case 'order_fax':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->fax = $sData;
+						}
+					break;
+					case 'order_address':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->address = $sData;
+						}
+					break;
+					case 'order_shop_order_status_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Order_Status = Core_Entity::factory('Shop_Order_Status')->getByName($sData);
+							if(!is_null($oShop_Order_Status))
+							{
+								$this->_oCurrentOrder->shop_order_status_id = $oShop_Order_Status->id;
+							}
+						}
+					break;
+					case 'order_shop_currency_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Currency = Core_Entity::factory('Shop_Currency')->getByName($sData);
+							if(!is_null($oShop_Currency))
+							{
+								$this->_oCurrentOrder->shop_currency_id = $oShop_Currency->id;
+							}
+						}
+					break;
+					case 'order_shop_payment_system_id':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$oShop_Payment_System = $this->_oCurrentShop->Shop_Payment_Systems->getById($sData);
+							if(!is_null($oShop_Payment_System))
+							{
+								$this->_oCurrentOrder->shop_payment_system_id = $oShop_Payment_System->id;
+							}
+						}
+					break;
+					case 'order_datetime':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
+							{
+								$this->_oCurrentOrder->datetime = $sData;
+							}
+							else
+							{
+								$this->_oCurrentOrder->datetime = Core_Date::datetime2sql($sData);
+							}
+						}
+					break;
+					case 'order_paid':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->paid = ((bool)$sData)?1:0;
+						}
+					break;
+					case 'order_payment_datetime':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
+							{
+								$this->_oCurrentOrder->payment_datetime = $sData;
+							}
+							else
+							{
+								$this->_oCurrentOrder->payment_datetime = Core_Date::datetime2sql($sData);
+							}
+						}
+					break;
+					case 'order_description':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->description = $sData;
+						}
+					break;
+					case 'order_system_information':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->system_information = $sData;
+						}
+					break;
+					case 'order_canceled':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->canceled = ((bool)$sData)?1:0;
+						}
+					break;
+					case 'order_status_datetime':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
+							{
+								$this->_oCurrentOrder->status_datetime = $sData;
+							}
+							else
+							{
+								$this->_oCurrentOrder->status_datetime = Core_Date::datetime2sql($sData);
+							}
+						}
+					break;
+					case 'order_delivery_information':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrder->delivery_information = $sData;
+						}
+					break;
+
+					//=======================================//
+
+					//==============    order items    ==============//
+
+					case 'order_item_marking':
+						if (strval($sData) && !is_null($this->_oCurrentOrder))
+						{
+							$this->_oCurrentOrderItem = $this->_oCurrentOrder->Shop_Order_Items->getBymarking($sData, FALSE);
+
+							if(is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem = Core_Entity::factory('Shop_Order_Item');
+								$this->_oCurrentOrderItem->marking = $sData;
+							}
+						}
+					break;
+					case 'order_item_name':
+						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
+						{
+							$this->_oCurrentOrderItem->name = $sData;
+						}
+					break;
+					case 'order_item_quantity':
+						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
+						{
+							$this->_oCurrentOrderItem->quantity = $sData;
+						}
+					break;
+					case 'order_item_price':
+						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
+						{
+							$this->_oCurrentOrderItem->price = $sData;
+						}
+					break;
+					case 'order_item_rate':
+						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
+						{
+							$this->_oCurrentOrderItem->rate = $sData;
+						}
+					break;
+					case 'order_item_type':
+						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
+						{
+							$this->_oCurrentOrderItem->type = $sData;
+						}
+					break;
+
+					//=======================================//
+
+
+
 					// Идентификатор группы товаров
 					case 'shop_groups_id':
 						if (intval($sData))
@@ -890,7 +1198,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							}
 							else
 							{
-								$this->_oCurrentItem->shop_seller_id = Core_Entity::factory("Shop_Seller")->name($sData)->save()->id;
+								$this->_oCurrentItem->shop_seller_id = Core_Entity::factory("Shop_Seller")->name($sData)->path(Core_Str::transliteration($sData))->save()->id;
 							}
 						}
 					break;
@@ -999,17 +1307,17 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					break;
 					// Передана большая картинка товара, обработка будет после вставки товара
 					case 'shop_items_catalog_image':
-						if ($sData != '')
-						{
+						/*if ($sData != '')
+						{*/
 							$this->_sBigImageFile = $sData;
-						}
+						//}
 					break;
 					// Передана малая картинка товара, обработка будет после вставки товара
 					case 'shop_items_catalog_small_image':
-						if ($sData != '')
-						{
+						/*if ($sData != '')
+						{*/
 							$this->_sSmallImageFile = $sData;
-						}
+						//}
 					break;
 					// Переданы метки товара, обработка будет после вставки товара
 					case 'shop_items_catalog_label':
@@ -1475,8 +1783,23 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			!$this->_oCurrentItem->id && is_null($this->_oCurrentItem->path) && $this->_oCurrentItem->path = '';
 			$this->_oCurrentItem->id && $this->_oCurrentItem->id == $this->_oCurrentItem->modification_id && $this->_oCurrentItem->modification_id = 0;
 
+			if(!is_null($this->_oCurrentOrder))
+			{
+				$this->_oCurrentShop->add($this->_oCurrentOrder);
+			}
+
+
+			if($this->_oCurrentItem->id && $this->importAction == 2)
+			{
+				// если сказано - оставить без изменений, затираем все изменения
+				$this->_oCurrentItem = Core_Entity::factory('Shop_Item')->find($this->_oCurrentItem->id);
+				$this->_sBigImageFile = '';
+				$this->_sSmallImageFile = '';
+				$this->deleteImage = 0;
+			}
+
 			if (($this->_oCurrentItem->id
-			&& $this->importAction == 1
+			//&& $this->importAction == 1
 			&& !is_null($this->_oCurrentItem->name)
 			&& $this->_oCurrentItem->save()))
 			{
@@ -1701,7 +2024,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					}
 				}
 
-				if (!is_null($this->_sBigImageFile) && $this->importAction != 2)
+				if (/*!is_null($this->_sBigImageFile) && */$this->_sBigImageFile != ''/* && $this->importAction != 2*/)
 				{
 					// Папка назначения
 					$sDestinationFolder = $this->_oCurrentItem->getItemPath();
@@ -1817,13 +2140,24 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							Core_File::delete($sSourceFile);
 						}
 					}
-
-					$this->_sBigImageFile = NULL;
+				}
+				elseif($this->deleteImage)
+				{
+					// Удалить текущее большое изображение
+					if ($this->_oCurrentItem->image_large != '')
+					{
+						try
+						{
+							Core_File::delete($this->_oCurrentItem->getItemPath() . $this->_oCurrentItem->image_large);
+						} catch (Exception $e) {}
+					}
 				}
 
-				if ((!is_null($this->_sSmallImageFile) || !is_null($this->_sBigImageFile)) && $this->importAction != 2)
+				if ($this->_sSmallImageFile != ''
+				|| ($this->_sBigImageFile != ''
+				&& !$this->deleteImage))
 				{
-					is_null($this->_sSmallImageFile) && $this->_sSmallImageFile = $this->_sBigImageFile;
+					$this->_sSmallImageFile == '' && $this->_sSmallImageFile = $this->_sBigImageFile;
 
 					// Папка назначения
 					$sDestinationFolder = $this->_oCurrentItem->getItemPath();
@@ -1872,6 +2206,15 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 						if (is_file($sSourceFile) && filesize($sSourceFile))
 						{
+							// Удаляем старое малое изображение
+							if ($this->_oCurrentItem->image_small != '')
+							{
+								try
+								{
+									Core_File::delete($this->_oCurrentItem->getItemPath() . $this->_oCurrentItem->image_small);
+								} catch (Exception $e) {}
+							}
+
 							$aPicturesParam = array();
 							$aPicturesParam['small_image_source'] = $sSourceFile;
 							$aPicturesParam['small_image_name'] = $sSourceFileBaseName;
@@ -1906,8 +2249,19 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 					}
 
-					$this->_sSmallImageFile = NULL;
+					$this->_sSmallImageFile = '';
 				}
+				elseif($this->deleteImage)
+				{
+					if ($this->_oCurrentItem->image_small != '')
+					{
+						try
+						{
+							Core_File::delete($this->_oCurrentItem->getItemPath() . $this->_oCurrentItem->image_small);
+						} catch (Exception $e) {}
+					}
+				}
+				$this->_sBigImageFile = '';
 
 				// WARNING
 				foreach ($this->_aExternalProperties as $iPropertyID => $sPropertyValue)
@@ -1931,9 +2285,18 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 					$aPropertyValues = $oProperty->getValues($this->_oCurrentItem->id, FALSE);
 
-					$oProperty_Value = isset($aPropertyValues[0])
-						? $aPropertyValues[0]
-						: $oProperty->createNewValue($this->_oCurrentItem->id);
+					if(!isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) || (isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) && !in_array($oProperty->guid, $this->_aClearedPropertyValues[$this->_oCurrentItem->id])))
+					{
+						foreach($aPropertyValues as $oPropertyValue)
+						{
+							$oProperty->type == 2 && $oPropertyValue->setDir($this->_oCurrentItem->getItemPath());
+							$oPropertyValue->delete();
+						}
+
+						$this->_aClearedPropertyValues[$this->_oCurrentItem->id][] = $oProperty->guid;
+					}
+
+					$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
 
 					switch($oProperty->type)
 					{
@@ -2226,7 +2589,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$oProperty_Value->save();
 				}
 
-
 				foreach ($this->_aExternalPrices as $iPriceID => $sPriceValue)
 				{
 					$oShop_Item_Price = Core_Entity::factory('Shop_Item', $this->_oCurrentItem->id)
@@ -2250,6 +2612,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			$this->_oCurrentItem = Core_Entity::factory('Shop_Item', 0);
 			$this->_oCurrentGroup =  Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
 			$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
+
+			if(!is_null($this->_oCurrentOrderItem))
+			{
+				$this->_oCurrentOrder->add($this->_oCurrentOrderItem);
+			}
+			$this->_oCurrentOrder = NULL;
+			$this->_oCurrentOrderItem = NULL;
+
 
 			// Очищаем временные массивы
 			$this->_aExternalPrices = array();

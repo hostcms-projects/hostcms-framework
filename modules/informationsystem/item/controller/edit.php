@@ -21,8 +21,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 	{
 		$modelName = $object->getModelName();
 
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$informationsystem_id = Core_Array::getGet('informationsystem_id');
 		$informationsystem_group_id = Core_Array::getGet('informationsystem_group_id');
@@ -70,7 +70,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab = $this->getTab('main');
 				$oAdditionalTab = $this->getTab('additional');
 
-				$oPropertyTab = Core::factory('Admin_Form_Entity_Tab')
+				$oPropertyTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_4'))
 					->name('Property');
 
@@ -88,7 +88,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oAdditionalTab->delete($this->getField('informationsystem_group_id'));
 
-				$oSelect_Group = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Group = Admin_Form_Entity::factory('Select')
 					->name('informationsystem_group_id')
 					->caption(Core::_('Informationsystem_Item.informationsystem_group_id'))
 					->options(
@@ -102,7 +102,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oMainTab->delete($this->getField('name'));
 
-				$oName = new Admin_Form_Entity_Input();
+				$oName = Admin_Form_Entity::factory('Input');
 
 				$oName
 					->name('name')
@@ -152,7 +152,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->style('width: 110px;');
 
 				// Добавляем новое поле типа файл
-				$oImageField = new Admin_Form_Entity_File();
+				$oImageField = Admin_Form_Entity::factory('File');
 
 				$oLargeFilePath = is_file($this->_object->getLargeFilePath())
 					? $this->_object->getLargeFileHref()
@@ -261,7 +261,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 
 				// Список групп пользователей
-				$oSelect_SiteuserGroups = new Admin_Form_Entity_Select();
+				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
 				$oSelect_SiteuserGroups
 					->options(
 						array(
@@ -282,7 +282,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				{
 					$oMaillist_Controller_Edit = new Maillist_Controller_Edit($this->_Admin_Form_Action);
 
-					$oSelect_Maillist = new Admin_Form_Entity_Select();
+					$oSelect_Maillist = Admin_Form_Entity::factory('Select');
 
 					$oSelect_Maillist->options(		array(Core::_('Informationsystem_Item.maillist_default_value'))
 						+ $oMaillist_Controller_Edit->fillMaillist()
@@ -298,7 +298,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$this->getField('informationsystem_id')->divAttr(array('style' => 'display: none'));
 
 				// Description
-				$oInformationsystemTabDescription = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabDescription = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_1'))
 					->name('Description');
 				$this->addTabAfter($oInformationsystemTabDescription, $oMainTab);
@@ -314,7 +314,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						Typograph_Controller::instance()->eraseOpticalAlignment($this->getField('description')->value)
 					);
 
-					$oUseTypograph = new Admin_Form_Entity_Checkbox();
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 					$oUseTypograph
 						->name("use_typograph_description")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_description'))
@@ -324,7 +324,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 					$oInformationsystemTabDescription->addAfter($oUseTypograph, $this->getField('description'));
 
-					$oUseTrailingPunctuation = new Admin_Form_Entity_Checkbox();
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_description")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation'))
@@ -349,7 +349,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						Typograph_Controller::instance()->eraseOpticalAlignment($this->getField('text')->value)
 					);
 
-					$oUseTypograph = new Admin_Form_Entity_Checkbox();
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 					$oUseTypograph
 						->name("use_typograph_text")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_for_text'))
@@ -359,7 +359,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 					$oInformationsystemTabDescription->addAfter($oUseTypograph, $this->getField('text'));
 
-					$oUseTrailingPunctuation = new Admin_Form_Entity_Checkbox();
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_text")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation_for_text'))
@@ -370,7 +370,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$oInformationsystemTabDescription->addAfter($oUseTrailingPunctuation, $oUseTypograph);
 				}
 
-				$oInformationsystemTabSeo = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_2'))
 					->name('Seo');
 
@@ -383,13 +383,13 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				if (Core::moduleIsActive('tag'))
 				{
-					$oTagsTab = Core::factory('Admin_Form_Entity_Tab')
+					$oTagsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Informationsystem_Item.tab_3'))
 						->name('Tags');
 
 					$this->addTabAfter($oTagsTab, $oInformationsystemTabSeo);
 
-					$oInput_Tags = new Admin_Form_Entity_Input();
+					$oInput_Tags = Admin_Form_Entity::factory('Input');
 
 					$oInput_Tags
 						->name('tags')
@@ -442,7 +442,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab = $this->getTab('main');
 				$oAdditionalTab = $this->getTab('additional');
 
-				$oPropertyTab = Core::factory('Admin_Form_Entity_Tab')
+				$oPropertyTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_properties'))
 					->name('Property');
 
@@ -464,7 +464,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oSelect_Group = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Group = Admin_Form_Entity::factory('Select')
 				->name('parent_id')
 				->caption(Core::_('Informationsystem_Group.parent_id'))
 				->options(
@@ -489,8 +489,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 
 				// Добавляем новое поле типа файл
-				//$oIcoFileField = new Admin_Form_Entity_Input();
-				$oImageField = new Admin_Form_Entity_File();
+				//$oIcoFileField = Admin_Form_Entity::factory('Input');
+				$oImageField = Admin_Form_Entity::factory('File');
 
 				$oLargeFilePath = is_file($this->_object->getLargeFilePath())
 					? $this->_object->getLargeFileHref()
@@ -576,7 +576,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				if (Core::moduleIsActive('typograph'))
 				{
-					$oUseTypograph = new Admin_Form_Entity_Checkbox();
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 					$oUseTypograph
 						->name("use_typograph")
 						->caption(Core::_('Informationsystem_Group.exec_typograph_description'))
@@ -586,7 +586,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 					$oMainTab->addAfter($oUseTypograph, $this->getField('description'));
 
-					$oUseTrailingPunctuation = new Admin_Form_Entity_Checkbox();
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation")
 						->caption(Core::_('Informationsystem_Group.use_trailing_punctuation'))
@@ -612,7 +612,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 
 				// Список групп пользователей
-				$oSelect_SiteuserGroups = new Admin_Form_Entity_Select();
+				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
 				$oSelect_SiteuserGroups
 					->options(		array(			0 => Core::_('Informationsystem.information_all'),
 							-1 => Core::_('Informationsystem_Group.information_parent')
@@ -631,7 +631,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oAdditionalTab->delete($this->getField('siteuser_id'));
 
-				$oSiteuser = new Admin_Form_Entity_Input();
+				$oSiteuser = Admin_Form_Entity::factory('Input');
 
 				$oSiteuser
 					->value($this->_object->siteuser_id)
@@ -649,9 +649,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					);
 
 				$oMainTab->delete($this->getField('active'));
-				$oSelect_SiteuserGroups = new Admin_Form_Entity_Select();
+				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
 
-				$oActive_Group = new Admin_Form_Entity_Checkbox();
+				$oActive_Group = Admin_Form_Entity::factory('Checkbox');
 				$oActive_Group
 					->name('active')
 					->value($this->_object->active)
@@ -660,7 +660,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oMainTab->addAfter($oActive_Group, $this->getField('path'));
 
-				$oInformationsystemTabSeo = Core::factory('Admin_Form_Entity_Tab')
+				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_seo'))
 					->name('Seo');
 

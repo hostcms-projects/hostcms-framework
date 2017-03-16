@@ -48,15 +48,15 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				$oAdditionalTab = $this->getTab('additional');
 
-				$oContactsTab = Core::factory('Admin_Form_Entity_Tab')
+				$oContactsTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Producer.tab2'))
 					->name('Contacts');
 
-				$oBankContactsTab = Core::factory('Admin_Form_Entity_Tab')
+				$oBankContactsTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Producer.tab3'))
 					->name('Contacts');
 
-				$oSEOTab = Core::factory('Admin_Form_Entity_Tab')
+				$oSEOTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Producer.tab4'))
 					->name('Contacts');
 
@@ -91,7 +91,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				$oShop = $this->_object->Shop;
 
 				// Добавляем новое поле типа файл
-				$oImageField = new Admin_Form_Entity_File();
+				$oImageField = Admin_Form_Entity::factory('File');
 
 				$oLargeFilePath = is_file($this->_object->getLargeFilePath())
 					? $this->_object->getLargeFileHref()
@@ -147,7 +147,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_producer_dir_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Producer_Dir.parent_id'))
 					->options(array(' … ') + $this->fillGroupList(Core_Array::getGet('shop_id', 0)))
 					->name('shop_producer_dir_id')
@@ -180,7 +180,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oGroupSelect = new Admin_Form_Entity_Select();
+				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Producer_Dir.parent_id'))
 					->options(array(' … ') + $this->fillGroupList(Core_Array::getGet('shop_id', 0)))
 					->name('parent_id')

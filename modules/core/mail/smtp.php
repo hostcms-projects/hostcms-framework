@@ -74,12 +74,16 @@ class Core_Mail_Smtp extends Core_Mail
 				fclose($fp);
 				return FALSE;
 			}
-
-			fputs($fp, "RCPT TO: <{$to}>\r\n");
-			if (!$this->_serverParse($fp, "250"))
+			
+			$aRecipients = explode(',', $to);
+			foreach ($aRecipients as $sTo)
 			{
-				fclose($fp);
-				return FALSE;
+				fputs($fp, "RCPT TO: <{$sTo}>\r\n");
+				if (!$this->_serverParse($fp, "250"))
+				{
+					fclose($fp);
+					return FALSE;
+				}
 			}
 
 			fputs($fp, "DATA\r\n");

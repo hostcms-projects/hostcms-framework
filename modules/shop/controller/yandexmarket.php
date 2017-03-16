@@ -6,12 +6,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Экспорт в YandexMarket для магазина.
  *
  * Доступные методы:
- * group($id) идентификатор группы магазина, если FALSE, то вывод товаров осуществляется из всех групп
- * groupsProperties(TRUE) выводить значения дополнительных свойств групп, по умолчанию NULL
- * itemsProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию NULL
- * tags(TRUE) выводить метки
- * offset($offset) смещение, с которого выводить товары. По умолчанию 0
- * limit($limit) количество выводимых товаров
+ *
+ * - itemsProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -32,7 +28,9 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 * Allowed object properties
 	 * @var array
 	 */
-	protected $_allowedProperties = array()	;
+	protected $_allowedProperties = array(
+		'itemsProperties',
+	);
 
 	/**
 	 * Shop's items object
@@ -146,6 +144,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 			->where('shop_groups.active', '=', 1)
 			->orderBy('shop_groups.parent_id');
+
+		$this->itemsProperties = TRUE;
 	}
 
 	/**
@@ -362,7 +362,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 					echo '<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n";
 				}
 
-				$this->_addPropertyValue($oShop_Item);
+				$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
 
 				Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));
 

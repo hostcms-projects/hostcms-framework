@@ -25,7 +25,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSelect_Dirs = new Admin_Form_Entity_Select();
+		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
 		switch($modelName)
 		{
@@ -41,7 +41,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oDocument_Version_Current = $this->_object->Document_Versions->getCurrent(FALSE);
 
-				$oTextarea_Document = Core::factory('Admin_Form_Entity_Textarea')
+				$oTextarea_Document = Admin_Form_Entity::factory('Textarea')
 					->value(
 						!is_null($oDocument_Version_Current)
 							? $oDocument_Version_Current->loadFile()
@@ -64,14 +64,14 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						Typograph_Controller::instance()->eraseOpticalAlignment($oTextarea_Document->value)
 					);
 					
-					$oUseTypograph = new Admin_Form_Entity_Checkbox();
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 					$oUseTypograph
 						->name("use_typograph")
 						->caption(Core::_('Document.use_typograph'))
 						->value(1)
 						->divAttr(array('style' => 'float: left;'));
 
-					$oUseTrailingPunctuation = new Admin_Form_Entity_Checkbox();
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation")
 						->caption(Core::_('Document.use_trailing_punctuation'))
@@ -81,11 +81,11 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oMainTab
 						->addAfter($oUseTypograph, $oTextarea_Document)
 						->addAfter($oUseTrailingPunctuation, $oUseTypograph)
-						->addAfter(Core::factory('Admin_Form_Entity_Separator'), $oUseTrailingPunctuation);
+						->addAfter(Admin_Form_Entity::factory('Separator'), $oUseTrailingPunctuation);
 				}
 
 				// Объект вкладки 'Атрибуты документа'
-				$oAttrTab = Core::factory('Admin_Form_Entity_Tab')
+				$oAttrTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Document.tab_1'))
 					->name('tab_1');
 
@@ -112,7 +112,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
 				
 				// Warning: TO DO: dynamic chain list template_dir -> template like Documents
-				$oSelect_Template_Id = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 					->options(
 						count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 					)
@@ -128,7 +128,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAttrTab
 					->add($oSelect_Template_Id)
-					->add(Core::factory('Admin_Form_Entity_Separator'));
+					->add(Admin_Form_Entity::factory('Separator'));
 
 				// Статус документа
 				$oAdditionalTab
@@ -136,7 +136,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$Document_Status_Controller_Edit = new Document_Status_Controller_Edit($this->_Admin_Form_Action);
 
-				$oSelect_Statuses = Core::factory('Admin_Form_Entity_Select')
+				$oSelect_Statuses = Admin_Form_Entity::factory('Select')
 					->options(
 						array(' … ') + $Document_Status_Controller_Edit->fillDocumentStatus(CURRENT_SITE)
 					)
@@ -149,7 +149,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAttrTab->add($oSelect_Statuses);
 
 				// Текушая версия
-				$oInput_Current = Core::factory('Admin_Form_Entity_Checkbox')
+				$oInput_Current = Admin_Form_Entity::factory('Checkbox')
 					->name('current')
 					->value(1)
 					->caption(Core::_('Document_Version.current'))
@@ -161,10 +161,10 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$oAttrTab
-					->add(Core::factory('Admin_Form_Entity_Separator'))
+					->add(Admin_Form_Entity::factory('Separator'))
 					->add($oInput_Current);
 
-				$oTextarea_Description = Core::factory('Admin_Form_Entity_Textarea')
+				$oTextarea_Description = Admin_Form_Entity::factory('Textarea')
 					->value(
 						!is_null($oDocument_Version_Current)
 							? $oDocument_Version_Current->description

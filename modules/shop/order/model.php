@@ -143,8 +143,8 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Change cancel on opposite
 	 * @return self
-	 * @hostcms-event shop_order_model.onBeforeChangeStatusPaid
-	 * @hostcms-event shop_order_model.onAfterChangeStatusPaid
+	 * @hostcms-event shop_order.onBeforeChangeStatusPaid
+	 * @hostcms-event shop_order.onAfterChangeStatusPaid
 	 */
 	public function changeStatusPaid()
 	{
@@ -267,8 +267,8 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Change cancel on opposite
 	 * @return self
-	 * @hostcms-event shop_order_model.onBeforeChangeStatusCanceled
-	 * @hostcms-event shop_order_model.onAfterChangeStatusCanceled
+	 * @hostcms-event shop_order.onBeforeChangeStatusCanceled
+	 * @hostcms-event shop_order.onAfterChangeStatusCanceled
 	 */
 	public function changeStatusCanceled()
 	{
@@ -316,8 +316,8 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Recalc delivery price by delivery conditions
 	 * @return boolean
-	 * @hostcms-event shop_order_model.onBeforeRecalcDelivery
-	 * @hostcms-event shop_order_model.onAfterRecalcDelivery
+	 * @hostcms-event shop_order.onBeforeRecalcDelivery
+	 * @hostcms-event shop_order.onAfterRecalcDelivery
 	 */
 	public function recalcDelivery()
 	{
@@ -447,28 +447,6 @@ class Shop_Order_Model extends Core_Entity
 		->where('shop_id', '=', $shop_id);
 
 		return $this->findAll();
-	}
-
-	/**
-	 * Get order by guid
-	 * @param string $shop_order_guid guid
-	 * @return Shop_Order|NULL
-	 */
-	public function getByGuid($shop_order_guid)
-	{
-		$this->queryBuilder()
-			//->clear()
-			->where('guid', '=', $shop_order_guid)
-			->limit(1);
-
-		$aShop_Orders = $this->findAll();
-
-		if (isset($aShop_Orders[0]))
-		{
-			return $aShop_Orders[0];
-		}
-
-		return NULL;
 	}
 
 	/**
@@ -613,7 +591,7 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_order_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_order.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -721,11 +699,10 @@ class Shop_Order_Model extends Core_Entity
 						->showXmlItem(TRUE)
 				);
 				//$tax = $oShop_Order_Item->quantity * $oShop_Order_Item->price / (100 + $oShop_Order_Item->rate) * $oShop_Order_Item->rate;
-				$tax = Shop_Controller::instance()->round($oShop_Order_Item->price * $oShop_Order_Item->rate / 100);
+				//$tax = Shop_Controller::instance()->round($oShop_Order_Item->price * $oShop_Order_Item->rate / 100);
 
-				$total_tax += $tax * $oShop_Order_Item->quantity;
-
-				$amount += ($oShop_Order_Item->price + $tax) * $oShop_Order_Item->quantity;
+				$total_tax += $oShop_Order_Item->getTax() * $oShop_Order_Item->quantity;
+				$amount += $oShop_Order_Item->getAmount();
 			}
 		}
 
@@ -746,8 +723,8 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Pay the order
 	 * @return self
-	 * @hostcms-event shop_order_model.onBeforePaid
-	 * @hostcms-event shop_order_model.onAfterPaid
+	 * @hostcms-event shop_order.onBeforePaid
+	 * @hostcms-event shop_order.onAfterPaid
 	 */
 	public function paid()
 	{
@@ -770,8 +747,8 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Cancel payment
 	 * @return self
-	 * @hostcms-event shop_order_model.onBeforeCancelPaid
-	 * @hostcms-event shop_order_model.onAfterCancelPaid
+	 * @hostcms-event shop_order.onBeforeCancelPaid
+	 * @hostcms-event shop_order.onAfterCancelPaid
 	 */
 	public function cancelPaid()
 	{
@@ -1091,14 +1068,15 @@ class Shop_Order_Model extends Core_Entity
 	public function copy()
 	{
 		$newObject = parent::copy();
+		$newObject->guid = Core_Guid::get();
 		$newObject->save();
-		$newObject->invoice=$newObject->id;
+		$newObject->invoice = $newObject->id;
 		$newObject->save();
 
 		$aShop_Order_Items = $this->Shop_Order_Items->findAll();
 		foreach($aShop_Order_Items as $oShop_Order_Item)
 		{
-			$newObject->add($oShop_Order_Item);
+			$newObject->add(clone $oShop_Order_Item);
 		}
 
 		return $newObject;

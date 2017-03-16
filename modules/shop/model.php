@@ -532,7 +532,7 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

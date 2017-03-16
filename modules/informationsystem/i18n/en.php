@@ -111,4 +111,6 @@ return array(
 	'subject_not_found' =>'Subject not found',
 	'tag' => 'Tag: %s',
 	'deleteEmptyDirs_success' => 'Empty dirs have been deleted!',
+
+	'structureIsExist' => 'Informationsystem linked with the same structure "%s" has already exist!',
 );

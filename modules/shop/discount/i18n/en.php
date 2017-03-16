@@ -23,6 +23,7 @@ return array(
 	'shop_id' => "Shop id",
 	'id' => "Id",
 	'shop_apply_modification_discount' => "Apply to modifications",
+	'shop_not_apply_modification_discount' => "Cancel to modifications",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
 'edit_success' => "Discount information edited successfully!",

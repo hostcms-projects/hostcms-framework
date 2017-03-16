@@ -44,7 +44,7 @@ class Shop_Order_Item_Digital_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_order_item_digital_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_order_item_digital.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

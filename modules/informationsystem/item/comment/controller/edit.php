@@ -8,9 +8,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Comment_Controller_Edit extends Comment_Controller_Edit{
 	/**
 	 * Processing of the form. Apply object fields.
-	 */	protected function _applyObjectProperty()	{		parent::_applyObjectProperty();		$Comment_Informationsystem_Item = $this->_object->Comment_Informationsystem_Item;		if (is_null($Comment_Informationsystem_Item->id))		{			$Comment_Informationsystem_Item->informationsystem_item_id = intval(Core_Array::getGet('informationsystem_item_id'));			$Comment_Informationsystem_Item->save();		}	}}
+	 */	protected function _applyObjectProperty()	{		parent::_applyObjectProperty();		$Comment_Informationsystem_Item = $this->_object->Comment_Informationsystem_Item;		if (is_null($Comment_Informationsystem_Item->id))		{			$Comment_Informationsystem_Item->informationsystem_item_id = intval($this->_object->parent_id
+				? Core_Entity::factory('Comment', $this->_object->parent_id)->Comment_Informationsystem_Item->informationsystem_item_id
+				: Core_Array::getGet('informationsystem_item_id'));			$Comment_Informationsystem_Item->save();		}	}}

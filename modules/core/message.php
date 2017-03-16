@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Message
 {
@@ -29,7 +29,7 @@ class Core_Message
 	{
 		echo self::get($message, $type);
 	}
-	
+
 	/**
 	 * Get message.
 	 *
@@ -44,7 +44,8 @@ class Core_Message
 	 */
 	static public function get($message, $type = 'message')
 	{
-		$return = '<div id="' . $type . '">' . $message . '</div>';
-		return $return;
+		$args = func_get_args();
+
+		return call_user_func_array(array(Core_Skin::instance(), 'getMessage'), $args);
 	}
 }

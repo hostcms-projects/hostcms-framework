@@ -58,7 +58,7 @@ class Property_Value_String_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_value_string_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_string.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

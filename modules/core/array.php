@@ -157,8 +157,8 @@ class Core_Array
 
 	/**
 	 * Union arrays $array1 and $array2. If $array1 is not array will return $array2
-	 * @param mixed $array1 
-	 * @param array $array2 
+	 * @param mixed $array1
+	 * @param array $array2
 	 * @return array
 	 */
 	static public function union($array1, array $array2)
@@ -268,5 +268,23 @@ class Core_Array
 			$aReturn[] = $aTmp;
 		}
 		return $aReturn;
+	}
+
+	/**
+	 * Join multi-level array elements with a string
+	 * @param string $glue
+	 * @param array $array The array of strings to implode.
+	 */
+	static public function implode($glue, array $array)
+	{
+		$aReturn = array();
+		foreach ($array as $value)
+		{
+			$aReturn[] = is_array($value)
+				? self::implode($glue, $value)
+				: $value;
+		}
+
+		return implode($glue, $aReturn);
 	}
 }

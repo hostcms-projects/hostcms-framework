@@ -66,7 +66,7 @@ class Property_Value_Datetime_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event property_value_datetime_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_datetime.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{

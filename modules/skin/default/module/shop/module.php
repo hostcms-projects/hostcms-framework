@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Module_Shop_Module extends Shop_Module
 {
@@ -89,7 +89,7 @@ class Skin_Default_Module_Shop_Module extends Shop_Module
 
 			$iAdmin_Form_Id = 52;
 			$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
-			$oAdmin_Form_Controller = new Admin_Form_Controller($oAdmin_Form);
+			$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form);
 
 			$sShopHref = '/admin/shop/item/comment/index.php';
 

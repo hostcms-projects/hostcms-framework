@@ -31,7 +31,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparatorField = new Admin_Form_Entity_Separator();
+		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
 		$oOrder = Core_Entity::factory('Shop_Order', intval(Core_Array::getGet('shop_order_id')));
 
@@ -56,7 +56,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 
 		$oMainTab->moveAfter($oRateField, $oPriceField);
 
-		$oSpanPercent = new Admin_Form_Entity_Span();
+		$oSpanPercent = Admin_Form_Entity::factory('Span');
 		$oSpanPercent->value('%')
 			->style("font-size: 200%")
 			->divAttr(array('style' => 'padding-top: 20px'));
@@ -71,7 +71,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 			$this->getField('shop_warehouse_id')
 		);
 
-		$oWarehouseSelect = new Admin_Form_Entity_Select();
+		$oWarehouseSelect = Admin_Form_Entity::factory('Select');
 
 		$oWarehouseSelect->caption(Core::_('Shop_Order_Item.shop_warehouse_id'))
 			->options(
@@ -90,7 +90,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 			$this->getField('type')
 		);
 
-		$oTypeSelect = new Admin_Form_Entity_Select();
+		$oTypeSelect = Admin_Form_Entity::factory('Select');
 
 		$oTypeSelect->caption(Core::_('Shop_Order_Item.type'))
 			->options(

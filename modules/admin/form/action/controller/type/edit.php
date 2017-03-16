@@ -120,10 +120,10 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 	/**
 	 * Add new tab into form
-	 * @param Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
 	 * @return self
 	 */
-	public function addTab(Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab)
+	public function addTab(Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab)
 	{
 		$this->_tabs[$oAdmin_Form_Entity_Tab->name] = $oAdmin_Form_Entity_Tab;
 		return $this;
@@ -131,11 +131,11 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 	/**
 	 * Add new tab into form before $oAdmin_Form_Entity_Tab_Before
-	 * @param Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
-	 * @param Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before old tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before old tab
 	 * @return self
 	 */
-	public function addTabBefore(Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before)
+	public function addTabBefore(Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before)
 	{
 		// Find key for before object
 		$key = array_search($oAdmin_Form_Entity_Tab_Before, $this->_tabs, $strict = TRUE);
@@ -155,11 +155,11 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 	/**
 	 * Add new tab into form after $oAdmin_Form_Entity_Tab_After
-	 * @param Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
-	 * @param Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After old tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After old tab
 	 * @return self
 	 */
-	public function addTabAfter(Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After)
+	public function addTabAfter(Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After)
 	{
 		// Find key for after object
 		$key = array_search($oAdmin_Form_Entity_Tab_After, $this->_tabs, $strict = FALSE);
@@ -283,7 +283,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 		// Список закладок
 		// Основная закладка
-		$oAdmin_Form_Tab_EntityMain = Core::factory('Admin_Form_Entity_Tab')
+		$oAdmin_Form_Tab_EntityMain = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('admin_form.form_forms_tab_1'))
 			->name('main');
 
@@ -292,7 +292,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		//if (!is_null($this->_object->id))
 		//{
 			// Дополнительные (ключи)
-			$oAdmin_Form_Tab_EntityAdditional = Core::factory('Admin_Form_Entity_Tab')
+			$oAdmin_Form_Tab_EntityAdditional = Admin_Form_Entity::factory('Tab')
 				->caption(Core::_('admin_form.form_forms_tab_2'))
 				->name('additional');
 
@@ -321,7 +321,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 				switch ($columnArray['datatype'])
 				{
 					case 'datetime':
-						$oAdmin_Form_Entity_For_Column = new Admin_Form_Entity_DateTime();
+						$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('DateTime');
 
 						/*$date = ($this->_object->$columnName == '0000-00-00 00:00:00')
 							? $this->_object->$columnName
@@ -335,7 +335,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 						break;
 					case 'date':
-						$oAdmin_Form_Entity_For_Column = new Admin_Form_Entity_Date();
+						$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('Date');
 
 						$oAdmin_Form_Entity_For_Column
 							->value(
@@ -351,7 +351,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					case 'blob':
 					case 'mediumblob':
 					case 'longblob':
-						$oAdmin_Form_Entity_For_Column = new Admin_Form_Entity_Textarea();
+						$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('Textarea');
 
 						$oAdmin_Form_Entity_For_Column
 							->value(
@@ -363,7 +363,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 						// Только при длине 1 символ
 						if ($columnArray['max_length'] == 1)
 						{
-							$oAdmin_Form_Entity_For_Column = new Admin_Form_Entity_Checkbox();
+							$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('Checkbox');
 
 							$oAdmin_Form_Entity_For_Column
 							->value(
@@ -372,7 +372,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 							break;
 						}
 					default:
-						$oAdmin_Form_Entity_For_Column = new Admin_Form_Entity_Input();
+						$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('Input');
 
 						$oAdmin_Form_Entity_For_Column
 							//->size(12) // изменить на расчет
@@ -596,7 +596,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 		// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
 		array_unshift($this->_children,
-			Core::factory('Admin_Form_Entity_Title')
+			Admin_Form_Entity::factory('Title')
 				->name($this->title)
 			);
 
@@ -613,7 +613,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			);
 
 		// Закладки
-		$oAdmin_Form_Entity_Tabs = new Admin_Form_Entity_Tabs();
+		$oAdmin_Form_Entity_Tabs = Admin_Form_Entity::factory('Tabs');
 		$oAdmin_Form_Entity_Tabs->formId($this->_formId);
 
 		// Все закладки к форме
@@ -659,10 +659,10 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	protected function _addButtons()
 	{
 		// Кнопки
-		$oAdmin_Form_Entity_Buttons = new Admin_Form_Entity_Buttons();
+		$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');
 
 		// Кнопка Сохранить
-		$oAdmin_Form_Entity_Button_Save = Core::factory('Admin_Form_Entity_Button')
+		$oAdmin_Form_Entity_Button_Save = Admin_Form_Entity::factory('Button')
 			->name('save')
 			->class('saveButton')
 			->value(Core::_('admin_form.save'))
@@ -670,7 +670,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 				$this->_Admin_Form_Controller->getAdminSendForm(NULL, 'save')
 			);
 
-		$oAdmin_Form_Entity_Button_Apply = Core::factory('Admin_Form_Entity_Button')
+		$oAdmin_Form_Entity_Button_Apply = Admin_Form_Entity::factory('Button')
 			->name('apply')
 			->class('applyButton')
 			->type('submit')

@@ -30,25 +30,25 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab = $this->getTab('main');
 
 		// Закладка обратных ссылок
-		$oLinksTab = Core::factory('Admin_Form_Entity_Tab')
+		$oLinksTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_links'))
 			->name('links');
 		$this->addTabAfter($oLinksTab, $oMainTab);
 		
 		// Закладка проиндексированных страниц
-		$oIndexedTab = Core::factory('Admin_Form_Entity_Tab')
+		$oIndexedTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_indexed'))
 			->name('indexed');
 		$this->addTabAfter($oIndexedTab, $oLinksTab);
 
 		// Закладка каталогов
-		$oCatalogTab = Core::factory('Admin_Form_Entity_Tab')
+		$oCatalogTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_catalog'))
 			->name('catalog');
 		$this->addTabAfter($oCatalogTab, $oIndexedTab);
 		
 		// Закладка счетчиков
-		$oCounterTab = Core::factory('Admin_Form_Entity_Tab')
+		$oCounterTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_counter'))
 			->name('counter');
 		$this->addTabAfter($oCounterTab, $oCatalogTab);

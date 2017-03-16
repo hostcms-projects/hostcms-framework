@@ -97,23 +97,33 @@ class Core_Session
 				self::$_started = TRUE;
 			//}
 
-			$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
-			if (!empty($domain))
-			{
-				// Обрезаем www у домена
-				strpos($domain, 'www.') === 0 && $domain = substr($domain, 4);
-
-				// Явное указание domain возможно только для домена второго и более уровня
-				// http://wp.netscape.com/newsref/std/cookie_spec.html
-				// http://web-notes.ru/2008/07/cookies_within_local_domains/
-				$domain = strpos($domain, '.') !== FALSE && !Core_Valid::ip($domain)
-					? '.' . $domain
-					: '';
-
-				setcookie(session_name(), session_id(), time() + $expires, '/', $domain);
-			}
+			self::_setCookie();
 		}
 		return TRUE;
+	}
+
+	/**
+	 * Set cookie with expiration date
+	 */
+	static protected function _setCookie()
+	{
+		$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
+		if (!empty($domain) && !headers_sent())
+		{
+			// Обрезаем www у домена
+			strpos($domain, 'www.') === 0 && $domain = substr($domain, 4);
+
+			// Явное указание domain возможно только для домена второго и более уровня
+			// http://wp.netscape.com/newsref/std/cookie_spec.html
+			// http://web-notes.ru/2008/07/cookies_within_local_domains/
+			$domain = strpos($domain, '.') !== FALSE && !Core_Valid::ip($domain)
+				? '.' . $domain
+				: '';
+
+			$expires = self::getMaxLifeTime();
+
+			setcookie(session_name(), session_id(), time() + $expires, '/', $domain);
+		}
 	}
 
 	/**
@@ -268,6 +278,9 @@ class Core_Session
 				->set('maxlifetime', $maxlifetime)
 				->where('id', '=', $id)
 				->execute();
+
+			// Set cookie with expiration date
+			self::_setCookie();
 		}
 
 		return TRUE;

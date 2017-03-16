@@ -77,7 +77,7 @@ class Shop_Order_Item_Model extends Core_Entity
 	 */
 	public function sum()
 	{
-		return sprintf("%.2f %s", $this->sum, $this->Shop_Order->Shop_Currency->name);
+		return sprintf("%.2f %s", $this->getAmount(), $this->Shop_Order->Shop_Currency->name);
 	}
 
 	/**
@@ -163,7 +163,8 @@ class Shop_Order_Item_Model extends Core_Entity
 	public function getAmount()
 	{
 		return Shop_Controller::instance()->round(
-			($this->price + $this->getTax()) * $this->quantity
+			// Цена каждого товара откругляется
+			Shop_Controller::instance()->round($this->price + $this->getTax()) * $this->quantity
 		);
 	}
 
@@ -190,7 +191,7 @@ class Shop_Order_Item_Model extends Core_Entity
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_order_item_model.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_order_item.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
