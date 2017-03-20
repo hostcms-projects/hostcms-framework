@@ -3,7 +3,7 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Экспорт в YandexMarket для магазина.
+ * Экспорт в Yandex.Market для магазина.
  *
  * Доступные методы:
  *
@@ -20,7 +20,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexMarket extends Core_Controller
 {
@@ -454,9 +454,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Shop_Controller_YandexMarket.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		$oShop = $this->getEntity();
 		$oSite = $oShop->Site;
 

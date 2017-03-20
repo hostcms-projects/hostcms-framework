@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Товары магазина',
@@ -266,4 +266,5 @@ return array(
 	'item_height'=>'Высота',
 	'show_in_group'=>'Показывать свойство в группе',
 	'show_in_item'=>'Показывать свойство в товаре',
+	'add_value'=>'Добавить отсутствующие значения свойства по умолчанию у товаров',
 );

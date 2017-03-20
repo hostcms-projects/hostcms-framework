@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 {
@@ -17,7 +17,7 @@ abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 	 * @var Admin_Form_Action
 	 */
 	protected $_Admin_Form_Action = NULL;
-	
+
 	/**
 	 * Form controller
 	 * @var Admin_Form_Controller
@@ -38,6 +38,21 @@ abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 		}
 
 		parent::__construct();
+	}
+
+	/**
+	* Create and return controller for current skin
+	* @param string $className name of class
+	* @return object
+	*/
+	static public function factory($className, Admin_Form_Action_Model $oAdmin_Form_Action)
+	{
+		$skinClassName = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_Modules_' .
+		ucfirst($className);
+
+		return class_exists($skinClassName)
+			? new $skinClassName($oAdmin_Form_Action)
+			: new $className($oAdmin_Form_Action);
 	}
 
 	/**
@@ -72,11 +87,11 @@ abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Content 
+	 * Content
 	 * @var string
 	 */
 	protected $_content = NULL;
-	
+
 	/**
 	 * Message text
 	 * @var string

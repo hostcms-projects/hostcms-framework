@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_Int_Model extends Core_Entity
 {
@@ -38,6 +38,7 @@ class Property_Value_Int_Model extends Core_Entity
 		'property' => array(),
 		'list_item' => array('foreign_key' => 'value'),
 		'informationsystem_item' => array('foreign_key' => 'value'),
+		'shop_item' => array('foreign_key' => 'value'),
 	);
 
 	/**
@@ -145,6 +146,37 @@ class Property_Value_Int_Model extends Core_Entity
 
 					$this->addEntity(
 						$oInformationsystem_Item->clearEntities()->showXmlProperties(count($aTmp) ? $aTmp : FALSE)
+					);
+				}
+			}
+		}
+
+		// Shop
+		if ($oProperty->type == 12 && Core::moduleIsActive('shop'))
+		{
+			$this->addForbiddenTag('value');
+
+			if ($this->value != 0)
+			{
+				// Allow all kinds of properties except shop
+				$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->Shop_Item->shop_id);
+
+				$aTmp = array();
+				$aItemProperties = $oShop_Item_Property_List->Properties->findAll();
+				foreach ($aItemProperties as $oItemProperty)
+				{
+					($oItemProperty->type != 12
+						|| self::$aConfig['recursive_properties'] && $oItemProperty->shop_id != $oProperty->shop_id
+					) && $aTmp[] = $oItemProperty->id;
+				}
+
+				$oShop_Item = $this->Shop_Item;
+				if ($oShop_Item->id)
+				{
+					$oShop_Item->shortcut_id && $oShop_Item = $oShop_Item->Shop_Item;
+
+					$this->addEntity(
+						$oShop_Item->clearEntities()->showXmlProperties(count($aTmp) ? $aTmp : FALSE)
 					);
 				}
 			}

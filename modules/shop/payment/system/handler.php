@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Shop_Payment_System_Handler
 {
@@ -21,7 +21,7 @@ abstract class Shop_Payment_System_Handler
 	{
 		require_once($oShop_Payment_System_Model->getPaymentSystemFilePath());
 
-		$name = 'Shop_Payment_System_Handler' . $oShop_Payment_System_Model->id;
+		$name = 'Shop_Payment_System_Handler' . intval($oShop_Payment_System_Model->id);
 		if (class_exists($name))
 		{
 			return new $name($oShop_Payment_System_Model);
@@ -40,7 +40,7 @@ abstract class Shop_Payment_System_Handler
 	 * @var array
 	 */
 	protected $_aProperty_Dirs = array();
-	
+
 	/**
 	 * Params of the order
 	 * @var array
@@ -56,7 +56,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	public function orderParams($orderParams)
 	{
-		Core_Event::notify('Shop_Payment_System_Handler.onBeforeOrderParams', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onBeforeOrderParams', $this, array($orderParams));
 
 		$this->_orderParams = $orderParams + array(
 			'invoice' => NULL,
@@ -64,7 +64,7 @@ abstract class Shop_Payment_System_Handler
 			'coupon_text' => NULL,
 		);
 
-		Core_Event::notify('Shop_Payment_System_Handler.onAfterOrderParams', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onAfterOrderParams', $this, array($orderParams));
 
 		return $this;
 	}
@@ -180,14 +180,14 @@ abstract class Shop_Payment_System_Handler
 		$this->_shopOrder->fax = strval(Core_Array::get($this->_orderParams, 'fax', ''));
 		$this->_shopOrder->email = strval(Core_Array::get($this->_orderParams, 'email', ''));
 		$this->_shopOrder->description = strval(Core_Array::get($this->_orderParams, 'description', ''));
-		
+
 		$shop_delivery_condition_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0));
 		$this->_shopOrder->shop_delivery_condition_id = $shop_delivery_condition_id;
 
 		$shop_delivery_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_id', 0));
 		!$shop_delivery_id && $shop_delivery_condition_id && $shop_delivery_id = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id)->shop_delivery_id;
 		$this->_shopOrder->shop_delivery_id = $shop_delivery_id;
-		
+
 		$this->_shopOrder->shop_payment_system_id = intval(Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0));
 		$this->_shopOrder->shop_currency_id = intval($oShop->shop_currency_id);
 		$this->_shopOrder->shop_order_status_id = intval($oShop->shop_order_status_id);
@@ -454,7 +454,7 @@ abstract class Shop_Payment_System_Handler
 
 		$shop_delivery_condition_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0));
 		$shop_delivery_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_id', 0));
-		
+
 		// Добавляем стоимость доставки как отдельный товар
 		// Доставка может прийти как сущесвтующий shop_delivery_condition_id, так и shop_delivery_id + название рассчитанного условия доставки
 		if ($shop_delivery_condition_id || $shop_delivery_id)
@@ -463,7 +463,7 @@ abstract class Shop_Payment_System_Handler
 			{
 				$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id);
 				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
-				
+
 				$aPrice = $oShop_Delivery_Condition->getPriceArray();
 				$price = $aPrice['price'];
 				$rate = $aPrice['rate'];
@@ -476,11 +476,11 @@ abstract class Shop_Payment_System_Handler
 			{
 				$oShop_Delivery = Core_Entity::factory('Shop_Delivery', $shop_delivery_id);
 				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery->name);
-				
+
 				$price = floatval(Core_Array::get($this->_orderParams, 'shop_delivery_price', 0));
 				$rate = intval(Core_Array::get($this->_orderParams, 'shop_delivery_rate', 0));
 				$marking = '';
-				
+
 				$shop_delivery_name = strval(Core_Array::get($this->_orderParams, 'shop_delivery_name', 0));
 				$this->_shopOrder->delivery_information = trim(
 					$this->_shopOrder->delivery_information .  "\n" . $shop_delivery_name
@@ -587,7 +587,7 @@ abstract class Shop_Payment_System_Handler
 		$oShop->addEntity($Shop_Order_Properties);
 
 		$this->_addPropertiesList(0, $Shop_Order_Properties);
-		
+
 		$oShop
 			->addEntity($oShop->Shop_Company)
 			->addEntity(
@@ -632,7 +632,7 @@ abstract class Shop_Payment_System_Handler
 
 		return $this;
 	}
-	
+
 	/**
 	 * Process XML
 	 * @return mixed
@@ -838,6 +838,19 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Get array of admin emails
+	 * @return array
+	 */
+	public function getAdminEmails()
+	{
+		$oShop = $this->_shopOrder->Shop;
+
+		return trim($oShop->email) != ''
+			? explode(',', $oShop->email)
+			: array(EMAIL_TO);
+	}
+
+	/**
 	 * Send e-mail to shop's administrator
 	 * @param Core_Mail $oCore_Mail mail
 	 * @return self
@@ -846,7 +859,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	public function sendAdminEmail(Core_Mail $oCore_Mail)
 	{
-		Core_Event::notify('Shop_Payment_System_Handler.onBeforeSendAdminEmail', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onBeforeSendAdminEmail', $this, array($oCore_Mail));
 
 		$oShopOrder = $this->_shopOrder;
 		$oShop = $oShopOrder->Shop;
@@ -874,9 +887,7 @@ abstract class Shop_Payment_System_Handler
 			->header('X-HostCMS-Reason', 'Order')
 			->header('Precedence', 'bulk');
 
-		$aEmails = trim($oShop->email) != ''
-			? explode(',', $oShop->email)
-			: array(EMAIL_TO);
+		$aEmails = $this->getAdminEmails();
 
 		foreach ($aEmails as $sEmail)
 		{
@@ -890,7 +901,7 @@ abstract class Shop_Payment_System_Handler
 			}
 		}
 
-		Core_Event::notify('Shop_Payment_System_Handler.onAfterSendAdminEmail', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onAfterSendAdminEmail', $this, array($oCore_Mail));
 
 		return $this;
 	}
@@ -904,7 +915,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	protected function _attachDigitalItems(Core_Mail $oCore_Mail)
 	{
-		Core_Event::notify('Shop_Payment_System_Handler.onBeforeAttachDigitalItems', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onBeforeAttachDigitalItems', $this, array($oCore_Mail));
 
 		$aShop_Order_Items = $this->_shopOrder->Shop_Order_Items->findAll(FALSE);
 		foreach ($aShop_Order_Items as $oShop_Order_Item)
@@ -925,7 +936,7 @@ abstract class Shop_Payment_System_Handler
 			}
 		}
 
-		Core_Event::notify('Shop_Payment_System_Handler.onAfterAttachDigitalItems', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onAfterAttachDigitalItems', $this, array($oCore_Mail));
 
 		return $this;
 	}
@@ -939,7 +950,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	public function sendSiteuserEmail(Core_Mail $oCore_Mail)
 	{
-		Core_Event::notify('Shop_Payment_System_Handler.onBeforeSendSiteuserEmail', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onBeforeSendSiteuserEmail', $this, array($oCore_Mail));
 
 		$oShopOrder = $this->_shopOrder;
 		$oShop = $oShopOrder->Shop;
@@ -978,7 +989,7 @@ abstract class Shop_Payment_System_Handler
 				->send();
 		}
 
-		Core_Event::notify('Shop_Payment_System_Handler.onAfterSendSiteuserEmail', $this);
+		Core_Event::notify('Shop_Payment_System_Handler.onAfterSendSiteuserEmail', $this, array($oCore_Mail));
 
 		return $this;
 	}

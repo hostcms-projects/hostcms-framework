@@ -21,7 +21,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_QueryBuilder_Lock extends Core_QueryBuilder_Statement
 {
@@ -33,7 +33,7 @@ class Core_QueryBuilder_Lock extends Core_QueryBuilder_Statement
 
 	/**
 	 * DataBase Query Type
-	 * 4 - LOCK
+	 * 8 - LOCK
 	 */
 	protected $_queryType = 8;
 

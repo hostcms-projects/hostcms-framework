@@ -17,11 +17,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - groupsForbiddenTags(array('description')) массив тегов групп, запрещенных к передаче в генерируемый XML
  * - item(123) идентификатор показываемого информационного элемента
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
- * - itemsPropertiesList(TRUE) выводить список дополнительных свойств информационных элементов, по умолчанию TRUE
+ * - itemsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств информационных элементов, по умолчанию TRUE
  * - itemsForbiddenTags(array('description')) массив тегов информационных элементов, запрещенных к передаче в генерируемый XML
- * - comments(TRUE) показывать комментарии для выбранных информационных элементов, по умолчанию FALSE
- * - tags(TRUE) выводить метки
- * - siteuser(TRUE) показывать данные о пользователе сайта, связанного с выбранным информационным элементом, по умолчанию TRUE
+ * - comments(TRUE|FALSE) показывать комментарии для выбранных информационных элементов, по умолчанию FALSE
+ * - tags(TRUE|FALSE) выводить метки
+ * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным информационным элементом, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить информационные элементы. По умолчанию 0
  * - limit($limit) количество выводимых элементов
@@ -29,10 +29,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - part($int) номер отображаемой части информационного элемента
  * - pattern($pattern) шаблон разбора данных в URI, см. __construct()
  * - tag($path) путь тега, с использованием которого ведется отбор информационных элементов
- * - cache(TRUE) использовать кэширование, по умолчанию TRUE
+ * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  * - itemsActivity('active'|'inactive'|'all') отображать элементы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - groupsActivity('active'|'inactive'|'all') отображать группы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - commentsActivity('active'|'inactive'|'all') отображать комментарии: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
+ * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
  *
  * Доступные свойства:
  *
@@ -55,7 +56,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Show extends Core_Controller
 {
@@ -90,6 +91,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		'itemsActivity',
 		'groupsActivity',
 		'commentsActivity',
+		'showPanel',
 	);
 
 	/**
@@ -193,6 +195,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$this->offset = 0;
 		$this->page = 0;
 		$this->part = 1;
+		$this->showPanel = TRUE;
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
@@ -337,10 +340,13 @@ class Informationsystem_Controller_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Informationsystem_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
-		Core::checkPanel() && $this->_showPanel();
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+	
+		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{

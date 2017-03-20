@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +20,7 @@ class Admin_Form_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-01-20';
+	public $date = '2014-03-28';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

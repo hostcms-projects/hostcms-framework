@@ -10,17 +10,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - menu($menuId) вывод узлов структуры меню $menu
  * - parentId($parentId) идентификатор родительского узла, по умолчанию 0
  * - level($level) выводить узлы структуры только до уровня вложенности $level
- * - showProperties(TRUE) выводить значения дополнительных свойств усзлов структуры, по умолчанию FALSE
- * - showInformationsystemGroups(TRUE) выводить связанные с узлом структуры группы информационной системы, по умолчанию FALSE
- * - showInformationsystemItems(TRUE) выводить связанные с узлом структуры информационные элементы, по умолчанию FALSE
- * - showShopGroups(TRUE) выводить связанные с узлом структуры группы магазина, по умолчанию FALSE
- * - showShopItems(TRUE) выводить связанные с узлом структуры товары, по умолчанию FALSE
- * - showInformationsystemGroupProperties(TRUE) выводить значения дополнительных свойств групп информационной системы, по умолчанию FALSE
- * - showInformationsystemItemProperties(TRUE) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE
- * - showShopGroupProperties(TRUE) выводить значения дополнительных свойств групп магазина, по умолчанию FALSE
- * - showShopItemProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
+ * - showProperties(TRUE|FALSE) выводить значения дополнительных свойств усзлов структуры, по умолчанию FALSE
+ * - showInformationsystemGroups(TRUE|FALSE) выводить связанные с узлом структуры группы информационной системы, по умолчанию FALSE
+ * - showInformationsystemItems(TRUE|FALSE) выводить связанные с узлом структуры информационные элементы, по умолчанию FALSE
+ * - showShopGroups(TRUE|FALSE) выводить связанные с узлом структуры группы магазина, по умолчанию FALSE
+ * - showShopItems(TRUE|FALSE) выводить связанные с узлом структуры товары, по умолчанию FALSE
+ * - showInformationsystemGroupProperties(TRUE|FALSE) выводить значения дополнительных свойств групп информационной системы, по умолчанию FALSE
+ * - showInformationsystemItemProperties(TRUE|FALSE) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE
+ * - showShopGroupProperties(TRUE|FALSE) выводить значения дополнительных свойств групп магазина, по умолчанию FALSE
+ * - showShopItemProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
  * - forbiddenTags(array('name')) массив тегов узла структуры, запрещенных к передаче в генерируемый XML
- * - cache(TRUE) использовать кэширование, по умолчанию TRUE
+ * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
+ * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
  *
  * Доступные свойства:
  *
@@ -41,7 +42,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Show extends Core_Controller
 {
@@ -65,6 +66,7 @@ class Structure_Controller_Show extends Core_Controller
 		'forbiddenTags',
 		'cache',
 		'currentStructureId',
+		'showPanel',
 	);
 
 	/**
@@ -128,7 +130,9 @@ class Structure_Controller_Show extends Core_Controller
 			->orderBy('structures.name');
 
 		$this->showProperties = $this->showInformationsystemGroups = $this->showInformationsystemItems = $this->showShopGroups = $this->showShopItems = $this->showInformationsystemGroupProperties = $this->showInformationsystemItemProperties = $this->showShopGroupProperties = $this->showShopItemProperties = FALSE;
-		$this->cache = TRUE;
+
+		$this->showPanel = $this->cache = TRUE;
+
 		$this->currentStructureId = Core_Page::instance()->structure->id;
 	}
 
@@ -162,10 +166,13 @@ class Structure_Controller_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Structure_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
-		Core::checkPanel() && $this->_showPanel();
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
+		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{

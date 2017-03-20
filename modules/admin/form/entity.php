@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Entity extends Core_Html_Entity
 {
@@ -39,7 +39,7 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 	}
 
 	/**
-	 * Create and return an object of model
+	 * Create and return an object of Admin_Form_Entity for current skin
 	 * @param string $className name of class
 	 * @return object
 	 */

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Model extends Core_Entity
 {
@@ -65,6 +65,42 @@ class Shop_Item_Model extends Core_Entity
 	 * @var string
 	 */
 	public $absolute_price = NULL;
+
+	/**
+	 * Triggered by calling isset() or empty() on inaccessible properties
+	 * @param string $property property name
+	 * @return boolean
+	 */
+	public function __isset($property)
+	{
+		return in_array(strtolower($property), array('adminprice'))
+			? TRUE
+			: parent::__isset($property);
+	}
+
+	/**
+	 * Run when writing data to inaccessible properties
+	 * @param string $property property name
+	 * @param string $value property value
+	 * @return self
+	 */
+	public function __set($property, $value)
+	{
+		$property == 'adminPrice' && $property = 'price';
+		return parent::__set($property, $value);
+	}
+
+	/**
+	 * Utilized for reading data from inaccessible properties
+	 * @param string $property property name
+	 * @return mixed
+	 */
+	public function __get($property)
+	{
+		return in_array(strtolower($property), array('adminprice'))
+			? $this->price
+			: parent::__get($property);
+	}
 
 	/**
 	 * One-to-many or many-to-many relations
@@ -310,18 +346,36 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
-	 * Get item price with currency name
+	 * Backend callback method
 	 * @return string
 	 */
-	public function price()
+	public function adminPrice($value = NULL)
 	{
-		if(!$this->shortcut_id)
+		// Get value
+		if (is_null($value) || is_object($value))
 		{
-		  return $this->price . " " . $this->Shop_Currency->name;
+			$oShopItem = $this->shortcut_id
+				? Core_Entity::factory("Shop_Item", $this->shortcut_id)
+				: $this;
+
+			return $oShopItem->price;
 		}
 
-		$oShopItem = Core_Entity::factory("Shop_Item", $this->shortcut_id);
-		return $oShopItem->price . " " . $oShopItem->Shop_Currency->name;
+		$this->price = $value;
+		$this->save();
+	}
+
+	/**
+	 * Show item's currency
+	 * @return string
+	 */
+	public function suffixAdminPrice()
+	{
+		$oShopItem = $this->shortcut_id
+				? Core_Entity::factory("Shop_Item", $this->shortcut_id)
+				: $this;
+
+		echo ' ' . $oShopItem->Shop_Currency->name;
 	}
 
 	/**
@@ -852,7 +906,7 @@ class Shop_Item_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value;
+					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value . ' ';
 				}
 			}
 			// Informationsystem
@@ -863,7 +917,7 @@ class Shop_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name;
+						$oSearch_Page->text .= $oInformationsystem_Item->name . ' ';
 					}
 				}
 			}
@@ -1707,19 +1761,25 @@ class Shop_Item_Model extends Core_Entity
 				$avgGrade += 1;
 			}
 
-			$this->addEntity(
+			!isset($this->_forbiddenTags['comments_count']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_count')
 					->value(count($aComments))
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_grade_sum']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_grade_sum')
 					->value($gradeSum)
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_grade_count']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_grade_count')
 					->value($gradeCount)
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_average_grade']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_average_grade')
 					->value($avgGrade)

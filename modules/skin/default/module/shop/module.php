@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Module_Shop_Module extends Shop_Module
 {
@@ -17,7 +17,7 @@ class Skin_Default_Module_Shop_Module extends Shop_Module
 	 * @var string
 	 */
 	protected $_skinName = 'default';
-	
+
 	/**
 	 * Name of the module
 	 * @var string

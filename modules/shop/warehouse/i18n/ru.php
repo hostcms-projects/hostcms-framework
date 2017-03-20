@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Склады',
@@ -28,7 +28,8 @@ return array(
 	'apply_success' => "Информация успешно изменена",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
-'markDeleted_success' => "Информация успешно удалена",
-'warehouse_default_not_exist' => "Внимание! Склад \"по умолчанию\" отсутствует, добавьте склад \"по умолчанию\"!",
-'warehouse_default_name' => "Основной",
+	'markDeleted_success' => "Информация успешно удалена",
+	'warehouse_default_not_exist' => "Внимание! Склад \"по умолчанию\" отсутствует, добавьте склад \"по умолчанию\"!",
+	'warehouse_default_name' => "Основной",
+	'warehouse_default_count' => "<acronym title=\"Устанавливаем всем товарам количество 0 на данном складе\">Установить количество товара на складе</acronym>",
 );

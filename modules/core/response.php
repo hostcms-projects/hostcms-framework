@@ -20,7 +20,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Response
 {
@@ -240,6 +240,16 @@ class Core_Response
 		return $this;
 	}
 
+	/**
+	 * Get headers
+	 *
+	 * @return array
+	 */
+	public function getHeaders()
+	{
+		return $this->_headers;
+	}
+	
 	/**
 	 * Show response body
 	 *

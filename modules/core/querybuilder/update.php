@@ -4,9 +4,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  * UPDATE Database Abstraction Layer (DBAL)
- * 
+ *
  * http://dev.mysql.com/doc/refman/5.5/en/update.html
- * 
+ *
  * <code>
  * // UPDATE `tableName` SET `column1` = 'value', `column2` = 'value2'
  * // WHERE `column` != '5' AND `a4` IN (17, 19, NULL) ORDER BY `column2` ASC LIMIT 10
@@ -31,7 +31,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 {
@@ -61,34 +61,34 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 
 	/**
 	 * DataBase Query Type
-	 * 7 - UPDATE
+	 * 2 - UPDATE
 	 */
-	protected $_queryType = 7;
-	
+	protected $_queryType = 2;
+
 	/**
 	 * Constructor.
 	 * @param array $args list of arguments
 	 * <code>
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName');
 	 * </code>
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName', array('tableName2', 'aliasTable2'));
 	 * </code>
-	 * 
+	 *
 	 * @see table()
 	 */
 	public function __construct(array $args = array())
 	{
 		// Set table name
 		call_user_func_array(array($this, 'table'), $args);
-	
+
 		return parent::__construct($args);
 	}
-	
+
 	/**
 	 * Set LOW_PRIORITY
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName')->lowPriority();
 	 * </code>
@@ -102,7 +102,7 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 
 	/**
 	 * Set IGNORE
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName')->ignore();
 	 * </code>
@@ -113,10 +113,10 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 		$this->_ignore = TRUE;
 		return $this;
 	}
-	
+
 	/**
 	 * Add table name
-	 * 
+	 *
 	 * <code>
 	 * // UPDATE `tableName`
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update()->table('tableName');
@@ -129,10 +129,10 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 		$this->_tableName = array_merge($this->_tableName, $args);
 		return $this;
 	}
-	
+
 	/**
 	 * Add multiple columns for UPDATE
-	 * 
+	 *
 	 * <code>
 	 * // UPDATE `tableName` SET `column` = 'value', `column2` = 'value3'
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName')
@@ -149,7 +149,7 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 
 	/**
 	 * Add column for UPDATE
-	 * 
+	 *
 	 * <code>
 	 * // UPDATE `tableName` SET `column` = 'value'
 	 * $oCore_QueryBuilder_Update = Core_QueryBuilder::update('tableName')
@@ -173,23 +173,25 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 	protected function _buildSet(array $columns)
 	{
 		$sql = array();
-		
+
 		foreach ($columns as $columnName => $value)
 		{
-			$value = $this->_isObjectSelect($value)
-				? '(' . $value->build() . ')'
-				// Escape value
+			$value = is_object($value)
+				? ($this->_isObjectSelect($value)
+					? '(' . $value->build() . ')'
+					: $value->build()
+				)
 				: $this->_dataBase->quote($value);
-			
+
 			$sql[] = $this->_dataBase->quoteColumnName($columnName) . ' = ' . $value;
 		}
-		
+
 		return implode(', ', $sql);
 	}
-	
+
 	/**
 	 * Build the SQL query
-	 * 
+	 *
 	 * @return string The SQL query
 	 */
 	public function build()
@@ -200,12 +202,12 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 		{
 			$sql .= ' ' . $this->_priority;
 		}
-		
+
 		if (!is_null($this->_ignore))
 		{
 			$sql .= ' IGNORE';
 		}
-		
+
 		$sql .= ' ' . implode(', ', $this->quoteColumns($this->_tableName));
 		$sql .= ' SET ' . $this->_buildSet($this->_columns);
 

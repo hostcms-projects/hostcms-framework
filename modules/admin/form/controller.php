@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Controller
 {
@@ -1286,10 +1286,8 @@ class Admin_Form_Controller
 	*/
 	public function applyFormat($str, $format)
 	{
-		if (!empty($format))
-		{
-			$str = sprintf($format, $str);
-		}
+		!empty($format) && $str = sprintf($format, $str);
+
 		return $str;
 	}
 
@@ -1663,6 +1661,7 @@ class Admin_Form_Controller
 				if (isset($oEntity->$fieldName) || method_exists($oEntity, $fieldName)
 					// Для сортировки должно существовать св-во модели
 					// || property_exists($oEntity, $fieldName)
+					|| $oAdmin_Form_Dataset->issetExternalField($fieldName)
 				)
 				{
 					$oAdmin_Form_Dataset->addCondition(array(
@@ -1696,7 +1695,11 @@ class Admin_Form_Controller
 
 						// для HAVING не проверяем наличие поля
 						if ($oAdmin_Form_Field->filter_type == 1
-							|| isset($oEntity->$sTmpFieldName) || method_exists($oEntity, $sTmpFieldName) || property_exists($oEntity, $sTmpFieldName))
+							|| isset($oEntity->$sTmpFieldName)
+							|| method_exists($oEntity, $sTmpFieldName)
+							|| property_exists($oEntity, $sTmpFieldName)
+							|| $oAdmin_Form_Dataset->issetExternalField($sTmpFieldName)
+						)
 						{
 
 							// Тип поля.

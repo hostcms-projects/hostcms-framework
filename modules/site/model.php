@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Model extends Core_Entity
 {
@@ -200,61 +200,54 @@ class Site_Model extends Core_Entity
 		}
 		$this->id = $primaryKey;
 
-		// Advertisement
 		if (Core::moduleIsActive('advertisement'))
 		{
 			$this->Advertisements->deleteAll(FALSE);
 			$this->Advertisement_Groups->deleteAll(FALSE);
 		}
 
-		// Counter
 		if (Core::moduleIsActive('counter'))
 		{
 			$this->Counters->deleteAll(FALSE);
 			$this->Counter_Pages->deleteAll(FALSE);
 		}
 
-		// Documents
 		$this->Documents->deleteAll(FALSE);
 		$this->Document_Dirs->deleteAll(FALSE);
 		$this->Document_Statuses->deleteAll(FALSE);
 
-		// Information systems
-		$this->Informationsystems->deleteAll(FALSE);
-		$this->Informationsystem_Dirs->deleteAll(FALSE);
+		if (Core::moduleIsActive('informationsystem'))
+		{
+			$this->Informationsystems->deleteAll(FALSE);
+			$this->Informationsystem_Dirs->deleteAll(FALSE);
+		}
 
-		// Lists
 		if (Core::moduleIsActive('list'))
 		{
 			$this->Lists->deleteAll(FALSE);
 			$this->List_Dirs->deleteAll(FALSE);
 		}
 
-		// Maillist
 		if (Core::moduleIsActive('maillist'))
 		{
 			$this->Maillists->deleteAll(FALSE);
 		}
 
-		// Polls
 		if (Core::moduleIsActive('poll'))
 		{
 			$this->Poll_Groups->deleteAll(FALSE);
 		}
 
-		// Helpdesks
 		if (Core::moduleIsActive('helpdesk'))
 		{
 			$this->Helpdesks->deleteAll(FALSE);
 		}
 
-		// Forums
 		if (Core::moduleIsActive('forum'))
 		{
 			$this->Forums->deleteAll(FALSE);
 		}
 
-		// Search
 		if (Core::moduleIsActive('search'))
 		{
 			$this->Search_Logs->deleteAll(FALSE);
@@ -273,7 +266,6 @@ class Site_Model extends Core_Entity
 			$this->Shop_Dirs->deleteAll(FALSE);
 		}
 
-		// Siteusers
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$this->Affiliate_Plans->deleteAll(FALSE);
@@ -287,7 +279,6 @@ class Site_Model extends Core_Entity
 			$oSiteuser_Property_List->Property_Dirs->deleteAll(FALSE);
 		}
 
-		// Forms
 		if (Core::moduleIsActive('form'))
 		{
 			$this->Forms->deleteAll(FALSE);
@@ -295,15 +286,12 @@ class Site_Model extends Core_Entity
 
 		$this->Site_Aliases->deleteAll(FALSE);
 
-		// Structures
 		$this->Structures->deleteAll(FALSE);
 		$this->Structure_Menus->deleteAll(FALSE);
 
-		// Templates
 		$this->Templates->deleteAll(FALSE);
 		$this->Template_Dirs->deleteAll(FALSE);
 
-		// Users
 		$this->User_Groups->deleteAll(FALSE);
 		$this->User_Group_Action_Accesses->deleteAll(FALSE);
 		$this->User_Modules->deleteAll(FALSE);
@@ -589,20 +577,6 @@ class Site_Model extends Core_Entity
 			unset($aMatchAdvertisements);
 		}
 
-		/*
-		$this->Advertisements->deleteAll(FALSE);
-		$this->Advertisement_Groups->deleteAll(FALSE);
-		*/
-
-		// Counter
-		/* WARNING! Уточнить про копирование
-		if (Core::moduleIsActive('counter'))
-		{
-			$this->Counters->deleteAll(FALSE);
-			$this->Counter_Pages->deleteAll(FALSE);
-		}
-		*/
-
 		// Documents
 		// Список статусов документов
 		$aDocument_Statuses = $this->Document_Statuses->findAll(FALSE);
@@ -679,12 +653,6 @@ class Site_Model extends Core_Entity
 
 		unset($aMatchDocument_Statuses);
 		unset($aMatchDocument_Dirs);
-
-		/*
-		$this->Documents->deleteAll(FALSE);
-		$this->Document_Dirs->deleteAll(FALSE);
-		$this->Document_Statuses->deleteAll(FALSE);
-		*/
 
 		// Menu
 		$aMatchStructure_Menus = array();
@@ -1015,17 +983,17 @@ class Site_Model extends Core_Entity
 
 				foreach($aSiteuser_Group_Lists as $oSiteuser_Group_List)
 				{
-					$oNewSiteuser_Group_List = $oSiteuser_Group_List->copy();
+					//$oNewSiteuser_Group_List = $oSiteuser_Group_List->copy();
+					$oNewSiteuser_Group_List = Core_Entity::factory('Siteuser_Group_List');
 
-					if (isset($aMatchSiteuser_Groups[$oNewSiteuser_Group_List->siteuser_group_id])
-					&& isset($aMatchSiteusers[$oNewSiteuser_Group_List->siteuser_id]))
+					if (isset($aMatchSiteuser_Groups[$oSiteuser_Group_List->siteuser_group_id])
+					&& isset($aMatchSiteusers[$oSiteuser_Group_List->siteuser_id]))
 					{
-						$oNewSiteuser_Group = $aMatchSiteuser_Groups[$oNewSiteuser_Group_List->siteuser_group_id];
-						$oNewSiteuser = $aMatchSiteusers[$oNewSiteuser_Group_List->siteuser_id];
+						$oNewSiteuser_Group = $aMatchSiteuser_Groups[$oSiteuser_Group_List->siteuser_group_id];
+						$oNewSiteuser = $aMatchSiteusers[$oSiteuser_Group_List->siteuser_id];
 
 						$oNewSiteuser_Group_List->siteuser_group_id = $oNewSiteuser_Group->id;
 						$oNewSiteuser_Group_List->siteuser_id = $oNewSiteuser->id;
-						$oNewSiteuser_Group_List->informationsystem_group_id = 0;
 						$oNewSiteuser_Group_List->save();
 					}
 				}
@@ -1064,66 +1032,63 @@ class Site_Model extends Core_Entity
 			*/
 		}
 
-		// Information systems
-		$aInformationsystem_Dirs = $this->Informationsystem_Dirs->findAll(FALSE);
-		$aMatchInformationsystem_Dirs = array();
-
-		foreach($aInformationsystem_Dirs as $oInformationsystem_Dir)
-		{
-			$oNewInformationsystem_Dir = clone $oInformationsystem_Dir;
-			$newObject->add($oNewInformationsystem_Dir);
-
-			$aMatchInformationsystem_Dirs[$oInformationsystem_Dir->id] = $oNewInformationsystem_Dir;
-		}
-
-		// Получаем скопированные разделы информационных систем
-		$aNewInformationsystem_Dirs = $newObject->Informationsystem_Dirs->findAll(FALSE);
-
-		foreach($aNewInformationsystem_Dirs as $oNewInformationsystem_Dir)
-		{
-			if(isset($aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]))
-			{
-				$oNewInformationsystem_Dir->parent_id = $aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]->id;
-
-				$oNewInformationsystem_Dir->save();
-			}
-		}
-
-		//Получаем список информационных систем, принадлежащих сайту
-		$aInformationsystems = $this->Informationsystems->findAll(FALSE);
-
-		// Цикл по информационным системам, находящимся в корне разделов информационных систем
 		$aMatchInformationsystems = array();
-
-		foreach($aInformationsystems as $oInformationsystem)
+		if (Core::moduleIsActive('informationsystem'))
 		{
-			$oNewInformationsystem = $oInformationsystem->copy();
-			if (isset($aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]))
+			// Informationsystems
+			$aInformationsystem_Dirs = $this->Informationsystem_Dirs->findAll(FALSE);
+			$aMatchInformationsystem_Dirs = array();
+
+			foreach($aInformationsystem_Dirs as $oInformationsystem_Dir)
 			{
-				$oInformationsystem->informationsystem_dir_id = $aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]->id;
+				$oNewInformationsystem_Dir = clone $oInformationsystem_Dir;
+				$newObject->add($oNewInformationsystem_Dir);
+
+				$aMatchInformationsystem_Dirs[$oInformationsystem_Dir->id] = $oNewInformationsystem_Dir;
 			}
 
-			if (isset($aMatchStructures[$oNewInformationsystem->structure_id]))
+			// Получаем скопированные разделы информационных систем
+			$aNewInformationsystem_Dirs = $newObject->Informationsystem_Dirs->findAll(FALSE);
+
+			foreach($aNewInformationsystem_Dirs as $oNewInformationsystem_Dir)
 			{
-				$oNewInformationsystem->structure_id = $aMatchStructures[$oNewInformationsystem->structure_id]->id;
+				if(isset($aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]))
+				{
+					$oNewInformationsystem_Dir->parent_id = $aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]->id;
+
+					$oNewInformationsystem_Dir->save();
+				}
 			}
 
-			if (isset($aMatchSiteuser_Groups[$oNewInformationsystem->siteuser_group_id]))
+			//Получаем список информационных систем, принадлежащих сайту
+			$aInformationsystems = $this->Informationsystems->findAll(FALSE);
+
+			// Цикл по информационным системам, находящимся в корне разделов информационных систем
+			foreach($aInformationsystems as $oInformationsystem)
 			{
-				$oNewInformationsystem->siteuser_group_id = $aMatchSiteuser_Groups[$oNewInformationsystem->siteuser_group_id]->id;
+				$oNewInformationsystem = $oInformationsystem->copy();
+				if (isset($aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]))
+				{
+					$oInformationsystem->informationsystem_dir_id = $aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]->id;
+				}
+
+				if (isset($aMatchStructures[$oNewInformationsystem->structure_id]))
+				{
+					$oNewInformationsystem->structure_id = $aMatchStructures[$oNewInformationsystem->structure_id]->id;
+				}
+
+				if (isset($aMatchSiteuser_Groups[$oNewInformationsystem->siteuser_group_id]))
+				{
+					$oNewInformationsystem->siteuser_group_id = $aMatchSiteuser_Groups[$oNewInformationsystem->siteuser_group_id]->id;
+				}
+
+				$newObject->add($oNewInformationsystem);
+
+				$aMatchInformationsystems[$oInformationsystem->id] = $oNewInformationsystem;
 			}
 
-			$newObject->add($oNewInformationsystem);
-
-			$aMatchInformationsystems[$oInformationsystem->id] = $oNewInformationsystem;
+			unset($aMatchInformationsystem_Dirs);
 		}
-
-		unset($aMatchInformationsystem_Dirs);
-
-		/*
-		$this->Informationsystems->deleteAll(FALSE);
-		$this->Informationsystem_Dirs->deleteAll(FALSE);
-		*/
 
 		// Forums
 		if (Core::moduleIsActive('forum'))
@@ -1168,83 +1133,74 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		// Search
-		// Поиск не копируем
-		if (Core::moduleIsActive('search'))
+		// Search, поиск не копируем
+		/*if (Core::moduleIsActive('search'))
 		{
-			//$this->Search_Logs->deleteAll(FALSE);
-			//$this->Search_Pages->deleteAll(FALSE);
+
+		}*/
+
+		if (Core::moduleIsActive('seo'))
+		{
+			$aSeos = $this->Seos->findAll(FALSE);
+			foreach($aSeos as $oSeo)
+			{
+				$newObject->add($oSeo->copy());
+			}
+
+			$aSeo_Queries = $this->Seo_Queries->findAll(FALSE);
+			foreach($aSeo_Queries as $oSeo_Query)
+			{
+				$newObject->add($oSeo_Query->copy());
+			}
 		}
 
-		$aSeos = $this->Seos->findAll(FALSE);
-		foreach($aSeos as $oSeo)
-		{
-			$newObject->add($oSeo->copy());
-		}
-
-		$aSeo_Queries = $this->Seo_Queries->findAll(FALSE);
-		foreach($aSeo_Queries as $oSeo_Query)
-		{
-			$newObject->add($oSeo_Query->copy());
-		}
-
-		/*
-		$this->Seos->deleteAll(FALSE);
-		$this->Seo_Queries->deleteAll(FALSE);
-		*/
-
-		// Shops
-		$aShop_Dirs = $this->Shop_Dirs->findAll(FALSE);
-
-		$aMatchShop_Dirs = array();
-		foreach($aShop_Dirs as $oShop_Dir)
-		{
-			//$oNewShop_Dir = $oShop_Dir->copy();
-			$oNewShop_Dir = clone $oShop_Dir;
-			$aMatchShop_Dirs[$oShop_Dir->id] = $oNewShop_Dir;
-
-			$newObject->add($oNewShop_Dir);
-		}
-
-		//Получаем список магазинов принадлежащих сайту
-		$oShops = $this->Shops;
-		//$oShops->queryBuilder()->where('shop_dir_id', '=', 0);
-
-		$aShops = $oShops->findAll(FALSE);
-
-		// Цикл по магазинам, находящимся в корне разделов магазинов
 		$aMatchShops = array();
-
-		foreach($aShops as $oShop)
+		if (Core::moduleIsActive('shop'))
 		{
-			$oNewShop = $oShop->copy();
+			$aShop_Dirs = $this->Shop_Dirs->findAll(FALSE);
 
-			if (isset($aMatchShop_Dirs[$oNewShop->shop_dir_id]))
+			$aMatchShop_Dirs = array();
+			foreach($aShop_Dirs as $oShop_Dir)
 			{
-				$oNewShop->shop_dir_id = $aMatchShop_Dirs[$oNewShop->shop_dir_id]->id;
+				//$oNewShop_Dir = $oShop_Dir->copy();
+				$oNewShop_Dir = clone $oShop_Dir;
+				$aMatchShop_Dirs[$oShop_Dir->id] = $oNewShop_Dir;
+
+				$newObject->add($oNewShop_Dir);
 			}
 
-			if (isset($aMatchStructures[$oNewShop->structure_id]))
+			//Получаем список магазинов принадлежащих сайту
+			$oShops = $this->Shops;
+			//$oShops->queryBuilder()->where('shop_dir_id', '=', 0);
+			$aShops = $oShops->findAll(FALSE);
+
+			// Цикл по магазинам, находящимся в корне разделов магазинов
+			foreach($aShops as $oShop)
 			{
-				$oNewShop->structure_id = $aMatchStructures[$oNewShop->structure_id]->id;
+				$oNewShop = $oShop->copy();
+
+				if (isset($aMatchShop_Dirs[$oNewShop->shop_dir_id]))
+				{
+					$oNewShop->shop_dir_id = $aMatchShop_Dirs[$oNewShop->shop_dir_id]->id;
+				}
+
+				if (isset($aMatchStructures[$oNewShop->structure_id]))
+				{
+					$oNewShop->structure_id = $aMatchStructures[$oNewShop->structure_id]->id;
+				}
+
+				if (isset($aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]))
+				{
+					$oNewShop->siteuser_group_id = $aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]->id;
+				}
+
+				$newObject->add($oNewShop);
+
+				$aMatchShops[$oShop->id] = $oNewShop;
 			}
 
-			if (isset($aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]))
-			{
-				$oNewShop->siteuser_group_id = $aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]->id;
-			}
-
-			$newObject->add($oNewShop);
-
-			$aMatchShops[$oShop->id] = $oNewShop;
+			unset($aMatchShop_Dirs);
 		}
-
-		unset($aMatchShop_Dirs);
-
-		/*
-		$this->Shops->deleteAll(FALSE);
-		$this->Shop_Dirs->deleteAll(FALSE);
-		*/
 
 		// Maillist
 		if (Core::moduleIsActive('maillist'))
@@ -1273,8 +1229,6 @@ class Site_Model extends Core_Entity
 					}
 				}
 			}
-
-			//$this->Maillists->deleteAll(FALSE);
 		}
 
 		// Helpdesks
@@ -1325,10 +1279,7 @@ class Site_Model extends Core_Entity
 					$oNewHelpdesk_Status->save();
 
 					//$newObject->add($oNewHelpdesk_Status);
-
 					$aMatchHelpdesk_Statuses[$oHelpdesk_Status->id] = $oNewHelpdesk_Status;
-
-					//$oNewHelpdesk->add();
 				}
 
 				if(isset($aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_reply_id]))
@@ -1368,8 +1319,6 @@ class Site_Model extends Core_Entity
 					$oNewHelpdesk->add($oHelpdesk_Working_Hour->copy());
 				}
 
-				////////////////////
-
 				if (isset($aMatchStructures[$oNewHelpdesk->structure_id]))
 				{
 					$oNewHelpdesk->structure_id = $aMatchStructures[$oNewHelpdesk->structure_id]->id;
@@ -1378,20 +1327,13 @@ class Site_Model extends Core_Entity
 
 				$aMatchHelpdesks[$oHelpdesk->id] = $oNewHelpdesk;
 			}
-
-			//$this->Helpdesks->deleteAll(FALSE);
 		}
-
-		//$this->Structures->deleteAll(FALSE);
-		//$this->Structure_Menus->deleteAll(FALSE);
 
 		$aSite_Aliases = $this->Site_Aliases->findAll(FALSE);
 		foreach($aSite_Aliases as $oSite_Alias)
 		{
 			$newObject->add($oSite_Alias->copy());
 		}
-
-		//$this->Site_Aliases->deleteAll(FALSE);
 
 		// Templates
 		// Получаем список разделов макетов сайта
@@ -1421,9 +1363,7 @@ class Site_Model extends Core_Entity
 
 		$aTemplates = $this->Templates->findAll(FALSE);
 
-		// В цикле копируем макеты сайта
 		$aMatchTemplates = array();
-
 		foreach($aTemplates as $oTemplate)
 		{
 			$oNewTemplate = clone $oTemplate;
@@ -1578,19 +1518,6 @@ class Site_Model extends Core_Entity
 		{
 			$newObject->add($oUser_Group->copy());
 		}
-
-		/*
-		$this->User_Groups->deleteAll(FALSE);
-		$this->User_Group_Action_Accesses->deleteAll(FALSE);
-		$this->User_Modules->deleteAll(FALSE);
-		*/
-
-		/*
-		// Удаление доп. св-в структуры сайта
-		$oStructure_Property_List = Core_Entity::factory('Structure_Property_List', $this->id);
-		$oStructure_Property_List->Properties->deleteAll(FALSE);
-		$oStructure_Property_List->Property_Dirs->deleteAll(FALSE);
-		*/
 
 		return $newObject;
 	}

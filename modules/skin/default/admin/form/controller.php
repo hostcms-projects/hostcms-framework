@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 {
@@ -412,6 +412,14 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 
 								$element_name = "apply_check_{$datasetKey}_{$key_field_value}_fv_{$oAdmin_Form_Field_Changed->id}";
 
+								// Функция, выполняемая перед отображением поля
+								$methodName = 'prefix' . ucfirst($fieldName);
+								if (method_exists($oEntity, $methodName))
+								{
+									// Выполним функцию обратного вызова
+									echo $oEntity->$methodName();
+								}
+								
 								// Отображения элементов полей, в зависимости от их типа.
 								switch ($oAdmin_Form_Field_Changed->type)
 								{
@@ -539,7 +547,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 											$alt_array[$value] = $fieldName;
 										}
 
-										// Warning: 01-06-11 Создать отдельное поле в таблице в БД и в нем хранить title-ы
+										// ToDo: Создать отдельное поле в таблице в БД и в нем хранить title-ы
 										if (isset($field_value['admin_forms_field_title']))
 										{
 											$str_array_title = explode("\n", $field_value['admin_forms_field_title']);
@@ -660,6 +668,14 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 									default: // Тип не определен.
 										?>&nbsp;<?php
 									break;
+								}
+								
+								// Функция, выполняемая после отображением поля
+								$methodName = 'suffix' . ucfirst($fieldName);
+								if (method_exists($oEntity, $methodName))
+								{
+									// Выполним функцию обратного вызова
+									echo $oEntity->$methodName();
 								}
 							}
 							catch (Exception $e)

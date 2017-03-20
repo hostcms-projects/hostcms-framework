@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online store goods',
@@ -266,4 +266,5 @@ return array(
 	'item_height'=>'Height',
 	'show_in_group'=>'Show property in group',
 	'show_in_item'=>'Show property in item',
+	'add_value'=>'Add the default property values ​​for the items with unset values',
 );

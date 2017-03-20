@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Model extends Core_Entity
 {
@@ -36,6 +36,15 @@ class Shop_Item_Property_Model extends Core_Entity
 		'shop_measure' => array(),
 	);
 
+	/**
+	 * List of preloaded values
+	 * @var array
+	 */
+	protected $_preloadValues = array(
+		'show_in_group' => 1,
+		'show_in_item' => 1,
+	);
+	
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object

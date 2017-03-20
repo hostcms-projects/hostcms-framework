@@ -1,12 +1,14 @@
 <?php
+
 defined('HOSTCMS') || exit('HostCMS: access denied.');
+
 /**
  * Online shop.
  *
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 {
@@ -37,6 +39,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 			->url($url)
 			->port(80)
 			->timeout(10)
+			->additionalHeader('User-Agent', 'Mozilla/5.0 (Windows NT 5.1; rv:26.0) Gecko/20100101 Firefox/26.0')
 			->execute();
 
 		$xml = $Core_Http->getBody();

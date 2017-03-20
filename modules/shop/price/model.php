@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Price_Model extends Core_Entity
 {
@@ -55,7 +55,7 @@ class Shop_Price_Model extends Core_Entity
 	}
 
 	/**
-	 * Get price by user group and shop
+	 * Get Shop_Price by user group and shop
 	 * @param int $siteuser_group_id user group id
 	 * @param int $shop_id shop id
 	 * @return Shop_Price_Model|NULL
@@ -63,19 +63,28 @@ class Shop_Price_Model extends Core_Entity
 	public function getBySiteuserGroupAndShop($siteuser_group_id, $shop_id)
 	{
 		$this->queryBuilder()
-			//->clear()
 			->where('siteuser_group_id', '=', $siteuser_group_id)
 			->where('shop_id', '=', $shop_id)
 			->limit(1);
 
 		$aShop_Prices = $this->findAll();
 
-		if (isset($aShop_Prices[0]))
-		{
-			return $aShop_Prices[0];
-		}
+		return isset($aShop_Prices[0]) ? $aShop_Prices[0] : NULL;
+	}
 
-		return NULL;
+	/**
+	 * Get all Shop_Prices by user group and shop
+	 * @param int $siteuser_group_id user group id
+	 * @param int $shop_id shop id
+	 * @return array
+	 */
+	public function getAllBySiteuserGroupAndShop($siteuser_group_id, $shop_id)
+	{
+		$this->queryBuilder()
+			->where('siteuser_group_id', '=', $siteuser_group_id)
+			->where('shop_id', '=', $shop_id);
+
+		return $this->findAll();
 	}
 
 	/**

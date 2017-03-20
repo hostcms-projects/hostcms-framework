@@ -6,7 +6,7 @@
  * @package HostCMS 6\Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'changeLanguage' => 'Выберите язык:',
@@ -91,6 +91,7 @@ return array(
 	'database_login' => 'Логин для базы данных:',
 	'database_pass' => 'Пароль для базы данных:',
 	'database_mysql' => 'База данных MySQL:',
+	'database_driver' => 'Драйвер MySQL:',
 	'create_database' => 'Создать базу данных:',
 	'create_database_flag' => 'Не устанавливайте этот флажок, если база данных уже создана!',
 	'clear_database' => 'Очистить базу данных:',

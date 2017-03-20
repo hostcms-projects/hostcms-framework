@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Group_Model extends Core_Entity
 {
@@ -76,7 +76,7 @@ class Shop_Group_Model extends Core_Entity
 	 * Backend property
 	 * @var int
 	 */
-	public $price = NULL;
+	public $adminPrice = NULL;
 
 	/**
 	 * One-to-many or many-to-many relations

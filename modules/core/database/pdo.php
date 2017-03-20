@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_DataBase_Pdo extends Core_DataBase
 {
@@ -48,7 +48,10 @@ class Core_DataBase_Pdo extends Core_DataBase
 			'driverName' => 'mysql',
 			'attr' => array(
 				PDO::ATTR_PERSISTENT => FALSE,
-				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+
+				// Setting the connection character set to UTF-8 prior to PHP 5.3.6
+				//PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $this->quote($this->_config['charset'])
 			)
 		);
 
@@ -68,7 +71,8 @@ class Core_DataBase_Pdo extends Core_DataBase
 				array('%errno' => $e->getCode(), '%error' => $e->getMessage()));
 		}
 
-		if (!empty($this->_config['charset']) && version_compare(PHP_VERSION, '5.3.6', '<'))
+		// 5.3.27 doesn't work without setCharset()
+		if (!empty($this->_config['charset']) /*&& version_compare(PHP_VERSION, '5.3.6', '<')*/)
 		{
 			// Sets the client character set
 			$this->setCharset($this->_config['charset']);
@@ -729,9 +733,9 @@ class Core_DataBase_Pdo extends Core_DataBase
 	public function getAffectedRows()
 	{
 		// Get the number of affected rows by the last INSERT, UPDATE, REPLACE or DELETE query
-		if ($this->_queryType > 0 && $this->_queryType < 4 && $this->_connection)
+		if ($this->_queryType > 0 && $this->_queryType < 4 && $this->_result)
 		{
-			return $this->_connection->rowCount();
+			return $this->_result->rowCount();
 		}
 
 		return NULL;

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Дополнительные свойства',
@@ -23,7 +23,7 @@ return array(
 	'description' => '<acronym title="Описание дополнительного свойства">Описание</acronym>',
 	'type' => '<acronym title="Тип свойства">Тип</acronym>',
 
-	'type0' => 'Число',
+	'type0' => 'Целое число',
 	'type1' => 'Строка',
 	'type2' => 'Файл',
 	'type3' => 'Список',
@@ -35,9 +35,11 @@ return array(
 	'type9' => 'Дата-время',
 	'type10' => 'Скрытое поле',
 	'type11' => 'Число с плавающей запятой',
+	'type12' => 'Интернет-магазин',
 
 	'list_id' => '<acronym title="Выберите список значений для дополнительного свойства">Список</acronym>',
 	'informationsystem_id' => '<acronym title="Информационная система, задаваемая в качестве свойства">Информационная система</acronym>',
+	'shop_id' => '<acronym title="Интернет-магазин, задаваемый в качестве свойства">Интернет-магазин</acronym>',
 
 	'sorting' => '<acronym title="Порядок сортировки свойства">Порядок сортировки</acronym>',
 	'default_value' => '<acronym title="Значение свойства по умолчанию">Значение по умолчанию</acronym>',

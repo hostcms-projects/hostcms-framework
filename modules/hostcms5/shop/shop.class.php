@@ -7315,7 +7315,18 @@ class shop
 		isset($param['country_id']) && $oShop_Order->shop_country_id = $param['country_id'];
 		isset($param['shop_city_id']) && $oShop_Order->shop_country_location_city_id = $param['shop_city_id'];
 		isset($param['city_area_id']) && $oShop_Order->shop_country_location_city_area_id = $param['city_area_id'];
-		isset($param['shop_cond_of_delivery_id']) && $oShop_Order->shop_delivery_condition_id = $param['shop_cond_of_delivery_id'];
+		if (isset($param['shop_cond_of_delivery_id']))
+		{
+			$shop_delivery_condition_id = intval($param['shop_cond_of_delivery_id']);
+			$oShop_Order->shop_delivery_condition_id = $shop_delivery_condition_id;
+
+			$shop_delivery_id = $shop_delivery_condition_id
+				? intval(Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id)->shop_delivery_id)
+				: 0;
+
+			$oShop_Order->shop_delivery_id = $shop_delivery_id;
+		}
+
 		isset($param['site_user_id']) && $oShop_Order->siteuser_id = $param['site_user_id'];
 		isset($param['shop_order_status_id']) && $oShop_Order->shop_order_status_id = $param['shop_order_status_id'];
 		isset($param['currency_id']) && $oShop_Order->shop_currency_id = $param['currency_id'];
@@ -20403,7 +20414,7 @@ class shop
 			)
 			->from('properties')
 			->join('shop_item_properties', 'properties.id', '=', 'shop_item_properties.property_id')
-			->where('shop_id', '=', $shop_shops_id)
+			->where('shop_item_properties.shop_id', '=', $shop_shops_id)
 			->where('properties.id', 'IN', $property_id_array)
 			->where('deleted', '=', 0)
 			->orderBy('shop_list_of_properties_order')

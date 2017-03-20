@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 {
@@ -151,7 +151,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				"","","","","","","","","",""
 				,"","","","","","","","","",""
 				,"","","","","","","","","",""
-				,"",""
+				,""
 			);
 
 			$this->_iCurrentDataPosition = 0;
@@ -254,6 +254,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	{
 		// Получаем список специальных цен товара
 		$aShop_Specialprices = $oShopItem->Shop_Specialprices->findAll(FALSE);
+		
 
 		$aTmpArray = $this->_aItemBase_Properties;
 
@@ -264,8 +265,8 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$aTmpArray[31] = $oShop_Specialprice->price;
 			$aTmpArray[32] = $oShop_Specialprice->percent;
 			$aTmpArray[33] = $oShopItem->guid;
-
-			$this->_aCurrentData[++$this->_iCurrentDataPosition] = array_merge($this->_aGroupBase_Properties, $aTmpArray);
+			
+			echo implode($this->separator,array_merge($this->_aGroupBase_Properties, $aTmpArray)) . "\n";
 		}
 	}
 
@@ -332,6 +333,13 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		$aTmpArray = $this->_aGroupBase_Properties;
 
 		$aTmpArray[1] = is_null($oShopItem->Shop_Group->id) ? 'ID00000000' : $oShopItem->Shop_Group->guid;
+		
+		if($oShopItem->Shop_Group->id)
+		{
+			$aTmpArray[3] = $oShopItem->Shop_Group->seo_title;
+			$aTmpArray[4] = $oShopItem->Shop_Group->seo_description;
+			$aTmpArray[5] = $oShopItem->Shop_Group->seo_keywords;
+		}
 
 		return array_merge($aTmpArray, array(
 		sprintf('"%s"', str_replace('"', '""', $oShopItem->marking)),
@@ -487,7 +495,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					{
 						$this->_printRow($this->getItemData($oShopItem));
 						
-						$iPropertyFieldOffset = count($this->_aSpecialPriceBase_Properties) + count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties) - 1;
+						$iPropertyFieldOffset = count($this->_aSpecialPriceBase_Properties) + count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties);
 						$aCurrentPropertyLine = array();
 						for($i = 0;$i<$iPropertyFieldOffset;$i++)
 						{

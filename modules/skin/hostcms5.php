@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Hostcms5 extends Core_Skin
 {
@@ -453,7 +453,7 @@ if (Core_Auth::logged())
 	</div>
 
 <div id="footer">
-	<div>Copyright &copy; 2005&ndash;2013 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
+	<div>Copyright &copy; 2005&ndash;2014 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
 </div>
 
 <!--[if lte IE 6]>

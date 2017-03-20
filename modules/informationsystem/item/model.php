@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Model extends Core_Entity
 {
@@ -1190,19 +1190,25 @@ class Informationsystem_Item_Model extends Core_Entity
 				$avgGrade += 1;
 			}
 
-			$this->addEntity(
+			!isset($this->_forbiddenTags['comments_count']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_count')
 					->value(count($aComments))
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_grade_sum']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_grade_sum')
 					->value($gradeSum)
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_grade_count']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_grade_count')
 					->value($gradeCount)
-			)->addEntity(
+			);
+
+			!isset($this->_forbiddenTags['comments_average_grade']) && $this->addEntity(
 				Core::factory('Core_Xml_Entity')
 					->name('comments_average_grade')
 					->value($avgGrade)

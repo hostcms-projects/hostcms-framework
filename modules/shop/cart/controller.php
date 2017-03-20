@@ -6,10 +6,19 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Online store cart operations.
  * Работа с корзиной интернет-магазина.
  *
+ * Доступные методы:
+ *
+ * - shop_item_id($id) идентификатор товара
+ * - quantity($value) количество товара
+ * - postpone(TRUE|FALSE) товар отложен
+ * - shop_warehouse_id($id) идентификатор склада
+ * - siteuser_id($id) идентификатор пользователя сайта
+ * - checkStock(TRUE|FALSE) проверять наличие товара на складе, по умолчанию FALSE
+ *
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Controller extends Core_Servant_Properties
 {
@@ -23,6 +32,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 		'postpone',
 		'shop_warehouse_id',
 		'siteuser_id',
+		'checkStock',
 	);
 
 	/**
@@ -46,6 +56,8 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				$this->siteuser_id = $oSiteuser->id;
 			}
 		}
+
+		$this->checkStock = FALSE;
 	}
 
 	/**
@@ -280,33 +292,40 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 			// Проверяем право пользователя добавить этот товар в корзину
 			if (in_array($oShop_Item->getSiteuserGroupId(), $aSiteuserGroups))
 			{
+				// Если передано количество товара и товар обычный или электронный
+				if ($oShop_Item->type == 1 || $oShop_Item->type == 0)
+				{
+					// Нужно получить реальное количество товара, если товар электронный
+					if ($oShop_Item->type == 1)
+					{
+						// Получаем количество электронного товара на складе
+						$iShop_Item_Digitals = $oShop_Item->Shop_Item_Digitals->getCountDigitalItems();
+
+						if ($iShop_Item_Digitals != -1 && $iShop_Item_Digitals < $this->quantity)
+						{
+							$this->quantity = $iShop_Item_Digitals;
+						}
+					}
+
+					// Товар обычный, поэтому intval()
+					$this->quantity = intval($this->quantity);
+				}
+				// Если делимый товар
+				elseif ($oShop_Item->type == 2)
+				{
+					// Товар делимый, поэтому floatval()
+					$this->quantity = floatval($this->quantity);
+				}
+
+				// Проверять остаток для обычных товаров
+				if ($this->checkStock && ($oShop_Item->type == 0 || $oShop_Item->type == 2))
+				{
+					$iRest = $oShop_Item->getRest();
+					$iRest < $this->quantity && $this->quantity = $iRest;
+				}
+
 				if ($this->quantity > 0)
 				{
-					// Если передано количество товара и товар обычный или электронный
-					if ($oShop_Item->type == 1 || $oShop_Item->type == 0)
-					{
-						// Нужно получить реальное количество товара, если товар электронный
-						if ($oShop_Item->type == 1)
-						{
-							// Получаем количество электронного товара на складе
-							$iShop_Item_Digitals = $oShop_Item->Shop_Item_Digitals->getCountDigitalItems();
-
-							if ($iShop_Item_Digitals != -1 && $iShop_Item_Digitals < $this->quantity)
-							{
-								$this->quantity = $iShop_Item_Digitals;
-							}
-						}
-
-						// Товар обычный, поэтому intval()
-						$this->quantity = intval($this->quantity);
-					}
-					// Если делимый товар
-					elseif ($oShop_Item->type == 2)
-					{
-						// Товар делимый, поэтому floatval()
-						$this->quantity = floatval($this->quantity);
-					}
-
 					// Проверяем наличие данных о пользователе
 					if ($this->siteuser_id)
 					{

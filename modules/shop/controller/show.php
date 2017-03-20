@@ -66,7 +66,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Show extends Core_Controller
 {
@@ -281,6 +281,7 @@ class Shop_Controller_Show extends Core_Controller
 					->orderBy('shop_items.sorting', $items_sorting_direction);
 		}
 
+
 		$dateTime = Core_Date::timestamp2sql(time());
 		$this->_Shop_Items
 			->queryBuilder()
@@ -370,9 +371,12 @@ class Shop_Controller_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Shop_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
@@ -673,9 +677,15 @@ class Shop_Controller_Show extends Core_Controller
 			if ($this->itemsProperties)
 			{
 				// Показываются свойства, явно указанные пользователем в itemsProperties и разрешенные для товаров
-				$mShowPropertyIDs = count($aShowPropertyIDs)
+				/*$mShowPropertyIDs = count($aShowPropertyIDs)
 					? (array_merge(is_array($this->itemsProperties) ? $this->itemsProperties : array(), $aShowPropertyIDs))
-					: $this->itemsProperties;
+					: $this->itemsProperties;*/
+
+				$mShowPropertyIDs = is_array($this->itemsProperties)
+					? $this->itemsProperties
+					: $aShowPropertyIDs;
+
+				is_array($mShowPropertyIDs) && !count($mShowPropertyIDs) && $mShowPropertyIDs = FALSE;
 			}
 			else
 			{

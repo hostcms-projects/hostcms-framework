@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Model extends Core_Entity
 {
@@ -160,15 +160,13 @@ class Informationsystem_Model extends Core_Entity
 
 	/**
 	 * Get watermark path
+	 * @return string|NULL
 	 */
 	public function getWatermarkFilePath()
 	{
-		if ($this->watermark_file != '')
-		{
-			return $this->getPath() . '/' . $this->watermark_file;
-		}
-
-		return NULL;
+		return $this->watermark_file != ''
+			? $this->getPath() . '/' . $this->watermark_file
+			: NULL;
 	}
 
 	/**

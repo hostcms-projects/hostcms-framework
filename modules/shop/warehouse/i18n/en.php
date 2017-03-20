@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Warehouses',
@@ -28,7 +28,8 @@ return array(
 	'apply_success' => "Information has been successfully changed",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-'markDeleted_success' => "Warehouse deleted successfully!",
-'warehouse_default_not_exist' => "Attention! Default warehouse is missing, please set default warehouse!",
-'warehouse_default_name' => "Primary",
+	'markDeleted_success' => "Warehouse deleted successfully!",
+	'warehouse_default_not_exist' => "Attention! Default warehouse is missing, please set default warehouse!",
+	'warehouse_default_name' => "Primary",
+	'warehouse_default_count' => "<acronym title=\"Set a zero rest in the warehouse\">Set rest in the warehouse</acronym>",
 );

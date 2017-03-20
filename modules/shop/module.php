@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +20,7 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-01-20';
+	public $date = '2014-03-28';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -130,6 +130,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
+	 * @hostcms-event shop_module.indexingShopGroups
 	 */
 	public function indexingShopGroups($offset, $limit)
 	{
@@ -150,6 +151,8 @@ class Shop_Module extends Core_Module{	/**
 			->where('structures.deleted', '=', 0)
 			->limit($offset, $limit);
 
+		Core_Event::notify(get_class($this) . '.indexingShopGroups', $this, array($oShopGroup));
+
 		$aShopGroups = $oShopGroup->findAll();
 
 		$result = array();
@@ -167,6 +170,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
+	 * @hostcms-event shop_module.indexingShopItems
 	 */
 	public function indexingShopItems($offset, $limit)
 	{
@@ -189,6 +193,8 @@ class Shop_Module extends Core_Module{	/**
 			->where('structures.deleted', '=', 0)
 			->limit($offset, $limit);
 
+		Core_Event::notify(get_class($this) . '.indexingShopItems', $this, array($oShopItem));
+
 		$aShopItems = $oShopItem->findAll();
 
 		$result = array();
@@ -206,7 +212,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @access private
+	 * @hostcms-event shop_module.indexingShopSellers
 	 */
 	public function indexingShopSellers($offset, $limit)
 	{
@@ -225,6 +231,8 @@ class Shop_Module extends Core_Module{	/**
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
 			->limit($offset, $limit);
+
+		Core_Event::notify(get_class($this) . '.indexingShopSellers', $this, array($oShopSeller));
 
 		$aShopSellers = $oShopSeller->findAll();
 

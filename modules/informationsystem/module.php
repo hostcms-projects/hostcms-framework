@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +20,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-01-20';
+	public $date = '2014-03-28';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -106,6 +106,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
+	 * @hostcms-event informationsystem_module.indexingInformationsystemGroups
 	 */
 	public function indexingInformationsystemGroups($offset, $limit)
 	{
@@ -126,6 +127,8 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('structures.deleted', '=', 0)
 			->limit($offset, $limit);
 
+		Core_Event::notify(get_class($this) . '.indexingInformationsystemGroups', $this, array($oInformationsystemGroup));
+
 		$aInformationsystemGroups = $oInformationsystemGroup->findAll();
 
 		$result = array();
@@ -143,6 +146,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
+	 * @hostcms-event informationsystem_module.indexingInformationsystemItems
 	 */
 	public function indexingInformationsystemItems($offset, $limit)
 	{
@@ -164,6 +168,8 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
 			->limit($offset, $limit);
+
+		Core_Event::notify(get_class($this) . '.indexingInformationsystemItems', $this, array($oInformationsystemItem));
 
 		$aInformationsystemItems = $oInformationsystemItem->findAll();
 
@@ -192,14 +198,14 @@ class Informationsystem_Module extends Core_Module{	/**
 					$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group')->find($oSearch_Page->module_value_id);
 
 					Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Group));
-					
+
 					!is_null($oInformationsystem_Group->id) && $oSearch_Page->addEntity($oInformationsystem_Group);
 				break;
 				case 2: // Информационые элементы
 					$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item')->find($oSearch_Page->module_value_id);
 
 					Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
-					
+
 					if (!is_null($oInformationsystem_Item->id))
 					{
 						$oInformationsystem_Item

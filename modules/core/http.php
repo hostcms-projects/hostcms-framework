@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Http
 {
@@ -374,8 +374,13 @@ abstract class Core_Http
 		{
 			if (preg_match('/([^:]+): (.+)/m', $field, $match))
 			{
-				$match[1] = preg_replace('/(?<=^|[\x09\x20\x2D])./e', 'strtoupper("\0")', strtolower(
+				/*$match[1] = preg_replace('/(?<=^|[\x09\x20\x2D])./e', 'strtoupper("\0")', strtolower(
 					trim($match[1]))
+				);*/
+
+				$match[1] = preg_replace_callback(
+					'/(?<=^|[\x09\x20\x2D])./',
+					create_function ('$matches', 'return strtoupper($matches[0]);'), strtolower(trim($match[1]))
 				);
 
 				if( isset($aReturn[$match[1]]))

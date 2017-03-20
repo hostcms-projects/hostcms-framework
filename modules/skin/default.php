@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default extends Core_Skin
 {
@@ -558,8 +558,6 @@ class Skin_Default extends Core_Skin
 
 			<?php
 			// Список основных меню
-			//$aCore_Config = Core::$mainConfig;
-
 			$aMainMenu = array();
 
 			$iMenuCount = 0;
@@ -743,7 +741,7 @@ class Skin_Default extends Core_Skin
 							$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId($oModule->id, $type, 0);
 
 							Core::factory('Core_Html_Entity_A')
-								->class("{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId={$oModule->id}&type={$type}\' })', img: '/modules/skin/{$this->_skinName}/images/module/{$oModule->path}.png'}")
+								->class("{action: '$.widgetLoad({ path: \'/admin/index.php?ajaxWidgetLoad&widgetAjax&moduleId={$oModule->id}&type={$type}\' })', img: '{$this->getImageHref()}module/{$oModule->path}.png'}")
 								->value($aAdminPage['title'])
 								->execute();
 						}
@@ -855,7 +853,7 @@ class Skin_Default extends Core_Skin
 	public function footer()
 	{
 		?><div id="footer">
-			<div id="copyright">&copy; 2005–2013 ООО «Хостмэйк»</div>
+			<div id="copyright">&copy; 2005–2014 ООО «Хостмэйк»</div>
 			<div id="links">
 				<p><?php echo Core::_('Admin.website')?> <a href="http://www.hostcms.ru" target="_blank">www.hostcms.ru</a></p>
 				<p><?php echo Core::_('Admin.support_email')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a></p>

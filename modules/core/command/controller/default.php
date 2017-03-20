@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Default extends Core_Command_Controller
 {
@@ -256,7 +256,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			else
 			{
 				$oCore_Response->body(
-					'This page has moved. <a href="' . htmlspecialchars($oStructure->url) . '">Click here.</a>'
+					'HostCMS: This page has moved. <a href="' . htmlspecialchars($oStructure->url) . '">Click here.</a>'
 				);
 			}
 

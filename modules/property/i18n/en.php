@@ -5,7 +5,7 @@
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Properties',
@@ -23,7 +23,7 @@ return array(
 	'description' => '<acronym title="Property description">Description</acronym>',
 	'type' => '<acronym title="Type of product property">Type</acronym>',
 
-	'type0' => 'Number',
+	'type0' => 'Integer',
 	'type1' => 'String',
 	'type2' => 'File',
 	'type3' => 'List',
@@ -35,9 +35,11 @@ return array(
 	'type9' => 'Date-time',
 	'type10' => 'Hidden field',
 	'type11' => 'Real number',
+	'type12' => 'Shop',
 
 	'list_id' => '<acronym title="Select list of values for property">Lists</acronym>',
-	'informationsystem_id' => '<acronym title="Information system set as a property">Information system</acronym>',
+	'informationsystem_id' => '<acronym title="Information system sets as a property">Information system</acronym>',
+	'shop_id' => '<acronym title="Online store sets as a property">Online store</acronym>',
 
 	'sorting' => '<acronym title="Sorting order">Sorting order</acronym>',
 	'default_value' => '<acronym title="Default value of product property">Value</acronym>',

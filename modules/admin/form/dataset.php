@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Dataset
 {
@@ -17,7 +17,7 @@ abstract class Admin_Form_Dataset
 	 * @var int
 	 */
 	protected $_limit = NULL;
-	
+
 	/**
 	 * Offset
 	 * @var int
@@ -43,15 +43,10 @@ abstract class Admin_Form_Dataset
 	protected $_Admin_Form_Controller = NULL;
 
 	/**
-	 * Set controller 
-	 * @param Admin_Form_Controller controller
-	 * @return self
+	 * Array of external fields from additional tables
+	 * @var array
 	 */
-	public function controller(Admin_Form_Controller $controller)
-	{
-		$this->_Admin_Form_Controller = $controller;
-		return $this;
-	}
+	protected $_externalFields = array();
 
 	/**
 	 * Array of conditions
@@ -61,6 +56,35 @@ abstract class Admin_Form_Dataset
 	 * )
 	 */
 	protected $_conditions = array();
+
+	/**
+	 * Get count of finded objects
+	 * @return int
+	 */
+	abstract public function getCount();
+
+	/**
+	 * Load objects
+	 * @return array
+	 */
+	abstract public function load();
+
+	/**
+	 * Get typical entity
+	 * @return object
+	 */
+	abstract public function getEntity();
+
+	/**
+	 * Set controller
+	 * @param Admin_Form_Controller $controller
+	 * @return self
+	 */
+	public function controller(Admin_Form_Controller $controller)
+	{
+		$this->_Admin_Form_Controller = $controller;
+		return $this;
+	}
 
 	/**
 	 * Set limit
@@ -74,7 +98,7 @@ abstract class Admin_Form_Dataset
 	}
 
 	/**
-	 * Set offset 
+	 * Set offset
 	 * @param int $offset offset
 	 * @return self
 	 */
@@ -128,32 +152,31 @@ abstract class Admin_Form_Dataset
 	 */
 	public function getFieldChanges($name)
 	{
-		if (isset($this->_changedFields[$name]))
-		{
-			return $this->_changedFields[$name];
-		}
-
-		return NULL;
+		return isset($this->_changedFields[$name])
+			? $this->_changedFields[$name]
+			: NULL;
 	}
 
 	/**
-	 * Get count of finded objects
-	 * @return int
+	 * Add external field name
+	 * @param strin $fieldName
+	 * @return self
 	 */
-	abstract public function getCount();
+	public function addExternalField($fieldName)
+	{
+		$this->_externalFields[] = $fieldName;
+		return $this;
+	}
 
 	/**
-	 * Load objects
-	 * @return array
+	 * Check if external field exists
+	 * @return boolean
 	 */
-	abstract public function load();
+	public function issetExternalField($fieldName)
+	{
+		return in_array($fieldName, $this->_externalFields);
+	}
 
-	/**
-	 * Get typical entity
-	 * @return object
-	 */
-	abstract public function getEntity();
-	
 	/**
 	 * User-defined comparison functions.
 	 * @param mixed $m

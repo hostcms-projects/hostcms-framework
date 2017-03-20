@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Model extends Core_Entity
 {
@@ -32,6 +32,7 @@ class Property_Model extends Core_Entity
 		'property_dir' => array(),
 		'list' => array(),
 		'informationsystem' => array(),
+		'shop' => array(),
 		'user' => array()
 	);
 
@@ -77,6 +78,7 @@ class Property_Model extends Core_Entity
 	protected $_preloadValues = array(
 		'list_id' => 0,
 		'informationsystem_id' => 0,
+		'shop_id' => 0,
 		'type' => 0,
 		'description' => '',
 		'tag_name' => '',

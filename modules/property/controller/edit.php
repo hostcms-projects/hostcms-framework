@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -77,18 +77,19 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 				$aListTypes = array(
-					Core::_('Property.type0'),
-					Core::_('Property.type1'),
-					Core::_('Property.type2'),
-					Core::_('Property.type3'),
-					Core::_('Property.type4'),
-					Core::_('Property.type5'),
-					Core::_('Property.type6'),
-					Core::_('Property.type7'),
-					Core::_('Property.type8'),
-					Core::_('Property.type9'),
-					Core::_('Property.type10'),
-					Core::_('Property.type11'),
+					0 => Core::_('Property.type0'),
+					11 => Core::_('Property.type11'),
+					1 => Core::_('Property.type1'),
+					2 => Core::_('Property.type2'),
+					3 => Core::_('Property.type3'),
+					4 => Core::_('Property.type4'),
+					5 => Core::_('Property.type5'),
+					12 => Core::_('Property.type12'),
+					6 => Core::_('Property.type6'),
+					7 => Core::_('Property.type7'),
+					8 => Core::_('Property.type8'),
+					9 => Core::_('Property.type9'),
+					10 => Core::_('Property.type10'),
 				);
 
 				// Delete list type if module is not active
@@ -100,6 +101,11 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				if (!Core::moduleIsActive('informationsystem'))
 				{
 					unset($aListTypes[5]);
+				}
+				// Delete shop type if module is not active
+				if (!Core::moduleIsActive('shop'))
+				{
+					unset($aListTypes[12]);
 				}
 
 				// Селектор с группой
@@ -175,6 +181,28 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oMainTab
 						->addAfter($oSelect_Informationsystems, $oSelect_Dirs);
+				}
+
+				// Магазин
+				if (Core::moduleIsActive('shop'))
+				{
+					$oAdditionalTab->delete($this->getField('shop_id'));
+
+					$oshop_Controller_Edit = new shop_Controller_Edit($this->_Admin_Form_Action);
+					// Селектор с группой
+					$oSelect_Shops = Admin_Form_Entity::factory('Select')
+						->options(
+							array(' … ') + $oshop_Controller_Edit->fillShops(CURRENT_SITE)
+						)
+						->name('shop_id')
+						->value($this->_object->shop_id)
+						->caption(Core::_('Property.shop_id'))
+						->style('width: 320px')
+						->divAttr(array('id' => 'shop_id'))
+						;
+
+					$oMainTab
+						->addAfter($oSelect_Shops, $oSelect_Dirs);
 				}
 
 				// ---
@@ -334,8 +362,6 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		switch($modelName)
 		{
 			case 'property':
-				$property_value = Core_Array::getPost('property_value');
-
 				switch($this->_object->type)
 				{
 					case 7: // Флажок

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -508,7 +508,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	}
 
 	/**
-	 * Fill information systems list for site
+	 * Fill list of information systems for site
 	 * @param int $iSiteId site ID
 	 * @return array
 	 */

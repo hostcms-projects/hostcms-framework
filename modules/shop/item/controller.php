@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller extends Core_Servant_Properties
 {
@@ -189,17 +189,23 @@ class Shop_Item_Controller extends Core_Servant_Properties
 			$aSiteuser_Groups = $this->siteuser->Siteuser_Groups->findAll();
 			foreach ($aSiteuser_Groups as $oSiteuser_Group)
 			{
-				$oShop_Price = Core_Entity::factory('Shop_Price')->getBySiteuserGroupAndShop($oSiteuser_Group->id, $oShop->id);
+				// Может быть создано несколько цен для одной группы пользователей
+				$aShop_Prices = Core_Entity::factory('Shop_Price')->getAllBySiteuserGroupAndShop(
+					$oSiteuser_Group->id, $oShop->id
+				);
 
-				// Если есть цена для группы
-				if ($oShop_Price)
+				foreach ($aShop_Prices as $oShop_Price)
 				{
-					// Смотрим, определена ли такая цена для данного товара
-					$oShop_Item_Price =$oShop_Item->Shop_Item_Prices->getByPriceId($oShop_Price->id);
-
-					if ($oShop_Item_Price)
+					// Если есть цена для группы
+					if ($oShop_Price)
 					{
-						$aPrices[] = $oShop_Item_Price->value;
+						// Смотрим, определена ли такая цена для данного товара
+						$oShop_Item_Price =$oShop_Item->Shop_Item_Prices->getByPriceId($oShop_Price->id);
+
+						if ($oShop_Item_Price)
+						{
+							$aPrices[] = $oShop_Item_Price->value;
+						}
 					}
 				}
 			}

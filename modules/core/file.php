@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_File
 {
@@ -378,6 +378,7 @@ class Core_File
 		if (!is_dir($pathname) && !is_link($pathname))
 		{
 			umask(0);
+		
 			if (mkdir($pathname, $chmod, $recursive))
 			{
 				chmod($pathname, $chmod);

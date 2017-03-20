@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 
 class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
@@ -79,6 +79,12 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	{
 		return $this->_UpdatedGroupsCount;
 	}
+
+	/**
+	 * ID of current shop
+	 * @var int
+	 */
+	protected $_iCurrentShopId = 0;
 
 	/**
 	 * ID of current group
@@ -198,12 +204,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		'firstlineheader',
 		// Настройка CSV: массив соответствий полей CSV сущностям системы HostCMS
 		'csv_fields',
-		// Текущая группа товаров
-		//'oCurrentGroup',
-		// Текущий товар
-		//'oCurrentItem',
-		// Текущий магазин
-		//'oCurrentShop',
 		// Путь к картинкам
 		'imagesPath',
 		// Действие с существующими товарами:
@@ -313,18 +313,15 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Constructor.
-	 * @param int $iCurrentShopId shop ID
-	 * @param int $iCurrentGroupId current group ID
+	 * Initialization
+	 * @return self
 	 */
-	public function __construct($iCurrentShopId, $iCurrentGroupId = 0)
+	protected function init()
 	{
-		parent::__construct();
-
-		$this->_oCurrentShop = Core_Entity::factory('Shop')->find($iCurrentShopId);
+		$this->_oCurrentShop = Core_Entity::factory('Shop')->find($this->_iCurrentShopId);
 
 		// Инициализация текущей группы товаров
-		$this->_oCurrentGroup = Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId = $iCurrentGroupId);
+		$this->_oCurrentGroup = Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
 		$this->_oCurrentGroup->shop_id = $this->_oCurrentShop->id;
 
 		// Инициализация текущего товара
@@ -340,6 +337,24 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		$this->_oCurrentOrder = NULL;
 		$this->_oCurrentOrderItem = NULL;
 
+		return $this;
+	}
+
+	/**
+	 * Constructor.
+	 * @param int $iCurrentShopId shop ID
+	 * @param int $iCurrentGroupId current group ID
+	 */
+	public function __construct($iCurrentShopId, $iCurrentGroupId = 0)
+	{
+		parent::__construct();
+
+		$this->_iCurrentShopId = $iCurrentShopId;
+		$this->_iCurrentGroupId = $iCurrentGroupId;
+
+		$this->init();
+
+		// Единожды в конструкторе, чтобы после __wakeup() не обнулялось
 		$this->_InsertedItemsCount = 0;
 		$this->_UpdatedItemsCount = 0;
 		$this->_InsertedGroupsCount = 0;
@@ -351,7 +366,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 * @param Shop_Group_Model $oShop_Group group
 	 * @return Shop_Group
 	 */
-	private function _doSaveGroup(Shop_Group_Model $oShop_Group)
+	protected function _doSaveGroup(Shop_Group_Model $oShop_Group)
 	{
 		is_null($oShop_Group->path) && $oShop_Group->path = '';
 		$this->_incInsertedGroups($oShop_Group->save()->id);
@@ -691,8 +706,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					break;
 
 					//=======================================//
-
-
 
 					// Идентификатор группы товаров
 					case 'shop_groups_id':
@@ -1542,9 +1555,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
 							$oTmpObject->queryBuilder()->where('guid', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
-							
+
 							$this->_oCurrentItem->guid = $sData;
-							
+
 							if (count($oTmpObject) > 0)
 							{
 								$this->_oCurrentItem = $oTmpObject[0];
@@ -1618,9 +1631,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 										$sSourceFile = $this->imagesPath . $sData;
 										$sSourceFileBaseName = basename($sSourceFile, '');
 
-										if (!Core_File::isValidExtension(
-										$sSourceFile,
-										Core::$mainConfig['availableExtension']))
+										if (!Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']))
 										{
 											// Неразрешенное расширение
 											break;
@@ -1640,7 +1651,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 										}
 										else
 										{
-											$sSourceFile = CMS_FOLDER . $sSourceFile;
+											$sSourceFile = CMS_FOLDER . ltrim($sSourceFile, '/\\');
 										}
 
 										if (!$this->_oCurrentShop->change_filename)
@@ -1656,7 +1667,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 												$sTargetFileExtension = ".{$sTargetFileExtension}";
 											}
 
-											$sTargetFileName = "shop_property_file_{$this->_oCurrentGroup->id}_{$oProperty->id}{$sTargetFileExtension}";
+											$oProperty_Value->save();
+											$sTargetFileName = "shop_property_file_{$this->_oCurrentGroup->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
 										}
 
 										// Создаем массив параметров для загрузки картинок элементу
@@ -1940,7 +1952,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oShop_Warehouse_Item->shop_warehouse_id = $iWarehouseID;
 							$oShop_Warehouse_Item->shop_item_id = $this->_oCurrentItem->id;
 						}
-						$oShop_Warehouse_Item->count = $iWarehouseCount;
+						$oShop_Warehouse_Item->count = Shop_Controller::instance()->convertPrice($iWarehouseCount);
 						$oShop_Warehouse_Item->save();
 					}
 				}
@@ -2309,6 +2321,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$sSourceFile = $this->imagesPath . $sPropertyValue;
 
 							$sSourceFileBaseName = basename($sSourceFile, '');
+
 							if (Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']))
 							{
 								// Создаем папку назначения
@@ -2325,7 +2338,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 								else
 								{
-									$sSourceFile = CMS_FOLDER . $sSourceFile;
+									$sSourceFile = CMS_FOLDER . ltrim($sSourceFile, '/\\');
 								}
 
 								if (!$this->_oCurrentShop->change_filename)
@@ -2341,7 +2354,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 										$sTargetFileExtension = ".{$sTargetFileExtension}";
 									}
 
-									$sTargetFileName = "shop_property_file_{$this->_oCurrentItem->id}_{$oProperty->id}{$sTargetFileExtension}";
+									$oProperty_Value->save();
+									$sTargetFileName = "shop_property_file_{$this->_oCurrentItem->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
+									//$sTargetFileName = "shop_property_file_{$this->_oCurrentItem->id}_{$oProperty->id}{$sTargetFileExtension}";
 								}
 
 								// Создаем массив параметров для загрузки картинок элементу
@@ -2372,9 +2387,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
 									$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
 									$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
-									//$aPicturesParam['small_image_max_width'] = $this->_oCurrentShop->image_small_max_width;
 									$aPicturesParam['small_image_max_width'] = $oProperty->image_small_max_width;
-									//$aPicturesParam['small_image_max_height'] = $this->_oCurrentShop->image_small_max_height;
 									$aPicturesParam['small_image_max_height'] = $oProperty->image_small_max_height;
 									$aPicturesParam['small_image_watermark'] = $this->_oCurrentShop->watermark_default_use_small_image;
 									$aPicturesParam['small_image_preserve_aspect_ratio'] = $aPicturesParam['large_image_preserve_aspect_ratio'];
@@ -2540,7 +2553,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$sTargetFileExtension = ".{$sTargetFileExtension}";
 							}
 
-							$sTargetFileName = "small_shop_property_file_{$this->_oCurrentItem->id}_{$oProperty->id}{$sTargetFileExtension}";
+							$oProperty_Value->save();
+							$sTargetFileName = "small_shop_property_file_{$this->_oCurrentItem->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
 						}
 
 						$aPicturesParam = array();
@@ -2569,7 +2583,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$aResult = Core_File::adminUpload($aPicturesParam);
 						} catch (Exception $exc) {
 							Core_Message::show($exc->getMessage(), 'error');
-							$result = array('large_image' => FALSE, 'small_image' => FALSE);
+							$aResult = array('large_image' => FALSE, 'small_image' => FALSE);
 						}
 
 						if ($aResult['small_image'])
@@ -2608,7 +2622,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 			$iCounter++;
 
-			$this->_oCurrentItem = Core_Entity::factory('Shop_Item', 0);
+			//$this->_oCurrentItem = Core_Entity::factory('Shop_Item', 0);
+			$this->_oCurrentItem->clear();
 			$this->_oCurrentGroup =  Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
 			$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
 
@@ -2667,8 +2682,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	public function getCSVLine($fileDescriptor)
 	{
-		if (strtoupper($this->encoding) != 'UTF-8'
-		&& defined('ALT_SITE_LOCALE'))
+		if (strtoupper($this->encoding) != 'UTF-8' && defined('ALT_SITE_LOCALE'))
 		{
 			setlocale(LC_ALL, ALT_SITE_LOCALE);
 		}
@@ -2686,6 +2700,28 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		return self::CorrectToEncoding($aCsvLine, 'UTF-8', $this->encoding);
 	}
 
+	public function clear()
+	{
+		$this->_oCurrentShop =
+		$this->_oCurrentGroup =
+		$this->_oCurrentItem =
+		$this->_oCurrentOrder =
+		$this->_oCurrentOrderItem =
+		$this->_oCurrentShopEItem =
+		$this->_oCurrentShopSpecialPrice = NULL;
+
+		return $this;
+	}
+
+    public function __sleep()
+    {
+			$this->clear();
+
+			return array_keys(
+				get_object_vars($this)
+			);
+    }
+
 	/**
 	 * Reestablish any database connections that may have been lost during serialization and perform other reinitialization tasks
 	 * @return self
@@ -2697,8 +2733,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		// Инициализация текущей группы товаров
 		$this->_oCurrentGroup = Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId
 			? $this->_iCurrentGroupId
-			: NULL
-		);
+			: NULL);
+
+		$this->init();
+			
 		$this->_oCurrentGroup->shop_id = $this->_oCurrentShop->id;
 
 		// Инициализация текущего товара

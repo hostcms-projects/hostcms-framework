@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Model extends Core_Entity{
 	/**
@@ -76,16 +76,24 @@ class Shop_Model extends Core_Entity{
 		'apply_tags_automatically' => 1,
 		'write_off_paid_items' => 0,
 		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,		'watermark_file' => '',
-		'producer_image_small_max_width' => '0',
-		'producer_image_large_max_width' => '0',
-		'producer_image_small_max_height' => '0',
-		'producer_image_large_max_height' => '0',	);
+		'producer_image_small_max_width' => 100,
+		'producer_image_large_max_width' => 800,
+		'producer_image_small_max_height' => 100,
+		'producer_image_large_max_height' => 800,	);
 
 	/**
 	 * Belongs to relations
 	 * @var array
 	 */
 	protected $_belongsTo = array(		'shop_dir' => array(),		'site' => array(),		'structure' => array(),		'shop_sountry' => array(),		'shop_currency' => array(),		'shop_order_status' => array(),		'shop_measure' => array(),		'user' => array(),		'siteuser_group' => array(),		'shop_company' => array(),		'shop_country' => array()	);
+	/**
+	 * Forbidden tags. If list of tags is empty, all tags will be shown.
+	 * @var array
+	 */
+	protected $_forbiddenTags = array(
+		'size_measure',
+	);
+
 	/**
 	 * Tree of groups
 	 * @var array
@@ -131,7 +139,7 @@ class Shop_Model extends Core_Entity{
 		$oShop_Group_Property_List = Core_Entity::factory('Shop_Group_Property_List', $this->id);
 		$oShop_Group_Property_List->Properties->deleteAll(FALSE);
 		$oShop_Group_Property_List->Property_Dirs->deleteAll(FALSE);
-		
+
 		// Доп. свойства заказов
 		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $this->id);
 		$oShop_Order_Property_List->Properties->deleteAll(FALSE);
@@ -143,7 +151,7 @@ class Shop_Model extends Core_Entity{
 		$this->Shop_Group_Properties->deleteAll(FALSE);
 		$this->Shop_Order_Property_Dirs->deleteAll(FALSE);
 		$this->Shop_Order_Properties->deleteAll(FALSE);
-				$this->Shop_Affiliate_Plans->deleteAll(FALSE);
+		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Deliveries->deleteAll(FALSE);
 		$this->Shop_Discounts->deleteAll(FALSE);
@@ -164,12 +172,32 @@ class Shop_Model extends Core_Entity{
 		return parent::delete($primaryKey);	}
 	/**
 	 * Get watermark file path
-	 * @return string
-	 */	public function getWatermarkFilePath()	{		return CMS_FOLDER . $this->Site->uploaddir . "shop_" . intval($this->id) . '/watermarks/' . $this->watermark_file;	}
+	 * @return string|NULL
+	 */	public function getWatermarkFilePath()	{		return $this->watermark_file != ''
+			? $this->getPath() . '/watermarks/' . $this->watermark_file
+			: NULL;	}
 	/**
 	 * Get watermark file href
 	 * @return string
 	 */	public function getWatermarkFileHref()	{		return '/' . $this->getHref() . '/watermarks/' . $this->watermark_file;	}
+	/**
+	 * Get shop path include CMS_FOLDER
+	 * @return string
+	 */
+	public function getPath()
+	{
+		return CMS_FOLDER . $this->getHref();
+	}
+
+	/**
+	 * Get shop href
+	 * @return string
+	 */
+	public function getHref()
+	{
+		return $this->Site->uploaddir . "shop_" . intval($this->id);
+	}
+	
 	/**
 	 * Save watermark file
 	 * @param string $fileSourcePath file to upload
@@ -177,7 +205,8 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Save object. Use self::update() or self::create()
 	 * @return Shop_Model
-	 */	public function save()	{		parent::save();		// Создание директории для Watermark		$sWatermarkDirPath = dirname($this->getWatermarkFilePath());		if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
+	 */	public function save()	{		parent::save();		// Создание директории для Watermark		$sWatermarkDirPath = $this->getPath() . '/watermarks';
+				if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
 	/**
 	 * Delete watermark file
 	 */	public function deleteWatermarkFile()	{		try		{			Core_File::delete($this->getWatermarkFilePath());		} catch (Exception $e) {}		$this->watermark_file = '';		$this->save();	}
@@ -339,7 +368,7 @@ class Shop_Model extends Core_Entity{
 				$oNewProperty->save();
 			}
 		}
-		
+
 		// Копирование связи (!) с партнерскими программами
 		$aAffiliate_Plans = $this->Affiliate_Plans->findAll();
 		foreach($aAffiliate_Plans as $oAffiliate_Plan)
@@ -540,15 +569,6 @@ class Shop_Model extends Core_Entity{
 	}
 
 	/**
-	 * Get shop path include CMS_FOLDER
-	 * @return string
-	 */	public function getPath()	{		return CMS_FOLDER . $this->getHref();	}
-	/**
-	 * Get shop href
-	 * @return string
-	 */	public function getHref()	{		return $this->Site->uploaddir . "shop_" . intval($this->id);	}
-
-	/**
 	 * Get first shop's admin email
 	 * @return string
 	 */
@@ -599,6 +619,16 @@ class Shop_Model extends Core_Entity{
 
 		$this->shop_currency_id && $this->addEntity($this->Shop_Currency);
 		$this->shop_measure_id && $this->addEntity($this->Shop_Measure);
+
+		$this->addEntity(
+			Core::factory('Core_Xml_Entity')
+					->name('size_measure')
+					->addEntity(
+						Core::factory('Core_Xml_Entity')
+							->name('name')
+							->value(Core::_('Shop.size_measure_' . $this->size_measure))
+					)
+		);
 
 		// Warehouses
 		$this->addEntities($this->Shop_Warehouses->findAll());

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Tab extends Core_Servant_Properties
 {
@@ -462,6 +462,57 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 				break;
 
+				case 12: // Интернет-магазин
+
+					// Директории
+					$oAdmin_Form_Entity_Shop_Groups = Admin_Form_Entity::factory('Select')
+						->caption($oProperty->name)
+						->style('width: 340px')
+						->divAttr(array(
+							'style' => 'width: 410px',
+							'id' => "property_{$oProperty->id}"
+						));
+
+					// Элементы
+					$oAdmin_Form_Entity_Shop_Items = Admin_Form_Entity::factory('Select')
+						->style('width: 340px')
+						->name("property_{$oProperty->id}[]")
+						->value($oProperty->default_value)
+						->divAttr(array('class' => ''));
+
+					$oProperty->multiple && $oAdmin_Form_Entity_Shop_Items->add($this->_getImgAdd($oProperty, '$.clonePropertyInfSys'));
+
+					// Значений св-в нет для объекта
+					if (count($aProperty_Values) == 0)
+					{
+						$oProperty->multiple && $oAdmin_Form_Entity_Shop_Items->add($this->_getImgDelete());
+
+						$this->_fillShop($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items);
+						$oAdmin_Form_Entity_Section->add($oAdmin_Form_Entity_Shop_Groups);
+					}
+					else
+					{
+						foreach ($aProperty_Values as $key => $oProperty_Value)
+						{
+							$value = $oProperty_Value->value;
+
+							$oNewAdmin_Form_Entity_Shop_Groups = clone $oAdmin_Form_Entity_Shop_Groups;
+
+							$oNewAdmin_Form_Entity_InfItems = clone $oAdmin_Form_Entity_Shop_Items;
+							$oNewAdmin_Form_Entity_InfItems
+								->id("property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
+								->name("property_{$oProperty->id}_{$oProperty_Value->id}")
+								->value($value);
+							$oProperty->multiple && $oNewAdmin_Form_Entity_InfItems->add($this->_getImgDelete($this->_getImgDeletePath()));
+
+							$this->_fillShop($value, $oProperty, $oNewAdmin_Form_Entity_Shop_Groups, $oNewAdmin_Form_Entity_InfItems);
+
+							$oAdmin_Form_Entity_Section->add($oNewAdmin_Form_Entity_Shop_Groups);
+						}
+					}
+
+				break;
+
 				default:
 					throw new Core_Exception(
 						Core::_('Property.type_does_not_exist'),
@@ -488,7 +539,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 	/**
 	 * Fill information systems/items list
-	 * @param int $value Informationsystem_Item_Model item
+	 * @param int $value informationsystem_item_id
 	 * @param Property_Model $oProperty property
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfGroups
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfItems
@@ -567,6 +618,86 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	}
 
 	/**
+	 * Fill shops/items list
+	 * @param int $value shop_item_id
+	 * @param Property_Model $oProperty property
+	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Groups
+	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Items
+	 */
+	protected function _fillShop($value, $oProperty, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items)
+	{
+		$Shop_Item = Core_Entity::factory('Shop_Item', $value);
+
+		$gropup_id = $value == 0
+			? 0
+			: intval($Shop_Item->shop_group_id);
+
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+
+		$oShop = $oProperty->Shop;
+		$oShop_Items = $oShop->Shop_Items;
+
+		switch ($oShop->items_sorting_direction)
+		{
+			case 1:
+				$items_sorting_direction = 'DESC';
+			break;
+			case 0:
+			default:
+				$items_sorting_direction = 'ASC';
+		}
+
+		$oShop_Items
+			->queryBuilder()
+			->clearOrderBy();
+
+		// Определяем поле сортировки информационных элементов
+		switch ($oShop->items_sorting_field)
+		{
+			case 1:
+				$oShop_Items
+					->queryBuilder()
+					->orderBy('shop_items.name', $items_sorting_direction)
+					->orderBy('shop_items.sorting', $items_sorting_direction);
+				break;
+			case 2:
+				$oShop_Items
+					->queryBuilder()
+					->orderBy('shop_items.sorting', $items_sorting_direction)
+					->orderBy('shop_items.name', $items_sorting_direction);
+				break;
+			case 0:
+			default:
+				$oShop_Items
+					->queryBuilder()
+					->orderBy('shop_items.datetime', $items_sorting_direction)
+					->orderBy('shop_items.sorting', $items_sorting_direction);
+		}
+
+		// Items
+		$aShop_Items = $oShop_Items->getAllByshop_group_id($gropup_id);
+
+		$aOptions = array(' … ');
+		foreach ($aShop_Items as $oShop_Item)
+		{
+			$aOptions[$oShop_Item->id] = !$oShop_Item->shortcut_id
+				? $oShop_Item->name
+				: $oShop_Item->Shop_Item->name;
+		}
+		$oAdmin_Form_Entity_Shop_Items->options($aOptions);
+
+		// Groups
+		$aOptions = Shop_Item_Controller_Edit::fillShopGroup($oProperty->shop_id, 0);
+		$oAdmin_Form_Entity_Shop_Groups
+			->value($Shop_Item->shop_group_id)
+			->options(array(' … ') + $aOptions)
+			->onchange("$.ajaxRequest({path: '/admin/shop/item/index.php', context: '{$oAdmin_Form_Entity_Shop_Items->id}', callBack: $.loadSelectOptionsCallback, action: 'loadShopItemList',additionalParams: 'shop_group_id=' + this.value + '&shop_id={$oProperty->shop_id}',windowId: '{$windowId}'}); return false")
+			;
+
+		$oAdmin_Form_Entity_Shop_Groups->add($oAdmin_Form_Entity_Shop_Items);
+	}
+
+	/**
 	 * Get property list
 	 * @return array
 	 */
@@ -603,6 +734,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				case 9: // Datetime
 				case 10: // Hidden field
 				case 11: // Float
+				case 12: // Shop
 
 					// Values already exist
 					foreach ($aProperty_Values as $oProperty_Value)
@@ -1023,6 +1155,21 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	{
 		switch ($oProperty->type)
 		{
+			case 0: // Int
+			case 7: // Checkbox
+			case 3: // List
+				$value = intval($value);
+			break;
+			case 1: // String
+			case 4: // Textarea
+			case 6: // Wysiwyg
+				$value = strval($value);
+			break;
+			case 11: // Float
+				$value = floatval(
+					str_replace(array(',', '-'), '.', $value)
+				);
+			break;
 			case 8: // Date
 				$value = $value == ''
 					? '0000-00-00 00:00:00'

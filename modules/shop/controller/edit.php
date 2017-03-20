@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -442,16 +442,16 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('format_date')
 				->style("width: 300px; margin-right: 30px")
 				->divAttr(array('style' => 'float: left'));
-				
+
 			$this->getField('producer_image_small_max_width')
 				->style("width: 300px; margin-right: 30px")
 				->divAttr(array('style' => 'float: left'));
 			$this->getField('producer_image_small_max_height')
 				->style("width: 300px; margin-right: 30px")
 				->divAttr(array('style' => 'float: left'));
-			
+
 			$oShopTabFormats->addAfter($oSeparatorField, $this->getField('producer_image_small_max_height'));
-			
+
 			$this->getField('producer_image_large_max_width')
 				->style("width: 300px; margin-right: 30px")
 				->divAttr(array('style' => 'float: left'));
@@ -460,7 +460,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->divAttr(array('style' => 'float: left'));
 
 			$oShopTabFormats->addAfter($oSeparatorField, $this->getField('producer_image_large_max_height'));
-			
+
 			$oShopTabFormats->addAfter($oSeparatorField,
 				$this->getField('format_datetime')
 					->style("width: 300px")
@@ -609,7 +609,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			(
 				$oGroupsSortingDirection
 			);
-			
+
 			$oMainTab->delete($this->getField('size_measure'));
 
 			$oMainTab->addAfter(Admin_Form_Entity::factory('Select')
@@ -653,9 +653,9 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->where('shops.structure_id', '=', $iStructureId);
 
 				$aShop = $oShop->findAll();
-				
+
 				$iCount = count($aShop);
-				
+
 				if ($iStructureId && $iCount && (is_null($this->_object->id) || $iCount > 1 || $aShop[0]->id != $this->_object->id))
 				{
 					$oStructure = Core_Entity::factory('Structure', $iStructureId);
@@ -896,7 +896,6 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$aCompanies = $oCompany->findAll();
 
 		$aCompanyArray = array(' … ');
-
 		foreach($aCompanies as $oCompany)
 		{
 			$aCompanyArray[$oCompany->id] = $oCompany->name;
@@ -939,5 +938,25 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		return $aResult;
+	}
+
+	/**
+	 * Fill list of shops for site
+	 * @param int $iSiteId site ID
+	 * @return array
+	 */
+	public function fillShops($iSiteId)
+	{
+		$iSiteId = intval($iSiteId);
+
+		$aReturn = array();
+
+		$aObjects = Core_Entity::factory('Site', $iSiteId)->Shops->findAll();
+		foreach ($aObjects as $oObject)
+		{
+			$aReturn[$oObject->id] = $oObject->name;
+		}
+
+		return $aReturn;
 	}
 }

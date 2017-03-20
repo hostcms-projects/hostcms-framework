@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Module
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Module_Model extends Core_Entity
 {
@@ -137,28 +137,6 @@ class Module_Model extends Core_Entity
 		{
 			return NULL;
 		}
-	}
-
-	/**
-	 * Get module by path
-	 * @param string $path path
-	 * @return Module|NULL
-	 */
-	public function getByPath($path)
-	{
-		$this->queryBuilder()
-			->clear()
-			->where('path', '=', $path)
-			->limit(1);
-
-		$aModules = $this->findAll();
-
-		if (isset($aModules[0]))
-		{
-			return $aModules[0];
-		}
-
-		return NULL;
 	}
 
 	/**

@@ -25,7 +25,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Controller_Show extends Core_Controller
 {
@@ -89,11 +89,23 @@ class Shop_Cart_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Get Shop_Cart_Controller
+	 * @return Shop_Cart_Controller
+	 */
+	protected function _getCartController()
+	{
+		return Shop_Cart_Controller::instance();
+	}
+
+	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Shop_Cart_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		$oShop = $this->getEntity();
 
 		// Coupon text
@@ -101,6 +113,13 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			Core::factory('Core_Xml_Entity')
 				->name('coupon_text')
 				->value($this->couponText)
+		);
+
+		//Активность модуля "Пользователи сайта"
+		$this->addEntity(
+			Core::factory('Core_Xml_Entity')
+				->name('siteuser_exists')
+				->value(Core::moduleIsActive('siteuser') ? 1 : 0)
 		);
 
 		// Список свойств товаров
@@ -136,7 +155,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			$this->_addItemsPropertiesList(0, $Shop_Item_Properties);
 		}
 
-		$Shop_Cart_Controller = Shop_Cart_Controller::instance();
+		$Shop_Cart_Controller = $this->_getCartController();
 
 		$quantity = $amount = $tax = $weight = 0;
 

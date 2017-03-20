@@ -819,13 +819,13 @@ input.large, div.large, input.calendar_field_large, select.large {
 ::selection { background-color: #D2D2D2; color: #000}
 
 .hostcmsWindow div.section_title {
+text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
 border: 1px solid #DDDDDD;
-border-radius: 5px 5px 0 0;
-font-weight: bold;
+border-radius: 5px 5px 0px 0px;
 height: 15px;
 padding: 6px 10px;
 position: relative;
-text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+font-weight: bold;
 }
 .hostcmsWindow div.section {
 border-color: #FFFFFF #DDDDDD #DDDDDD;
