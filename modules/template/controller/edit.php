@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -89,7 +89,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Селектор с родительским макетом
 				$oSelect_Templates
 					->options(
-						array(' … ') + $this->fillTemplateParent()
+						array(' … ') + $this->fillTemplateParent(0, $this->_object->id)
 					)
 					->name('template_id')
 					->value($this->_object->template_id)

@@ -382,34 +382,39 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->move($this->getField('seo_keywords'), $oInformationsystemTabSeo);
 
 				if (Core::moduleIsActive('tag'))
-				{
+				{					
 					$oTagsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Informationsystem_Item.tab_3'))
 						->name('Tags');
-
 					$this->addTabAfter($oTagsTab, $oInformationsystemTabSeo);
-
-					$oInput_Tags = Admin_Form_Entity::factory('Input');
-
-					$oInput_Tags
-						->name('tags')
-						->caption(Core::_('Informationsystem_Item.tags'));
-
-					if (!is_null($object->id))
-					{
-						$aTags = $object->Tags->findAll();
-
-						$aTag_Names = array();
-
-						foreach($aTags as $oTag)
-						{
-							$aTag_Names[] = $oTag->name;
-						}
-
-						$oInput_Tags->value = implode(', ', $aTag_Names);
-					}
-
-					$oTagsTab->add($oInput_Tags);
+										
+					$html = '<label class="tags_label" for="form-field-tags">Метки (теги)</label>
+						<div class="item_div">															
+							<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="Введите тэг ..." />
+						</div>
+						<script type="text/javascript">
+							jQuery(function($){
+								//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
+								//var tag_input = $(\'#' . $windowId .' #form-field-tags\');
+								var tag_input = $(\'#form-field-tags\');
+								if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) ) 
+								{
+									tag_input.tag(
+									  {
+										placeholder:tag_input.attr(\'placeholder\')											
+									  }
+									);
+								}
+								else {
+									//display a textarea for old IE, because it doesnt support this plugin or another one I tried!
+									tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
+									//$(\'#form-field-tags\').autosize({append: "n"});
+								}
+								
+							})
+						</script>
+							';
+					$oTagsTab->add(Admin_Form_Entity::factory('Code')->html($html));		
 				}
 
 			break;

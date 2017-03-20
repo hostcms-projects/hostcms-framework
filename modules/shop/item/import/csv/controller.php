@@ -1379,7 +1379,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 							if (count($oTmpObject) > 0)
 							{
-								$this->_oCurrentItem->id = $oTmpObject[0]->id;
+								$this->_oCurrentItem = $oTmpObject[0];
 							}
 							else
 							{
@@ -1445,6 +1445,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 							if (count($oTmpObject) > 0 && $this->_oCurrentItem->id != $oTmpObject[0]->id)
 							{
+								$this->_oCurrentItem->shop_group_id = 0;
 								$this->_oCurrentItem->modification_id = $oTmpObject[0]->id;
 							}
 						}
@@ -2280,15 +2281,19 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$oProperty = Core_Entity::factory('Property')->find($iPropertyID);
 
 					$iShop_Item_Property_Id = $oProperty->Shop_Item_Property->id;
-
+					
+					$group_id = $this->_oCurrentItem->modification_id == 0 
+						? $this->_oCurrentItem->shop_group_id 
+						: $this->_oCurrentItem->Modification->shop_group_id;
+					
 					// Проверяем доступность дополнительного свойства для группы товаров
 					if (is_null(Core_Entity::factory('Shop', $this->_oCurrentShop->id)
 						->Shop_Item_Property_For_Groups
-						->getByShopItemPropertyIdAndGroupId($iShop_Item_Property_Id, $this->_oCurrentGroup->id)))
+						->getByShopItemPropertyIdAndGroupId($iShop_Item_Property_Id, $group_id)))
 					{
 						// Свойство не доступно текущей группе, делаем его доступным
 						Core_Entity::factory('Shop_Item_Property_For_Group')
-							->shop_group_id($this->_oCurrentGroup->id)
+							->shop_group_id($group_id)
 							->shop_item_property_id($iShop_Item_Property_Id)
 							->shop_id($this->_oCurrentShop->id)
 							->save();
@@ -2307,7 +2312,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						$this->_aClearedPropertyValues[$this->_oCurrentItem->id][] = $oProperty->guid;
 					}
 
-					$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
+					//$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
+					$oProperty_Value = isset($aPropertyValues[0])
+						? $aPropertyValues[0]
+						: $oProperty->createNewValue($this->_oCurrentItem->id);
 
 					switch($oProperty->type)
 					{
@@ -2622,8 +2630,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 			$iCounter++;
 
-			//$this->_oCurrentItem = Core_Entity::factory('Shop_Item', 0);
-			$this->_oCurrentItem->clear();
+			//$this->_oCurrentItem->clear();
+			$this->_oCurrentItem = Core_Entity::factory('Shop_Item');
 			$this->_oCurrentGroup =  Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
 			$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
 

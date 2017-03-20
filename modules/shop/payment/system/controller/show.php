@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Payment_System_Controller_Show extends Core_Controller
 {
@@ -42,9 +42,12 @@ class Shop_Payment_System_Controller_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Shop_Payment_System_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		$oShop = $this->getEntity();
 
 		$oShop_Payment_Systems = $oShop->Shop_Payment_Systems;

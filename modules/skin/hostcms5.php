@@ -41,6 +41,10 @@ class Skin_Hostcms5 extends Core_Skin
 			->addJs('/admin/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
 			->addJs('/admin/js/ui/stars/jquery.ui.stars.js')
 			->addJs('/admin/js/fusionchart/FusionCharts.js')
+			
+			->addJs('/admin/js/typeahead-bs2.min.js')			
+			->addJs('/admin/js/bootstrap-tag.js')
+			->addJs('/admin/js/ace.js')
 			;
 
 		//if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)

@@ -876,7 +876,7 @@ class Informationsystem_Item_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value;
+					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value . ' ';
 				}
 			}
 			// Informationsystem
@@ -887,7 +887,7 @@ class Informationsystem_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name;
+						$oSearch_Page->text .= $oInformationsystem_Item->name . ' ';
 					}
 				}
 			}

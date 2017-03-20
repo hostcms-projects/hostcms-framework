@@ -9,6 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - group($id) идентификатор информационной группы, если FALSE, то вывод информационных элементов осуществляется из всех групп
  * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - groupsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств групп информационных элементов, по умолчанию TRUE
  * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп.
  * - groupsMode('tree') режим показа групп, может принимать следующие значения:
 	none - не показывать группы,
@@ -67,6 +68,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 	protected $_allowedProperties = array(
 		'group',
 		'groupsProperties',
+		'groupsPropertiesList',
 		'propertiesForGroups',
 		'groupsMode',
 		'groupsForbiddenTags',
@@ -189,7 +191,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$this->item = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = TRUE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = TRUE;
 
 		$this->groupsMode = 'tree';
 		$this->offset = 0;
@@ -345,7 +347,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 	public function show()
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
-	
+
 		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
@@ -445,12 +447,15 @@ class Informationsystem_Controller_Show extends Core_Controller
 			}
 
 			// Список свойств информационных элементов
-			$Informationsystem_Group_Properties = Core::factory('Core_Xml_Entity')
-					->name('informationsystem_group_properties');
+			if ($this->groupsPropertiesList)
+			{
+				$Informationsystem_Group_Properties = Core::factory('Core_Xml_Entity')
+						->name('informationsystem_group_properties');
 
-			$this->addEntity($Informationsystem_Group_Properties);
+				$this->addEntity($Informationsystem_Group_Properties);
 
-			$this->_addGroupsPropertiesList(0, $Informationsystem_Group_Properties);
+				$this->_addGroupsPropertiesList(0, $Informationsystem_Group_Properties);
+			}
 		}
 
 		is_array($this->groupsProperties) && $this->groupsProperties = array_combine($this->groupsProperties, $this->groupsProperties);
@@ -514,14 +519,26 @@ class Informationsystem_Controller_Show extends Core_Controller
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 			{
 				// Shortcut
-				$oInformationsystem_Item->shortcut_id && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
+				$bShortcut = $oInformationsystem_Item->shortcut_id;
+
+				$bShortcut && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
 
 				// Ярлык может ссылаться на отключенный элемент
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
 					? 1
 					: (strtolower($this->itemsActivity) == 'all' ? $oInformationsystem_Item->active : 0);
 
-				if ($oInformationsystem_Item->active == $desiredActivity)
+				//Ярлык может ссылаться на элемент с истекшим или не наступившим сроком публикации
+				$iCurrentTimestamp = time();
+
+				if ($oInformationsystem_Item->active == $desiredActivity
+					&& (!$bShortcut
+						||  (Core_Date::sql2timestamp($oInformationsystem_Item->end_datetime) >= $iCurrentTimestamp
+							|| $oInformationsystem_Item->end_datetime == '0000-00-00 00:00:00')
+						&& (Core_Date::sql2timestamp($oInformationsystem_Item->start_datetime) <= $iCurrentTimestamp
+							|| $oInformationsystem_Item->start_datetime == '0000-00-00 00:00:00')
+					)
+				)
 				{
 					$oInformationsystem_Item->clearEntities();
 
@@ -773,6 +790,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
 			$oStructure->setCorePageSeo($oCore_Page);
+			
+			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
+			$oCore_Page->buildingPage && $oCore_Page->execute();
 		}
 		else
 		{

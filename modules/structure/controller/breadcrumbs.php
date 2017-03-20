@@ -24,7 +24,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Breadcrumbs extends Core_Controller
 {
@@ -89,9 +89,12 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		if (is_object(Core_Page::instance()->object))
 		{
 			if ($this->showInformationsystem && Core_Page::instance()->object instanceof Informationsystem_Controller_Show)

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Str
 {
@@ -444,7 +444,8 @@ class Core_Str
 		}
 		else
 		{
-			$result = preg_replace('/<(.*?)>/ieu', "'<' . preg_replace(array('/javascript:[^\"\']*/iu', '/(" . implode('|', $aDisabledAttributes) . ")[ \\t\\n]*=[ \\t\\n]*[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes('\\1')) . '>'", strip_tags($sSource, $aAllowedTags));
+			//$result = preg_replace('/<(.*?)>/ieu', "'<' . preg_replace(array('/javascript:[^\"\']*/iu', '/(" . implode('|', $aDisabledAttributes) . ")[ \\t\\n]*=[ \\t\\n]*[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes('\\1')) . '>'", strip_tags($sSource, $aAllowedTags));
+			$result = preg_replace_callback('/<(.*?)>/iu', create_function('$matches', "return '<' . preg_replace(array('/javascript:[^\"\']*/iu', '/(" . implode('|', $aDisabledAttributes) . ")[ \\t\\n]*=[ \\t\\n]*[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes(" . '$matches[1]' . ")) . '>';"), strip_tags($sSource, $aAllowedTags));
 		}
 
 		return $result;

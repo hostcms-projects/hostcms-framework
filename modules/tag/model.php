@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Model extends Core_Entity{
 	/**
@@ -68,15 +68,15 @@ class Tag_Model extends Core_Entity{
 	 * @return boolean
 	 */
 	public function __isset($property)
-    {
+	{
 		$property = strtolower($property);
 		if (in_array($property, array('site_count', 'all_count')))
 		{
 			return TRUE;
 		}
 
-        return parent::__isset($property);
-    }
+		return parent::__isset($property);
+	}
 
 	/**
 	 * Calculate count

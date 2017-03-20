@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Typograph
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Typograph_Controller
 {
@@ -118,7 +118,8 @@ class Typograph_Controller
 		// выражение преобразования добавляет слэши перед кавычками.
 
 		// кавычки в html-тегах на символ '¬'
-		$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('\\\"', '¬','\\1').'>'", $str);
+		//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('\\\"', '¬','\\1').'>'", $str);
+		$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("\"", "¬", $matches[1]) . ">";'), $str);
 
 		// Расстановка заков в скобках перед добавлением висячей пунктуации
 		$str = str_replace(
@@ -247,7 +248,7 @@ class Typograph_Controller
 
 		$regex = '/'.$aEntries['RAQUO'].'([^'.$aEntries['LAQUO'].']*?)'.$aEntries['RAQUO'].'/u'; // без модификатора s
 		$replace = $aEntries['RDQUO'].'\1'.$aEntries['RAQUO'];
-		
+
 		$i = 0;
 		while (($i++ < 10) && preg_match('/'.$aEntries['RAQUO'].'(?:[^'.$aEntries['LAQUO'].']*?)'.$aEntries['RAQUO'].'/u', $str))
 		{
@@ -496,14 +497,15 @@ class Typograph_Controller
 		if ($bTrailingPunctuation)
 		{
 			// Заменяем СКОБКИ В ТЕГАХ на непечатные символы
-			$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('(', chr(0x01),'\\1').'>'", $str);
+			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('(', chr(0x01),'\\1').'>'", $str);
+			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("(", chr(0x01), $matches[1]) . ">";'), $str);
 
 			$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 
 			$left_span = !empty($oSite->css_left)
 				? '<span class=¬'.$oSite->css_left.'¬>'
 				: '<span style=¬margin-left: -0.3em¬>';
-			
+
 			$right_span = !empty($oSite->css_right)
 				? '<span class=¬' . $oSite->css_right . '¬>'
 				: '<span style=¬margin-right: 0.3em¬>';
@@ -512,24 +514,31 @@ class Typograph_Controller
 			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)?(\s)?(\(\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('(', chr(0x01), '\\4').'</span>'", $str);
 			// исключено (\s)?(<[^\/][^>]*>)?
 			// т.к. тогда span вылезает слева за <p>
-			$str = preg_replace("/(\s)?(\(\w*)/iseu", "'{$right_span} </span> {$left_span}'.str_replace('(', chr(0x01), '\\2').'</span>'", $str);
+			//$str = preg_replace("/(\s)?(\(\w*)/iseu", "'{$right_span} </span> {$left_span}'.str_replace('(', chr(0x01), '\\2').'</span>'", $str);
+			$str = preg_replace_callback("/(\s)?(\(\w*)/isu", create_function('$matches', "return '{$right_span} </span> {$left_span}' . str_replace('(', chr(0x01), \$matches[2]) . '</span>';"), $str);
+
 			// Восстанавливаем скобки в тегах.
 			$str = str_replace(chr(0x01), '(', $str);
 
 			// Заменяем ЁЛОЧКИ В ТЕГАХ на непечатные символы.
-			$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&laquo;', chr(0x02),'\\1').'>'", $str);
+			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&laquo;', chr(0x02),'\\1').'>'", $str);
+			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("&laquo;", chr(0x02), $matches[1]) . ">";'), $str);
 
 			// Добавляем висячие елочки.
 			// возможно проблема вылезания за <p>, пример изменения см. выше
-			$str = preg_replace("/(\s)?(<[^\/][^>]*>)?(\s)?(\&laquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&laquo;', chr(0x02), '\\4').'</span>'", $str);
+			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)?(\s)?(\&laquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&laquo;', chr(0x02), '\\4').'</span>'", $str);
+			$str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)?(\s)?(\&laquo;\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('&laquo;', chr(0x02), \$matches[4]).'</span>';"), $str);
+
 			// Восстанавливаем елочки в тегах.
 			$str = str_replace(chr(0x02), "&laquo;", $str);
 
 			// Заменяем ЛАПКИ В ТЕГАХ на непечатные символы.
-			$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&bdquo;', chr(0x03),'\\1').'>'", $str);
+			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&bdquo;', chr(0x03),'\\1').'>'", $str);
+			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("&bdquo;", chr(0x03), $matches[1]) . ">";'), $str);
 
 			// Добавляем висячие лапки.
-			$str = preg_replace("/(\s)?(<[^\/][^>]*>)(\s)?(\&bdquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&bdquo;', chr(0x03), '\\4').'</span>\\5'", $str);
+			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)(\s)?(\&bdquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&bdquo;', chr(0x03), '\\4').'</span>\\5'", $str);
+			$str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)(\s)?(\&bdquo;\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('&bdquo;', chr(0x03), \$matches[4]) . '</span>' . \$matches[5];"), $str);
 
 			// Восстанавливаем лапки в тегах.
 			$str = str_replace(chr(0x03), "&bdquo;", $str);

@@ -242,7 +242,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					if (is_null($oSeller))
 					{
 						$oSeller = Core_Entity::factory('Shop_Seller');
-						$oSeller->shop_id($this->iShopId)->name($sPropertyValue)->save();
+						$oSeller->shop_id($this->iShopId)->name($sPropertyValue)->path(Core_Guid::get())->save();
 					}
 
 					$oItem->shop_seller_id = $oSeller->id;

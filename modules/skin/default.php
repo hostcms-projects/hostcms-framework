@@ -45,6 +45,10 @@ class Skin_Default extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/mbMenu.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.metadata.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.hoverIntent.js')
+			
+			->addJs('/admin/js/typeahead-bs2.min.js')			
+			->addJs('/admin/js/bootstrap-tag.js')
+			->addJs('/admin/js/ace.js')
 			;
 
 		/*if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -783,6 +787,7 @@ class Skin_Default extends Core_Skin
 			$("#sortable0,#sortable1,#sortable2,#sortable3,#sortable4").sortable({
 				cursor: 'move',
 				distance: 5,
+				helper : 'clone',
 				//connectWith: '#shortcuts>.sortable',
 				start: function(event, ui) {
 					ui.item.toggleClass('drag');

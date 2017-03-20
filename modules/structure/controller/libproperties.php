@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 {
@@ -21,7 +21,7 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 
 	/**
 	 * Set lib ID
-	 * @param int $libId 
+	 * @param int $libId
 	 * @return self
 	 */
 	public function libId($libId)
@@ -183,7 +183,8 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 											array(' … ') + $aXslDirs
 										)
 										->value($xsl_dir_id)
-										->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'lib_property_id_{$oLib_Property->id}', callBack: [$.loadSelectOptionsCallback, function(){\$('#{$windowId} #lib_property_id_{$oLib_Property->id}').val('{$xsl_id}')}], action: 'loadXslList',additionalParams: 'xsl_dir_id=' + this.value,windowId: '{$windowId}'}); return false")
+										// lib_property_id передается для исключения Abort в ajaxPrefilter
+										->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'lib_property_id_{$oLib_Property->id}', callBack: [$.loadSelectOptionsCallback, function(){\$('#{$windowId} #lib_property_id_{$oLib_Property->id}').val('{$xsl_id}')}], action: 'loadXslList',additionalParams: 'xsl_dir_id=' + this.value + '&lib_property_id={$oLib_Property->id}',windowId: '{$windowId}'}); return false")
 								)
 								->add(
 									Core::factory('Core_Html_Entity_Script')

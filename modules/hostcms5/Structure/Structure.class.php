@@ -3489,7 +3489,7 @@ class Structure
 				$site_nesting_level = SITE_NESTING_LEVEL;
 			}
 
-			return $uploaddir . 'structure_site_' . Core_Type_Conversion::toInt($structure_item_row['site_id']) . '/' . $kernel->GetDirPath($structure_id, $site_nesting_level) . '/structure_' . $structure_id . '/';
+			return $uploaddir . 'structure_' . Core_Type_Conversion::toInt($structure_item_row['site_id']) . '/' . $kernel->GetDirPath($structure_id, $site_nesting_level) . '/structure_' . $structure_id . '/';
 		}
 
 		return FALSE;

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -493,7 +493,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
 					$fieldAfter = $oModificationPrice;
 				}
-				
+
 				// Добавляем разделитель
 				//$oMainTab->addAfter($oSeparator, $oShopTaxSelect);
 
@@ -670,23 +670,80 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				if (Core::moduleIsActive('tag'))
 				{
 					// Добавляем метки на вкладку меток
+					/*
 					$oTagsField = Admin_Form_Entity::factory('Input');
 					$oTagsField
 						->caption(Core::_("Shop_Item.items_catalog_tags"))
 						->name("tags")
 						->value(implode(", ", $this->_object->Tags->findAll()));
 					$oShopItemTabTags->add($oTagsField);
+					*/
+					
+					// Добавляем метки на вкладку меток					
+					$html = '<label class="tags_label" for="form-field-tags">Метки (теги)</label>
+							<div class="item_div">															
+								<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="Введите тэг ..." />
+							</div>
+							<script type="text/javascript">
+								jQuery(function($){
+									//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
+									//var tag_input = $(\'#' . $windowId .' #form-field-tags\');
+									var tag_input = $(\'#form-field-tags\');
+									if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) ) 
+									{
+										tag_input.tag(
+										  {
+											placeholder:tag_input.attr(\'placeholder\')											
+										  }
+										);
+									}
+									else {
+										//display a textarea for old IE, because it doesnt support this plugin or another one I tried!
+										tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
+										//$(\'#form-field-tags\').autosize({append: "n"});
+									}
+									
+								})
+							</script>
+							';
+					$oShopItemTabTags->add(Admin_Form_Entity::factory('Code')->html($html));	
 				}
-				
-				$oMultiplSign = Admin_Form_Entity::factory('Div')->divAttr(array('style' => 'float: left;padding:10px;height:25px;position: relative;'))->style("position:absolute;bottom:0;left:0;width: 100%;text-align:center;font-size:large;")->value('×');
-				$oLengthField = $this->getField('length')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_length'));
+
+				$oMultiplSign = Admin_Form_Entity::factory('Div')->divAttr(
+						array('style' => 'float: left;padding:10px;height:25px;position: relative;')
+					)
+					->style("position:absolute;bottom:0;left:0;width: 100%;text-align:center;font-size:large;")
+					->value('×');
+
+				$oLengthField = $this->getField('length')->divAttr(
+						array('style' => 'float: left;padding-right:0px;')
+					)
+					->style("width: 120px")
+					->caption(Core::_('Shop_Item.item_length'));
+
 				$oMainTab->addAfter($oMultiplSign, $oLengthField);
-				$oWidthField = $this->getField('width')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_width'));
+
+				$oWidthField = $this->getField('width')->divAttr(
+						array('style' => 'float: left;padding-right:0px;')
+					)
+					->style("width: 120px")
+					->caption(Core::_('Shop_Item.item_width'));
+
 				$oMainTab->addAfter($oMultiplSign, $oWidthField);
-				$oHeightField = $this->getField('height')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_height'));
-				$oMainTab->addAfter(Admin_Form_Entity::factory('Div')->divAttr(array('style' => 'float: left;padding:10px;height:25px;position: relative;'))->style("padding-left:10px;position:absolute;bottom:0;left:0;width: 100%;text-align:center;")->value(Core::_('Shop.size_measure_'.$oShop->size_measure)), $oHeightField);
-				
-				
+
+				$oHeightField = $this->getField('height')->divAttr(
+						array('style' => 'float: left;padding-right:0px;')
+					)
+					->style("width: 120px")
+					->caption(Core::_('Shop_Item.item_height'));
+
+				$oMainTab->addAfter(
+					Admin_Form_Entity::factory('Div')->divAttr(
+						array('style' => 'float: left;padding:10px;height:25px;position: relative;')
+					)
+					->style("padding-left:10px;position:absolute;bottom:0;left:0;width: 100%;text-align:center;")
+					->value(Core::_('Shop.size_measure_'.$oShop->size_measure)), $oHeightField
+				);
 			break;
 
 			case 'shop_group':
@@ -1146,7 +1203,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oShopItemWarehouse->save();
 				}
-				
+
 				if (Core_Array::getPost('apply_price_for_modification'))
 				{
 					$aModifications = $this->_object->Modifications->findAll();

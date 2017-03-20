@@ -27,7 +27,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Tag_Show extends Core_Controller
 {
@@ -122,9 +122,12 @@ class Shop_Controller_Tag_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return self
+	 * @hostcms-event Shop_Controller_Tag_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);

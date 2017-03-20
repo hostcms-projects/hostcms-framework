@@ -1049,7 +1049,6 @@ class Site_Model extends Core_Entity
 
 			// Получаем скопированные разделы информационных систем
 			$aNewInformationsystem_Dirs = $newObject->Informationsystem_Dirs->findAll(FALSE);
-
 			foreach($aNewInformationsystem_Dirs as $oNewInformationsystem_Dir)
 			{
 				if(isset($aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]))
@@ -1069,7 +1068,7 @@ class Site_Model extends Core_Entity
 				$oNewInformationsystem = $oInformationsystem->copy();
 				if (isset($aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]))
 				{
-					$oInformationsystem->informationsystem_dir_id = $aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]->id;
+					$oNewInformationsystem->informationsystem_dir_id = $aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]->id;
 				}
 
 				if (isset($aMatchStructures[$oNewInformationsystem->structure_id]))
@@ -1089,8 +1088,55 @@ class Site_Model extends Core_Entity
 
 			unset($aMatchInformationsystem_Dirs);
 		}
+		
+		$aMatchShops = array();
+		if (Core::moduleIsActive('shop'))
+		{
+			$aShop_Dirs = $this->Shop_Dirs->findAll(FALSE);
 
-		// Forums
+			$aMatchShop_Dirs = array();
+			foreach($aShop_Dirs as $oShop_Dir)
+			{
+				//$oNewShop_Dir = $oShop_Dir->copy();
+				$oNewShop_Dir = clone $oShop_Dir;
+				$aMatchShop_Dirs[$oShop_Dir->id] = $oNewShop_Dir;
+
+				$newObject->add($oNewShop_Dir);
+			}
+
+			//Получаем список магазинов принадлежащих сайту
+			$oShops = $this->Shops;
+			//$oShops->queryBuilder()->where('shop_dir_id', '=', 0);
+			$aShops = $oShops->findAll(FALSE);
+
+			// Цикл по магазинам, находящимся в корне разделов магазинов
+			foreach($aShops as $oShop)
+			{
+				$oNewShop = $oShop->copy();
+
+				if (isset($aMatchShop_Dirs[$oNewShop->shop_dir_id]))
+				{
+					$oNewShop->shop_dir_id = $aMatchShop_Dirs[$oNewShop->shop_dir_id]->id;
+				}
+
+				if (isset($aMatchStructures[$oNewShop->structure_id]))
+				{
+					$oNewShop->structure_id = $aMatchStructures[$oNewShop->structure_id]->id;
+				}
+
+				if (isset($aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]))
+				{
+					$oNewShop->siteuser_group_id = $aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]->id;
+				}
+
+				$newObject->add($oNewShop);
+
+				$aMatchShops[$oShop->id] = $oNewShop;
+			}
+
+			unset($aMatchShop_Dirs);
+		}
+
 		if (Core::moduleIsActive('forum'))
 		{
 			$aForums = $this->Forums->findAll(FALSE);
@@ -1154,55 +1200,6 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		$aMatchShops = array();
-		if (Core::moduleIsActive('shop'))
-		{
-			$aShop_Dirs = $this->Shop_Dirs->findAll(FALSE);
-
-			$aMatchShop_Dirs = array();
-			foreach($aShop_Dirs as $oShop_Dir)
-			{
-				//$oNewShop_Dir = $oShop_Dir->copy();
-				$oNewShop_Dir = clone $oShop_Dir;
-				$aMatchShop_Dirs[$oShop_Dir->id] = $oNewShop_Dir;
-
-				$newObject->add($oNewShop_Dir);
-			}
-
-			//Получаем список магазинов принадлежащих сайту
-			$oShops = $this->Shops;
-			//$oShops->queryBuilder()->where('shop_dir_id', '=', 0);
-			$aShops = $oShops->findAll(FALSE);
-
-			// Цикл по магазинам, находящимся в корне разделов магазинов
-			foreach($aShops as $oShop)
-			{
-				$oNewShop = $oShop->copy();
-
-				if (isset($aMatchShop_Dirs[$oNewShop->shop_dir_id]))
-				{
-					$oNewShop->shop_dir_id = $aMatchShop_Dirs[$oNewShop->shop_dir_id]->id;
-				}
-
-				if (isset($aMatchStructures[$oNewShop->structure_id]))
-				{
-					$oNewShop->structure_id = $aMatchStructures[$oNewShop->structure_id]->id;
-				}
-
-				if (isset($aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]))
-				{
-					$oNewShop->siteuser_group_id = $aMatchSiteuser_Groups[$oNewShop->siteuser_group_id]->id;
-				}
-
-				$newObject->add($oNewShop);
-
-				$aMatchShops[$oShop->id] = $oNewShop;
-			}
-
-			unset($aMatchShop_Dirs);
-		}
-
-		// Maillist
 		if (Core::moduleIsActive('maillist'))
 		{
 			// Получаем список рассылок
@@ -1231,7 +1228,6 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		// Helpdesks
 		if (Core::moduleIsActive('helpdesk'))
 		{
 			$aHelpdesks = $this->Helpdesks->findAll(FALSE);

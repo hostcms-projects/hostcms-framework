@@ -345,14 +345,14 @@ abstract class Shop_Payment_System_Handler
 
 					$oShop_Item_Controller->count($oShop_Cart->quantity);
 
-					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item, FALSE);
+					$oShop_Item = $oShop_Cart->Shop_Item;
+
+					$aPrices = $oShop_Item_Controller->getPrices($oShop_Item, FALSE);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
 					$oShop_Order_Item->price = $aPrices['price_discount'] - $aPrices['tax'];
 					$oShop_Order_Item->rate = $aPrices['rate'];
-
-					$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
-					$oShop_Order_Item->name = !is_null($oShop_Item) ? $oShop_Item->name : '';
-					$oShop_Order_Item->marking = !is_null($oShop_Item) ? $oShop_Item->marking : '';
+					$oShop_Order_Item->name = $oShop_Item->name;
+					$oShop_Order_Item->marking = $oShop_Item->marking;
 
 					$this->_shopOrder->add($oShop_Order_Item);
 

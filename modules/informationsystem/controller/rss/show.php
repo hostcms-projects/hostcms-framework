@@ -25,7 +25,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Rss_Show extends Core_Controller
 {
@@ -176,9 +176,12 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 	/**
 	 * Show RSS
 	 * @return self
+	 * @hostcms-event Informationsystem_Controller_Rss_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+	
 		$oInformationsystem = $this->getEntity();
 
 		$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();

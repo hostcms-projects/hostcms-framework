@@ -20,9 +20,10 @@ class Typograph_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-04-25';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 260,				'block' => 3,				'name' => Core::_('typograph.menu'),				'href' => "/admin/typograph/index.php",				'onclick' => "$.adminLoad({path: '/admin/typograph/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 260,				'block' => 3,
+				'ico' => 'fa-paragraph',				'name' => Core::_('typograph.menu'),				'href' => "/admin/typograph/index.php",				'onclick' => "$.adminLoad({path: '/admin/typograph/index.php'}); return false"			)		);	}}

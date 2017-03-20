@@ -13,7 +13,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Address_Controller_Show extends Core_Controller
 {
@@ -69,9 +69,12 @@ class Shop_Address_Controller_Show extends Core_Controller
 	/**
 	 * Show built data
 	 * @return Core_Controller
+	 * @hostcms-event Shop_Address_Controller_Show.onBeforeRedeclaredShow
 	 */
 	public function show()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
+
 		$oShop = $this->getEntity();
 
 		if ($this->orderProperties)

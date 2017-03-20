@@ -74,7 +74,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Page extends Core_Servant_Properties
 {
@@ -90,7 +90,8 @@ class Core_Page extends Core_Servant_Properties
 		'structure',
 		'response',
 		'libParams',
-		'object'
+		'object',
+		'buildingPage'
 	);
 
 	/**
@@ -141,6 +142,15 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get children
+	 * @return array
+	 */
+	public function getChildren()
+	{
+		return $this->_children;
+	}
+	
+	/**
 	 * Constructor.
 	 */
 	public function __construct()
@@ -148,6 +158,7 @@ class Core_Page extends Core_Servant_Properties
 		parent::__construct();
 
 		$this->libParams = array();
+		$this->buildingPage = FALSE;
 	}
 
 	/**

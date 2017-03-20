@@ -9,6 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - group($id) идентификатор группы магазина, если FALSE, то вывод товаров осуществляется из всех групп
  * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - groupsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств групп товаров, по умолчанию TRUE
  * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп.
  * - groupsMode('tree') режим показа групп, может принимать следующие значения:
 	none - не показывать группы,
@@ -31,6 +32,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - favorite(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
  * - favoriteOrder('ASC'|'DESC'|'RAND') направление сортировки избранных товаров, по умолчанию RAND
  * - viewed(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
+ * - cart(TRUE|FALSE) выводить товары в корзине, по умолчанию FALSE
  * - viewedOrder('ASC'|'DESC'|'RAND') направление сортировки избранных товаров, по умолчанию DESC
  * - warehousesItems(TRUE|FALSE) выводить остаток на каждом складе для товара, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить товары. По умолчанию 0
@@ -77,6 +79,7 @@ class Shop_Controller_Show extends Core_Controller
 	protected $_allowedProperties = array(
 		'group',
 		'groupsProperties',
+		'groupsPropertiesList',
 		'propertiesForGroups',
 		'groupsMode',
 		'groupsForbiddenTags',
@@ -97,6 +100,7 @@ class Shop_Controller_Show extends Core_Controller
 		'favoriteOrder',
 		'viewed',
 		'viewedOrder',
+		'cart',
 		'warehousesItems',
 		'offset',
 		'limit',
@@ -208,8 +212,8 @@ class Shop_Controller_Show extends Core_Controller
 		$this->group = 0;
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
-			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->comparing = $this->favorite = $this->viewed = TRUE;
+			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->cart = FALSE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = TRUE;
 
 		$this->favoriteOrder = 'RAND';
 		$this->viewedOrder = 'DESC';
@@ -504,10 +508,37 @@ class Shop_Controller_Show extends Core_Controller
 					foreach ($hostcmsViewed as $view_item_id)
 					{
 						$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id);
-						if (!is_null($oShop_Item->id))
+
+						if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item)
 						{
 							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 							$oViewedEntity->addEntity($oShop_Item->clearEntities());
+						}
+					}
+				}
+			}
+
+			//Товары в корзине
+			if ($this->cart)
+			{
+				// Проверяем наличие товара в корзины
+				$Shop_Cart_Controller = Shop_Cart_Controller::instance();
+				$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
+
+				if (count($aShop_Cart))
+				{
+					$this->addEntity(
+						$oCartEntity = Core::factory('Core_Xml_Entity')
+							->name('items_in_cart')
+					);
+
+					foreach ($aShop_Cart as $oShop_Cart)
+					{
+						$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
+						if (!is_null($oShop_Item->id))
+						{
+							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+							$oCartEntity->addEntity($oShop_Item->clearEntities());
 						}
 					}
 				}
@@ -578,12 +609,16 @@ class Shop_Controller_Show extends Core_Controller
 				$this->_aGroup_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
 			}
 
-			$Shop_Group_Properties = Core::factory('Core_Xml_Entity')
-				->name('shop_group_properties');
+			// Список свойств групп товаров
+			if ($this->groupsPropertiesList)
+			{
+				$Shop_Group_Properties = Core::factory('Core_Xml_Entity')
+					->name('shop_group_properties');
 
-			$this->addEntity($Shop_Group_Properties);
+				$this->addEntity($Shop_Group_Properties);
 
-			$this->_addGroupsPropertiesList(0, $Shop_Group_Properties);
+				$this->_addGroupsPropertiesList(0, $Shop_Group_Properties);
+			}
 		}
 
 		is_array($this->groupsProperties) && $this->groupsProperties = array_combine($this->groupsProperties, $this->groupsProperties);
@@ -695,14 +730,26 @@ class Shop_Controller_Show extends Core_Controller
 			foreach ($aShop_Items as $oShop_Item)
 			{
 				// Shortcut
-				$oShop_Item->shortcut_id && $oShop_Item = $oShop_Item->Shop_Item;
+				$bShortcut = $oShop_Item->shortcut_id;
+
+				$bShortcut && $oShop_Item = $oShop_Item->Shop_Item;
 
 				// Ярлык может ссылаться на отключенный товар
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
 					? 1
 					: (strtolower($this->itemsActivity) == 'all' ? $oShop_Item->active : 0);
 
-				if ($oShop_Item->active == $desiredActivity)
+				//Ярлык может ссылаться на товар с истекшим или не наступившим сроком публикации
+				$iCurrentTimestamp = time();
+
+				if ($oShop_Item->active == $desiredActivity
+					&& (!$bShortcut
+						|| (Core_Date::sql2timestamp($oShop_Item->end_datetime) >= $iCurrentTimestamp
+							|| $oShop_Item->end_datetime == '0000-00-00 00:00:00')
+						&& (Core_Date::sql2timestamp($oShop_Item->start_datetime) <= $iCurrentTimestamp
+							|| $oShop_Item->start_datetime == '0000-00-00 00:00:00')
+					)
+				)
 				{
 					$oShop_Item->clearEntities();
 
@@ -1038,6 +1085,9 @@ class Shop_Controller_Show extends Core_Controller
 
 			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
 			$oStructure->setCorePageSeo($oCore_Page);
+
+			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
+			$oCore_Page->buildingPage && $oCore_Page->execute();
 		}
 		else
 		{

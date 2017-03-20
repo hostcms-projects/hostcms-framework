@@ -20,7 +20,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Entity extends Core_ORM
 {
@@ -29,6 +29,17 @@ class Core_Entity extends Core_ORM
 	 * @var string
 	 */
 	protected $_tagName = NULL;
+
+	/**
+	 * Set name of XML node
+	 * @param string $tagName new tag name for node
+	 * @return self
+	 */
+	public function setXmlTagName($tagName)
+	{
+		$this->_tagName = strval($tagName);
+		return $this;
+	}
 
 	/**
 	 * Allowed tags. If list of tags is empty, all tags will show.

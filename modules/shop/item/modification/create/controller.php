@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Controller
 {
@@ -38,7 +38,7 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 				$aPropertiesId[] = $iPropertyID[1];
 
 				$aList_Items = $oProperty->List->List_Items->getAllByActive(1);
-			
+
 				if(isset($_POST["property{$oProperty->id}list"]))
 				{
 					foreach($_POST["property{$oProperty->id}list"] as $value)
@@ -94,6 +94,9 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 				$oShopItem->text = $oShopItemParent->text;
 				$oShopItem->image_large = $oShopItemParent->image_large;
 				$oShopItem->image_small = $oShopItemParent->image_small;
+				$oShopItem->length = $oShopItemParent->length;
+				$oShopItem->width = $oShopItemParent->width;
+				$oShopItem->height = $oShopItemParent->height;
 
 				try
 				{

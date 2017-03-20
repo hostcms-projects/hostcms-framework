@@ -73,7 +73,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			if ($this->_oSiteuser)
 			{
 				// Move goods from cookies to session
-				$Shop_Cart_Controller = Shop_Cart_Controller::instance();
+				$Shop_Cart_Controller = $this->_getCartController();
 				$Shop_Cart_Controller->moveTemporaryCart($oShop);
 			}
 		}
@@ -178,6 +178,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 						$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 						$oSiteuser && $oShop_Item_Controller->siteuser($oSiteuser);
 					}
+
 					$oShop_Item_Controller->count($oShop_Cart->quantity);
 					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;

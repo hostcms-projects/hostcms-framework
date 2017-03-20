@@ -375,6 +375,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		$oCore_Page
 			->addTemplates($oTemplate)
+			->buildingPage(TRUE)
 			->execute();
 
 		$oCore_Registry = Core_Registry::instance();
