@@ -261,4 +261,9 @@ return array(
 	'manufacturer_warranty' => '<acronym title="Товар имеет официальную гарантию производителя">Гарантия производителя</acronym>',
 	'country_of_origin' => '<acronym title="Страна, в которой товар был произведён">Страна производства</acronym>',
 	'apply_price_for_modification' => "<acronym title=\"Применяет основную цену и валюту товара для модификаций\">Применить основную цену для модификаций</acronym>",
+	'item_length'=>'Длина',
+	'item_width'=>'Ширина',
+	'item_height'=>'Высота',
+	'show_in_group'=>'Показывать свойство в группе',
+	'show_in_item'=>'Показывать свойство в товаре',
 );

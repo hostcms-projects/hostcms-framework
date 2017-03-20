@@ -6,6 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Google sitemap
  * http://www.sitemaps.org/protocol.html
  *
+ * - rebuildTime время в секундах, которое должно пройти с момента создания sitemap.xml для его перегенерации. По умолчанию 14400
+ * - limit ограничение на единичную выборку элементов, по умолчанию 1000. При наличии достаточного объема памяти рекомендуется увеличить параметр
+ * - createIndex разбивать карту на несколько файлов
+ * - perFile Count of nodes per one file
+ *
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
@@ -23,10 +28,14 @@ class Core_Sitemap extends Core_Servant_Properties
 		'showShopGroups',
 		'showShopItems',
 		'showModifications',
+		'rebuildTime',
+		'limit',
+		'createIndex',
+		'perFile'
 	);
 
 	/**
-	 * Site 
+	 * Site
 	 * @var Site_Model
 	 */
 	protected $_oSite = NULL;
@@ -48,13 +57,18 @@ class Core_Sitemap extends Core_Servant_Properties
 
 			if ($oSiteuser)
 			{
-				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
+				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll(FALSE);
 				foreach ($aSiteuser_Groups as $oSiteuser_Group)
 				{
 					$this->_aSiteuserGroups[] = $oSiteuser_Group->id;
 				}
 			}
 		}
+
+		$this->rebuildTime = 14400; // 4 часа
+		$this->limit = 1000;
+		$this->createIndex = FALSE;
+
 	}
 
 	/**
@@ -68,7 +82,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	 * @var array
 	 */
 	protected $_Informationsystems = array();
-	
+
 	/**
 	 * List of shops
 	 * @var array
@@ -103,7 +117,7 @@ class Core_Sitemap extends Core_Servant_Properties
 			->orderBy('sorting')
 			->orderBy('name');
 
-		$aStructure = $oStructures->findAll();
+		$aStructure = $oStructures->findAll(FALSE);
 
 		$dateTime = Core_Date::timestamp2sql(time());
 
@@ -118,47 +132,73 @@ class Core_Sitemap extends Core_Servant_Properties
 			{
 				$oInformationsystem = $this->_Informationsystems[$oStructure->id];
 
-				$oInformationsystem_Groups = $oInformationsystem->Informationsystem_Groups;
-				$oInformationsystem_Groups->queryBuilder()
-					->where('informationsystem_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-					->where('informationsystem_groups.active', '=', 1)
-					->where('informationsystem_groups.indexing', '=', 1);
-				$aInformationsystem_Groups = $oInformationsystem_Groups->findAll();
+				$offset = 0;
 
-				$path = 'http://' . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
+				do {
+					$oInformationsystem_Groups = $oInformationsystem->Informationsystem_Groups;
+					$oInformationsystem_Groups->queryBuilder()
+						->select('informationsystem_groups.id',
+							'informationsystem_groups.informationsystem_id',
+							'informationsystem_groups.parent_id',
+							'informationsystem_groups.path'
+							)
+						->where('informationsystem_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+						->where('informationsystem_groups.active', '=', 1)
+						->where('informationsystem_groups.indexing', '=', 1)
+						->offset($offset)->limit($this->limit);
 
-				foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
-				{
-					$this->addNode($path . $oInformationsystem_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
+					$aInformationsystem_Groups = $oInformationsystem_Groups->findAll(FALSE);
+
+					$path = 'http://' . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
+
+					foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
+					{
+						$this->addNode($path . $oInformationsystem_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
+					}
+					$offset += $this->limit;
 				}
+				while (count($aInformationsystem_Groups));
 
 				// Informationsystem's items
 				if ($this->showInformationsystemItems)
 				{
-					$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
-					$oInformationsystem_Items->queryBuilder()
-						->select('informationsystem_items.*')
-						->open()
-						->where('informationsystem_items.start_datetime', '<', $dateTime)
-						->setOr()
-						->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
-						->close()
-						->setAnd()
-						->open()
-						->where('informationsystem_items.end_datetime', '>', $dateTime)
-						->setOr()
-						->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
-						->close()
-						->where('informationsystem_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-						->where('informationsystem_items.active', '=', 1)
-						->where('informationsystem_items.shortcut_id', '=', 0)
-						->where('informationsystem_items.indexing', '=', 1);
+					$offset = 0;
 
-					$aInformationsystem_Items = $oInformationsystem_Items->findAll();
-					foreach ($aInformationsystem_Items as $oInformationsystem_Item)
-					{
-						$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+					do {
+						$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
+						$oInformationsystem_Items->queryBuilder()
+							->select('informationsystem_items.id',
+								'informationsystem_items.informationsystem_id',
+								'informationsystem_items.informationsystem_group_id',
+								'informationsystem_items.shortcut_id',
+								'informationsystem_items.path'
+								)
+							->open()
+							->where('informationsystem_items.start_datetime', '<', $dateTime)
+							->setOr()
+							->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
+							->close()
+							->setAnd()
+							->open()
+							->where('informationsystem_items.end_datetime', '>', $dateTime)
+							->setOr()
+							->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
+							->close()
+							->where('informationsystem_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+							->where('informationsystem_items.active', '=', 1)
+							->where('informationsystem_items.shortcut_id', '=', 0)
+							->where('informationsystem_items.indexing', '=', 1)
+							->offset($offset)->limit($this->limit);
+
+						$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
+						foreach ($aInformationsystem_Items as $oInformationsystem_Item)
+						{
+							$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+						}
+
+						$offset += $this->limit;
 					}
+					while (count($aInformationsystem_Items));
 				}
 			}
 
@@ -167,57 +207,85 @@ class Core_Sitemap extends Core_Servant_Properties
 			{
 				$oShop = $this->_Shops[$oStructure->id];
 
-				$oShop_Groups = $oShop->Shop_Groups;
-				$oShop_Groups->queryBuilder()
-					->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-					->where('shop_groups.active', '=', 1)
-					->where('shop_groups.indexing', '=', 1);
+				$offset = 0;
 
-				$aShop_Groups = $oShop_Groups->findAll();
+				do {
+					$oShop_Groups = $oShop->Shop_Groups;
+					$oShop_Groups->queryBuilder()
+						->select('shop_groups.id',
+							'shop_groups.shop_id',
+							'shop_groups.parent_id',
+							'shop_groups.path'
+							)
+						->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+						->where('shop_groups.active', '=', 1)
+						->where('shop_groups.indexing', '=', 1)
+						->offset($offset)->limit($this->limit);
 
-				$path = 'http://' . $oSite_Alias->name . $oShop->Structure->getPath();
-				foreach ($aShop_Groups as $oShop_Group)
-				{
-					$this->addNode($path . $oShop_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
+					$aShop_Groups = $oShop_Groups->findAll(FALSE);
+
+					$path = 'http://' . $oSite_Alias->name . $oShop->Structure->getPath();
+					foreach ($aShop_Groups as $oShop_Group)
+					{
+						$this->addNode($path . $oShop_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
+					}
+
+					$offset += $this->limit;
 				}
+				while (count($aShop_Groups));
 
 				// Shop's items
 				if ($this->showShopItems)
 				{
-					$oShop_Items = $oShop->Shop_Items;
-					$oShop_Items->queryBuilder()
-						->select('shop_items.*')
-						->open()
-						->where('shop_items.start_datetime', '<', $dateTime)
-						->setOr()
-						->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
-						->close()
-						->setAnd()
-						->open()
-						->where('shop_items.end_datetime', '>', $dateTime)
-						->setOr()
-						->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
-						->close()
-						->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-						->where('shop_items.active', '=', 1)
-						->where('shop_items.shortcut_id', '=', 0)
-						->where('shop_items.indexing', '=', 1);
-						
-						//Modifications
+					$offset = 0;
+
+					do {
+						$oShop_Items = $oShop->Shop_Items;
+						$oShop_Items->queryBuilder()
+							->select('shop_items.id',
+								'shop_items.shop_id',
+								'shop_items.shop_group_id',
+								'shop_items.shortcut_id',
+								'shop_items.modification_id',
+								'shop_items.path'
+								)
+							->open()
+							->where('shop_items.start_datetime', '<', $dateTime)
+							->setOr()
+							->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+							->close()
+							->setAnd()
+							->open()
+							->where('shop_items.end_datetime', '>', $dateTime)
+							->setOr()
+							->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+							->close()
+							->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+							->where('shop_items.active', '=', 1)
+							->where('shop_items.shortcut_id', '=', 0)
+							->where('shop_items.indexing', '=', 1)
+							->offset($offset)->limit($this->limit);
+
+						// Modifications
 						if (!$this->showModifications)
 						{
 							$oShop_Items->queryBuilder()
 								->where('shop_items.modification_id', '=', 0);
 						}
 
-					$aShop_Items = $oShop_Items->findAll();
-					foreach ($aShop_Items as $oShop_Item)
-					{
-						$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+						$aShop_Items = $oShop_Items->findAll(FALSE);
+						foreach ($aShop_Items as $oShop_Item)
+						{
+							$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+						}
+
+						$offset += $this->limit;
 					}
+					while (count($aShop_Items));
 				}
 			}
 
+			// Structure
 			$this->_structure($oStructure->id);
 		}
 
@@ -225,69 +293,47 @@ class Core_Sitemap extends Core_Servant_Properties
 	}
 
 	/**
+	 * Is it necessary to rebuild sitemap?
+	 */
+	protected $_bRebuild = TRUE;
+
+	/**
 	 * Fill nodes of structure
 	 * @return self
 	 */
 	public function fillNodes()
 	{
-		$this->_Informationsystems = $this->_Shops = array();
+		$sIndexFilePath = $this->_getIndexFilePath();
 
-		$oSite = $this->getSite();
+		$this->_bRebuild = !is_file($sIndexFilePath) || time() > filemtime($sIndexFilePath) + 2000;
 
-		if ($this->showInformationsystemGroups || $this->showInformationsystemItems)
+		if ($this->_bRebuild)
 		{
-			$aInformationsystems = $oSite->Informationsystems->findAll(FALSE);
-			foreach ($aInformationsystems as $oInformationsystem)
+			$this->_Informationsystems = $this->_Shops = array();
+
+			$oSite = $this->getSite();
+
+			if ($this->showInformationsystemGroups || $this->showInformationsystemItems)
 			{
-				$this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
+				$aInformationsystems = $oSite->Informationsystems->findAll();
+				foreach ($aInformationsystems as $oInformationsystem)
+				{
+					$this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
+				}
 			}
+
+			if ($this->showShopGroups || $this->showShopItems)
+			{
+				$aShops = $oSite->Shops->findAll();
+				foreach ($aShops as $oShop)
+				{
+					$this->_Shops[$oShop->structure_id] = $oShop;
+				}
+			}
+
+			$this->_structure(0);
 		}
 
-		if ($this->showShopGroups || $this->showShopItems)
-		{
-			$aShops = $oSite->Shops->findAll(FALSE);
-			foreach ($aShops as $oShop)
-			{
-				$this->_Shops[$oShop->structure_id] = $oShop;
-			}
-		}
-
-		$this->_structure(0);
-
-		return $this;
-	}
-
-	/**
-	 * Split sitemap on the several files
-	 * @var boolean
-	 */
-	protected $_createIndex = FALSE;
-
-	/**
-	 * Split sitemap on the several files
-	 * @param boolean $createIndex create index mode
-	 * @return self
-	 */
-	public function createIndex($createIndex)
-	{
-		$this->_createIndex = $createIndex;
-		return $this;
-	}
-
-	/**
-	 * Count of nodes per one file
-	 * @var int
-	 */
-	protected $_perFile = NULL;
-
-	/**
-	 * Set URL count per file
-	 * @param int $perFile count
-	 * @return self
-	 */
-	public function perFile($perFile)
-	{
-		$this->_perFile = intval($perFile);
 		return $this;
 	}
 
@@ -298,7 +344,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	protected $_aIndexedFiles = array();
 
 	/**
-	 * Current output file 
+	 * Current output file
 	 * @var Core_Out_File
 	 */
 	protected $_currentOut = NULL;
@@ -309,9 +355,9 @@ class Core_Sitemap extends Core_Servant_Properties
 	 */
 	protected function _getOut()
 	{
-		if ($this->_createIndex)
+		if ($this->createIndex)
 		{
-			if (is_null($this->_currentOut) || $this->_inFile > $this->_perFile)
+			if (is_null($this->_currentOut) || $this->_inFile >= $this->perFile)
 			{
 				$this->_getNewOutFile();
 			}
@@ -330,12 +376,12 @@ class Core_Sitemap extends Core_Servant_Properties
 	 * @var int
 	 */
 	protected $_inFile = 0;
-	
+
 	/**
 	 * Sitemap files count
 	 * @var int
 	 */
-	protected $_countFile = 0;
+	protected $_countFile = 1;
 
 	/**
 	 * Open current output file
@@ -355,8 +401,11 @@ class Core_Sitemap extends Core_Servant_Properties
 	 */
 	protected function _close()
 	{
-		$this->_currentOut->write("</urlset>\n");
-		$this->_currentOut->close();
+		if ($this->_currentOut)
+		{
+			$this->_currentOut->write("</urlset>\n");
+			$this->_currentOut->close();
+		}
 		return $this;
 	}
 
@@ -415,28 +464,50 @@ class Core_Sitemap extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get index file path
+	 * @return string
+	 */
+	protected function _getIndexFilePath()
+	{
+		return CMS_FOLDER . 'sitemap.xml';
+	}
+
+	/**
 	 * Executes the business logic.
 	 */
 	public function execute()
 	{
 		$this->_close();
 
-		if ($this->_createIndex)
+		if ($this->createIndex)
 		{
-			echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+			$sIndexFilePath = $this->_getIndexFilePath();
 
-			$oSite_Alias = $this->_oSite->getCurrentAlias();
-
-			echo '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
-			foreach ($this->_aIndexedFiles as $filename)
+			if ($this->_bRebuild)
 			{
-				echo "<sitemap>\n";
-				echo "<loc>http://{$oSite_Alias->name}/{$filename}</loc>";
-				echo "<lastmod>" . date('Y-m-d') . "</lastmod>";
-				echo "</sitemap>\n";
-			}
+				$sIndex = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 
-			echo '</sitemapindex>';
+				$oSite_Alias = $this->_oSite->getCurrentAlias();
+
+				$sIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+				foreach ($this->_aIndexedFiles as $filename)
+				{
+					$sIndex .= "<sitemap>\n";
+					$sIndex .= "<loc>http://{$oSite_Alias->name}/{$filename}</loc>\n";
+					$sIndex .= "<lastmod>" . date('Y-m-d') . "</lastmod>\n";
+					$sIndex .= "</sitemap>\n";
+				}
+
+				$sIndex .= '</sitemapindex>';
+
+				echo $sIndex;
+
+				Core_File::write($sIndexFilePath, $sIndex);
+			}
+			else
+			{
+				echo Core_File::read($sIndexFilePath);
+			}
 		}
 
 		return $this;

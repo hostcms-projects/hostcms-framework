@@ -61,8 +61,8 @@ class Shop_Controller
 	}
 
 	/**
-	 * Convert price 
-	 * @param string $price price 
+	 * Convert price
+	 * @param string $price price
 	 * @param int $decimalPlaces precision
 	 * @return mixed
 	 */
@@ -89,7 +89,7 @@ class Shop_Controller
 		$fItemExchangeRate = $oItem_Currency->exchange_rate;
 		if ($fItemExchangeRate == 0)
 		{
-			throw new Core_Exception('Method getCurrencyCoefficientInShopCurrency(): Item currency %id exchange rate is 0.', array('%id' => $oItem_Currency->id));
+			throw new Core_Exception('Method getCurrencyCoefficientInShopCurrency(): Item "%id" currency exchange rate is 0.', array('%id' => $oItem_Currency->id));
 		}
 
 		// Определяем коэффициент пересчета в валюту магазина
@@ -102,5 +102,32 @@ class Shop_Controller
 		// Без округления
 		//return round($fItemExchangeRate / $fShopExchangeRate, 2);
 		return $fItemExchangeRate / $fShopExchangeRate;
+	}
+
+	/**
+	 * Конвертирование значения из одной меры размера в другую
+	 * @param string $value значение для конвертации
+	 * @param int $sourceMeasure исходная мера
+	 * @param int $destMeasure целевая мера
+	 */
+	static public function convertSizeMeasure($value, $sourceMeasure, $destMeasure = 0)
+	{
+		$sourceMeasure = intval($sourceMeasure);
+		$destMeasure = intval($destMeasure);
+
+		if ($sourceMeasure < 0 || $sourceMeasure > 4 || $destMeasure < 0 || $destMeasure > 4)
+		{
+			throw new Core_Exception('Method convertSizeMeasure(): Measure %id is out of range.', array('%id' => $destMeasure));
+		}
+
+		$aTmp = array(
+			0 => 1, // мм
+			1 => 10, // см
+			2 => 1000, // м
+			3 => 25.4, // дюйм
+			4 => 304.8 // фут
+		);
+
+		return $aTmp[$sourceMeasure] * $value / $aTmp[$destMeasure];
 	}
 }

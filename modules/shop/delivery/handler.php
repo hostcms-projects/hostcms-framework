@@ -38,6 +38,16 @@ abstract class Shop_Delivery_Handler
 	 */
 	protected $_weight = NULL;
 	/**
+	 * postcode
+	 * @var string
+	 */
+	protected $_postcode = NULL;
+	/**
+	 * volume
+	 * @var float
+	 */
+	protected $_volume = NULL;
+	/**
 	 * Set weight
 	 * @param string $fWeight weight
 	 * @return self
@@ -55,6 +65,28 @@ abstract class Shop_Delivery_Handler
 	public function company(Shop_Company_Model $oShop_Company)
 	{
 		$this->_shopCompany = $oShop_Company;
+		return $this;
+	}
+	
+	/** 
+	 * Set postcode
+	 * @param string $sPostcode volume
+	 * @return self
+	 */
+	public function postcode($sPostcode)
+	{
+		$this->_postcode = $sPostcode;
+		return $this;
+	}
+	
+	/** 
+	 * Set volume
+	 * @param float $fVolume volume
+	 * @return self
+	 */
+	public function volume($fVolume)
+	{
+		$this->_volume = $fVolume;
 		return $this;
 	}
 	/**

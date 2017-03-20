@@ -37,6 +37,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		'title',
 		'description',
 		'link',
+		'image',
 		'group',
 		'offset',
 		'limit',
@@ -188,12 +189,19 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 		$this->_Core_Rss
 			->add('title', !is_null($this->title) ? $this->title : $oInformationsystem->name)
-			->add('description', !is_null($this->description) ? $this->description : $oInformationsystem->description);
+			->add('description', !is_null($this->description) ? $this->description : ($this->stripTags
+					? strip_tags($oInformationsystem->description)
+					: $oInformationsystem->description));
 
 		$this->_Core_Rss->add('link', !is_null($this->link)
 			? $this->link
 			: $this->_path
 		);
+
+		if (is_array($this->image) && count($this->image))
+		{
+			$this->_Core_Rss->add('image', $this->image);
+		}
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{

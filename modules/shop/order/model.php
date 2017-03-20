@@ -67,6 +67,7 @@ class Shop_Order_Model extends Core_Entity
 		'shop_country' => array(),
 		'shop_country_location_city' => array(),
 		'shop_country_location_city_area' => array(),
+		'shop_delivery' => array(),
 		'shop_delivery_condition' => array(),
 		'siteuser' => array(),
 		'shop_currency' => array(),
@@ -754,11 +755,14 @@ class Shop_Order_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeCancelPaid', $this);
 
-		$this->paid = 0;
-		$this->payment_datetime = '0000-00-00 00:00:00';
+		if ($this->paid)
+		{
+			$this->paid = 0;
+			$this->payment_datetime = '0000-00-00 00:00:00';
 
-		// Вернуть списанные товары
-		$this->_paidTransaction();
+			// Вернуть списанные товары
+			$this->_paidTransaction();
+		}
 
 		Core_Event::notify($this->_modelName . '.onAfterCancelPaid', $this);
 
@@ -1080,5 +1084,77 @@ class Shop_Order_Model extends Core_Entity
 		}
 
 		return $newObject;
+	}
+
+	/**
+	 * Add order CommerceML
+	 * @param Core_SimpleXMLElement $oXml
+	 */
+	public function addCml(Core_SimpleXMLElement $oXml)
+	{
+		$oOrderXml = $oXml->addChild('Документ');
+		$oOrderXml->addChild('Ид', $this->id);
+		$oOrderXml->addChild('Номер', $this->id);
+		$datetime = explode(' ', $this->datetime);
+		$date = $datetime[0];
+		$time = $datetime[1];
+		$oOrderXml->addChild('Дата', $date);
+		$oOrderXml->addChild('ХозОперация', 'Заказ товара');
+		$oOrderXml->addChild('Роль', 'Продавец');
+		$oOrderXml->addChild('Валюта', $this->Shop_Currency->code);
+		$oOrderXml->addChild('Курс', $this->shop_currency_id > 0 && $this->Shop->shop_currency_id > 0 ? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency($this->Shop_Currency, $this->Shop->Shop_Currency) : 0);
+		$oOrderXml->addChild('Сумма', $this->getAmount());
+
+		$oContractor = $oOrderXml->addChild('Контрагенты');
+		$oContractor = $oContractor->addChild('Контрагент');
+
+		$sContractorName = '';
+		$sContractorName .= $this->surname == '' ? $this->surname : $this->surname . ' ';
+		$sContractorName .= $this->name == '' ? $this->name : $this->name . ' ';
+		$sContractorName .= $this->patronymic;
+
+		$sContractorName == '' && $sContractorName = 'Контрагент #' . $this->siteuser_id;
+
+		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
+		$oContractor->addChild('Ид', $this->siteuser_id
+			? $this->siteuser_id
+			: Core::crc32($sContractorName)
+		);
+
+		$oContractor->addChild('Наименование', $sContractorName);
+		$oContractor->addChild('Роль', 'Покупатель');
+		$oContractor->addChild('ПолноеНаименование', $sContractorName);
+		$oContractor->addChild('Фамилия', $this->surname);
+		$oContractor->addChild('Имя', $this->name);
+		$oContractor->addChild('Отчество', $this->patronymic);
+		$oContractor->addChild('АдресРегистрации')->addChild('Представление', $this->address);
+
+		$oOrderXml->addChild('Время', $time);
+		$oOrderXml->addChild('Комментарий', $this->description);
+
+		$oOrderItems = $oOrderXml->addChild('Товары');
+
+		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
+
+		foreach($aOrderItems as $oOrderItem)
+		{
+			$oCurrentItem = $oOrderItems->addChild('Товар');
+			$oCurrentItem->addChild('Ид', $oOrderItem->Shop_Item->modification_id ? sprintf('%s#%s', $oOrderItem->Shop_Item->Modification->guid, $oOrderItem->Shop_Item->guid) : ($oOrderItem->type == 1 ? 'ORDER_DELIVERY' : $oOrderItem->Shop_Item->guid));
+			$oCurrentItem->addChild('Наименование', $oOrderItem->name);
+			$oCurrentItem->addChild('БазоваяЕдиница', $oOrderItem->Shop_Item->Shop_Measure->name);
+			$oCurrentItem->addChild('ЦенаЗаЕдиницу', $oOrderItem->price);
+			$oCurrentItem->addChild('Количество', $oOrderItem->quantity);
+			$oCurrentItem->addChild('Сумма', $oOrderItem->getAmount());
+
+			$oProperty = $oCurrentItem->addChild('ЗначенияРеквизитов');
+			$oValue = $oProperty->addChild('ЗначениеРеквизита');
+			$oValue->addChild('Наименование', 'ВидНоменклатуры');
+			$oValue->addChild('Значение', $oOrderItem->type == 1 ? 'Услуга' : 'Товар');
+			$oValue = $oProperty->addChild('ЗначениеРеквизита');
+			$oValue->addChild('Наименование', 'ТипНоменклатуры');
+			$oValue->addChild('Значение', $oOrderItem->type == 1 ? 'Услуга' : 'Товар');
+		}
+
+		return $this;
 	}
 }

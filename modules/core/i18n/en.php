@@ -6,7 +6,7 @@
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'admin_menu_0' => 'Site structure',
@@ -127,4 +127,9 @@ return array(
 	'extension_does_not_allow' => 'File extension "%s" does not allow.',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	'redaction0'=>'Free',
+	'redaction1'=>'My site',
+	'redaction3'=>'Small business',
+	'redaction5'=>'Business',
+	'redaction7'=>'Corporation',
 );

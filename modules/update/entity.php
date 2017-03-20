@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Entity extends Core_Entity
 {
@@ -95,7 +95,7 @@ class Update_Entity extends Core_Entity
 				'<img src="/admin/images/add.gif" class="img_line" />',
 				'<img src="/admin/images/edited.gif" class="img_line" />',
 				'<img src="/admin/images/error.gif" class="img_line" />',
-			), $this->description)
+			), htmlspecialchars($this->description))
 		);
 	}
 

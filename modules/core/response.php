@@ -250,7 +250,12 @@ class Core_Response
 	 */
 	public function showBody()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeShowBody', $this);
+
 		echo $this->_body;
+
+		Core_Event::notify(get_class($this) . '.onAfterShowBody', $this);
+
 		return $this;
 	}
 }

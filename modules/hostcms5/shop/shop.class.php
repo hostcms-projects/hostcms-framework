@@ -1356,7 +1356,6 @@ class shop
 	 */
 	function Round($float)
 	{
-		//return sprintf($this->float_format, $float);
 		return Shop_Controller::instance()->round($float);
 	}
 
@@ -7796,29 +7795,6 @@ class shop
 	 */
 	function GetAllItemsForOrder($shop_order_id)
 	{
-		/*$shop_order_id = intval($shop_order_id);
-
-		$queryBuilder = Core_QueryBuilder::select(
-			array('id', 'shop_order_items_id'),
-			array('shop_item_id', 'shop_items_catalog_item_id'),
-			'shop_order_id',
-			array('quantity', 'shop_order_items_quantity'),
-			array(Core_QueryBuilder::expression('ROUND((`price` +  ROUND(`price` * `rate` / 100, 2)) * `quantity`, 2)'), 'shop_order_items_price'),
-			array('name', 'shop_order_items_name'),
-			array('marking', 'shop_order_items_marking'),
-			array('rate', 'shop_tax_rate'),
-			array('user_id', 'users_id'),
-			array('hash', 'shop_order_items_eitem_resource'),
-			//array('shop_item_digital_id', 'shop_eitem_id'),
-			array(Core_QueryBuilder::expression("'0'"), 'shop_eitem_id'),
-			array('type', 'shop_order_items_type'),
-			array('shop_warehouse_id', 'shop_warehouse_id')
-		)
-		->from('shop_order_items')
-		->where('shop_order_id', '=', $shop_order_id)
-		->where('deleted', '=', 0);
-
-		return $queryBuilder->execute()->asAssoc()->getResult();*/
 		return $this->GetOrderItems($shop_order_id);
 	}
 
@@ -8438,7 +8414,7 @@ class shop
 
 		if (isset($param['shop_order_items_price']))
 		{
-			$price = floatval($param['shop_order_items_price']);
+			$price = $param['shop_order_items_price'];
 
 			// shop_order_items_price содержит итоговую цену с налогом, исключаем налог из цены
 			if ($shop_tax_rate)
@@ -8457,7 +8433,6 @@ class shop
 		isset($param['shop_order_items_eitem_resource']) && $oShop_Order_Item->hash = mb_substr($param['shop_order_items_eitem_resource'], 0, 65534);
 
 		is_null($oShop_Order_Item->id) && isset($param['users_id']) && $param['users_id'] && $oShop_Order_Item->user_id = intval($param['users_id']);
-
 
 		$oShop_Order_Item->save();
 
@@ -8553,7 +8528,7 @@ class shop
 			array('shop_item_id', 'shop_items_catalog_item_id'),
 			'shop_order_id',
 			array('quantity', 'shop_order_items_quantity'),
-			array(/*'price'*/Core_QueryBuilder::expression('`price` + ROUND(`price` * `rate` / 100, 2)'), 'shop_order_items_price'),
+			array(Core_QueryBuilder::expression('`price` + ROUND(`price` * `rate` / 100, 2)'), 'shop_order_items_price'),
 			array('name', 'shop_order_items_name'),
 			array('marking', 'shop_order_items_marking'),
 			array('rate', 'shop_tax_rate'),
@@ -12909,9 +12884,6 @@ class shop
 			// Перебираем все группы по очереди
 			foreach ($a_UserGroup as $user_group_id)
 			{
-				/*$user_group_id = each($a_UserGroup);
-				 $user_group_id = $user_group_id['key'];*/
-
 				// Выбираем цену для группы из таблицы цен
 				$row_price = $this->SelectPrice($user_group_id, $item_row['shop_shops_id']);
 
@@ -12967,7 +12939,7 @@ class shop
 			if ($tax && $tax['shop_tax_is_in_price'] == 0)
 			{
 				// То считаем цену с налогом
-				$price['tax'] = Core_Type_Conversion::toFloat($tax['shop_tax_rate']) / 100 * $price['price'];
+				$price['tax'] = $tax['shop_tax_rate'] / 100 * $price['price'];
 				$price['price_tax'] = $price['price'] + $price['tax'];
 			}
 			else
@@ -17384,8 +17356,6 @@ class shop
 						 $kernel = & singleton('kernel');
 
 						 $cache_element_name_xml = $shop_id . "_" . $kernel->implode_array($param, '_');
-
-						 //var_dump($cache_element_name_xml);
 
 						 $cache = & singleton('Cache');
 

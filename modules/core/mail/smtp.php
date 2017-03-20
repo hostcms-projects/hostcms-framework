@@ -31,55 +31,70 @@ class Core_Mail_Smtp extends Core_Mail
 
 		$header .=  $message . $sSingleSeparator;
 
-		$timeout = 30;
+		$timeout = 5;
 		if ($fp = fsockopen($this->_config['host'], $this->_config['port'], $errno, $errstr, $timeout))
 		{
-			if (!$this->_serverParse($fp, "220"))
+			stream_set_timeout($fp, $timeout);
+
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "220"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
 
-			fputs($fp, "HELO {$this->_config['host']}\r\n");
+			fputs($fp, "EHLO {$this->_config['host']}\r\n");
 
-			if (!$this->_serverParse($fp, "250"))
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "250"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
+
+			// Может быть много 250-х
+			do {
+				$server_response = $this->_serverFgets($fp);
+			}
+			while(!feof($fp) && $this->_getResponseStatus($server_response) == "250");
 
 			fputs($fp, "AUTH LOGIN\r\n");
-			if (!$this->_serverParse($fp, "334"))
+			$server_response = $this->_serverFgets($fp); // Получен выше в цикле
+			if (!$this->_serverParse($server_response, "334"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
 
 			fputs($fp, base64_encode($this->_config['username']) . "\r\n");
-			if (!$this->_serverParse($fp, "334"))
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "334"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
 
 			fputs($fp, base64_encode($this->_config['password']) . "\r\n");
-			if (!$this->_serverParse($fp, "235"))
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "235"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
 
 			fputs($fp, "MAIL FROM: <{$this->_config['username']}>\r\n");
-			if (!$this->_serverParse($fp, "250")) {
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "250")) {
 				fclose($fp);
 				return FALSE;
 			}
-			
+
 			$aRecipients = explode(',', $to);
 			foreach ($aRecipients as $sTo)
 			{
 				fputs($fp, "RCPT TO: <{$sTo}>\r\n");
-				if (!$this->_serverParse($fp, "250"))
+				$server_response = $this->_serverFgets($fp);
+				if (!$this->_serverParse($server_response, "250"))
 				{
 					fclose($fp);
 					return FALSE;
@@ -87,14 +102,16 @@ class Core_Mail_Smtp extends Core_Mail
 			}
 
 			fputs($fp, "DATA\r\n");
-			if (!$this->_serverParse($fp, "354"))
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "354"))
 			{
 				fclose($fp);
 				return FALSE;
 			}
 
 			fputs($fp, $header."\r\n.\r\n");
-			if (!$this->_serverParse($fp, "250"))
+			$server_response = $this->_serverFgets($fp);
+			if (!$this->_serverParse($server_response, "250"))
 			{
 				fclose($fp);
 				return FALSE;
@@ -114,15 +131,34 @@ class Core_Mail_Smtp extends Core_Mail
 	}
 
 	/**
+	 * fgets 256 bytes
+	 * @param pointer $socket
+	 * @return mixed
+	 */
+	protected function _serverFgets($socket)
+	{
+		return fgets($socket, 256);
+	}
+
+	/**
+	 * Get status of response
+	 * @param string $server_response
+	 * @return string
+	 */
+	protected function _getResponseStatus($server_response)
+	{
+		return substr($server_response, 0, 3);
+	}
+
+	/**
 	 * Parse server answer
-	 * @param pointer $socket socket pointer
+	 * @param string $server_response
 	 * @param string $response response
 	 * @return string
 	 */
-	protected function _serverParse($socket, $response)
+	protected function _serverParse($server_response, $response)
 	{
-		$server_response = fgets($socket, 256);
-		$result = substr($server_response, 0, 3) == $response;
+		$result = $this->_getResponseStatus($server_response) == $response;
 
 		if (!$result)
 		{

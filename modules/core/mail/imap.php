@@ -149,6 +149,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 		{
 			// imap_errors для пресечения вывода сообщений об ошибках, в том числе, если ящик пуст
 			imap_errors();
+			imap_alerts();
 			imap_close($this->_stream);
 			return $this;
 		}
@@ -215,9 +216,13 @@ class Core_Mail_Imap extends Core_Servant_Properties
 					$this->_aMessages[$i]['from'] = $value->mailbox . "@" . $value->host;
 				}
 			}
+			else
+			{
+				$this->_aMessages[$i]['from'] = '';
+			}
 
 			$this->_aMessages[$i]['subject'] = isset($header_message->subject)
-				? iconv_mime_decode($header_message->subject, 0, 'UTF-8')
+				? iconv_mime_decode($header_message->subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8')
 				: '';
 
 			$i++;
@@ -225,6 +230,10 @@ class Core_Mail_Imap extends Core_Servant_Properties
 
 		// Удалить письма после просмотра
 		$this->delete && $this->_deleteMessages($this->_stream);
+
+		// imap_errors() для пресечения вывода сообщений об ошибках, в том числе, если ящик пуст
+		imap_errors();
+		imap_alerts();
 
 		imap_close($this->_stream);
 

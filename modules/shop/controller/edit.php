@@ -117,6 +117,10 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->move($this->getField('group_image_small_max_height'), $oShopTabFormats)
 			->move($this->getField('group_image_large_max_width'), $oShopTabFormats)
 			->move($this->getField('group_image_large_max_height'), $oShopTabFormats)
+			->move($this->getField('producer_image_small_max_width'), $oShopTabFormats)
+			->move($this->getField('producer_image_small_max_height'), $oShopTabFormats)
+			->move($this->getField('producer_image_large_max_width'), $oShopTabFormats)
+			->move($this->getField('producer_image_large_max_height'), $oShopTabFormats)
 			->move($this->getField('format_date'), $oShopTabFormats)
 			->move($this->getField('format_datetime'), $oShopTabFormats)
 			->move($this->getField('typograph_default_items'), $oShopTabFormats)
@@ -227,16 +231,16 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			// Добавляем группу магазинов
 			$oMainTab->addAfter
 			(
-				Core::factory("Admin_Form_Entity_Select")
-				->name('shop_dir_id')
-				->caption(Core::_('Shop.shop_dir_id'))
-				//->divAttr(array('style' => 'float: left'))
-				->style("width: 320px")
-				->options(
-					array(' … ') + $this->_fillShopDir()
-				)
-				->value($this->_object->shop_dir_id),
-				$this->getField('name')
+				Admin_Form_Entity::factory('Select')
+					->name('shop_dir_id')
+					->caption(Core::_('Shop.shop_dir_id'))
+					//->divAttr(array('style' => 'float: left'))
+					->style("width: 320px")
+					->options(
+						array(' … ') + $this->_fillShopDir()
+					)
+					->value($this->_object->shop_dir_id),
+					$this->getField('name')
 			);
 
 			// Получаем поле описания магазина
@@ -252,7 +256,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$Structure_Controller_Edit = new Structure_Controller_Edit($this->_Admin_Form_Action);
 
 			// Добавляем структуру
-			$oStructureSelectField = Core::factory("Admin_Form_Entity_Select")
+			$oStructureSelectField = Admin_Form_Entity::factory('Select')
 				->name('structure_id')
 				->caption(Core::_('Shop.structure_id'))
 				->options(
@@ -273,7 +277,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 
 			// Добавляем группы пользователей сайта
-			$oShopUserGroupSelect = Core::factory("Admin_Form_Entity_Select")
+			$oShopUserGroupSelect = Admin_Form_Entity::factory('Select')
 				->name('siteuser_group_id')
 				->caption(Core::_('Shop.siteuser_group_id'))
 				->style("width: 190px")
@@ -284,7 +288,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$oMainTab->addAfter($oShopUserGroupSelect, $oStructureSelectField);
 
 			// Добавляем компании
-			$oCompaniesField = Core::factory("Admin_Form_Entity_Select")
+			$oCompaniesField = Admin_Form_Entity::factory('Select')
 				->name('shop_company_id')
 				->caption(Core::_('Shop.shop_company_id'))
 				->style("width: 190px")
@@ -301,7 +305,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем валюты
-			$oCurrencyField = Core::factory("Admin_Form_Entity_Select")
+			$oCurrencyField = Admin_Form_Entity::factory('Select')
 				->name('shop_currency_id')
 				->caption(Core::_('Shop.shop_currency_id'))
 				->style("width: 190px")
@@ -318,7 +322,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем страны
-			$oCountriesField = Core::factory("Admin_Form_Entity_Select")
+			$oCountriesField = Admin_Form_Entity::factory('Select')
 				->name('shop_country_id')
 				->caption(Core::_('Shop.shop_country_id'))
 				->style("width: 190px")
@@ -335,7 +339,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем статусы заказов
-			$oOrderStatusField = Core::factory("Admin_Form_Entity_Select")
+			$oOrderStatusField = Admin_Form_Entity::factory('Select')
 				->name('shop_order_status_id')
 				->caption(Core::_('Shop.shop_order_status_id'))
 				->style("width: 190px")
@@ -352,7 +356,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем единицы измерения
-			$oMeasuresField = Core::factory("Admin_Form_Entity_Select")
+			$oMeasuresField = Admin_Form_Entity::factory('Select')
 				->name('shop_measure_id')
 				->caption(Core::_('Shop.shop_measure_id'))
 				->style("width: 190px")
@@ -379,11 +383,11 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->divAttr(array('style' => 'float: left'));
 
 			// Добавляем тип URL
-			$oUrlTypeField = Core::factory("Admin_Form_Entity_Select")
+			$oUrlTypeField = Admin_Form_Entity::factory('Select')
 				->name('url_type')
 				->caption(Core::_('Shop.url_type'))
 				->style("width: 190px")
-				->divAttr(array('style' => 'float: left'))
+				//->divAttr(array('style' => 'float: left'))
 				->options(
 					array(
 						Core::_('Shop.shop_shops_url_type_element_0'),
@@ -438,7 +442,25 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->getField('format_date')
 				->style("width: 300px; margin-right: 30px")
 				->divAttr(array('style' => 'float: left'));
+				
+			$this->getField('producer_image_small_max_width')
+				->style("width: 300px; margin-right: 30px")
+				->divAttr(array('style' => 'float: left'));
+			$this->getField('producer_image_small_max_height')
+				->style("width: 300px; margin-right: 30px")
+				->divAttr(array('style' => 'float: left'));
+			
+			$oShopTabFormats->addAfter($oSeparatorField, $this->getField('producer_image_small_max_height'));
+			
+			$this->getField('producer_image_large_max_width')
+				->style("width: 300px; margin-right: 30px")
+				->divAttr(array('style' => 'float: left'));
+			$this->getField('producer_image_large_max_height')
+				->style("width: 300px; margin-right: 30px")
+				->divAttr(array('style' => 'float: left'));
 
+			$oShopTabFormats->addAfter($oSeparatorField, $this->getField('producer_image_large_max_height'));
+			
 			$oShopTabFormats->addAfter($oSeparatorField,
 				$this->getField('format_datetime')
 					->style("width: 300px")
@@ -501,7 +523,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем поле сортировки товара
-			$oItemsSortingField = Core::factory("Admin_Form_Entity_Select")
+			$oItemsSortingField = Admin_Form_Entity::factory('Select')
 				->name('items_sorting_field')
 				->caption(Core::_('Shop.items_sorting_field'))
 				->style("width: 300px")
@@ -523,7 +545,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 
 			// Добавляем направление сортировки товара
-			$oItemsSortingDirection = Core::factory("Admin_Form_Entity_Select")
+			$oItemsSortingDirection = Admin_Form_Entity::factory('Select')
 				->name('items_sorting_direction')
 				->caption(Core::_('Shop.items_sorting_direction'))
 				->style("width: 300px")
@@ -549,7 +571,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем поле сортировки групп
-			$oGroupsSortingField = Core::factory("Admin_Form_Entity_Select")
+			$oGroupsSortingField = Admin_Form_Entity::factory('Select')
 				->name('groups_sorting_field')
 				->caption(Core::_('Shop.groups_sorting_field'))
 				->style("width: 300px")
@@ -569,7 +591,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			// Добавляем направление сортировки групп
-			$oGroupsSortingDirection = Core::factory("Admin_Form_Entity_Select")
+			$oGroupsSortingDirection = Admin_Form_Entity::factory('Select')
 				->name('groups_sorting_direction')
 				->caption(Core::_('Shop.groups_sorting_direction'))
 				->style("width: 300px")
@@ -587,6 +609,20 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			(
 				$oGroupsSortingDirection
 			);
+			
+			$oMainTab->delete($this->getField('size_measure'));
+
+			$oMainTab->addAfter(Admin_Form_Entity::factory('Select')
+				->name('size_measure')
+				->caption(Core::_('Shop.size_measure'))
+				->style("width: 190px")
+				->divAttr(array('style' => 'float: left'))
+				->options(array(Core::_('Shop.size_measure_0'),
+					Core::_('Shop.size_measure_1'),
+					Core::_('Shop.size_measure_2'),
+					Core::_('Shop.size_measure_3'),
+					Core::_('Shop.size_measure_4')))
+				->value($this->_object->size_measure), $oUrlTypeField);
 
 			break;
 		}

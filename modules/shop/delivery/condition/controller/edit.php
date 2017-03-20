@@ -155,6 +155,18 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					$this->getField('shop_country_location_city_area_id')
 				);
 
+				$oMainTab->delete(
+					$this->getField('shop_country_id_inverted')
+				);
+				$oMainTab->delete(
+					$this->getField('shop_country_location_id_inverted')
+				);
+				$oMainTab->delete(
+					$this->getField('shop_country_location_city_id_inverted')
+				);
+				$oMainTab->delete(
+					$this->getField('shop_country_location_city_area_id_inverted')
+				);
 				$lastField = $this->generateCountryFields($this,
 						$oMainTab,
 						$this->getField('name')
@@ -311,9 +323,15 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				)
 			->value($object->_object->shop_country_id)
 			->onchange("$('#{$windowId} #list4').clearSelect();$('#{$windowId} #list3').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list2', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList2',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+			$CountriesSelectField
+				->invertor(true)
+				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_id_inverted'))
+				->inverted($object->_object->shop_country_id_inverted);
+		}
 
 		// Добавляем страны
-		if(is_null($fieldAfter))
+		if (is_null($fieldAfter))
 		{
 			$tab->add($CountriesSelectField);
 		}
@@ -333,6 +351,12 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				)
 			->value($object->_object->shop_country_location_id)
 			->onchange("$('#{$windowId} #list4').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list3', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList3',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+			$CountryLocationsSelectField
+				->invertor(true)
+				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_id_inverted'))
+				->inverted($object->_object->shop_country_location_id_inverted);
+		}
 
 		// Добавляем местоположения
 		$tab->addAfter($CountryLocationsSelectField, $CountriesSelectField);
@@ -350,6 +374,13 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 			->value($object->_object->shop_country_location_city_id)
 			->onchange("$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list4', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList4',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
 
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+			$CountryLocationCitiesSelectField
+				->invertor(true)
+				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id_inverted'))
+				->inverted($object->_object->shop_country_location_city_id_inverted);
+		}
+
 		// Добавляем города
 		$tab->addAfter($CountryLocationCitiesSelectField, $CountryLocationsSelectField);
 
@@ -363,6 +394,12 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					$Shop_Controller_Edit->fillCountryLocationCityAreas($object->_object->shop_country_location_city_id)
 				)
 			->value($object->_object->shop_country_location_city_area_id);
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+			$CountryLocationCityAreasSelectField
+				->invertor(true)
+				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id_inverted'))
+				->inverted($object->_object->shop_country_location_city_area_id_inverted);
+		}
 
 		// Добавляем районы
 		$tab->addAfter($CountryLocationCityAreasSelectField, $CountryLocationCitiesSelectField);

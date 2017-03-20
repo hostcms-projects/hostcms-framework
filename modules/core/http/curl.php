@@ -32,10 +32,10 @@ class Core_Http_Curl extends Core_Http
 		}
 		else
 		{
-			count($this->_data) && curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_data);
-
 			curl_setopt($curl, CURLOPT_POST, TRUE);
 			curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
+
+			count($this->_data) && curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_data);
 		}
 
 		foreach ($this->_config['options'] as $optionName => $optionValue)

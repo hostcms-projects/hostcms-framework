@@ -81,13 +81,30 @@ class Core_Session
 				array($oCore_Session, 'sessionGc')
 			);
 
-			$expires = self::getMaxLifeTime();
+			//$expires = self::getMaxLifeTime();
+			$expires = 31536000;
 
 			if (!defined('DENY_INI_SET') || !DENY_INI_SET)
 			{
 				// Период хранения куки в секундах. Значение 0 означает "пока браузер не будет закрыт"
 				ini_set('session.cookie_lifetime', $expires);
-				ini_set('session.gc_maxlifetime', $expires);
+				//ini_set('session.gc_maxlifetime', $expires);
+			}
+
+			$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
+			if (!empty($domain) && !headers_sent())
+			{
+				// Обрезаем www у домена
+				strpos($domain, 'www.') === 0 && $domain = substr($domain, 4);
+
+				// Явное указание domain возможно только для домена второго и более уровня
+				// http://wp.netscape.com/newsref/std/cookie_spec.html
+				// http://web-notes.ru/2008/07/cookies_within_local_domains/
+				$domain = strpos($domain, '.') !== FALSE && !Core_Valid::ip($domain)
+					? '.' . $domain
+					: '';
+
+				session_set_cookie_params($expires, '/', $domain);
 			}
 
 			// При повторном запуске $_SESSION уже будет
@@ -97,15 +114,16 @@ class Core_Session
 				self::$_started = TRUE;
 			//}
 
-			self::_setCookie();
+			//self::_setCookie();
 		}
+
 		return TRUE;
 	}
 
 	/**
 	 * Set cookie with expiration date
 	 */
-	static protected function _setCookie()
+	/*static protected function _setCookie()
 	{
 		$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
 		if (!empty($domain) && !headers_sent())
@@ -123,8 +141,13 @@ class Core_Session
 			$expires = self::getMaxLifeTime();
 
 			setcookie(session_name(), session_id(), time() + $expires, '/', $domain);
+
+			// Заменяем заголовок ($replace = TRUE)
+			//Core::setcookie(session_name(), session_id(), time() + $expires, '/', $domain, FALSE, TRUE, $replace = TRUE);
+			//session_set_cookie_params(time() + $expires, '/', $domain);
+			//session_id(session_id());
 		}
-	}
+	}*/
 
 	/**
 	 * Callback function
@@ -269,6 +292,11 @@ class Core_Session
 	{
 		self::$_maxlifetime = $maxlifetime;
 
+		if (!defined('DENY_INI_SET') || !DENY_INI_SET)
+		{
+			ini_set('session.gc_maxlifetime', $maxlifetime);
+		}
+
 		// Для уже запущенной сесии обновляем время жизни
 		if (self::$_started)
 		{
@@ -280,7 +308,7 @@ class Core_Session
 				->execute();
 
 			// Set cookie with expiration date
-			self::_setCookie();
+			//self::_setCookie();
 		}
 
 		return TRUE;

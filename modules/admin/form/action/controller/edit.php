@@ -121,7 +121,17 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 			$oAdmin_Form_Action = $this->_object;
 			foreach ($aAdmin_Languages as $oAdmin_Language)
 			{
-				$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Word->getWordByLanguage($oAdmin_Language->id);
+				if ($oAdmin_Form_Action->admin_word_id)
+				{
+					$oAdmin_Word = $oAdmin_Form_Action->Admin_Word;
+				}
+				else
+				{
+					$oAdmin_Word = Core_Entity::factory('Admin_Word');
+					$oAdmin_Form_Action->add($oAdmin_Word);
+				}
+				
+				$oAdmin_Word_Value = $oAdmin_Word->getWordByLanguage($oAdmin_Language->id);
 
 				$name = Core_Array::getPost('name_lng_' . $oAdmin_Language->id);
 				$description = Core_Array::getPost('description_lng_' . $oAdmin_Language->id);
@@ -135,9 +145,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				$oAdmin_Word_Value->name = $name;
 				$oAdmin_Word_Value->description = $description;
 				$oAdmin_Word_Value->save();
-				$oAdmin_Form_Action->Admin_Word->add($oAdmin_Word_Value);
-
-				$oAdmin_Form_Action->add($oAdmin_Form_Action->Admin_Word);
+				$oAdmin_Word->add($oAdmin_Word_Value);
 			}
 		}
 

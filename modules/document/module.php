@@ -20,7 +20,7 @@ class Document_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2013-11-15';
+	public $date = '2014-01-20';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

@@ -39,7 +39,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			$this->getField('shop_id')
 		);
 
-		$oShopField = Core::factory("Admin_Form_Entity_Select")
+		$oShopField = Admin_Form_Entity::factory('Select')
 			->name('shop_id')
 			->caption(Core::_('Shop_Payment_System.shop_id'))
 			->style("width: 190px")
@@ -63,7 +63,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
-		$oCurrencyField = Core::factory("Admin_Form_Entity_Select")
+		$oCurrencyField = Admin_Form_Entity::factory('Select')
 			->name('shop_currency_id')
 			->caption(Core::_('Shop_Payment_System.shop_currency_id'))
 			->style("width: 110px")

@@ -270,7 +270,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oShopGroupSelect = Admin_Form_Entity::factory('Select');
 					$oShopGroupSelect->caption(Core::_('Shop_Item.shop_group_id'))
-					->options(array(' … ') + $this->fillShopGroup($this->_object->shop_id))
+					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
 					->name('shop_group_id')
 					->value($this->_object->shop_group_id)
 					->style('width:300px; float:left')
@@ -677,6 +677,16 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value(implode(", ", $this->_object->Tags->findAll()));
 					$oShopItemTabTags->add($oTagsField);
 				}
+				
+				$oMultiplSign = Admin_Form_Entity::factory('Div')->divAttr(array('style' => 'float: left;padding:10px;height:25px;position: relative;'))->style("position:absolute;bottom:0;left:0;width: 100%;text-align:center;font-size:large;")->value('×');
+				$oLengthField = $this->getField('length')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_length'));
+				$oMainTab->addAfter($oMultiplSign, $oLengthField);
+				$oWidthField = $this->getField('width')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_width'));
+				$oMainTab->addAfter($oMultiplSign, $oWidthField);
+				$oHeightField = $this->getField('height')->divAttr(array('style' => 'float: left;padding-right:0px;'))->style("width: 120px")->caption(Core::_('Shop_Item.item_height'));
+				$oMainTab->addAfter(Admin_Form_Entity::factory('Div')->divAttr(array('style' => 'float: left;padding:10px;height:25px;position: relative;'))->style("padding-left:10px;position:absolute;bottom:0;left:0;width: 100%;text-align:center;")->value(Core::_('Shop.size_measure_'.$oShop->size_measure)), $oHeightField);
+				
+				
 			break;
 
 			case 'shop_group':
@@ -760,7 +770,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopGroupParentSelect = Admin_Form_Entity::factory('Select');
 
 				$oShopGroupParentSelect->caption(Core::_('Shop_Group.parent_id'))
-					->options(array(' … ') + $this->fillShopGroup($this->_object->shop_id, 0, array($this->_object->id)))
+					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
 					->value($this->_object->parent_id);
 
@@ -1645,7 +1655,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 * Shop groups tree
 	 * @var array
 	 */
-	protected $_aGroupTree = array();
+	static protected $_aGroupTree = array();
 
 	/**
 	 * Build visual representation of group tree
@@ -1655,7 +1665,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 * @param int $iLevel current nesting level
 	 * @return array
 	 */
-	public function fillShopGroup($iShopId, $iShopGroupParentId = 0, $aExclude = array(), $iLevel = 0)
+	static public function fillShopGroup($iShopId, $iShopGroupParentId = 0, $aExclude = array(), $iLevel = 0)
 	{
 		$iShopId = intval($iShopId);
 		$iShopGroupParentId = intval($iShopGroupParentId);
@@ -1673,26 +1683,26 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			foreach ($aTmp as $aGroup)
 			{
-				$this->_aGroupTree[$aGroup['parent_id']][] = $aGroup;
+				self::$_aGroupTree[$aGroup['parent_id']][] = $aGroup;
 			}
 		}
 
 		$aReturn = array();
 
-		if (isset($this->_aGroupTree[$iShopGroupParentId]))
+		if (isset(self::$_aGroupTree[$iShopGroupParentId]))
 		{
 			$countExclude = count($aExclude);
-			foreach ($this->_aGroupTree[$iShopGroupParentId] as $childrenGroup)
+			foreach (self::$_aGroupTree[$iShopGroupParentId] as $childrenGroup)
 			{
 				if ($countExclude == 0 || !in_array($childrenGroup['id'], $aExclude))
 				{
 					$aReturn[$childrenGroup['id']] = str_repeat('  ', $iLevel) . $childrenGroup['name'];
-					$aReturn += $this->fillShopGroup($iShopId, $childrenGroup['id'], $aExclude, $iLevel + 1);
+					$aReturn += self::fillShopGroup($iShopId, $childrenGroup['id'], $aExclude, $iLevel + 1);
 				}
 			}
 		}
 
-		$iLevel == 0 && $this->_aGroupTree = array();
+		$iLevel == 0 && self::$_aGroupTree = array();
 
 		return $aReturn;
 	}

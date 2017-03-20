@@ -17,6 +17,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 	 * @return Core_Response
 	 * @hostcms-event Core_Command_Controller_Default.onBeforeShowAction
 	 * @hostcms-event Core_Command_Controller_Default.onAfterShowAction
+	 * @hostcms-event Core_Command_Controller_Default.onBeforeSetTemplate
 	 */
 	public function showAction()
 	{
@@ -367,7 +368,9 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				->header('Cache-control', "{$sCacheControlType}, max-age={$max_age}");
 		}
 
-		// Tamplate might be changed at lib config
+		Core_Event::notify(get_class($this) . '.onBeforeSetTemplate', $this);
+		
+		// Template might be changed at lib config
 		$oTemplate = $oCore_Page->template;
 
 		$oCore_Page

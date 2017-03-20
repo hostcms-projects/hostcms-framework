@@ -49,6 +49,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					//->cols(140)
 					->rows(15)
+					->style('height: 500px; width: 100%')
 					->caption(Core::_('Document_Version.text'))
 					->name('text')
 					->wysiwyg(TRUE)

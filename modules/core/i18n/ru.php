@@ -6,7 +6,7 @@
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'admin_menu_0' => 'Структура сайта',
@@ -129,4 +129,9 @@ return array(
 	'extension_does_not_allow' => 'Загружать файл с расширением "%s" запрещено.',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	'redaction0'=>'Халява',
+	'redaction1'=>'Мой сайт',
+	'redaction3'=>'Малый бизнес',
+	'redaction5'=>'Бизнес',
+	'redaction7'=>'Корпорация',
 );

@@ -672,4 +672,14 @@ class Core
 
 		return $version;
 	}
+	
+	static public function setCookie($name, $value, $expire = 0, $path = '', $domain = '', $secure = FALSE, $httponly = FALSE, $replace = FALSE)
+	{
+		header('Set-Cookie: ' . rawurlencode($name) . '=' . rawurlencode($value)
+		  . (empty($expire) ? '' : '; expires=' . gmdate('D, d-M-Y H:i:s', $expire) . ' GMT')
+		  . (empty($path) ? '' : '; path=' . $path)
+		  . (empty($domain) ? '' : '; domain=' . $domain)
+		  . (!$secure ? '' : '; secure')
+		  . (!$httponly ? '' : '; HttpOnly'), $replace);
+	}
 }

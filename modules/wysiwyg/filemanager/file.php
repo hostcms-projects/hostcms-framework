@@ -115,13 +115,22 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	}
 
 	/**
+	 * Get full file path for current file
+	 * @return string
+	 */
+	protected function _getFullPath()
+	{
+		return $this->path . DIRECTORY_SEPARATOR . Core_File::convertfileNameToLocalEncoding($this->name);
+	}
+
+	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
 	 */
 	public function delete($primaryKey = NULL)
 	{
-		$filePath = $this->path . DIRECTORY_SEPARATOR . Core_File::convertfileNameToLocalEncoding($this->name);
+		$filePath = $this->_getFullPath();
 
 		$this->type == 'file'
 			? Core_File::delete($filePath)
@@ -156,7 +165,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 */
 	public function download()
 	{
-		$filePath = $this->path . DIRECTORY_SEPARATOR . Core_File::convertfileNameToLocalEncoding($this->name);
+		$filePath = $this->_getFullPath();
 
 		Core_File::download($filePath, $this->name, array('content_disposition' => 'attachment'));
 		exit();
@@ -180,10 +189,159 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	{
 		if ($this->type == 'file')
 		{
+			$aExt = array('JPG', 'JPEG', 'GIF', 'PNG');
+
 			// Ассоциированные иконки
 			$ext = Core_File::getExtension($this->name);
 
 			$icon_file = '/admin/images/icons/' . (isset(Core::$mainConfig['fileIcons'][$ext]) ? Core::$mainConfig['fileIcons'][$ext] : 'file.gif');
+
+			try
+			{
+				if (Core_File::isValidExtension($this->name, $aExt))
+				{
+					$sImgContent = NULL;
+
+					$filePath = $this->_getFullPath();
+
+					/// ------
+					$maxWidth = 48;
+					$maxHeight = 48;
+
+					$picsize = Core_Image::getImageSize($filePath);
+
+					if ($picsize)
+					{
+						$sourceX = $picsize['width'];
+						$sourceY = $picsize['height'];
+
+						/* Если размеры исходного файла больше максимальных, тогда масштабируем*/
+						if (($sourceX > $maxWidth || $sourceY > $maxHeight))
+						{
+							$destX = $sourceX;
+							$destY = $sourceY;
+
+							// Масштабируем сначала по X
+							if ($destX > $maxWidth && $maxWidth != 0)
+							{
+								$coefficient = $sourceY / $sourceX;
+								$destX = $maxWidth;
+								$destY = ceil($maxWidth * $coefficient);
+							}
+
+							// Масштабируем по Y
+							if ($destY > $maxHeight && $maxHeight != 0)
+							{
+								$coefficient = $sourceX / $sourceY;
+								$destX = ceil($maxHeight * $coefficient);
+								$destY = $maxHeight;
+							}
+
+							// в $destX и $destY теперь хранятся размеры оригинального изображения после уменьшения
+							// от них рассчитываем размеры для обрезания на втором шаге
+							$destX_step2 = $maxWidth;
+							// Масштабируем сначала по X
+							if ($destX > $maxWidth && $maxWidth != 0)
+							{
+								// Позиции, с которых необходимо вырезать
+								$src_x = ceil(($destX - $maxWidth) / 2);
+							}
+							else
+							{
+								$src_x = 0;
+							}
+
+							// Масштабируем по Y
+							if ($destY > $maxHeight && $maxHeight != 0)
+							{
+								$destY_step2 = $maxHeight;
+								$destX_step2 = $destX;
+
+								// Позиции, с которых необходимо вырезать
+								$src_y = ceil(($destY - $maxHeight) / 2);
+							}
+							else
+							{
+								$destY_step2 = $destY;
+								$src_y = 0;
+							}
+
+							$targetResourceStep1 = imagecreatetruecolor($destX, $destY);
+
+							$ext = Core_File::getExtension($this->name);
+							if ($ext == 'jpg' || $ext == 'jpeg')
+							{
+								$quality = JPG_QUALITY;
+
+								$sourceResource = imagecreatefromjpeg($filePath);
+
+								if ($sourceResource)
+								{
+									// Изменяем размер оригинальной картинки и копируем в созданую картинку
+									imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
+
+									ob_start();
+									//imagejpeg($targetResourceStep1, $quality);
+									imagejpeg($targetResourceStep1);
+									$sImgContent = ob_get_clean();
+
+									imagedestroy($sourceResource);
+								}
+							}
+							elseif ($ext == 'png')
+							{
+								$sourceResource = imagecreatefrompng($filePath);
+
+								if ($sourceResource)
+								{
+									imagealphablending($targetResourceStep1, FALSE);
+									imagesavealpha($targetResourceStep1, TRUE);
+
+									imagecopyresized($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
+
+									ob_start();
+									imagepng($targetResourceStep1);
+									$sImgContent = ob_get_clean();
+
+									imagedestroy($sourceResource);
+								}
+							}
+							elseif ($ext == 'gif')
+							{
+								$sourceResource = imagecreatefromgif($filePath);
+
+								if ($sourceResource)
+								{
+									Core_Image_Gd::setTransparency($targetResourceStep1, $sourceResource);
+
+									imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
+
+									ob_start();
+									imagegif($targetResourceStep1);
+									$sImgContent = ob_get_clean();
+
+									imagedestroy($sourceResource);
+								}
+							}
+							else
+							{
+								imagedestroy($targetResourceStep1);
+
+								return FALSE;
+							}
+
+							imagedestroy($targetResourceStep1);
+						}
+						else
+						{
+							$sImgContent = Core_File::read($filePath);
+						}
+
+						$icon_file = "data:" . Core_Mime::getFileMime($filePath) . ";base64," . base64_encode($sImgContent);
+					}
+				}
+			}
+			catch (Exception $e) { }
 		}
 		else
 		{
@@ -192,7 +350,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 				: '/admin/images/folder.gif';
 		}
 
-		?><img src="<?php echo $icon_file?>" /><?php
+		?><div class="fm_preview"><img src="<?php echo $icon_file?>" /></div><?php
 	}
 
 	/**

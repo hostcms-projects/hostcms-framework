@@ -47,10 +47,34 @@ class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 				// Поле orderfield внесено для того, чтобы поля со всеми заполенынми условиями были выше
 				//->select(array(Core_QueryBuilder::expression('IF ( `min_weight` > 0 AND `max_weight` > 0 AND  `min_price` > 0 AND `max_price` > 0, 1, 0)'), 'orderfield'))
 				// Отрезаем по Стране, Области, Городу и Району
+				->open()
+				->where('shop_country_id_inverted', '=', '0')
 				->where('shop_country_id', '=', $shop_country_id)
+				->setOr()
+				->where('shop_country_id_inverted', '=', '1')
+				->where('shop_country_id', '!=', $this->shop_country_id) // здесь всегда исходное значение переменной!
+				->close()
+				->open()
+				->where('shop_country_location_id_inverted', '=', '0')
 				->where('shop_country_location_id', '=', $shop_country_location_id)
+				->setOr()
+				->where('shop_country_location_id_inverted', '=', '1')
+				->where('shop_country_location_id', '!=', $this->shop_country_location_id) // здесь всегда исходное значение переменной!
+				->close()
+				->open()
+				->where('shop_country_location_city_id_inverted', '=', '0')
 				->where('shop_country_location_city_id', '=', $shop_country_location_city_id)
+				->setOr()
+				->where('shop_country_location_city_id_inverted', '=', '1')
+				->where('shop_country_location_city_id', '!=', $this->shop_country_location_city_id) // здесь всегда исходное значение переменной!
+				->close()
+				->open()
+				->where('shop_country_location_city_area_id_inverted', '=', '0')
 				->where('shop_country_location_city_area_id', '=', $shop_country_location_city_area_id)
+				->setOr()
+				->where('shop_country_location_city_area_id_inverted', '=', '1')
+				->where('shop_country_location_city_area_id', '!=', $this->shop_country_location_city_area_id) // здесь всегда исходное значение переменной!
+				->close()
 				->where('active', '=', 1)
 				// Основная обрезка по характеристикам заказа
 				->where('min_weight', '<=', $this->totalWeight)
@@ -75,7 +99,7 @@ class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 				->limit(1);
 
 			$aShop_Delivery_Conditions = $oShop_Delivery_Conditions->findAll();
-
+			
 			// Проверяем выбрали ли хотя бы одну запись
 			if (count($aShop_Delivery_Conditions) > 0)
 			{

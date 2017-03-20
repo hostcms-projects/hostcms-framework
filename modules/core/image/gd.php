@@ -60,14 +60,14 @@ class Core_Image_Gd extends Core_Image
 				{
 					$coefficient = $sourceY / $sourceX;
 					$destX = $maxWidth;
-					$destY = $maxWidth * $coefficient;
+					$destY = ceil($maxWidth * $coefficient);
 				}
 
 				// Масштабируем по Y
 				if ($destY > $maxHeight && $maxHeight != 0)
 				{
 					$coefficient = $sourceX / $sourceY;
-					$destX = $maxHeight * $coefficient;
+					$destX = ceil($maxHeight * $coefficient);
 					$destY = $maxHeight;
 				}
 			}
@@ -84,7 +84,7 @@ class Core_Image_Gd extends Core_Image
 					{
 						$coefficient = $sourceY / $sourceX;
 						$destX = $maxWidth;
-						$destY = $maxWidth * $coefficient;
+						$destY = ceil($maxWidth * $coefficient);
 					}
 				}
 				// division by zero
@@ -94,7 +94,7 @@ class Core_Image_Gd extends Core_Image
 					if ($destY > $maxHeight && $maxHeight != 0)
 					{
 						$coefficient = $sourceX / $sourceY;
-						$destX = $maxHeight * $coefficient;
+						$destX = ceil($maxHeight * $coefficient);
 						$destY = $maxHeight;
 					}
 				}

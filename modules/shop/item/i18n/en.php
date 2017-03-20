@@ -260,5 +260,10 @@ return array(
 	'item_cards_sign' => "Signature of responsible person",
 	'manufacturer_warranty' => '<acronym title="Checks if product has just a manufacturer warranty">Manufacturer warranty</acronym>',
 	'country_of_origin' => '<acronym title="Country of origin">Country of origin</acronym>',
-	'apply_price_for_modification' => "<acronym title=\"Apply price and currency for modifications\">Apply price for modifications</acronym>",	
+	'apply_price_for_modification' => "<acronym title=\"Apply price and currency for modifications\">Apply price for modifications</acronym>",
+	'item_length'=>'Length',
+	'item_width'=>'Width',
+	'item_height'=>'Height',
+	'show_in_group'=>'Show property in group',
+	'show_in_item'=>'Show property in item',
 );

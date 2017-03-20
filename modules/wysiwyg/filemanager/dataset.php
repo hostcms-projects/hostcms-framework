@@ -203,5 +203,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 		{
 			return $this->_newObject();
 		}
+		
+		return NULL;
 	}
 }

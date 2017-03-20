@@ -88,7 +88,6 @@ class Constant_Model extends Core_Entity
 	public function changeStatus()
 	{
 		$this->active = 1 - $this->active;
-		$this->save();
-		return $this;
+		return $this->save();
 	}
 }

@@ -123,7 +123,7 @@ class Skin_Hostcms5 extends Core_Skin
 		{
 			// Получаем данные о корневом пути для группы, в которой размещен текущий пользователь
 			$oUser = Core_Entity::factory('User')->getCurrent();
-			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo htmlspecialchars($oUser
+			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo Core_Str::escapeJavascriptVariable($oUser
 				? $oUser->User_Group->root_dir
 				: '')?>');<?php
 		}
@@ -806,7 +806,7 @@ if (Core_Auth::logged())
 		<table border="0">
 			<tr>
 				<td valign="top"><?php echo Core::_('Admin.index_tech_date_hostcms')?>
-				<span class="success"><?php echo htmlspecialchars(strip_tags(CURRENT_VERSION))?> </span> <br />
+				<span class="success"><?php echo htmlspecialchars(strip_tags(Core::_('Core.redaction' . Core_Array::get(Core::$config->get('core_hostcms'), 'integration', 0)) . ' ' . CURRENT_VERSION))?> </span> <br />
 				<?php echo Core::_('Admin.index_tech_date_php')?>
 				<span class="<?php echo version_compare(phpversion(), '5.2.2', ">=") ? 'success' :'error'?>">
 					<?php echo htmlspecialchars(phpversion())?> </span> <br />

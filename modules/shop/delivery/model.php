@@ -26,7 +26,6 @@ class Shop_Delivery_Model extends Core_Entity
 		'shop_delivery_condition' => array(),
 		'shop_delivery_payment_system' => array(),
 		'shop_payment_system' => array('through' => 'shop_delivery_payment_system')
-
 	);
 
 	/**
@@ -103,8 +102,7 @@ class Shop_Delivery_Model extends Core_Entity
 	 */
 	public function getHref()
 	{
-		return '/' . $this->Shop->getHref()
-		. '/types_of_delivery/';
+		return '/' . $this->Shop->getHref() . '/types_of_delivery/';
 	}
 
 	/**

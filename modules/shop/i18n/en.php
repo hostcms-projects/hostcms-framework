@@ -50,6 +50,12 @@ return array(
 	'group_image_small_max_height' => '<acronym title="Maximum height of small image for group">Maximum height of small image for group</acronym>',
 	'group_image_large_max_width' => '<acronym title="Maximum width of large image for group">Maximum width of large image for group</acronym>',
 	'group_image_large_max_height' => '<acronym title="Maximum height of large image for group">Maximum height of large image for group</acronym>',
+	
+	'producer_image_small_max_width' => '<acronym title="Maximum height of large image for producer">Maximum height of large image</acronym>',
+	'producer_image_small_max_height' => '<acronym title="Maximum height of small image for producer">Maximum height of small image </acronym>',
+	'producer_image_large_max_width' => '<acronym title="Maximum width of large image for producer">Maximum width of large image</acronym>',
+	'producer_image_large_max_height' => '<acronym title="Maximum height of large image for producer">Maximum height of large image</acronym>',
+	
 	'format_date' => '<acronym title="Date display format, e.g. %d.%m.%Y">Date format</acronym>',
 	'format_datetime' => '<acronym title="Date/time display format, e.g. %d.%m.%Y %H:%M:%S">Date/time format</acronym>',
 	'typograph_default_items' => '<acronym title="Parameter that enables you to specify a default prepress service for products">Use prepress service to products</acronym>',
@@ -106,4 +112,10 @@ return array(
 	'tag' => 'Tag: %s',
 	'comment_mail_subject' => 'Add comment/reply to website',
 	'deleteEmptyDirs_success' => 'Empty dirs have been deleted!',
+	'size_measure'=>"Unit of measurement of the item's dimensions",
+	'size_measure_0'=>'mm',
+	'size_measure_1'=>'cm',
+	'size_measure_2'=>'m',
+	'size_measure_3'=>'inch',
+	'size_measure_4'=>'ft',
 );

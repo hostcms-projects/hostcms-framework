@@ -916,6 +916,10 @@ div.hostcmsAdminButton {float: none; display: inline; padding: 3px; }
 	padding: 5px 10px 10px 10px;
 }
 
+div.fm_preview {
+	width: 48px; text-align: center
+}
+
 .hostcms6 #install label {
 	font-family: Candara, Corbel, 'Myriad Pro',Arial, Helvetica, Tahoma, sans-serif;
 	font-size: 13pt; color: #3f3f3f; text-shadow: 1px 1px 0 #FFF;

@@ -113,6 +113,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->moveAfter($oPaymentdatetimeField = $this->getField('payment_datetime'), $oCanceledField, $oMainTab)
 			->moveAfter($oStatusdatetimeField = $this->getField('status_datetime'), $oPaymentdatetimeField, $oMainTab);
 
+		$this->getField('status_datetime')->id('status_datetime');
+
 		if ($this->_object->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = $this->_object->Siteuser;
@@ -311,6 +313,9 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oShopOrderStatusesSelect = Admin_Form_Entity::factory('Select');
 
+		$objectId = intval($this->_object->id);
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+
 		$oShopOrderStatusesSelect
 			->caption(Core::_('Shop_Order.show_order_status'))
 			->style("width: 100px")
@@ -319,7 +324,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			)
 			->divAttr(array('style' => 'float: left'))
 			->name('shop_order_status_id')
-			->value($this->_object->shop_order_status_id);
+			->value($this->_object->shop_order_status_id)
+			->onchange("$.changeOrderStatus('{$windowId}')");
 
 		$oMainTab->addAfter(
 				$oShopOrderStatusesSelect, $oShopPaymentSystemsSelect
@@ -333,14 +339,13 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oIpField
 			->style("width: 100px");
 
-		$objectId = intval($this->_object->id);
-
-		$windowId = $this->_Admin_Form_Controller->getWindowId();
-
 		$Shop_Delivery_Controller_Edit = new Shop_Delivery_Controller_Edit($this->_Admin_Form_Action);
 
 		$oShopDelivery = Core_Entity::factory('Shop_Delivery_Condition', $this->_object->shop_delivery_condition_id)->Shop_Delivery;
 
+		$oAdditionalTab->delete(
+			$this->getField('shop_delivery_id')
+		);
 		$oShopDeliveryTypeSelect = Admin_Form_Entity::factory('Select');
 
 		$oShopDeliveryTypeSelect
@@ -350,8 +355,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$Shop_Delivery_Controller_Edit->fillDeliveries(Core_Array::getGet('shop_id', 0))
 			)
 			->divAttr(array('style' => 'float: left'))
-			->name('delivery_id')
-			->value($oShopDelivery->id)
+			->name('shop_delivery_id')
+			->value($this->_object->shop_delivery_id)
 			->onchange("$.ajaxRequest({path: '/admin/shop/order/index.php',context: 'shop_delivery_condition_id', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadDeliveryConditionsList',additionalParams: 'delivery_id=' + this.value,windowId: '{$windowId}'}); return false");
 
 		$oMainTab->addAfter(
@@ -506,6 +511,10 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
+		$this->_object->paid != Core_Array::get($this->_formValues, 'paid') && $this->_object->paid == 0
+			? $this->_object->paid()
+			: $this->_object->cancelPaid();
+
 		parent::_applyObjectProperty();
 
 		// ---- Дополнительные свойства
@@ -522,10 +531,6 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->_object->invoice = $this->_object->id;
 			$this->_object->save();
 		}
-
-		$this->_object->paid == 1
-			? $this->_object->paid()
-			: $this->_object->cancelPaid();
 
 		if ($bShop_payment_system_id)
 		{

@@ -43,6 +43,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsActivity('active'|'inactive'|'all') отображать элементы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - groupsActivity('active'|'inactive'|'all') отображать группы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - commentsActivity('active'|'inactive'|'all') отображать комментарии: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
+ * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
  *
  * Доступные свойства:
  *
@@ -110,6 +111,7 @@ class Shop_Controller_Show extends Core_Controller
 		'itemsActivity',
 		'groupsActivity',
 		'commentsActivity',
+		'showPanel',
 	);
 
 	/**
@@ -215,6 +217,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->groupsMode = 'tree';
 		$this->offset = 0;
 		$this->page = 0;
+		$this->showPanel = TRUE;
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
@@ -370,7 +373,7 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	public function show()
 	{
-		Core::checkPanel() && $this->_showPanel();
+		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
@@ -611,16 +614,31 @@ class Shop_Controller_Show extends Core_Controller
 				? $oShop_Item_Property_List->Properties->findAll()
 				: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
 
+			$aShowPropertyIDs = array();
+
 			foreach ($aProperties as $oProperty)
 			{
+				$oShop_Item_Property = $oProperty->Shop_Item_Property;
+
+				if ($oShop_Item_Property->show_in_item && $this->item || $oShop_Item_Property->show_in_group && !$this->item)
+				{
+					// Используется ниже для ограничение показа значений св-в товара в модели
+					$aShowPropertyIDs[] = $oProperty->id;
+				}
+
 				$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
 
-				$oShop_Item_Property = $oProperty->Shop_Item_Property;
 				$oProperty->addEntity(
 					Core::factory('Core_Xml_Entity')->name('prefix')->value($oShop_Item_Property->prefix)
 				)
 				->addEntity(
 					Core::factory('Core_Xml_Entity')->name('filter')->value($oShop_Item_Property->filter)
+				)
+				->addEntity(
+					Core::factory('Core_Xml_Entity')->name('show_in_group')->value($oShop_Item_Property->show_in_group)
+				)
+				->addEntity(
+					Core::factory('Core_Xml_Entity')->name('show_in_item')->value($oShop_Item_Property->show_in_item)
 				);
 
 				$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
@@ -652,6 +670,18 @@ class Shop_Controller_Show extends Core_Controller
 
 		if ($this->limit > 0)
 		{
+			if ($this->itemsProperties)
+			{
+				// Показываются свойства, явно указанные пользователем в itemsProperties и разрешенные для товаров
+				$mShowPropertyIDs = count($aShowPropertyIDs)
+					? (array_merge(is_array($this->itemsProperties) ? $this->itemsProperties : array(), $aShowPropertyIDs))
+					: $this->itemsProperties;
+			}
+			else
+			{
+				$mShowPropertyIDs = FALSE;
+			}
+
 			foreach ($aShop_Items as $oShop_Item)
 			{
 				// Shortcut
@@ -678,7 +708,7 @@ class Shop_Controller_Show extends Core_Controller
 					$this->specialprices && $oShop_Item->showXmlSpecialprices(TRUE);
 
 					// Properties for shop's item entity
-					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+					$this->itemsProperties && $oShop_Item->showXmlProperties($mShowPropertyIDs);
 
 					// Tags
 					$this->tags && $oShop_Item->showXmlTags(TRUE);

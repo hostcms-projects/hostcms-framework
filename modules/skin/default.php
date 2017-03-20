@@ -99,7 +99,7 @@ class Skin_Default extends Core_Skin
 		{
 			// Получаем данные о корневом пути для группы, в которой размещен текущий пользователь
 			$oUser = Core_Entity::factory('User')->getCurrent();
-			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo htmlspecialchars($oUser
+			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo Core_Str::escapeJavascriptVariable($oUser
 				? $oUser->User_Group->root_dir
 				: '')?>');<?php
 		}

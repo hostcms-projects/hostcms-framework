@@ -57,7 +57,7 @@ class Mail
 		}
 
 		// Удалить письма после просмотра
-		isset($param['delete']) && $Core_Mail_Imap->delete($param['delete'])
+		isset($param['delete']) && $Core_Mail_Imap->delete($param['delete']);
 
 		$Core_Mail_Imap->execute();
 
@@ -67,7 +67,7 @@ class Mail
 		if (count($aErrors))
 		{
 			return array(
-				'error' => $error
+				'error' => $Core_Mail_Imap->getLastError()
 			);
 		}
 

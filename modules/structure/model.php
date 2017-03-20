@@ -826,6 +826,7 @@ class Structure_Model extends Core_Entity
 			->title($sTitle)
 			->description($sDescription)
 			->keywords($sKeywords);
+
 		return $this;
 	}
 

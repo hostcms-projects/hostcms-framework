@@ -53,6 +53,8 @@ class Shop_Model extends Core_Entity{
 		'shop_item_property' => array(),
 		'shop_item_property_dir' => array(),
 		'shop_order' => array(),
+		'shop_order_property' => array(),
+		'shop_order_property_dir' => array(),
 		'shop_payment_system' => array(),
 		'shop_price' => array(),
 		'shop_producer' => array(),
@@ -73,7 +75,11 @@ class Shop_Model extends Core_Entity{
 		'url_type' => 0,
 		'apply_tags_automatically' => 1,
 		'write_off_paid_items' => 0,
-		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,		'watermark_file' => '',	);
+		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,		'watermark_file' => '',
+		'producer_image_small_max_width' => '0',
+		'producer_image_large_max_width' => '0',
+		'producer_image_small_max_height' => '0',
+		'producer_image_large_max_height' => '0',	);
 
 	/**
 	 * Belongs to relations
@@ -125,12 +131,19 @@ class Shop_Model extends Core_Entity{
 		$oShop_Group_Property_List = Core_Entity::factory('Shop_Group_Property_List', $this->id);
 		$oShop_Group_Property_List->Properties->deleteAll(FALSE);
 		$oShop_Group_Property_List->Property_Dirs->deleteAll(FALSE);
+		
+		// Доп. свойства заказов
+		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $this->id);
+		$oShop_Order_Property_List->Properties->deleteAll(FALSE);
+		$oShop_Order_Property_List->Property_Dirs->deleteAll(FALSE);
 
 		$this->Shop_Item_Property_Dirs->deleteAll(FALSE);
 		$this->Shop_Item_Properties->deleteAll(FALSE);
 		$this->Shop_Group_Property_Dirs->deleteAll(FALSE);
 		$this->Shop_Group_Properties->deleteAll(FALSE);
-		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
+		$this->Shop_Order_Property_Dirs->deleteAll(FALSE);
+		$this->Shop_Order_Properties->deleteAll(FALSE);
+				$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Deliveries->deleteAll(FALSE);
 		$this->Shop_Discounts->deleteAll(FALSE);
@@ -286,6 +299,47 @@ class Shop_Model extends Core_Entity{
 			}
 		}
 
+		// Копирование доп. свойств и разделов доп. свойств заказов
+		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $this->id);
+		$oNewObject_Shop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $newObject->id);
+
+		$aProperty_Dirs = $oShop_Order_Property_List->Property_Dirs->findAll();
+
+		$aMatchProperty_Dirs = array();
+		foreach($aProperty_Dirs as $oProperty_Dir)
+		{
+			$oNewProperty_Dir = clone $oProperty_Dir;
+			$oNewObject_Shop_Order_Property_List->add($oNewProperty_Dir);
+			$aMatchProperty_Dirs[$oProperty_Dir->id] = $oNewProperty_Dir;
+		}
+
+		$oNewProperty_Dirs = $oNewObject_Shop_Order_Property_List->Property_Dirs->findAll();
+		foreach($oNewProperty_Dirs as $oNewProperty_Dir)
+		{
+			if (isset($aMatchProperty_Dirs[$oNewProperty_Dir->parent_id]))
+			{
+				$oNewProperty_Dir->parent_id = $aMatchProperty_Dirs[$oNewProperty_Dir->parent_id]->id;
+				$oNewProperty_Dir->save();
+			}
+		}
+
+		$aProperties = $oShop_Order_Property_List->Properties->findAll();
+		foreach($aProperties as $oProperty)
+		{
+			$oNewProperty = clone $oProperty;
+			$oNewObject_Shop_Order_Property_List->add($oNewProperty);
+		}
+
+		$oNewProperties = $oNewObject_Shop_Order_Property_List->Properties->findAll();
+		foreach($oNewProperties as $oNewProperty)
+		{
+			if (isset($aMatchProperty_Dirs[$oNewProperty->property_dir_id]))
+			{
+				$oNewProperty->property_dir_id = $aMatchProperty_Dirs[$oNewProperty->property_dir_id]->id;
+				$oNewProperty->save();
+			}
+		}
+		
 		// Копирование связи (!) с партнерскими программами
 		$aAffiliate_Plans = $this->Affiliate_Plans->findAll();
 		foreach($aAffiliate_Plans as $oAffiliate_Plan)

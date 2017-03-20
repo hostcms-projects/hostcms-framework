@@ -818,18 +818,21 @@ input.large, div.large, input.calendar_field_large, select.large {
 ::-moz-selection { background-color: #D2D2D2; color: #000}
 ::selection { background-color: #D2D2D2; color: #000}
 
-.hostcms6 div.section{background-color:#FAFAFA;border-right:1px solid #DDD;color:#333;margin-bottom:15px;border-color:#FFF #DDD #DDD;border-style:solid;border-width:1px;padding:10px}
-
-.hostcms6 div.section_title
-{
-	background: url('/admin/js/ui/themes/base/images/ui-dialog-titlebar-gradient.png') repeat-x scroll 50% 50% transparent;
-	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
-	border: 1px solid #DDDDDD;
-	border-radius: 5px 5px 0px 0px;
-	height: 15px;
-	padding: 6px 10px;
-	position: relative;
-	font-weight: bold;
+.hostcmsWindow div.section_title {
+border: 1px solid #DDDDDD;
+border-radius: 5px 5px 0 0;
+font-weight: bold;
+height: 15px;
+padding: 6px 10px;
+position: relative;
+text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+.hostcmsWindow div.section {
+border-color: #FFFFFF #DDDDDD #DDDDDD;
+border-style: solid;
+border-width: 1px;
+margin-bottom: 15px;
+padding: 10px;
 }
 
 .hostcms6 div.modalwindow, .hostcmsWindow div.modalwindow {overflow:auto; margin: 7px; font-size: 9pt; color:#333}
@@ -842,6 +845,10 @@ div.hostcmsAdminButton {float: none; display: inline; padding: 3px; }
 	background-color: #FFF;
 	border-radius: 9px;
 	padding: 5px 10px 10px 10px;
+}
+
+div.fm_preview {
+	width: 48px; text-align: center
 }
 
 .hostcms6 #install label {

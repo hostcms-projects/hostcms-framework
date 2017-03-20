@@ -109,8 +109,9 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->style("width: 400px;")
 					->name("image")
 					->id("image")
-					->largeImage(array(	'max_width' => $oShop->image_large_max_width,
-							'max_height' => $oShop->image_large_max_height,
+					->largeImage(array(	
+							'max_width' => $oShop->producer_image_large_max_width,
+							'max_height' => $oShop->producer_image_large_max_height,
 							'path' => $oLargeFilePath,
 							'show_params' => TRUE,
 							'watermark_position_x' => 0,
@@ -125,8 +126,9 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 						)
 					)
 					->smallImage
-					(array(	'max_width' => $oShop->image_small_max_width,
-							'max_height' => $oShop->image_small_max_height,
+					(array(	
+							'max_width' => $oShop->producer_image_small_max_width,
+							'max_height' => $oShop->producer_image_small_max_height,
 							'path' => $oSmallFilePath,
 							'create_small_image_from_large_checked' =>
 							$this->_object->image_small == '',
@@ -149,7 +151,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Producer_Dir.parent_id'))
-					->options(array(' … ') + $this->fillGroupList(Core_Array::getGet('shop_id', 0)))
+					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id))
 					->name('shop_producer_dir_id')
 					->value($this->_object->shop_producer_dir_id)
 					->style('width:300px; float:left')
@@ -182,7 +184,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Shop_Producer_Dir.parent_id'))
-					->options(array(' … ') + $this->fillGroupList(Core_Array::getGet('shop_id', 0)))
+					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
 					->value($this->_object->parent_id)
 					->style('width:300px; float:left')

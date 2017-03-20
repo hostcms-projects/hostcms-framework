@@ -1542,13 +1542,12 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
 							$oTmpObject->queryBuilder()->where('guid', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
+							
+							$this->_oCurrentItem->guid = $sData;
+							
 							if (count($oTmpObject) > 0)
 							{
-								$this->_oCurrentItem->id = $oTmpObject[0]->id;
-							}
-							else
-							{
-								$this->_oCurrentItem->guid = $sData;
+								$this->_oCurrentItem = $oTmpObject[0];
 							}
 						}
 					break;

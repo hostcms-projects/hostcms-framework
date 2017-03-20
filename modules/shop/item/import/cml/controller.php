@@ -65,7 +65,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		'sShopDefaultPriceName',
 		'sShopDefaultPriceGUID',
 		'sPicturesPath',
-		'importAction'
+		'importAction',
+		'namespace'
 	);
 
 	/**
@@ -84,7 +85,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 		$this->_oSimpleXMLElement = new SimpleXMLElement(
 			// Delete  xmlns="urn:1C.ru:commerceml_2"
-			str_replace(' xmlns="urn:1C.ru:commerceml_2"', '', Core_File::read($sXMLFilePath))
+			/*str_replace(array(' xmlns="urn:1C.ru:commerceml_2"', ' xmlns="urn:1C.ru:commerceml_205"'), '',*/
+				Core_File::read($sXMLFilePath)
+			/*)*/
 		);
 		$this->sShopDefaultPriceName = 'РОЗНИЧНАЯ';
 		$this->sShopDefaultPriceGUID = '';
@@ -98,7 +101,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 */
 	protected function _importGroups($oXMLNode, $iParentId = 0)
 	{
-		foreach($oXMLNode->xpath('Группа') as $oXMLGroupNode)
+		foreach ($this->xpath($oXMLNode, 'Группа') as $oXMLGroupNode)
 		{
 			$oShopGroup = Core_Entity::factory('Shop', $this->iShopId)->Shop_Groups->getByGuid(strval($oXMLGroupNode->Ид), FALSE);
 			is_null($oShopGroup) && $oShopGroup = Core_Entity::factory('Shop_Group');
@@ -116,7 +119,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			//$oSubGroups = $oXMLGroupNode->Группы;
 			//is_object($oSubGroups) && $this->_importGroups($oSubGroups, $oShopGroup->id);
-			foreach($oXMLGroupNode->xpath('Группы') as $Groups)
+			foreach ($this->xpath($oXMLGroupNode, 'Группы') as $Groups)
 			{
 				$this->_importGroups($Groups, $oShopGroup->id);
 			}
@@ -143,11 +146,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oShopTax = Core_Entity::factory('Shop_Tax');
 			$oShopTax->name = $sTaxName;
 			$oShopTax->guid = $sTaxGUID;
+			$oShopTax->rate = ($sTaxRate == '' ? 0 : ($sTaxRate == 'Без налога' ? 0 : $sTaxRate));
+			$oShopTax->tax_is_included = 0;
 		}
-
-		$oShopTax->rate = ($sTaxRate == '' ? 0 : ($sTaxRate == 'Без налога' ? 0 : $sTaxRate));
-
-		$oShopTax->tax_is_included = 0;
 
 		$oShopTax->save();
 
@@ -192,12 +193,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$oProperty_Value = isset($aPropertyValues[0])
 			? $aPropertyValues[0]
 			: $oProperty->createNewValue($oShopItem->id);
-			
+
 		if($oProperty->type == 7)
 		{
 			mb_strtoupper($sPropertyValue) == 'ДА' ? $sPropertyValue = 1 : $sPropertyValue = intval($sPropertyValue);
 		}
-			
+
 		$this->_setPropertyValue($oProperty_Value, $sPropertyValue);
 	}
 
@@ -256,7 +257,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					$oItem->shop_producer_id = $oProducer->id;
-				
+
 					if($oItem->modification_id)
 					{
 						$oItem->Modification->shop_producer_id = $oProducer->id;
@@ -294,6 +295,37 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Определяет namespace документа, если был указан, то устаналивает его и возвращает $object->xpath($path) с учетом namespace
+	 * @param SimpleXMLElement $object
+	 * @param string $path
+	 * @return array|false
+	 */
+	public function xpath(SimpleXMLElement $object, $path)
+	{
+		if ($this->namespace)
+		{
+			$object->registerXPathNamespace('w', $this->namespace);
+			$sXmlns = 'w:';
+		}
+		else
+		{
+			$sXmlns = '';
+		}
+
+		// namespace указываем перед каждым элементом xpath
+		$aExplode = explode('/', $path);
+		foreach ($aExplode as $key => $value)
+		{
+			$aExplode[$key] = $sXmlns . $value;
+		}
+
+		$return = $object->xpath(implode('/', $aExplode));
+		!is_array($return) && $return = array();
+
+		return $return;
+	}
+
+	/**
 	 * Start import
 	 * @return array
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImport
@@ -328,24 +360,34 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 		$oShop = Core_Entity::factory('Shop', $this->iShopId);
 
+		$aNamespaces = $this->_oSimpleXMLElement->getNamespaces(true);
+		if (count($aNamespaces))
+		{
+			list(, $this->namespace) = each($aNamespaces);
+		}
+
 		// Файл import.xml
 		if (count((array)$this->_oSimpleXMLElement->Классификатор))
 		{
 			$classifier = $this->_oSimpleXMLElement->Классификатор;
 
+//print_r($classifier->xpath($sXmlns . 'Группы'));
+//print_r($this->xpath($classifier, 'Группы'));
+//print_r($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар'));
+
 			// Импортируем группы товаров
-			foreach($classifier->xpath('Группы') as $Groups)
+			foreach ($this->xpath($classifier, 'Группы') as $Groups)
 			{
 				$this->_importGroups($Groups, $this->iShopGroupId);
 			}
 			//is_object($classifier->Группы) && $this->_importGroups($classifier->Группы, $this->iShopGroupId);
 
 			// Импортируем дополнительные свойства товаров
-			foreach($classifier->xpath('Свойства/Свойство') as $oItemProperty)
+			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
 			{
 				$sPropertyName = strval($oItemProperty->Наименование);
 
-				foreach($oItemProperty->xpath('ВариантыЗначений/Справочник') as $oValue)
+				foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
 				{
 					$this->_aPropertyValues[strval($oValue->ИдЗначения)] = strval($oValue->Значение);
 				}
@@ -361,7 +403,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 			}
 
-			foreach($this->_oSimpleXMLElement->Каталог->xpath('Товары/Товар') as $oItem)
+			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oItem)
 			{
 				$sGUID = strval($oItem->Ид);
 				$sGUIDmod = FALSE;
@@ -417,7 +459,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$oShopItem->marking = strval($oItem->Артикул);
 				$oShopItem->name = $sItemName;
 
-				if (is_array($aTmp = $oItem->xpath('Группы'))
+				if (is_array($aTmp = $this->xpath($oItem, 'Группы'))
 				&& count($aTmp) > 0
 				&& !is_null($oShop_Group = $oShop->Shop_Groups->getByGuid(strval($aTmp[0]->Ид), FALSE)))
 				{
@@ -454,7 +496,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 
 				// Обрабатываем описание товара
-				foreach($oItem->xpath('Описание') as $DescriptionData)
+				foreach ($this->xpath($oItem, 'Описание') as $DescriptionData)
 				{
 					$oShopItem->description = strval($DescriptionData);
 					$oShopItem->save();
@@ -463,7 +505,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$bFirstPicture = TRUE;
 
 				// Обрабатываем изображения для товара
-				foreach($oItem->xpath('Картинка') as $PictureData)
+				foreach ($this->xpath($oItem, 'Картинка') as $PictureData)
 				{
 					if (Core_File::isValidExtension(
 					$PictureData,
@@ -481,7 +523,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 
 							$sPictureData = strval($PictureData);
-							$oNewPropertyGUID = $oItem->xpath("ЗначенияРеквизитов/ЗначениеРеквизита[starts-with(Значение, '{$sPictureData}')]/Значение");
+							$oNewPropertyGUID = $this->xpath($oItem, "ЗначенияРеквизитов/ЗначениеРеквизита[starts-with(Значение, '{$sPictureData}')]/Значение");
 							if($oNewPropertyGUID !== FALSE && count($oNewPropertyGUID) > 0)
 							{
 								$oNewPropertyGUID = strval($oNewPropertyGUID[0]);
@@ -682,7 +724,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Добавляем значения для общих свойств всех товаров
-				foreach($oItem->xpath('ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
+				foreach ($this->xpath($oItem, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
 				{
 					/*if(isset($this->aAdditionalProperties[$sPropertyGUID = strval($ItemPropertyValue->Ид)]))
 					{
@@ -692,7 +734,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Обрабатываем свойства/значения свойств для конкретно данного товара
-				foreach($oItem->xpath('ХарактеристикиТовара/ХарактеристикаТовара | ЗначенияРеквизитов/ЗначениеРеквизита')
+				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара | ЗначенияРеквизитов/ЗначениеРеквизита')
 						  as $oItemProperty)
 				{
 					if (mb_strtoupper(strval($oItemProperty->Наименование)) == 'ВЕС')
@@ -711,7 +753,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Обрабатываем налоги
-				foreach($oItem->xpath('СтавкиНалогов/СтавкаНалога') as $oTax)
+				foreach ($this->xpath($oItem, 'СтавкиНалогов/СтавкаНалога') as $oTax)
 				{
 					$oShopTax = $this->_addTax($oTax);
 					$oShopItem->shop_tax_id = $oShopTax->id;
@@ -725,7 +767,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$packageOfProposals = $this->_oSimpleXMLElement->ПакетПредложений;
 
 			// Обработка специальных цен
-			foreach($packageOfProposals->xpath('ТипыЦен/ТипЦены') as $oPrice)
+			foreach ($this->xpath($packageOfProposals, 'ТипыЦен/ТипЦены') as $oPrice)
 			{
 				$oShopPrice = Core_Entity::factory('Shop', $this->iShopId)->Shop_Prices->getByGuid(strval($oPrice->Ид), FALSE);
 
@@ -763,7 +805,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			}
 
 			// Обработка предложений
-			foreach($packageOfProposals->xpath('Предложения/Предложение') as $oProposal)
+			foreach ($this->xpath($packageOfProposals, 'Предложения/Предложение') as $oProposal)
 			{
 				$sItemGUID = strval($oProposal->Ид);
 
@@ -821,12 +863,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					// Добавляем значения для общих свойств всех товаров
-					foreach($oProposal->xpath('ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
+					foreach ($this->xpath($oProposal, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
 					{
 						$this->_importProperties($oShopItem, $ItemPropertyValue);
 					}
 
-					foreach($oProposal->xpath('Цены/Цена') as $oPrice)
+					foreach ($this->xpath($oProposal, 'Цены/Цена') as $oPrice)
 					{
 						// Ищем цену
 						$oShopPrice = Core_Entity::factory('Shop', $this->iShopId)->Shop_Prices->getByGuid(strval($oPrice->ИдТипаЦены), FALSE);
@@ -845,7 +887,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							$itemPrice = strval($oPrice->ЦенаЗаЕдиницу);
 
 							// Валюта товара
-							$baseCurrencyNode = $oProposal->xpath("Цены/Цена[ИдТипаЦены='{$this->sShopDefaultPriceGUID}']");
+							$baseCurrencyNode = $this->xpath($oProposal, "Цены/Цена[ИдТипаЦены='{$this->sShopDefaultPriceGUID}']");
 
 							if (isset($baseCurrencyNode[0]))
 							{
@@ -890,7 +932,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						}
 					}
 
-					foreach($oProposal->xpath('Количество') as $oCount)
+					foreach ($this->xpath($oProposal, 'Количество') as $oCount)
 					{
 						// Ищем главный склад
 						$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
@@ -928,11 +970,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		elseif (count((array)$this->_oSimpleXMLElement->Каталог))
 		{
 			$catalog = $this->_oSimpleXMLElement->Каталог;
-			foreach($catalog->xpath('Свойство') as $oXmlProperty)
+			foreach ($catalog->xpath('Свойство') as $oXmlProperty)
 			{
 				$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 				$oShopProperty = $oShop_Item_Property_List->Properties->getByGuid(strval($oXmlProperty->attributes()->Идентификатор), FALSE);
-				
+
 				if (is_null($oShopProperty))
 				{
 					$oProperty = Core_Entity::factory('Property');
@@ -943,10 +985,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShop_Item_Property_List->add($oProperty);
 				}
 			}
-			
+
 			$aGroupList = array();
 			$aGroupListTree = array();
-			foreach($catalog->xpath('Группа') as $oXmlGroup)
+			foreach ($catalog->xpath('Группа') as $oXmlGroup)
 			{
 				$sParentGUID = strval($oXmlGroup->attributes()->Родитель) == '' ? 0 : strval($oXmlGroup->attributes()->Родитель);
 				$aGroupList[strval($oXmlGroup->attributes()->Идентификатор)] = $oXmlGroup;
@@ -959,7 +1001,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				unset($aStack[count($aStack) - 1]);
 				if(isset($aGroupListTree[$sStackEnd]))
 				{
-					foreach($aGroupListTree[$sStackEnd] as $sGroupGUID)
+					foreach ($aGroupListTree[$sStackEnd] as $sGroupGUID)
 					{
 						$oShopGroup = Core_Entity::factory('Shop', $this->iShopId)->Shop_Groups->getByGuid($sGroupGUID, FALSE);
 						if(is_null($oShopGroup))
@@ -981,8 +1023,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 				}
 			}
-			
-			foreach($catalog->xpath('Товар') as $oXmlItem)
+
+			foreach ($catalog->xpath('Товар') as $oXmlItem)
 			{
 				$oShopItem = $oShop->Shop_Items->getByGuid(strval($oXmlItem->attributes()->Идентификатор), FALSE);
 
@@ -1014,12 +1056,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 				$oShopItem->shop_measure_id = $oShopMeasure->id;
 				$oShopItem->save();
-				
-				foreach($oXmlItem->xpath('ЗначениеСвойства') as $oXmlPropertyValue)
+
+				foreach ($oXmlItem->xpath('ЗначениеСвойства') as $oXmlPropertyValue)
 				{
 					$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 					$oShopProperty = $oShop_Item_Property_List->Properties->getByGuid(strval($oXmlPropertyValue->attributes()->ИдентификаторСвойства), FALSE);
-					
+
 					if (!is_null($oShopProperty) && $oShopProperty->type != 2 && $oShopProperty->type != 3)
 					{
 						if (is_null(Core_Entity::factory('Shop', $this->iShopId)
@@ -1032,7 +1074,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 								->shop_id($this->iShopId)
 								->save();
 						}
-						
+
 						$aPropertyValues = $oShopProperty->getValues($oShopItem->id, FALSE);
 
 						$oProperty_Value = isset($aPropertyValues[0])
@@ -1043,9 +1085,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 				}
 			}
-			
+
 			$offers = $this->_oSimpleXMLElement->ПакетПредложений;
-			foreach($offers->xpath('Предложение') as $oXmlOffer)
+			foreach ($offers->xpath('Предложение') as $oXmlOffer)
 			{
 				$oShopItem = $oShop->Shop_Items->getByGuid(strval($oXmlOffer->attributes()->ИдентификаторТовара), FALSE);
 
@@ -1113,7 +1155,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							->save();
 					}
 					$oProperty_Value->setValue($oListItem->id);
-				} 
+				}
 			break;
 			case 8:
 				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $value))

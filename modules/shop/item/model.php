@@ -112,6 +112,9 @@ class Shop_Item_Model extends Core_Entity
 		'indexing' => 1,
 		'modification_id' => 0,
 		'shop_measure_id' => 0,
+		'length' => 0,
+		'width' => 0,
+		'height' => 0,
 		'showed' => 0
 	);
 
@@ -205,23 +208,6 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	protected $_propertyValues = NULL;
 
-	/*protected function _getPropertyValue(Property_Model $oProperty, $bCache = TRUE)
-	{
-		$aReturn = array();
-		$aProperty_Values = $oProperty->getValues($this->id, $bCache);
-
-		foreach ($aProperty_Values as $oProperty_Value)
-		{
-			if ($oProperty->type == 2)
-			{
-				$oProperty_Value->setHref($this->getItemHref());
-			}
-
-			$aReturn[] = $oProperty_Value;
-		}
-		return $aReturn;
-	}*/
-
 	/**
 	 * Values of all properties of item
 	 * Значения всех свойств товара
@@ -235,7 +221,7 @@ class Shop_Item_Model extends Core_Entity
 			return $this->_propertyValues;
 		}
 
-		// Warning: Need cache
+		// Warning: Needs cache
 		$aProperties = Core_Entity::factory('Shop_Item_Property_List', $this->shop_id)
 			->Properties
 			->findAll();
@@ -261,10 +247,7 @@ class Shop_Item_Model extends Core_Entity
 			}
 		}
 
-		if ($bCache)
-		{
-			$this->_propertyValues = $aReturn;
-		}
+		$bCache && $this->_propertyValues = $aReturn;
 
 		return $aReturn;
 	}
@@ -498,9 +481,9 @@ class Shop_Item_Model extends Core_Entity
 		}
 		else
 		{
-			$oParenItem = $this->Modification;
+			$oParentItem = $this->Modification;
 
-			$aSameItems = $oParenItem->Modifications->getAllByPath($this->path);
+			$aSameItems = $oParentItem->Modifications->getAllByPath($this->path);
 			foreach ($aSameItems as $oSameItem)
 			{
 				if ($oSameItem->id != $this->id)
@@ -1640,10 +1623,13 @@ class Shop_Item_Model extends Core_Entity
 
 				$aForbiddenTags = $this->getForbiddenTags();
 
-				foreach ($aShop_Item_Associateds as $oShop_Item_Associated)
+				foreach ($aShop_Item_Associateds as $oShop_Item_Associated_Original)
 				{
-					if ($oShop_Item_Associated->id != $this->id)
+					if ($oShop_Item_Associated_Original->id != $this->id)
 					{
+						// Сопутствующий товар может быть в списке, соответственное его модификации не выведутся из-за запрета на вывод модификаций для сопутствующих
+						$oShop_Item_Associated = clone $oShop_Item_Associated_Original;
+						$oShop_Item_Associated->id = $oShop_Item_Associated_Original->id;
 						$oShop_Item_Associated->clearEntities();
 
 						// Apply forbidden tags for modifications

@@ -194,7 +194,7 @@ class Skin_Default_Module_Core_Module extends Core_Module
 							->class('characteristics characteristicOk')
 							->add(
 								Core::factory('Core_Html_Entity_Span')
-									->value(Core::_('Admin.index_tech_date_hostcms') . ' ' . CURRENT_VERSION)
+									->value(Core::_('Admin.index_tech_date_hostcms') . ' ' . Core::_('Core.redaction' . Core_Array::get(Core::$config->get('core_hostcms'), 'integration', 0)) . ' ' . CURRENT_VERSION)
 							)
 					)->add(
 						Core::factory('Core_Html_Entity_Div')

@@ -1055,8 +1055,8 @@ class Admin_Form_Controller
 							{
 								$oObject = $this->_datasets[$datasetKey]->getObject($checkedItemId);
 
-								// Проверка на доступность действия к dataset
-								if ($oAdmin_Form_Action->dataset != -1
+								// Проверка на наличие объекта и доступность действия к dataset
+								if (!is_object($oObject) || $oAdmin_Form_Action->dataset != -1
 									&& $oAdmin_Form_Action->dataset != $datasetKey)
 								{
 									break;

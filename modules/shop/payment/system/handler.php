@@ -30,6 +30,18 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * List of properties
+	 * @var array
+	 */
+	protected $_aProperties = array();
+
+	/**
+	 * Property directories
+	 * @var array
+	 */
+	protected $_aProperty_Dirs = array();
+	
+	/**
 	 * Params of the order
 	 * @var array
 	 */
@@ -154,26 +166,33 @@ abstract class Shop_Payment_System_Handler
 		$oShop = $this->_Shop_Payment_System_Model->Shop;
 
 		$this->_shopOrder = Core_Entity::factory('Shop_Order');
-		$this->_shopOrder->shop_country_id = Core_Array::get($this->_orderParams, 'shop_country_id', 0);
-		$this->_shopOrder->shop_country_location_id = Core_Array::get($this->_orderParams, 'shop_country_location_id', 0);
-		$this->_shopOrder->shop_country_location_city_id = Core_Array::get($this->_orderParams, 'shop_country_location_city_id', 0);
-		$this->_shopOrder->shop_country_location_city_area_id = Core_Array::get($this->_orderParams, 'shop_country_location_city_area_id', 0);
-		$this->_shopOrder->postcode = Core_Array::get($this->_orderParams, 'postcode', '');
-		$this->_shopOrder->address = Core_Array::get($this->_orderParams, 'address', '');
-		$this->_shopOrder->surname = Core_Array::get($this->_orderParams, 'surname', '');
-		$this->_shopOrder->name = Core_Array::get($this->_orderParams, 'name', '');
-		$this->_shopOrder->patronymic = Core_Array::get($this->_orderParams, 'patronymic', '');
-		$this->_shopOrder->company = Core_Array::get($this->_orderParams, 'company', '');
-		$this->_shopOrder->phone = Core_Array::get($this->_orderParams, 'phone', '');
-		$this->_shopOrder->fax = Core_Array::get($this->_orderParams, 'fax', '');
-		$this->_shopOrder->email = Core_Array::get($this->_orderParams, 'email', '');
-		$this->_shopOrder->description = Core_Array::get($this->_orderParams, 'description', '');
-		$this->_shopOrder->shop_delivery_condition_id = Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0);
-		$this->_shopOrder->shop_payment_system_id = Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0);
-		$this->_shopOrder->shop_currency_id = $oShop->shop_currency_id;
-		$this->_shopOrder->shop_order_status_id = $oShop->shop_order_status_id;
-		$this->_shopOrder->tin = Core_Array::get($this->_orderParams, 'tin', '');
-		$this->_shopOrder->kpp = Core_Array::get($this->_orderParams, 'kpp', '');
+		$this->_shopOrder->shop_country_id = intval(Core_Array::get($this->_orderParams, 'shop_country_id', 0));
+		$this->_shopOrder->shop_country_location_id = intval(Core_Array::get($this->_orderParams, 'shop_country_location_id', 0));
+		$this->_shopOrder->shop_country_location_city_id = intval(Core_Array::get($this->_orderParams, 'shop_country_location_city_id', 0));
+		$this->_shopOrder->shop_country_location_city_area_id = intval(Core_Array::get($this->_orderParams, 'shop_country_location_city_area_id', 0));
+		$this->_shopOrder->postcode = strval(Core_Array::get($this->_orderParams, 'postcode', ''));
+		$this->_shopOrder->address = strval(Core_Array::get($this->_orderParams, 'address', ''));
+		$this->_shopOrder->surname = strval(Core_Array::get($this->_orderParams, 'surname', ''));
+		$this->_shopOrder->name = strval(Core_Array::get($this->_orderParams, 'name', ''));
+		$this->_shopOrder->patronymic = strval(Core_Array::get($this->_orderParams, 'patronymic', ''));
+		$this->_shopOrder->company = strval(Core_Array::get($this->_orderParams, 'company', ''));
+		$this->_shopOrder->phone = strval(Core_Array::get($this->_orderParams, 'phone', ''));
+		$this->_shopOrder->fax = strval(Core_Array::get($this->_orderParams, 'fax', ''));
+		$this->_shopOrder->email = strval(Core_Array::get($this->_orderParams, 'email', ''));
+		$this->_shopOrder->description = strval(Core_Array::get($this->_orderParams, 'description', ''));
+		
+		$shop_delivery_condition_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0));
+		$this->_shopOrder->shop_delivery_condition_id = $shop_delivery_condition_id;
+
+		$shop_delivery_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_id', 0));
+		!$shop_delivery_id && $shop_delivery_condition_id && $shop_delivery_id = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id)->shop_delivery_id;
+		$this->_shopOrder->shop_delivery_id = $shop_delivery_id;
+		
+		$this->_shopOrder->shop_payment_system_id = intval(Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0));
+		$this->_shopOrder->shop_currency_id = intval($oShop->shop_currency_id);
+		$this->_shopOrder->shop_order_status_id = intval($oShop->shop_order_status_id);
+		$this->_shopOrder->tin = strval(Core_Array::get($this->_orderParams, 'tin', ''));
+		$this->_shopOrder->kpp = strval(Core_Array::get($this->_orderParams, 'kpp', ''));
 
 		if (Core::moduleIsActive('siteuser'))
 		{
@@ -433,21 +452,47 @@ abstract class Shop_Payment_System_Handler
 	{
 		Core_Event::notify('Shop_Payment_System_Handler.onBeforeAddDelivery', $this);
 
+		$shop_delivery_condition_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0));
+		$shop_delivery_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_id', 0));
+		
 		// Добавляем стоимость доставки как отдельный товар
-		if (Core_Array::get($this->_orderParams, 'shop_delivery_condition_id', 0))
+		// Доставка может прийти как сущесвтующий shop_delivery_condition_id, так и shop_delivery_id + название рассчитанного условия доставки
+		if ($shop_delivery_condition_id || $shop_delivery_id)
 		{
-			$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition', $this->_orderParams['shop_delivery_condition_id']);
+			if ($shop_delivery_condition_id)
+			{
+				$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id);
+				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
+				
+				$aPrice = $oShop_Delivery_Condition->getPriceArray();
+				$price = $aPrice['price'];
+				$rate = $aPrice['rate'];
+				$marking = !is_null($oShop_Delivery_Condition->marking)
+					? $oShop_Delivery_Condition->marking
+					: '';
+			}
+			// Доставка рассчитывалась кодом
+			else
+			{
+				$oShop_Delivery = Core_Entity::factory('Shop_Delivery', $shop_delivery_id);
+				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery->name);
+				
+				$price = floatval(Core_Array::get($this->_orderParams, 'shop_delivery_price', 0));
+				$rate = intval(Core_Array::get($this->_orderParams, 'shop_delivery_rate', 0));
+				$marking = '';
+				
+				$shop_delivery_name = strval(Core_Array::get($this->_orderParams, 'shop_delivery_name', 0));
+				$this->_shopOrder->delivery_information = trim(
+					$this->_shopOrder->delivery_information .  "\n" . $shop_delivery_name
+				);
+			}
 
 			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
-			$oShop_Order_Item->name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
+			$oShop_Order_Item->name = $name;
 			$oShop_Order_Item->quantity = 1;
-
-			$aPrice = $oShop_Delivery_Condition->getPriceArray();
-			$oShop_Order_Item->rate = $aPrice['rate'];
-			$oShop_Order_Item->price = $aPrice['price'];
-			$oShop_Order_Item->marking = !is_null($oShop_Delivery_Condition->marking)
-				? $oShop_Delivery_Condition->marking
-				: '';
+			$oShop_Order_Item->rate = $rate;
+			$oShop_Order_Item->price = $price;
+			$oShop_Order_Item->marking = $marking;
 			$oShop_Order_Item->type = 1;
 			$this->_shopOrder->add($oShop_Order_Item);
 		}
@@ -519,6 +564,30 @@ abstract class Shop_Payment_System_Handler
 	{
 		$oShop = $this->_shopOrder->Shop->clearEntities();
 
+		// Список свойств заказа
+		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
+
+		$aProperties = $oShop_Order_Property_List->Properties->findAll();
+		foreach ($aProperties as $oProperty)
+		{
+			$this->_aProperties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
+		}
+
+		$aProperty_Dirs = $oShop_Order_Property_List->Property_Dirs->findAll();
+		foreach ($aProperty_Dirs as $oProperty_Dir)
+		{
+			$oProperty_Dir->clearEntities();
+			$this->_aProperty_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir->clearEntities();
+		}
+
+		// Список свойств
+		$Shop_Order_Properties = Core::factory('Core_Xml_Entity')
+			->name('properties');
+
+		$oShop->addEntity($Shop_Order_Properties);
+
+		$this->_addPropertiesList(0, $Shop_Order_Properties);
+		
 		$oShop
 			->addEntity($oShop->Shop_Company)
 			->addEntity(
@@ -539,6 +608,31 @@ abstract class Shop_Payment_System_Handler
 		return $oShop;
 	}
 
+	/**
+	 * Add list of user's properties to XML
+	 * @param int $parent_id parent directory
+	 * @param object $parentObject
+	 * @return self
+	 */
+	protected function _addPropertiesList($parent_id, $parentObject)
+	{
+		if (isset($this->_aProperty_Dirs[$parent_id]))
+		{
+			foreach ($this->_aProperty_Dirs[$parent_id] as $oProperty_Dir)
+			{
+				$parentObject->addEntity($oProperty_Dir);
+				$this->_addPropertiesList($oProperty_Dir->id, $oProperty_Dir);
+			}
+		}
+
+		if (isset($this->_aProperties[$parent_id]))
+		{
+			$parentObject->addEntities($this->_aProperties[$parent_id]);
+		}
+
+		return $this;
+	}
+	
 	/**
 	 * Process XML
 	 * @return mixed

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Sql
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Sql_Dataset_Optimize extends Admin_Form_Dataset
 {
@@ -70,7 +70,7 @@ class Sql_Dataset_Optimize extends Admin_Form_Dataset
 			Core_Message::show($e->getMessage(), 'error');
 		}
 
-		$return = $this->_objects = $this->_database->asObject()->result();
+		$return = $this->_objects = $this->_database->asObject(NULL)->result();
 
 		foreach ($return as $row)
 		{

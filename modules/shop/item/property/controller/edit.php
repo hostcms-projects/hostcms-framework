@@ -44,7 +44,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 
 				//Переносим GUID на "Экспорт/Импорт"
 				$oAdditionalTab->move($this->getField('guid'), $oShopItemTabExportImport);
-				
+
 				// Создаем поле единиц измерения как выпадающий список
 				$oShopMeasuresSelect = Admin_Form_Entity::factory('Select');
 
@@ -89,11 +89,31 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 						7 => Core::_('Shop_Item.properties_show_kind_listbox'))
 					)
 					->name('filter')
-					->value($this->_object->Shop_Item_Property->filter)
-					->divAttr(array('style' => 'float: left'));
+					->value($this->_object->Shop_Item_Property->filter);
+					//->divAttr(array('style' => 'float: left'));
 
 				$oMainTab
 					->add($oShopFilterSelect);
+
+				$oShopShowInGroupCheckbox = Admin_Form_Entity::factory('Checkbox');
+				$oShopShowInGroupCheckbox
+					->value($this->_object->Shop_Item_Property->show_in_group)
+					->caption(Core::_("Shop_Item.show_in_group"))
+					->name("show_in_group");
+					//->divAttr(array('style' => 'float: left'));
+
+				$oMainTab
+					->add($oShopShowInGroupCheckbox);
+
+				$oShopShowInItemCheckbox = Admin_Form_Entity::factory('Checkbox');
+				$oShopShowInItemCheckbox
+					->value($this->_object->Shop_Item_Property->show_in_item)
+					->caption(Core::_("Shop_Item.show_in_item"))
+					->name("show_in_item");
+					//->divAttr(array('style' => 'float: left'));
+
+				$oMainTab
+					->add($oShopShowInItemCheckbox);
 
 			break;
 			case 'property_dir':
@@ -117,9 +137,11 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 		{
 			case 'property':
 				$Shop_Item_Property = $this->_object->Shop_Item_Property;
-				$Shop_Item_Property->shop_measure_id = Core_Array::getPost('shop_measure_id');
+				$Shop_Item_Property->shop_measure_id = intval(Core_Array::getPost('shop_measure_id'));
 				$Shop_Item_Property->prefix = Core_Array::getPost('prefix');
-				$Shop_Item_Property->filter = Core_Array::getPost('filter');
+				$Shop_Item_Property->filter = intval(Core_Array::getPost('filter'));
+				$Shop_Item_Property->show_in_group = intval(Core_Array::getPost('show_in_group'));
+				$Shop_Item_Property->show_in_item = intval(Core_Array::getPost('show_in_item'));
 				$Shop_Item_Property->save();
 			break;
 			case 'property_dir':

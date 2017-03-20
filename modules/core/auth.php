@@ -62,7 +62,6 @@ class Core_Auth
 				header("HTTP/1.0 401 Unauthorized");
 
 				// Нужен старт сессии, чтобы записать в нее HOSTCMS_HTTP_AUTH_FLAG
-				//$this->AdminSessionStart();
 				if (@session_id() == '')
 				{
 					@session_start();
@@ -212,12 +211,7 @@ class Core_Auth
 
 		if (!defined('DENY_INI_SET') || !DENY_INI_SET)
 		{
-			// Включаем вывод ошибок вместе с результатом работы скрипта
 			ini_set('display_errors', 1);
-
-			// Период хранения куки в секундах
-			ini_set('session.cookie_lifetime', '14400'); //60*60*4
-			ini_set('session.gc_maxlifetime', '14400');
 		}
 
 		// Если есть ID сессии и сессия еще не запущена - то стартуем ее,
@@ -260,13 +254,7 @@ class Core_Auth
 	 */
 	static public function adminSessionStart()
 	{
-		//$expire = 86400;
-		/*if (isset($_REQUEST[session_name()]) && !isset($_SESSION))
-		{
-			// Стартуем сессию, если она еще не запущена
-			@session_start();
-		}*/
-
+		Core_Session::setMaxLifeTime(14400);
 		Core_Session::start();
 	}
 

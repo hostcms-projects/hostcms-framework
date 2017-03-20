@@ -22,7 +22,11 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		'caption',
 		'value', // идет в selected
 		'format', // array, массив условий форматирования
-		'filter'
+		'filter',
+		'invertor',
+		'invertor_id',
+		'invertorCaption', 
+		'inverted'
 	);
 
 	/**
@@ -49,9 +53,12 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 
 		$oCore_Registry = Core_Registry::instance();
 		$iAdmin_Form_Count = $oCore_Registry->get('Admin_Form_Count', 0);
-		$oCore_Registry->set('Admin_Form_Count', $iAdmin_Form_Count + 1);
+		$oCore_Registry->set('Admin_Form_Count', $iAdmin_Form_Count + 2);
 
 		$this->id = $this->name = 'field_id_' . $iAdmin_Form_Count;
+	
+		$iAdmin_Form_Count++;
+		$this->invertor_id = 'field_id_' . $iAdmin_Form_Count;
 	}
 
 	/**
@@ -89,6 +96,24 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 
 		?><span class="caption"><?php echo $this->caption?></span><?php
 
+		if($this->invertor)
+		{
+			$oCore_Html_Entity_Input = Core::factory('Core_Html_Entity_Input')
+				->type("checkbox")
+				->id($this->invertor_id)
+				->name($this->name . '_inverted')
+				->value(1);
+
+			$this->inverted && $oCore_Html_Entity_Input->checked(true);
+
+			$oCore_Html_Entity_Input->execute();
+
+			Core::factory('Core_Html_Entity_Span')
+				->class('caption')
+				->style('display:inline')
+				->value($this->invertorCaption . '&nbsp;')
+				->execute();
+		}
 		?><select <?php echo implode(' ', $aAttr) ?>><?php
 		if (is_array($this->options))
 		{
