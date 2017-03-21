@@ -32,7 +32,9 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$modelName = $object->getModelName();
 
-		if (!$object->id && $modelName == 'property')
+		$bNewProperty = is_null($object->id);
+		
+		if ($bNewProperty && $modelName == 'property')
 		{
 			$object->image_large_max_width = $this->linkedObject->getLargeImageMaxWidth();
 			$object->image_large_max_height = $this->linkedObject->getLargeImageMaxHeight();
@@ -208,14 +210,16 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// ---
 				$this->getField('tag_name')
 					->style('width: 220px')
-					->divAttr(array('style' => 'float: left'))
-					->format(
+					->divAttr(array('style' => 'float: left'));
+
+				// Для тегов проверка на длину только при редактировании.
+				!$bNewProperty && $this->getField('tag_name')->format(
 						array(
 							'maxlen' => array('value' => 255),
 							'minlen' => array('value' => 1)
 						)
 					);
-
+					
 				$this->getField('sorting')
 					->style('width: 220px');
 
@@ -356,6 +360,8 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	protected function _applyObjectProperty()
 	{
+		$bNewProperty = is_null($this->_object->id);
+
 		parent::_applyObjectProperty();
 
 		$modelName = $this->_object->getModelName();
@@ -363,6 +369,15 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		switch($modelName)
 		{
 			case 'property':
+				if ($bNewProperty && trim($this->_object->tag_name) == '')
+				{
+					 $this->_object->tag_name = Core_Str::transliteration(
+						Core::$mainConfig['translate']
+							? Core_Str::translate($this->_object->name)
+							: $this->_object->name
+						);
+				}
+				
 				switch($this->_object->type)
 				{
 					case 7: // Флажок

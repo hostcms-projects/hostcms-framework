@@ -68,7 +68,7 @@ class Update_Dataset extends Admin_Form_Dataset
 		if ($error > 0 && $error != 5)
 		{
 			$this->_Admin_Form_Controller->addMessage(
-				Core::_('Update.server_error_respond_' . $error), 'error'
+				Core_Message::show(Core::_('Update.server_error_respond_' . $error), 'error')
 			);
 			//throw new Core_Exception(Core::_('Update.server_error_respond_' . $error), array(), 0, FALSE);
 		}
@@ -76,7 +76,7 @@ class Update_Dataset extends Admin_Form_Dataset
 		elseif (count($this->_objects) == 0)
 		{
 			$this->_Admin_Form_Controller->addMessage(
-				Core::_('Update.isLastUpdate')
+				Core_Message::show(Core::_('Update.isLastUpdate'), 'message')
 			);
 		}
 

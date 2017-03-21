@@ -27,7 +27,9 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 		'caption',
 		'format', // array, массив условий форматирования
 		'value', // идет в значение <textarea>
-		'template_id' // ID макета для визуального редактора
+		'template_id', // ID макета для визуального редактора
+		'syntaxHighlighter',
+		'syntaxHighlighterOptions',
 	);
 
 	/**
@@ -35,7 +37,9 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 	 * @var array
 	 */
 	protected $_allowedProperties = array(
-		'wysiwyg', // TRUE/FALSE
+		'wysiwyg',
+		'syntaxHighlighter',
+		'syntaxHighlighterOptions'
 	);
 
 	/**
@@ -60,7 +64,16 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 
 		$this->id = $this->name = 'field_id_' . $iAdmin_Form_Count;
 		$this->style('width: 100%')
-			->rows(3);
+			->rows(3)
+			->syntaxHighlighterOptions(
+				array(
+					'mode' => 'css',
+					'lineNumbers' => 'true',
+					'styleActiveLine' => 'true',
+					'lineWrapping' => 'true',
+					'autoCloseTags' => 'true',
+				)
+			);
 	}
 
 	/**
@@ -171,6 +184,26 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 					->value("$(function() { setTimeout(function(){ $('#{$windowId} #{$this->id}').tinymce({ {$sInit} }); }, 300); });")
 					->execute();
 			}
+		}
+		elseif ($this->syntaxHighlighter)
+		{
+			$aTmp = array();
+			foreach ($this->syntaxHighlighterOptions as $key => $value)
+			{
+				$aTmp[] = "'" . Core_Str::escapeJavascriptVariable($key) . "': '" . Core_Str::escapeJavascriptVariable($value) . "'";
+			}
+
+			$sHeight = ($this->rows * 15) . 'px';
+
+			$Core_Html_Entity_Script = new Core_Html_Entity_Script();
+			$Core_Html_Entity_Script
+				->type('text/javascript')
+				->value("$(function() { var editor = CodeMirror.fromTextArea(document.getElementById('{$this->id}'), {
+					" . implode(",\n", $aTmp) . "
+				});
+				editor.setSize(null, '{$sHeight}');
+				});")
+				->execute();
 		}
 		else
 		{

@@ -727,6 +727,28 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oShopItem->save() && $bFirstPicture = FALSE;
 					}
 				}
+				
+				// До обработки свойств из 1С нужно записать значения "по умолчанию" для всех свойств, заданных данной группе товара
+				$aProperties = Core_Entity::factory('Shop_Item_Property_List', $oShop->id)->Properties;
+				$aProperties
+					->queryBuilder()
+					->join('shop_item_property_for_groups', 'shop_item_property_for_groups.shop_item_property_id', '=', 'shop_item_properties.id')
+					->where('shop_item_property_for_groups.shop_id', '=', $oShop->id)
+					->where('shop_item_property_for_groups.shop_group_id', '=', $oShopItem->Shop_Group->id);
+					
+				$aProperties = $aProperties->findAll(FALSE);
+				
+				foreach($aProperties as $oProperty)
+				{
+					$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
+
+					if(count($aPropertyValues) == 0)
+					{
+						$oProperty_Value = $oProperty->createNewValue($oShopItem->id);
+						$oProperty_Value->setValue($oProperty->default_value);
+						$oProperty_Value->save();
+					}
+				}
 
 				// Добавляем значения для общих свойств всех товаров
 				foreach ($this->xpath($oItem, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)

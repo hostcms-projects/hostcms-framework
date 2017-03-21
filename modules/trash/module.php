@@ -20,7 +20,7 @@ class Trash_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-07-16';
+	public $date = '2014-08-22';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

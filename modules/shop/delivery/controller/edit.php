@@ -25,10 +25,10 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		}
 
 		$this
-				->addSkipColumn('image')
-				->addSkipColumn('image_height')
-				->addSkipColumn('image_width')
-				;
+			->addSkipColumn('image')
+			->addSkipColumn('image_height')
+			->addSkipColumn('image_width')
+			;
 
 		parent::setObject($object);
 
@@ -161,13 +161,20 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			});</script>"), $oTypeRadio);
 
 
-	$oMainTab->addAfter(
-		Admin_Form_Entity::factory('Textarea')
-			->caption(Core::_('Shop_Delivery.handler'))
+		$oTextarea = Admin_Form_Entity::factory('Textarea');
+		
+		$oTmpOptions = $oTextarea->syntaxHighlighterOptions;
+		$oTmpOptions['mode'] = 'application/x-httpd-php';
+		
+		$oTextarea->caption(Core::_('Shop_Delivery.handler'))
 			->name('code')
 			->value($this->_object->loadHandlerFile())
-			->divAttr(array('id' => 'code')),
-		$oTypeRadio);
+			->divAttr(array('id' => 'code'))
+			->rows(15)
+			->syntaxHighlighter(TRUE)
+			->syntaxHighlighterOptions($oTmpOptions);
+
+		$oMainTab->addAfter($oTextarea, $oTypeRadio);
 
 		return $this;
 	}

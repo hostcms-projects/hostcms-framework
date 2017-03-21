@@ -45,10 +45,18 @@ class Skin_Default extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/mbMenu.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.metadata.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.hoverIntent.js')
-			
-			->addJs('/admin/js/typeahead-bs2.min.js')			
+			->addJs('/admin/js/typeahead-bs2.min.js')
 			->addJs('/admin/js/bootstrap-tag.js')
 			->addJs('/admin/js/ace.js')
+			->addJs('/admin/js/codemirror/lib/codemirror.js')
+			->addJs('/admin/js/codemirror/mode/css/css.js')
+			->addJs('/admin/js/codemirror/mode/htmlmixed/htmlmixed.js')
+			->addJs('/admin/js/codemirror/mode/javascript/javascript.js')
+			->addJs('/admin/js/codemirror/mode/clike/clike.js')
+			->addJs('/admin/js/codemirror/mode/php/php.js')
+			->addJs('/admin/js/codemirror/mode/xml/xml.js')
+			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
+			
 			;
 
 		/*if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -64,6 +72,7 @@ class Skin_Default extends Core_Skin
 			->addCss('/admin/js/ui/themes/base/jquery.ui.all.css')
 			->addCss('/admin/js/ui/stars/ui.stars.css')
 			->addCss('/admin/js/ui/ui.css')
+			->addCss('/admin/js/codemirror/lib/codemirror.css')
 			;
 	}
 
@@ -847,7 +856,7 @@ class Skin_Default extends Core_Skin
 				->ajax($bAjax)
 				->execute();
 			exit();
-		}	
+		}
 		return $this;
 	}
 

@@ -104,6 +104,9 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oTemplate_Textarea = Admin_Form_Entity::factory('Textarea');
 
+				$oTmpOptions = $oTemplate_Textarea->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'application/x-httpd-php';
+
 				$oTemplate_Textarea
 					->value(
 						$this->_object->loadTemplateFile()
@@ -111,12 +114,17 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->cols(140)
 					->rows(30)
 					->caption(Core::_('Template.template'))
-					->name('template');
+					->name('template')
+					->syntaxHighlighter(TRUE)
+					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oTemplateTab->add($oTemplate_Textarea);
 
 				$oCss_Textarea = Admin_Form_Entity::factory('Textarea');
 
+				$oTmpOptions = $oCss_Textarea->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'css';
+				
 				$oCss_Textarea
 					->value(
 						$this->_object->loadTemplateCssFile()
@@ -124,7 +132,9 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->cols(140)
 					->rows(30)
 					->caption(Core::_('Template.css'))
-					->name('css');
+					->name('css')
+					->syntaxHighlighter(TRUE)
+					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oCssTab->add($oCss_Textarea);
 

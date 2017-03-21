@@ -996,3 +996,12 @@ div.fm_preview {
     outline: 0 none;
     text-decoration: none;
 }
+
+.hostcmsWindow .CodeMirror {
+	border: 1px solid #ddd;
+}
+
+.hostcmsWindow .CodeMirror * {
+	font-family: monospace;
+	font-size: 10pt;
+}

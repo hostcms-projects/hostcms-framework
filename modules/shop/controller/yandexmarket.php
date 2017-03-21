@@ -362,6 +362,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 					echo '<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n";
 				}
 
+				// Элемент предназначен для обозначения товара, который можно скачать. Если указано значение параметра true, товарное предложение показывается во всех регионах независимо от регионов доставки, указанных магазином на странице Параметры размещения.
+				if ($oShop_Item->type == 1)
+				{
+					echo '<downloadable>true</downloadable>'. "\n";
+				}
+
 				$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
 
 				Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));

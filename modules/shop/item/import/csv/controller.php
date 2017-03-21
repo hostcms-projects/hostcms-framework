@@ -1883,7 +1883,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					}
 				}
 			}
-			
+
 			if (($this->_oCurrentItem->id
 			//&& $this->importAction == 1
 			&& !is_null($this->_oCurrentItem->name)
@@ -1973,10 +1973,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						->where('percent', '=', $this->_oCurrentShopSpecialPrice->percent)
 					;
 
-					$oTmpObject = $oTmpObject->findAll(FALSE);
-
 					// Добавляем специальную цену, если её ещё не существовало
-					if (count($oTmpObject) == 0)
+					if ($oTmpObject->getCount(FALSE) == 0)
 					{
 						$this->_oCurrentShopSpecialPrice->shop_item_id = $this->_oCurrentItem->id;
 						$this->_oCurrentShopSpecialPrice->save();
@@ -2284,11 +2282,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$oProperty = Core_Entity::factory('Property')->find($iPropertyID);
 
 					$iShop_Item_Property_Id = $oProperty->Shop_Item_Property->id;
-					
-					$group_id = $this->_oCurrentItem->modification_id == 0 
-						? $this->_oCurrentItem->shop_group_id 
+
+					$group_id = $this->_oCurrentItem->modification_id == 0
+						? $this->_oCurrentItem->shop_group_id
 						: $this->_oCurrentItem->Modification->shop_group_id;
-					
+
 					// Проверяем доступность дополнительного свойства для группы товаров
 					if (is_null(Core_Entity::factory('Shop', $this->_oCurrentShop->id)
 						->Shop_Item_Property_For_Groups
@@ -2311,13 +2309,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$oProperty->type == 2 && $oPropertyValue->setDir($this->_oCurrentItem->getItemPath());
 							$oPropertyValue->delete();
 						}
-						
+
 						$aPropertyValues = array();
 
 						$this->_aClearedPropertyValues[$this->_oCurrentItem->id][] = $oProperty->guid;
 					}
 
-					
+
 					if($oProperty->multiple)
 					{
 						$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
@@ -2326,7 +2324,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					{
 						$oProperty_Value = isset($aPropertyValues[0])
 							? $aPropertyValues[0]
-							: $oProperty->createNewValue($this->_oCurrentItem->id);						
+							: $oProperty->createNewValue($this->_oCurrentItem->id);
 					}
 
 					switch($oProperty->type)
@@ -2756,7 +2754,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			: NULL);
 
 		$this->init();
-			
+
 		$this->_oCurrentGroup->shop_id = $this->_oCurrentShop->id;
 
 		// Инициализация текущего товара

@@ -121,6 +121,7 @@ class Core_ORM
 				'type' => Type of relation: one|many
 				'model' => Model name
 				'foreign_key' => Foreign key
+				'primary_key' => Primary key in the parent table
 				'through' => Model name for many-to-many relation
 				'through_table_name' => Table name for many-to-many relation
 				'dependent_key' => Dependent child's key in "through" table
@@ -200,8 +201,9 @@ class Core_ORM
 	 * // Equivalence belongs to relation for Comment-Book with detailed conditions:
 	 * // book - Model name
 	 * // foreign_key - Foreign key
+	 * // primary_key - Primary key in the parent table
 	 * protected $_belongsTo = array('book' => array(
-						'foreign_key' => 'book_id'
+	 * 		'foreign_key' => 'book_id'
 	 * 	));
 	 * </code>
 	 * @var array
@@ -412,6 +414,7 @@ class Core_ORM
 
 		if ($aCurrent !== FALSE)
 		{
+			/* */
 			$this->setValues($this->_modelColumns + $aCurrent);
 
 			$Core_DataBase->free();

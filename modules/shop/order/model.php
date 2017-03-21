@@ -1128,6 +1128,46 @@ class Shop_Order_Model extends Core_Entity
 		$oContractor->addChild('Имя', $this->name);
 		$oContractor->addChild('Отчество', $this->patronymic);
 		$oContractor->addChild('АдресРегистрации')->addChild('Представление', $this->address);
+		
+		// Адрес контрагента
+		$oContractorAddress = $oContractor->addChild('Адрес');
+		$oContractorAddress->addChild('Представление', implode(', ', array($this->postcode,$this->shop_country->name,$this->shop_country_location_city->name,$this->address)));
+		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
+		$oAddressField->addChild('Тип', 'Почтовый индекс');
+		$oAddressField->addChild('Значение', $this->postcode);
+		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
+		$oAddressField->addChild('Тип', 'Страна');
+		$oAddressField->addChild('Значение', $this->shop_country->name);
+		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
+		$oAddressField->addChild('Тип', 'Город');
+		$oAddressField->addChild('Значение', $this->shop_country_location_city->name);
+		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
+		$oAddressField->addChild('Тип', 'Улица');
+		$oAddressField->addChild('Значение', $this->address);
+		$oAddressContacts = $oContractorAddress->addChild('Контакты');
+		$oContact = $oAddressContacts->addChild('Контакт');
+		$oContact->addChild('Тип','Почта');
+		$oContact->addChild('Значение',$this->email);
+		$oContact = $oAddressContacts->addChild('Контакт');
+		$oContact->addChild('Тип','Телефон');
+		$oContact->addChild('Значение',$this->phone);
+		
+		// Статус оплаты заказа
+		$oOrderProperties = $oOrderXml->addChild('ЗначенияРеквизитов');
+		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
+		$oOrderProperty->addChild('Наименование', 'Заказ оплачен');
+		$oOrderProperty->addChild('Значение', $this->paid == 1 ? 'true' : 'false');
+		
+		// Способ доставки
+		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
+		$oOrderProperty->addChild('Наименование', 'Способ доставки');
+		$oOrderProperty->addChild('Значение', $this->shop_delivery->name);
+		
+		// Метод оплаты
+		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
+		$oOrderProperty->addChild('Наименование', 'Метод оплаты');
+		$oOrderProperty->addChild('Значение', $this->shop_payment_system->name); 
+		////////////////////
 
 		$oOrderXml->addChild('Время', $time);
 		$oOrderXml->addChild('Комментарий', $this->description);

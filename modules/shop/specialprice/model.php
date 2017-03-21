@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Specialprice_Model extends Core_Entity
 {
@@ -34,6 +34,17 @@ class Shop_Specialprice_Model extends Core_Entity
 		'price',
 	);
 
+	/**
+	 * List of preloaded values
+	 * @var array
+	 */
+	protected $_preloadValues = array(
+		'min_quantity' => 0,
+		'max_quantity' => 0,
+		'price' => 0,
+		'percent' => 0
+	);
+	
 	/**
 	 * Get XML for entity and children entities
 	 * @return string

@@ -59,6 +59,9 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oTextarea_Xsl = Admin_Form_Entity::factory('Textarea');
 
+				$oTmpOptions = $oTextarea_Xsl->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'xml';
+				
 				$oTextarea_Xsl
 					->value(
 						$this->_object->loadXslFile()
@@ -66,7 +69,9 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->cols(140)
 					->rows(30)
 					->caption(Core::_('Xsl.value'))
-					->name('xsl_value');
+					->name('xsl_value')
+					->syntaxHighlighter(TRUE)
+					->syntaxHighlighterOptions($oTmpOptions);
 
 				// Добавляем на основную вкладку большое текстовое поле с кодом XSL-шаблона
 				// после выпадающего списка разделов XSL

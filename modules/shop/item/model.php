@@ -98,7 +98,9 @@ class Shop_Item_Model extends Core_Entity
 	public function __get($property)
 	{
 		return in_array(strtolower($property), array('adminprice'))
-			? $this->price
+			? ($this->shortcut_id
+				? Core_Entity::factory('Shop_Item', $this->shortcut_id)->price
+				: $this->price)
 			: parent::__get($property);
 	}
 
@@ -637,6 +639,7 @@ class Shop_Item_Model extends Core_Entity
 		$newObject = parent::copy();
 		$newObject->path = '';
 		$newObject->showed = 0;
+		$newObject->guid = Core_Guid::get();
 		$newObject->save();
 
 		if (is_file($this->getLargeFilePath()))
@@ -1867,21 +1870,5 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		return $return;
-	}
-
-	/**
-	 * Get item by guid
-	 * @param string $guid guid
-	 * @return Property_Model|NULL
-	 */
-	public function getByGuid($guid)
-	{
-		$this->queryBuilder()
-			//->clear()
-			->where('guid', '=', $guid)
-			->limit(1);
-		$aShop_Items = $this->findAll(FALSE);
-
-		return isset($aShop_Items[0]) ? $aShop_Items[0] : NULL;
 	}
 }

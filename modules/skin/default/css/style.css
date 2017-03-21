@@ -1159,3 +1159,12 @@ div.fm_preview {
 	cursor: default;
 	background-color: #F3AE00;
 }
+
+.hostcms6 .CodeMirror {
+	border: 1px solid #ddd;
+}
+
+.hostcms6 .CodeMirror * {
+	font-family: monospace;
+	font-size: 10pt;
+}

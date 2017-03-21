@@ -41,10 +41,17 @@ class Skin_Hostcms5 extends Core_Skin
 			->addJs('/admin/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
 			->addJs('/admin/js/ui/stars/jquery.ui.stars.js')
 			->addJs('/admin/js/fusionchart/FusionCharts.js')
-			
-			->addJs('/admin/js/typeahead-bs2.min.js')			
+			->addJs('/admin/js/typeahead-bs2.min.js')
 			->addJs('/admin/js/bootstrap-tag.js')
 			->addJs('/admin/js/ace.js')
+			->addJs('/admin/js/codemirror/lib/codemirror.js')
+			->addJs('/admin/js/codemirror/mode/css/css.js')
+			->addJs('/admin/js/codemirror/mode/htmlmixed/htmlmixed.js')
+			->addJs('/admin/js/codemirror/mode/javascript/javascript.js')
+			->addJs('/admin/js/codemirror/mode/clike/clike.js')
+			->addJs('/admin/js/codemirror/mode/php/php.js')
+			->addJs('/admin/js/codemirror/mode/xml/xml.js')
+			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
 			;
 
 		//if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -59,6 +66,7 @@ class Skin_Hostcms5 extends Core_Skin
 			->addCss('/admin/js/ui/themes/base/jquery.ui.all.css')
 			->addCss('/admin/js/ui/ui.css')
 			->addCss('/admin/js/ui/stars/ui.stars.css')
+			->addCss('/admin/js/codemirror/lib/codemirror.css')
 			;
 	}
 
@@ -635,7 +643,7 @@ if (Core_Auth::logged())
 					$domain = $oSite_Alias
 						? $oSite_Alias->name
 						: '';
-					
+
 					if (!$update->GetUpdate(array (
 							'login' => $login,
 							'contract' => $contract,
@@ -943,7 +951,7 @@ if (Core_Auth::logged())
 			NewTr($count_td);
 		}
 
-		?></tr></table><?php				
+		?></tr></table><?php
 		return $this;
 	}
 

@@ -22,7 +22,7 @@ class Market_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-04';
+	public $date = '2014-08-22';
 
 	/**
 	 * Constructor.

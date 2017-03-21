@@ -45,41 +45,48 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 		$xml = $Core_Http->getBody();
 
 		$oXml = @simplexml_load_string($xml);
-		
+
 		if (is_object($oXml))
 		{
 			$oDefaultCurrency = Core_Entity::factory('Shop_Currency')->getBydefault(1);
-		
+
 			// валюты по умолчанию нет, нет смысла считать дальше
 			if(is_null($oDefaultCurrency))
 			{
 				throw new Exception('Валюта по умолчанию не задана. Невозможно рассчитать курс');
 			}
-	
+
 			// получаем данные о котировках их XML
 			foreach ($oXml->Valute as $Valute)
 			{
-				$this->_exchangeRate[strval($Valute->CharCode)] = floatval((str_replace(',', '.', $Valute->Value))) / floatval((str_replace(',', '.', $Valute->Nominal)));
+				$this->_exchangeRate[strval($Valute->CharCode)] = floatval((str_replace(',', '.', $Valute->Value))) / floatval(str_replace(',', '.', $Valute->Nominal));
 			}
-			
-			if($oDefaultCurrency->code!='RUB' && !isset($this->_exchangeRate[$oDefaultCurrency->code]))
+
+			if ($oDefaultCurrency->code != 'RUB' && !isset($this->_exchangeRate[$oDefaultCurrency->code]))
 			{
 				throw new Exception('Валюта по умолчанию отсутствует во входящем XML');
 			}
-			
+
 			// любая валюта по умолчанию равна 1
 			$oDefaultCurrency->exchange_rate(1)->save();
-			
-			/* Рубль - не всегда валюта по умолчанию, но он всегда отсутствует во входящем XML. 
-			 *	Значение котировки рабля в таком случае = 1/котировка_валюты_по_умолчанию. 
+
+			/* Рубль - не всегда валюта по умолчанию, но он всегда отсутствует во входящем XML.
 			 * Итак, если:
-					валюта по умолчанию НЕ рубль 
-					И рубль присутсвует в списке валют 
+					валюта по умолчанию НЕ рубль
+					И рубль присутсвует в списке валют
 				ставим рублю его котировку, относительно валюты по умолчанию
 			 */
-			$oDefaultCurrency->code!='RUB' && !is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUB')) && $oRubCurrency->exchange_rate(1.0/$this->_exchangeRate[$oDefaultCurrency->code])->save();
-		
-			foreach($this->_exchangeRate as $code => $rate)
+			if ($oDefaultCurrency->code != 'RUB')
+			{
+				$fRubRate = 1.0 / $this->_exchangeRate[$oDefaultCurrency->code];
+
+				!is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUB'))
+					&& $oRubCurrency
+						->exchange_rate($fRubRate)
+						->save();
+			}
+
+			foreach ($this->_exchangeRate as $code => $rate)
 			{
 				// ищем текущую валюту в магазине
 				$oCurrentCurrency = Core_Entity::factory('Shop_Currency')->getByCode($code);
@@ -88,15 +95,15 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 					// валюта не найдена, пропускаем итерацию
 					continue;
 				}
-				
-				if($oDefaultCurrency->code=='RUB')
+
+				if($oDefaultCurrency->code == 'RUB')
 				{
 					$oCurrentCurrency->exchange_rate = $rate;
 					$oCurrentCurrency->save();
 				}
 				elseif(isset($this->_exchangeRate[$oDefaultCurrency->code]))
 				{
-					$oCurrentCurrency->exchange_rate = 1 / $rate * $this->_exchangeRate[$oDefaultCurrency->code];
+					$oCurrentCurrency->exchange_rate = $rate * $fRubRate;
 					$oCurrentCurrency->save();
 				}
 				else
@@ -105,7 +112,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 				}
 			}
 		}
-		
+
 		return $this;
 	}
 }

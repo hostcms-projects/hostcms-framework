@@ -49,11 +49,9 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		parent::__construct($oAdmin_Form_Action);
 
 		// Set default title
-
 		$oAdmin_Word = $this->_Admin_Form_Action->Admin_Word->getWordByLanguage(
 			Core_Entity::factory('Admin_Language')->getCurrent()->id
 		);
-
 		$this->title = is_object($oAdmin_Word) ? $oAdmin_Word->name : 'undefined';
 
 		// Пропускаемые свойства модели
@@ -298,11 +296,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 			$oUser = Core_Entity::factory('User')->getCurrent();
 
-			if (!$oUser->superuser)
-			{
-				$oAdmin_Form_Tab_EntityAdditional->active(FALSE);
-			}
-
+			!$oUser->superuser && $oAdmin_Form_Tab_EntityAdditional->active(FALSE);
 
 			$this->addTab($oAdmin_Form_Tab_EntityAdditional);
 		//}

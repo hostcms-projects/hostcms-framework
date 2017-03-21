@@ -102,6 +102,19 @@ abstract class Core_Http
 	}
 
 	/**
+	 * Clear object
+	 *
+	 * @return self
+	 */
+	public function clear()
+	{
+		$this->_additionalHeaders = $this->_data = array();
+		$this->_url = $this->_referer = $this->_headers = $this->_body = NULL;
+
+		return $this->_init();
+	}
+
+	/**
 	 * Initialize object
 	 * @return self
 	 */

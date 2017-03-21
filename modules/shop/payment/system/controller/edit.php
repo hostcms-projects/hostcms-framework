@@ -44,20 +44,17 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			->caption(Core::_('Shop_Payment_System.shop_id'))
 			->style("width: 190px")
 			->divAttr(array('style' => 'float: left'))
-			->options
-			(
+			->options(
 				$this->_fillShops()
 			)
 			->value($this->_object->shop_id);
 
-		$oMainTab->addAfter
-		(
+		$oMainTab->addAfter(
 			$oShopField,
 			$this->getField('name')
 		);
 
-		$oAdditionalTab->delete
-		(
+		$oAdditionalTab->delete(
 			$this->getField('shop_currency_id')
 		);
 
@@ -68,14 +65,12 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			->caption(Core::_('Shop_Payment_System.shop_currency_id'))
 			->style("width: 110px")
 			->divAttr(array('style' => 'float: left'))
-			->options
-			(
+			->options(
 				$Shop_Controller_Edit->fillCurrencies()
 			)
 			->value($this->_object->shop_currency_id);
 
-		$oMainTab->addAfter
-		(
+		$oMainTab->addAfter(
 			$oCurrencyField,
 			$oShopField
 		);
@@ -84,6 +79,9 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 
 		$Admin_Form_Entity_Textarea = Admin_Form_Entity::factory('Textarea');
 
+		$oTmpOptions = $Admin_Form_Entity_Textarea->syntaxHighlighterOptions;
+		$oTmpOptions['mode'] = 'application/x-httpd-php';
+
 		$Admin_Form_Entity_Textarea
 			->value(
 				$this->_object->loadPaymentSystemFile()
@@ -91,7 +89,9 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			->cols(140)
 			->rows(30)
 			->caption(Core::_('Shop_Payment_System.system_of_pay_add_form_handler'))
-			->name('system_of_pay_add_form_handler');
+			->name('system_of_pay_add_form_handler')
+			->syntaxHighlighter(TRUE)
+			->syntaxHighlighterOptions($oTmpOptions);
 
 		$oMainTab->add($Admin_Form_Entity_Textarea);
 

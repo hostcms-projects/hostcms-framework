@@ -55,6 +55,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAdmin_Form_Entity_Textarea_Lib_Config = Admin_Form_Entity::factory('Textarea');
 
+				$oTmpOptions = $oAdmin_Form_Entity_Textarea_Lib_Config->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'application/x-httpd-php';
+
 				$oAdmin_Form_Entity_Textarea_Lib_Config
 					->value(
 						$this->_object->loadLibConfigFile()
@@ -62,7 +65,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->cols(140)
 					->rows(30)
 					->caption(Core::_('Lib.lib_form_module_config'))
-					->name('lib_php_code_config');
+					->name('lib_php_code_config')
+					->syntaxHighlighter(TRUE)
+					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oAdmin_Form_Tab_Entity_Lib_Config->add($oAdmin_Form_Entity_Textarea_Lib_Config);
 
@@ -75,6 +80,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAdmin_Form_Entity_Textarea_Lib = Admin_Form_Entity::factory('Textarea');
 
+				$oTmpOptions = $oAdmin_Form_Entity_Textarea_Lib->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'application/x-httpd-php';
+
 				$oAdmin_Form_Entity_Textarea_Lib
 					->value(
 						$this->_object->loadLibFile()
@@ -82,7 +90,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->cols(140)
 					->rows(30)
 					->caption(Core::_('Lib.lib_form_module'))
-					->name('lib_php_code');
+					->name('lib_php_code')
+					->syntaxHighlighter(TRUE)
+					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oAdmin_Form_Tab_Entity_Lib->add($oAdmin_Form_Entity_Textarea_Lib);
 
