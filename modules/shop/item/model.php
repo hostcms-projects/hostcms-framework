@@ -522,6 +522,7 @@ class Shop_Item_Model extends Core_Entity
 		{
 			// Search the same item or group
 			$oSameShopItem = $oShop->Shop_Items->getByGroupIdAndPath($this->shop_group_id, $this->path);
+
 			if (!is_null($oSameShopItem) && $oSameShopItem->id != $this->id)
 			{
 				$this->path = Core_Guid::get();
@@ -598,7 +599,6 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$this->checkDuplicatePath();
 		}
-
 		parent::save();
 
 		if ($this->path == '' && !$this->deleted && $this->makePath())
@@ -1201,14 +1201,11 @@ class Shop_Item_Model extends Core_Entity
 			->where('shortcut_id', '=', 0)
 			->limit(1);
 
-		$aShop_Items = $this->findAll();
+		$aShop_Items = $this->findAll(FALSE);
 
-		if (isset($aShop_Items[0]))
-		{
-			return $aShop_Items[0];
-		}
-
-		return NULL;
+		return isset($aShop_Items[0])
+			? $aShop_Items[0]
+			: NULL;
 	}
 
 	/**

@@ -135,6 +135,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Item_Property_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -197,5 +198,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 			case 'property_dir':
 			break;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

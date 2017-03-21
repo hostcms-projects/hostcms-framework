@@ -70,6 +70,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Warehouse_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -111,5 +112,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			}
 			while (count($aShop_Items));
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

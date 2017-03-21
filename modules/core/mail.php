@@ -24,7 +24,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Mail
 {
@@ -282,7 +282,7 @@ abstract class Core_Mail
 	 */
 	public function header($name, $value)
 	{
-		$this->_headers[$name] = $value;
+		$this->_headers[$name] = str_replace(array("\r", "\n"), '', $value);
 		return $this;
 	}
 

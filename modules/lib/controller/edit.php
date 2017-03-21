@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -138,6 +138,7 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Lib_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -152,6 +153,8 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->_object->saveLibConfigFile(Core_Array::getRequest('lib_php_code_config'));
 			break;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**

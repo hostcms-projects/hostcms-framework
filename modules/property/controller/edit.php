@@ -352,6 +352,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Property_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -388,5 +389,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$this->linkedObject->add($this->_object);
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

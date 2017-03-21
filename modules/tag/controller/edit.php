@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -58,7 +58,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 
 				$this->getField('description')->wysiwyg(TRUE);
-				
+
 				if (is_null($this->_object->id))
 				{
 					// Удаляем стандартный <input>
@@ -77,7 +77,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oMainTab->addBefore($oTextarea_TagName, $oSelect_Dirs);
 				}
-				
+
 				// Tags SEO
 				$this->addTabAfter($seoTab = Admin_Form_Entity::factory('Tab')
 					->caption('SEO')
@@ -124,6 +124,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	/**
 	 * Processing of the form. Apply object fields.
 	 * @return self
+	 * @hostcms-event Tag_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -170,6 +171,8 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			break;
 		}
 
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
+
 		return $this;
 	}
 
@@ -177,7 +180,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 * Build visual representation of group tree
 	 * @param int $iTagDirParentId parent ID
 	 * @param int $aExclude exclude group ID
-	 * @param int $iLevel current nesting level 
+	 * @param int $iLevel current nesting level
 	 * @return array
 	 */
 	public function fillTagDir($iTagDirParentId = 0, $aExclude = array(), $iLevel = 0)

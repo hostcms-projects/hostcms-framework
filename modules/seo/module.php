@@ -22,7 +22,7 @@ class Seo_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 
 	/**
 	 * Constructor.
@@ -35,6 +35,7 @@ class Seo_Module extends Core_Module
 			array(
 				'sorting' => 55,
 				'block' => 1,
+				'ico' => 'fa-bullseye',
 				'name' => Core::_('Seo.menu'),
 				'href' => "/admin/seo/index.php",
 				'onclick' => "$.adminLoad({path: '/admin/seo/index.php'}); return false"

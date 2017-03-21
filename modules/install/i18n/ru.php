@@ -121,7 +121,7 @@ return array(
 	'sql_dump_loading_error' => 'Ошибка. Версия MySQL %s',
 	'domen_installing' => 'Установка домена',
 	'lng_installing' => 'Установка языка',
-	'sql_error' => 'Ошибка %s : %s',
+	'sql_error' => 'Ошибка %s',
 
 	'error_system_already_install' => 'Система управления HostCMS уже установлена!',
 	'delete_install_file' => 'Удалите файл install.php',

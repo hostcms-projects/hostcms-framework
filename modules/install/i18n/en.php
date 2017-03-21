@@ -122,7 +122,7 @@ return array(
 	'sql_dump_loading_error' => 'Error. MySQL version %s',
 	'domen_installing' => 'Domain installation',
 	'lng_installing' => 'Language installation',
-	'sql_error' => 'Error %s : %s',
+	'sql_error' => 'Error %s',
 
 	'error_system_already_install' => 'The HostCMS has been installed!',
 	'delete_install_file' => 'Delete file install.php',

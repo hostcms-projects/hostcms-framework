@@ -382,14 +382,14 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->move($this->getField('seo_keywords'), $oInformationsystemTabSeo);
 
 				if (Core::moduleIsActive('tag'))
-				{					
+				{
 					$oTagsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Informationsystem_Item.tab_3'))
 						->name('Tags');
 					$this->addTabAfter($oTagsTab, $oInformationsystemTabSeo);
-										
+
 					$html = '<label class="tags_label" for="form-field-tags">Метки (теги)</label>
-						<div class="item_div">															
+						<div class="item_div">
 							<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="Введите тэг ..." />
 						</div>
 						<script type="text/javascript">
@@ -397,11 +397,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 								//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
 								//var tag_input = $(\'#' . $windowId .' #form-field-tags\');
 								var tag_input = $(\'#form-field-tags\');
-								if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) ) 
+								if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
 								{
 									tag_input.tag(
 									  {
-										placeholder:tag_input.attr(\'placeholder\')											
+										placeholder:tag_input.attr(\'placeholder\')
 									  }
 									);
 								}
@@ -410,11 +410,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 									tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
 									//$(\'#form-field-tags\').autosize({append: "n"});
 								}
-								
+
 							})
 						</script>
 							';
-					$oTagsTab->add(Admin_Form_Entity::factory('Code')->html($html));		
+					$oTagsTab->add(Admin_Form_Entity::factory('Code')->html($html));
 				}
 
 			break;
@@ -542,7 +542,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						'caption' => Core::_('Informationsystem_Group.image_large'),
 
 						// used_big_image_preserve_aspect_ratio_checked -  вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
-						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio
+						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio_group
 						)
 					)
 					->smallImage(array(
@@ -572,7 +572,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 						'show_params' => TRUE,
 
-						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio_small
+						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio_group_small
 						)
 					);
 
@@ -741,6 +741,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Informationsystem_Item_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -1153,6 +1154,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			$oMaillist_Fascicle->save();
 			$oMaillist->add($oMaillist_Fascicle);
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**

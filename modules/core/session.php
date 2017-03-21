@@ -91,7 +91,7 @@ class Core_Session
 				//ini_set('session.gc_maxlifetime', $expires);
 			}
 
-			$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
+			$domain = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST'));
 			if (!empty($domain) && !headers_sent())
 			{
 				// Обрезаем www у домена
@@ -125,7 +125,7 @@ class Core_Session
 	 */
 	/*static protected function _setCookie()
 	{
-		$domain = Core_Array::get($_SERVER, 'HTTP_HOST');
+		$domain = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST'));
 		if (!empty($domain) && !headers_sent())
 		{
 			// Обрезаем www у домена

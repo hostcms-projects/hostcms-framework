@@ -20,7 +20,7 @@ class Typograph_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

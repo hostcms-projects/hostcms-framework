@@ -442,8 +442,9 @@ class Informationsystem_Model extends Core_Entity
 		$this->_groupsTree = array();
 		$queryBuilder = Core_QueryBuilder::select('id', 'parent_id')
 			->from('informationsystem_groups')
-			->where('informationsystem_id', '=', $information_system_id)
-			->where('deleted', '=', 0);
+			->where('informationsystem_groups.informationsystem_id', '=', $information_system_id)
+			->where('informationsystem_groups.active', '=', 1)
+			->where('informationsystem_groups.deleted', '=', 0);
 
 		$aInformationsystem_Groups = $queryBuilder->execute()->asAssoc()->result();
 		foreach($aInformationsystem_Groups as $aInformationsystem_Group)
@@ -455,8 +456,9 @@ class Informationsystem_Model extends Core_Entity
 
 		$queryBuilder = Core_QueryBuilder::select('parent_id', array('COUNT(id)', 'count'))
 			->from('informationsystem_groups')
-			->where('informationsystem_id', '=', $information_system_id)
-			->where('deleted', '=', 0)
+			->where('informationsystem_groups.informationsystem_id', '=', $information_system_id)
+			->where('informationsystem_groups.active', '=', 1)
+			->where('informationsystem_groups.deleted', '=', 0)
 			->groupBy('parent_id');
 
 		$aInformationsystem_Groups = $queryBuilder->execute()->asAssoc()->result();
@@ -472,16 +474,16 @@ class Informationsystem_Model extends Core_Entity
 		$queryBuilder->clear()
 			->select('informationsystem_group_id', array('COUNT(id)', 'count'))
 			->from('informationsystem_items')
-			->where('informationsystem_id', '=', $information_system_id)
-			->where('active', '=', 1)
-			->where('start_datetime', '<=', $current_date)
+			->where('informationsystem_items.informationsystem_id', '=', $information_system_id)
+			->where('informationsystem_items.active', '=', 1)
+			->where('informationsystem_items.start_datetime', '<=', $current_date)
 			->open()
-			->where('end_datetime', '>=', $current_date)
+			->where('informationsystem_items.end_datetime', '>=', $current_date)
 			->setOr()
-			->where('end_datetime', '=', '0000-00-00 00:00:00')
+			->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			//->where('siteuser_group_id', 'IN', $mas_result)
-			->where('deleted', '=', 0)
+			->where('informationsystem_items.deleted', '=', 0)
 			->groupBy('informationsystem_group_id');
 
 		$aInformationsystem_Items = $queryBuilder->execute()->asAssoc()->result();

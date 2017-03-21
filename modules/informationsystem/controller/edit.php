@@ -342,6 +342,8 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				$oMainTab
 					->move($this->getField('preserve_aspect_ratio'), $oInformationsystemTabImage)
 					->move($this->getField('preserve_aspect_ratio_small'), $oInformationsystemTabImage)
+					->move($this->getField('preserve_aspect_ratio_group'), $oInformationsystemTabImage)
+					->move($this->getField('preserve_aspect_ratio_group_small'), $oInformationsystemTabImage)
 					->move($this->getField('watermark_default_use_large_image'), $oInformationsystemTabImage)
 					->move($this->getField('watermark_default_use_small_image'), $oInformationsystemTabImage)
 					->move($this->getField('watermark_default_position_x'), $oInformationsystemTabImage)
@@ -418,9 +420,9 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->where('informationsystems.structure_id', '=', $iStructureId);
 
 				$aInformationsystems = $oInformationsystem->findAll();
-				
+
 				$iCount = count($aInformationsystems);
-				
+
 				if ($iStructureId && $iCount && (is_null($this->_object->id) || $iCount > 1 || $aInformationsystems[0]->id != $this->_object->id))
 				{
 					$oStructure = Core_Entity::factory('Structure', $iStructureId);
@@ -442,11 +444,12 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Informationsystem_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
 		parent::_applyObjectProperty();
-		
+
 		if(
 			// Поле файла существует
 			!is_null($aFileData = Core_Array::getFiles('watermark_file', NULL))
@@ -467,6 +470,8 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 				);
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**

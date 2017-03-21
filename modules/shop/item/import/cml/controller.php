@@ -248,20 +248,24 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oItem->shop_seller_id = $oSeller->id;
 				break;
 				case 'ПРОИЗВОДИТЕЛЬ':
-					$oProducer = Core_Entity::factory('Shop', $this->iShopId)->Shop_Producers->getByName($sPropertyValue, FALSE);
-
-					if (is_null($oProducer))
+				
+					if(trim($sPropertyValue) != '')
 					{
-						$oProducer = Core_Entity::factory('Shop_Producer');
-						$oProducer->shop_id($this->iShopId)->name($sPropertyValue)->save();
-					}
+						$oProducer = Core_Entity::factory('Shop', $this->iShopId)->Shop_Producers->getByName($sPropertyValue, FALSE);
 
-					$oItem->shop_producer_id = $oProducer->id;
+						if (is_null($oProducer))
+						{
+							$oProducer = Core_Entity::factory('Shop_Producer');
+							$oProducer->shop_id($this->iShopId)->name($sPropertyValue)->save();
+						}
 
-					if ($oItem->modification_id)
-					{
-						$oItem->Modification->shop_producer_id = $oProducer->id;
-						$oItem->Modification->save();
+						$oItem->shop_producer_id = $oProducer->id;
+
+						if ($oItem->modification_id)
+						{
+							$oItem->Modification->shop_producer_id = $oProducer->id;
+							$oItem->Modification->save();
+						}
 					}
 				break;
 				case 'АКТИВНОСТЬ':
@@ -306,20 +310,26 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		{
 			$object->registerXPathNamespace('w', $this->namespace);
 			$sXmlns = 'w:';
-		}
-		else
-		{
-			$sXmlns = '';
+
+			// namespace указываем перед каждым элементом xpath
+			$aExplode = explode('/', $path);
+			foreach ($aExplode as $key => $value)
+			{
+				$aExplode[$key] = $sXmlns . $value;
+			}
+
+			$sOriginalPath = $path;
+
+			$path = implode('/', $aExplode);
 		}
 
-		// namespace указываем перед каждым элементом xpath
-		$aExplode = explode('/', $path);
-		foreach ($aExplode as $key => $value)
+		$return = $object->xpath($path);
+
+		if ($this->namespace && ($return === FALSE || !count($return)))
 		{
-			$aExplode[$key] = $sXmlns . $value;
+			$return = $object->xpath($sOriginalPath);
 		}
 
-		$return = $object->xpath(implode('/', $aExplode));
 		!is_array($return) && $return = array();
 
 		return $return;

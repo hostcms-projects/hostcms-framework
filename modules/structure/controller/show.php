@@ -202,8 +202,7 @@ class Structure_Controller_Show extends Core_Controller
 
 		foreach ($aStructures as $oStructure)
 		{
-			$oStructure->clearEntities();
-			$this->_aStructures[$oStructure->parent_id][] = $oStructure;
+			$this->_aStructures[$oStructure->parent_id][] = $oStructure->clearEntities();
 		}
 
 		$oSite = $this->getEntity();
@@ -282,7 +281,7 @@ class Structure_Controller_Show extends Core_Controller
 				$parentObject->addEntity($oStructure);
 
 				// Properties for structure entity
-				$this->showProperties && $oStructure->showXmlProperties(TRUE);
+				$oStructure->showXmlProperties($this->showProperties);
 
 				if (is_null($this->level) || $level < $this->level)
 				{

@@ -847,8 +847,7 @@ class Skin_Default extends Core_Skin
 				->ajax($bAjax)
 				->execute();
 			exit();
-		}
-
+		}	
 		return $this;
 	}
 

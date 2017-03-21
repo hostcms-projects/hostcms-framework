@@ -20,7 +20,7 @@ class Template_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 
 	/**
 	 * Constructor.
@@ -33,6 +33,7 @@ class Template_Module extends Core_Module{	/**
 			array(
 				'sorting' => 70,
 				'block' => 0,
+				'ico' => 'fa-desktop',
 				'name' => Core::_('template.menu'),
 				'href' => "/admin/template/index.php",
 				'onclick' => "$.adminLoad({path: '/admin/template/index.php'}); return false"

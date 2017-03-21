@@ -5,7 +5,7 @@
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Обновления',
@@ -29,7 +29,7 @@ return array(
 	'error_open_updatefile' => 'Файл обновлений не обнаружен.',
 	'error_write_file_update' => 'Ошибка записи данных в файл "%s".',
 	'update_constant_error' => 'Не обнаружена константа HOSTCMS_UPDATE_SERVER.',
-	'update_files_error' => 'Ошибка обновления.',
+	'update_files_error' => 'Ошибка распаковки tar.gz файла.',
 	'server_return_empty_answer' => 'Сервер вернул пустой ответ, наиболее вероятно на хостинге запрещены исходящие соединения с использованием fsockopen(). Обратитесь к хостинг-провайдеру или администратору сервера.',
 	'support_available' => 'Период технической поддержки доступен до %s г.',
 	'support_has_expired' => 'Период технической поддержки истек %s г. <a href="http://%s/users/" target="_blank">Продлить поддержку</a>.',

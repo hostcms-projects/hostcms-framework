@@ -68,7 +68,6 @@ class Core_Sitemap extends Core_Servant_Properties
 		$this->rebuildTime = 14400; // 4 часа
 		$this->limit = 1000;
 		$this->createIndex = FALSE;
-
 	}
 
 	/**
@@ -305,7 +304,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	{
 		$sIndexFilePath = $this->_getIndexFilePath();
 
-		$this->_bRebuild = !is_file($sIndexFilePath) || time() > filemtime($sIndexFilePath) + 2000;
+		$this->_bRebuild = !is_file($sIndexFilePath) || time() > filemtime($sIndexFilePath) + $this->rebuildTime;
 
 		if ($this->_bRebuild)
 		{
@@ -479,10 +478,10 @@ class Core_Sitemap extends Core_Servant_Properties
 	{
 		$this->_close();
 
+		$sIndexFilePath = $this->_getIndexFilePath();
+
 		if ($this->createIndex)
 		{
-			$sIndexFilePath = $this->_getIndexFilePath();
-
 			if ($this->_bRebuild)
 			{
 				$sIndex = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -504,10 +503,11 @@ class Core_Sitemap extends Core_Servant_Properties
 
 				Core_File::write($sIndexFilePath, $sIndex);
 			}
-			else
-			{
-				echo Core_File::read($sIndexFilePath);
-			}
+		}
+
+		if (!$this->_bRebuild)
+		{
+			echo Core_File::read($sIndexFilePath);
 		}
 
 		return $this;

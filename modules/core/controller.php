@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Controller extends Core_Servant_Properties
 {
@@ -113,6 +113,15 @@ class Core_Controller extends Core_Servant_Properties
 	{
 		$this->_xsl = $oXsl;
 		return $this;
+	}
+
+	/**
+	 * Get XSL
+	 * @return Xsl_Model
+	 */
+	public function getXsl()
+	{
+		return $this->_xsl;
 	}
 
 	/**

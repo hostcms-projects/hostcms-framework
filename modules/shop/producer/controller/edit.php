@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -17,7 +17,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 	 * @var array
 	 */
 	protected $_aGroupTree = array();
-	
+
 	/**
 	 * Set object
 	 * @param object $object object
@@ -26,7 +26,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 	public function setObject($object)
 	{
 		$modelName = $object->getModelName();
-		
+
 		switch($modelName)
 		{
 			case 'shop_producer':
@@ -109,7 +109,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->style("width: 400px;")
 					->name("image")
 					->id("image")
-					->largeImage(array(	
+					->largeImage(array(
 							'max_width' => $oShop->producer_image_large_max_width,
 							'max_height' => $oShop->producer_image_large_max_height,
 							'path' => $oLargeFilePath,
@@ -126,7 +126,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 						)
 					)
 					->smallImage
-					(array(	
+					(array(
 							'max_width' => $oShop->producer_image_small_max_width,
 							'max_height' => $oShop->producer_image_small_max_height,
 							'path' => $oSmallFilePath,
@@ -159,7 +159,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				// Добавляем группу товаров
 				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
-				
+
 				$title = $this->_object->id
 					? Core::_('Shop_Producer.producer_edit_form_title')
 					: Core::_('Shop_Producer.producer_add_form_title');
@@ -167,18 +167,18 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				$this->title($title);
 			break;
 			case 'shop_producer_dir':
-			
+
 				if (is_null($object->id))
 				{
 					$object->shop_id = Core_Array::getGet('shop_id');
 					$object->parent_id = Core_Array::getGet('producer_dir_id');
 				}
-				
+
 				parent::setObject($object);
-				
+
 				$oMainTab = $this->getTab('main');
 				$oAdditionalTab = $this->getTab('additional');
-				
+
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
@@ -192,20 +192,20 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				// Добавляем группу товаров
 				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
-				
+
 				$title = $this->_object->id
 					? Core::_('Shop_Producer_Dir.edit')
 					: Core::_('Shop_Producer_Dir.add');
 
 				$this->title($title);
-			
+
 			break;
 		}
 
 		return $this;
 	}
-	
-	
+
+
 	/**
 	 * Create visual tree of the directories
 	 * @param int $shop_id shop ID
@@ -258,6 +258,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Producer_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -454,5 +455,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		}
 
 		$this->_object->save();
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

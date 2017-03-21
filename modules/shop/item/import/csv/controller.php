@@ -1791,7 +1791,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			}
 
 			$this->_oCurrentItem->shop_id = $this->_oCurrentShop->id;
-			//$this->_oCurrentItem->shop_group_id = (int)$this->_oCurrentGroup->id;
+			!$this->_oCurrentItem->id && $this->_oCurrentItem->shop_group_id = (int)$this->_oCurrentGroup->id;
 			!$this->_oCurrentItem->id && is_null($this->_oCurrentItem->path) && $this->_oCurrentItem->path = '';
 			$this->_oCurrentItem->id && $this->_oCurrentItem->id == $this->_oCurrentItem->modification_id && $this->_oCurrentItem->modification_id = 0;
 
@@ -1810,6 +1810,80 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				$this->deleteImage = 0;
 			}
 
+			$aTagsName = array();
+			if(!$this->_oCurrentItem->id)
+			{
+				if (Core::moduleIsActive('tag'))
+				{
+					$oTag = Core_Entity::factory('Tag');
+
+					// Вставка тэгов автоматически разрешена
+					if ($this->_sCurrentTags == '' && $this->_oCurrentShop->apply_tags_automatically)
+					{
+						$sTmpString = '';
+
+						$sTmpString .= $this->_oCurrentItem->name ? ' ' . $this->_oCurrentItem->name : '';
+						$sTmpString .= $this->_oCurrentItem->description ? ' ' . $this->_oCurrentItem->description : '';
+						$sTmpString .= $this->_oCurrentItem->text ? ' ' . $this->_oCurrentItem->text : '';
+
+						// получаем хэш названия и описания группы
+						$aText = Core_Str::getHashes($sTmpString, array ('hash_function' => 'crc32'));
+
+						$aText = array_unique($aText);
+
+						// Получаем список меток
+						$aTags = $oTag->findAll(FALSE);
+
+						// Есть хотя бы одна метка
+						if (count($aTags) > 0)
+						{
+							// Удаляем уже существующие связи с метками
+							$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
+
+							foreach($aTags as $oTag)
+							{
+								$aTmpTags =  Core_Str::getHashes($oTag->name, array ('hash_function' => 'crc32'));
+
+								$aTmpTags = array_unique($aTmpTags);
+
+								if (count($aText) >= count($aTmpTags))
+								{
+									// Расчитываем пересечение
+									$iIntersect = count(array_intersect($aText, $aTmpTags));
+
+									if (count($aTmpTags) != 0)
+									{
+										$iCoefficient = $iIntersect / count($aTmpTags);
+									}
+									else
+									{
+										$iCoefficient = 0;
+									}
+
+									// Найдено полное вхождение
+									if ($iCoefficient == 1)
+									{
+										// Если тэг еще не учтен
+										if (!in_array($oTag->name, $aTmpTags))
+										{
+											// Добавляем в массив
+											$aTagsName[] = $oTag->name;
+
+											// Add relation
+											$this->_oCurrentItem->add($oTag);
+										}
+									}
+								}
+							}
+						}
+					}
+					elseif ($this->_sCurrentTags != '')
+					{
+						$this->_oCurrentItem->id && $this->_oCurrentItem->applyTags($this->_sCurrentTags);
+					}
+				}
+			}
+			
 			if (($this->_oCurrentItem->id
 			//&& $this->importAction == 1
 			&& !is_null($this->_oCurrentItem->name)
@@ -1826,77 +1900,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$this->_oCurrentItem->save();
 				}
 				$this->_incInsertedItems($this->_oCurrentItem->id);
-			}
-
-			$aTagsName = array();
-			if (Core::moduleIsActive('tag'))
-			{
-				$oTag = Core_Entity::factory('Tag');
-
-				// Вставка тэгов автоматически разрешена
-				if ($this->_sCurrentTags == '' && $this->_oCurrentShop->apply_tags_automatically)
-				{
-					$sTmpString = '';
-
-					$sTmpString .= $this->_oCurrentItem->name ? ' ' . $this->_oCurrentItem->name : '';
-					$sTmpString .= $this->_oCurrentItem->description ? ' ' . $this->_oCurrentItem->description : '';
-					$sTmpString .= $this->_oCurrentItem->text ? ' ' . $this->_oCurrentItem->text : '';
-
-					// получаем хэш названия и описания группы
-					$aText = Core_Str::getHashes($sTmpString, array ('hash_function' => 'crc32'));
-
-					$aText = array_unique($aText);
-
-					// Получаем список меток
-					$aTags = $oTag->findAll(FALSE);
-
-					// Есть хотя бы одна метка
-					if (count($aTags) > 0)
-					{
-						// Удаляем уже существующие связи с метками
-						$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
-
-						foreach($aTags as $oTag)
-						{
-							$aTmpTags =  Core_Str::getHashes($oTag->name, array ('hash_function' => 'crc32'));
-
-							$aTmpTags = array_unique($aTmpTags);
-
-							if (count($aText) >= count($aTmpTags))
-							{
-								// Расчитываем пересечение
-								$iIntersect = count(array_intersect($aText, $aTmpTags));
-
-								if (count($aTmpTags) != 0)
-								{
-									$iCoefficient = $iIntersect / count($aTmpTags);
-								}
-								else
-								{
-									$iCoefficient = 0;
-								}
-
-								// Найдено полное вхождение
-								if ($iCoefficient == 1)
-								{
-									// Если тэг еще не учтен
-									if (!in_array($oTag->name, $aTmpTags))
-									{
-										// Добавляем в массив
-										$aTagsName[] = $oTag->name;
-
-										// Add relation
-										$this->_oCurrentItem->add($oTag);
-									}
-								}
-							}
-						}
-					}
-				}
-				elseif ($this->_sCurrentTags != '')
-				{
-					$this->_oCurrentItem->id && $this->_oCurrentItem->applyTags($this->_sCurrentTags);
-				}
 			}
 
 			if ($this->_oCurrentItem->seo_keywords == '' && count($aTagsName) > 0)
@@ -2238,7 +2241,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$aPicturesParam['watermark_file_path'] = $this->_oCurrentShop->getWatermarkFilePath();
 							$aPicturesParam['watermark_position_x'] = $this->_oCurrentShop->watermark_default_position_x;
 							$aPicturesParam['watermark_position_y'] = $this->_oCurrentShop->watermark_default_position_y;
-							$aPicturesParam['small_image_preserve_aspect_ratio'] = $this->_oCurrentShop->preserve_aspect_ratio;
+							$aPicturesParam['small_image_preserve_aspect_ratio'] = $this->_oCurrentShop->preserve_aspect_ratio_small;
 
 							try {
 								$result = Core_File::adminUpload($aPicturesParam);
@@ -2292,30 +2295,39 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						->getByShopItemPropertyIdAndGroupId($iShop_Item_Property_Id, $group_id)))
 					{
 						// Свойство не доступно текущей группе, делаем его доступным
-						Core_Entity::factory('Shop_Item_Property_For_Group')
-							->shop_group_id($group_id)
-							->shop_item_property_id($iShop_Item_Property_Id)
-							->shop_id($this->_oCurrentShop->id)
-							->save();
+						$oShop_Item_Property_For_Group = Core_Entity::factory('Shop_Item_Property_For_Group');
+						$oShop_Item_Property_For_Group->shop_group_id = intval($group_id);
+						$oShop_Item_Property_For_Group->shop_item_property_id = $iShop_Item_Property_Id;
+						$oShop_Item_Property_For_Group->shop_id = $this->_oCurrentShop->id;
+						$oShop_Item_Property_For_Group->save();
 					}
 
 					$aPropertyValues = $oProperty->getValues($this->_oCurrentItem->id, FALSE);
 
-					if(!isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) || (isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) && !in_array($oProperty->guid, $this->_aClearedPropertyValues[$this->_oCurrentItem->id])))
+					if(!isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) || !in_array($oProperty->guid, $this->_aClearedPropertyValues[$this->_oCurrentItem->id]))
 					{
 						foreach($aPropertyValues as $oPropertyValue)
 						{
 							$oProperty->type == 2 && $oPropertyValue->setDir($this->_oCurrentItem->getItemPath());
 							$oPropertyValue->delete();
 						}
+						
+						$aPropertyValues = array();
 
 						$this->_aClearedPropertyValues[$this->_oCurrentItem->id][] = $oProperty->guid;
 					}
 
-					//$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
-					$oProperty_Value = isset($aPropertyValues[0])
-						? $aPropertyValues[0]
-						: $oProperty->createNewValue($this->_oCurrentItem->id);
+					
+					if($oProperty->multiple)
+					{
+						$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
+					}
+					else
+					{
+						$oProperty_Value = isset($aPropertyValues[0])
+							? $aPropertyValues[0]
+							: $oProperty->createNewValue($this->_oCurrentItem->id);						
+					}
 
 					switch($oProperty->type)
 					{

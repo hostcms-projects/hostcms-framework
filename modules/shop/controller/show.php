@@ -31,9 +31,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - comparing(TRUE|FALSE) выводить сравниваемые товары, по умолчанию TRUE
  * - favorite(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
  * - favoriteOrder('ASC'|'DESC'|'RAND') направление сортировки избранных товаров, по умолчанию RAND
- * - viewed(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
+ * - viewed(TRUE|FALSE) выводить просмотренные товары, по умолчанию TRUE
  * - cart(TRUE|FALSE) выводить товары в корзине, по умолчанию FALSE
- * - viewedOrder('ASC'|'DESC'|'RAND') направление сортировки избранных товаров, по умолчанию DESC
+ * - viewedOrder('ASC'|'DESC'|'RAND') направление сортировки просмотренных товаров, по умолчанию DESC
  * - warehousesItems(TRUE|FALSE) выводить остаток на каждом складе для товара, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить товары. По умолчанию 0
  * - limit($limit) количество выводимых товаров
@@ -286,11 +286,30 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 
-		$dateTime = Core_Date::timestamp2sql(time());
+
 		$this->_Shop_Items
 			->queryBuilder()
 			->select('shop_items.*')
 			//->where('shop_items.active', '=', 1)
+			//->where('shop_items.modification_id', '=', 0)
+			;
+
+		$this->_applyItemConditions($this->_Shop_Items);
+
+		return $this;
+	}
+
+	/**
+	 * Apply item's conditions
+	 *
+	 * @param Shop_Item_Model $oShop_Items
+	 * @return self
+	 */
+	protected function _applyItemConditions(Shop_Item_Model $oShop_Items)
+	{
+		$dateTime = Core_Date::timestamp2sql(time());
+		$oShop_Items
+			->queryBuilder()
 			->open()
 			->where('shop_items.start_datetime', '<', $dateTime)
 			->setOr()
@@ -302,9 +321,7 @@ class Shop_Controller_Show extends Core_Controller
 			->setOr()
 			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-			->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-			//->where('shop_items.modification_id', '=', 0)
-			;
+			->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups);
 
 		return $this;
 	}
@@ -373,6 +390,134 @@ class Shop_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Add comparing goods
+	 * @return self
+	 */
+	protected function _addComparing()
+	{
+		$oShop = $this->getEntity();
+
+		$hostcmsCompare = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsCompare', array()), $oShop->id, array());
+
+		if (count($hostcmsCompare))
+		{
+			$this->addEntity(
+				$oCompareEntity = Core::factory('Core_Xml_Entity')
+					->name('comparing')
+			);
+
+			while (list($key) = each($hostcmsCompare))
+			{
+				$oShop_Item = Core_Entity::factory('Shop_Item')->find($key);
+				if (!is_null($oShop_Item->id))
+				{
+					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+					$oCompareEntity->addEntity($oShop_Item->clearEntities());
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add favorite goods
+	 * @return self
+	 */
+	protected function _addFavorite()
+	{
+		$oShop = $this->getEntity();
+
+		$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
+
+		if (count($hostcmsFavorite))
+		{
+			$this->addEntity(
+				$oFavouriteEntity = Core::factory('Core_Xml_Entity')
+					->name('favorite')
+			);
+
+			switch ($this->favoriteOrder)
+			{
+				case 'RAND':
+					shuffle($hostcmsFavorite);
+				break;
+				case 'ASC':
+					asort($hostcmsFavorite);
+				break;
+				case 'DESC':
+					arsort($hostcmsFavorite);
+				break;
+				default:
+					throw new Core_Exception("The favoriteOrder direction '%direction' doesn't allow",
+						array('%direction' => $this->favoriteOrder)
+					);
+			}
+
+			foreach ($hostcmsFavorite as $shop_item_id)
+			{
+				$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
+				if (!is_null($oShop_Item->id))
+				{
+					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+					$oFavouriteEntity->addEntity($oShop_Item->clearEntities());
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add viewed goods
+	 * @return self
+	 */
+	protected function _addViewed()
+	{
+		$oShop = $this->getEntity();
+
+		$hostcmsViewed = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsViewed', array()), $oShop->id, array());
+
+		if (count($hostcmsViewed))
+		{
+			$this->addEntity(
+				$oViewedEntity = Core::factory('Core_Xml_Entity')
+					->name('viewed')
+			);
+
+			switch ($this->viewedOrder)
+			{
+				case 'RAND':
+					shuffle($hostcmsViewed);
+				break;
+				case 'ASC':
+					asort($hostcmsViewed);
+				break;
+				case 'DESC':
+					arsort($hostcmsViewed);
+				break;
+				default:
+					throw new Core_Exception("The viewedOrder direction '%direction' doesn't allow",
+						array('%direction' => $this->viewedOrder)
+					);
+			}
+
+			foreach ($hostcmsViewed as $view_item_id)
+			{
+				$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id);
+
+				if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item)
+				{
+					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+					$oViewedEntity->addEntity($oShop_Item->clearEntities());
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Shop_Controller_Show.onBeforeRedeclaredShow
@@ -411,114 +556,19 @@ class Shop_Controller_Show extends Core_Controller
 				->value(intval($this->limit))
 		);
 
-		// Comparing goods and favorite goods
+		// Comparing, favorite and viewed goods
 		if (isset($_SESSION))
 		{
-			if ($this->comparing)
-			{
-				$hostcmsCompare = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsCompare', array()), $oShop->id, array());
+			// Comparing goods
+			$this->comparing && $this->_addComparing();
 
-				if (count($hostcmsCompare))
-				{
-					$this->addEntity(
-						$oCompareEntity = Core::factory('Core_Xml_Entity')
-							->name('comparing')
-					);
+			// Favorite goods
+			$this->favorite && $this->_addFavorite();
 
-					while (list($key) = each($hostcmsCompare))
-					{
-						$oShop_Item = Core_Entity::factory('Shop_Item')->find($key);
-						if (!is_null($oShop_Item->id))
-						{
-							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-							$oCompareEntity->addEntity($oShop_Item->clearEntities());
-						}
-					}
-				}
-			}
+			// Viewed goods
+			$this->viewed && $this->_addViewed();
 
-			if ($this->favorite)
-			{
-				$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
-
-				if (count($hostcmsFavorite))
-				{
-					$this->addEntity(
-						$oFavouriteEntity = Core::factory('Core_Xml_Entity')
-							->name('favorite')
-					);
-
-					switch ($this->favoriteOrder)
-					{
-						case 'RAND':
-							shuffle($hostcmsFavorite);
-						break;
-						case 'ASC':
-							asort($hostcmsFavorite);
-						break;
-						case 'DESC':
-							arsort($hostcmsFavorite);
-						break;
-						default:
-							throw new Core_Exception("The favoriteOrder direction '%direction' doesn't allow",
-								array('%direction' => $this->favoriteOrder)
-							);
-					}
-
-					foreach ($hostcmsFavorite as $shop_item_id)
-					{
-						$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
-						if (!is_null($oShop_Item->id))
-						{
-							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-							$oFavouriteEntity->addEntity($oShop_Item->clearEntities());
-						}
-					}
-				}
-			}
-
-			if ($this->viewed)
-			{
-				$hostcmsViewed = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsViewed', array()), $oShop->id, array());
-
-				if (count($hostcmsViewed))
-				{
-					$this->addEntity(
-						$oViewedEntity = Core::factory('Core_Xml_Entity')
-							->name('viewed')
-					);
-
-					switch ($this->viewedOrder)
-					{
-						case 'RAND':
-							shuffle($hostcmsViewed);
-						break;
-						case 'ASC':
-							asort($hostcmsViewed);
-						break;
-						case 'DESC':
-							arsort($hostcmsViewed);
-						break;
-						default:
-							throw new Core_Exception("The viewedOrder direction '%direction' doesn't allow",
-								array('%direction' => $this->viewedOrder)
-							);
-					}
-
-					foreach ($hostcmsViewed as $view_item_id)
-					{
-						$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id);
-
-						if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item)
-						{
-							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-							$oViewedEntity->addEntity($oShop_Item->clearEntities());
-						}
-					}
-				}
-			}
-
-			//Товары в корзине
+			// Товары в корзине
 			if ($this->cart)
 			{
 				// Проверяем наличие товара в корзины
@@ -895,10 +945,17 @@ class Shop_Controller_Show extends Core_Controller
 		$Core_Router_Route = new Core_Router_Route($this->pattern, $this->patternExpressions);
 		$this->patternParams = $matches = $Core_Router_Route->applyPattern(Core::$url['path']);
 
-		if (isset($matches['page']) && $matches['page'] > 1)
+		if (isset($matches['page']) && is_numeric($matches['page']))
 		{
-			$this->page($matches['page'] - 1)
-				->offset($this->limit * $this->page);
+			if ($matches['page'] > 1)
+			{
+				$this->page($matches['page'] - 1)
+					->offset($this->limit * $this->page);
+			}
+			else
+			{
+				return $this->error404();
+			}
 		}
 
 		if (isset($matches['tag']) && $matches['tag'] != '' && Core::moduleIsActive('tag'))
@@ -976,6 +1033,8 @@ class Shop_Controller_Show extends Core_Controller
 							->queryBuilder()
 							->where('shop_items.active', '=', $this->itemsActivity == 'inactive' ? 0 : 1);
 					}
+
+					$this->_applyItemConditions($oShop_Items);
 
 					$oShop_Items->queryBuilder()->where('shop_items.modification_id', '=', 0);
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_Type_Edit{	/**
 	 * Operation name
@@ -510,6 +510,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Site_Controller_addSiteWithTemplate.onAfterRedeclaredApplyObjectProperty
 	 */	protected function _applyObjectProperty()	{		//parent::_applyObjectProperty();
 		$oConstantLogin = Core_Entity::factory('Constant')->getByName('HOSTCMS_USER_LOGIN');
 		$oConstantNumber = Core_Entity::factory('Constant')->getByName('HOSTCMS_CONTRACT_NUMBER');
@@ -543,4 +544,6 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 		$oConstantNumber->save();
 
 		$oConstantPin->value = Core_Array::getPost('HOSTCMS_PIN_CODE');
-		$oConstantPin->save();	}}
+		$oConstantPin->save();
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));	}}

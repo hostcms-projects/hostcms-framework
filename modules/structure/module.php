@@ -20,12 +20,13 @@ class Structure_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 10,				'block' => 0,				'name' => Core::_('Structure.menu'),				'href' => "/admin/structure/index.php",				'onclick' => "$.adminLoad({path: '/admin/structure/index.php'}); return false"			)		);	}
+		$this->menu = array(			array(				'sorting' => 10,				'block' => 0,
+				'ico' => 'fa-sitemap',				'name' => Core::_('Structure.menu'),				'href' => "/admin/structure/index.php",				'onclick' => "$.adminLoad({path: '/admin/structure/index.php'}); return false"			)		);	}
 
 	/**
 	 * Индексация структуры сайта
@@ -33,7 +34,7 @@ class Structure_Module extends Core_Module{	/**
 	 * @param $offset
 	 * @param $limit
 	 * @return array
-	 * @hostcms-event structure_module.indexing
+	 * @hostcms-event Structure_Module.indexing
 	 */
 	public function indexing($offset, $limit)
 	{

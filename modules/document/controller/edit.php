@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -64,7 +64,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oTextarea_Document->value(
 						Typograph_Controller::instance()->eraseOpticalAlignment($oTextarea_Document->value)
 					);
-					
+
 					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
 					$oUseTypograph
 						->name("use_typograph")
@@ -111,7 +111,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
 
 				$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
-				
+
 				// Warning: TO DO: dynamic chain list template_dir -> template like Documents
 				$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 					->options(
@@ -216,6 +216,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Document_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -239,13 +240,15 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oNewDocument_Version->current = Core_Array::getPost('current');
 				$oNewDocument_Version->saveFile($text);
 				$this->_object->add($oNewDocument_Version);
-				
+
 				if ($oNewDocument_Version->current)
 				{
 					$oNewDocument_Version->setCurrent();
 				}
 			break;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**

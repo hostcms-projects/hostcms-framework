@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Payment_System_Model extends Core_Entity
 {
@@ -19,7 +19,6 @@ class Shop_Payment_System_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop' => array(),
 		'shop_currency' => array()
-
 	);
 
 	/**
@@ -30,13 +29,13 @@ class Shop_Payment_System_Model extends Core_Entity
 		'shop_delivery_payment_system' => array()
 	);
 
-
 	/**
 	 * List of preloaded values
 	 * @var array
 	 */
 	protected $_preloadValues = array(
-		'sorting' => 0
+		'sorting' => 0,
+		'active' => 1,
 	);
 
 	/**
@@ -128,7 +127,6 @@ class Shop_Payment_System_Model extends Core_Entity
 	public function changeStatus()
 	{
 		$this->active = 1 - $this->active;
-
 		return $this->save();
 	}
 

@@ -197,7 +197,7 @@ class Shop_Model extends Core_Entity{
 	{
 		return $this->Site->uploaddir . "shop_" . intval($this->id);
 	}
-	
+
 	/**
 	 * Save watermark file
 	 * @param string $fileSourcePath file to upload
@@ -206,7 +206,7 @@ class Shop_Model extends Core_Entity{
 	 * Save object. Use self::update() or self::create()
 	 * @return Shop_Model
 	 */	public function save()	{		parent::save();		// Создание директории для Watermark		$sWatermarkDirPath = $this->getPath() . '/watermarks';
-				if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
+		if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
 	/**
 	 * Delete watermark file
 	 */	public function deleteWatermarkFile()	{		try		{			Core_File::delete($this->getWatermarkFilePath());		} catch (Exception $e) {}		$this->watermark_file = '';		$this->save();	}
@@ -447,8 +447,9 @@ class Shop_Model extends Core_Entity{
 		$this->_groupsTree = array();
 		$queryBuilder = Core_QueryBuilder::select('id', 'parent_id')
 			->from('shop_groups')
-			->where('shop_id', '=', $shop_id)
-			->where('deleted', '=', 0);
+			->where('shop_groups.shop_id', '=', $shop_id)
+			->where('shop_groups.active', '=', 1)
+			->where('shop_groups.deleted', '=', 0);
 
 		$aShop_Groups = $queryBuilder->execute()->asAssoc()->result();
 
@@ -461,8 +462,9 @@ class Shop_Model extends Core_Entity{
 
 		$queryBuilder = Core_QueryBuilder::select('parent_id', array('COUNT(id)', 'count'))
 			->from('shop_groups')
-			->where('shop_id', '=', $shop_id)
-			->where('deleted', '=', 0)
+			->where('shop_groups.shop_id', '=', $shop_id)
+			->where('shop_groups.active', '=', 1)
+			->where('shop_groups.deleted', '=', 0)
 			->groupBy('parent_id');
 
 		$aShop_Groups = $queryBuilder->execute()->asAssoc()->result();
@@ -479,16 +481,16 @@ class Shop_Model extends Core_Entity{
 		$queryBuilder->clear()
 			->select('shop_group_id', array('COUNT(id)', 'count'))
 			->from('shop_items')
-			->where('shop_id', '=', $shop_id)
-			->where('active', '=', 1)
-			->where('start_datetime', '<=', $current_date)
+			->where('shop_items.shop_id', '=', $shop_id)
+			->where('shop_items.active', '=', 1)
+			->where('shop_items.start_datetime', '<=', $current_date)
 			->open()
-			->where('end_datetime', '>=', $current_date)
+			->where('shop_items.end_datetime', '>=', $current_date)
 			->setOr()
-			->where('end_datetime', '=', '0000-00-00 00:00:00')
+			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			//->where('siteuser_group_id', 'IN', $mas_result)
-			->where('deleted', '=', 0)
+			->where('shop_items.deleted', '=', 0)
 			->groupBy('shop_group_id');
 
 		$aShop_Items = $queryBuilder->execute()->asAssoc()->result();

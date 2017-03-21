@@ -255,11 +255,29 @@ class Informationsystem_Controller_Show extends Core_Controller
 					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
 		}
 
-		$dateTime = Core_Date::timestamp2sql(time());
+
 		$this->_Informationsystem_Items
 			->queryBuilder()
 			->select('informationsystem_items.*')
 			//->where('informationsystem_items.active', '=', 1)
+			;
+
+		$this->_applyItemConditions($this->_Informationsystem_Items);
+
+		return $this;
+	}
+
+	/**
+	 * Apply item's conditions
+	 *
+	 * @param Informationsystem_Item_Model $oInformationsystem_Items
+	 * @return self
+	 */
+	protected function _applyItemConditions(Informationsystem_Item_Model $oInformationsystem_Items)
+	{
+		$dateTime = Core_Date::timestamp2sql(time());
+		$oInformationsystem_Items
+			->queryBuilder()
 			->open()
 			->where('informationsystem_items.start_datetime', '<', $dateTime)
 			->setOr()
@@ -658,10 +676,17 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$Core_Router_Route = new Core_Router_Route($this->pattern, $this->patternExpressions);
 		$this->patternParams = $matches = $Core_Router_Route->applyPattern(Core::$url['path']);
 
-		if (isset($matches['page']) && $matches['page'] > 1)
+		if (isset($matches['page']) && is_numeric($matches['page']))
 		{
-			$this->page($matches['page'] - 1)
-				->offset($this->limit * $this->page);
+			if ($matches['page'] > 1)
+			{
+				$this->page($matches['page'] - 1)
+					->offset($this->limit * $this->page);
+			}
+			else
+			{
+				return $this->error404();
+			}
 		}
 
 		isset($matches['part']) && $this->part($matches['part']);
@@ -725,6 +750,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 							->where('informationsystem_items.active', '=', $this->itemsActivity == 'inactive' ? 0 : 1);
 					}
 
+					$this->_applyItemConditions($oInformationsystem_Items);
+					
 					$Informationsystem_Item = $oInformationsystem_Items->getByGroupIdAndPath($this->group, $sPath);
 
 					if (!$this->item && !is_null($Informationsystem_Item))
@@ -790,7 +817,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
 			$oStructure->setCorePageSeo($oCore_Page);
-			
+
 			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
 			$oCore_Page->buildingPage && $oCore_Page->execute();
 		}

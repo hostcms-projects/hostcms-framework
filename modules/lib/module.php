@@ -20,9 +20,10 @@ class Lib_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 90,				'block' => 0,				'name' => Core::_('lib.menu'),				'href' => "/admin/lib/index.php",				'onclick' => "$.adminLoad({path: '/admin/lib/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 90,				'block' => 0,
+				'ico' => 'fa-briefcase',				'name' => Core::_('lib.menu'),				'href' => "/admin/lib/index.php",				'onclick' => "$.adminLoad({path: '/admin/lib/index.php'}); return false"			)		);	}}

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Заказы магазина',
@@ -225,4 +225,5 @@ return array(
 	'properties_show_kind_textarea' => 'Большое текстовое поле',
 	
 	'copy_success' => "Заказ успешно скопирован!",
+	'guid' => "GUID",
 );

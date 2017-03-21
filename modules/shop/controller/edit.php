@@ -133,6 +133,8 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			//->move($this->getField('watermark_file'), $oShopTabWatermark)
 			->move($this->getField('preserve_aspect_ratio'), $oShopTabWatermark)
 			->move($this->getField('preserve_aspect_ratio_small'), $oShopTabWatermark)
+			->move($this->getField('preserve_aspect_ratio_group'), $oShopTabWatermark)
+			->move($this->getField('preserve_aspect_ratio_group_small'), $oShopTabWatermark)
 			->move($this->getField('watermark_default_use_large_image'), $oShopTabWatermark)
 			->move($this->getField('watermark_default_use_small_image'), $oShopTabWatermark)
 			->move($this->getField('watermark_default_position_x'), $oShopTabWatermark)
@@ -677,6 +679,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -702,6 +705,8 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**

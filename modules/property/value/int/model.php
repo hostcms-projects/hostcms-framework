@@ -134,7 +134,8 @@ class Property_Value_Int_Model extends Core_Entity
 				$aItemProperties = $oInformationsystem_Item_Property_List->Properties->findAll();
 				foreach ($aItemProperties as $oItemProperty)
 				{
-					($oItemProperty->type != 5
+					// Зацикленность через Св-во типа ИЭ/Товар, у которого св-во ИЭ/Товар
+					($oItemProperty->type != 5 && $oItemProperty->type != 12
 						|| self::$aConfig['recursive_properties'] && $oItemProperty->informationsystem_id != $oProperty->informationsystem_id
 					) && $aTmp[] = $oItemProperty->id;
 				}
@@ -165,7 +166,8 @@ class Property_Value_Int_Model extends Core_Entity
 				$aItemProperties = $oShop_Item_Property_List->Properties->findAll();
 				foreach ($aItemProperties as $oItemProperty)
 				{
-					($oItemProperty->type != 12
+					// Зацикленность через Св-во типа ИЭ/Товар, у которого св-во ИЭ/Товар
+					($oItemProperty->type != 12 && $oItemProperty->type != 5
 						|| self::$aConfig['recursive_properties'] && $oItemProperty->shop_id != $oProperty->shop_id
 					) && $aTmp[] = $oItemProperty->id;
 				}

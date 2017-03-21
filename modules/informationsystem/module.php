@@ -20,12 +20,13 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 30,				'block' => 0,				'name' => Core::_('Informationsystem.menu'),				'href' => "/admin/informationsystem/index.php",				'onclick' => "$.adminLoad({path: '/admin/informationsystem/index.php'}); return false"			)		);	}
+		$this->menu = array(			array(				'sorting' => 30,				'block' => 0,
+				'ico' => 'fa-tasks',				'name' => Core::_('Informationsystem.menu'),				'href' => "/admin/informationsystem/index.php",				'onclick' => "$.adminLoad({path: '/admin/informationsystem/index.php'}); return false"			)		);	}
 
 	/**
 	 * Функция обратного вызова для поисковой индексации
@@ -106,7 +107,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @hostcms-event informationsystem_module.indexingInformationsystemGroups
+	 * @hostcms-event Informationsystem_Module.indexingInformationsystemGroups
 	 */
 	public function indexingInformationsystemGroups($offset, $limit)
 	{
@@ -146,7 +147,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @hostcms-event informationsystem_module.indexingInformationsystemItems
+	 * @hostcms-event Informationsystem_Module.indexingInformationsystemItems
 	 */
 	public function indexingInformationsystemItems($offset, $limit)
 	{
@@ -186,7 +187,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Search callback function
 	 * @param Search_Page_Model $oSearch_Page
 	 * @return self
-	 * @hostcms-event informationsystem_module.searchCallback
+	 * @hostcms-event Informationsystem_Module.searchCallback
 	 */
 	public function searchCallback($oSearch_Page)
 	{
@@ -204,13 +205,13 @@ class Informationsystem_Module extends Core_Module{	/**
 				case 2: // Информационые элементы
 					$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item')->find($oSearch_Page->module_value_id);
 
-					Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
-
 					if (!is_null($oInformationsystem_Item->id))
 					{
 						$oInformationsystem_Item
 							->showXmlComments(TRUE)
 							->showXmlProperties(TRUE);
+
+						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
 
 						$oSearch_Page
 							->addEntity($oInformationsystem_Item)

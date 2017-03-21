@@ -222,9 +222,7 @@ class kernel
 	 */
 	function GetCurrentLng()
 	{
-		return isset($_SESSION["current_lng"])
-		? quote_smart($_SESSION["current_lng"])
-		: 'ru';
+		return isset($_SESSION["current_lng"]) ? $_SESSION["current_lng"] : 'ru';
 	}
 
 	/**

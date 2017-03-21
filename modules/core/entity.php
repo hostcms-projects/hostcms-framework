@@ -84,6 +84,20 @@ class Core_Entity extends Core_ORM
 	}
 
 	/**
+	 * Add tags to forbidden tags list
+	 * @param array $aTags array of tags
+	 * @return self
+	 */
+	public function addForbiddenTags(array $aTags)
+	{
+		foreach ($aTags as $tag)
+		{
+			$this->_forbiddenTags[$tag] = $tag;
+		}
+		return $this;
+	}
+
+	/**
 	 * Get forbidden tags list
 	 * @return array
 	 */

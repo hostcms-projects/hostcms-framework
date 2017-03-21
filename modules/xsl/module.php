@@ -20,9 +20,10 @@ class Xsl_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 100,				'block' => 0,				'name' => Core::_('Xsl.menu'),				'href' => "/admin/xsl/index.php",				'onclick' => "$.adminLoad({path: '/admin/xsl/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 100,				'block' => 0,
+				'ico' => 'fa-certificate',				'name' => Core::_('Xsl.menu'),				'href' => "/admin/xsl/index.php",				'onclick' => "$.adminLoad({path: '/admin/xsl/index.php'}); return false"			)		);	}}

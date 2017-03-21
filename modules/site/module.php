@@ -20,10 +20,11 @@ class Site_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 140,				'block' => 3,				'name' => Core::_('Site.menu'),				'href' => "/admin/site/index.php",				'onclick' => "$.adminLoad({path: '/admin/site/index.php'}); return false"			)		);	}
+		$this->menu = array(			array(				'sorting' => 140,				'block' => 3,
+				'ico' => 'fa-globe',				'name' => Core::_('Site.menu'),				'href' => "/admin/site/index.php",				'onclick' => "$.adminLoad({path: '/admin/site/index.php'}); return false"			)		);	}
 }

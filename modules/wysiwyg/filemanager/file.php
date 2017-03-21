@@ -183,6 +183,27 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	}
 
 	/**
+	 * Module config
+	 */
+	static public $aConfig = NULL;
+
+	/**
+	 * Constructor.
+	 * @param string $primaryKey
+	 */
+	public function __construct($primaryKey = NULL)
+	{
+		parent::__construct($primaryKey);
+
+		if (is_null(self::$aConfig))
+		{
+			self::$aConfig = Core_Config::instance()->get('wysiwyg_filemanager_config', array()) + array(
+				'thumbnails' => TRUE,
+			);
+		}
+	}
+
+	/**
 	 * Get file image
 	 */
 	public function image()
@@ -198,7 +219,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 
 			try
 			{
-				if (Core_File::isValidExtension($this->name, $aExt))
+				if (self::$aConfig['thumbnails'] && Core_File::isValidExtension($this->name, $aExt))
 				{
 					$sImgContent = NULL;
 
@@ -271,8 +292,6 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 							$ext = Core_File::getExtension($this->name);
 							if ($ext == 'jpg' || $ext == 'jpeg')
 							{
-								$quality = JPG_QUALITY;
-
 								$sourceResource = imagecreatefromjpeg($filePath);
 
 								if ($sourceResource)
@@ -281,7 +300,6 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 									imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
 
 									ob_start();
-									//imagejpeg($targetResourceStep1, $quality);
 									imagejpeg($targetResourceStep1);
 									$sImgContent = ob_get_clean();
 

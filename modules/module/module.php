@@ -20,10 +20,11 @@ class Module_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 220,				'block' => 3,				'name' => Core::_('Module.menu'),				'href' => "/admin/module/index.php",				'onclick' => "$.adminLoad({path: '/admin/module/index.php'}); return false"			)		);
+		$this->menu = array(			array(				'sorting' => 220,				'block' => 3,
+				'ico' => 'fa-puzzle-piece',				'name' => Core::_('Module.menu'),				'href' => "/admin/module/index.php",				'onclick' => "$.adminLoad({path: '/admin/module/index.php'}); return false"			)		);
 	}}

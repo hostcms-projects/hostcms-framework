@@ -6,7 +6,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information systems',
@@ -78,6 +78,8 @@ return array(
 
 	'preserve_aspect_ratio' => '<acronym title="Preserve aspect ratio">Preserve aspect ratio</acronym>',
 	'preserve_aspect_ratio_small' => '<acronym title="Preserve aspect ratio for small images">Preserve aspect ratio</acronym>',
+	'preserve_aspect_ratio' => '<acronym title="Preserve aspect ratio for group">Preserve aspect ratio for group</acronym>',
+	'preserve_aspect_ratio_small' => '<acronym title="Preserve aspect ratio for small images of group">Preserve aspect ratio for group</acronym>',
 	'items_on_page' => '<acronym title="Property to specify the number of items on a page">Number of items on page</acronym>',
 	'apply_tags_automatically' => '<acronym title="Automatic generation of labels (tags) of information item from its name, description and text">Apply labels (tags) automatically</acronym>',
 	'change_filename' => '<acronym title="Conversion of all uploaded files for all information system objects: items, groups, additional properties of items and groups">Edit names of uploaded files</acronym>',

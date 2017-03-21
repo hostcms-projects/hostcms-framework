@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Administration center',
@@ -65,7 +65,7 @@ return array(
 	'index_events_bad_password' => 'A user with standard login and password exists in the system; you need to change password of user "admin"',
 	'index_unset_tmp_dir' => 'No such directory "%s" for temporary file, you must create it. You can change path to the temporary directory in constant TMP_DIR',
 
-	'updates_count_access' => '%s %s available. <a href="/admin/update/update.php">Display updates list</a>.',
+	'updates_count_access' => '%s %s available. <a href="/admin/update/index.php">Display updates list</a>.',
 
 	'unknown' => 'Unknown',
 

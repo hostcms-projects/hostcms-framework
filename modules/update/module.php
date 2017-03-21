@@ -22,7 +22,7 @@ class Update_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 
 	/**
 	 * Constructor.
@@ -35,6 +35,7 @@ class Update_Module extends Core_Module
 			array(
 				'sorting' => 150,
 				'block' => 3,
+				'ico' => 'fa-refresh',
 				'name' => Core::_('Update.menu'),
 				'href' => "/admin/update/index.php",
 				'onclick' => "$.adminLoad({path: '/admin/update/index.php'}); return false"

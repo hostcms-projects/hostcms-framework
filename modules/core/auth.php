@@ -196,7 +196,7 @@ class Core_Auth
 		// Если не используется HTTPS-доступ
 		if (defined('USE_ONLY_HTTPS_AUTHORIZATION') && !Core::httpsUses())
 		{
-			$url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			$url = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST')) . $_SERVER['REQUEST_URI'];
 
 			$url = str_replace ("\r", '', $url);
 			$url = str_replace ("\n", '', $url);
@@ -218,7 +218,6 @@ class Core_Auth
 		// первоначальный старт осуществляется при авторизации пользователя
 		self::adminSessionStart();
 
-		// Определяем константу - "это есть раздел администрирования"
 		define('IS_ADMIN_PART', TRUE);
 
 		$lng = Core_Array::get($_SESSION, 'current_lng');
@@ -297,7 +296,7 @@ class Core_Auth
 			// Если нет выбранного сайта
 			if (!isset($_SESSION['current_site_id']))
 			{
-				$domain = strval($_SERVER['HTTP_HOST']);
+				$domain = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST'));
 				$oSiteAlias = Core_Entity::factory('Site_Alias')->getByName($domain);
 
 				if (!is_null($oSiteAlias))
@@ -340,7 +339,7 @@ class Core_Auth
 
 				if (!$site_id)
 				{
-					exit('Site does not exist! Check aliases.');
+					exit('Site does not exist! Check aliases and permissions for a users.');
 				}
 
 				// Заносим значение в сессию

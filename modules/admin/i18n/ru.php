@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Центр администрирования',
@@ -65,7 +65,7 @@ return array(
 	'index_events_bad_password' => 'В системе существует пользователь со стандартными логином и паролем, необходимо изменить пароль пользователя "admin"',
 	'index_unset_tmp_dir' => 'Не существует директория для временных файлов "%s", необходимо создать ее. Изменить путь к директории можно через константу TMP_DIR',
 
-	'updates_count_access' => 'Доступно %s %s. <a href="/admin/update/update.php">Посмотреть список обновлений</a>.',
+	'updates_count_access' => 'Доступно %s %s. <a href="/admin/update/index.php">Посмотреть список обновлений</a>.',
 
 	'unknown' => 'Не определено',
 

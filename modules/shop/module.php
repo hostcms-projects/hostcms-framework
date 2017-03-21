@@ -20,12 +20,13 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 40,				'block' => 0,				'name' => Core::_('Shop.menu'),				'href' => "/admin/shop/index.php",				'onclick' => "$.adminLoad({path: '/admin/shop/index.php'}); return false"			)		);	}
+		$this->menu = array(			array(				'sorting' => 40,				'block' => 0,
+				'ico' => 'fa-shopping-cart',				'name' => Core::_('Shop.menu'),				'href' => "/admin/shop/index.php",				'onclick' => "$.adminLoad({path: '/admin/shop/index.php'}); return false"			)		);	}
 
 	/**
 	 * Функция обратного вызова для поисковой индексации данных модуля
@@ -130,7 +131,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @hostcms-event shop_module.indexingShopGroups
+	 * @hostcms-event Shop_Module.indexingShopGroups
 	 */
 	public function indexingShopGroups($offset, $limit)
 	{
@@ -170,7 +171,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @hostcms-event shop_module.indexingShopItems
+	 * @hostcms-event Shop_Module.indexingShopItems
 	 */
 	public function indexingShopItems($offset, $limit)
 	{
@@ -212,7 +213,7 @@ class Shop_Module extends Core_Module{	/**
 	 * @param int $offset
 	 * @param int $limit
 	 * @return array
-	 * @hostcms-event shop_module.indexingShopSellers
+	 * @hostcms-event Shop_Module.indexingShopSellers
 	 */
 	public function indexingShopSellers($offset, $limit)
 	{
@@ -249,7 +250,7 @@ class Shop_Module extends Core_Module{	/**
 	 * Search callback function
 	 * @param Search_Page_Model $oSearch_Page
 	 * @return self
-	 * @hostcms-event shop_module.searchCallback
+	 * @hostcms-event Shop_Module.searchCallback
 	 */
 	public function searchCallback($oSearch_Page)
 	{
@@ -267,14 +268,14 @@ class Shop_Module extends Core_Module{	/**
 				case 2: // Товары
 					$oShop_Item = Core_Entity::factory('Shop_Item')->find($oSearch_Page->module_value_id);
 
-					Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oShop_Item));
-
 					if (!is_null($oShop_Item->id))
 					{
 						$oShop_Item
 							->showXmlComments(TRUE)
 							->showXmlProperties(TRUE)
 							->showXmlSpecialprices(TRUE);
+
+						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oShop_Item));
 
 						$oSearch_Page
 							->addEntity($oShop_Item)

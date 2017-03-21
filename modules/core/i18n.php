@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_I18n
 {
@@ -169,7 +169,7 @@ class Core_I18n
 	 * Include lng file
 	 * @param string $className class name
 	 * @param string $lng language name
-	 * @return array 
+	 * @return array
 	 */
 	public function getLngFile($className, $lng)
 	{

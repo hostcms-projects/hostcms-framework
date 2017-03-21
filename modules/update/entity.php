@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Entity extends Core_Entity
 {
@@ -17,13 +17,13 @@ class Update_Entity extends Core_Entity
 	 * @var int
 	 */
 	public $id = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var int
 	 */
 	public $name = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var int
@@ -35,7 +35,7 @@ class Update_Entity extends Core_Entity
 	 * @var string
 	 */
 	protected $_modelName = 'update';
-	
+
 	/**
 	 * Load columns list
 	 * @return self
@@ -59,7 +59,7 @@ class Update_Entity extends Core_Entity
 	 * @var array
 	 */
 	protected $_tableColums = array();
-	
+
 	/**
 	 * Set table columns
 	 * @param array $tableColums columns
@@ -73,7 +73,7 @@ class Update_Entity extends Core_Entity
 
 	/**
 	 * Get table colums
-	 * @return array 
+	 * @return array
 	 */
 	public function getTableColums()
 	{
@@ -167,7 +167,8 @@ class Update_Entity extends Core_Entity
 
 			$error = (int)$oXml->error;
 
-			if (!$error)
+			// 5 - истек период поддержки
+			if (!$error || $error == 5)
 			{
 				foreach ($oXml->update as $value)
 				{

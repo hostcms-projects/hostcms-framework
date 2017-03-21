@@ -772,10 +772,10 @@ class Admin_Form_Controller
 	* Показ строки ссылок
 	*/
 	protected function _pageNavigation()
-	{
+	{		
 		$total_count = $this->getTotalCount();
 		$total_page = $total_count / $this->_limit;
-
+				
 		// Округляем в большую сторону
 		if ($total_count % $this->_limit != 0)
 		{
@@ -1240,14 +1240,14 @@ class Admin_Form_Controller
 	protected function _getForm()
 	{
 		ob_start();
-
+		
 		$this
 			->_showFormTitle()
 			->showChildren()
 			->_showFormContent()
 			->_showBottomActions()
 			->_applyEditable()
-			->_pageNavigation();
+			->_pageNavigation();		
 
 		return ob_get_clean();
 	}

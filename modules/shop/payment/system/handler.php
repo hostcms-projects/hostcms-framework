@@ -22,6 +22,7 @@ abstract class Shop_Payment_System_Handler
 		require_once($oShop_Payment_System_Model->getPaymentSystemFilePath());
 
 		$name = 'Shop_Payment_System_Handler' . intval($oShop_Payment_System_Model->id);
+		
 		if (class_exists($name))
 		{
 			return new $name($oShop_Payment_System_Model);

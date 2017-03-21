@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Dataset extends Admin_Form_Dataset
 {
@@ -65,14 +65,19 @@ class Update_Dataset extends Admin_Form_Dataset
 		$expiration_of_support = $aReturn['expiration_of_support'];
 		$this->_objects = $aReturn['entities'];
 
-		if ($error > 0)
+		if ($error > 0 && $error != 5)
 		{
-			throw new Core_Exception(Core::_('Update.server_error_respond_' . $error), array(), 0, FALSE);
+			$this->_Admin_Form_Controller->addMessage(
+				Core::_('Update.server_error_respond_' . $error), 'error'
+			);
+			//throw new Core_Exception(Core::_('Update.server_error_respond_' . $error), array(), 0, FALSE);
 		}
 		// Ошибок нет и количество обновления тоже 0
 		elseif (count($this->_objects) == 0)
 		{
-			Core_Message::show(Core::_('Update.isLastUpdate'));
+			$this->_Admin_Form_Controller->addMessage(
+				Core::_('Update.isLastUpdate')
+			);
 		}
 
 		if ($expiration_of_support && !defined('IS_HOSTCMS_FREE'))

@@ -126,11 +126,14 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Payment_System_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
 		parent::_applyObjectProperty();
 
 		$this->_object->savePaymentSystemFile(Core_Array::getRequest('system_of_pay_add_form_handler'));
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Language_Model extends Core_Entity
 {
@@ -71,12 +71,9 @@ class Admin_Language_Model extends Core_Entity
 		$this->queryBuilder()->clear();
 		$aAdmin_Language = $this->findAll();
 
-		if (count($aAdmin_Language) > 0)
-		{
-			return $aAdmin_Language[0];
-		}
-
-		return NULL;
+		return count($aAdmin_Language)
+			? $aAdmin_Language[0]
+			: NULL;
 	}
 
 	/**
@@ -89,6 +86,7 @@ class Admin_Language_Model extends Core_Entity
 		$this->queryBuilder()
 			->clear()
 			->where('shortname', '=', $shortname)
+			->where('active', '=', 1)
 			->limit(1);
 
 		$aAdmin_Language = $this->findAll();

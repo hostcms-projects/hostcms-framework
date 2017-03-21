@@ -20,7 +20,6 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	public function setObject($object)
 	{
 		$this
-			->addSkipColumn('guid')
 			->addSkipColumn('unloaded');
 
 		if (is_null($object->id))
@@ -94,6 +93,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->moveAfter($oPhoneField = $this->getField('phone'), $oCompanyField, $oContactsTab)
 			->moveAfter($oFaxField = $this->getField('fax'), $oPhoneField, $oContactsTab)
 			->moveAfter($oEmailField = $this->getField('email'), $oFaxField, $oContactsTab);
+
+		$oMainTab->move($this->getField('guid'), $oAdditionalTab);
 
 		$oMainTab
 			->moveBefore($oInvoiceField = $this->getField('invoice'), $oIpField = $this->getField('ip'), $oMainTab)
@@ -486,6 +487,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	/**
 	 * Processing of the form. Apply object fields.
 	 * @return self
+	 * @hostcms-event Shop_Order_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -511,9 +513,12 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
-		$this->_object->paid != Core_Array::get($this->_formValues, 'paid') && $this->_object->paid == 0
-			? $this->_object->paid()
-			: $this->_object->cancelPaid();
+		if ($this->_object->id)
+		{
+			$this->_object->paid != Core_Array::get($this->_formValues, 'paid') && $this->_object->paid == 0
+				? $this->_object->paid()
+				: $this->_object->cancelPaid();
+		}
 
 		parent::_applyObjectProperty();
 
@@ -550,6 +555,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				));
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		return $this;
 	}

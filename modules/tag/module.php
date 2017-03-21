@@ -20,9 +20,10 @@ class Tag_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-				$this->menu = array(			array(				'sorting' => 200,				'block' => 3,				'name' => Core::_('Tag.menu'),				'href' => "/admin/tag/index.php",				'onclick' => "$.adminLoad({path: '/admin/tag/index.php'}); return false"			)		);	}}
+				$this->menu = array(			array(				'sorting' => 200,				'block' => 3,
+				'ico' => 'fa-tags',				'name' => Core::_('Tag.menu'),				'href' => "/admin/tag/index.php",				'onclick' => "$.adminLoad({path: '/admin/tag/index.php'}); return false"			)		);	}}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_DataBase_Mysql extends Core_DataBase
 {
@@ -52,7 +52,7 @@ class Core_DataBase_Mysql extends Core_DataBase
 		Core_Event::notify('Core_DataBase.onBeforeConnect', $this);
 
 		// Trying to open connection
-		$this->_connection = mysql_connect(
+		$this->_connection = @mysql_connect(
 			$this->_config['host'], $this->_config['username'], $this->_config['password'], $this->_newLink
 		);
 

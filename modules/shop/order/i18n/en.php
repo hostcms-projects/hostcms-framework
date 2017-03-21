@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online store orders',
@@ -225,4 +225,5 @@ return array(
 	'properties_show_kind_textarea' => 'Textarea',
 	
 	'copy_success' => "Order copied successfully!",
+	'guid' => "GUID",
 );

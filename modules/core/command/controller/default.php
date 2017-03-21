@@ -102,8 +102,11 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			if (hexdec($a[1]) & (~(Core::convert64b32(Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms')) & abs(Core::crc32($c)) ^ Core::convert64b32(hexdec($a[2])))))
 			{
 				Core_Router::add('key_not_found', '()')
-					->controller('Core_Command_Controller_Key_Not_Found')->execute()
-					->sendHeaders()->showBody();
+					->controller('Core_Command_Controller_Key_Not_Found')
+					->execute()
+					->header('X-Powered-By', Core::xPoweredBy())
+					->sendHeaders()
+					->showBody();
 
 				exit();
 			}
@@ -285,7 +288,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		{
 			Counter_Controller::instance()
 				->site($oSite)
-				->page('http://' . Core_Array::get($_SERVER, 'HTTP_HOST') . Core_Array::get($_SERVER, 'REQUEST_URI'))
+				->page('http://' . strtolower(Core_Array::get($_SERVER, 'HTTP_HOST')) . Core_Array::get($_SERVER, 'REQUEST_URI'))
 				->ip(Core_Array::get($_SERVER, 'REMOTE_ADDR'))
 				->userAgent(Core_Array::get($_SERVER, 'HTTP_USER_AGENT'))
 				->counterId(0)

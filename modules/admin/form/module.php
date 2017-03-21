@@ -20,9 +20,10 @@ class Admin_Form_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-04-25';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 174,				'block' => 3,				'name' => Core::_('Admin_Form.menu'),				'href' => "/admin/admin_form/index.php",				'onclick' => "$.adminLoad({path: '/admin/admin_form/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 174,				'block' => 3,
+				'ico' => 'fa-table',				'name' => Core::_('Admin_Form.menu'),				'href' => "/admin/admin_form/index.php",				'onclick' => "$.adminLoad({path: '/admin/admin_form/index.php'}); return false"			)		);	}}

@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Интернет-магазины',
@@ -65,6 +65,8 @@ return array(
 	'watermark_file' => '<acronym title="Файл изображения, используемого в качестве watermark">Изображение для watermark</acronym>',
 	'preserve_aspect_ratio' => 'Сохранять пропорции изображения',
 	'preserve_aspect_ratio_small' => 'Сохранять пропорции малого изображения',
+	'preserve_aspect_ratio_group' => 'Сохранять пропорции изображения для групп',
+	'preserve_aspect_ratio_group_small' => 'Сохранять пропорции малого изображения для групп',
 	'watermark_default_use_large_image' => '<acronym title="Свойство, определяющее будет ли использоваться watermark по умолчанию">Использовать watermark по умолчанию</acronym>',
 	'watermark_default_use_small_image' => '<acronym title="Свойство, определяющее будет ли использоваться watermark по умолчанию для малых изображений">Использовать watermark по умолчанию для малых изображений</acronym>',
 	'watermark_default_position_x' => "<acronym title=\"Свойство, определяющее положение водяного знака по оси X (по умолчанию), например 200 (в пикселях) или 50% (в процентах)\">Позиция по оси X (по умолчанию)</acronym>",

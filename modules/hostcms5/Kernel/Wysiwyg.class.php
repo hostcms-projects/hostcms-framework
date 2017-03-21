@@ -1,13 +1,13 @@
-<?php 
+<?php
 /**
  * Система управления сайтом HostCMS v. 5.xx
- * 
+ *
  * Copyright © 2005-2011 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  *
  * Ядро, класс визуального редактора.
- * 
+ *
  * Файл: /modules/Kernel/wysiwyg.class.php
- * 
+ *
  * @package HostCMS 5
  * @author Hostmake LLC
  * @version 5.x
@@ -21,15 +21,15 @@ class wysiwyg
 	 * @var array
 	 */
 	var $init = array();
-	
+
 	/**
 	 * Добавление записи в блок tinyMCE.init
-	 * 
+	 *
 	 * <code>
 	 * $wysiwyg = & singleton('wysiwyg');
 	 * $wysiwyg->AddInit('mode', '"exact"');
 	 * </code>
-	 * 
+	 *
 	 * @param string $name название параметра
 	 * @param string $value значение
 	 */
@@ -37,15 +37,15 @@ class wysiwyg
 	{
 		$this->init[$name] = $value;
 	}
-	
+
 	/**
 	 * Удаление записи из блока tinyMCE.init
-	 * 
+	 *
 	 * <code>
 	 * $wysiwyg = & singleton('wysiwyg');
 	 * $wysiwyg->RemoveInit('mode');
 	 * </code>
-	 * 
+	 *
 	 * @param string $name название параметра
 	 */
 	function RemoveInit($name)
@@ -58,14 +58,14 @@ class wysiwyg
 
 	/**
 	 * Конструктор
-	 *  
+	 *
 	 */
 	function wysiwyg()
 	{
 		// См. modules/core/config/wysiwyg.php
 		$this->init = Core_Config::instance()->get('core_wysiwyg');
 	}
-	
+
 	/**
 	 * Метод отображает визуальный редактор
 	 *
@@ -85,7 +85,7 @@ class wysiwyg
 		/* Убираем оптическое выравнивание */
 		if (Core::moduleIsActive('typograph'))
 		{
-			
+
 			$main_text = Typograph_Controller::instance()->eraseOpticalAlignment($main_text);
 		}
 
@@ -105,25 +105,18 @@ class wysiwyg
 		}
 		?>
 		<textarea name="<?php echo quote_smart($ws_name)?>" id="<?php echo quote_smart($ws_name)?>_ID" style="width: 100%; height: 300px"><?php echo $main_text?></textarea>
-		<?php 
+		<?php
 
 		if (!defined('USE_WYSIWYG') || defined('USE_WYSIWYG') && USE_WYSIWYG)
 		{
-			if (isset($_SESSION["current_lng"]))
-			{
-				$lng = quote_smart($_SESSION["current_lng"]);
-			}
-			else
-			{
-				$lng = 'ru';
-			}
-			
+			$lng = isset($_SESSION["current_lng"]) ? $_SESSION["current_lng"] : 'ru';
+
 			$this->init['language'] = '"' . $lng . '"';
 			$this->init['docs_language'] = '"' . $lng . '"';
 			$this->init['elements'] = '"' . quote_smart($ws_name)."_ID" . '"';
-			
+
 			$this->init['content_css'] = '"' . $CSS . '"';
-			
+
 			// Создаем структуру для внутренних ссылок
 			$level = -1;
 			$menu_id = false;
@@ -152,16 +145,16 @@ class wysiwyg
 			$tinyMCELinkList .= ');';
 
 			unset($tinyMCELinkListArray);
-		
+
 			// Передаем в конфигураци
 			$this->init['external_link_list'] = '"' . addslashes($tinyMCELinkList) . '"';
-			
+
 			?>
 			<!-- TinyMCE -->
-			<script language="javascript" type="text/javascript">
+			<script type="text/javascript">
 			tinyMCE.init({
 				<?php
-				
+
 				if (count($this->init) > 0)
 				{
 					$aInit = array();
@@ -169,7 +162,7 @@ class wysiwyg
 					{
 						$aInit[] = "$init_name : $init_value";
 					}
-					
+
 					echo implode(", \n", $aInit);
 				}
 				?>
@@ -185,7 +178,7 @@ class wysiwyg
 				}
 				return content;
 			}
-			</script><?php 
+			</script><?php
 		}
 	}
 }

@@ -171,6 +171,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	/**
 	 * Processing of the form. Apply object fields.
 	 * @return this
+	 * @hostcms-event Template_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -183,6 +184,8 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->_object->saveTemplateFile(Core_Array::getPost('template'));
 			$this->_object->saveTemplateCssFile(Core_Array::getPost('css'));
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		return $this;
 	}

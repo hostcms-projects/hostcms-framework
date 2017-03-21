@@ -184,7 +184,7 @@ class Core_Image_Gd extends Core_Image
 					imagealphablending($targetResourceStep1, FALSE);
 					imagesavealpha($targetResourceStep1, TRUE);
 
-					imagecopyresized($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
+					imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
 
 					if ($preserveAspectRatio)
 					{
@@ -196,7 +196,7 @@ class Core_Image_Gd extends Core_Image
 						imagesavealpha($targetResourceStep2, TRUE);
 
 						//imagecopy($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2);
-						imagecopyresized($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2, $destX_step2, $destY_step2);
+						imagecopyresampled($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2, $destX_step2, $destY_step2);
 
 						imagepng($targetResourceStep2, $targetFile, $quality);
 						imagedestroy($targetResourceStep2);
@@ -215,7 +215,7 @@ class Core_Image_Gd extends Core_Image
 					self::setTransparency($targetResourceStep1, $sourceResource);
 
 					imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
-					//imagecopyresized($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
+					//imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
 
 					if ($preserveAspectRatio)
 					{
@@ -224,7 +224,7 @@ class Core_Image_Gd extends Core_Image
 					else
 					{
 						//imagecopy($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2);
-						imagecopyresized($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2, $destX_step2, $destY_step2);
+						imagecopyresampled($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2, $destX_step2, $destY_step2);
 
 						imagegif($targetResourceStep2, $targetFile);
 						imagedestroy($targetResourceStep2);

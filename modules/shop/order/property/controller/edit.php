@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 {
@@ -30,19 +30,19 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 		{
 			case 'property':
 
-				// Префикс				
+				// Префикс
 				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
 				$oShopPrefixInput
 					->caption(Core::_('Shop_Order.prefix'))
-					->style('width: 100px')					
+					->style('width: 100px')
 					->name('prefix')
 					->value($this->_object->Shop_Order_Property->prefix)
 					->divAttr(array('style' => 'float: left'));
-				
-				$oMainTab
-					->add($oShopPrefixInput);					
 
-				// Способ отображения в фильтре				
+				$oMainTab
+					->add($oShopPrefixInput);
+
+				// Способ отображения в фильтре
 				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
 				$oShopFilterSelect
 					->caption(Core::_('Shop_Order.display'))
@@ -59,7 +59,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 						8 => Core::_('Shop_Order.properties_show_kind_textarea'))
 					)
 					->name('display')
-					->value($this->_object->Shop_Order_Property->display)					
+					->value($this->_object->Shop_Order_Property->display)
 					->divAttr(array('style' => 'float: left'));
 
 				$oMainTab
@@ -76,6 +76,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
+	 * @hostcms-event Shop_Order_Property_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -94,5 +95,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 			case 'property_dir':
 			break;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

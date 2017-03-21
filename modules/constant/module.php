@@ -20,9 +20,10 @@ class Constant_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 250,				'block' => 3,				'name' => Core::_('constant.menu'),				'href' => "/admin/constant/index.php",				'onclick' => "$.adminLoad({path: '/admin/constant/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 250,				'block' => 3,
+				'ico' => 'fa-wrench',				'name' => Core::_('constant.menu'),				'href' => "/admin/constant/index.php",				'onclick' => "$.adminLoad({path: '/admin/constant/index.php'}); return false"			)		);	}}

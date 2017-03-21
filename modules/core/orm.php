@@ -62,7 +62,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_ORM
 {
@@ -159,7 +159,7 @@ class Core_ORM
 	 * <code>
 	 * // Relation many-to-many for Book-Comments through model 'books_comment' with detailed conditions:
 	 * protected $_hasMany = array('comment' => array(
-			'foreign_key' => 'book_id,
+			'foreign_key' => 'book_id',
 			'through' => 'books_comment',
 			'dependent_key' => 'comment_id'
 	 * 	));

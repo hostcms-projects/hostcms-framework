@@ -20,9 +20,10 @@ class User_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-03-28';
+	public $date = '2014-07-16';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-				$this->menu = array(			array(				'sorting' => 10,				'block' => 2,				'name' => Core::_('User.menu'),				'href' => "/admin/user/index.php",				'onclick' => "$.adminLoad({path: '/admin/user/index.php'}); return false"			)		);	}}
+				$this->menu = array(			array(				'sorting' => 10,				'block' => 2,
+				'ico' => 'fa-user',				'name' => Core::_('User.menu'),				'href' => "/admin/user/index.php",				'onclick' => "$.adminLoad({path: '/admin/user/index.php'}); return false"			)		);	}}

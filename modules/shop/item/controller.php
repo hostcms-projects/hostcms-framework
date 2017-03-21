@@ -241,7 +241,7 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		$aShop_Specialprices = $oShop_Item->Shop_Specialprices->findAll();
 		foreach ($aShop_Specialprices as $oShop_Specialprice)
 		{
-			if ($this->count >= $oShop_Specialprice->min_quantity && $this->count <= $oShop_Specialprice->max_quantity)
+			if ($this->count >= $oShop_Specialprice->min_quantity && ($this->count <= $oShop_Specialprice->max_quantity || $oShop_Specialprice->max_quantity == 0))
 			{
 				$price = $oShop_Specialprice->percent != 0
 					? $price * $oShop_Specialprice->percent / 100

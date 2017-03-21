@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Smtp extends Core_Mail
 {
@@ -30,9 +30,13 @@ class Core_Mail_Smtp extends Core_Mail
 		$header .= $additional_headers . $sSingleSeparator . $sSingleSeparator;
 
 		$header .=  $message . $sSingleSeparator;
-
 		$timeout = 5;
-		if ($fp = fsockopen($this->_config['host'], $this->_config['port'], $errno, $errstr, $timeout))
+
+		$fp = function_exists('stream_socket_client')
+			? stream_socket_client($this->_config['host'] . ":" . $this->_config['port'], $errno, $errstr, $timeout)
+			: fsockopen($this->_config['host'], $this->_config['port'], $errno, $errstr, $timeout);
+
+		if ($fp)
 		{
 			stream_set_timeout($fp, $timeout);
 
@@ -52,11 +56,14 @@ class Core_Mail_Smtp extends Core_Mail
 				return FALSE;
 			}
 
-			// Может быть много 250-х
+			// Может быть много 250-х, последний отделяется пробелом, а не минусом
 			do {
 				$server_response = $this->_serverFgets($fp);
 			}
-			while(!feof($fp) && $this->_getResponseStatus($server_response) == "250");
+			while(!feof($fp)
+				&& $this->_getResponseStatus($server_response) == "250"
+				&& substr($server_response, 3, 1) != ' '
+			);
 
 			fputs($fp, "AUTH LOGIN\r\n");
 			$server_response = $this->_serverFgets($fp); // Получен выше в цикле

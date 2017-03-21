@@ -474,8 +474,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		// Название магазина
 		$shop_name = trim(
-			!empty($oSite->yandex_market_name)
-				? $oSite->yandex_market_name
+			!empty($oShop->yandex_market_name)
+				? $oShop->yandex_market_name
 				: $oSite->name
 		);
 

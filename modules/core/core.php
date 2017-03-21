@@ -597,7 +597,7 @@ class Core
 	 */
 	static public function parseUrl()
 	{
-		$aDomain = explode(':', Core_Array::get($_SERVER, 'HTTP_HOST', ''));
+		$aDomain = explode(':', strtolower(Core_Array::get($_SERVER, 'HTTP_HOST', '')));
 
 		if (strlen($aDomain[0]))
 		{
@@ -615,7 +615,10 @@ class Core
 				$sUrl .= $_SERVER['REQUEST_URI'];
 			}
 
-			self::$url = parse_url($sUrl);
+			self::$url = parse_url($sUrl) + array(
+				'host' => '',
+				'path' => ''
+			);
 
 			// Decode parts of URL
 			foreach (self::$url as $key => $value)
@@ -672,7 +675,7 @@ class Core
 
 		return $version;
 	}
-	
+
 	static public function setCookie($name, $value, $expire = 0, $path = '', $domain = '', $secure = FALSE, $httponly = FALSE, $replace = FALSE)
 	{
 		header('Set-Cookie: ' . rawurlencode($name) . '=' . rawurlencode($value)

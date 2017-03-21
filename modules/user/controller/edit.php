@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -131,7 +131,8 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Processing of the form. Apply object fields.
-	 * @return Admin_Form_Action_Controller
+	 * @return self
+	 * @hostcms-event User_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -147,6 +148,8 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		parent::_applyObjectProperty();
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 
 	/**
@@ -165,7 +168,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		return $aReturn;
 	}
-	
+
 	/**
 	 * Executes the business logic.
 	 * @param mixed $operation Operation name

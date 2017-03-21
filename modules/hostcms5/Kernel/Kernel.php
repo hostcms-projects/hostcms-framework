@@ -380,7 +380,7 @@ $DataBase = & singleton('DataBase');
 $DataBase->db_connect();
 
 $current_lng = !defined('CURRENT_LNG') && isset($_SESSION["current_lng"])
-	? quote_smart(Core_Type_Conversion::toStr($_SESSION["current_lng"]))
+	? Core_Type_Conversion::toStr($_SESSION["current_lng"])
 	: DEFAULT_LNG;
 
 require_once($sModulesPath . 'Kernel/Core.php');

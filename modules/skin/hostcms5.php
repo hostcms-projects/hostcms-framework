@@ -943,7 +943,7 @@ if (Core_Auth::logged())
 			NewTr($count_td);
 		}
 
-		?></tr></table><?php
+		?></tr></table><?php				
 		return $this;
 	}
 

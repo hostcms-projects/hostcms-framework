@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -234,6 +234,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 	/**
 	 * Processing of the form. Apply object fields.
 	 * @return self
+	 * @hostcms-event Admin_Form_Field_Controller_Edit.onAfterRedeclaredApplyObjectProperty
 	 */
 	protected function _applyObjectProperty()
 	{
@@ -273,6 +274,8 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 				$oAdmin_Word->add($oAdmin_Word_Value);
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		return $this;
 	}

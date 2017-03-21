@@ -787,7 +787,7 @@ class shop
 	{
 		$aShop_Order_Item_Digitals = $oShopOrderItem->Shop_Order_Item_Digitals->findAll();
 
-		$tax = Shop_Controller::instance()->round($oShopOrderItem->price * $oShopOrderItem->rate / 100);
+		$tax = $this->Round($oShopOrderItem->price * $oShopOrderItem->rate / 100);
 
 		return array(
 			'shop_order_items_id' => $oShopOrderItem->id,
@@ -1356,7 +1356,9 @@ class shop
 	 */
 	function Round($float)
 	{
-		return Shop_Controller::instance()->round($float);
+		return Shop_Controller::instance()
+			->floatFormat($this->float_format)
+			->round($float);
 	}
 
 	/**
@@ -8430,7 +8432,7 @@ class shop
 			// shop_order_items_price содержит итоговую цену с налогом, исключаем налог из цены
 			if ($shop_tax_rate)
 			{
-				$price = Shop_Controller::instance()->round(
+				$price = $this->Round(
 					$price * 100 / (100 + $shop_tax_rate)
 				);
 			}
