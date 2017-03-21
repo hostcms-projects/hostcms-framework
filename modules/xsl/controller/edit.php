@@ -70,7 +70,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(30)
 					->caption(Core::_('Xsl.value'))
 					->name('xsl_value')
-					->syntaxHighlighter(TRUE)
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
 				// Добавляем на основную вкладку большое текстовое поле с кодом XSL-шаблона

@@ -10,8 +10,8 @@
  */
 return array(
 	'authorization_form_title' => 'Administration center',
-	'authorization_form_login' => 'User:',
-	'authorization_form_password' => 'Password:',
+	'authorization_form_login' => 'User',
+	'authorization_form_password' => 'Password',
 	'authorization_form_ip' => 'Attach session to IP address',
 	'authorization_form_button' => 'Enter',
 	'themes' => 'Themes',

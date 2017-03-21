@@ -6,8 +6,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Показ навигационной цепочки структуры сайта.
  *
  * Доступные методы:
- * current($parentId) вывод потомков узла структуры $parentId
- * showProperties(TRUE) выводить значения дополнительных свойств, по умолчанию NULL
+ *
+ * - current($parentId) вывод потомков узла структуры $parentId
+ * - showProperties(TRUE) выводить значения дополнительных свойств, по умолчанию NULL
+ * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  *
  * <code>
  * $Structure_Controller_Breadcrumbs = new Structure_Controller_Breadcrumbs(
@@ -33,7 +35,6 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 	 * @var array
 	 */
 	protected $_allowedProperties = array(
-		'menu',
 		'current',
 		'showProperties',
 		'showInformationsystem',

@@ -375,7 +375,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 						if ($sTabName == 'main'
 						&& $this->_tabs[$sTabName]->getCountChildren() == 0)
 						{
-							$oAdmin_Form_Entity_For_Column->class('large');
+							$oAdmin_Form_Entity_For_Column->class($oAdmin_Form_Entity_For_Column->class . ' large');
 						}
 
 						$columnName == 'id' && $oAdmin_Form_Entity_For_Column->readonly('readonly');
@@ -468,10 +468,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		switch ($operation)
 		{
 			case NULL: // Показ формы
+			
 				$this->_Admin_Form_Controller->title(
 					$this->title
 				);
+				
 				$return = $this->_showEditForm();
+				
 			break;
 			case 'save':
 				$primaryKeyName = $this->_object->getPrimaryKeyName();
@@ -492,6 +495,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					$windowId = $this->_Admin_Form_Controller->getWindowId();
 					?><script type="text/javascript"><?php
 					?>$.appendInput('<?php echo $windowId?>', '<?php echo $this->_formId?>', '<?php echo $primaryKeyName?>', '<?php echo $this->_object->$primaryKeyName?>');<?php
+					/*?>$.appendInput('<?php echo $windowId?>', '<?php echo $this->_formId?>', 'hostcms[checked][<?php echo $this->_datasetId?>][<?php echo $this->_object->$primaryKeyName?>]', '1');<?php*/
 					?></script><?php
 				}
 

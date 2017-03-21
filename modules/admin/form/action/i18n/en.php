@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Administration center form actions',
@@ -36,7 +36,9 @@ return array(
 	'confirm' => '<acronym title="Request confirmation before performing action">Request confirmation</acronym>',
 	'name' => '<acronym title="Action handler function name">Handler function</acronym>',
 	'sorting' => '<acronym title="Action sorting order">Sorting order</acronym>',
-	'picture' => '<acronym title="Action picture in actions list, e.g. /admin/images/edit.gif">Picture</acronym>',
+	'picture' => '<acronym title="Action picture in the actions list, e.g. /admin/images/edit.gif">Picture</acronym>',
+	'icon' => '<acronym title="Part of the name CSS icon in the actions list, e.g. pencil">Icon</acronym>',
+	'color' => '<acronym title="CSS name of action\'s color in actions list, e.g. success">Color</acronym>',
 	'dataset' => '<acronym title="Action data set index, -1 &mdash; action for all data sets">Data set index</acronym>',
 	'single' => '<acronym title="Display action in actions list">Display action in actions list</acronym>',
 	'group' => '<acronym title="Display action in group operations list">Group operation</acronym>',

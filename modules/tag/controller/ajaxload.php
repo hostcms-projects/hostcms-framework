@@ -13,14 +13,25 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  */
 class Tag_Controller_Ajaxload extends Admin_Form_Action_Controller
 {
+	/**
+	 * Tag filter
+	 * @var string
+	 */
 	protected $_tagFilter = null;
-
+	/**
+	 * Set tag filter
+	 * @param string $tagFilter tag filter
+	 * @return self
+	 */
 	public function query($tagFilter = '')
 	{
 		$this->_tagFilter = $tagFilter;
 		return $this;
 	}
-
+	/**
+	 * Execute business logic
+	 * @param string $operation operation
+	 */
 	public function execute($operation = NULL)
 	{		
 		$aReturn = array();

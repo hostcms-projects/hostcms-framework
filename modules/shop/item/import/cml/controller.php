@@ -435,6 +435,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopItem = Core_Entity::factory('Shop_Item')->guid($sGUID);
 					// Минимально необходимы данные
 					$oShopItem->name = $sItemName;
+					$oShopItem->path = '';
 					$oShopItem->shop_id($this->iShopId)->save();
 					$this->_aReturn['insertItemCount']++;
 				}
@@ -508,7 +509,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Обрабатываем описание товара
 				foreach ($this->xpath($oItem, 'Описание') as $DescriptionData)
 				{
-					$oShopItem->description = nl2br(strval($DescriptionData));
+					$oShopItem->text = nl2br(strval($DescriptionData));
 					$oShopItem->save();
 				}
 
@@ -740,6 +741,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				
 				foreach($aProperties as $oProperty)
 				{
+					if($oProperty->type==2)
+					{
+						continue;
+					}
+				
 					$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
 
 					if(count($aPropertyValues) == 0)
@@ -1225,7 +1231,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$oProperty_Value->setValue($value);
 			break;
 			default:
-				$oProperty_Value->setValue($value);
+				$oProperty_Value->setValue(nl2br($value));
 			break;
 		}
 

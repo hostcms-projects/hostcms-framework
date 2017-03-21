@@ -20,4 +20,4 @@ class Wysiwyg_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-08-22';}
+	public $date = '2014-10-27';}

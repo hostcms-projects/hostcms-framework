@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Warehouse_Item_Model extends Core_Entity
 {
@@ -19,10 +19,10 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 	protected $_marksDeleted = NULL;
 
 	/**
-	 * One-to-many or many-to-many relations
+	 * Belongs to relations
 	 * @var array
 	 */
-	protected $_hasMany = array(
+	protected $_belongsTo = array(
 		'shop_item' => array(),
 		'shop_warehouse' => array()
 	);
@@ -51,6 +51,40 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 	}
 
 	/**
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_warehouse_item.onBeforeRedeclaredGetXml
+	 */
+	public function getXml()
+	{
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
+
+		$oShop_Item_Reserveds = Core_Entity::factory('Shop_Item_Reserved');
+		$oShop_Item_Reserveds->queryBuilder()
+			->where('shop_item_id', '=', $this->shop_item_id)
+			->where('shop_warehouse_id', '=', $this->shop_warehouse_id)
+			->where('datetime', '>', Core_Date::timestamp2sql(time() - $this->Shop_Item->Shop->reserve_hours * 60 * 60));
+
+		$aShop_Item_Reserveds = $oShop_Item_Reserveds->findAll();
+
+		$reserved = 0;
+		foreach ($aShop_Item_Reserveds as $oShop_Item_Reserved)
+		{
+			$reserved += $oShop_Item_Reserved->count;
+		}
+
+		$this
+			->clearXmlTags()
+			->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('reserved')
+					->value($reserved)
+			);
+
+		return parent::getXml();
+	}
+
+	/**
 	 * Get item count by item ID
 	 * @param int $shop_item_id item ID
 	 * @param boolean $bCache cache mode
@@ -65,7 +99,9 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 
 		$aShop_Warehouse_Items = $this->findAll($bCache);
 
-		return isset($aShop_Warehouse_Items[0]) ? $aShop_Warehouse_Items[0] : NULL;
+		return isset($aShop_Warehouse_Items[0])
+			? $aShop_Warehouse_Items[0]
+			: NULL;
 	}
 
 	/**
@@ -83,11 +119,8 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 
 		$aShop_Warehouse_Items = $this->findAll($bCache);
 
-		if (isset($aShop_Warehouse_Items[0]))
-		{
-			return $aShop_Warehouse_Items[0];
-		}
-
-		return NULL;
+		return isset($aShop_Warehouse_Items[0])
+			? $aShop_Warehouse_Items[0]
+			: NULL;
 	}
 }

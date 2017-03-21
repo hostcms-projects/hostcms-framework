@@ -43,12 +43,13 @@ abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 	/**
 	* Create and return controller for current skin
 	* @param string $className name of class
+	* @param Admin_Form_Action_Model $oAdmin_Form_Action action
 	* @return object
 	*/
 	static public function factory($className, Admin_Form_Action_Model $oAdmin_Form_Action)
 	{
-		$skinClassName = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_Modules_' .
-		ucfirst($className);
+		//$skinClassName = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_Modules_' . ucfirst($className);
+		$skinClassName = ucfirst($className) . '_' . ucfirst(Core_Skin::instance()->getSkinName());
 
 		return class_exists($skinClassName)
 			? new $skinClassName($oAdmin_Form_Action)

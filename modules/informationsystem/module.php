@@ -20,7 +20,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-08-22';
+	public $date = '2014-10-27';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -126,6 +126,7 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('informationsystem_groups.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
+			->orderBy('informationsystem_groups.id')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingInformationsystemGroups', $this, array($oInformationsystemGroup));
@@ -168,11 +169,14 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('informationsystem_items.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
+			->orderBy('informationsystem_items.id')
 			->limit($offset, $limit);
+
+			//->orderBy('informationsystem_items.id');
 
 		Core_Event::notify(get_class($this) . '.indexingInformationsystemItems', $this, array($oInformationsystemItem));
 
-		$aInformationsystemItems = $oInformationsystemItem->findAll();
+		$aInformationsystemItems = $oInformationsystemItem->findAll(FALSE);
 
 		$result = array();
 		foreach($aInformationsystemItems as $oInformationsystemItem)
@@ -213,9 +217,9 @@ class Informationsystem_Module extends Core_Module{	/**
 
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
 
-						$oSearch_Page
-							->addEntity($oInformationsystem_Item)
-							->addEntity($oInformationsystem_Item->Informationsystem_Group);
+						$oSearch_Page->addEntity($oInformationsystem_Item);
+
+						$oInformationsystem_Item->informationsystem_group_id && $oSearch_Page->addEntity($oInformationsystem_Item->Informationsystem_Group);
 					}
 				break;
 			}

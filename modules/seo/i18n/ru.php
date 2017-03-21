@@ -5,7 +5,7 @@
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'SEO характеристики',
@@ -46,8 +46,7 @@ return array(
 	'mail_catalog' => 'Mail.ru',
 	'yandex_catalog' => 'Yandex.ru',
 	'rambler_catalog' => 'Rambler.ru',
-	'aport_catalog' => 'Aport.ru',
-	'dmoz_catalog' => 'Dmoz.ru',
+	'dmoz_catalog' => 'Dmoz.org',
 	'mail_counter' => 'Mail.ru',
 	'rambler_counter' => "Rambler's Top100",
 	'spylog_counter' => 'SpyLog.ru',

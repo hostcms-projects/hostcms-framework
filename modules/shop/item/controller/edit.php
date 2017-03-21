@@ -678,10 +678,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value(implode(", ", $this->_object->Tags->findAll()));
 					$oShopItemTabTags->add($oTagsField);
 					*/
-					
-					// Добавляем метки на вкладку меток					
+
+					// Добавляем метки на вкладку меток
 					$html = '<label class="tags_label" for="form-field-tags">Метки (теги)</label>
-							<div class="item_div">															
+							<div class="item_div">
 								<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="Введите тэг ..." />
 							</div>
 							<script type="text/javascript">
@@ -689,11 +689,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 									//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
 									//var tag_input = $(\'#' . $windowId .' #form-field-tags\');
 									var tag_input = $(\'#form-field-tags\');
-									if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) ) 
+									if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
 									{
 										tag_input.tag(
 										  {
-											placeholder:tag_input.attr(\'placeholder\')											
+											placeholder:tag_input.attr(\'placeholder\')
 										  }
 										);
 									}
@@ -702,11 +702,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 										tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
 										//$(\'#form-field-tags\').autosize({append: "n"});
 									}
-									
+
 								})
 							</script>
 							';
-					$oShopItemTabTags->add(Admin_Form_Entity::factory('Code')->html($html));	
+					$oShopItemTabTags->add(Admin_Form_Entity::factory('Code')->html($html));
 				}
 
 				$oMultiplSign = Admin_Form_Entity::factory('Div')->divAttr(
@@ -955,18 +955,13 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	protected function _applyObjectProperty()
 	{
-		$bNewObject = is_null($this->_object->id);
+		$bNewObject = is_null($this->_object->id) && is_null(Core_Array::getPost('id'));
 
 		parent::_applyObjectProperty();
 
-		if (is_null($this->_object->id))
-		{
-			$oShop = Core_Entity::factory('Shop', intval(Core_Array::getGet('shop_id', 0)));
-		}
-		else
-		{
-			$oShop = $this->_object->Shop;
-		}
+		$oShop = $bNewObject
+			? Core_Entity::factory('Shop', intval(Core_Array::getGet('shop_id', 0)))
+			: $this->_object->Shop;
 
 		$modelName = $this->_object->getModelName();
 
@@ -1270,11 +1265,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			// и передан файл
 			&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
-			if (Core_File::isValidExtension($aFileData['name'],
-			$aCore_Config['availableExtension']))
+			if (Core_File::isValidExtension($aFileData['name'], $aCore_Config['availableExtension']))
 			{
 				// Удаление файла большого изображения
 				if ($this->_object->image_large)
@@ -1314,14 +1308,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			!is_null($aSmallFileData)
 			&& $aSmallFileData['size'];
 
-
 		// Задано малое изображение и при этом не задано создание малого изображения
 		// из большого или задано создание малого изображения из большого и
 		// при этом не задано большое изображение.
 
-		if ($bSmallImageIsCorrect
-		|| $create_small_image_from_large
-		&& $bLargeImageIsCorrect)
+		if ($bSmallImageIsCorrect || $create_small_image_from_large && $bLargeImageIsCorrect)
 		{
 			// Удаление файла малого изображения
 			if ($this->_object->image_small)
@@ -1346,7 +1337,6 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$create_large_image = empty($large_image);
 				}
-
 
 				$file_name = $aSmallFileData['name'];
 
@@ -1474,27 +1464,25 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			if ($result['large_image'])
 			{
 				$this->_object->image_large = $large_image;
-
 				$this->_object->setLargeImageSizes();
 			}
 
 			if ($result['small_image'])
 			{
 				$this->_object->image_small = $small_image;
-
 				$this->_object->setSmallImageSizes();
 			}
 		}
 
 		$this->_object->save();
 
-		if (Core::moduleIsActive('search'))
+		if (Core::moduleIsActive('search') && $this->_object->indexing && $this->_object->active)
 		{
 			Search_Controller::indexingSearchPages(array($this->_object->indexing()));
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
-		
+
 		return $this;
 	}
 
@@ -1660,15 +1648,15 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$aReturnArray = array(' … ');
 
 		// Если это модификация - её основной товар в любом случае должен быть в списке
-		if($oShopItem->modification_id)
+		if ($oShopItem->modification_id)
 		{
 			$aReturnArray[$oShopItem->Modification->id] = $oShopItem->Modification->name;
 			$iModificationsLimit--;
 		}
 
-		if(is_null($oShopItem->id))
+		if (is_null($oShopItem->id))
 		{
-			if(intval(Core_Array::getGet('shop_item_id', 0)))
+			if (intval(Core_Array::getGet('shop_item_id', 0)))
 			{
 				$oShopItemParent = Core_Entity::factory('Shop_Item', Core_Array::getGet('shop_item_id', 0));
 

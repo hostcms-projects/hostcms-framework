@@ -22,7 +22,7 @@ abstract class Shop_Payment_System_Handler
 		require_once($oShop_Payment_System_Model->getPaymentSystemFilePath());
 
 		$name = 'Shop_Payment_System_Handler' . intval($oShop_Payment_System_Model->id);
-		
+
 		if (class_exists($name))
 		{
 			return new $name($oShop_Payment_System_Model);
@@ -132,6 +132,15 @@ abstract class Shop_Payment_System_Handler
 	{
 		$this->_shopOrderBeforeAction = $oShopOrderBeforeAction;
 		return $this;
+	}
+
+	/**
+	 * Get order before change
+	 * @return Shop_Order_Model
+	 */
+	public function getShopOrderBeforeAction()
+	{
+		return $this->_shopOrderBeforeAction;
 	}
 
 	/**
@@ -357,6 +366,17 @@ abstract class Shop_Payment_System_Handler
 
 					$this->_shopOrder->add($oShop_Order_Item);
 
+					// Reserved
+					if ($oShop->reserve && !$this->_shopOrder->paid)
+					{
+						$oShop_Item_Reserved = Core_Entity::factory('Shop_Item_Reserved');
+						$oShop_Item_Reserved->shop_order_id = $this->_shopOrder->id;
+						$oShop_Item_Reserved->shop_item_id = $oShop_Order_Item->shop_item_id;
+						$oShop_Item_Reserved->shop_warehouse_id = $oShop_Order_Item->shop_warehouse_id;
+						$oShop_Item_Reserved->count = $oShop_Order_Item->quantity;
+						$oShop_Item_Reserved->save();
+					}
+
 					// Delete item from the cart
 					$Shop_Cart_Controller
 						->shop_item_id($oShop_Cart->shop_item_id)
@@ -376,6 +396,13 @@ abstract class Shop_Payment_System_Handler
 		}
 
 		$this->_addDelivery();
+
+		// Удаляем истекшие товары
+		Core_QueryBuilder::delete('shop_item_reserved')
+			->leftJoin('shop_items', 'shop_item_reserved.shop_item_id', '=', 'shop_items.id')
+			->where('shop_items.shop_id', '=', $oShop->id)
+			->where('shop_item_reserved.datetime', '<', Core_Date::timestamp2sql(time() - $oShop->reserve_hours * 60 * 60))
+			->execute();
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterProcessOrder', $this);
 
@@ -421,7 +448,13 @@ abstract class Shop_Payment_System_Handler
 			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
 			$oShop_Order_Item->name = $oShop_Purchase_Discount->name;
 			$oShop_Order_Item->quantity = 1;
-			$oShop_Order_Item->price = -1 * $oShop_Purchase_Discount->getDiscountAmount();
+
+			$discountAmount = $oShop_Purchase_Discount->getDiscountAmount();
+			
+			// Скидка больше суммы заказа
+			$discountAmount > $amount && $discountAmount = $amount;
+
+			$oShop_Order_Item->price = -1 * $discountAmount;
 
 			if ($oShop_Purchase_Discount->id == $shop_purchase_discount_id)
 			{
@@ -568,12 +601,14 @@ abstract class Shop_Payment_System_Handler
 		// Список свойств заказа
 		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
 
+		$this->_aProperties = array();
 		$aProperties = $oShop_Order_Property_List->Properties->findAll();
 		foreach ($aProperties as $oProperty)
 		{
 			$this->_aProperties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
 		}
 
+		$this->_aProperty_Dirs = array();
 		$aProperty_Dirs = $oShop_Order_Property_List->Property_Dirs->findAll();
 		foreach ($aProperty_Dirs as $oProperty_Dir)
 		{

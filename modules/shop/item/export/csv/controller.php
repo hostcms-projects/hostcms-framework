@@ -95,7 +95,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	 */
 	private $_aCurrentData;
 
-	/** 
+	/**
 	 * Data pointer
 	 * @var int
 	 */
@@ -124,7 +124,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		$this->exportItemModifications = $bExportItemModifications;
 		$this->_iItem_Properties_Count = 0;
 		$this->_iGroup_Properties_Count = 0;
-		
+
 		$this->exportOrders = $bExportOrders;
 
 		// Устанавливаем лимит времени выполнения в 1 час
@@ -209,12 +209,12 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			// Добавляем в заголовок информацию о свойствах товара
 			foreach($this->_aItem_Properties as $oItem_Property)
 			{
-				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oItem_Property->name));
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString($oItem_Property->name));
 				$this->_iItem_Properties_Count++;
 
 				if($oItem_Property->type == 2)
 				{
-					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oItem_Property->name));
+					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString(Core::_('Shop_item.import_small_images') . $oItem_Property->name));
 					$this->_iItem_Properties_Count++;
 				}
 			}
@@ -222,12 +222,12 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			// Добавляем в заголовок информацию о свойствах группы товаров
 			foreach($this->_aGroup_Properties as $oGroup_Property)
 			{
-				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', $oGroup_Property->name));
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString($oGroup_Property->name));
 				$this->_iGroup_Properties_Count++;
 
 				if($oGroup_Property->type == 2)
 				{
-					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', str_replace('"', '""', Core::_('Shop_item.import_small_images') . $oGroup_Property->name));
+					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString(Core::_('Shop_item.import_small_images') . $oGroup_Property->name));
 					$this->_iGroup_Properties_Count++;
 				}
 			}
@@ -235,7 +235,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			// Добавляем в заголовок информацию о складах
 			foreach($this->_aShopWarehouses as $oWarehouse)
 			{
-				$this->_aCurrentData[$this->_iCurrentDataPosition][] = Core::_('Shop_Item.warehouse_import_field', str_replace('"', '""', $oWarehouse->name));
+				$this->_aCurrentData[$this->_iCurrentDataPosition][] = Core::_('Shop_Item.warehouse_import_field', $this->_prepareString($oWarehouse->name));
 			}
 
 			// Добавляем информацию о ценах на группы пользователя
@@ -254,7 +254,6 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	{
 		// Получаем список специальных цен товара
 		$aShop_Specialprices = $oShopItem->Shop_Specialprices->findAll(FALSE);
-		
 
 		$aTmpArray = $this->_aItemBase_Properties;
 
@@ -265,7 +264,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$aTmpArray[31] = $oShop_Specialprice->price;
 			$aTmpArray[32] = $oShop_Specialprice->percent;
 			$aTmpArray[33] = $oShopItem->guid;
-			
+
 			echo implode($this->separator,array_merge($this->_aGroupBase_Properties, $aTmpArray)) . "\n";
 		}
 	}
@@ -287,7 +286,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$aProperty_Values = $oItem_Property->getValues($oShopItem->id, FALSE);
 			$iProperty_Values_Count = count($aProperty_Values);
 
-			$aItemProperties[] = sprintf('"%s"', str_replace('"', '""', $iProperty_Values_Count > 0
+			$aItemProperties[] = sprintf('"%s"', $this->_prepareString($iProperty_Values_Count > 0
 				? ($oItem_Property->type != 2
 					? ($oItem_Property->type == 3 && $aProperty_Values[0]->value != 0 && Core::moduleIsActive('list')
 						? $aProperty_Values[0]->List_Item->value
@@ -333,36 +332,39 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		$aTmpArray = $this->_aGroupBase_Properties;
 
 		$aTmpArray[1] = is_null($oShopItem->Shop_Group->id) ? 'ID00000000' : $oShopItem->Shop_Group->guid;
-		
+
 		if($oShopItem->Shop_Group->id)
 		{
-			$aTmpArray[3] = $oShopItem->Shop_Group->seo_title;
+			/*$aTmpArray[3] = $oShopItem->Shop_Group->seo_title;
 			$aTmpArray[4] = $oShopItem->Shop_Group->seo_description;
-			$aTmpArray[5] = $oShopItem->Shop_Group->seo_keywords;
+			$aTmpArray[5] = $oShopItem->Shop_Group->seo_keywords;*/
+			$aTmpArray[3] = sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Group->seo_title));
+			$aTmpArray[4] = sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Group->seo_description));
+			$aTmpArray[5] = sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Group->seo_keywords));
 		}
 
 		return array_merge($aTmpArray, array(
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->marking)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->Modification->marking)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->name)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->description)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->text)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->marking)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->Modification->marking)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->name)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->description)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->text)),
 		sprintf('"%s"', $oShopItem->weight),
 		sprintf('"%s"', $oShopItem->type),
-		sprintf('"%s"', (Core::moduleIsActive('tag') ? str_replace('"', '""', implode(",", $oShopItem->Tags->findAll(FALSE))) : "")),
+		sprintf('"%s"', (Core::moduleIsActive('tag') ? $this->_prepareString(implode(",", $oShopItem->Tags->findAll(FALSE))) : "")),
 		sprintf('"%s"', $oShopItem->price),
 		sprintf('"%s"', $oShopItem->active),
 		sprintf('"%s"', $oShopItem->sorting),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->path)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->path)),
 		sprintf('"%s"', $oShopItem->shop_tax_id),
 		sprintf('"%s"', $oShopItem->shop_currency_id),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->Shop_Seller->name)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->Shop_Producer->name)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->Shop_Measure->name)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->seo_title)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->seo_description)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->seo_keywords)),
-		sprintf('"%s"', str_replace('"', '""', $oShopItem->indexing)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Seller->name)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Producer->name)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->Shop_Measure->name)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->seo_title)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->seo_description)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->seo_keywords)),
+		sprintf('"%s"', $this->_prepareString($oShopItem->indexing)),
 		sprintf('"%s"', $oShopItem->yandex_market),
 		sprintf('"%s"', $oShopItem->yandex_market_bid),
 		sprintf('"%s"', $oShopItem->yandex_market_cid),
@@ -371,7 +373,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		sprintf('"%s"', $oShopItem->end_datetime == '0000-00-00 00:00:00' ? '0000-00-00 00:00:00' :  Core_Date::sql2datetime($oShopItem->end_datetime)),
 		sprintf('"%s"', ($oShopItem->image_large == '') ? '' : $oShopItem->getLargeFileHref()),
 		sprintf('"%s"', ($oShopItem->image_small == '') ? '' : $oShopItem->getSmallFileHref())), $this->_aSpecialPriceBase_Properties,
-		array(sprintf('"%s"', str_replace('"', '""', $oShopItem->guid)),
+		array(sprintf('"%s"', $this->_prepareString($oShopItem->guid)),
 		sprintf('"%s"', $oShopItem->siteuser_id)), $aItemProperties, $aGroupProperties, $aWarehouses, $aShopPrices);
 	}
 
@@ -385,7 +387,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		header("Content-Type: application/force-download");
 		header("Content-Disposition: attachment; filename = " . 'CSV_' .date("Y_m_d_H_i_s").'.csv'. ";");
 		header("Content-Transfer-Encoding: binary");
-		
+
 		if(!$this->exportOrders)
 		{
 			foreach($this->_aCurrentData as $aData)
@@ -418,15 +420,15 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				if($iShopGroupId != 0)
 				{
 					$aTmpArray = array(
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->name)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->guid)),
-						sprintf('"%s"', str_replace('"', '""', is_null($oShopGroup->Shop_Group->id) ? 'ID00000000' : $oShopGroup->Shop_Group->guid)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_title)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_description)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->seo_keywords)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->description)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->path)),
-						sprintf('"%s"', str_replace('"', '""', $oShopGroup->sorting))
+						sprintf('"%s"', $this->_prepareString($oShopGroup->name)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->guid)),
+						sprintf('"%s"', $this->_prepareString(is_null($oShopGroup->Shop_Group->id) ? 'ID00000000' : $oShopGroup->Shop_Group->guid)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->seo_title)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->seo_description)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->seo_keywords)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->description)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->path)),
+						sprintf('"%s"', $this->_prepareString($oShopGroup->sorting))
 					);
 
 					// Пропускаем поля товара
@@ -453,7 +455,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 						$aProperty_Values = $oGroup_Property->getValues($oShopGroup->id);
 						$iProperty_Values_Count = count($aProperty_Values);
 
-						$aTmpArray[] = sprintf('"%s"', str_replace('"', '""', $iProperty_Values_Count > 0 ? ($oGroup_Property->type != 2
+						$aTmpArray[] = sprintf('"%s"', $this->_prepareString($iProperty_Values_Count > 0 ? ($oGroup_Property->type != 2
 							? ($oGroup_Property->type == 3 && $aProperty_Values[0]->value != 0 && Core::moduleIsActive('list')
 								? $aProperty_Values[0]->List_Item->value
 								: ($oGroup_Property->type == 8
@@ -494,26 +496,26 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					foreach($aShopItems as $oShopItem)
 					{
 						$this->_printRow($this->getItemData($oShopItem));
-						
+
 						$iPropertyFieldOffset = count($this->_aSpecialPriceBase_Properties) + count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties);
 						$aCurrentPropertyLine = array();
 						for($i = 0;$i<$iPropertyFieldOffset;$i++)
 						{
 							$aCurrentPropertyLine[] = '""';
 						}
-						
+
 						$aCurrentPropertyLine[$iPropertyFieldOffset-2] = $oShopItem->guid;
-						
+
 						foreach ($this->_aItem_Properties as $oItem_Property)
 						{
 							$aProperty_Values = $oItem_Property->getValues($oShopItem->id, FALSE);
 							array_shift($aProperty_Values);
-							
+
 							if(count($aProperty_Values))
 							{
 								foreach($aProperty_Values as $oProperty_Value)
 								{
-									$aCurrentPropertyLine[$iPropertyFieldOffset] = sprintf('"%s"', str_replace('"', '""', ($oItem_Property->type != 2
+									$aCurrentPropertyLine[$iPropertyFieldOffset] = sprintf('"%s"', $this->_prepareString(($oItem_Property->type != 2
 										? ($oItem_Property->type == 3 && $oProperty_Value->value != 0 && Core::moduleIsActive('list')
 											? $oProperty_Value->List_Item->value
 											: ($oItem_Property->type == 8
@@ -523,16 +525,16 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 													: $oProperty_Value->value)))
 													: ($oProperty_Value->file == '' ? '' : $oProperty_Value->setHref($oShopItem->getItemHref())->getLargeFileHref())
 													)));
-									
+
 									if($oItem_Property->type == 2)
 									{
-										$aCurrentPropertyLine[$iPropertyFieldOffset+1] = sprintf('"%s"', str_replace('"', '""', $oProperty_Value->setHref($oShopItem->getItemHref())->getSmallFileHref()));
+										$aCurrentPropertyLine[$iPropertyFieldOffset+1] = sprintf('"%s"', $this->_prepareString($oProperty_Value->setHref($oShopItem->getItemHref())->getSmallFileHref()));
 									}
-									
+
 									$this->_printRow($aCurrentPropertyLine);
 								}
 							}
-							
+
 							if($oItem_Property->type==2)
 							{
 								$aCurrentPropertyLine[$iPropertyFieldOffset] = '""';
@@ -565,7 +567,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				}
 				while (count($aShopItems));
 			}
-		} 
+		}
 		else
 		{
 			$this->_aCurrentData[0] = array(
@@ -604,48 +606,48 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Цена товара заказа"',
 				'"Налог на товар заказа"',
 				'"Тип товара"');
-				
+
 			$aShop_Orders = Core_Entity::factory('Shop', $this->shopId)->Shop_Orders->findAll();
 			foreach($aShop_Orders as $oShop_Order)
 			{
 				$this->_aCurrentData[] = array(
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->guid)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->invoice)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location_City->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Country_Location_City_Area->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->surname)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->patronymic)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->email)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->acceptance_report)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->vat_invoice)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->company)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->tin)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->kpp)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->phone)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->fax)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->address)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Order_Status->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->Shop_Currency->name)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->shop_payment_system_id)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->datetime)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->paid)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->payment_datetime)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->description)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->system_information)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->canceled)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->status_datetime)),
-					sprintf('"%s"', str_replace('"', '""', $oShop_Order->delivery_information))
+					sprintf('"%s"', $this->_prepareString($oShop_Order->guid)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->invoice)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City_Area->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->surname)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->patronymic)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->email)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->acceptance_report)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->vat_invoice)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->company)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->tin)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->kpp)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->phone)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->fax)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->address)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Order_Status->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Currency->name)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->shop_payment_system_id)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->datetime)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->paid)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->payment_datetime)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->description)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->system_information)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->canceled)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->status_datetime)),
+					sprintf('"%s"', $this->_prepareString($oShop_Order->delivery_information))
 				);
-				
+
 				// Получаем все товары заказа
 				$aShop_Order_Items = $oShop_Order->Shop_Order_Items->findAll();
 				foreach($aShop_Order_Items as $oShop_Order_Item)
 				{
 					$this->_aCurrentData[] = array(
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order->guid)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->guid)),
 						'""',
 						'""',
 						'""',
@@ -674,16 +676,16 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 						'""',
 						'""',
 						'""',
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->marking)),
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->name)),
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->quantity)),
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->price)),
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->rate)),
-						sprintf('"%s"', str_replace('"', '""', $oShop_Order_Item->type))
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->marking)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->quantity)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->price)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->rate)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->type))
 					);
 				}
 			}
-			
+
 			foreach($this->_aCurrentData as $aCurrentLine)
 			{
 				$this->_printRow($aCurrentLine);
@@ -693,6 +695,16 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		exit();
 	}
 
+	/**
+	 * Prepare string
+	 * @param string $string
+	 * @return string
+	 */
+	protected function _prepareString($string)
+	{
+		return str_replace('"', '""', trim($string));
+	}
+	
 	/**
 	 * Print array
 	 * @param array $aData

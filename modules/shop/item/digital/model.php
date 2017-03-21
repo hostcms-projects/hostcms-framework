@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Digital_Model extends Core_Entity
 {
@@ -59,6 +59,7 @@ class Shop_Item_Digital_Model extends Core_Entity
 
 	/**
 	 * Get digital items count
+	 * @return int Count of digital items or -1 for unlimited
 	 */
 	public function getCountDigitalItems()
 	{
@@ -95,7 +96,7 @@ class Shop_Item_Digital_Model extends Core_Entity
 			->orderBy('count')
 			->orderBy('id');
 
-		return $this->findAll();
+		return $this->findAll(FALSE);
 	}
 
 	/**

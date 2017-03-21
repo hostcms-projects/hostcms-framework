@@ -23,12 +23,7 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
-
-		$oAdmin_Form_Entity_Select
-			->options(
-				array(' … ') + $this->fillLibDir(0)
-			);
+		
 
 		$oMainTab = $this->getTab('main');
 
@@ -66,7 +61,7 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(30)
 					->caption(Core::_('Lib.lib_form_module_config'))
 					->name('lib_php_code_config')
-					->syntaxHighlighter(TRUE)
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oAdmin_Form_Tab_Entity_Lib_Config->add($oAdmin_Form_Entity_Textarea_Lib_Config);
@@ -91,13 +86,18 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(30)
 					->caption(Core::_('Lib.lib_form_module'))
 					->name('lib_php_code')
-					->syntaxHighlighter(TRUE)
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oAdmin_Form_Tab_Entity_Lib->add($oAdmin_Form_Entity_Textarea_Lib);
 
 				// Селектор с группой
+				$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
+
 				$oAdmin_Form_Entity_Select
+					->options(
+						array(' … ') + $this->fillLibDir(0)
+					)
 					->name('lib_dir_id')
 					->value($this->_object->lib_dir_id)
 					->caption(Core::_('Lib.lib_dir_id'));
@@ -105,19 +105,19 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				//->addAfter($oAdmin_Form_Entity_Textarea_Lib, $this->getField('lib_dir_id'));
 
 				$oAdditionalTab->delete(
-						 $this->getField('lib_dir_id') // Удаляем стандартный <input> lib_dir_id
-					);
+					 $this->getField('lib_dir_id') // Удаляем стандартный <input> lib_dir_id
+				);
 
 				$oMainTab->addBefore(
-						$oAdmin_Form_Entity_Select, $this->getField('description')
-					);
+					$oAdmin_Form_Entity_Select, $this->getField('description')
+				);
 
 			break;
 			case 'lib_dir':
 			default:
 				$title = $this->_object->id
-						? Core::_('Lib_Dir.lib_form_title_edit_dir')
-						: Core::_('Lib_Dir.lib_form_title_add_dir');
+					? Core::_('Lib_Dir.lib_form_title_edit_dir')
+					: Core::_('Lib_Dir.lib_form_title_add_dir');
 
 				// Значения директории для добавляемого объекта
 				if (is_null($this->_object->id))
@@ -125,7 +125,11 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$this->_object->parent_id = Core_Array::getGet('lib_dir_id');
 				}
 
+				$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
 				$oAdmin_Form_Entity_Select
+					->options(
+						array(' … ') + $this->fillLibDir(0, $this->_object->id)
+					)
 					->name('parent_id')
 					->value($this->_object->parent_id)
 					->caption(Core::_('Lib_Dir.parent_id'));
@@ -136,8 +140,8 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					);
 
 				$oMainTab->add(
-						$oAdmin_Form_Entity_Select
-					);
+					$oAdmin_Form_Entity_Select
+				);
 			break;
 		}
 

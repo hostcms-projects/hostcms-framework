@@ -56,7 +56,9 @@ class Skin_Default extends Core_Skin
 			->addJs('/admin/js/codemirror/mode/php/php.js')
 			->addJs('/admin/js/codemirror/mode/xml/xml.js')
 			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
-			
+			->addJs('/admin/js/codemirror/addon/search/searchcursor.js')
+			->addJs('/admin/js/codemirror/addon/search/search.js')
+			->addJs('/admin/js/codemirror/addon/dialog/dialog.js')
 			;
 
 		/*if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -73,6 +75,7 @@ class Skin_Default extends Core_Skin
 			->addCss('/admin/js/ui/stars/ui.stars.css')
 			->addCss('/admin/js/ui/ui.css')
 			->addCss('/admin/js/codemirror/lib/codemirror.css')
+			->addCss('/admin/js/codemirror/addon/dialog/dialog.css')
 			;
 	}
 
@@ -311,11 +314,11 @@ class Skin_Default extends Core_Skin
 			<div id="form">
 				<form name="authorization" action="/admin/index.php" method="post">
 					<div>
-						<p><?php echo Core::_('Admin.authorization_form_login')?></p>
+						<p><?php echo Core::_('Admin.authorization_form_login')?>:</p>
 						<p><input name="login" type="text"></input></p>
 					</div>
 					<div>
-						<p><?php echo Core::_('Admin.authorization_form_password')?></p>
+						<p><?php echo Core::_('Admin.authorization_form_password')?>:</p>
 						<p><input name="password" type="password"></input></p>
 					</div>
 					<div id="languages">

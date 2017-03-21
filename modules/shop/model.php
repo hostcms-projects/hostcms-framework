@@ -75,7 +75,8 @@ class Shop_Model extends Core_Entity{
 		'url_type' => 0,
 		'apply_tags_automatically' => 1,
 		'write_off_paid_items' => 0,
-		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,		'watermark_file' => '',
+		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,
+		'reserve_hours' => 24,		'watermark_file' => '',
 		'producer_image_small_max_width' => 100,
 		'producer_image_large_max_width' => 800,
 		'producer_image_small_max_height' => 100,
@@ -85,7 +86,7 @@ class Shop_Model extends Core_Entity{
 	 * Belongs to relations
 	 * @var array
 	 */
-	protected $_belongsTo = array(		'shop_dir' => array(),		'site' => array(),		'structure' => array(),		'shop_sountry' => array(),		'shop_currency' => array(),		'shop_order_status' => array(),		'shop_measure' => array(),		'user' => array(),		'siteuser_group' => array(),		'shop_company' => array(),		'shop_country' => array()	);
+	protected $_belongsTo = array(		'shop_dir' => array(),		'site' => array(),		'structure' => array(),		'shop_country' => array(),		'shop_currency' => array(),		'shop_order_status' => array(),		'shop_measure' => array(),		'user' => array(),		'siteuser_group' => array(),		'shop_company' => array(),		'shop_country' => array()	);
 	/**
 	 * Forbidden tags. If list of tags is empty, all tags will be shown.
 	 * @var array
@@ -120,7 +121,7 @@ class Shop_Model extends Core_Entity{
 	 * Get shop by structure id.
 	 * @param int $structure_id
 	 * @return Shop_Model|NULL
-	 */	public function getByStructureId($structure_id)	{		$this->queryBuilder()			->clear()			->where('structure_id', '=', $structure_id)			->limit(1);		$aShops = $this->findAll();		if (isset($aShops[0]))		{			return $aShops[0];		}		return NULL;	}
+	 */	public function getByStructureId($structure_id)	{		$this->queryBuilder()			->clear()			->where('structure_id', '=', $structure_id)			->limit(1);		$aShops = $this->findAll();		return isset($aShops[0]) ? $aShops[0] : NULL;	}
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
@@ -606,6 +607,23 @@ class Shop_Model extends Core_Entity{
 	}
 
 	/**
+	 * Show taxes in XML
+	 * @var boolean
+	 */
+	protected $_showXmlTaxes = FALSE;
+
+	/**
+	 * Add taxes to XML
+	 * @param boolean $showXmlTaxes
+	 * @return self
+	 */
+	public function showXmlTaxes($showXmlTaxes = TRUE)
+	{
+		$this->_showXmlTaxes = $showXmlTaxes;
+		return $this;
+	}
+
+	/**
 	 * Get XML for entity and children entities
 	 * @return string
 	 * @hostcms-event shop.onBeforeRedeclaredGetXml
@@ -634,6 +652,8 @@ class Shop_Model extends Core_Entity{
 
 		// Warehouses
 		$this->addEntities($this->Shop_Warehouses->findAll());
+
+		$this->_showXmlTaxes && $this->addEntities(Core_Entity::factory('Shop_Tax')->findAll());
 
 		$oShop_Items = $this->Shop_Items;
 		$oShop_Items->queryBuilder()

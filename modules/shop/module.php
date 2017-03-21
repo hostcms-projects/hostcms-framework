@@ -20,7 +20,7 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-08-22';
+	public $date = '2014-10-27';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -150,6 +150,7 @@ class Shop_Module extends Core_Module{	/**
 			->where('shop_groups.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
+			->orderBy('shop_groups.id')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingShopGroups', $this, array($oShopGroup));
@@ -192,6 +193,7 @@ class Shop_Module extends Core_Module{	/**
 			->where('shop_items.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
+			->orderBy('shop_items.id')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingShopItems', $this, array($oShopItem));
@@ -199,6 +201,7 @@ class Shop_Module extends Core_Module{	/**
 		$aShopItems = $oShopItem->findAll();
 
 		$result = array();
+
 		foreach($aShopItems as $oShopItem)
 		{
 			$result[] = $oShopItem->indexing();
@@ -231,6 +234,7 @@ class Shop_Module extends Core_Module{	/**
 			->where('shop_sellers.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
+			->orderBy('shop_sellers.id')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingShopSellers', $this, array($oShopSeller));
@@ -277,9 +281,9 @@ class Shop_Module extends Core_Module{	/**
 
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oShop_Item));
 
-						$oSearch_Page
-							->addEntity($oShop_Item)
-							->addEntity($oShop_Item->Shop_Group);
+						$oSearch_Page->addEntity($oShop_Item);
+
+						$oShop_Item->shop_group_id && $oSearch_Page->addEntity($oShop_Item->Shop_Group);
 					}
 				break;
 			}

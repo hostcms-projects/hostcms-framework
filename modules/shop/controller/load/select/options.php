@@ -4,7 +4,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  *
- * Контроллер загрузки значений списка товаров для <select> доп. св-в
+ * Контроллер загрузки значений списка товаров для select доп. св-в
  *
  * @package HostCMS 6\Shop
  * @version 6.x

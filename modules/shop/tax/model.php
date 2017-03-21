@@ -8,18 +8,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Tax_Model extends Core_Entity
 {
-	/**
-	 * One-to-many or many-to-many relations
-	 * @var array
-	 */
-	protected $_hasMany = array(
-		'shop' => array()
-	);
-
 	/**
 	 * Constructor.
 	 * @param int $id entity ID

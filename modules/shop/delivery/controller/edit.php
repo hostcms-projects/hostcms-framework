@@ -171,7 +171,7 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			->value($this->_object->loadHandlerFile())
 			->divAttr(array('id' => 'code'))
 			->rows(15)
-			->syntaxHighlighter(TRUE)
+			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 			->syntaxHighlighterOptions($oTmpOptions);
 
 		$oMainTab->addAfter($oTextarea, $oTypeRadio);

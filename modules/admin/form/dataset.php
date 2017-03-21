@@ -159,7 +159,7 @@ abstract class Admin_Form_Dataset
 
 	/**
 	 * Add external field name
-	 * @param strin $fieldName
+	 * @param string $fieldName name of the field
 	 * @return self
 	 */
 	public function addExternalField($fieldName)
@@ -170,6 +170,7 @@ abstract class Admin_Form_Dataset
 
 	/**
 	 * Check if external field exists
+	 * @param string $fieldName name of the field
 	 * @return boolean
 	 */
 	public function issetExternalField($fieldName)

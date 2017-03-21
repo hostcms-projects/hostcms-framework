@@ -52,6 +52,9 @@ class Skin_Hostcms5 extends Core_Skin
 			->addJs('/admin/js/codemirror/mode/php/php.js')
 			->addJs('/admin/js/codemirror/mode/xml/xml.js')
 			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
+			->addJs('/admin/js/codemirror/addon/search/searchcursor.js')
+			->addJs('/admin/js/codemirror/addon/search/search.js')
+			->addJs('/admin/js/codemirror/addon/dialog/dialog.js')
 			;
 
 		//if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -67,6 +70,7 @@ class Skin_Hostcms5 extends Core_Skin
 			->addCss('/admin/js/ui/ui.css')
 			->addCss('/admin/js/ui/stars/ui.stars.css')
 			->addCss('/admin/js/codemirror/lib/codemirror.css')
+			->addCss('/admin/js/codemirror/addon/dialog/dialog.css')
 			;
 	}
 
@@ -285,10 +289,10 @@ if (Core_Auth::logged())
 			<div class="box0" style="margin-top: 30px; float: left;">
 			<form method="post" action="/admin/index.php" id="authorization" style="padding: 15px">
 
-				<div><?php echo Core::_('Admin.authorization_form_login')?></div>
+				<div><?php echo Core::_('Admin.authorization_form_login')?>:</div>
 				<div><input type="text" name="login" id="login" class="large"></div>
 
-				<div style="margin-top: 10px"><?php echo Core::_('Admin.authorization_form_password')?></div>
+				<div style="margin-top: 10px"><?php echo Core::_('Admin.authorization_form_password')?>:</div>
 				<div><input type="password" name="password" class="large"></div>
 
 				<div><input type="checkbox" name="ip" id="ip" class="checkbox_authorization" checked="checked">&nbsp;<label for="ip"><?php echo Core::_('Admin.authorization_form_ip')?></label></div>

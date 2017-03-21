@@ -88,7 +88,7 @@ class User_Model extends Core_Entity
 	}
 
 	/**
-	 * Get user by login and password
+	 * Get active user by login and password
 	 * @param string $login login
 	 * @param string $password password
 	 * @return User_Model|NULL
@@ -97,8 +97,9 @@ class User_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			->clear()
-			->where('login', '=', $login)
-			->where('password', '=', Core_Hash::instance()->hash($password))
+			->where('users.login', '=', $login)
+			->where('users.password', '=', Core_Hash::instance()->hash($password))
+			->where('users.active', '=', 1)
 			->limit(1);
 
 		$aUsers = $this->findAll(FALSE);
@@ -302,5 +303,32 @@ class User_Model extends Core_Entity
 		}
 
 		return parent::delete($primaryKey);
+	}
+
+	/**
+	 * Change user status
+	 * @return self
+	 */
+	public function changeActive()
+	{
+		$oCurrentUser = Core_Entity::factory('User', 0)->getCurrent();
+
+		$oUsers = Core_Entity::factory('User');
+		$oUsers->queryBuilder()
+			->select('users.*')
+			->join('user_groups', 'users.user_group_id', '=', 'user_groups.id')
+			->where('users.active', '=', 1)
+			->where('user_groups.site_id', '=', CURRENT_SITE)
+			->where('user_groups.deleted', '=', 0);
+
+		if (!$this->active
+			|| (!$oCurrentUser || $oCurrentUser->id != $this->id) && $oUsers->getCount() > 0
+		)
+		{
+			$this->active = 1 - $this->active;
+			$this->save();
+		}
+
+		return $this;
 	}
 }

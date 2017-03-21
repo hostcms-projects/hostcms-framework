@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Действия формы центра администрирования',
@@ -36,6 +36,8 @@ return array(
 	'name' => '<acronym title="Имя функции-обработчика действия">Функция-обработчик</acronym>',
 	'sorting' => '<acronym title="Порядок сортировки для действия">Порядок сортировки</acronym>',
 	'picture' => '<acronym title="Изображение для действия в списке действий, например /admin/images/edit.gif">Изображение</acronym>',
+	'icon' => '<acronym title="CSS-стиля пиктограммы для действия в списке действий, например pencil">Пиктограмма</acronym>',
+	'color' => '<acronym title="Название CSS-стиля, определяющего цвет действия в списке действий, например success">Цвет</acronym>',
 	'dataset' => '<acronym title="Индекс набора данных для действия, -1 &mdash; действие для всех наборов данных">Индекс набора данных</acronym>',
 	'single' => '<acronym title="Отображать действие в правом блоке со списком действий">Отображать в списке действий</acronym>',
 	'group' => '<acronym title="Отображать действие в списке групповых операций">Групповая операция</acronym>',

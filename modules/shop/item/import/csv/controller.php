@@ -1790,8 +1790,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				}
 			}
 
-			$this->_oCurrentItem->shop_id = $this->_oCurrentShop->id;
-			!$this->_oCurrentItem->id && $this->_oCurrentItem->shop_group_id = (int)$this->_oCurrentGroup->id;
+			!$this->_oCurrentItem->modification_id && !$this->_oCurrentItem->id && $this->_oCurrentItem->shop_group_id = (int)$this->_oCurrentGroup->id;
 			!$this->_oCurrentItem->id && is_null($this->_oCurrentItem->path) && $this->_oCurrentItem->path = '';
 			$this->_oCurrentItem->id && $this->_oCurrentItem->id == $this->_oCurrentItem->modification_id && $this->_oCurrentItem->modification_id = 0;
 
@@ -1809,7 +1808,28 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				$this->_sSmallImageFile = '';
 				$this->deleteImage = 0;
 			}
+			
+			// Обязательно после обработки тегов, т.к. иначе ORM сохранит товар косвенно.
+			$this->_oCurrentItem->shop_id = $this->_oCurrentShop->id;
 
+			if (($this->_oCurrentItem->id
+			//&& $this->importAction == 1
+			&& !is_null($this->_oCurrentItem->name)
+			&& $this->_oCurrentItem->save()))
+			{
+				$this->_incUpdatedItems($this->_oCurrentItem->id);
+			}
+			elseif (!is_null($this->_oCurrentItem->name)
+			&& $this->_oCurrentItem->save())
+			{
+				if(intval($this->_oCurrentItem->shop_currency_id) == 0)
+				{
+					$this->_oCurrentItem->shop_currency_id = $this->_oCurrentShop->shop_currency_id;
+					$this->_oCurrentItem->save();
+				}
+				$this->_incInsertedItems($this->_oCurrentItem->id);
+			}
+			
 			$aTagsName = array();
 			if(!$this->_oCurrentItem->id)
 			{
@@ -1883,30 +1903,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					}
 				}
 			}
-
-			if (($this->_oCurrentItem->id
-			//&& $this->importAction == 1
-			&& !is_null($this->_oCurrentItem->name)
-			&& $this->_oCurrentItem->save()))
-			{
-				$this->_incUpdatedItems($this->_oCurrentItem->id);
-			}
-			elseif (!is_null($this->_oCurrentItem->name)
-			&& $this->_oCurrentItem->save())
-			{
-				if(intval($this->_oCurrentItem->shop_currency_id) == 0)
-				{
-					$this->_oCurrentItem->shop_currency_id = $this->_oCurrentShop->shop_currency_id;
-					$this->_oCurrentItem->save();
-				}
-				$this->_incInsertedItems($this->_oCurrentItem->id);
-			}
-
+			
 			if ($this->_oCurrentItem->seo_keywords == '' && count($aTagsName) > 0)
 			{
 				$this->_oCurrentItem->seo_keywords = implode(", ", $aTagsName);
 				$this->_oCurrentItem->save();
 			}
+			
 
 			if ($this->searchIndexation
 			&& $this->_oCurrentGroup->id)
@@ -2718,6 +2721,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		return self::CorrectToEncoding($aCsvLine, 'UTF-8', $this->encoding);
 	}
 
+	/**
+	 * Clear object 
+	 * @return self
+	 */
 	public function clear()
 	{
 		$this->_oCurrentShop =
@@ -2731,14 +2738,18 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		return $this;
 	}
 
-    public function __sleep()
-    {
-			$this->clear();
+	/**
+	 * Execute some routine before serialization
+	 * @return array
+	 */
+	public function __sleep()
+	{
+		$this->clear();
 
-			return array_keys(
-				get_object_vars($this)
-			);
-    }
+		return array_keys(
+			get_object_vars($this)
+		);
+	}
 
 	/**
 	 * Reestablish any database connections that may have been lost during serialization and perform other reinitialization tasks

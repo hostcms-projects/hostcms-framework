@@ -157,40 +157,30 @@ class Informationsystem_Item_Model extends Core_Entity
 	 * Values of all properties of item
 	 * Значения всех свойств товара
 	 * @param boolean $bCache cache mode status
+	 * @param array $aPropertiesId array of properties' IDs
 	 * @return array Property_Value
 	 */
-	public function getPropertyValues($bCache = TRUE)
+	public function getPropertyValues($bCache = TRUE, $aPropertiesId = array())
 	{
 		if ($bCache && !is_null($this->_propertyValues))
 		{
 			return $this->_propertyValues;
 		}
 
-		// Need cache
-		$aProperties = Core_Entity::factory('Informationsystem_Item_Property_List', $this->informationsystem_id)
-			->Properties
-			->findAll();
-
-		//$aReturn = array();
-		$aProperiesId = array();
-		foreach ($aProperties as $oProperty)
+		if (!is_array($aPropertiesId) || !count($aPropertiesId))
 		{
-			$aProperiesId[] = $oProperty->id;
+			$aProperties = Core_Entity::factory('Informationsystem_Item_Property_List', $this->informationsystem_id)
+				->Properties
+				->findAll();
 
-			/*$aProperty_Values = $oProperty->getValues($this->id, $bCache);
-
-			foreach ($aProperty_Values as $oProperty_Value)
+			$aPropertiesId = array();
+			foreach ($aProperties as $oProperty)
 			{
-				if ($oProperty->type == 2)
-				{
-					$oProperty_Value->setHref($this->getItemHref());
-				}
-
-				$aReturn[] = $oProperty_Value;
-			}*/
+				$aPropertiesId[] = $oProperty->id;
+			}
 		}
 
-		$aReturn = Property_Controller_Value::getPropertiesValues($aProperiesId, $this->id);
+		$aReturn = Property_Controller_Value::getPropertiesValues($aPropertiesId, $this->id, $bCache);
 
 		// setHref()
 		foreach ($aReturn as $oProperty_Value)
@@ -664,6 +654,12 @@ class Informationsystem_Item_Model extends Core_Entity
 			$oItemShortcut->active = 1 - $oItemShortcut->active;
 			$oItemShortcut->save();
 		}
+
+		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+		
 		return $this;
 	}
 
@@ -763,8 +759,8 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		!$bRightTime && $oCore_Html_Entity_Div->class('wrongTime');
 
-		// Зачеркнут в зависимости от своего статуса
-		if (!$this->active)
+		// Зачеркнут в зависимости от статуса родительского инф. элемента или своего статуса
+		if (!$object->active || !$this->active)
 		{
 			$oCore_Html_Entity_Div->class('inactive');
 		}
@@ -847,7 +843,7 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path . ' ';
+		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . htmlspecialchars($this->name) . ' ' . $this->id . ' ' . htmlspecialchars($this->seo_title) . ' ' . htmlspecialchars($this->seo_description) . ' ' . htmlspecialchars($this->seo_keywords) . ' ' . htmlspecialchars($this->path) . ' ';
 
 		$oSearch_Page->title = $this->name;
 
@@ -855,7 +851,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		$aComments = $this->Comments->findAll();
 		foreach ($aComments as $oComment)
 		{
-			$oSearch_Page->text .= $oComment->author . ' ' . $oComment->text . ' ';
+			$oSearch_Page->text .= htmlspecialchars($oComment->author) . ' ' . $oComment->text . ' ';
 		}
 
 		if (Core::moduleIsActive('tag'))
@@ -863,7 +859,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			$aTags = $this->Tags->findAll();
 			foreach ($aTags as $oTag)
 			{
-				$oSearch_Page->text .= $oTag->name . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oTag->name) . ' ';
 			}
 		}
 
@@ -876,7 +872,7 @@ class Informationsystem_Item_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value . ' ';
+					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value) . ' ';
 				}
 			}
 			// Informationsystem
@@ -887,14 +883,14 @@ class Informationsystem_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name . ' ';
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ';
 					}
 				}
 			}
 			// Other type
 			elseif ($oPropertyValue->Property->type != 2)
 			{
-				$oSearch_Page->text .= $oPropertyValue->value . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oPropertyValue->value) . ' ';
 			}
 		}
 

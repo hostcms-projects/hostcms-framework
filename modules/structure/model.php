@@ -355,8 +355,7 @@ class Structure_Model extends Core_Entity
 
 		if ($this->active == 0)
 		{
-			$oCore_Html_Entity_Div
-				->style("text-decoration: line-through");
+			$oCore_Html_Entity_Div->style("text-decoration: line-through");
 		}
 
 		$oCore_Html_Entity_Div
@@ -393,8 +392,7 @@ class Structure_Model extends Core_Entity
 
 			if (!$this->active)
 			{
-				$oCore_Html_Entity_Div
-					->style("text-decoration: line-through");
+				$oCore_Html_Entity_Div->style("text-decoration: line-through");
 			}
 
 			$oCore_Html_Entity_Div->add(
@@ -404,7 +402,9 @@ class Structure_Model extends Core_Entity
 					->value(htmlspecialchars(urldecode($sPath)))
 			);
 
-			$oCore_Html_Entity_Div->execute();
+			$oCore_Html_Entity_Div
+				->class('hostcms-linkbox')
+				->execute();
 		}
 		else
 		{
@@ -703,7 +703,7 @@ class Structure_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path;
+		$oSearch_Page->text = htmlspecialchars($this->name) . ' ' . $this->id . ' ' . htmlspecialchars($this->seo_title) . ' ' . htmlspecialchars($this->seo_description) . ' ' . htmlspecialchars($this->seo_keywords) . ' ' . htmlspecialchars($this->path);
 
 		$oSearch_Page->title = strlen($this->seo_title) > 0
 				? $this->seo_title
@@ -729,7 +729,7 @@ class Structure_Model extends Core_Entity
 			$oInformationsystem = Core_Entity::factory('Informationsystem')->getByStructureId($this->id);
 			if ($oInformationsystem)
 			{
-				$oSearch_Page->text .= $oInformationsystem->name . ' ' . $oInformationsystem->description . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oInformationsystem->name) . ' ' . $oInformationsystem->description . ' ';
 			}
 		}
 
@@ -738,7 +738,7 @@ class Structure_Model extends Core_Entity
 			$oShop = Core_Entity::factory('Shop')->getByStructureId($this->id);
 			if ($oShop)
 			{
-				$oSearch_Page->text .= $oShop->name . ' ' . $oShop->description . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oShop->name) . ' ' . $oShop->description . ' ';
 			}
 		}
 
@@ -751,7 +751,7 @@ class Structure_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value;
+					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value);
 				}
 			}
 			// Informationsystem
@@ -762,14 +762,14 @@ class Structure_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name;
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name);
 					}
 				}
 			}
 			// Other type
 			elseif ($oPropertyValue->Property->type != 2)
 			{
-				$oSearch_Page->text .= $oPropertyValue->value . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oPropertyValue->value) . ' ';
 			}
 		}
 

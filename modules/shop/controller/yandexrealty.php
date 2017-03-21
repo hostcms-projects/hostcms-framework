@@ -32,6 +32,10 @@ class Shop_Controller_YandexRealty extends Core_Controller
 	 */
 	protected $_aSiteuserGroups = array();
 
+	/**
+	 * List's tags
+	 * @var array
+	 */
 	public $aListTags = array(
 		/* Основные */
 		'type',
@@ -98,7 +102,11 @@ class Shop_Controller_YandexRealty extends Core_Controller
 		'gas-supply',
 		);
 
-		public $aLocationTags = array(
+	/**
+	 * Location's tags
+	 * @var array
+	 */
+	public $aLocationTags = array(
 		'country',
 		'region',
 		'district',
@@ -117,13 +125,17 @@ class Shop_Controller_YandexRealty extends Core_Controller
 		'railway-station',
 	);
 
-		public $aAreaTags = array(
-		/* Информация о площадях объекта */
-			'area',
-			'living-space',
-			'kitchen-space',
-			'lot-area',
-		);
+	/**
+	 * Object's areas
+	 * @var array
+	 */
+	public $aAreaTags = array(
+	/* Информация о площадях объекта */
+		'area',
+		'living-space',
+		'kitchen-space',
+		'lot-area',
+	);
 
 	/**
 	 * Constructor.
@@ -190,12 +202,20 @@ class Shop_Controller_YandexRealty extends Core_Controller
 		$this->_Shop_Items
 			->queryBuilder()
 			->select('shop_items.*')
-			->join('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id',
+			->leftJoin('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id'/*,
 				array(
 						array('AND' => array('shop_groups.active', '=', 1)),
 						array('OR' => array('shop_items.shop_group_id', '=', 0))
-					)
+					)*/
 			)
+
+			// Активность группы или группа корневая
+			->open()
+			->where('shop_groups.active', '=', 1)
+			->setOr()
+			->where('shop_groups.id', 'IS', NULL)
+			->close()
+
 			->where('shop_items.shortcut_id', '=', 0)
 			->where('shop_items.active', '=', 1)
 			->where('shop_items.siteuser_id', 'IN', $this->_aSiteuserGroups)
@@ -211,8 +231,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->where('shop_items.yandex_market', '=', 1)
-			->where('shop_items.price', '>', 0)
-			->groupBy('shop_items.id');
+			->where('shop_items.price', '>', 0);
 	}
 
 	/**

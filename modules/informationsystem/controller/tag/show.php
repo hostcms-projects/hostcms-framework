@@ -92,8 +92,8 @@ class Informationsystem_Controller_Tag_Show extends Core_Controller
 			->leftJoin('informationsystem_items', 'tag_informationsystem_items.informationsystem_item_id', '=', 'informationsystem_items.id')
 			->leftJoin('informationsystem_groups', 'informationsystem_items.informationsystem_group_id', '=', 'informationsystem_groups.id',
 				array(
-					array('AND' => array('informationsystem_groups.siteuser_group_id', 'IN', $aSiteuserGroups)),
 					array('AND' => array('informationsystem_groups.deleted', '=', 0)),
+					array('AND' => array('informationsystem_groups.siteuser_group_id', 'IN', $aSiteuserGroups))
 				)
 			)
 			->where('informationsystem_items.siteuser_group_id', 'IN', $aSiteuserGroups)

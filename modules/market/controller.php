@@ -65,7 +65,7 @@ class Market_Controller extends Core_Servant_Properties
 
 		$this->categories = $this->items = array();
 		$this->page = 1;
-		$this->limit = 4;
+		$this->limit = 9;
 		$this->error = 0;
 	}
 

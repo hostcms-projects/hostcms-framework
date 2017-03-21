@@ -4,9 +4,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  * DELETE Database Abstraction Layer (DBAL)
- * 
+ *
  * http://dev.mysql.com/doc/refman/5.5/en/delete.html
- * 
+ *
  * <code>
  * // DELETE FROM `tableName` WHERE `column1` = '17'
  * $delete = Core_QueryBuilder::delete('tableName')
@@ -31,8 +31,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
- */ 
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ */
 class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 {
 	/**
@@ -58,7 +58,7 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 	 * @var mixed
 	 */
 	protected $_quick = NULL;
-	
+
 	/**
 	 * Use IGNORE
 	 * @var mixed
@@ -70,31 +70,31 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 	 * 3 - DELETE
 	 */
 	protected $_queryType = 3;
-	
+
 	/**
 	 * Constructor.
 	 * @param array $args list of arguments
 	 * <code>
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete('tableName');
 	 * </code>
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete('tableName', array('tableName2', 'aliasTable2'));
 	 * </code>
-	 * 
+	 *
 	 * @see table()
 	 */
 	public function __construct(array $args = array())
 	{
 		// Set table name
 		call_user_func_array(array($this, 'table'), $args);
-	
+
 		return parent::__construct($args);
 	}
-	
+
 	/**
 	 * Set LOW_PRIORITY
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete('tableName')->lowPriority();
 	 * </code>
@@ -108,7 +108,7 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 
 	/**
 	 * Set QUICK
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete('tableName')->quick();
 	 * </code>
@@ -122,7 +122,7 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 
 	/**
 	 * Set IGNORE
-	 * 
+	 *
 	 * <code>
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete('tableName')->ignore();
 	 * </code>
@@ -133,10 +133,10 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 		$this->_ignore = TRUE;
 		return $this;
 	}
-	
+
 	/**
 	 * Add table name
-	 * 
+	 *
 	 * <code>
 	 * // DELETE FROM `tableName`
 	 * $oCore_QueryBuilder_Delete = Core_QueryBuilder::delete()->table('tableName');
@@ -149,10 +149,10 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 		$this->_tableName = array_merge($this->_tableName, $args);
 		return $this;
 	}
-	
+
 	/**
 	 * Build the SQL query
-	 * 
+	 *
 	 * @return string The SQL query
 	 */
 	public function build()
@@ -163,19 +163,32 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 		{
 			$query[] = $this->_priority;
 		}
-		
+
 		if (!is_null($this->_quick))
 		{
 			$query[] = 'QUICK';
 		}
-		
+
 		if (!is_null($this->_ignore))
 		{
 			$query[] = 'IGNORE';
 		}
-		
-		$query[] = 'FROM ' . implode(', ', $this->quoteColumns($this->_tableName));
-		
+
+		$aQuoteColumns = $this->quoteColumns($this->_tableName);
+
+		// Delte from first table when using JOIN
+		if (!empty($this->_join))
+		{
+			$query[] = $aQuoteColumns[0];
+		}
+
+		$query[] = 'FROM ' . implode(', ', $aQuoteColumns);
+
+		if (!empty($this->_join))
+		{
+			$query[] = $this->_buildJoin($this->_join);
+		}
+
 		if (!empty($this->_where))
 		{
 			$query[] = 'WHERE ' . $this->_buildExpression($this->_where);
@@ -195,9 +208,9 @@ class Core_QueryBuilder_Delete extends Core_QueryBuilder_Selection
 		{
 			$query[] = 'OFFSET ' . $this->_offset;
 		}*/
-		
+
 		$sql = implode(' ', $query);
-		
+
 		return $sql;
 	}
 }

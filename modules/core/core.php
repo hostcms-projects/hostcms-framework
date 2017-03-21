@@ -676,6 +676,17 @@ class Core
 		return $version;
 	}
 
+	/**
+	 * Set cookie
+	 * @param string $name cookie name
+	 * @param string $value cookie value
+	 * @param int $expire cookie expire date
+	 * @param string $path cookie path
+	 * @param string $domain cookie domain
+	 * @param boolean $secure cookie secure
+	 * @param boolean $httponly http only
+	 * @param boolean $replace replace exists cookie
+	 */
 	static public function setCookie($name, $value, $expire = 0, $path = '', $domain = '', $secure = FALSE, $httponly = FALSE, $replace = FALSE)
 	{
 		header('Set-Cookie: ' . rawurlencode($name) . '=' . rawurlencode($value)

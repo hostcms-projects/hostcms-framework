@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Model extends Core_Entity
 {
@@ -48,7 +48,6 @@ class Seo_Model extends Core_Entity
 		'tcy' => 0,
 		'yandex_indexed' => 0,
 		'yahoo_indexed' => 0,
-		'rambler_indexed' => 0,
 		'bing_indexed' => 0,
 		'google_indexed' => 0,
 		'google_links' => 0,

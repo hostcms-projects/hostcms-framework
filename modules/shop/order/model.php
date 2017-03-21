@@ -42,6 +42,7 @@ class Shop_Order_Model extends Core_Entity
 	 */
 	protected $_hasMany = array(
 		'shop_order_item' => array(),
+		'shop_item_reserved' => array(),
 		'shop_siteuser_transaction' => array()
 	);
 
@@ -80,7 +81,7 @@ class Shop_Order_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_sorting = array(
-		'shop_orders.datetime' => 'DESC',
+		'shop_orders.datetime' => 'ASC',
 	);
 
 	/**
@@ -126,6 +127,8 @@ class Shop_Order_Model extends Core_Entity
 			$primaryKey = $this->getPrimaryKey();
 		}
 
+		$this->id = $primaryKey;
+
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues();
 		foreach($aPropertyValues as $oPropertyValue)
@@ -134,9 +137,10 @@ class Shop_Order_Model extends Core_Entity
 			$oPropertyValue->delete();
 		}
 
-		$this->id = $primaryKey;
-
 		$this->Shop_Order_Items->deleteAll(FALSE);
+
+		// Удаляем связи с зарезервированными, прямая связь
+		$this->Shop_Item_Reserveds->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}
@@ -738,6 +742,9 @@ class Shop_Order_Model extends Core_Entity
 
 			// Списать товары
 			$this->_paidTransaction();
+			
+			// Удалить зарезервированные товары
+			$this->Shop_Item_Reserveds->deleteAll();
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterPaid', $this);
@@ -914,7 +921,7 @@ class Shop_Order_Model extends Core_Entity
 				$aAffiliate_Plans = $oAffiliate_Plans->findAll();
 				foreach ($aAffiliate_Plans as $oAffiliate_Plan)
 				{
-					// Не включать стоимость доставки в расчет вознаграждения
+					// Не включать стоимость доставки в расчет вознаграждения, вычитаем из суммы заказа
 					if ($oAffiliate_Plan->include_delivery == 0)
 					{
 						$aShop_Order_Items = $this->Shop_Order_Items->findAll();
@@ -923,7 +930,9 @@ class Shop_Order_Model extends Core_Entity
 							// Товар является доставкой
 							if ($oShop_Order_Item->type == 1)
 							{
-								$fOrderAmount -= $oShop_Order_Item->price * $oShop_Order_Item->quantity;
+								$fOrderAmount -= Shop_Controller::instance()->round(
+									Shop_Controller::instance()->round($oShop_Order_Item->price + $oShop_Order_Item->getTax()) * $oShop_Order_Item->quantity
+								);
 							}
 						}
 					}
@@ -1128,7 +1137,7 @@ class Shop_Order_Model extends Core_Entity
 		$oContractor->addChild('Имя', $this->name);
 		$oContractor->addChild('Отчество', $this->patronymic);
 		$oContractor->addChild('АдресРегистрации')->addChild('Представление', $this->address);
-		
+
 		// Адрес контрагента
 		$oContractorAddress = $oContractor->addChild('Адрес');
 		$oContractorAddress->addChild('Представление', implode(', ', array($this->postcode,$this->shop_country->name,$this->shop_country_location_city->name,$this->address)));
@@ -1151,22 +1160,22 @@ class Shop_Order_Model extends Core_Entity
 		$oContact = $oAddressContacts->addChild('Контакт');
 		$oContact->addChild('Тип','Телефон');
 		$oContact->addChild('Значение',$this->phone);
-		
+
 		// Статус оплаты заказа
 		$oOrderProperties = $oOrderXml->addChild('ЗначенияРеквизитов');
 		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
 		$oOrderProperty->addChild('Наименование', 'Заказ оплачен');
 		$oOrderProperty->addChild('Значение', $this->paid == 1 ? 'true' : 'false');
-		
+
 		// Способ доставки
 		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
 		$oOrderProperty->addChild('Наименование', 'Способ доставки');
 		$oOrderProperty->addChild('Значение', $this->shop_delivery->name);
-		
+
 		// Метод оплаты
 		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
 		$oOrderProperty->addChild('Наименование', 'Метод оплаты');
-		$oOrderProperty->addChild('Значение', $this->shop_payment_system->name); 
+		$oOrderProperty->addChild('Значение', $this->shop_payment_system->name);
 		////////////////////
 
 		$oOrderXml->addChild('Время', $time);

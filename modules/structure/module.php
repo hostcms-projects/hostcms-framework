@@ -20,7 +20,7 @@ class Structure_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-08-22';
+	public $date = '2014-10-27';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -51,6 +51,7 @@ class Structure_Module extends Core_Module{	/**
 			->where('structures.path', '!=', '')
 			->where('structures.url', '=', '')
 			->where('sites.deleted', '=', 0)
+			->orderBy('structures.id')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexing', $this, array($oStructure));

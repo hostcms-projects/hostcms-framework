@@ -995,7 +995,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 				if ($this->groupsProperties
 					&& (!$bIsArrayPropertiesForGroups || in_array($oInformationsystem_Group->id, $this->propertiesForGroups)))
 				{
-					$aProperty_Values = $oInformationsystem_Group->getPropertyValues();
+					$aProperty_Values = $oInformationsystem_Group->getPropertyValues(TRUE, $bIsArrayGroupsProperties ? $this->groupsProperties : array());
 
 					if ($bIsArrayGroupsProperties)
 					{

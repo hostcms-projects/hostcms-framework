@@ -19,13 +19,6 @@ class Core_DataBase_Mysql extends Core_DataBase
 	protected $_result = NULL;
 
 	/**
-	 * The new_link parameter makes mysql_connect() always open a new link,
-	 * even if mysql_connect() was called before with the same parameters.
-	 * @var boolean
-	 */
-	protected $_newLink = FALSE;
-
-	/**
 	 * Get MySQL connection
 	 * @return resource
 	 */
@@ -51,9 +44,14 @@ class Core_DataBase_Mysql extends Core_DataBase
 
 		Core_Event::notify('Core_DataBase.onBeforeConnect', $this);
 
-		// Trying to open connection
+		/**
+		 * Trying to open connection
+		 * The new_link parameter makes mysql_connect() always open a new link,
+		 * even if mysql_connect() was called before with the same parameters.
+		 * @var boolean
+		 */
 		$this->_connection = @mysql_connect(
-			$this->_config['host'], $this->_config['username'], $this->_config['password'], $this->_newLink
+			$this->_config['host'], $this->_config['username'], $this->_config['password'], $this->_config['newlink']
 		);
 
 		if (!$this->_connection)

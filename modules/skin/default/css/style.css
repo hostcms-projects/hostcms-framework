@@ -1089,6 +1089,10 @@ div.fm_preview {
     text-decoration: none;
 }
 
+.hostcms6 td.importantField {
+	font-weight: bold;
+}
+
 /* Market */
 .market
 {

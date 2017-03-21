@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -120,7 +120,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		$oCatalogTab->add($this->getField('yandex_catalog')->value(1))
 			->add($this->getField('rambler_catalog')->value(1))
 			->add($this->getField('dmoz_catalog')->value(1))
-			->add($this->getField('aport_catalog')->value(1))
 			->add($this->getField('mail_catalog')->value(1));
 
 		// Закладка счетчиков
@@ -146,10 +145,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_position')
 				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
+			/*->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.rambler'))
 				->name('rambler_position')
-				->value(1))
+				->value(1))*/
 			->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_position')
@@ -325,7 +324,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 					$oCore_Html_Entity_Table->execute();
 				}
-				
+
 				$yandex_indexed = intval(Core_Array::get($this->_formValues, 'yandex_indexed', 0));
 				$yahoo_indexed = intval(Core_Array::get($this->_formValues, 'yahoo_indexed', 0));
 				$bing_indexed = intval(Core_Array::get($this->_formValues, 'bing_indexed', 0));
@@ -386,13 +385,12 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				$yandex_catalog = intval(Core_Array::get($this->_formValues, 'yandex_catalog', 0));
 				$rambler_catalog = intval(Core_Array::get($this->_formValues, 'rambler_catalog', 0));
 				$dmoz_catalog = intval(Core_Array::get($this->_formValues, 'dmoz_catalog', 0));
-				$aport_catalog = intval(Core_Array::get($this->_formValues, 'aport_catalog', 0));
 				$mail_catalog = intval(Core_Array::get($this->_formValues, 'mail_catalog', 0));
 
 				$param['status'] = TRUE;
 
 				//Если в отчете должны быть данные о каталогах
-				if ($yandex_catalog || $rambler_catalog || $dmoz_catalog || $aport_catalog || $mail_catalog)
+				if ($yandex_catalog || $rambler_catalog || $dmoz_catalog || $mail_catalog)
 				{
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.report_catalog'))
@@ -417,17 +415,11 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					{
 						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.rambler'), "rambler_catalog", $param));
 					}
-					
+
 					// Dmoz каталог
 					if ($dmoz_catalog)
 					{
 						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.dmoz_catalog'), "dmoz_catalog", $param));
-					}
-					
-					// Апорт каталог
-					if ($aport_catalog)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.aport_catalog'), "aport_catalog", $param));
 					}
 
 					// Mail каталог
@@ -498,13 +490,12 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				$aSeo_Queries = $oSite->Seo_Queries->findAll();
 
 				$yandex_position = intval(Core_Array::get($this->_formValues, 'yandex_position', 0));
-				$rambler_position = intval(Core_Array::get($this->_formValues, 'rambler_position', 0));
 				$google_position = intval(Core_Array::get($this->_formValues, 'google_position', 0));
 				$yahoo_position = intval(Core_Array::get($this->_formValues, 'yahoo_position', 0));
 				$bing_position = intval(Core_Array::get($this->_formValues, 'bing_position', 0));
 
 				//Если в отчете должны быть данные о поисковых запросах
-				if (count($aSeo_Queries) && ($yandex_position || $rambler_position ||$google_position || $yahoo_position || $bing_position ))
+				if (count($aSeo_Queries) && ($yandex_position ||$google_position || $yahoo_position || $bing_position ))
 				{
 					Core::factory('Core_Html_Entity_H1')
 						->value(Core::_('Seo.report_position'))
@@ -517,7 +508,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 							->execute();
 
 						Core::factory('Core_Html_Entity_Img')
-							->src("/admin/seo/img.php?id_report=4&seo_query_id={$oSeo_Query->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_position={$yandex_position}&rambler_position={$rambler_position}&google_position{$google_position}&yahoo_position={$yahoo_position}&bing_position={$bing_position}")
+							->src("/admin/seo/img.php?id_report=4&seo_query_id={$oSeo_Query->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_position={$yandex_position}&google_position{$google_position}&yahoo_position={$yahoo_position}&bing_position={$bing_position}")
 							->execute();
 
 						$param['inverse'] = true;
@@ -538,11 +529,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						if ($yandex_position)
 						{
 							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex", $param));
-						}
-
-						if ($rambler_position)
-						{
-							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.rambler'), "rambler", $param));
 						}
 
 						if ($google_position)
@@ -647,7 +633,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	 * - $report[]['seo_characteristic_links_yandex'] int Ссылающиеся страницы по данным Yandex
 	 * - $report[]['seo_characteristic_links_yahoo'] int Ссылающиеся страницы по данным Yahoo
 	 * - $report[]['seo_characteristic_links_msn'] int Ссылающиеся страницы по данным Bing.com
-	 * - $report[]['seo_characteristic_indexed_aport'] int Индексированные страницы сервисом Aport
 	 * - $report[]['seo_characteristic_indexed_yandex'] int Индексированные страницы сервисом Yandex
 	 * - $report[]['seo_characteristic_indexed_yahoo'] int Индексированные страницы сервисом Yahoo
 	 * - $report[]['seo_characteristic_indexed_msn'] int Индексированные страницы сервисом Bing.com
@@ -657,7 +642,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	 * - $report[]['seo_characteristic_catalog_rambler'] bool Наличие страницы в каталоге Rambler
 	 * - $report[]['seo_characteristic_catalog_mail'] bool Наличие страницы в каталоге Mail
 	 * - $report[]['seo_characteristic_catalog_dmoz'] bool Наличие страницы в каталоге Dmoz
-	 * - $report[]['seo_characteristic_catalog_aport'] bool Наличие страницы в каталоге Aport
 	 * - $report[]['seo_characteristic_counter_rambler'] bool Наличие счетчика Rambler
 	 * - $report[]['seo_characteristic_counter_spylog'] bool Наличие счетчика SpyLog
 	 * - $report[]['seo_characteristic_counter_hotlog'] bool Наличие счетчика HotLog
@@ -791,7 +775,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				$field_value[] = "yandex_catalog";
 				$field_value[] = "rambler_catalog";
 				$field_value[] = "dmoz_catalog";
-				$field_value[] = "aport_catalog";
 				$field_value[] = "mail_catalog";
 				break;
 			case 'counter':
@@ -803,7 +786,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				break;
 			case 'position':
 				$field_value[] = "yandex";
-				$field_value[] = "rambler";
+				//$field_value[] = "rambler";
 				$field_value[] = "google";
 				$field_value[] = "yahoo";
 				$field_value[] = "bing";
@@ -889,7 +872,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 			// Индекс первого учитываемого элемента
 			$ind = $quotient;
-			
+
 			// Формируем массив из учитываемых элементов
 			while (floor($ind) < count($array_value))
 			{

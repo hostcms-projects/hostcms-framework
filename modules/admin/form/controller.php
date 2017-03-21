@@ -769,8 +769,9 @@ class Admin_Form_Controller
 	protected $_pageNavigationDelta = 5;
 
 	/**
-	* Показ строки ссылок
-	*/
+	 * Показ строки ссылок
+	 * @return self
+	 */
 	protected function _pageNavigation()
 	{
 		$total_count = $this->getTotalCount();
@@ -934,6 +935,8 @@ class Admin_Form_Controller
 				->style('clear: both')
 				->execute();
 		}
+		
+		return $this;
 	}
 
 	/**
@@ -1226,7 +1229,8 @@ class Admin_Form_Controller
 		Core::factory('Core_Html_Entity_Script')
 			->type("text/javascript")
 			->value("(function($){
-				$('#{$windowId} table.admin_table .admin_table_filter :input').on('keydown', $.filterKeyDown);
+				//$('#{$windowId} table.admin_table .admin_table_filter :input').on('keydown', $.filterKeyDown);
+				$('#{$windowId} table .admin_table_filter :input').on('keydown', $.filterKeyDown);
 			})(jQuery);")
 			->execute();
 

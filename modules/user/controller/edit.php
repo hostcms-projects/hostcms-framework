@@ -86,6 +86,8 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab->addAfter($oPasswordSecond, $oPasswordFirst);
 		$oMainTab->delete($this->getField('settings'));
+		
+		$oMainTab->moveAfter($this->getField('active'), $oPasswordSecond);
 
 		$oPersonalDataTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('User.users_type_form_tab_2'))

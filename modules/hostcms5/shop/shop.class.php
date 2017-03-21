@@ -475,6 +475,10 @@ class shop
 				$tableName = 'property_value_files';
 				$fieldName = 'file';
 			break;
+			case 11:
+				$tableName = 'property_value_floats';
+				$fieldName = 'value';
+			break;
 		}
 
 		return array('tableName' => $tableName, 'fieldName' => $fieldName);
@@ -2469,6 +2473,11 @@ class shop
 							->leftJoin('property_value_ints', 'shop_items.id', '=', 'property_value_ints.entity_id',
 								array(
 									array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_ints.property_id')))
+								)
+							)
+							->leftJoin('property_value_floats', 'shop_items.id', '=', 'property_value_floats.entity_id',
+								array(
+									array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_floats.property_id')))
 								)
 							)
 							->leftJoin('property_value_strings', 'shop_items.id', '=', 'property_value_strings.entity_id',
@@ -4745,6 +4754,11 @@ class shop
 					->leftJoin('property_value_ints', 'shop_items.id', '=', 'property_value_ints.entity_id',
 						array(
 							array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_ints.property_id')))
+						)
+					)
+					->leftJoin('property_value_floats', 'shop_items.id', '=', 'property_value_floats.entity_id',
+						array(
+							array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_floats.property_id')))
 						)
 					)
 					->leftJoin('property_value_strings', 'shop_items.id', '=', 'property_value_strings.entity_id',
@@ -17637,18 +17651,17 @@ class shop
 			->leftJoin('shop_items', 'tag_shop_items.shop_item_id', '=', 'shop_items.id')
 			->leftJoin('shop_groups', 'shop_items.shop_group_id', '=', 'shop_groups.id',
 				array(
-					array('AND' => array('shop_groups.siteuser_group_id', 'IN', $mas_result))
+					array('AND' => array('shop_groups.siteuser_group_id', 'IN', $mas_result)),
+					array('AND' => array('shop_groups.deleted', '=', 0)),
 				)
 			)
 			->leftJoin('tags', 'tag_shop_items.tag_id', '=', 'tags.id')
 			->where('shop_items.shop_id', '=', $shop_shops_id)
 			->where('shop_items.siteuser_group_id', 'IN', $mas_result)
 			->where('shop_items.deleted', '=', 0)
-			->where('shop_groups.deleted', '=', 0)
 			->where('tags.deleted', '=', 0)
 			->groupBy('tag_shop_items.tag_id')
 			->having('count', '>', 0);
-
 
 		if (isset($property['tags_group_id']))
 		{
@@ -19830,6 +19843,11 @@ class shop
 								array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_ints.property_id')))
 							)
 						)
+						->leftJoin('property_value_floats', 'shop_items.id', '=', 'property_value_floats.entity_id',
+							array(
+								array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_floats.property_id')))
+							)
+						)
 						->leftJoin('property_value_strings', 'shop_items.id', '=', 'property_value_strings.entity_id',
 							array(
 								array('AND' => array('shop_item_properties.property_id', '=', Core_QueryBuilder::expression('property_value_strings.property_id')))
@@ -20325,7 +20343,7 @@ class shop
 
 			$xmlData .= '<property_name>' . str_for_xml($property_row['shop_list_of_properties_name']) . "</property_name>\n";
 			$show_kind = Core_Type_Conversion::toInt($property_row['shop_list_of_properties_show_kind']);
-
+			
 			switch (Core_Type_Conversion::toInt($property_row['shop_list_of_properties_type']))
 			{
 				case 2: // Список, код откорректированный

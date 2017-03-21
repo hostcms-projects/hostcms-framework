@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -17,7 +17,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 	 * @var array
 	 */
 	protected $_aGroupTree = array();
-	
+
 	/**
 	 * Load object's fields when object has been set
 	 * После установки объекта загружаются данные о его полях
@@ -27,7 +27,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 	public function setObject($object)
 	{
 		$modelName = $object->getModelName();
-	
+
 		switch($modelName)
 		{
 			case 'shop_delivery_condition':
@@ -48,7 +48,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					$oMainTab = $this->getTab('main')
 				);
 
-				$oShop = Core_Entity::factory('Shop')->find(Core_Array::getGet('delivery_id'));
+				$oShop = $object->shop_delivery->Shop;
 
 				$oAdditionalTab = $this->getTab('additional');
 
@@ -61,7 +61,6 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->moveAfter($oMinPriceField = $this->getField('min_price'), $oMaxWeightField, $oConditionsTab)
 					->moveAfter($oMaxPriceField = $this->getField('max_price'), $oMinPriceField, $oConditionsTab)
 					->moveAfter($oPriceField = $this->getField('price'), $oMaxPriceField, $oConditionsTab);
-					
 
 				// Настраиваем внешний вид
 				$oPriceField
@@ -193,7 +192,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 
 				// Добавляем типы доставок
 				$oMainTab->addAfter($DeliverySelectField, $lastField);
-				
+
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_delivery_condition_dir_id'));
 
@@ -214,7 +213,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				$title = $this->_object->id
 					? Core::_('Shop_Delivery_Condition.cond_of_delivery_edit_form_title')
 					: Core::_('Shop_Delivery_Condition.cond_of_delivery_add_form_title');
-					
+
 				$this->title($title);
 			break;
 			case 'shop_delivery_condition_dir':
@@ -223,12 +222,12 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					$object->shop_delivery_id = Core_Array::getGet('delivery_id');
 					$object->parent_id = Core_Array::getGet('shop_delivery_condition_dir_id');
 				}
-				
+
 				parent::setObject($object);
-				
+
 				$oMainTab = $this->getTab('main');
 				$oAdditionalTab = $this->getTab('additional');
-				
+
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
@@ -244,10 +243,10 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
 			break;
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Create visual tree of the directories
 	 * @param int $shop_delivery_id delivery ID
@@ -300,7 +299,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 
 	/**
 	 * Generate linked lists for $object add/edit form
-	 * @param object $object object 
+	 * @param object $object object
 	 * @param Admin_Form_Entity_Tab $tab tab for linked list
 	 * @param Admin_Form_Entity $fieldAfter after that field linked list should be inserted
 	 * @return Admin_Form_Entity_Select

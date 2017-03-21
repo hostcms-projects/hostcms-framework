@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller
 {
@@ -138,10 +138,12 @@ DOC;
 	*
 	* @param str $url URL-документа
 	* @param boolean $useCache использовать ли кэширование запрошенной страницы
+	* @param mixed $referer Referer
+	* @param mixed $cookie Cookie
 	*
 	* @return str контент документа
 	*/
-	protected function _getUrl($url, $useCache = TRUE)
+	protected function _getUrl($url, $useCache = TRUE, $referer = NULL, $cookie = NULL)
 	{
 		$md5 = md5($url);
 
@@ -155,7 +157,12 @@ DOC;
 			$Core_Http = Core_Http::instance()
 				->url($url)
 				->timeout(3)
-				->execute();
+				->userAgent('Mozilla/5.0 (Windows NT 5.1; rv:32.0) Gecko/20100101 Firefox/32.0');
+
+			!is_null($referer) && $Core_Http->referer($referer);
+			!is_null($cookie) && $Core_Http->additionalHeader('Cookie', $cookie);
+
+			$Core_Http->execute();
 
 			$response = $Core_Http->getBody();
 		}
@@ -291,11 +298,8 @@ DOC;
 		{
 			if (strpos($content, 'http://captcha.yandex.ru') === FALSE)
 			{
-				/*<strong class="l">
-					Нашлось<br>2011&nbsp;ответов
-				</strong>
-				 */
-				preg_match_all('#Наш[\W]*<br[^>]*>([^<]*)#siu', $content, $matches);
+				/*Яндекс: нашлось 17 тыс. ответов*/
+				preg_match_all('#нашлось\s*(.*?)\s*ответ#siu', $content, $matches);
 
 				if (isset($matches[1][0]))
 				{
@@ -465,39 +469,7 @@ DOC;
 	}
 
 	/**
-	 * Определение наличия страницы в каталоге Апорт
-	 *
-	 * @param string $domain Адрес сайта
-	 * @return bool
-	 * <code>
-	 * <?php
-	 * $domain = 'www.hostcms.ru';
-	 *
-	 * $result = Seo_Controller::instance()->getAportCatalog($domain);
-	 *
-	 * if ($result)
-	 * {
-	 * 	echo "Сайт присутствует в каталоге Апорт";
-	 * }
-	 * else
-	 * {
-	 * 	echo "Сайт отсутствует в каталоге Апорт";
-	 * }
-	 * ?>
-	 * </code>
-	 */
-	public function getAportCatalog($domain)
-	{
-		$domain = $this->_cutDomain($domain);
-
-		$file = $this->_getUrl("http://sm.aport.ru/search?r=URL%3Dwww." . rawurlencode($domain) . "&That=std", false);
-		$file = @iconv('Windows-1251', 'UTF-8//IGNORE//TRANSLIT', $file);
-
-		return $file && !strstr(strstr($file, "Страниц"), "не найдено");
-	}
-
-	/**
-	* Определение наличия страницы в каталоге Dmoz
+	* Определение наличия страницы в каталоге Dmoz.org
 	*
 	* @param string $domain Адрес сайта
 	* @return bool
@@ -609,13 +581,15 @@ DOC;
 			$lr = $this->_getLr();
 			$url = 'http://yandex.ru/yandsearch?text=' . rawurlencode($query) . '&lr=' . $lr;
 
-			$file = $this->_getUrl($url, FALSE);
-			$str_res = 0;
+			$referer = 'http://yandex.ru/showcaptcha?cc=1&retpath=http%3A//yandex.ru/yandsearch%3Flr%3D11053%26text%3Dhostcms%26csg%3D296%252C952%252C7%252C7%252C0%252C0%252C0_0dcda3d3f077b36f4d87985923d896fd&t=0/1413872716/9204adf17cf435f34e3fa4de2641f17b&s=907062f2f1b55ba757daef7f2a3c3bfd';
 
-			if ($file)
-			{
-				$str_res = $this->_parseYandex($file);
-			}
+			$cookie = 'yandexuid=8581718501413872711; fuid01=5445fc4b2ed25581.eVTYImiKnIVjgTZsfnEtinTW-Jt2S-TIF1F7cGGoAx3PBMsrujGqkEeWYOVZNPTW5qrfoKOf4Zj_uCqVjWUIWTb1LJDtwY007X-6iu-7t0ycBZhTf0ROGMT3tRxu6wcr; yabs-frequency=/4/0000000000000000/sn2lS6WR8G00/; spravka=dD0xNDEzODcyNzIzO2k9ODcuMTE3LjQuMTI7dT0xNDEzODcyNzIzNDgyMzU2MzgwO2g9ZjQzOGM3ODNkODM1N2Q1N2M4OWRjZTM2M2YzNTAwZDI=; _ym_visorc_10630330=b';
+
+			$file = $this->_getUrl($url, FALSE, $referer, $cookie);
+
+			$str_res = $file
+				? $this->_parseYandex($file)
+				: 0;
 		}
 
 		return $str_res;
@@ -668,7 +642,7 @@ DOC;
 	*/
 	public function getGoogleIndex($domain)
 	{
-		$url = "http://www.google.com/search?hl=en&q=site:" . rawurlencode($domain);
+		$url = "https://www.google.com/search?hl=en&q=site:" . rawurlencode($domain) . '&gws_rd=ssl';
 		$file = $this->_getUrl($url, false);
 
 		return $file
@@ -702,7 +676,7 @@ DOC;
 
 		if ($file)
 		{
-			preg_match_all('#<span id="resultCount"[^>]*>([^<]*)</span>#siu', $file, $matches);
+			preg_match_all('#<span>(.*?)\s*result#siu', $file, $matches);
 
 			if (isset($matches[1][0]))
 			{
@@ -733,6 +707,7 @@ DOC;
 	*/
 	public function getBingIndex($domain)
 	{
+		$domain = $this->_cutDomain($domain);
 		$url = "http://www.bing.com/search?q=site%3A" . rawurlencode($domain) . "&setplang=ru-RU";
 		$file = $this->_getUrl($url, false);
 
@@ -791,17 +766,13 @@ DOC;
 			return intval($found_all);
 		}
 
-		$str_res = 0;
 		$url = "http://yandex.ru/yandsearch?text=%22*." . rawurlencode($domain) . "%22&lr=1";
 
 		$file = $this->_getUrl($url, false);
 
-		if ($file)
-		{
-			$str_res = $this->_parseYandex($file);
-		}
-
-		return $str_res;
+		return $file
+			? $this->_parseYandex($file)
+			: 0;
 	}
 
 	/**
@@ -822,7 +793,7 @@ DOC;
 	 */
 	public function getGoogleLinks($domain)
 	{
-		$url = "http://www.google.ru/search?hl=en&newwindow=1&filter=1&q=link:" . rawurlencode($domain)/* . '*'*/;
+		$url = "https://www.google.ru/search?hl=en&newwindow=1&filter=1&q=link:" . rawurlencode($domain)/* . '*'*/ . '&gws_rd=ssl';
 		$file = $this->_getUrl($url, false);
 
 		return $file
@@ -1171,7 +1142,12 @@ DOC;
 			else
 			{
 				$url = "http://yandex.ru/yandsearch?p={$page}&text=" . rawurlencode($text) . "&lr=" . $lr;
-				$file = $this->_getUrl($url, false);
+
+				$referer = 'http://yandex.ru/showcaptcha?cc=1&retpath=http%3A//yandex.ru/yandsearch%3Flr%3D11053%26text%3Dhostcms%26csg%3D296%252C952%252C7%252C7%252C0%252C0%252C0_0dcda3d3f077b36f4d87985923d896fd&t=0/1413872716/9204adf17cf435f34e3fa4de2641f17b&s=907062f2f1b55ba757daef7f2a3c3bfd';
+
+				$cookie = 'yandexuid=8581718501413872711; fuid01=5445fc4b2ed25581.eVTYImiKnIVjgTZsfnEtinTW-Jt2S-TIF1F7cGGoAx3PBMsrujGqkEeWYOVZNPTW5qrfoKOf4Zj_uCqVjWUIWTb1LJDtwY007X-6iu-7t0ycBZhTf0ROGMT3tRxu6wcr; yabs-frequency=/4/0000000000000000/sn2lS6WR8G00/; spravka=dD0xNDEzODcyNzIzO2k9ODcuMTE3LjQuMTI7dT0xNDEzODcyNzIzNDgyMzU2MzgwO2g9ZjQzOGM3ODNkODM1N2Q1N2M4OWRjZTM2M2YzNTAwZDI=; _ym_visorc_10630330=b';
+
+				$file = $this->_getUrl($url, FALSE, $referer, $cookie);
 
 				if ($file)
 				{
@@ -1209,7 +1185,7 @@ DOC;
 	* ?>
 	* </code>
  	*/
-	public function getRamblerPosition($domain, $text, $param = array())
+	/*public function getRamblerPosition($domain, $text, $param = array())
 	{
 		$domain = $this->_cutDomain($domain);
 
@@ -1262,7 +1238,7 @@ DOC;
 		}
 
 		return 0;
-	}
+	}*/
 
 	/**
  	* Определение позиции сайта в поисковой системе Google
@@ -1297,14 +1273,18 @@ DOC;
 
 		$subreg = $param['search_subdomain'] ? '([\w]*?\.)*?' : '';
 
+		// На странице может быть не 10, а меньше элементов
+		$pastPages = 0;
+
 		for($i = 0; $i < $param['page_count']; $i++)
 		{
-			$content = $this->_getUrl("https://www.google.ru/search?complete=1&hl=ru&newwindow=1&q=" .  rawurlencode($text) . "&start=" .(10* $i) . "&sa=N", false);
+			$url = "https://www.google.ru/search?complete=1&hl=ru&newwindow=1&q=" .  rawurlencode($text) . "&start=" .(10* $i) . "&sa=N&gws_rd=ssl";
+			$content = $this->_getUrl($url, false);
 
 			if ($content)
 			{
-				/*preg_match_all("#<a href=\"(http://[\w\.\-%_\;\?/]*)\"[^>]* target=_blank class=.*?>#siu", $content, $matches);*/
-				preg_match_all("#<a href=\"/url\?q=(http://[\w\.\-%_\;\?/]*)#siu", $content, $matches);
+				// <h3 class="r"><a href="http://hosting.nic.ru/cms/hostcms.shtml" onmousedown=
+				preg_match_all("#<h3 class=\"r\"><a\s*href=\"(.*?)\"\s*onmousedown=#siu", $content, $matches);
 
 				if (isset($matches[1]))
 				{
@@ -1312,9 +1292,11 @@ DOC;
 					{
 						if (preg_match("'http://{$subreg}{$domain}[^<>]*?'siu", $value))
 						{
-							return $i* 10 + $key + 1;
+							return $pastPages + $key + 1;
 						}
 					}
+
+					$pastPages += count($matches[1]);
 				}
 			}
 
@@ -1366,15 +1348,15 @@ DOC;
 			if ($content)
 			{
 				/*preg_match_all("#<li[^<>]*?>[^<]*?<div class=\"res\">[^<]*?<div>[^<]*?<h3>[^<]*?<a class=\"yschttl([^\"]*?spt)?\" href=\"(http://[^<>\"]*?)\"[^<>]*?>#siu", $content, $matches); */
-				preg_match_all("#<a[^<>]*?class=\"yschttl[^\"]*?\"\s*href=\"([^\"]*?)\"#siu", $content, $matches);
+				preg_match_all("#<a[^>]*?class=\"yschttl[^\"]*?\"\s*href=\"([^\"]*?)\"#siu", $content, $matches);
 
 				if (isset($matches[1]) && count($matches[1]))
 				{
 					foreach($matches[1] as $key => $val)
 					{
-						if (preg_match("'//{$subreg}{$domain}[^<>]*?'siu", $val))
+						if (preg_match("'{$subreg}{$domain}[^<>]*?'siu", $val))
 						{
-							return $i* 10 + $key + 1;
+							return $i * 10 + $key + 1;
 						}
 					}
 				}
@@ -1440,7 +1422,7 @@ DOC;
 
 			if ($content)
 			{
-				if (preg_match_all("#<h3><a href=\"(http://[^\"]*?)\"\s*h=#siu", $content, $matches))
+				if (preg_match_all("#<li class=\"b_algo\"><h2><a href=\"(http://[^\"]*?)\"\s*h=#siu", $content, $matches))
 				{
 					if (isset($matches[1]))
 					{
@@ -1454,7 +1436,6 @@ DOC;
 					}
 				}
 			}
-
 			usleep(1000000);
 		}
 
@@ -1492,12 +1473,6 @@ DOC;
 				$oSeo->google_links = $oSeo_Controller->getGoogleLinks($sAliasName);
 				//$oSeo->yahoo_links = $oSeo_Controller->getYahooLinks($sAliasName);
 				$oSeo->bing_links = $oSeo_Controller->getBingLinks($sAliasName);
-
-				// Если не запрещено определение позиций Апорта
-				if (defined('SEO_APORT') && SEO_APORT)
-				{
-					$oSeo->aport_catalog = intval($oSeo_Controller->getAportCatalog($sAliasName));
-				}
 
 				$oSeo->mail_catalog = intval($oSeo_Controller->getMailCatalog($sAliasName));
 				$oSeo->dmoz_catalog = intval($oSeo_Controller->getDmozCatalog($sAliasName));
@@ -1546,7 +1521,7 @@ DOC;
 					$oSeo_Query_Position = Core_Entity::factory('Seo_Query_Position');
 
 					$oSeo_Query_Position->yandex = $oSeo_Controller->getYandexPosition($sAliasName, $oSeo_Query->query);
-					$oSeo_Query_Position->rambler = $oSeo_Controller->getRamblerPosition($sAliasName, $oSeo_Query->query);
+					//$oSeo_Query_Position->rambler = $oSeo_Controller->getRamblerPosition($sAliasName, $oSeo_Query->query);
 					$oSeo_Query_Position->google = $oSeo_Controller->getGooglePosition($sAliasName, $oSeo_Query->query);
 					$oSeo_Query_Position->yahoo = $oSeo_Controller->getYahooPosition($sAliasName, $oSeo_Query->query);
 					$oSeo_Query_Position->bing = $oSeo_Controller->getBingPosition($sAliasName, $oSeo_Query->query);

@@ -146,7 +146,20 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	 */
 	protected function _getAllFromDb(Shop_Model $oShop)
 	{
-		return $oShop->Shop_Carts->getBySiteuserId($this->siteuser_id, FALSE);
+		$aShop_Carts = $oShop->Shop_Carts->getBySiteuserId($this->siteuser_id, FALSE);
+
+		$aTmp_Shop_Cart = array();
+		foreach ($aShop_Carts as $oShop_Cart)
+		{
+			$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
+
+			if (!is_null($oShop_Item) && $oShop_Item->active)
+			{
+				$aTmp_Shop_Cart[] = $oShop_Cart;
+			}
+		}
+
+		return $aTmp_Shop_Cart;
 	}
 
 	/**
@@ -166,15 +179,20 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 		$aShop_Cart = array();
 		foreach ($aCart[$shop_id] as $shop_item_id => $aCartItem)
 		{
-			// Temporary object
-			$oShop_Cart = Core_Entity::factory('Shop_Cart');
-			$oShop_Cart->shop_item_id = $shop_item_id;
-			$oShop_Cart->quantity = $aCartItem['quantity'];
-			$oShop_Cart->postpone = $aCartItem['postpone'];
-			$oShop_Cart->shop_id = $shop_id;
-			$oShop_Cart->shop_warehouse_id = $aCartItem['shop_warehouse_id'];
-			$oShop_Cart->siteuser_id = 0;
-			$aShop_Cart[] = $oShop_Cart;
+			$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
+
+			if (!is_null($oShop_Item) && $oShop_Item->active)
+			{
+				// Temporary object
+				$oShop_Cart = Core_Entity::factory('Shop_Cart');
+				$oShop_Cart->shop_item_id = $shop_item_id;
+				$oShop_Cart->quantity = $aCartItem['quantity'];
+				$oShop_Cart->postpone = $aCartItem['postpone'];
+				$oShop_Cart->shop_id = $shop_id;
+				$oShop_Cart->shop_warehouse_id = $aCartItem['shop_warehouse_id'];
+				$oShop_Cart->siteuser_id = 0;
+				$aShop_Cart[] = $oShop_Cart;
+			}
 		}
 
 		return $aShop_Cart;
@@ -320,7 +338,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				// Проверять остаток для обычных товаров
 				if ($this->checkStock && ($oShop_Item->type == 0 || $oShop_Item->type == 2))
 				{
-					$iRest = $oShop_Item->getRest();
+					$iRest = $oShop_Item->getRest() - $oShop_Item->getReserved();
 					$iRest < $this->quantity && $this->quantity = $iRest;
 				}
 

@@ -122,6 +122,7 @@ class Shop_Item_Model extends Core_Entity
 		'shop_item_associated' => array(),
 		'shop_item_associated_second' => array('model' => 'Shop_Item_Associated', 'foreign_key' => 'shop_item_associated_id'),
 		'shop_specialprice' => array(),
+		'shop_item_reserved' => array(),
 		'tag' => array('through' => 'tag_shop_item'),
 		'tag_shop_item' => array(),
 		'shop_warehouse' => array('through' => 'shop_warehouse_item'),
@@ -250,29 +251,30 @@ class Shop_Item_Model extends Core_Entity
 	 * Values of all properties of item
 	 * Значения всех свойств товара
 	 * @param boolean $bCache cache mode status
+	 * @param array $aPropertiesId array of properties' IDs
 	 * @return array Property_Value
 	 */
-	public function getPropertyValues($bCache = TRUE)
+	public function getPropertyValues($bCache = TRUE, $aPropertiesId = array())
 	{
 		if ($bCache && !is_null($this->_propertyValues))
 		{
 			return $this->_propertyValues;
 		}
 
-		// Warning: Needs cache
-		$aProperties = Core_Entity::factory('Shop_Item_Property_List', $this->shop_id)
-			->Properties
-			->findAll();
-
-		//$aReturn = array();
-		$aProperiesId = array();
-		foreach ($aProperties as $oProperty)
+		if (!is_array($aPropertiesId) || !count($aPropertiesId))
 		{
-			$aProperiesId[] = $oProperty->id;
-			//$aReturn = array_merge($aReturn, $this->_getPropertyValue($oProperty, $bCache));
+			$aProperties = Core_Entity::factory('Shop_Item_Property_List', $this->shop_id)
+				->Properties
+				->findAll();
+
+			$aPropertiesId = array();
+			foreach ($aProperties as $oProperty)
+			{
+				$aPropertiesId[] = $oProperty->id;
+			}
 		}
 
-		$aReturn = Property_Controller_Value::getPropertiesValues($aProperiesId, $this->id);
+		$aReturn = Property_Controller_Value::getPropertiesValues($aPropertiesId, $this->id, $bCache);
 
 		// setHref()
 		foreach ($aReturn as $oProperty_Value)
@@ -291,14 +293,14 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
-	 * Backend callback method
+	 * Get the quantity in stocks
 	 * @return float
 	 */
 	public function getRest()
 	{
 		$aShop_Warehouse_Items = !$this->shortcut_id
 			? $this->Shop_Warehouse_Items->findAll()
-			: Core_Entity::factory("Shop_Item", $this->shortcut_id)->Shop_Warehouse_Items->findAll();
+			: Core_Entity::factory('Shop_Item', $this->shortcut_id)->Shop_Warehouse_Items->findAll();
 
 		$rest = 0;
 		foreach ($aShop_Warehouse_Items as $oShop_Warehouse_Item)
@@ -307,6 +309,31 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		return $rest;
+	}
+
+	/**
+	 * Get the quantity of reserved items
+	 * @return float
+	 */
+	public function getReserved()
+	{
+		$oShop_Item = !$this->shortcut_id
+			? $this
+			: Core_Entity::factory('Shop_Item', $this->shortcut_id);
+
+		$oShop_Item_Reserveds = $oShop_Item->Shop_Item_Reserveds;
+		$oShop_Item_Reserveds->queryBuilder()
+			->where('shop_item_reserved.datetime', '>', Core_Date::timestamp2sql(time() - $oShop_Item->Shop->reserve_hours * 60 * 60));
+
+		$aShop_Item_Reserveds = $oShop_Item_Reserveds->findAll();
+
+		$reserved = 0;
+		foreach ($aShop_Item_Reserveds as $oShop_Item_Reserved)
+		{
+			$reserved += $oShop_Item_Reserved->count;
+		}
+
+		return $reserved;
 	}
 
 	/**
@@ -349,6 +376,7 @@ class Shop_Item_Model extends Core_Entity
 
 	/**
 	 * Backend callback method
+	 * @param object $value value
 	 * @return string
 	 */
 	public function adminPrice($value = NULL)
@@ -374,8 +402,8 @@ class Shop_Item_Model extends Core_Entity
 	public function suffixAdminPrice()
 	{
 		$oShopItem = $this->shortcut_id
-				? Core_Entity::factory("Shop_Item", $this->shortcut_id)
-				: $this;
+			? Core_Entity::factory("Shop_Item", $this->shortcut_id)
+			: $this;
 
 		echo ' ' . $oShopItem->Shop_Currency->name;
 	}
@@ -761,7 +789,14 @@ class Shop_Item_Model extends Core_Entity
 	public function changeActive()
 	{
 		$this->active = 1 - $this->active;
-		return $this->save();
+		$this->save();
+
+		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+
+		return $this;
 	}
 
 	/**
@@ -880,7 +915,7 @@ class Shop_Item_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . $this->name . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path . ' ' . $this->price . ' ' . $this->vendorcode . ' ' . $this->marking . ' ';
+		$oSearch_Page->text = $this->text . ' ' . $this->description . ' ' . htmlspecialchars($this->name) . ' ' . $this->id . ' ' . htmlspecialchars($this->seo_title) . ' ' . htmlspecialchars($this->seo_description) . ' ' . htmlspecialchars($this->seo_keywords) . ' ' . htmlspecialchars($this->path) . ' ' . $this->price . ' ' . htmlspecialchars($this->vendorcode) . ' ' . htmlspecialchars($this->marking) . ' ';
 
 		$oSearch_Page->title = $this->name;
 
@@ -888,7 +923,7 @@ class Shop_Item_Model extends Core_Entity
 		$aComments = $this->Comments->findAll();
 		foreach ($aComments as $oComment)
 		{
-			$oSearch_Page->text .= $oComment->author . ' ' . $oComment->text . ' ';
+			$oSearch_Page->text .= htmlspecialchars($oComment->author) . ' ' . $oComment->text . ' ';
 		}
 
 		if (Core::moduleIsActive('tag'))
@@ -896,7 +931,7 @@ class Shop_Item_Model extends Core_Entity
 			$aTags = $this->Tags->findAll();
 			foreach ($aTags as $oTag)
 			{
-				$oSearch_Page->text .= $oTag->name . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oTag->name) . ' ';
 			}
 		}
 
@@ -909,7 +944,7 @@ class Shop_Item_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value . ' ';
+					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value) . ' ';
 				}
 			}
 			// Informationsystem
@@ -920,14 +955,14 @@ class Shop_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name . ' ';
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ';
 					}
 				}
 			}
 			// Other type
 			elseif ($oPropertyValue->Property->type != 2)
 			{
-				$oSearch_Page->text .= $oPropertyValue->value . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oPropertyValue->value) . ' ';
 			}
 		}
 
@@ -935,14 +970,14 @@ class Shop_Item_Model extends Core_Entity
 		$oShop_Producer = $this->Shop_Producer;
 		if ($oShop_Producer->id)
 		{
-			$oSearch_Page->text .= $oShop_Producer->name . ' ';
+			$oSearch_Page->text .= htmlspecialchars($oShop_Producer->name) . ' ';
 		}
 
 		// Продавец
 		$oShop_Seller = $this->Shop_Seller;
 		if ($oShop_Seller->id)
 		{
-			$oSearch_Page->text .= $oShop_Seller->name . ' ';
+			$oSearch_Page->text .= htmlspecialchars($oShop_Seller->name) . ' ';
 		}
 
 		$oSiteAlias = $this->Shop->Site->getCurrentAlias();
@@ -1072,14 +1107,9 @@ class Shop_Item_Model extends Core_Entity
 			->Shop_Item_Associateds
 			->getByAssociatedId($this->id);
 
-		if(!is_null($oShopAssociatedItem))
-		{
-			$this->adminUnsetAssociated();
-		}
-		else
-		{
-			$this->adminSetAssociated();
-		}
+		!is_null($oShopAssociatedItem)
+			? $this->adminUnsetAssociated()
+			: $this->adminSetAssociated();
 	}
 
 	/**
@@ -1162,6 +1192,9 @@ class Shop_Item_Model extends Core_Entity
 		// Удаляем значения из складов
 		$this->Shop_Warehouse_Items->deleteAll(FALSE);
 
+		// Удаляем связи с зарезервированными, прямая связь
+		$this->Shop_Item_Reserveds->deleteAll(FALSE);
+
 		// Удаляем директорию товара
 		$this->deleteDir();
 
@@ -1230,8 +1263,8 @@ class Shop_Item_Model extends Core_Entity
 
 		!$bRightTime && $oCore_Html_Entity_Div->class('wrongTime');
 
-		// Зачеркнут в зависимости от своего статуса
-		if (!$this->active)
+		// Зачеркнут в зависимости от статуса родительского товара или своего статуса
+		if (!$object->active || !$this->active)
 		{
 			$oCore_Html_Entity_Div->class('inactive');
 		}
@@ -1550,6 +1583,9 @@ class Shop_Item_Model extends Core_Entity
 
 		// Warehouses rest
 		!isset($this->_forbiddenTags['rest']) && $this->addXmlTag('rest', $this->getRest());
+
+		// Reserved
+		$oShop->reserve && !isset($this->_forbiddenTags['reserved']) && $this->addXmlTag('reserved', $this->getReserved());
 
 		// Prices
 		$oShop_Item_Controller = new Shop_Item_Controller();

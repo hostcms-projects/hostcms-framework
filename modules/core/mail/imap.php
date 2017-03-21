@@ -124,7 +124,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 
 		// Безопасное соединение TSL/SSL
 		$this->_protocol .= $this->ssl
-			? '/ssl'
+			? '/ssl/novalidate-cert/notls'
 			: '/novalidate-cert/notls';
 
 		// Формируем имя ящика

@@ -141,8 +141,10 @@ class Core_Image_Gd extends Core_Image
 				$targetResourceStep2 = imagecreatetruecolor($destX_step2, $destY_step2);
 			}
 
-			$ext = Core_File::getExtension($targetFile);
-			if ($ext == 'jpg' || $ext == 'jpeg')
+			//$ext = Core_File::getExtension($targetFile);
+			$iImagetype = Core_Image::instance()->exifImagetype($sourceFile);
+
+			if ($iImagetype == IMAGETYPE_JPEG)
 			{
 				$quality = is_null($quality)
 					? JPG_QUALITY
@@ -171,7 +173,7 @@ class Core_Image_Gd extends Core_Image
 					imagedestroy($sourceResource);
 				}
 			}
-			elseif ($ext == 'png')
+			elseif ($iImagetype == IMAGETYPE_PNG)
 			{
 				$quality = is_null($quality)
 					? PNG_QUALITY
@@ -206,7 +208,7 @@ class Core_Image_Gd extends Core_Image
 					imagedestroy($sourceResource);
 				}
 			}
-			elseif ($ext == 'gif')
+			elseif ($iImagetype == IMAGETYPE_GIF)
 			{
 				$sourceResource = imagecreatefromgif($sourceFile);
 

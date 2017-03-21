@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -34,7 +34,7 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Seo.tab_links'))
 			->name('links');
 		$this->addTabAfter($oLinksTab, $oMainTab);
-		
+
 		// Закладка проиндексированных страниц
 		$oIndexedTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_indexed'))
@@ -46,7 +46,7 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Seo.tab_catalog'))
 			->name('catalog');
 		$this->addTabAfter($oCatalogTab, $oIndexedTab);
-		
+
 		// Закладка счетчиков
 		$oCounterTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_counter'))
@@ -95,20 +95,18 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oIndexedTab)
 			->move($this->getField('bing_indexed')
 				->style('width: 300px;'),
-				$oIndexedTab)
-			->move($this->getField('rambler_indexed')
-				->style('width: 300px;'),
 				$oIndexedTab);
 
 		// Закладка каталогов
-		$oMainTab->move($this->getField('yandex_catalog'), $oCatalogTab)
+		$oMainTab
+			->move($this->getField('yandex_catalog'), $oCatalogTab)
 			->move($this->getField('rambler_catalog'), $oCatalogTab)
 			->move($this->getField('dmoz_catalog'), $oCatalogTab)
-			->move($this->getField('aport_catalog'), $oCatalogTab)
 			->move($this->getField('mail_catalog'), $oCatalogTab);
 
 		// Закладка счетчиков
-		$oMainTab->move($this->getField('rambler_counter'), $oCounterTab)
+		$oMainTab
+			->move($this->getField('rambler_counter'), $oCounterTab)
 			->move($this->getField('spylog_counter'), $oCounterTab)
 			->move($this->getField('hotlog_counter'), $oCounterTab)
 			->move($this->getField('liveinternet_counter'), $oCounterTab)

@@ -8,6 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Доступные методы:
  *
  * - itemsProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
+ * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -30,6 +31,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected $_allowedProperties = array(
 		'itemsProperties',
+		'modifications'
 	);
 
 	/**
@@ -114,12 +116,20 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->_Shop_Items
 			->queryBuilder()
 			->select('shop_items.*')
-			->join('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id',
+			->leftJoin('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id'/*,
 				array(
 						array('AND' => array('shop_groups.active', '=', 1)),
 						array('OR' => array('shop_items.shop_group_id', '=', 0))
-					)
+					)*/
 			)
+
+			// Активность группы или группа корневая
+			->open()
+			->where('shop_groups.active', '=', 1)
+			->setOr()
+			->where('shop_groups.id', 'IS', NULL)
+			->close()
+
 			->where('shop_items.shortcut_id', '=', 0)
 			->where('shop_items.active', '=', 1)
 			->where('shop_items.siteuser_id', 'IN', $this->_aSiteuserGroups)
@@ -135,8 +145,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->where('shop_items.yandex_market', '=', 1)
-			->where('shop_items.price', '>', 0)
-			->groupBy('shop_items.id');
+			->where('shop_items.price', '>', 0);
 
 		$this->_Shop_Groups = $oShop->Shop_Groups;
 		$this->_Shop_Groups
@@ -145,7 +154,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_groups.active', '=', 1)
 			->orderBy('shop_groups.parent_id');
 
-		$this->itemsProperties = TRUE;
+		$this->itemsProperties = $this->modifications = TRUE;
 	}
 
 	/**
@@ -206,17 +215,22 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected function _categories()
 	{
 		$aShop_Groups = $this->_Shop_Groups->findAll(FALSE);
-		if (count($aShop_Groups))
-		{
-			echo "<categories>\n";
-			foreach ($aShop_Groups as $oShop_Group)
-			{
-				$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0 ? '' : ' parentId="' . $oShop_Group->parent_id . '"';
 
-				echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
-			}
-			echo "</categories>\n";
+		echo "<categories>\n";
+
+		// Название магазина
+		$oShop = $this->getEntity();
+
+		echo '<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n";
+
+		foreach ($aShop_Groups as $oShop_Group)
+		{
+			$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0 ? '' : ' parentId="' . $oShop_Group->parent_id . '"';
+
+			echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
 		}
+		echo "</categories>\n";
+
 		unset($aShop_Groups);
 
 		return $this;
@@ -232,6 +246,13 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	{
 		$oShop = $this->getEntity();
 
+		if (!$this->modifications)
+		{
+			$this->_Shop_Items
+				->queryBuilder()
+				->where('shop_items.modification_id', '=', 0);
+		}
+
 		echo "<offers>\n";
 
 		$offset = 0;
@@ -239,7 +260,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		do {
 			$oShop_Items = $this->_Shop_Items;
-			$oShop_Items->queryBuilder()->offset($offset)->limit($limit);
+			$oShop_Items->queryBuilder()
+				->offset($offset)
+				->limit($limit);
+
 			$aShop_Items = $oShop_Items->findAll(FALSE);
 
 			foreach ($aShop_Items as $oShop_Item)

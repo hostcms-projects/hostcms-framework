@@ -10,8 +10,8 @@
  */
 return array(
 	'authorization_form_title' => 'Центр администрирования',
-	'authorization_form_login' => 'Пользователь:',
-	'authorization_form_password' => 'Пароль:',
+	'authorization_form_login' => 'Пользователь',
+	'authorization_form_password' => 'Пароль',
 	'authorization_form_ip' => 'Привязать сессию к IP-адресу',
 	'authorization_form_button' => 'Войти',
 	'themes' => 'Темы',

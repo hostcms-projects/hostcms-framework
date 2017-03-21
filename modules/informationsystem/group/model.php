@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Group_Model extends Core_Entity
 {
@@ -100,40 +100,30 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Values of all properties of element
 	 * @param boolean $bCache cache mode
+	 * @param array $aPropertiesId array of properties' IDs
 	 * @return array Property_Value
 	 */
-	public function getPropertyValues($bCache = TRUE)
+	public function getPropertyValues($bCache = TRUE, $aPropertiesId = array())
 	{
 		if ($bCache && !is_null($this->_propertyValues))
 		{
 			return $this->_propertyValues;
 		}
 
-		// Warning: Need cache
-		$aProperties = Core_Entity::factory('Informationsystem_Group_Property_List', $this->informationsystem_id)
-			->Properties
-			->findAll();
-
-		$aReturn = array();
-		$aProperiesId = array();
-		foreach ($aProperties as $oProperty)
+		if (!is_array($aPropertiesId) || !count($aPropertiesId))
 		{
-			$aProperiesId[] = $oProperty->id;
+			$aProperties = Core_Entity::factory('Informationsystem_Group_Property_List', $this->informationsystem_id)
+				->Properties
+				->findAll();
 
-			/*$aProperty_Values = $oProperty->getValues($this->id, $bCache);
-
-			foreach ($aProperty_Values as $oProperty_Value)
+			$aPropertiesId = array();
+			foreach ($aProperties as $oProperty)
 			{
-				if ($oProperty->type == 2)
-				{
-					$oProperty_Value->setHref($this->getGroupHref());
-				}
-
-				$aReturn[] = $oProperty_Value;
-			}*/
+				$aPropertiesId[] = $oProperty->id;
+			}
 		}
 
-		$aReturn = Property_Controller_Value::getPropertiesValues($aProperiesId, $this->id, $bCache);
+		$aReturn = Property_Controller_Value::getPropertiesValues($aPropertiesId, $this->id, $bCache);
 
 		// setHref()
 		foreach ($aReturn as $oProperty_Value)
@@ -559,7 +549,14 @@ class Informationsystem_Group_Model extends Core_Entity
 	public function changeActive()
 	{
 		$this->active = 1 - $this->active;
-		return $this->save();
+		$this->save();
+
+		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+
+		return $this;
 	}
 
 	/**
@@ -768,7 +765,7 @@ class Informationsystem_Group_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = $this->name . ' ' . $this->description . ' ' . $this->id . ' ' . $this->seo_title . ' ' . $this->seo_description . ' ' . $this->seo_keywords . ' ' . $this->path;
+		$oSearch_Page->text = htmlspecialchars($this->name) . ' ' . $this->description . ' ' . $this->id . ' ' . htmlspecialchars($this->seo_title) . ' ' . htmlspecialchars($this->seo_description) . ' ' . htmlspecialchars($this->seo_keywords) . ' ' . htmlspecialchars($this->path);
 
 		$oSearch_Page->title = $this->name;
 
@@ -781,7 +778,7 @@ class Informationsystem_Group_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= $oList_Item->value;
+					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value);
 				}
 			}
 			// Informationsystem
@@ -792,14 +789,14 @@ class Informationsystem_Group_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= $oInformationsystem_Item->name;
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name);
 					}
 				}
 			}
 			// Other type
 			elseif ($oPropertyValue->Property->type != 2)
 			{
-				$oSearch_Page->text .= $oPropertyValue->value . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oPropertyValue->value) . ' ';
 			}
 		}
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Menu extends Admin_Form_Entity
 {
@@ -20,7 +20,8 @@ class Skin_Default_Admin_Form_Entity_Menu extends Admin_Form_Entity
 		'name',
 		'img',
 		'href',
-		'onclick'
+		'onclick',
+		'icon'
 	);
 
 	/**
@@ -33,8 +34,6 @@ class Skin_Default_Admin_Form_Entity_Menu extends Admin_Form_Entity
 
 		if ($href && $onclick)
 		{
-			//$href = $this->doReplaces(false, $field_list, $href);
-			//$onclick = $this->doReplaces(false, $field_list, $onclick);
 			?><a href="<?php echo $href?>" onclick="<?php echo $onclick?>"><?php
 		}
 		else

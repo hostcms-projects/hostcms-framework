@@ -90,7 +90,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			->rows(30)
 			->caption(Core::_('Shop_Payment_System.system_of_pay_add_form_handler'))
 			->name('system_of_pay_add_form_handler')
-			->syntaxHighlighter(TRUE)
+			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 			->syntaxHighlighterOptions($oTmpOptions);
 
 		$oMainTab->add($Admin_Form_Entity_Textarea);

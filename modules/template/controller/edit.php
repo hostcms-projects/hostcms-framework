@@ -115,7 +115,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(30)
 					->caption(Core::_('Template.template'))
 					->name('template')
-					->syntaxHighlighter(TRUE)
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oTemplateTab->add($oTemplate_Textarea);
@@ -133,7 +133,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(30)
 					->caption(Core::_('Template.css'))
 					->name('css')
-					->syntaxHighlighter(TRUE)
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
 				$oCssTab->add($oCss_Textarea);

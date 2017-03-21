@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 {
@@ -29,6 +29,12 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 	 * @var string
 	 */
 	protected $_defaultOperator = 'AND';
+
+	/**
+	 * JOIN
+	 * @var array
+	 */
+	protected $_join = array();
 
 	/**
 	 * ORDER BY
@@ -145,6 +151,122 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 		$this->setDefaultOperator();
 
 		return $this;
+	}
+
+	/**
+	 * http://dev.mysql.com/doc/refman/5.5/en/join.html
+	 * @param string $type join type
+	 * @param string $table table name
+	 * @param string $column column name
+	 * @param string $expression expression
+	 * @param string $value value
+	 * @param string $additionalConditions additional conditions
+	 * @return Core_QueryBuilder_Select
+	 */
+	protected function _join($type, $table, $column = NULL, $expression = NULL, $value = NULL, $additionalConditions = NULL)
+	{
+		$this->_join[] = array($type, $table, $column, $expression, $value, $additionalConditions);
+
+		return $this;
+	}
+
+	/**
+	 * INNER JOIN
+	 *
+	 * <code>
+	 * // INNER JOIN `join1` USING (`join_field`)
+	 * $Core_QueryBuilder_Select->join('join1', 'join_field');
+	 *
+	 * // INNER JOIN `jointable`.`join1` ON `join_field` = `join_field2`
+	 * $Core_QueryBuilder_Select->join('jointable.join1', 'join_field1', '=', 'join_field2');
+	 *
+	 * // INNER JOIN `jointable`.`join1` ON `join_field` = `join_field2` AND `A` = '123' AND `B` = 'xyz'
+	 * $Core_QueryBuilder_Select->join('jointable.join1', 'join_field1', '=', 'join_field2', array(
+	 *		array('AND' => array('A', '=', '123')),
+	 *		array('AND' => array('B', '=', 'xyz'))
+	 *	));
+	 * </code>
+	 * @param string $table table name
+	 * @param string $column column name
+	 * @param string $expression expression
+	 * @param string $value value
+	 * @param string $additionalConditions additional conditions
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function join($table, $column, $expression = NULL, $value = NULL, $additionalConditions = NULL)
+	{
+		return $this->_join('INNER JOIN', $table, $column, $expression, $value, $additionalConditions);
+	}
+
+	/**
+	 * <code>
+	 * // LEFT OUTER JOIN `join1` USING (`join_field2`)
+	 * $Core_QueryBuilder_Select->leftJoin('join1', 'join_field2');
+	 *
+	 * // LEFT OUTER JOIN `jointable`.`join1` ON `join_field` = `join_field2`
+	 * $Core_QueryBuilder_Select->leftJoin('jointable.join1', 'join_field', '=', 'join_field2');
+	 * </code>
+	 * @param string $table table name
+	 * @param string $column column name
+	 * @param string $expression expression
+	 * @param string $value value
+	 * @param string $additionalConditions additional conditions
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function leftJoin($table, $column, $expression = NULL, $value = NULL, $additionalConditions = NULL)
+	{
+		return $this->_join('LEFT OUTER JOIN', $table, $column, $expression, $value, $additionalConditions);
+	}
+
+	/**
+	 *
+	 * <code>
+	 * // RIGHT OUTER JOIN `join1` USING (`join_field2`)
+	 * $Core_QueryBuilder_Select->rightJoin('join1', 'join_field2');
+	 *
+	 * // RIGHT OUTER JOIN `jointable`.`join1` ON `join_field` = `join_field2`
+	 * $Core_QueryBuilder_Select->rightJoin('jointable.join1', 'join_field', '=', 'join_field2');
+	 * </code>
+	 * @param string $table table name
+	 * @param string $column column name
+	 * @param string $expression expression
+	 * @param string $value value
+	 * @param string $additionalConditions additional conditions
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function rightJoin($table, $column, $expression = NULL, $value = NULL, $additionalConditions = NULL)
+	{
+		return $this->_join('RIGHT OUTER JOIN', $table, $column, $expression, $value, $additionalConditions);
+	}
+
+	/**
+	 * In MySQL, CROSS JOIN is a syntactic equivalent to INNER JOIN (they can replace each other).
+	 * In standard SQL, they are not equivalent. INNER JOIN is used with an ON clause, CROSS JOIN is used otherwise.
+	 *
+	 * <code>
+	 * // CROSS JOIN `join1`
+	 * $Core_QueryBuilder_Select->crossJoin('join1');
+	 * </code>
+	 * @param string $table table name
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function crossJoin($table)
+	{
+		return $this->_join('CROSS JOIN', $table);
+	}
+
+	/**
+	 *
+	 * <code>
+	 * // NATURAL JOIN `join1`
+	 * $Core_QueryBuilder_Select->naturalJoin('join1');
+	 * </code>
+	 * @param string $table table name
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function naturalJoin($table)
+	{
+		return $this->_join('NATURAL JOIN', $table);
 	}
 
 	/**

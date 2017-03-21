@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_DataBase
 {
@@ -312,6 +312,7 @@ abstract class Core_DataBase
 			'password' => '',
 			'database' => '',
 			'charset' => 'UTF8',
+			'newlink' => FALSE,
 			'attr' => array(),
 			//'cache' => 'memory'
 		);

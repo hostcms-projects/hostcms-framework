@@ -84,6 +84,17 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 			}
 		}
 
+		$this->getField('picture')
+			->divAttr(array('style' => 'float: left'))
+			->style('width: 300px');
+			
+		$this->getField('icon')
+			->divAttr(array('style' => 'float: left'))
+			->style('width: 250px');				
+			
+		$this->getField('color')
+			->style('width: 250px');			
+			
 		$this->getField('sorting')
 			->divAttr(array('style' => 'float: left'))
 			->style('width: 220px');

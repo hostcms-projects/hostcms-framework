@@ -404,6 +404,14 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			);
 
 			$oMainTab->addAfter($oSeparatorField, $oUrlTypeField);
+			
+			$oMainTab->delete($this->getField('reserve_hours'));
+			
+			$oItemsReserveHours = $this->getField('reserve_hours')
+				->style("width: 190px")
+				->divAttr(array('style' => 'float: left'));
+
+			$oMainTab->addAfter($oItemsReserveHours, $oUrlTypeField);	
 
 			$this->getField('image_small_max_width')
 				->style("width: 300px; margin-right: 30px")

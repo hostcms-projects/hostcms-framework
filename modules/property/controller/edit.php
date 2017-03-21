@@ -190,11 +190,11 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$oAdditionalTab->delete($this->getField('shop_id'));
 
-					$oshop_Controller_Edit = new shop_Controller_Edit($this->_Admin_Form_Action);
+					$oShop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 					// Селектор с группой
 					$oSelect_Shops = Admin_Form_Entity::factory('Select')
 						->options(
-							array(' … ') + $oshop_Controller_Edit->fillShops(CURRENT_SITE)
+							array(' … ') + $oShop_Controller_Edit->fillShops(CURRENT_SITE)
 						)
 						->name('shop_id')
 						->value($this->_object->shop_id)

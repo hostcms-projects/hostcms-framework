@@ -544,7 +544,7 @@ class Structure_Controller_Show extends Core_Controller
 	 */
 	protected function _addShopGroups($parentObject, $oShop)
 	{
-		$this->_aShop_Groups = array();
+		//$this->_aShop_Groups = array();
 
 		$dateTime = Core_Date::timestamp2sql(time());
 

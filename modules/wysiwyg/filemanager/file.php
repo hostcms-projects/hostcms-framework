@@ -289,8 +289,10 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 
 							$targetResourceStep1 = imagecreatetruecolor($destX, $destY);
 
-							$ext = Core_File::getExtension($this->name);
-							if ($ext == 'jpg' || $ext == 'jpeg')
+							$iImagetype = Core_Image::instance()->exifImagetype($filePath);
+
+							//$ext = Core_File::getExtension($this->name);
+							if ($iImagetype == IMAGETYPE_JPEG)
 							{
 								$sourceResource = imagecreatefromjpeg($filePath);
 
@@ -306,7 +308,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 									imagedestroy($sourceResource);
 								}
 							}
-							elseif ($ext == 'png')
+							elseif ($iImagetype == IMAGETYPE_PNG)
 							{
 								$sourceResource = imagecreatefrompng($filePath);
 
@@ -324,7 +326,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 									imagedestroy($sourceResource);
 								}
 							}
-							elseif ($ext == 'gif')
+							elseif ($iImagetype == IMAGETYPE_GIF)
 							{
 								$sourceResource = imagecreatefromgif($filePath);
 

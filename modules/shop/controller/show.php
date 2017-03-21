@@ -8,9 +8,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Доступные методы:
  *
  * - group($id) идентификатор группы магазина, если FALSE, то вывод товаров осуществляется из всех групп
- * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести
  * - groupsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств групп товаров, по умолчанию TRUE
- * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп.
+ * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп (каким группам выводить доп. св-ва)
  * - groupsMode('tree') режим показа групп, может принимать следующие значения:
 	none - не показывать группы,
 	tree - показывать дерево групп и все группы на текущем уровне (по умолчанию),
@@ -22,6 +22,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsForbiddenTags(array('description')) массив тегов товаров, запрещенных к передаче в генерируемый XML
  * - parentItem(123) идентификатор родительского товара для отображаемой модификации
  * - modifications(TRUE|FALSE) показывать модификации для выбранных товаров, по умолчанию FALSE
+ * - modificationsList(TRUE|FALSE) показывать модификации товаров текущей группы на уровне товаров группы, по умолчанию FALSE
  * - specialprices(TRUE|FALSE) показывать специальные цены для выбранных товаров, по умолчанию FALSE
  * - associatedItems(TRUE|FALSE) показывать сопутствующие товары для выбранных товаров, по умолчанию FALSE
  * - comments(TRUE|FALSE) показывать комментарии для выбранных товаров, по умолчанию FALSE
@@ -35,6 +36,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - cart(TRUE|FALSE) выводить товары в корзине, по умолчанию FALSE
  * - viewedOrder('ASC'|'DESC'|'RAND') направление сортировки просмотренных товаров, по умолчанию DESC
  * - warehousesItems(TRUE|FALSE) выводить остаток на каждом складе для товара, по умолчанию FALSE
+ * - taxes(TRUE|FALSE) выводить список налогов, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить товары. По умолчанию 0
  * - limit($limit) количество выводимых товаров
  * - page(2) текущая страница, по умолчанию 0, счет ведется с 0
@@ -89,6 +91,7 @@ class Shop_Controller_Show extends Core_Controller
 		'itemsForbiddenTags',
 		'parentItem',
 		'modifications',
+		'modificationsList',
 		'specialprices',
 		'associatedItems',
 		'comments',
@@ -102,6 +105,7 @@ class Shop_Controller_Show extends Core_Controller
 		'viewedOrder',
 		'cart',
 		'warehousesItems',
+		'taxes',
 		'offset',
 		'limit',
 		'page',
@@ -173,6 +177,11 @@ class Shop_Controller_Show extends Core_Controller
 	protected $_cacheName = 'shop_show';
 
 	/**
+	 * Select modififactions, default's TRUE
+	 */
+	protected $_selectModifications = TRUE;
+
+	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
 	 */
@@ -212,7 +221,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->group = 0;
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
-			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->cart = FALSE;
+			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->taxes = $this->cart = FALSE;
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = TRUE;
 
 		$this->favoriteOrder = 'RAND';
@@ -307,9 +316,21 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	protected function _applyItemConditions(Shop_Item_Model $oShop_Items)
 	{
+		return $this->_applyItemConditionsQueryBuilder(
+			$oShop_Items->queryBuilder()
+		);
+	}
+
+	/**
+	 * Apply item's conditions
+	 *
+	 * @param Core_QueryBuilder_Select $oCore_QueryBuilder_Select
+	 * @return self
+	 */
+	protected function _applyItemConditionsQueryBuilder(Core_QueryBuilder_Select $oCore_QueryBuilder_Select)
+	{
 		$dateTime = Core_Date::timestamp2sql(time());
-		$oShop_Items
-			->queryBuilder()
+		$oCore_QueryBuilder_Select
 			->open()
 			->where('shop_items.start_datetime', '<', $dateTime)
 			->setOr()
@@ -506,9 +527,11 @@ class Shop_Controller_Show extends Core_Controller
 			{
 				$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id);
 
-				if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item)
+				if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item && $oShop_Item->active)
 				{
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
+					$this->comments && $oShop_Item->showXmlComments($this->comments);
+
 					$oViewedEntity->addEntity($oShop_Item->clearEntities());
 				}
 			}
@@ -541,6 +564,8 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		$oShop = $this->getEntity();
+
+		$this->taxes && $oShop->showXmlTaxes(TRUE);
 
 		$this->addEntity(
 			Core::factory('Core_Xml_Entity')
@@ -585,7 +610,7 @@ class Shop_Controller_Show extends Core_Controller
 					foreach ($aShop_Cart as $oShop_Cart)
 					{
 						$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
-						if (!is_null($oShop_Item->id))
+						if (!is_null($oShop_Item->id) && $oShop_Item->active)
 						{
 							$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 							$oCartEntity->addEntity($oShop_Item->clearEntities());
@@ -697,64 +722,7 @@ class Shop_Controller_Show extends Core_Controller
 		// Показывать дополнительные свойства товара
 		if ($this->itemsProperties)
 		{
-			$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
-
-			$aProperties = $this->group === FALSE
-				? $oShop_Item_Property_List->Properties->findAll()
-				: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
-
-			$aShowPropertyIDs = array();
-
-			foreach ($aProperties as $oProperty)
-			{
-				$oShop_Item_Property = $oProperty->Shop_Item_Property;
-
-				if ($oShop_Item_Property->show_in_item && $this->item || $oShop_Item_Property->show_in_group && !$this->item)
-				{
-					// Используется ниже для ограничение показа значений св-в товара в модели
-					$aShowPropertyIDs[] = $oProperty->id;
-				}
-
-				$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
-
-				$oProperty->addEntity(
-					Core::factory('Core_Xml_Entity')->name('prefix')->value($oShop_Item_Property->prefix)
-				)
-				->addEntity(
-					Core::factory('Core_Xml_Entity')->name('filter')->value($oShop_Item_Property->filter)
-				)
-				->addEntity(
-					Core::factory('Core_Xml_Entity')->name('show_in_group')->value($oShop_Item_Property->show_in_group)
-				)
-				->addEntity(
-					Core::factory('Core_Xml_Entity')->name('show_in_item')->value($oShop_Item_Property->show_in_item)
-				);
-
-				$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
-					$oShop_Item_Property->Shop_Measure
-				);
-
-				// Load all values for property
-				//$oProperty->loadAllValues();
-			}
-
-			$aProperty_Dirs = $oShop_Item_Property_List->Property_Dirs->findAll();
-			foreach ($aProperty_Dirs as $oProperty_Dir)
-			{
-				$oProperty_Dir->clearEntities();
-				$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
-			}
-
-			// Список свойств товаров
-			if ($this->itemsPropertiesList)
-			{
-				$Shop_Item_Properties = Core::factory('Core_Xml_Entity')
-						->name('shop_item_properties');
-
-				$this->addEntity($Shop_Item_Properties);
-
-				$this->_addItemsPropertiesList(0, $Shop_Item_Properties);
-			}
+			$aShowPropertyIDs = $this->_itemsProperties();
 		}
 
 		if ($this->limit > 0)
@@ -847,6 +815,75 @@ class Shop_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Add list of item properties
+	 */
+	protected function _itemsProperties()
+	{
+		$oShop = $this->getEntity();
+
+		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
+
+		$aProperties = $this->group === FALSE
+			? $oShop_Item_Property_List->Properties->findAll()
+			: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
+
+		$aShowPropertyIDs = array();
+
+		foreach ($aProperties as $oProperty)
+		{
+			$oShop_Item_Property = $oProperty->Shop_Item_Property;
+
+			if ($oShop_Item_Property->show_in_item && $this->item || $oShop_Item_Property->show_in_group && !$this->item)
+			{
+				// Используется ниже для ограничение показа значений св-в товара в модели
+				$aShowPropertyIDs[] = $oProperty->id;
+			}
+
+			$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
+
+			$oProperty->addEntity(
+				Core::factory('Core_Xml_Entity')->name('prefix')->value($oShop_Item_Property->prefix)
+			)
+			->addEntity(
+				Core::factory('Core_Xml_Entity')->name('filter')->value($oShop_Item_Property->filter)
+			)
+			->addEntity(
+				Core::factory('Core_Xml_Entity')->name('show_in_group')->value($oShop_Item_Property->show_in_group)
+			)
+			->addEntity(
+				Core::factory('Core_Xml_Entity')->name('show_in_item')->value($oShop_Item_Property->show_in_item)
+			);
+
+			$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
+				$oShop_Item_Property->Shop_Measure
+			);
+
+			// Load all values for property
+			//$oProperty->loadAllValues();
+		}
+
+		$aProperty_Dirs = $oShop_Item_Property_List->Property_Dirs->findAll();
+		foreach ($aProperty_Dirs as $oProperty_Dir)
+		{
+			$oProperty_Dir->clearEntities();
+			$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
+		}
+
+		// Список свойств товаров
+		if ($this->itemsPropertiesList)
+		{
+			$Shop_Item_Properties = Core::factory('Core_Xml_Entity')
+				->name('shop_item_properties');
+
+			$this->addEntity($Shop_Item_Properties);
+
+			$this->_addItemsPropertiesList(0, $Shop_Item_Properties);
+		}
+
+		return $aShowPropertyIDs;
+	}
+
+	/**
 	 * Inc Shop_Item->showed
 	 * @return self
 	 */
@@ -923,13 +960,42 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	protected function _groupCondition()
 	{
+		$shop_group_id = !$this->parentItem
+			? intval($this->group)
+			: 0;
+
 		$this->_Shop_Items
 			->queryBuilder()
+			->open()
 			// Для модификаций ограничение по группе 0
-			->where('shop_items.shop_group_id', '=', !$this->parentItem
-				? intval($this->group)
-				: 0
-			);
+			->where('shop_items.shop_group_id', '=', $shop_group_id);
+
+		if (!$this->_selectModifications)
+		{
+			$this->_Shop_Items
+				->queryBuilder()
+				->where('shop_items.modification_id', '=', 0);
+		}
+
+		// Вывод модификаций на одном уровне в списке товаров
+		if (!$this->item && $this->modificationsList)
+		{
+			$oCore_QueryBuilder_Select_Modifications = Core_QueryBuilder::select('shop_items.id')
+				->from('shop_items')
+				->where('shop_items.shop_group_id', '=', $shop_group_id);
+			// Стандартные ограничения для товаров
+			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
+
+			$this->_Shop_Items
+				->queryBuilder()
+				->setOr()
+				->where('shop_items.shop_group_id', '=', 0)
+				->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Modifications);
+		}
+
+		$this->_Shop_Items
+			->queryBuilder()
+			->close();
 
 		return $this;
 	}
@@ -1088,13 +1154,14 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		// Ограничение на список товаров
-		!$this->item && is_null($this->tag) && $this->forbidSelectModifications();
+		//!$this->item && is_null($this->tag) && $this->forbidSelectModifications();
+		!$this->item && is_null($this->tag) && $this->_selectModifications = FALSE;
 
 		return $this;
 	}
 
 	/**
-	 * Forbids to select modifications
+	 * External forbids to select modifications. Do not execute with ->modificationsList(TRUE)
 	 * @return self
 	 */
 	public function forbidSelectModifications()
@@ -1102,6 +1169,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->_Shop_Items
 			->queryBuilder()
 			->where('shop_items.modification_id', '=', 0);
+
 		return $this;
 	}
 
@@ -1326,7 +1394,7 @@ class Shop_Controller_Show extends Core_Controller
 				if ($this->groupsProperties
 					&& (!$bIsArrayPropertiesForGroups || in_array($oShop_Group->id, $this->propertiesForGroups)))
 				{
-					$aProperty_Values = $oShop_Group->getPropertyValues();
+					$aProperty_Values = $oShop_Group->getPropertyValues(TRUE, $bIsArrayGroupsProperties ? $this->groupsProperties : array());
 
 					if ($bIsArrayGroupsProperties)
 					{

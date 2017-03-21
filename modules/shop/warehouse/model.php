@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Warehouse_Model extends Core_Entity
 {
@@ -19,6 +19,7 @@ class Shop_Warehouse_Model extends Core_Entity
 	protected $_hasMany = array(
 		'shop_item' => array('through' => 'shop_warehouse_item'),
 		'shop_warehouse_item' => array(),
+		'shop_item_reserved' => array(),
 		'shop_cart' => array(),
 	);
 
@@ -144,6 +145,8 @@ class Shop_Warehouse_Model extends Core_Entity
 
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Warehouse_Items->deleteAll(FALSE);
+		// Удаляем связи с зарезервированными, прямая связь
+		$this->Shop_Item_Reserveds->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

@@ -95,6 +95,15 @@ class Core_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get enities
+	 * @return array
+	 */
+	public function getEntities()
+	{
+		return $this->_entities;
+	}
+	
+	/**
 	 * Clear enities
 	 * @return self
 	 */

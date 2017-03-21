@@ -9,6 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - itemsProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
  * - itemsPropertiesList(TRUE) выводить список дополнительных свойств товаров, по умолчанию TRUE
+ * - taxes(TRUE|FALSE) выводить список налогов, по умолчанию FALSE
  *
  * <code>
  * $Shop_Cart_Controller_Show = new Shop_Cart_Controller_Show(
@@ -37,6 +38,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		'couponText',
 		'itemsProperties',
 		'itemsPropertiesList',
+		'taxes',
 	);
 
 	/**
@@ -84,7 +86,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 				->value($this->_oSiteuser ? $this->_oSiteuser->id : 0)
 		);
 
-		$this->itemsProperties = FALSE;
+		$this->itemsProperties = $this->taxes = FALSE;
 		$this->itemsPropertiesList = TRUE;
 	}
 
@@ -210,6 +212,11 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			$this->addEntity($oShop_Purchase_Discount->clearEntities());
 			$totalDiscount += $oShop_Purchase_Discount->getDiscountAmount();
 		}
+
+		$this->taxes && $oShop->showXmlTaxes(TRUE);
+
+		// Скидка больше суммы заказа
+		$totalDiscount > $amount && $totalDiscount = $amount;
 
 		// Total order amount
 		$this->addEntity(

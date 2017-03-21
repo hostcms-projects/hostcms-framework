@@ -5,7 +5,7 @@
  * @package HostCMS 6\User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Пользователи центра администрирования',
@@ -33,12 +33,14 @@ return array(
 	'email' => '<acronym title="Электронный адрес пользователя">Электронный адрес</acronym>',
 	'icq' => '<acronym title="Номер ICQ пользователя">ICQ</acronym>',
 	'site' => '<acronym title="Сайт пользователя">Сайт</acronym>',
+	'active' => "<acronym title=\"Активность пользователя\">Активность пользователя</acronym>",	
 	'position' => '<acronym title="Должность пользователя">Должность</acronym>',
 	'only_access_my_own' => '<acronym title="Доступ только к созданным пользователем элементам">Доступ только к созданным пользователем элементам</acronym>',
 	'read_only' => '<acronym title="Доступ только для чтения для непривилегированных пользователей">Только чтение</acronym>',
 	'markDeleted_success' => 'Пользователь успешено удален',
 	'markDeleted_error' => 'Ошибка! Пользователь не удален!',
 	'edit_success' => 'Информация о пользователе изменена!',
+	'changeActive_success' => "Информация успешно изменена",	
 	'apply_success' => 'Информация изменена!',
 	'error_superuser' => 'Ошибка! В системе должен быть хотя бы один superuser!',
 	'user_has_already_registered' => 'Ошибка! Пользователь с данным именем уже зарегистрирован!',

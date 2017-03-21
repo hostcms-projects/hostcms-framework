@@ -362,8 +362,7 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		if (Core::moduleIsActive('search'))
 		{
-			Search_Controller::indexingSearchPages(array($this->_object->indexing()
-			));
+			Search_Controller::indexingSearchPages(array($this->_object->indexing()));
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));

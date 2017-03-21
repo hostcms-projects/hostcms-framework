@@ -819,20 +819,21 @@ input.large, div.large, input.calendar_field_large, select.large {
 ::selection { background-color: #D2D2D2; color: #000}
 
 .hostcmsWindow div.section_title {
-text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
-border: 1px solid #DDDDDD;
-border-radius: 5px 5px 0px 0px;
-height: 15px;
-padding: 6px 10px;
-position: relative;
-font-weight: bold;
+	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+	border: 1px solid #DDDDDD;
+	border-radius: 5px 5px 0px 0px;
+	height: 15px;
+	padding: 6px 10px;
+	position: relative;
+	font-weight: bold;
+	clear: both;
 }
 .hostcmsWindow div.section {
-border-color: #FFFFFF #DDDDDD #DDDDDD;
-border-style: solid;
-border-width: 1px;
-margin-bottom: 15px;
-padding: 10px;
+	border-color: #FFFFFF #DDDDDD #DDDDDD;
+	border-style: solid;
+	border-width: 1px;
+	margin-bottom: 15px;
+	padding: 10px;
 }
 
 .hostcms6 div.modalwindow, .hostcmsWindow div.modalwindow {overflow:auto; margin: 7px; font-size: 9pt; color:#333}
@@ -995,6 +996,10 @@ div.fm_preview {
     color: #FFFFFF;
     outline: 0 none;
     text-decoration: none;
+}
+
+.hostcmsWindow td.importantField {
+	font-weight: bold;
 }
 
 .hostcmsWindow .CodeMirror {

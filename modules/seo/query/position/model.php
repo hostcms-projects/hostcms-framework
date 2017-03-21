@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Query_Position_Model extends Core_Entity
 {
@@ -33,7 +33,6 @@ class Seo_Query_Position_Model extends Core_Entity
 	 */
 	protected $_preloadValues = array(
 		'yandex' => 0,
-		'rambler' => 0,
 		'google' => 0,
 		'yahoo' => 0,
 		'bing' => 0,
