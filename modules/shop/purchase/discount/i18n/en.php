@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Purchase discounts',
@@ -27,8 +27,8 @@ return array(
 	'order_discount_case_and' => 'AND',
 	'order_discount_case_or' => 'OR',
 	'order_discount_case_accumulative' => 'Accumulation discount',
-	'min_count' => '<acronym title="Initial count">Initial count interval</acronym>',
-	'max_count' => '<acronym title="End count">End count interval</acronym>',
+	'min_count' => '<acronym title="Initial count">Count &gt;=</acronym>',
+	'max_count' => '<acronym title="End count">Count &lt;</acronym>',
 	'form_edit_affiliate_values_type_percent' => 'Percentage rate',
 	'form_edit_affiliate_values_type_summ' => 'Amount',
 	'shop_id' => 'Shop id',

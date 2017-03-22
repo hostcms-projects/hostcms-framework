@@ -149,7 +149,7 @@ class Core_Page extends Core_Servant_Properties
 	{
 		return $this->_children;
 	}
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -203,13 +203,11 @@ class Core_Page extends Core_Servant_Properties
 	 * @param boolean $bExternal add as link
 	 * @return string
 	 */
-	public function getCss($bExternal = TRUE)
+	protected function _getCss($bExternal = TRUE)
 	{
 		$sReturn = '';
 
-		$aTmp = array_reverse($this->css);
-
-		foreach ($aTmp as $css)
+		foreach ($this->css as $css)
 		{
 			if ($bExternal)
 			{
@@ -228,6 +226,46 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get block of linked compressed css
+	 * @return string
+	 */
+	protected function _getCssCompressed()
+	{
+		try
+		{
+			$sReturn = '';
+
+			$oCompression_Controller = Compression_Controller::instance('css');
+
+			foreach ($this->css as $css)
+			{
+				$oCompression_Controller->addCss($css);
+			}
+
+			$sPath = $oCompression_Controller->getPath();
+			$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $sPath . '?' . Core_Date::sql2timestamp($this->template->timestamp) . '" />' . "\n";
+		}
+		catch (Exception $e)
+		{
+			$sReturn = $this->_getCss();
+		}
+
+		return $sReturn;
+	}
+
+	/**
+	 * Get block of linked css
+	 * @param boolean $bExternal add as link
+	 * @return string
+	 */
+	public function getCss($bExternal = TRUE)
+	{
+		return Core::moduleIsActive('compression')
+			? $this->_getCssCompressed()
+			: $this->_getCss($bExternal);
+	}
+
+	/**
 	 * Show block of linked css
 	 * @param boolean $bExternal add as link
 	 * @return Core_Page
@@ -235,6 +273,88 @@ class Core_Page extends Core_Servant_Properties
 	public function showCss($bExternal = TRUE)
 	{
 		echo $this->getCss($bExternal);
+		return $this;
+	}
+
+	/**
+	 * Linking js
+	 * @var array
+	 */
+	public $js = array();
+
+	/**
+	 * Link js
+	 * @param string $js path
+	 * @return Core_Page
+	 */
+	public function js($js)
+	{
+		$this->js[] = $js;
+		return $this;
+	}
+
+	/**
+	 * Get block of linked js
+	 * @return string
+	 */
+	protected function _getJs()
+	{
+		$sReturn = '';
+
+		foreach ($this->js as $js)
+		{
+			$sReturn .= '<script type="text/javascript" src="' . $js . '"></script>' . "\n";
+		}
+
+		return $sReturn;
+	}
+
+	/**
+	 * Get block of linked compressed js
+	 * @return string
+	 */
+	protected function _getJsCompressed()
+	{
+		try
+		{
+			$sReturn = '';
+
+			$oCompression_Controller = Compression_Controller::instance('js');
+
+			foreach ($this->js as $js)
+			{
+				$oCompression_Controller->addJs($js);
+			}
+
+			$sPath = $oCompression_Controller->getPath();
+			$sReturn .= '<script type="text/javascript" src="' . $sPath . '"></script>' . "\n";
+		}
+		catch (Exception $e)
+		{
+			$sReturn = $this->_getJs();
+		}
+
+		return $sReturn;
+	}
+
+	/**
+	 * Get block of linked js
+	 * @return string
+	 */
+	public function getJs()
+	{
+		return Core::moduleIsActive('compression')
+			? $this->_getJsCompressed()
+			: $this->_getJs();
+	}
+
+	/**
+	 * Show block of linked js
+	 * @return Core_Page
+	 */
+	public function showJs()
+	{
+		echo $this->getJs();
 		return $this;
 	}
 
@@ -275,12 +395,18 @@ class Core_Page extends Core_Servant_Properties
 	 */
 	public function addTemplates(Template_Model $oTemplate)
 	{
+		$aCss = array();
+
 		do {
 			$this
-				->css($oTemplate->getTemplateCssFileHref())
+				//->css($oTemplate->getTemplateCssFileHref())
 				->addChild($oTemplate);
 
+			$aCss[] = $oTemplate->getTemplateCssFileHref();
+
 		} while($oTemplate = $oTemplate->getParent());
+
+		$this->css = array_merge($this->css, array_reverse($aCss));
 
 		return $this;
 	}

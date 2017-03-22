@@ -34,8 +34,8 @@ class Skin_Hostcms5 extends Core_Skin
 			->addJs('/admin/js/main.js')
 			->addJs('/admin/js/hostcms6.js')
 			->addJs('/admin/js/ui/jquery-ui.js')
+			->addJs('/modules/skin/default/js/default-hostcms.js')
 			->addJs('/admin/js/ui/i18n/jquery.ui.datepicker-' . $lng . '.js')
-			->addJs('/admin/js/ui/functions.js')
 			->addJs('/admin/js/ui/jquery-HostCMSWindow.js')
 			->addJs('/admin/js/ui/timepicker/timepicker.js')
 			->addJs('/admin/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
@@ -171,7 +171,7 @@ class Skin_Hostcms5 extends Core_Skin
 <div class="left_box">
 
 <div class="logo"><a href="/admin/"
-<?php echo (isset($_SESSION['valid_user']) ? 'onclick="'."$.adminLoad({path: '/admin/index.php'}); return false".'"' : '')?>><img
+<?php echo isset ($_SESSION['valid_user']) ? 'onclick="'."$.adminLoad({path: '/admin/index.php'}); return false".'"' : ''?>><img
 	src="/admin/images/logo.gif" alt="(^) HostCMS"
 	title="HostCMS <?php echo (isset($_SESSION["valid_user"])) ? 'v. ' . strip_tags(CURRENT_VERSION) : ''?>" /></a>
 </div>
@@ -290,10 +290,10 @@ if (Core_Auth::logged())
 			<form method="post" action="/admin/index.php" id="authorization" style="padding: 15px">
 
 				<div><?php echo Core::_('Admin.authorization_form_login')?>:</div>
-				<div><input type="text" name="login" id="login" class="large"></div>
+				<div><input type="text" name="login" id="login" class="input-lg"></div>
 
 				<div style="margin-top: 10px"><?php echo Core::_('Admin.authorization_form_password')?>:</div>
-				<div><input type="password" name="password" class="large"></div>
+				<div><input type="password" name="password" class="input-lg"></div>
 
 				<div><input type="checkbox" name="ip" id="ip" class="checkbox_authorization" checked="checked">&nbsp;<label for="ip"><?php echo Core::_('Admin.authorization_form_ip')?></label></div>
 
@@ -327,11 +327,11 @@ if (Core_Auth::logged())
 if (Core_Auth::logged())
 {
 	// Список основных меню
-	$aCore_Config = Core::$mainConfig;
+	$aSkin_Config = Core_Config::instance()->get('skin_hostcms5_config');
 
 	$oUser = Core_Entity::factory('User')->getCurrent();
 
-	if (isset($aCore_Config['adminMenu']))
+	if (isset($aSkin_Config['adminMenu']))
 	{
 		$aModules = $this->_getAllowedModules();
 		foreach ($aModules as $oModule)
@@ -342,7 +342,7 @@ if (Core_Auth::logged())
 			{
 				foreach ($oCore_Module->menu as $aMenu)
 				{
-					$aCore_Config['adminMenu']
+					$aSkin_Config['adminMenu']
 						[$aMenu['block']]
 						['sub'][] = $aMenu + array('sorting' => 0, 'block' => 0);
 				}
@@ -352,7 +352,7 @@ if (Core_Auth::logged())
 		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
 			->id('MainMenu');
 
-		foreach ($aCore_Config['adminMenu'] as $key => $aAdminMenu)
+		foreach ($aSkin_Config['adminMenu'] as $key => $aAdminMenu)
 		{
 			$aAdminMenu += array(
 				'image' => '/admin/images/system.gif'
@@ -374,7 +374,7 @@ if (Core_Auth::logged())
 					->add(
 						Core::factory('Core_Html_Entity_Span')
 							->onclick("SubMenu('id_{$key}')")
-							->value(nl2br(htmlspecialchars(Core::_("Core.admin_menu_{$key}"))))
+							->value(nl2br(htmlspecialchars(Core::_("Skin_Hostcms5.admin_menu_{$key}"))))
 					);
 
 				// Sub menu

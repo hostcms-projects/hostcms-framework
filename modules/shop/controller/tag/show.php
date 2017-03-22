@@ -88,8 +88,8 @@ class Shop_Controller_Tag_Show extends Core_Controller
 			->select(array('COUNT(tag_id)', 'count'), 'tags.*')
 			//->from('tag_shop_items')
 			//->leftJoin('tags', 'tag_shop_items.tag_id', '=', 'tags.id')
-			->leftJoin('tag_shop_items', 'tag_shop_items.tag_id', '=', 'tags.id')
-			->leftJoin('shop_items', 'tag_shop_items.shop_item_id', '=', 'shop_items.id')
+			->join('tag_shop_items', 'tag_shop_items.tag_id', '=', 'tags.id')
+			->join('shop_items', 'tag_shop_items.shop_item_id', '=', 'shop_items.id')
 			->leftJoin('shop_groups', 'shop_items.shop_group_id', '=', 'shop_groups.id',
 				array(
 					array('AND' => array('shop_groups.siteuser_group_id', 'IN', $aSiteuserGroups)),
@@ -99,7 +99,7 @@ class Shop_Controller_Tag_Show extends Core_Controller
 			->where('shop_items.siteuser_group_id', 'IN', $aSiteuserGroups)
 			->where('shop_items.shop_id', '=', $oShop->id)
 			->where('shop_items.deleted', '=', 0)
-			->where('tags.deleted', '=', 0)
+			//->where('tags.deleted', '=', 0)
 			->groupBy('tag_shop_items.tag_id')
 			->having('count', '>', 0)
 			->orderBy('tags.name', 'ASC');

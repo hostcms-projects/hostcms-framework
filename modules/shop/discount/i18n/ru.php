@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Скидки',
@@ -26,9 +26,9 @@ return array(
 	'shop_not_apply_modification_discount' => "Отменить у модификаций",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
-'edit_success' => "Данные о скидке успешно обновлены!",
-'markDeleted_success' => "Данные о скидке успешно удалены!",
-'changeStatus_success' => "Информация успешно изменена",
-'item_discount_name' => "<acronym title=\"Список скидок\">Название скидки</acronym>",
-'description' => "<acronym title=\"Описание скидки\">Описание скидки</acronym>",
+	'edit_success' => "Данные о скидке успешно обновлены!",
+	'markDeleted_success' => "Данные о скидке успешно удалены!",
+	'changeStatus_success' => "Информация успешно изменена",
+	'item_discount_name' => "<acronym title=\"Список скидок\">Название скидки</acronym>",
+	'description' => "<acronym title=\"Описание скидки\">Описание скидки</acronym>",
 );

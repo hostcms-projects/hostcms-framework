@@ -108,7 +108,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('name')
 					->value($this->_object->name)
 					->caption(Core::_('Informationsystem_Item.name'))
-					->class('large');
+					->class('input-lg');
 
 				$oMainTab->addBefore($oName, $oSelect_Group);
 

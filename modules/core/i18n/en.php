@@ -6,14 +6,9 @@
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
-	'admin_menu_0' => 'Site structure',
-	'admin_menu_1' => 'Services',
-	'admin_menu_2' => 'Users',
-	'admin_menu_3' => 'Administration',
-
 	'error_file_write' => 'Error while opening file to write %s; check your access rights to folder.',
 	'error_resize' => 'Error while minimizing small image to maximum permissible size. Image size you specified is probably less than 0.',
 	'error_upload' => 'File not uploaded!',

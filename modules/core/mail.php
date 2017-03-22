@@ -131,7 +131,24 @@ abstract class Core_Mail
 		$this->_separator = $separator;
 		return $this;
 	}
-
+	
+	/**
+	 * The chunk length.
+	 * @var string
+	 */
+	protected $_chunklen = 76;
+	
+	/**
+	 * Set chunk length
+	 * @param int $chunklen The chunk length
+	 * @return self
+	 */
+	public function chunklen($chunklen)
+	{
+		$this->_chunklen = $chunklen;
+		return $this;
+	}
+	
 	/**
 	 * Mail TO field
 	 * @var string
@@ -365,7 +382,7 @@ abstract class Core_Mail
 		$content .= "Content-Transfer-Encoding: base64";
 		$content .= $sDoubleSeparators;
 		//$content .= str_replace("\r", "", $this->_message);
-		$content .= chunk_split(base64_encode($this->_message));
+		$content .= chunk_split(base64_encode($this->_message), $this->_chunklen, $this->_separator);
 		$content .= $sDoubleSeparators;
 
 		if (count($this->_files) > 0)
@@ -400,7 +417,7 @@ abstract class Core_Mail
 						$content .= " filename=\"{$filename}\"";
 						$content .= $sDoubleSeparators;
 
-						$content .= chunk_split(base64_encode(Core_File::read($value['filepath'])));
+						$content .= chunk_split(base64_encode(Core_File::read($value['filepath'])), $this->_chunklen, $this->_separator);
 					}
 					catch (Exception $e){}
 				}

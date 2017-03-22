@@ -1153,7 +1153,7 @@ class Shop_Order_Model extends Core_Entity
 		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
 		$oAddressField->addChild('Тип', 'Улица');
 		$oAddressField->addChild('Значение', $this->address);
-		$oAddressContacts = $oContractorAddress->addChild('Контакты');
+		$oAddressContacts = $oContractor->addChild('Контакты');
 		$oContact = $oAddressContacts->addChild('Контакт');
 		$oContact->addChild('Тип','Почта');
 		$oContact->addChild('Значение',$this->email);

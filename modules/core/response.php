@@ -178,12 +178,16 @@ class Core_Response
 	 * $oCore_Response->compress();
 	 * </code>
 	 * @return Core_Response
+	 * @hostcms-event Core_Response.onBeforeCompress
+	 * @hostcms-event Core_Response.onAfterCompress
 	 */
 	public function compress()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeCompress', $this);
+
 		if (Core::moduleIsActive('compression'))
 		{
-			$oCompression_Controller = Compression_Controller::instance();
+			$oCompression_Controller = Compression_Controller::instance('http');
 
 			if ($oCompression_Controller->compressionAllowed())
 			{
@@ -196,6 +200,9 @@ class Core_Response
 				}
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterCompress', $this);
+
 		return $this;
 	}
 
@@ -206,9 +213,13 @@ class Core_Response
 	 * $oCore_Response->sendHeaders();
 	 * </code>
 	 * @return Core_Response
+	 * @hostcms-event Core_Response.onBeforeSendHeaders
+	 * @hostcms-event Core_Response.onAfterSendHeaders
 	 */
 	public function sendHeaders()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeSendHeaders', $this);
+
 		if (isset(self::$_httpStatusCode[$this->_status]))
 		{
 			$sHttpStatusCode = self::$_httpStatusCode[$this->_status];
@@ -237,6 +248,8 @@ class Core_Response
 			header($value[0] . ': ' . str_replace(array("\r", "\n"), '', $value[1]));
 		}
 
+		Core_Event::notify(get_class($this) . '.onAfterSendHeaders', $this);
+
 		return $this;
 	}
 
@@ -249,6 +262,16 @@ class Core_Response
 	{
 		return $this->_headers;
 	}
+
+	/**
+	 * Get body
+	 *
+	 * @return string
+	 */
+	public function getBody()
+	{
+		return $this->_body;
+	}
 	
 	/**
 	 * Show response body
@@ -257,6 +280,8 @@ class Core_Response
 	 * $oCore_Response->showBody();
 	 * </code>
 	 * @return Core_Response
+	 * @hostcms-event Core_Response.onBeforeShowBody
+	 * @hostcms-event Core_Response.onAfterShowBody
 	 */
 	public function showBody()
 	{

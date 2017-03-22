@@ -64,7 +64,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Action.action_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
-					->class('large')
+					->class('input-lg')
 					->format(
 						array(
 							'maxlen' => array('value' => 255),

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Discounts',
@@ -26,9 +26,9 @@ return array(
 	'shop_not_apply_modification_discount' => "Cancel to modifications",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-'edit_success' => "Discount information edited successfully!",
-'markDeleted_success' => "Discount information deleted successfully!",
-'changeStatus_success' => "Information has been successfully changed",
-'item_discount_name' => "<acronym title=\"Discounts list\">Discount name</acronym>",
-'description' => "<acronym title=\"Description of the discount\">Description of the discount</acronym>",
+	'edit_success' => "Discount information edited successfully!",
+	'markDeleted_success' => "Discount information deleted successfully!",
+	'changeStatus_success' => "Information has been successfully changed",
+	'item_discount_name' => "<acronym title=\"Discounts list\">Discount name</acronym>",
+	'description' => "<acronym title=\"Description of the discount\">Description of the discount</acronym>",
 );

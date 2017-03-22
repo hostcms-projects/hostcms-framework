@@ -171,7 +171,7 @@ input[type="button"]
 }
 
 /* Большое поле ввода центра администрирования */
-input.large, div.large, input.calendar_field_large, select.large {
+input.input-lg, div.input-lg, input.calendar_field_large, select.input-lg {
 	font-size: 14pt;
 }
 .hostcmsWindow button{font-family:Verdana, 'MS Sans Serif', Arial, sans-serif;border:1px solid #777;background-color:#f7f7f7;cursor:pointer;margin-right:8px;color:#000;font-size:9pt;margin-top:10px}
@@ -229,8 +229,16 @@ input.large, div.large, input.calendar_field_large, select.large {
 .hostcmsWindow .admin_table .row_odd .hl{background-color:#EEE}
 .hostcmsWindow .admin_table .row:hover,.hostcmsWindow .admin_table .row_odd:hover{background-color:#E5E5E5}
 .hostcmsWindow .row td,.hostcmsWindow .admin_td,.hostcmsWindow .row_odd td{padding-left:4px;padding-right:4px;padding-bottom:2px;border-bottom:1px;border-bottom-style:solid;overflow:hidden;border-color:#ddd}
-.hostcmsWindow .admin_table .highlight_row{background-color:#F2F0EB}
-.hostcmsWindow .admin_table .highlight_row_odd{background-color:#E2E0DB}
+
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > td,
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > th {
+  background-color: #E2E0DB;
+}
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(odd) > td,
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(odd) > th {
+  background-color: #F2F0EB;
+}
+
 .hostcmsWindow .report_height td{height:25px}
 .hostcmsWindow .success{color:#393}
 .hostcmsWindow .warning{color:#EBB100}

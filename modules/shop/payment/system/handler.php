@@ -450,7 +450,7 @@ abstract class Shop_Payment_System_Handler
 			$oShop_Order_Item->quantity = 1;
 
 			$discountAmount = $oShop_Purchase_Discount->getDiscountAmount();
-			
+
 			// Скидка больше суммы заказа
 			$discountAmount > $amount && $discountAmount = $amount;
 
@@ -477,6 +477,16 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Get delivery name
+	 * @param Shop_Delivery_Model $oShop_Delivery
+	 * @return string
+	 */
+	protected function _getDeliveryName(Shop_Delivery_Model $oShop_Delivery)
+	{
+		return Core::_('Shop_Delivery.delivery', $oShop_Delivery->name);
+	}
+
+	/**
 	 * Add a delivery into the order
 	 * @return self
 	 * @hostcms-event Shop_Payment_System_Handler.onBeforeAddDelivery
@@ -496,7 +506,8 @@ abstract class Shop_Payment_System_Handler
 			if ($shop_delivery_condition_id)
 			{
 				$oShop_Delivery_Condition = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id);
-				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
+
+				$oShop_Delivery = $oShop_Delivery_Condition->Shop_Delivery;
 
 				$aPrice = $oShop_Delivery_Condition->getPriceArray();
 				$price = $aPrice['price'];
@@ -509,7 +520,6 @@ abstract class Shop_Payment_System_Handler
 			else
 			{
 				$oShop_Delivery = Core_Entity::factory('Shop_Delivery', $shop_delivery_id);
-				$name = Core::_('Shop_Delivery.delivery', $oShop_Delivery->name);
 
 				$price = floatval(Core_Array::get($this->_orderParams, 'shop_delivery_price', 0));
 				$rate = intval(Core_Array::get($this->_orderParams, 'shop_delivery_rate', 0));
@@ -522,7 +532,7 @@ abstract class Shop_Payment_System_Handler
 			}
 
 			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
-			$oShop_Order_Item->name = $name;
+			$oShop_Order_Item->name = $this->_getDeliveryName($oShop_Delivery);
 			$oShop_Order_Item->quantity = 1;
 			$oShop_Order_Item->rate = $rate;
 			$oShop_Order_Item->price = $price;

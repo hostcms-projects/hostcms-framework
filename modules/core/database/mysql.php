@@ -572,12 +572,9 @@ class Core_DataBase_Mysql extends Core_DataBase
 			$query .= ' LIKE ' . $this->quote($selectionCondition);
 		}
 
-		//$result = mysql_query($query, $this->_connection);
 		$result = $this->query($query)->asAssoc()->result();
 
 		$return = array();
-
-		//while ($row = mysql_fetch_assoc($result))
 		foreach ($result as $row)
 		{
 			$column = $this->getColumnType($row['Type']);

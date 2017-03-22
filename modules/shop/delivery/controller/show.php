@@ -110,7 +110,9 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 							$object->description = NULL;
 						}
 
-						$_SESSION['hostcmsOrder']['deliveries'][$key] = array(
+						$sIndex = $oShop_Delivery->id . '-' . $key;
+						
+						$_SESSION['hostcmsOrder']['deliveries'][$sIndex] = array(
 							'shop_delivery_id' => $oShop_Delivery->id,
 							'price' => $object->price,
 							'rate' => (isset($object->rate) ? intval($object->rate) : 0),
@@ -119,7 +121,7 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 						$oShop_Delivery_Condition = Core::factory('Core_Xml_Entity')
 							->name('shop_delivery_condition')
-							->addAttribute('id', $key . '#')
+							->addAttribute('id', $sIndex . '#')
 							->addEntity(
 								Core::factory('Core_Xml_Entity')->name('shop_delivery_id')->value($oShop_Delivery->id)
 							)->addEntity(

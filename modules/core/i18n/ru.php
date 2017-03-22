@@ -6,14 +6,9 @@
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
-	'admin_menu_0' => 'Структура сайта',
-	'admin_menu_1' => 'Сервисы',
-	'admin_menu_2' => 'Пользователи',
-	'admin_menu_3' => 'Системные функции',
-
 	'error_file_write' => 'Ошибка открытия файла для записи %s, проверьте права доступа к директории.',
 	'error_resize' => 'Ошибка уменьшения малого изображения до максимально допустимого размера. Вероятной причиной является указание размера изображения меньше 0.',
 	'error_upload' => 'Файл не загружен!',

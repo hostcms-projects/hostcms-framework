@@ -352,7 +352,7 @@ class Typograph_Controller
 		$str = preg_replace("/(\d) %/u", "\\1%", $str);
 
 		// Убираем лишние пробелы
-		while (mb_strpos($str, "  ") !== false)
+		while (mb_strpos($str, "  ") !== FALSE)
 		{
 			$str = str_replace("  ", " ", $str);
 		}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Curl extends Core_Http
 {
@@ -23,19 +23,40 @@ class Core_Http_Curl extends Core_Http
 	{
 		$curl = @curl_init();
 
+		// Предотвращаем chunked-ответ
+		curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+
 		curl_setopt($curl, CURLOPT_URL, "http://{$host}{$path}{$query}");
 
-		if ($this->_method == 'GET')
+		switch ($this->_method)
 		{
-			curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
-			curl_setopt($curl, CURLOPT_POST, FALSE);
-		}
-		else
-		{
-			curl_setopt($curl, CURLOPT_POST, TRUE);
-			curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
+			case 'GET':
+				curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
+				curl_setopt($curl, CURLOPT_POST, FALSE);
+			break;
 
-			count($this->_data) && curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_data);
+			case 'PUT':
+				curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
+				curl_setopt($curl, CURLOPT_POST, FALSE);
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+			break;
+
+			default:
+				curl_setopt($curl, CURLOPT_POST, TRUE);
+				curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
+			break;
+		}
+
+		if ($this->_method != 'GET')
+		{
+			if ($this->_rawData)
+			{
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_rawData);
+			}
+			else
+			{
+				count($this->_data) && curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_data);
+			}
 		}
 
 		foreach ($this->_config['options'] as $optionName => $optionValue)

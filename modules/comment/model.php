@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Model extends Core_Entity
 {
@@ -72,6 +72,40 @@ class Comment_Model extends Core_Entity
 	protected $_forbiddenTags = array(
 		'datetime'
 	);
+
+	/**
+	 * Date format.
+	 * @var string
+	 */
+	protected $_dateFormat = NULL;
+
+	/**
+	 * Set date format
+	 * @param string $dateFormat
+	 * @return self
+	 */
+	public function dateFormat($dateFormat)
+	{
+		$this->_dateFormat = $dateFormat;
+		return $this;
+	}
+
+	/**
+	 * DateTime format.
+	 * @var string
+	 */
+	protected $_dateTimeFormat = NULL;
+
+	/**
+	 * Set DateTime format
+	 * @param string $dateTimeFormat
+	 * @return self
+	 */
+	public function dateTimeFormat($dateTimeFormat)
+	{
+		$this->_dateTimeFormat = $dateTimeFormat;
+		return $this;
+	}
 
 	/**
 	 * Constructor.
@@ -259,8 +293,8 @@ class Comment_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags()
-			->addXmlTag('date', Core_Date::sql2date($this->datetime))
-			->addXmlTag('datetime', Core_Date::sql2datetime($this->datetime));
+			->addXmlTag('date', strftime($this->_dateFormat, Core_Date::sql2timestamp($this->datetime)))
+			->addXmlTag('datetime', strftime($this->_dateTimeFormat, Core_Date::sql2timestamp($this->datetime)));
 
 		if ($this->siteuser_id && Core::moduleIsActive('siteuser'))
 		{

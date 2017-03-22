@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 {
@@ -42,7 +42,7 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 	 */
 	public function execute()
 	{
-		$aDefaultDivAttr = array('class' => 'large item_div item_div_as_is');
+		$aDefaultDivAttr = array('class' => 'input-lg item_div item_div_as_is');
 
 		$this->divAttr = Core_Array::union($this->divAttr, $aDefaultDivAttr);
 

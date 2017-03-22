@@ -1831,8 +1831,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			}
 			
 			$aTagsName = array();
-			if(!$this->_oCurrentItem->id)
-			{
+			/*if(!$this->_oCurrentItem->id)
+			{*/
 				if (Core::moduleIsActive('tag'))
 				{
 					$oTag = Core_Entity::factory('Tag');
@@ -1902,7 +1902,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						$this->_oCurrentItem->id && $this->_oCurrentItem->applyTags($this->_sCurrentTags);
 					}
 				}
-			}
+			//}
 			
 			if ($this->_oCurrentItem->seo_keywords == '' && count($aTagsName) > 0)
 			{

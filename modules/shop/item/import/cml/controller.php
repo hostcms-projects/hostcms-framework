@@ -182,6 +182,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			$oShop_Item_Property_List->add($oProperty);
 		}
+		$xxx = $oShopItem->modification_id == 0
+			? intval($oShopItem->Shop_Group->id)
+			: intval($oShopItem->Modification->Shop_Group->id);
 		$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
 			? intval($oShopItem->Shop_Group->id)
 			: intval($oShopItem->Modification->Shop_Group->id)
@@ -562,18 +565,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 								$oShop_Item_Property_List->add($oProperty);
 							}
-
-							if (is_null(Core_Entity::factory('Shop', $oShop->id)
-								->Shop_Item_Property_For_Groups
-								->getByShopItemPropertyIdAndGroupId($oProperty->Shop_Item_Property->id, $oShopItem->shop_group_id)))
-							{
-								// Свойство не доступно текущей группе, делаем его доступным
-								Core_Entity::factory('Shop_Item_Property_For_Group')
-									->shop_group_id($oShopItem->shop_group_id)
-									->shop_item_property_id($oProperty->Shop_Item_Property->id)
-									->shop_id($oShop->id)
-									->save();
-							}
+							
+							$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
+								? intval($oShopItem->Shop_Group->id)
+								: intval($oShopItem->Modification->Shop_Group->id)
+							));
 
 							$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
 

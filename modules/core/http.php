@@ -137,6 +137,23 @@ abstract class Core_Http
 	}
 
 	/**
+	 * Request Raw Data
+	 * @var string
+	 */
+	protected $_rawData = NULL;
+
+	/**
+	 * Set Raw request data
+	 * @param string $data Raw data
+	 * @return self
+	 */
+	public function rawData($data)
+	{
+		$this->_rawData = $data;
+		return $this;
+	}
+	
+	/**
 	 * Request User-Agent
 	 * @var string
 	 */

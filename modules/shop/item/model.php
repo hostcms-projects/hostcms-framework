@@ -858,13 +858,18 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function deleteLargeImage()
 	{
-		try
+		$fileName = $this->getLargeFilePath();
+		if ($this->image_large != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getLargeFilePath());
-		} catch (Exception $e) {}
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
 
-		$this->image_large = '';
-		return $this->save();
+			$this->image_large = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -873,13 +878,18 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function deleteSmallImage()
 	{
-		try
+		$fileName = $this->getSmallFilePath();
+		if ($this->image_small != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getSmallFilePath());
-		} catch (Exception $e) {}
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
 
-		$this->image_small = '';
-		return $this->save();
+			$this->image_small = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -1441,6 +1451,23 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
+	 * Show votes in XML
+	 * @var boolean
+	 */
+	protected $_showXmlVotes = FALSE;
+
+	/**
+	 * Add votes XML to item
+	 * @param boolean $showXmlSiteuser mode
+	 * @return self
+	 */
+	public function showXmlVotes($showXmlVotes = TRUE)
+	{
+		$this->_showXmlVotes = $showXmlVotes;
+		return $this;
+	}
+	
+	/**
 	 * Show siteuser properties in XML
 	 * @var boolean
 	 */
@@ -1546,7 +1573,7 @@ class Shop_Item_Model extends Core_Entity
 
 		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getItemHref());
 
-		if (Core::moduleIsActive('siteuser'))
+		if ($this->_showXmlVotes && Core::moduleIsActive('siteuser'))
 		{
 			$aRate = Vote_Controller::instance()->getRateByObject($this);
 
@@ -1585,7 +1612,9 @@ class Shop_Item_Model extends Core_Entity
 		!isset($this->_forbiddenTags['rest']) && $this->addXmlTag('rest', $this->getRest());
 
 		// Reserved
-		$oShop->reserve && !isset($this->_forbiddenTags['reserved']) && $this->addXmlTag('reserved', $this->getReserved());
+		!isset($this->_forbiddenTags['reserved']) && $this->addXmlTag('reserved', $oShop->reserve
+			? $this->getReserved()
+			: 0);
 
 		// Prices
 		$oShop_Item_Controller = new Shop_Item_Controller();
@@ -1878,6 +1907,8 @@ class Shop_Item_Model extends Core_Entity
 				$parentObject->addEntity($oComment
 					->clearEntities()
 					->showXmlProperties($this->_showXmlSiteuserProperties)
+					->dateFormat($this->Shop->format_date)
+					->dateTimeFormat($this->Shop->format_datetime)
 				);
 
 				$this->_addComments($oComment->id, $oComment);

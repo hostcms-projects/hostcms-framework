@@ -213,7 +213,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oNameField = $this->getField('name');
 
-				$oNameField->class("large")
+				$oNameField->class('input-lg')
 				->format(
 					array(
 						//'maxlen' => array('value' => 255),

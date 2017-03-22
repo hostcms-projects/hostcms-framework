@@ -66,10 +66,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						 $this->getField('name')
 					);
 
-					$oTextarea_TagName = Admin_Form_Entity::factory('Textarea');
-
-					$oTextarea_TagName
-						//->value()
+					$oTextarea_TagName = Admin_Form_Entity::factory('Textarea')
 						->cols(140)
 						->rows(5)
 						->caption(Core::_('Tag.add_tag_name'))

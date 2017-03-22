@@ -340,13 +340,18 @@ class Shop_Group_Model extends Core_Entity
 	 */
 	public function deleteLargeImage()
 	{
-		try
+		$fileName = $this->getLargeFilePath();
+		if ($this->image_large != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getLargeFilePath());
-		} catch (Exception $e) {}
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
 
-		$this->image_large = '';
-		return $this->save();
+			$this->image_large = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -355,13 +360,18 @@ class Shop_Group_Model extends Core_Entity
 	 */
 	public function deleteSmallImage()
 	{
-		try
+		$fileName = $this->getSmallFilePath();
+		if ($this->image_small != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getSmallFilePath());
-		} catch (Exception $e) {}
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
 
-		$this->image_small = '';
-		return $this->save();
+			$this->image_small = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**

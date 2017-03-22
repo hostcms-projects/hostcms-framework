@@ -617,12 +617,18 @@ class Informationsystem_Item_Model extends Core_Entity
 	 */
 	public function deleteLargeImage()
 	{
-		try
+		$fileName = $this->getLargeFilePath();
+		if ($this->image_large != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getLargeFilePath());
-		} catch (Exception $e) {}
-		$this->image_large = '';
-		return $this->save();
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
+
+			$this->image_large = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -631,12 +637,18 @@ class Informationsystem_Item_Model extends Core_Entity
 	 */
 	public function deleteSmallImage()
 	{
-		try
+		$fileName = $this->getSmallFilePath();
+		if ($this->image_small != '' && is_file($fileName))
 		{
-			Core_File::delete($this->getSmallFilePath());
-		} catch (Exception $e) {}
-		$this->image_small = '';
-		return $this->save();
+			try
+			{
+				Core_File::delete($fileName);
+			} catch (Exception $e) {}
+
+			$this->image_small = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -659,7 +671,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		{
 			Search_Controller::indexingSearchPages(array($this->indexing()));
 		}
-		
+
 		return $this;
 	}
 
@@ -997,6 +1009,23 @@ class Informationsystem_Item_Model extends Core_Entity
 	}
 
 	/**
+	 * Show votes in XML
+	 * @var boolean
+	 */
+	protected $_showXmlVotes = FALSE;
+
+	/**
+	 * Add votes XML to item
+	 * @param boolean $showXmlSiteuser mode
+	 * @return self
+	 */
+	public function showXmlVotes($showXmlVotes = TRUE)
+	{
+		$this->_showXmlVotes = $showXmlVotes;
+		return $this;
+	}
+
+	/**
 	 * Show siteuser properties in XML
 	 * @var boolean
 	 */
@@ -1109,7 +1138,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			unset($aParts);
 		}
 
-		if (Core::moduleIsActive('siteuser'))
+		if ($this->_showXmlVotes && Core::moduleIsActive('siteuser'))
 		{
 			$aRate = Vote_Controller::instance()->getRateByObject($this);
 
@@ -1262,9 +1291,12 @@ class Informationsystem_Item_Model extends Core_Entity
 		{
 			foreach ($this->_aComments[$parent_id] as $oComment)
 			{
-				$parentObject->addEntity($oComment
-					->clearEntities()
-					->showXmlProperties($this->_showXmlSiteuserProperties)
+				$parentObject->addEntity(
+					$oComment
+						->clearEntities()
+						->showXmlProperties($this->_showXmlSiteuserProperties)
+						->dateFormat($this->InformationSystem->format_date)
+						->dateTimeFormat($this->InformationSystem->format_datetime)
 				);
 
 				$this->_addComments($oComment->id, $oComment);

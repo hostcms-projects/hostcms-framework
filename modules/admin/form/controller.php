@@ -315,7 +315,7 @@ class Admin_Form_Controller
 		// Set link to controller
 		$oAdmin_Form_Entity->controller($this);
 
-		Core_Event::notify(get_class($this) . '.onBeforeAddEntity', $this, array($oAdmin_Form_Entity));
+		Core_Event::notify('Admin_Form_Controller.onBeforeAddEntity', $this, array($oAdmin_Form_Entity));
 
 		$this->_children[] = $oAdmin_Form_Entity;
 		return $this;
@@ -432,6 +432,25 @@ class Admin_Form_Controller
 	public function showOperations($showOperations)
 	{
 		$this->_showOperations = $showOperations;
+		return $this;
+	}
+
+	/**
+	 * List of filter handlers
+	 * @var array
+	 */
+	protected $_filterCallbacks = array();
+
+	/**
+	 * Добавление функции обратного вызова, используемой для корректировки переданного значения
+	 *
+	 * @param string $fieldName field name
+	 * @param string $function function name
+	 * @return self
+	 */
+	public function addFilterCallback($fieldName, $function)
+	{
+		$this->_filterCallbacks[$fieldName] = $function;
 		return $this;
 	}
 
@@ -935,7 +954,7 @@ class Admin_Form_Controller
 				->style('clear: both')
 				->execute();
 		}
-		
+
 		return $this;
 	}
 
@@ -1179,7 +1198,7 @@ class Admin_Form_Controller
 	protected function _showFormTitle()
 	{
 		// Заголовок формы
-		if (!is_null($this->_pageTitle) && strlen($this->_pageTitle) > 0)
+		if (strlen($this->_pageTitle) > 0)
 		{
 			// Заголовок
 			Admin_Form_Entity::factory('Title')
@@ -1686,6 +1705,14 @@ class Admin_Form_Controller
 					$fieldName = $oAdmin_Form_Field->name;
 
 					$sFilterValue = Core_Array::get($this->request, "admin_form_filter_{$oAdmin_Form_Field->id}", NULL);
+
+					// Функция обратного вызова для значения в фильтре
+					if (isset($this->_filterCallbacks[$oAdmin_Form_Field->name]))
+					{
+						$sFilterValue = call_user_func(
+							$this->_filterCallbacks[$oAdmin_Form_Field->name], $sFilterValue, $oAdmin_Form_Field
+						);
+					}
 
 					if ($fieldName != '')
 					{

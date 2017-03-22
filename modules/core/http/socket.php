@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Socket extends Core_Http
 {
@@ -21,7 +21,12 @@ class Core_Http_Socket extends Core_Http
 	 */
 	protected function _execute($host, $path, $query)
 	{
-		$fp = @fsockopen($host, $this->_port, $errno, $errstr, $this->_timeout);
+		// для 443 порта в fsockopen перед хостом нужно добавлять ssl://
+		$socketHost = $this->_port == 443
+			? 'ssl://' . $host
+			: $host;
+
+		$fp = @fsockopen($socketHost, $this->_port, $errno, $errstr, $this->_timeout);
 
 		if (!$fp)
 		{
@@ -43,17 +48,24 @@ class Core_Http_Socket extends Core_Http
 
 		$out .= "Host: {$host}\r\n";
 
-		$bIsPost = count($this->_data) > 0;
+		$bIsPost = $this->_method != 'GET' && ($this->_rawData || count($this->_data) > 0);
 
 		if ($bIsPost)
 		{
-			$aData = array();
-			foreach ($this->_data as $key => $value)
+			if ($this->_rawData)
 			{
-				$aData[] = urlencode($key) . '=' . urlencode($value);
+				$sPost = $this->_rawData;
 			}
+			else
+			{
+				$aData = array();
+				foreach ($this->_data as $key => $value)
+				{
+					$aData[] = urlencode($key) . '=' . urlencode($value);
+				}
 
-			$sPost = implode('&', $aData);
+				$sPost = implode('&', $aData);
+			}
 
 			$out .= "Content-length: " . strlen($sPost) . "\r\n";
 		}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Inflection
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Inflection_Ru extends Core_Inflection
 {
@@ -46,21 +46,59 @@ class Core_Inflection_Ru extends Core_Inflection
 			return self::$pluralIrregular[$word];
 		}
 
-		if (is_null($count))
+		if (strlen($word))
 		{
-			$word = $word . 'ы';
-		}
+			$lastChar = mb_substr($word, -1, 1);
 
-		/*
-		foreach (self::$rules as $pattern => $replacement)
-		{
-			$word = preg_replace($pattern, $replacement, $word, 1, $replaceCount);
+			$nominative = $lastChar;
+			$cutWord = mb_substr($word, 0, -1);
 
-            if ($replaceCount)
+			switch ($lastChar)
 			{
-                return $word;
-            }
-		}*/
+				case 'й':
+					$singular = 'я';
+					$plural = 'ев';
+				break;
+				case 'а':
+					$singular = 'ы';
+					$plural = '';
+				break;
+				case 'я':
+					$singular = 'и';
+					$plural = 'й';
+				break;
+				case 'о':
+					$singular = 'а';
+					$plural = '';
+				break;
+				case 'е':
+					$singular = 'я';
+					$plural = 'й';
+				break;
+				default:
+					$singular = 'ы';
+					$plural = 'ов';
+					$cutWord = $word;
+			}
+
+			$last_digit = $count % 10;
+			$last_two_digits = $count % 100;
+
+			if ($last_digit = 1 && $last_two_digits != 11)
+			{
+				return $cutWord . $nominative;
+			}
+			elseif ($last_digit = 2 && $last_two_digits != 12
+				|| $last_digit = 3 && $last_two_digits != 13
+				|| $last_digit = 4 && $last_two_digits != 14)
+			{
+				return $cutWord . $singular;
+			}
+			else
+			{
+				return $cutWord . $plural;
+			}
+		}
 
 		return $word;
 	}

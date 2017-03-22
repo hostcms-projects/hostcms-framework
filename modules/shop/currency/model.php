@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Currency_Model extends Core_Entity
 {
@@ -72,10 +72,7 @@ class Shop_Currency_Model extends Core_Entity
 		{
 			$oShop_Currency->default = 0;
 
-			if($this->exchange_rate == 0)
-			{
-				$this->exchange_rate = 1;
-			}
+			$this->exchange_rate == 0 && $this->exchange_rate = 1;
 
 			$oShop_Currency->exchange_rate /= $this->exchange_rate;
 
@@ -85,29 +82,6 @@ class Shop_Currency_Model extends Core_Entity
 		$this->default = 1;
 		$this->exchange_rate = 1;
 		$this->save();
-	}
-
-	/**
-	 * Get currency by name
-	 * @param string $name currency name
-	 * @param boolean $bCache cache mode
-	 * @return Shop_Currency_Model|NULL
-	 */
-	public function getByName($name, $bCache = TRUE)
-	{
-		$this->queryBuilder()
-			->clear()
-			->where('name', '=', $name)
-			->limit(1);
-
-		$aObjects = $this->findAll($bCache);
-
-		if (count($aObjects) > 0)
-		{
-			return $aObjects[0];
-		}
-
-		return NULL;
 	}
 
 	/**
@@ -148,11 +122,8 @@ class Shop_Currency_Model extends Core_Entity
 
 		$aObjects = $this->findAll();
 
-		if (count($aObjects) > 0)
-		{
-			return $aObjects[0];
-		}
-
-		return NULL;
+		return count($aObjects) > 0
+			? $aObjects[0]
+			: NULL;
 	}
 }

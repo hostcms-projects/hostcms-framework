@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Model extends Core_Entity
 {
@@ -68,6 +68,32 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 	);
 
 	/**
+	 * Price array
+	 * @var array
+	 */
+	protected $_aPrice = array();
+
+	/**
+	 * Get $this->_aPrice
+	 * @return array
+	 */
+	public function getAPrice()
+	{
+		return $this->_aPrice;
+	}
+
+	/**
+	 * Set $this->_aPrice
+	 * @param array $aPrice
+	 * @return array
+	 */
+	public function setAPrice(array $aPrice)
+	{
+		$this->_aPrice = $aPrice;
+		return $this;
+	}
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -89,12 +115,13 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 	 * - $price['tax'] сумма налога
 	 * - $price['rate'] размер налога
 	 * - $price['price'] цена с учетом валюты без налога
+	 * @hostcms-event shop_delivery_condition.onAfterGetPriceArray
 	 */
 	public function getPriceArray()
 	{
 		$oShop = $this->Shop_Delivery->Shop;
 
-		$price = array(
+		$this->_aPrice = array(
 			'tax' => 0,
 			'rate' => 0,
 			'price' => $this->price,
@@ -111,9 +138,9 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 			: 0;
 
 		// Умножаем цену товара на курс валюты в базовой валюте
-		$price['price'] *= $fCurrencyCoefficient;
+		$this->_aPrice['price'] *= $fCurrencyCoefficient;
 
-		$price['price_tax'] = $price['price_discount'] = $price['price'];
+		$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] = $this->_aPrice['price'];
 
 		if ($this->shop_tax_id)
 		{
@@ -121,33 +148,35 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 
 			if ($oShop_Tax->id)
 			{
-				$price['rate'] = $oShop_Tax->rate;
+				$this->_aPrice['rate'] = $oShop_Tax->rate;
 
 				// Если он не входит в цену
 				if ($oShop_Tax->tax_is_included == 0)
 				{
 					// То считаем цену с налогом
-					$price['tax'] = $oShop_Tax->rate / 100 * $price['price'];
-					$price['price_tax'] = $price['price_discount'] = $price['price'] + $price['tax'];
+					$this->_aPrice['tax'] = $oShop_Tax->rate / 100 * $this->_aPrice['price'];
+					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] = $this->_aPrice['price'] + $this->_aPrice['tax'];
 				}
 				else
 				{
-					$price['tax'] = $price['price'] / (100 + $oShop_Tax->rate) * $oShop_Tax->rate;
-					$price['price_tax'] = $price['price'];
-					$price['price'] -= $price['tax'];
+					$this->_aPrice['tax'] = $this->_aPrice['price'] / (100 + $oShop_Tax->rate) * $oShop_Tax->rate;
+					$this->_aPrice['price_tax'] = $this->_aPrice['price'];
+					$this->_aPrice['price'] -= $this->_aPrice['tax'];
 				}
 			}
 		}
 
 		$oShop_Controller = Shop_Controller::instance();
 
-		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
-		$price['tax'] = $oShop_Controller->round($price['tax']);
-		$price['price'] = $oShop_Controller->round($price['price']);
-		$price['price_discount'] = $oShop_Controller->round($price['price_discount']);
-		$price['price_tax'] = $oShop_Controller->round($price['price_tax']);
+		Core_Event::notify($this->_modelName . '.onAfterGetPriceArray', $this);
 
-		return $price;
+		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
+		$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
+		$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
+		$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
+		$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
+
+		return $this->_aPrice;
 	}
 
 	/**

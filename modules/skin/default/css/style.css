@@ -449,7 +449,7 @@ body.hostcms6 {
 .hostcms6 hr{border-top:1px solid #e2d1ba;border-bottom:1px solid #FFF;border-left:none;border-right:none;height:0!important;margin:25px 0 10px!important;padding:0}
 
 .hostcms6 input.calendar_field,.hostcms6 input.calendar_field_large{padding-right:17px !important; background:url(/admin/images/calendar.gif) no-repeat 100% 50% #FFF !important }
-input.large, div.large, input.calendar_field_large, select.large { font-size: 14pt !important }
+input.input-lg, div.input-lg, input.calendar_field_large, select.input-lg { font-size: 14pt !important }
 .hostcms6 .hostcmsWindow input, .hostcms6 .hostcmsWindow textarea, .hostcms6 .hostcmsWindow select,
 .hostcms6 .hostcmsWindow input:focus,
 .hostcms6 .hostcmsWindow select:focus { font-family: Tahoma, Verdana, 'MS Sans Serif', Arial, sans-serif; font-size: 10pt; outline: none; margin-top: 2px; margin-bottom: 2px; border-color: #D4D0C8;}
@@ -611,8 +611,16 @@ background:linear-gradient(top,#FFE707 0,#FFD012);
 .hostcms6 .admin_table .row_odd .hl{background-color:#EEE}
 .hostcms6 .admin_table .row:hover,.hostcms6 .admin_table .row_odd:hover{background-color:#E5E5E5}
 .hostcms6 .row td,.hostcms6 .admin_td,.hostcms6 .row_odd td{padding-left:4px;padding-right:4px;padding-bottom:2px;border-bottom:1px;border-bottom-style:solid;overflow:hidden;border-color:#ddd}
-.hostcms6 .admin_table .highlight_row{background-color:#F2F0EB}
-.hostcms6 .admin_table .highlight_row_odd{background-color:#E2E0DB}
+
+.hostcms6 .admin_table > tbody > tr.cheked:nth-child(even) > td,
+.hostcms6 .admin_table > tbody > tr.cheked:nth-child(even) > th {
+  background-color: #E2E0DB;
+}
+.hostcms6 .admin_table > tbody > tr.cheked:nth-child(odd) > td,
+.hostcms6 .admin_table > tbody > tr.cheked:nth-child(odd) > th {
+  background-color: #F2F0EB;
+}
+
 .hostcms6 .report_height td{height:25px}
 .hostcms6 .success{color:#393}
 .hostcms6 .warning{color:#EBB100}

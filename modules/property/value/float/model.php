@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_Float_Model extends Core_Entity
 {
@@ -42,9 +42,9 @@ class Property_Value_Float_Model extends Core_Entity
 	 * Default sorting for models
 	 * @var array
 	 */
-	protected $_sorting = array(
+	/*protected $_sorting = array(
 		'property_value_floats.id' => 'ASC'
-	);
+	);*/
 
 	/**
 	 * Set property value

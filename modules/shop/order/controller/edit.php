@@ -147,7 +147,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->moveAfter($oDeliveryinformationField = $this->getField('delivery_information'), $oSysteminformationField, $oDescriptionTab);
 
 		$oInvoiceField
-			->class("large")
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'))
 			->style("width: 150px;");
 
@@ -156,13 +156,13 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('style' => 'float: left'));
 
 		$oSiteuseridField
-			->class("large")
+			->class("input-lg")
 			->divAttr(array('style' => 'float: left'))
 			->style("width: 150px;");
 
 		$oOrderSumTextBox
 			->divAttr(array('style' => 'float: left'))
-			->class("large")
+			->class("input-lg")
 			->style("width: 150px; ")
 			->value($this->_object->getAmount())
 			->readonly('readonly')
@@ -178,7 +178,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oCurrencySelect
 			->caption(Core::_('Shop_Order.order_currency'))
 			->style("width: 150px")
-			->class("large")
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'))
 			->options(
 					$Shop_Controller_Edit->fillCurrencies()
@@ -546,11 +546,11 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			// HostCMS v. 5
 			elseif (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
 			{
-				// Вызываем обработчик платежной системы для события сменя статуса HostCMS v. 5
+				// Вызываем обработчик платежной системы для события смены статуса HostCMS v. 5
 				$shop->ExecSystemsOfPayChangeStatus($order_row['shop_system_of_pay_id'], array(
 					'shop_order_id' => $this->_object->id,
 					'action' => 'edit',
-					// Предыдущие даные о заказе до редактирования
+					// Предыдущие данные о заказе до редактирования
 					'prev_order_row' => $order_row
 				));
 			}

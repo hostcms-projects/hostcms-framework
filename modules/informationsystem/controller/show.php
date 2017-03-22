@@ -21,6 +21,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств информационных элементов, по умолчанию TRUE
  * - itemsForbiddenTags(array('description')) массив тегов информационных элементов, запрещенных к передаче в генерируемый XML
  * - comments(TRUE|FALSE) показывать комментарии для выбранных информационных элементов, по умолчанию FALSE
+ * - votes(TRUE|FALSE) показывать рейтинг элемента, по умолчанию TRUE
  * - tags(TRUE|FALSE) выводить метки
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным информационным элементом, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
@@ -77,6 +78,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		'itemsPropertiesList',
 		'itemsForbiddenTags',
 		'comments',
+		'votes',
 		'tags',
 		'siteuser',
 		'siteuserProperties',
@@ -191,7 +193,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$this->item = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = TRUE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = TRUE;
 
 		$this->groupsMode = 'tree';
 		$this->offset = 0;
@@ -537,9 +539,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 			{
 				// Shortcut
-				$bShortcut = $oInformationsystem_Item->shortcut_id;
+				$iShortcut = $oInformationsystem_Item->shortcut_id;
 
-				$bShortcut && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
+				$iShortcut && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
 
 				// Ярлык может ссылаться на отключенный элемент
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
@@ -549,8 +551,15 @@ class Informationsystem_Controller_Show extends Core_Controller
 				//Ярлык может ссылаться на элемент с истекшим или не наступившим сроком публикации
 				$iCurrentTimestamp = time();
 
+				$oInformationsystem_Item->clearEntities();
+
+				// ID оригинального ярлыка
+				$iShortcut && $oInformationsystem_Item->addEntity(
+					Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
+				);
+
 				if ($oInformationsystem_Item->active == $desiredActivity
-					&& (!$bShortcut
+					&& (!$iShortcut
 						||  (Core_Date::sql2timestamp($oInformationsystem_Item->end_datetime) >= $iCurrentTimestamp
 							|| $oInformationsystem_Item->end_datetime == '0000-00-00 00:00:00')
 						&& (Core_Date::sql2timestamp($oInformationsystem_Item->start_datetime) <= $iCurrentTimestamp
@@ -558,8 +567,6 @@ class Informationsystem_Controller_Show extends Core_Controller
 					)
 				)
 				{
-					$oInformationsystem_Item->clearEntities();
-
 					$this->applyItemsForbiddenTags($oInformationsystem_Item);
 
 					// Comments
@@ -570,6 +577,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 					// Tags
 					$this->tags && $oInformationsystem_Item->showXmlTags(TRUE);
+
+					// votes
+					$this->votes && $oInformationsystem_Item->showXmlVotes(TRUE);
 
 					// Siteuser
 					$this->siteuser && $oInformationsystem_Item
@@ -751,7 +761,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 					}
 
 					$this->_applyItemConditions($oInformationsystem_Items);
-					
+
 					$Informationsystem_Item = $oInformationsystem_Items->getByGroupIdAndPath($this->group, $sPath);
 
 					if (!$this->item && !is_null($Informationsystem_Item))

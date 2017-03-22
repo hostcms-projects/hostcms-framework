@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_Action_Controller
 {
@@ -39,6 +39,23 @@ class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_A
 	public function defaultValue($defaultValue)
 	{
 		$this->_defaultValue = $defaultValue;
+		return $this;
+	}
+
+	/**
+	 * Add IDs
+	 * @var boolean
+	 */
+	protected $_addIDs = FALSE;
+
+	/**
+	 * Add IDs
+	 * @param boolean $addIDs
+	 * @return self
+	 */
+	public function addIDs($addIDs = TRUE)
+	{
+		$this->_addIDs = $addIDs;
 		return $this;
 	}
 
@@ -126,7 +143,10 @@ class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_A
 	{
 		foreach ($this->_objects as $Object)
 		{
-			$this->_values[$Object->id] = $Object->name;
+			$this->_values[$Object->id] = 
+				$this->_addIDs
+					? '[' . $Object->id . '] ' . $Object->name
+					: $Object->name;
 		}
 
 		return $this;

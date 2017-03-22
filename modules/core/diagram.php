@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Diagram extends Core_Servant_Properties
 {
@@ -403,8 +403,10 @@ class Core_Diagram extends Core_Servant_Properties
 
 		// Фон
 		// Шаг делений по осям
-		$point_x =($x2 - $x1) /($count_value - 1);
-		$point_y =($y2 - $y1) / $scaleDivision;
+		$point_x = $count_value > 1
+			? ($x2 - $x1) / ($count_value - 1)
+			: 0;
+		$point_y = ($y2 - $y1) / $scaleDivision;
 
 		// Светлый фон
 		$this->_drawFilledRectangle($im,$x1,$y1,$x2, $y2,$this->colors($im, 18), false);

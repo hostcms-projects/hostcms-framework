@@ -19,7 +19,8 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 */
 	protected $_allowedProperties = array(
 		'title', // Form Title
-		'skipColumns' // Array of skipped columns
+		'skipColumns', // Array of skipped columns
+		'xml'
 	);
 
 	/**
@@ -375,7 +376,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 						if ($sTabName == 'main'
 						&& $this->_tabs[$sTabName]->getCountChildren() == 0)
 						{
-							$oAdmin_Form_Entity_For_Column->class($oAdmin_Form_Entity_For_Column->class . ' large');
+							$oAdmin_Form_Entity_For_Column->class($oAdmin_Form_Entity_For_Column->class . ' input-lg');
 						}
 
 						$columnName == 'id' && $oAdmin_Form_Entity_For_Column->readonly('readonly');
@@ -455,6 +456,12 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	}
 
 	/**
+	 * XML
+	 * @var SimpleXMLElement
+	 */
+	protected $_oSimpleXMLElement = NULL;
+
+	/**
 	 * Executes the business logic.
 	 * @param mixed $operation Operation for action
 	 * @return boolean
@@ -468,13 +475,20 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		switch ($operation)
 		{
 			case NULL: // Показ формы
-			
+
 				$this->_Admin_Form_Controller->title(
 					$this->title
 				);
-				
+
+				if ($this->xml)
+				{
+					$this->_oSimpleXMLElement = new SimpleXMLElement(
+						$this->xml
+					);
+				}
+
 				$return = $this->_showEditForm();
-				
+
 			break;
 			case 'save':
 				$primaryKeyName = $this->_object->getPrimaryKeyName();
@@ -590,97 +604,31 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 */
 	protected function _showEditForm()
 	{
-		ob_start();
+		// Контроллер показа формы редактирования с учетом скина
+		$oAdmin_Form_Action_Controller_Type_Edit_Show = Admin_Form_Action_Controller_Type_Edit_Show::create();
 
-		// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
-		array_unshift($this->_children,
-			Admin_Form_Entity::factory('Title')
-				->name($this->title)
-			);
-
-		// Форма
-		$oAdmin_Form_Entity_Form = new Admin_Form_Entity_Form(
-			$this->_Admin_Form_Controller
-		);
-
-		$oAdmin_Form_Entity_Form
-			->id($this->_formId)
-			->class('adminForm')
-			->action(
-				$this->_Admin_Form_Controller->getPath()
-			);
-
-		// Закладки
-		$oAdmin_Form_Entity_Tabs = Admin_Form_Entity::factory('Tabs');
-		$oAdmin_Form_Entity_Tabs->formId($this->_formId);
-
-		// Все закладки к форме
-		$oAdmin_Form_Entity_Form->add(
-			$oAdmin_Form_Entity_Tabs
-		);
-
-		// Add all tabs to $oAdmin_Form_Entity_Tabs
-		foreach ($this->_tabs as $oAdmin_Form_Tab_Entity)
-		{
-			if ($oAdmin_Form_Tab_Entity->getCountChildren() > 0)
-			{
-				$oAdmin_Form_Entity_Tabs->add(
-					$oAdmin_Form_Tab_Entity
-				);
-			}
-		}
-
-		// Кнопки
-		$oAdmin_Form_Entity_Form->add(
-			$this->_addButtons()
-		);
-
-		// Форма добавляется к контроллеру
-		$this->addEntity($oAdmin_Form_Entity_Form);
-
-		foreach ($this->_children as $oAdmin_Form_Entity)
-		{
-			$oAdmin_Form_Entity->execute();
-		}
+		$oAdmin_Form_Action_Controller_Type_Edit_Show
+			->title($this->title)
+			->children($this->_children)
+			->Admin_Form_Controller($this->_Admin_Form_Controller)
+			->formId($this->_formId)
+			->tabs($this->_tabs)
+			->buttons($this->_addButtons())
+			;
 
 		$this->addContent(
-			ob_get_clean()
+			$oAdmin_Form_Action_Controller_Type_Edit_Show->showEditForm()
 		);
 
 		return TRUE;
 	}
 
 	/**
-	 * Add save and apply buttons
+	 * Add form buttons
 	 * @return Admin_Form_Entity_Buttons
 	 */
 	protected function _addButtons()
 	{
-		// Кнопки
-		$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');
-
-		// Кнопка Сохранить
-		$oAdmin_Form_Entity_Button_Save = Admin_Form_Entity::factory('Button')
-			->name('save')
-			->class('saveButton')
-			->value(Core::_('admin_form.save'))
-			->onclick(
-				$this->_Admin_Form_Controller->getAdminSendForm(NULL, 'save')
-			);
-
-		$oAdmin_Form_Entity_Button_Apply = Admin_Form_Entity::factory('Button')
-			->name('apply')
-			->class('applyButton')
-			->type('submit')
-			->value(Core::_('admin_form.apply'))
-			->onclick(
-				$this->_Admin_Form_Controller->getAdminSendForm(NULL, 'apply')
-			);
-
-		$oAdmin_Form_Entity_Buttons
-			->add($oAdmin_Form_Entity_Button_Save)
-			->add($oAdmin_Form_Entity_Button_Apply);
-
-		return $oAdmin_Form_Entity_Buttons;
+		return NULL;
 	}
 }

@@ -45,9 +45,9 @@ class Property_Value_Int_Model extends Core_Entity
 	 * Default sorting for models
 	 * @var array
 	 */
-	protected $_sorting = array(
+	/*protected $_sorting = array(
 		'property_value_ints.id' => 'ASC'
-	);
+	);*/
 
 	/**
 	 * Set property value

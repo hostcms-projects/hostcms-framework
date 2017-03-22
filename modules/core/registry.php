@@ -5,10 +5,19 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Implement a Registry pattern
  *
+ * <code>
+ * $value = 1;
+ * Core_Registry::instance()->set('My_Key', $value);
+ * </code>
+ *
+ * <code>
+ * echo Core_Registry::instance()->get('My_Key');
+ * </code>
+ *
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Registry {
 
@@ -56,12 +65,9 @@ class Core_Registry {
 	 */
 	public function get($key, $defaultValue = NULL)
 	{
-		if (isset($this->_values[$key]))
-		{
-			return $this->_values[$key];
-		}
-
-		return $defaultValue;
+		return isset($this->_values[$key])
+			? $this->_values[$key]
+			: $defaultValue;
 	}
 
 	/**

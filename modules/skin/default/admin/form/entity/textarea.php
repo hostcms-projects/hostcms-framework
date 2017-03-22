@@ -72,6 +72,10 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 					'styleActiveLine' => 'true',
 					'lineWrapping' => 'true',
 					'autoCloseTags' => 'true',
+
+					'tabSize' => 2, // из-зм indentUnit равного 2-м
+					'indentWithTabs' => 'true',
+					'smartIndent' => 'false',
 				)
 			);
 	}

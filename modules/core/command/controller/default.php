@@ -13,6 +13,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Core_Command_Controller_Default extends Core_Command_Controller
 {
 	/**
+	 * Check possibility of using static cache
+	 */
+	protected function _checkCache()
+	{
+		return (
+			!isset($_SESSION)
+			|| !isset($_SESSION['siteuser_id']) && !Core_Auth::logged() && empty($_SESSION['SCART'])
+			)
+			&& empty($_COOKIE['CART']) && count($_POST) == 0;
+	}
+
+	/**
 	 * Default controller action
 	 * @return Core_Response
 	 * @hostcms-event Core_Command_Controller_Default.onBeforeShowAction
@@ -30,6 +42,29 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 
 		$this->_uri == '' && $this->_uri = '/';
+
+		// Отдача статичного кэша в случае, если правила mod_rewrite не сработали
+		// из-за %{HTTP_COOKIE} !^.*PHPSESSID=.*$
+		$bCheckCache = Core::moduleIsActive('cache') && $oSite->html_cache_use == 1;
+		if ($bCheckCache)
+		{
+			$Core_Cache = Core_Cache::instance('static');
+
+			if ($this->_checkCache())
+			{
+				$result = $Core_Cache->get($this->_uri);
+
+				if ($result !== FALSE)
+				{
+					$oCore_Response
+						->header('Content-Type', 'text/html; charset=' . $oSite->coding)
+						->body($result);
+
+					return $oCore_Response;
+				}
+			}
+
+		}
 
 		// Путь заканчивается на слэш
 		if (substr($this->_uri, -1) == '/'
@@ -372,7 +407,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		}
 
 		Core_Event::notify(get_class($this) . '.onBeforeSetTemplate', $this);
-		
+
 		// Template might be changed at lib config
 		$oTemplate = $oCore_Page->template;
 
@@ -472,10 +507,8 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$sContent = $this->_iconv($oSite->coding, $sContent);
 		}
 
-		if (Core::moduleIsActive('cache') && $oSite->html_cache_use == 1)
+		if ($bCheckCache)
 		{
-			$Core_Cache = Core_Cache::instance('static');
-
 			// Проверяем, нужно ли очищать кэш
 			if ($oSite->html_cache_clear_probability > 0 && rand(0, $oSite->html_cache_clear_probability) == 0)
 			{
@@ -484,10 +517,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				$Core_Cache->deleteAll($oSite->id);
 			}
 
-			if (
-				(!isset($_SESSION) || !isset($_SESSION['siteuser_id']) && !Core_Auth::logged() && empty($_SESSION['SCART']))
-				&& empty($_COOKIE['CART']) && count($_POST) == 0 && strlen($sContent) > 0
-			)
+			if ($this->_checkCache() && strlen($sContent) > 0)
 			{
 				$Core_Cache->insert($this->_uri, $sContent);
 			}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -35,7 +35,7 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 			->style("width: 100px");
 
 		$this->getField('percent')
-			->class('large')
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'))
 			->style("width: 100px");
 
@@ -46,14 +46,14 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 		$oValueField = $this->getField('value');
 
 		$oValueField
-			->class('large')
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'))
 			->style('width: 100px;');
 
 		$oTypeField = Admin_Form_Entity::factory('Select');
 		$oTypeField
 			->name('type')
-			->class('large')
+			->class('input-lg')
 			->style('width: 100px;')
 			->caption(Core::_('Affiliate_Plan_Level.type'))
 			->options(array

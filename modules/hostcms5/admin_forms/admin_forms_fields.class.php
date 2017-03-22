@@ -150,7 +150,7 @@ class admin_forms_fields extends admin_forms
 	*   <br />$param['items'][1] = 'Значение 1';
 	*   <br />$param['items'][2] = 'Значение 2';
 	* - bool $param['apply_filter'] выводить для поля типа "Выпадающий список" поля фильтра, по умолчанию false
-	* - array $param['attributes'] дополнительные атрибуты поля, например $param['attributes']['class'] = 'large';
+	* - array $param['attributes'] дополнительные атрибуты поля, например $param['attributes']['class'] = 'input-lg';
 	* - string $params['separator'] разделитель для радиогрупп, по умолчанию используется тег br
 	*
 	* - array $param['options'] - дополнительные параметры формы:

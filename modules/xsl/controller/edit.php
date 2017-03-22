@@ -61,7 +61,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oTmpOptions = $oTextarea_Xsl->syntaxHighlighterOptions;
 				$oTmpOptions['mode'] = 'xml';
-				
+
 				$oTextarea_Xsl
 					->value(
 						$this->_object->loadXslFile()
@@ -179,10 +179,10 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->_object->saveXslFile($xsl_value);
 			break;
 		}
-		
+
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
-	
+
 	/**
 	 * Executes the business logic.
 	 * @param mixed $operation Operation name
@@ -200,7 +200,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$name = Core_Array::getRequest('name');
 					$id = Core_Array::getRequest('id');
 					$oSameXsl = Core_Entity::factory('Xsl')->getByName($name);
-					
+
 					if (!is_null($oSameXsl) && $oSameXsl->id != $id)
 					{
 						$this->addMessage(
@@ -210,7 +210,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					}
 			}
 		}
-		
+
 		return parent::execute($operation);
 	}
 }

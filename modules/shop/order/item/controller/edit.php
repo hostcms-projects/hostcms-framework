@@ -38,7 +38,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 		$this->getField('quantity')
 			->style("width: 200px")
 			->divAttr(array('style' => 'float: left'))
-			->class("large");
+			->class('input-lg');
 
 		$this->getField('name')->format(array('minlen' => array('value' => 0)));
 
@@ -46,12 +46,12 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 
 		$oPriceField
 			->style("width: 200px")
-			->class("large")
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'));
 
 		$oRateField = $this->getField('rate');
 		$oRateField->style("width: 100px")
-			->class("large")
+			->class('input-lg')
 			->divAttr(array('style' => 'float: left'));
 
 		$oMainTab->moveAfter($oRateField, $oPriceField);

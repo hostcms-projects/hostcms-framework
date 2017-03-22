@@ -26,6 +26,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - specialprices(TRUE|FALSE) показывать специальные цены для выбранных товаров, по умолчанию FALSE
  * - associatedItems(TRUE|FALSE) показывать сопутствующие товары для выбранных товаров, по умолчанию FALSE
  * - comments(TRUE|FALSE) показывать комментарии для выбранных товаров, по умолчанию FALSE
+ * - votes(TRUE|FALSE) показывать рейтинг элемента, по умолчанию TRUE
  * - tags(TRUE|FALSE) выводить метки
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным товаром, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
@@ -95,6 +96,7 @@ class Shop_Controller_Show extends Core_Controller
 		'specialprices',
 		'associatedItems',
 		'comments',
+		'votes',
 		'tags',
 		'siteuser',
 		'siteuserProperties',
@@ -222,7 +224,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->taxes = $this->cart = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = TRUE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
 
 		$this->favoriteOrder = 'RAND';
 		$this->viewedOrder = 'DESC';
@@ -748,9 +750,9 @@ class Shop_Controller_Show extends Core_Controller
 			foreach ($aShop_Items as $oShop_Item)
 			{
 				// Shortcut
-				$bShortcut = $oShop_Item->shortcut_id;
+				$iShortcut = $oShop_Item->shortcut_id;
 
-				$bShortcut && $oShop_Item = $oShop_Item->Shop_Item;
+				$iShortcut && $oShop_Item = $oShop_Item->Shop_Item;
 
 				// Ярлык может ссылаться на отключенный товар
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
@@ -760,8 +762,15 @@ class Shop_Controller_Show extends Core_Controller
 				//Ярлык может ссылаться на товар с истекшим или не наступившим сроком публикации
 				$iCurrentTimestamp = time();
 
+				$oShop_Item->clearEntities();
+
+				// ID оригинального ярлыка
+				$iShortcut && $oShop_Item->addEntity(
+					Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
+				);
+
 				if ($oShop_Item->active == $desiredActivity
-					&& (!$bShortcut
+					&& (!$iShortcut
 						|| (Core_Date::sql2timestamp($oShop_Item->end_datetime) >= $iCurrentTimestamp
 							|| $oShop_Item->end_datetime == '0000-00-00 00:00:00')
 						&& (Core_Date::sql2timestamp($oShop_Item->start_datetime) <= $iCurrentTimestamp
@@ -769,8 +778,6 @@ class Shop_Controller_Show extends Core_Controller
 					)
 				)
 				{
-					$oShop_Item->clearEntities();
-
 					$this->applyItemsForbiddenTags($oShop_Item);
 
 					// Comments
@@ -787,6 +794,9 @@ class Shop_Controller_Show extends Core_Controller
 
 					// Tags
 					$this->tags && $oShop_Item->showXmlTags(TRUE);
+
+					// votes
+					$this->votes && $oShop_Item->showXmlVotes(TRUE);
 
 					// Siteuser
 					$this->siteuser && $oShop_Item->showXmlSiteuser(TRUE)

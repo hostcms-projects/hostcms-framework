@@ -124,7 +124,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oTmpOptions = $oCss_Textarea->syntaxHighlighterOptions;
 				$oTmpOptions['mode'] = 'css';
-				
+
 				$oCss_Textarea
 					->value(
 						$this->_object->loadTemplateCssFile()
@@ -193,6 +193,41 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$this->_object->saveTemplateFile(Core_Array::getPost('template'));
 			$this->_object->saveTemplateCssFile(Core_Array::getPost('css'));
+
+			// Обновляем сохраненные минимизированные CSS
+			if (Core::moduleIsActive('compression'))
+			{
+				$oCompression_Controller = Compression_Controller::instance('css');
+
+				$sTemplatePath = $this->_object->getTemplateCssFileHref();
+
+				$oCompression_Css = Core_Entity::factory('Compression_Css');
+				$oCompression_Css
+					->queryBuilder()
+					->where('path', 'LIKE', $sTemplatePath)
+					->groupBy('filename');
+
+				$aCompression_Css_With_Path = $oCompression_Css->findAll(FALSE);
+
+				foreach ($aCompression_Css_With_Path as $oCompression_Css)
+				{
+					$oCompression_Controller->clear();
+
+					$aCompression_Css = Core_Entity::factory('Compression_Css')->getAllByFilename(
+						$oCompression_Css->filename
+					);
+
+					// Все файлы, использованные при создании этого CSS
+					foreach ($aCompression_Css as $oTmpCompression_Css)
+					{
+						$oCompression_Controller->addCss(
+							$oTmpCompression_Css->path
+						);
+					}
+
+					$oCompression_Controller->buildCss($oCompression_Css->filename, TRUE);
+				}
+			}
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
@@ -227,7 +262,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			foreach ($aTemplates as $children)
 			{
-				$aReturn[$children->id] = str_repeat('  ', $iLevel) . $children->name;
+				$aReturn[$children->id] = str_repeat('  ', $iLevel) . '[' . $children->id . '] ' . $children->name;
 				$aReturn += $this->fillTemplateList($iSiteId, $children->id, $iLevel + 1);
 			}
 		}

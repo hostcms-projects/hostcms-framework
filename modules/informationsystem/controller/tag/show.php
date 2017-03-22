@@ -88,8 +88,8 @@ class Informationsystem_Controller_Tag_Show extends Core_Controller
 			->select(array('COUNT(tag_id)', 'count'), 'tags.*')
 			//->from('tag_informationsystem_items')
 			//->leftJoin('tags', 'tag_informationsystem_items.tag_id', '=', 'tags.id')
-			->leftJoin('tag_informationsystem_items', 'tag_informationsystem_items.tag_id', '=', 'tags.id')
-			->leftJoin('informationsystem_items', 'tag_informationsystem_items.informationsystem_item_id', '=', 'informationsystem_items.id')
+			->join('tag_informationsystem_items', 'tag_informationsystem_items.tag_id', '=', 'tags.id')
+			->join('informationsystem_items', 'tag_informationsystem_items.informationsystem_item_id', '=', 'informationsystem_items.id')
 			->leftJoin('informationsystem_groups', 'informationsystem_items.informationsystem_group_id', '=', 'informationsystem_groups.id',
 				array(
 					array('AND' => array('informationsystem_groups.deleted', '=', 0)),
@@ -99,7 +99,7 @@ class Informationsystem_Controller_Tag_Show extends Core_Controller
 			->where('informationsystem_items.siteuser_group_id', 'IN', $aSiteuserGroups)
 			->where('informationsystem_items.informationsystem_id', '=', $oInformationsystem->id)
 			->where('informationsystem_items.deleted', '=', 0)
-			->where('tags.deleted', '=', 0)
+			//->where('tags.deleted', '=', 0)
 			->groupBy('tag_informationsystem_items.tag_id')
 			->having('count', '>', 0)
 			->orderBy('tags.name', 'ASC');

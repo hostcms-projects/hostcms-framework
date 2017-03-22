@@ -69,7 +69,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Field.form_forms_field_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
-					->class('large')
+					->class('input-lg')
 					->format(
 						array(
 							// 'minlen' => array('value' => 1),

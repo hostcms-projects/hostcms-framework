@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 {
@@ -17,13 +17,13 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 	 * @var mixed
 	 */
 	private $_xml;
-	
+
 	/**
 	 * Backend property
 	 * @var array
 	 */
 	private $_groupsID = array();
-	
+
 	/**
 	 * Backend property
 	 * @var mixed
@@ -145,81 +145,91 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 		$oShopItems = Core_Entity::factory('Shop_Item');
 		$oQueryBuilder = $oShopItems->queryBuilder()
 			->where('shop_group_id', 'IN', $this->_groupsID)
-			->where('shop_id', '=', $this->shop->id);
+			->where('shop_id', '=', $this->shop->id)
+			->where('modification_id', '=', 0)
+			->clearOrderBy()
+			->orderBy('id', 'ASC');
 
-		if($this->exportItemModifications !== FALSE)
-		{
-			$aItemsID = array();
-			$aShopItems = $oShopItems->findAll(FALSE);
-		
-			foreach($aShopItems as $oShopItem)
-			{
-				$aItemsID[] = $oShopItem->id;
-			}
-	
-			count($aShopItems) > 0 && $oQueryBuilder->where('modification_id', 'IN', $aItemsID);
-			$aShopItems += $oShopItems->findAll(FALSE);
-		}
-		else
-		{
-			$oQueryBuilder->where('modification_id', '=', 0);
-			$aShopItems = $oShopItems->findAll(FALSE);
-		}
+		$catalog = $catalog->addChild('Товары');
 
-		if(count($aShopItems) > 0)
-		{
-			$catalog = $catalog->addChild('Товары');
+		$offset = 0;
+		$limit = 100;
+
+		do {
+			$oShopItems->queryBuilder()->offset($offset)->limit($limit);
+			$aShopItems = $oShopItems->findAll(FALSE);
 
 			foreach ($aShopItems as $oShopItem)
 			{
-				$oShopItem->modification_id == 0 ? $sMod = '' : $sMod = $oShopItem->Modification->guid . '#';
+				$this->_addImportItem($oShopItem, $catalog);
 
-				$item = $catalog->addChild('Товар');
-				$item->addChild('Ид', $sMod . $oShopItem->guid);
-				$item->addChild('Артикул', $oShopItem->marking);
-				$item->addChild('Наименование', $oShopItem->name);
-				$item->addChild('Описание', $oShopItem->description);
-				$item->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
-					->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
-
-				if($oShopItem->modification_id && $oShopItem->Modification->Shop_Group->id)
+				// Модификации
+				if ($this->exportItemModifications)
 				{
-					$item->addChild('Группы')->addChild('Ид', $oShopItem->Modification->Shop_Group->guid);
-				}
-				elseif($oShopItem->Shop_Group->id)
-				{
-					$item->addChild('Группы')->addChild('Ид', $oShopItem->Shop_Group->guid);
-				}
-
-				$oShopItem->image_large && $item->addChild('Картинка', $oShopItem->getItemHref() . $oShopItem->image_large);
-
-				// Обработка дополнительных свойств
-				$aShopItemPropertyValues = $oShopItem->getPropertyValues();
-
-				if(count($aShopItemPropertyValues) > 0)
-				{
-					$properties = $item->addChild('ЗначенияСвойств');
-
-					foreach ($aShopItemPropertyValues as $oShopItemPropertyValue)
+					$aModifications = $oShopItem->Modifications->findAll(FALSE);
+					foreach ($aModifications as $oModification)
 					{
-						$property = $properties->addChild('ЗначенияСвойства');
-
-						$property->addChild('Ид', $oShopItemPropertyValue->Property->guid);
-
-						if($oShopItemPropertyValue->Property->type == 2)
-						{
-							$property->addChild('Значение', $oShopItemPropertyValue->getLargeFileHref());
-						}
-						else
-						{
-							$property->addChild('Значение', $oShopItemPropertyValue->value);
-						}
+						$this->_addImportItem($oModification, $catalog);
 					}
 				}
 			}
+
+			$offset += $limit;
 		}
+		while (count($aShopItems));
 
 		return $this->_xml->asXML();
+	}
+
+	/**
+	 * Add import-item
+	 * @param Shop_Item_Model $oShopItem
+	 * @param object $parentNode Parent node
+	 * @return self
+	 */
+	protected function _addImportItem(Shop_Item_Model $oShopItem, $parentNode)
+	{
+		$sMod = $oShopItem->modification_id == 0
+			? ''
+			: $oShopItem->Modification->guid . '#';
+
+		$item = $parentNode->addChild('Товар');
+		$item->addChild('Ид', $sMod . $oShopItem->guid);
+		$item->addChild('Артикул', $oShopItem->marking);
+		$item->addChild('Наименование', $oShopItem->name);
+		$item->addChild('Описание', $oShopItem->description);
+		$item->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
+			->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
+
+		if($oShopItem->modification_id && $oShopItem->Modification->Shop_Group->id)
+		{
+			$item->addChild('Группы')->addChild('Ид', $oShopItem->Modification->Shop_Group->guid);
+		}
+		elseif($oShopItem->Shop_Group->id)
+		{
+			$item->addChild('Группы')->addChild('Ид', $oShopItem->Shop_Group->guid);
+		}
+
+		$oShopItem->image_large && $item->addChild('Картинка', $oShopItem->getItemHref() . $oShopItem->image_large);
+
+		// Обработка дополнительных свойств
+		$aShopItemPropertyValues = $oShopItem->getPropertyValues(FALSE);
+
+		if(count($aShopItemPropertyValues) > 0)
+		{
+			$properties = $item->addChild('ЗначенияСвойств');
+
+			foreach ($aShopItemPropertyValues as $oShopItemPropertyValue)
+			{
+				$property = $properties->addChild('ЗначенияСвойства');
+				$property->addChild('Ид', $oShopItemPropertyValue->Property->guid);
+				$property->addChild('Значение', $oShopItemPropertyValue->Property->type == 2
+					? $oShopItemPropertyValue->getLargeFileHref()
+					: $oShopItemPropertyValue->value);
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -246,39 +256,72 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 
 		$this->getGroupsCML($this->group, new Core_SimpleXMLElement("<root></root>"));
 
-		$aShopItems = $this->shop->Shop_Items;
-		$aShopItems->queryBuilder()
-				  ->where('shop_group_id', 'IN', $this->_groupsID);
-		$this->exportItemModifications === FALSE && $aShopItems->queryBuilder()->where('modification_id', '=', 0);
-		$aShopItems = $aShopItems->findAll();
+		$oShopItems = $this->shop->Shop_Items;
+		$oShopItems->queryBuilder()
+			->where('shop_group_id', 'IN', $this->_groupsID)
+			->where('modification_id', '=', 0);
 
-		if(count($aShopItems))
-		{
-			$packageOfProposals = $packageOfProposals->addChild('Предложения');
+		$packageOfProposals = $packageOfProposals->addChild('Предложения');
+
+		$offset = 0;
+		$limit = 100;
+
+		do {
+			$oShopItems->queryBuilder()->offset($offset)->limit($limit);
+			$aShopItems = $oShopItems->findAll(FALSE);
 
 			foreach($aShopItems as $oShopItem)
 			{
-				$oShopItem->modification_id == 0 ? $sMod = '' : $sMod = $oShopItem->Modification->guid . '#';
-				$proposal = $packageOfProposals->addChild('Предложение');
-				$proposal->addChild('Ид', $sMod . $oShopItem->guid);
-				$proposal->addChild('Артикул', $oShopItem->marking);
-				$proposal->addChild('Наименование', $oShopItem->name);
-				$proposal->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
-								->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
-				$price = $proposal->addChild('Цены')->addChild('Цена');
+				$this->_addOffersItem($oShopItem, $packageOfProposals);
 
-				$price->addChild('ИдТипаЦены', $this->_retailPriceGUID);
-				$price->addChild('ЦенаЗаЕдиницу', $oShopItem->price);
-				$price->addChild('Представление',
-								sprintf('%s %s за %s',
-										$oShopItem->price,
-										$oShopItem->Shop_Currency->code,
-										$oShopItem->Shop_Measure->name));
-				$price->addChild('Единица', $oShopItem->Shop_Measure->name);
-				$proposal->addChild('Количество', $oShopItem->getRest());
+				// Модификации
+				if ($this->exportItemModifications)
+				{
+					$aModifications = $oShopItem->Modifications->findAll(FALSE);
+					foreach ($aModifications as $oModification)
+					{
+						$this->_addOffersItem($oModification, $packageOfProposals);
+					}
+				}
 			}
+
+			$offset += $limit;
 		}
+		while (count($aShopItems));
 
 		return $this->_xml->asXML();
+	}
+
+	/**
+	 * Add offers-item
+	 * @param Shop_Item_Model $oShopItem
+	 * @param object $parentNode Parent node
+	 * @return self
+	 */
+	protected function _addOffersItem(Shop_Item_Model $oShopItem, $parentNode)
+	{
+		$sMod = $oShopItem->modification_id == 0
+			? ''
+			: $oShopItem->Modification->guid . '#';
+
+		$proposal = $parentNode->addChild('Предложение');
+		$proposal->addChild('Ид', $sMod . $oShopItem->guid);
+		$proposal->addChild('Артикул', $oShopItem->marking);
+		$proposal->addChild('Наименование', $oShopItem->name);
+		$proposal->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
+				->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
+		$price = $proposal->addChild('Цены')->addChild('Цена');
+
+		$price->addChild('ИдТипаЦены', $this->_retailPriceGUID);
+		$price->addChild('ЦенаЗаЕдиницу', $oShopItem->price);
+		$price->addChild('Представление',
+						sprintf('%s %s за %s',
+								$oShopItem->price,
+								$oShopItem->Shop_Currency->code,
+								$oShopItem->Shop_Measure->name));
+		$price->addChild('Единица', $oShopItem->Shop_Measure->name);
+		$proposal->addChild('Количество', $oShopItem->getRest());
+
+		return $this;
 	}
 }

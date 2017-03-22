@@ -55,7 +55,7 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			)
 			->caption(Core::_('Document.name'))
 			->name('name')
-			->class('large');
+			->class('input-lg');
 
 		$oMainTab->add($oDocument_Name);
 
