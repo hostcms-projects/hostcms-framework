@@ -155,11 +155,7 @@ class Core_Controller extends Core_Servant_Properties
 	 */
 	public function show()
 	{
-		Core_Event::notify(get_class($this) . '.onBeforeShow', $this);
-
 		echo $this->get();
-
-		Core_Event::notify(get_class($this) . '.onAfterShow', $this);
 
 		return $this;
 	}
@@ -171,6 +167,8 @@ class Core_Controller extends Core_Servant_Properties
 	 */
 	public function get()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeShow', $this);
+
 		if (is_null($this->_xsl))
 		{
 			throw new Core_Exception('Xsl does not exist.');
@@ -189,6 +187,8 @@ class Core_Controller extends Core_Servant_Properties
 			"<pre>" . htmlspecialchars(
 				Xsl_Processor::instance()->formatXml($sXml)
 			) . "</pre>";*/
+
+		Core_Event::notify(get_class($this) . '.onAfterShow', $this);
 
 		return $return;
 	}

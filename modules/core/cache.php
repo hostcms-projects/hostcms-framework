@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Cache
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Cache
 {
@@ -44,6 +44,17 @@ abstract class Core_Cache
 	 */
 	abstract public function available();
 
+	/**
+	 * Check if data exists
+	 * @param string $key key name
+	 * @param string $cacheName cache name
+	 * @return NULL|TRUE|FALSE
+	 */
+	public function check($key, $cacheName = 'default')
+	{
+		return NULL;
+	}
+	
 	/**
 	 * Get data from cache
 	 * @param string $key key name

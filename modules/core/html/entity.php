@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Html
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Html_Entity extends Core_Servant_Properties
 {
@@ -137,6 +137,38 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 		return $this;
 	}
 
+	protected function _find($haystack, $object)
+	{
+		$aChildren = $haystack->getChildren();
+
+		$key = array_search($object, $aChildren, $strict = TRUE);
+
+		if ($key !== FALSE)
+		{
+			return array($key, $haystack);
+		}
+		else
+		{
+			foreach ($aChildren as $tmpKey => $tmpObject)
+			{
+				$result = $this->_find($tmpObject, $object);
+
+				if ($result)
+				{
+					return $result;
+				}
+			}
+		}
+
+		return FALSE;
+	}
+
+	protected function _addBefore($key, $oCore_Html_Entity)
+	{
+		array_splice($this->_children, $key, 0, array($oCore_Html_Entity));
+		return $this;
+	}
+
 	/**
 	 * Add new entity before $oAdmin_Form_Entity_Before
 	 * @param Admin_Form_Entity $oCore_Html_Entity new entity
@@ -145,12 +177,18 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 	 */
 	public function addBefore($oCore_Html_Entity, $oCore_Html_Entity_Before)
 	{
-		// Find key for before object
-		$key = array_search($oCore_Html_Entity_Before, $this->_children, $strict = TRUE);
+		// Find key for 'before' object
+		//$key = array_search($oCore_Html_Entity_Before, $this->_children, $strict = TRUE);
 
-		if ($key !== FALSE)
+		$result = $this->_find($this, $oCore_Html_Entity_Before);
+
+		if ($result !== FALSE)
 		{
-			array_splice($this->_children, $key, 0, array($oCore_Html_Entity));
+			list($key, $haystack) = $result;
+			/*array_splice($this->_children, $key, 0, array($oCore_Html_Entity));
+			return $this;*/
+
+			$haystack->_addBefore($key, $oCore_Html_Entity);
 			return $this;
 		}
 
@@ -158,6 +196,12 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 			"addBefore(): before adding object '%name' does not exist.",
 			array('%name' => $oCore_Html_Entity_Before->name)
 		);
+	}
+
+	protected function _addAfter($key, $oCore_Html_Entity)
+	{
+		array_splice($this->_children, $key + 1, 0, array($oCore_Html_Entity));
+		return $this;
 	}
 
 	/**
@@ -168,12 +212,19 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 	 */
 	public function addAfter($oCore_Html_Entity, $oCore_Html_Entity_After)
 	{
-		// Find key for after object
-		$key = array_search($oCore_Html_Entity_After, $this->_children, $strict = TRUE);
+		// Find key for 'after' object
+		//$key = array_search($oCore_Html_Entity_After, $this->_children, $strict = TRUE);
 
-		if ($key !== FALSE)
+		$result = $this->_find($this, $oCore_Html_Entity_After);
+
+		if ($result !== FALSE)
 		{
-			array_splice($this->_children, $key + 1, 0, array($oCore_Html_Entity));
+			list($key, $haystack) = $result;
+
+			//array_splice($this->_children, $key + 1, 0, array($oCore_Html_Entity));
+			//return $this;
+
+			$haystack->_addAfter($key, $oCore_Html_Entity);
 			return $this;
 		}
 
@@ -183,6 +234,31 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 		);
 	}
 
+	protected function _deleteObject($oSource_Object, $Core_Html_Entity)
+	{
+		$haystack = $oSource_Object->getChildren();
+
+		foreach ($haystack as $key => $object)
+		{
+			if ($object == $Core_Html_Entity)
+			{
+				$oSource_Object->deleteChild($key);
+
+				return TRUE;
+			}
+			// Ищем в потомках
+			else
+			{
+				if ($this->_deleteObject($object, $Core_Html_Entity))
+				{
+					return TRUE;
+				}
+			}
+		}
+
+		return FALSE;
+	}
+
 	/**
 	 * Delete child element
 	 * @param Core_Html_Entity $oCore_Html_Entity element
@@ -190,7 +266,9 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 	 */
 	public function delete(Core_Html_Entity $oCore_Html_Entity)
 	{
-		foreach ($this->_children as $key => $object)
+		$result = $this->_deleteObject($this, $oCore_Html_Entity);
+
+		/*foreach ($this->_children as $key => $object)
 		{
 			if ($oCore_Html_Entity == $object)
 			{
@@ -201,9 +279,14 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 
 				return $this;
 			}
+		}*/
+
+		if (!$result)
+		{
+			throw new Core_Exception("delete(): deleting object does not exist.");
 		}
 
-		throw new Core_Exception("delete(): deleting object does not exist.");
+		return $this;
 	}
 
 	/**
@@ -233,6 +316,19 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 		return $this->_children;
 	}
 
+	public function deleteChild($key)
+	{
+		if (isset($this->_children[$key]))
+		{
+			unset($this->_children[$key]);
+
+			// Reset keys
+			$this->_children = array_values($this->_children);
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Get count of children entities
 	 * @return int
@@ -244,12 +340,24 @@ abstract class Core_Html_Entity extends Core_Servant_Properties
 
 	/**
 	 * Executes the business logic.
+	 * @return self
 	 */
 	public function execute()
+	{
+		return $this->executeChildren();
+	}
+
+	/**
+	 * Execute all children
+	 * @return self
+	 */
+	public function executeChildren()
 	{
 		foreach ($this->_children as $oCore_Html_Entity)
 		{
 			$oCore_Html_Entity->execute();
 		}
+
+		return $this;
 	}
 }

@@ -91,6 +91,8 @@ class Property_Value_Int_Model extends Core_Entity
 	 * Get XML for entity and children entities
 	 * @return string
 	 * @hostcms-event property_value_int.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_int.onBeforeAddInformationsystemItem
+	 * @hostcms-event property_value_int.onBeforeAddShopItem
 	 */
 	public function getXml()
 	{
@@ -145,9 +147,13 @@ class Property_Value_Int_Model extends Core_Entity
 				{
 					$oInformationsystem_Item->shortcut_id && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
 
-					$this->addEntity(
-						$oInformationsystem_Item->clearEntities()->showXmlProperties(count($aTmp) ? $aTmp : FALSE)
-					);
+					$oInformationsystem_Item
+						->clearEntities()
+						->showXmlProperties(count($aTmp) ? $aTmp : FALSE);
+
+					Core_Event::notify($this->_modelName . '.onBeforeAddInformationsystemItem', $this, array($oInformationsystem_Item));
+
+					$this->addEntity($oInformationsystem_Item);
 				}
 			}
 		}
@@ -177,9 +183,13 @@ class Property_Value_Int_Model extends Core_Entity
 				{
 					$oShop_Item->shortcut_id && $oShop_Item = $oShop_Item->Shop_Item;
 
-					$this->addEntity(
-						$oShop_Item->clearEntities()->showXmlProperties(count($aTmp) ? $aTmp : FALSE)
-					);
+					$oShop_Item
+						->clearEntities()
+						->showXmlProperties(count($aTmp) ? $aTmp : FALSE);
+
+					Core_Event::notify($this->_modelName . '.onBeforeAddShopItem', $this, array($oShop_Item));
+
+					$this->addEntity($oShop_Item);
 				}
 			}
 		}

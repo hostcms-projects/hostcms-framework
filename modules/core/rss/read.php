@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Rss
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Rss_Read
 {
@@ -26,11 +26,11 @@ class Core_Rss_Read
 	protected $_encoding = '';
 
 	/**
-	 * Пустой массив с полями канала
+	 * Пустой массив с полями записи
 	 *
 	 * @var array
 	 */
-	protected $_default_row = array(
+	static protected $_defaultRow = array(
 		'title' => '',
 		'link' => '',
 		'description' => '',
@@ -38,7 +38,23 @@ class Core_Rss_Read
 		'pubdate' => '',
 		'yandex:full-text' => ''
 	);
-
+	
+	/**
+	 * Пустой массив с полями канала
+	 *
+	 * @var array
+	 */
+	static protected $_defaultChanel = array(
+		'title' => '',
+		'link' => '',
+		'description' => '',
+		'image' => array(
+			'title' => '',
+			'link' => '',
+			'url' => ''
+		)
+	);
+	
 	/**
 	 * XML parser
 	 */
@@ -74,6 +90,14 @@ class Core_Rss_Read
 	 */
 	protected $_itemCount = 0;
 
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		$this->_chanel = self::$_defaultChanel;
+	}
+	
 	/**
 	 * Callback function for xml parser
 	 * @param string $parser reference to the XML parser to set up character data handler function
@@ -118,7 +142,7 @@ class Core_Rss_Read
 			$this->_itemCount++;
 			if (!isset($this->_items[$this->_itemCount]))
 			{
-				$this->_items[$this->_itemCount] = $this->_default_row;
+				$this->_items[$this->_itemCount] = self::$_defaultRow;
 			}
 		}
 
@@ -196,9 +220,8 @@ class Core_Rss_Read
 	 */
 	public function clear()
 	{
-		$this->_chanel['title'] = $this->_chanel['link'] = $this->_chanel['description'] =  $this->_chanel['image']['title'] = $this->_chanel['image']['link'] = $this->_chanel['image']['url'] = '';
-
-		$this->_data = $this->_rss = $this->_tag = '';
+		$this->_chanel = self::$_defaultChanel;
+		$this->_data = $this->_rss = $this->_tag = NULL;
 
 		return $this;
 	}
@@ -266,7 +289,7 @@ class Core_Rss_Read
 	{
 		$this->_itemCount = 0;
 
-		$this->_items = array (0 => $this->_default_row);
+		$this->_items = array (0 => self::$_defaultRow);
 
 		$this->_xml_parser = xml_parser_create($encoding);
 		$this->_encoding = xml_parser_get_option($this->_xml_parser, XML_OPTION_TARGET_ENCODING);

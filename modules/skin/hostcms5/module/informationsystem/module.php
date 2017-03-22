@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Hostcms5_Module_Informationsystem_Module extends Informationsystem_Module{
 	/**
@@ -19,13 +19,14 @@ class Skin_Hostcms5_Module_Informationsystem_Module extends Informationsystem_Mo
 	 */	public function adminPage($type = 0, $ajax = FALSE)
 	{
 		$oUser = Core_Entity::factory('User')->getCurrent();
-		
+
 		$oComments = Core_Entity::factory('Comment');
-		
+
 		$oComments->queryBuilder()
-			->leftJoin('comment_informationsystem_items', 'comments.id', '=', 'comment_informationsystem_items.comment_id')
-			->leftJoin('informationsystem_items', 'comment_informationsystem_items.informationsystem_item_id', '=', 'informationsystem_items.id')
-			->leftJoin('informationsystems', 'informationsystem_items.informationsystem_id', '=', 'informationsystems.id')
+			->straightJoin()
+			->join('comment_informationsystem_items', 'comments.id', '=', 'comment_informationsystem_items.comment_id')
+			->join('informationsystem_items', 'comment_informationsystem_items.informationsystem_item_id', '=', 'informationsystem_items.id')
+			->join('informationsystems', 'informationsystem_items.informationsystem_id', '=', 'informationsystems.id')
 			->where('informationsystem_items.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
 			->where('site_id', '=', CURRENT_SITE)

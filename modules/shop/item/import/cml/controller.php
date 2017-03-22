@@ -251,7 +251,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oItem->shop_seller_id = $oSeller->id;
 				break;
 				case 'ПРОИЗВОДИТЕЛЬ':
-				
+
 					if(trim($sPropertyValue) != '')
 					{
 						$oProducer = Core_Entity::factory('Shop', $this->iShopId)->Shop_Producers->getByName($sPropertyValue, FALSE);
@@ -492,6 +492,26 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 				$oShopItem->shop_id = $this->iShopId;
 
+				// check item path
+				$oShopItem->makePath();
+
+				$oSameShopItem = Core_Entity::factory('Shop', $this->iShopId)->Shop_Items->getByGroupIdAndPath($oShopItem->shop_group_id, $oShopItem->path);
+
+				if (!is_null($oSameShopItem) && $oSameShopItem->id != $oShopItem->id)
+				{
+					$oShopItem->path = Core_Guid::get();
+				}
+				else
+				{
+					$oSameShopGroup = Core_Entity::factory('Shop', $this->iShopId)->Shop_Groups->getByParentIdAndPath($oShopItem->shop_group_id, $oShopItem->path);
+
+					if (!is_null($oSameShopGroup))
+					{
+						$oShopItem->path = Core_Guid::get();
+					}
+				}
+				
+				
 				if (($oShopItem->id
 				&& $this->importAction == 1
 				&& !is_null($oShopItem->name)))
@@ -500,7 +520,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 				elseif (!is_null($oShopItem->name))
 				{
-					is_null($oShopItem->path) && $oShopItem->path='';
+					is_null($oShopItem->path) && $oShopItem->path = '';
+
 					$oShopItem->save();
 				}
 				else
@@ -513,6 +534,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				foreach ($this->xpath($oItem, 'Описание') as $DescriptionData)
 				{
 					$oShopItem->text = nl2br(strval($DescriptionData));
+					$oShopItem->save();
+				}
+
+				// Обрабатываем "малое описание" товара. Данный тег не соответствует стандарту CommerceML!
+				foreach ($this->xpath($oItem, 'МалоеОписание') as $DescriptionData)
+				{
+					$oShopItem->description = nl2br(strval($DescriptionData));
 					$oShopItem->save();
 				}
 
@@ -565,7 +593,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 								$oShop_Item_Property_List->add($oProperty);
 							}
-							
+
 							$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
 								? intval($oShopItem->Shop_Group->id)
 								: intval($oShopItem->Modification->Shop_Group->id)
@@ -724,7 +752,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oShopItem->save() && $bFirstPicture = FALSE;
 					}
 				}
-				
+
 				// До обработки свойств из 1С нужно записать значения "по умолчанию" для всех свойств, заданных данной группе товара
 				$aProperties = Core_Entity::factory('Shop_Item_Property_List', $oShop->id)->Properties;
 				$aProperties
@@ -732,16 +760,16 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					->join('shop_item_property_for_groups', 'shop_item_property_for_groups.shop_item_property_id', '=', 'shop_item_properties.id')
 					->where('shop_item_property_for_groups.shop_id', '=', $oShop->id)
 					->where('shop_item_property_for_groups.shop_group_id', '=', $oShopItem->Shop_Group->id);
-					
+
 				$aProperties = $aProperties->findAll(FALSE);
-				
+
 				foreach($aProperties as $oProperty)
 				{
 					if($oProperty->type==2)
 					{
 						continue;
 					}
-				
+
 					$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
 
 					if(count($aPropertyValues) == 0)

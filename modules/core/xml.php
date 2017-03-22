@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Xml
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Xml
 {
@@ -54,5 +54,27 @@ class Core_Xml
 		}
 
 		return $array ;
+	}
+	
+	/**
+	 * Array to XML
+	 * @param array $array Array
+	 * @return string
+	 */
+	static public function array2xml(array $array)
+	{
+		$sReturn = '';
+		
+		foreach ($array as $key => $value)
+		{
+			$key = Core_Str::xml($key);
+			$sReturn .= '<' . $key . '>' . (
+				is_array($value)
+					? "\n" . self::array2xml($value)
+					: Core_Str::xml($value)
+			) . '</' . $key . ">\n";
+		}
+		
+		return $sReturn;
 	}
 }

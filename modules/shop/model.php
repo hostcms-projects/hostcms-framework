@@ -445,6 +445,12 @@ class Shop_Model extends Core_Entity{
 	{
 		$shop_id = $this->id;
 
+		if (!defined('DENY_INI_SET') || !DENY_INI_SET)
+		{
+			@set_time_limit(90000);
+			ini_set('max_execution_time', '90000');
+		}
+
 		$this->_groupsTree = array();
 		$queryBuilder = Core_QueryBuilder::select('id', 'parent_id')
 			->from('shop_groups')

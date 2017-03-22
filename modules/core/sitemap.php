@@ -48,6 +48,12 @@ class Core_Sitemap extends Core_Servant_Properties
 	{
 		parent::__construct();
 
+		if (!defined('DENY_INI_SET') || !DENY_INI_SET)
+		{
+			@set_time_limit(90000);
+			ini_set('max_execution_time', '90000');
+		}
+
 		$this->_oSite = $oSite;
 
 		$this->_aSiteuserGroups = array(0, -1);
@@ -308,6 +314,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 		if ($this->_bRebuild)
 		{
+			$this->createIndex && $this->createSitemapDir();
+
 			$this->_Informationsystems = $this->_Shops = array();
 
 			$oSite = $this->getSite();
@@ -421,10 +429,11 @@ class Core_Sitemap extends Core_Servant_Properties
 			$this->_inFile = 0;
 		}
 
-		$this->_aIndexedFiles[] = $filename = "sitemap{$this->_countFile}.xml";
+		$this->_aIndexedFiles[] = $filename = "sitemap-{$this->_oSite->id}-{$this->_countFile}.xml";
 
 		$this->_currentOut = new Core_Out_File();
-		$this->_currentOut->filePath(CMS_FOLDER . $filename);
+		//$this->_currentOut->filePath(CMS_FOLDER . $filename);
+		$this->_currentOut->filePath($this->getSitemapDir() . $filename);
 		$this->_open();
 	}
 
@@ -468,7 +477,27 @@ class Core_Sitemap extends Core_Servant_Properties
 	 */
 	protected function _getIndexFilePath()
 	{
-		return CMS_FOLDER . 'sitemap.xml';
+		return CMS_FOLDER . "sitemap-{$this->_oSite->id}.xml";
+	}
+
+	public function createSitemapDir()
+	{
+		clearstatcache();
+
+		$sSitemapDir = $this->getSitemapDir();
+		!is_dir($sSitemapDir) && Core_File::mkdir($sSitemapDir);
+
+		return $this;
+	}
+
+	public function getSitemapDir()
+	{
+		return CMS_FOLDER . 'hostcmsfiles' . DIRECTORY_SEPARATOR . 'sitemap' . DIRECTORY_SEPARATOR;
+	}
+
+	public function getSitemapHref()
+	{
+		return '/hostcmsfiles/sitemap/';
 	}
 
 	/**
@@ -482,6 +511,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 		if ($this->createIndex)
 		{
+			$this->createSitemapDir();
+
 			if ($this->_bRebuild)
 			{
 				$sIndex = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -492,7 +523,7 @@ class Core_Sitemap extends Core_Servant_Properties
 				foreach ($this->_aIndexedFiles as $filename)
 				{
 					$sIndex .= "<sitemap>\n";
-					$sIndex .= "<loc>http://{$oSite_Alias->name}/{$filename}</loc>\n";
+					$sIndex .= "<loc>http://{$oSite_Alias->name}{$this->getSitemapHref()}{$filename}</loc>\n";
 					$sIndex .= "<lastmod>" . date('Y-m-d') . "</lastmod>\n";
 					$sIndex .= "</sitemap>\n";
 				}

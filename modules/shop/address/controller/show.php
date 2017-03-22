@@ -113,7 +113,7 @@ class Shop_Address_Controller_Show extends Core_Controller
 		}
 
 		$this->countries && $this->addEntities(
-			Core_Entity::factory('Shop_Country')->findAll()
+			Core_Entity::factory('Shop_Country')->findAll(FALSE)
 		);
 
 		if (!is_null($this->_Siteuser) && strlen($this->_Siteuser->country))

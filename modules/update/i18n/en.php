@@ -33,4 +33,7 @@ return array(
 	'server_return_empty_answer' => 'Server returned an empty response. Outgoing connections using fsockopen() may be forbidden on the hosting server. Please contact your hosting provider or server administrator.',
 	'support_available' => 'Period of technical support has available until %s.',
 	'support_has_expired' => 'Period of technical support has expired at %s. <a href="http://%s/users/">Extend technical support in private office</a>.',
+	'msg_update_required' => 'Update %s required',
+	'msg_installing_package' => 'Installing package %s',
+	'msg_unpack_package' => 'Unpacking file %s',
 );

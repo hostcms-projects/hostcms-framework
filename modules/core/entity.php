@@ -56,6 +56,7 @@ class Core_Entity extends Core_ORM
 	public function addAllowedTag($tag)
 	{
 		$this->_allowedTags[$tag] = $tag;
+		return $this;
 	}
 
 	/**

@@ -20,7 +20,7 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-12-05';
+	public $date = '2015-01-29';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -185,12 +185,19 @@ class Shop_Module extends Core_Module{	/**
 			->queryBuilder()
 			->join('shops', 'shop_items.shop_id', '=', 'shops.id')
 			->join('structures', 'shops.structure_id', '=', 'structures.id')
+			->leftJoin('shop_groups', 'shop_items.shop_group_id', '=', 'shop_groups.id')
 			->where('structures.active', '=', 1)
 			->where('structures.indexing', '=', 1)
 			->where('shop_items.indexing', '=', 1)
-			->where('shop_items.active', '=', 1)
 			->where('shop_items.shortcut_id', '=', 0)
+			->where('shop_items.active', '=', 1)
 			->where('shop_items.deleted', '=', 0)
+			->open()
+			->where('shop_groups.id', 'IS', NULL)
+			->setOr()
+			->where('shop_groups.active', '=', 1)
+			->where('shop_groups.indexing', '=', 1)
+			->close()
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
 			->orderBy('shop_items.id')

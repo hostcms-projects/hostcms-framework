@@ -5,7 +5,7 @@
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Domains',
@@ -44,4 +44,6 @@ return array(
 	'getKey_success' => 'Key received successfully.',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	'redirect' => '<acronym title="Use 301 redirect to base domain">Redirect</acronym>',
+	'setRedirect_success' => 'Information has been saved',
 );

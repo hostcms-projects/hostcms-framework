@@ -72,6 +72,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 		'bathroom-unit',
 		'floor-covering',
 		'window-view',
+		'floor',
 
 		/* Описание здания  */
 		'floors-total',
@@ -126,11 +127,10 @@ class Shop_Controller_YandexRealty extends Core_Controller
 	);
 
 	/**
-	 * Object's areas
+	 * Информация о площадях объекта.
 	 * @var array
 	 */
 	public $aAreaTags = array(
-	/* Информация о площадях объекта */
 		'area',
 		'living-space',
 		'kitchen-space',
@@ -244,6 +244,51 @@ class Shop_Controller_YandexRealty extends Core_Controller
 	}
 
 	/**
+	 * Get value depends on type, e.g. list item for list-type property
+	 * @param Core_Entity $oProperty_Value
+	 * @return mixed
+	 */
+	protected function _getValue(Core_Entity $oProperty_Value)
+	{
+		$oProperty = $oProperty_Value->Property;
+
+		switch ($oProperty->type)
+		{
+			case 0: // Int
+			case 1: // String
+			case 4: // Textarea
+			case 6: // Wysiwyg
+			case 8: // Date
+			case 9: // Datetime
+				$value = $oProperty_Value->value;
+			break;
+
+			case 3: // List
+				$value = NULL;
+
+				$oList_Item = $oProperty->List->List_Items->getById(
+					$oProperty_Value->value, FALSE
+				);
+
+				!is_null($oList_Item) && $value = $oList_Item->value;
+			break;
+
+			case 7: // Checkbox
+				$value = $oProperty_Value->value == 1 ? 'да' : NULL;
+			break;
+
+			case 2: // File
+			case 5: // ИС
+			case 10: // Hidden field
+			default:
+				$value = NULL;
+			break;
+		}
+		
+		return $value;
+	}
+	
+	/**
 	 * Show offers
 	 * @return self
 	 */
@@ -297,40 +342,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 
 						foreach ($aProperty_Values as $oProperty_Value)
 						{
-							$oProperty = $oProperty_Value->Property;
-
-							switch ($oProperty->type)
-							{
-								case 0: // Int
-								case 1: // String
-								case 4: // Textarea
-								case 6: // Wysiwyg
-								case 8: // Date
-								case 9: // Datetime
-									$value = $oProperty_Value->value;
-								break;
-
-								case 3: // List
-									$value = NULL;
-
-									$oList_Item = $oProperty->List->List_Items->getById(
-										$oProperty_Value->value, FALSE
-									);
-
-									!is_null($oList_Item) && $value = $oList_Item->value;
-								break;
-
-								case 7: // Checkbox
-									$value = $oProperty_Value->value == 1 ? 'есть' : NULL;
-								break;
-
-								case 2: // File
-								case 5: // ИС
-								case 10: // Hidden field
-								default:
-									$value = NULL;
-								break;
-							}
+							$value = $this->_getValue($oProperty_Value);
 
 							if (!is_null($value))
 							{
@@ -358,7 +370,9 @@ class Shop_Controller_YandexRealty extends Core_Controller
 						$aLocationValues = $oLocation->getValues($oShop_Item->id);
 						if(isset($aLocationValues[0]))
 						{
-							echo '<' . $locationTagName . '>' . $aLocationValues[0]->value . '</' . $locationTagName . '>'."\n";
+							$value = $this->_getValue($aLocationValues[0]);
+							
+							echo '<' . $locationTagName . '>' . $value . '</' . $locationTagName . '>'."\n";
 						}
 					}
 				}
@@ -414,9 +428,9 @@ class Shop_Controller_YandexRealty extends Core_Controller
 							$aAreaValues = $oArea->getValues($oShop_Item->id);
 							if(isset($aAreaValues[0]))
 							{
-								echo '<' . $areaTagName . '-' . $subAreaTagName . '>' .
-									$aAreaValues[0]->value .
-								'</' . $areaTagName . '-' . $subAreaTagName . '>'."\n";
+								$value = $this->_getValue($aAreaValues[0]);
+								
+								echo '<' . $subAreaTagName . '>' . $value . '</' . $subAreaTagName . '>' . "\n";
 							}
 						}
 					}

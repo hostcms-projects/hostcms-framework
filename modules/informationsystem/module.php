@@ -20,7 +20,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-12-05';
+	public $date = '2015-01-29';
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -162,12 +162,19 @@ class Informationsystem_Module extends Core_Module{	/**
 			->queryBuilder()
 			->join('informationsystems', 'informationsystem_items.informationsystem_id', '=', 'informationsystems.id')
 			->join('structures', 'informationsystems.structure_id', '=', 'structures.id')
+			->leftJoin('informationsystem_groups', 'informationsystem_items.informationsystem_group_id', '=', 'informationsystem_groups.id')
 			->where('structures.active', '=', 1)
 			->where('structures.indexing', '=', 1)
 			->where('informationsystem_items.indexing', '=', 1)
 			->where('informationsystem_items.active', '=', 1)
 			->where('informationsystem_items.shortcut_id', '=', 0)
 			->where('informationsystem_items.deleted', '=', 0)
+			->open()
+			->where('informationsystem_groups.id', 'IS', NULL)
+			->setOr()
+			->where('informationsystem_groups.active', '=', 1)
+			->where('informationsystem_groups.indexing', '=', 1)
+			->close()			
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
 			->orderBy('informationsystem_items.id')

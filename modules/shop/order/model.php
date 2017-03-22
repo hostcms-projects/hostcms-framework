@@ -53,8 +53,8 @@ class Shop_Order_Model extends Core_Entity
 	protected $_preloadValues = array(
 		'shop_country_location_city_area_id' => 0,
 		'shop_country_location_city_id' => 0,
-		'shop_country_id' => 0,
 		'shop_country_location_id' => 0,
+		'shop_country_id' => 0,
 		'unloaded' => 0
 	);
 
@@ -742,7 +742,7 @@ class Shop_Order_Model extends Core_Entity
 
 			// Списать товары
 			$this->_paidTransaction();
-			
+
 			// Удалить зарезервированные товары
 			$this->Shop_Item_Reserveds->deleteAll();
 		}

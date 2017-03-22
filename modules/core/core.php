@@ -616,6 +616,7 @@ class Core
 			}
 
 			self::$url = parse_url($sUrl) + array(
+				'scheme' => 'http',
 				'host' => '',
 				'path' => ''
 			);

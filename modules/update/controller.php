@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Controller extends Core_Servant_Properties
 {
@@ -110,7 +110,7 @@ class Update_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Загрузка файла обновления
+	 * Загрузка XML со списком обновлений
 	 *
 	 * @param string $path
 	 * @return Core_Http
@@ -118,13 +118,13 @@ class Update_Controller extends Core_Servant_Properties
 	public function getUpdateFile($path)
 	{
 		$url = 'http://' . $this->update_server . $path . "&domain=".rawurlencode($this->domain) .
-		"&login=" . rawurlencode($this->login) .
-		"&contract=" . rawurlencode(md5($this->contract)) .
-		"&pin=" . rawurlencode(md5($this->pin)) .
-		"&cms_folder=" . rawurlencode($this->cms_folder) .
-		"&php_version=" . rawurlencode($this->php_version) .
-		"&mysql_version=" . rawurlencode($this->mysql_version) .
-		"&update_id=" . $this->update_id . "&install_beta_update=" . rawurlencode($this->install_beta);
+			"&login=" . rawurlencode($this->login) .
+			"&contract=" . rawurlencode(md5($this->contract)) .
+			"&pin=" . rawurlencode(md5($this->pin)) .
+			"&cms_folder=" . rawurlencode($this->cms_folder) .
+			"&php_version=" . rawurlencode($this->php_version) .
+			"&mysql_version=" . rawurlencode($this->mysql_version) .
+			"&update_id=" . $this->update_id . "&install_beta_update=" . rawurlencode($this->install_beta);
 
 		$Core_Http = Core_Http::instance()
 			->url($url)
@@ -136,21 +136,21 @@ class Update_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Загрузка XML обновления
+	 * Загрузка файла для обновления $update_key_id
 	 *
 	 * @param int $update_id update ID
 	 * @return string
 	 */
-	public function getUpdate($update_id)
+	public function getUpdate($update_key_id)
 	{
 		$url = 'http://' . $this->update_server . "/hostcmsupdate/?action=get_update&domain=".rawurlencode($this->domain) .
-		"&login=" . rawurlencode($this->login) .
-		"&contract=" . rawurlencode(md5($this->contract)) .
-		"&pin=" . rawurlencode(md5($this->pin)) .
-		"&cms_folder=" . rawurlencode($this->cms_folder) .
-		"&php_version=" . rawurlencode($this->php_version) .
-		"&mysql_version=" . rawurlencode($this->mysql_version) .
-		"&update_id=" . $this->update_id . "&update_key_id=" . rawurlencode($update_id) . "&install_beta_update=" . rawurlencode($this->install_beta);
+			"&login=" . rawurlencode($this->login) .
+			"&contract=" . rawurlencode(md5($this->contract)) .
+			"&pin=" . rawurlencode(md5($this->pin)) .
+			"&cms_folder=" . rawurlencode($this->cms_folder) .
+			"&php_version=" . rawurlencode($this->php_version) .
+			"&mysql_version=" . rawurlencode($this->mysql_version) .
+			"&update_id=" . $this->update_id . "&update_key_id=" . rawurlencode($update_key_id) . "&install_beta_update=" . rawurlencode($this->install_beta);
 
 		$Core_Http = Core_Http::instance()
 			->url($url)
@@ -238,13 +238,13 @@ class Update_Controller extends Core_Servant_Properties
 	{
 		// Формируем строку запроса
 		$url = 'http://' . $this->update_server . "/hostcmsupdate/?action=get_listupdate&domain=".rawurlencode($this->domain) .
-		"&login=" . rawurlencode($this->login) .
-		"&contract=" . rawurlencode(md5($this->contract)) .
-		"&pin=" . rawurlencode(md5($this->pin)) .
-		"&cms_folder=" . rawurlencode($this->cms_folder) .
-		"&php_version=" . rawurlencode($this->php_version) .
-		"&mysql_version=" . rawurlencode($this->mysql_version) .
-		"&update_id={$this->update_id}&install_beta_update=" . rawurlencode($this->install_beta);
+			"&login=" . rawurlencode($this->login) .
+			"&contract=" . rawurlencode(md5($this->contract)) .
+			"&pin=" . rawurlencode(md5($this->pin)) .
+			"&cms_folder=" . rawurlencode($this->cms_folder) .
+			"&php_version=" . rawurlencode($this->php_version) .
+			"&mysql_version=" . rawurlencode($this->mysql_version) .
+			"&update_id={$this->update_id}&install_beta_update=" . rawurlencode($this->install_beta);
 
 		if (is_array($this->keys))
 		{

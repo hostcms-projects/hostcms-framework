@@ -1907,6 +1907,7 @@ class Shop_Item_Model extends Core_Entity
 				$parentObject->addEntity($oComment
 					->clearEntities()
 					->showXmlProperties($this->_showXmlSiteuserProperties)
+					->showXmlVotes($this->_showXmlVotes)
 					->dateFormat($this->Shop->format_date)
 					->dateTimeFormat($this->Shop->format_datetime)
 				);

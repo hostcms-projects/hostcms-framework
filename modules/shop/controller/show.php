@@ -280,7 +280,8 @@ class Shop_Controller_Show extends Core_Controller
 				$this->_Shop_Items
 					->queryBuilder()
 					->orderBy('shop_items.name', $items_sorting_direction)
-					->orderBy('shop_items.sorting', $items_sorting_direction);
+					//->orderBy('shop_items.sorting', $items_sorting_direction)
+					;
 				break;
 			case 2:
 				$this->_Shop_Items
@@ -293,10 +294,9 @@ class Shop_Controller_Show extends Core_Controller
 				$this->_Shop_Items
 					->queryBuilder()
 					->orderBy('shop_items.datetime', $items_sorting_direction)
-					->orderBy('shop_items.sorting', $items_sorting_direction);
+					//->orderBy('shop_items.sorting', $items_sorting_direction)
+					;
 		}
-
-
 
 		$this->_Shop_Items
 			->queryBuilder()
@@ -543,6 +543,21 @@ class Shop_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Check if data is cached
+	 * @return NULL|TRUE|FALSE
+	 */
+	public function inCache()
+	{
+		if ($this->cache && Core::moduleIsActive('cache'))
+		{
+			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+		}
+
+		return FALSE;
+	}
+
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Shop_Controller_Show.onBeforeRedeclaredShow
@@ -552,6 +567,8 @@ class Shop_Controller_Show extends Core_Controller
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
 
 		$this->showPanel && Core::checkPanel() && $this->_showPanel();
+
+		$this->item && $this->_incShowed();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
@@ -921,9 +938,6 @@ class Shop_Controller_Show extends Core_Controller
 			$this->_Shop_Items
 				->queryBuilder()
 				->where('shop_items.id', '=', intval($this->item));
-
-			// Inc
-			$this->_incShowed();
 		}
 		elseif (!is_null($this->tag))
 		{

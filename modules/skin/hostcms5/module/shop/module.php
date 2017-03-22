@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Hostcms5_Module_Shop_Module extends Shop_Module{
 	/**
@@ -23,9 +23,10 @@ class Skin_Hostcms5_Module_Shop_Module extends Shop_Module{
 		$oComments = Core_Entity::factory('Comment');
 		
 		$oComments->queryBuilder()
-			->leftJoin('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
-			->leftJoin('shop_items', 'comment_shop_items.shop_item_id', '=', 'shop_items.id')
-			->leftJoin('shops', 'shop_items.shop_id', '=', 'shops.id')
+			->straightJoin()
+			->join('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
+			->join('shop_items', 'comment_shop_items.shop_item_id', '=', 'shop_items.id')
+			->join('shops', 'shop_items.shop_id', '=', 'shops.id')
 			->where('shop_items.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('site_id', '=', CURRENT_SITE)

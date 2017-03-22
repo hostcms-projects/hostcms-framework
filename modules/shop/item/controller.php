@@ -163,6 +163,7 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		{
 			$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
 			$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
+			$this->_aPrice['discount'] = $oShop_Controller->round($this->_aPrice['discount']);
 			$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
 			$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
 		}

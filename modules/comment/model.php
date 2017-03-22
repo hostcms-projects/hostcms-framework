@@ -108,6 +108,23 @@ class Comment_Model extends Core_Entity
 	}
 
 	/**
+	 * Show votes in XML
+	 * @var boolean
+	 */
+	protected $_showXmlVotes = FALSE;
+
+	/**
+	 * Add votes XML to item
+	 * @param boolean $showXmlSiteuser mode
+	 * @return self
+	 */
+	public function showXmlVotes($showXmlVotes = TRUE)
+	{
+		$this->_showXmlVotes = $showXmlVotes;
+		return $this;
+	}
+	
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -304,7 +321,7 @@ class Comment_Model extends Core_Entity
 			);
 		}
 
-		if (Core::moduleIsActive('siteuser'))
+		if ($this->_showXmlVotes && Core::moduleIsActive('siteuser'))
 		{
 			$aRate = Vote_Controller::instance()->getRateByObject($this);
 

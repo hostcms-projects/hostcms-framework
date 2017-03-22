@@ -269,9 +269,9 @@ class Informationsystem_Item_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			//->clear()
-			->where('path', '=', $path)
-			->where('informationsystem_group_id', '=', $group_id)
-			->where('shortcut_id', '=', 0)
+			->where('informationsystem_items.path', '=', $path)
+			->where('informationsystem_items.informationsystem_group_id', '=', $group_id)
+			->where('informationsystem_items.shortcut_id', '=', 0)
 			->limit(1);
 
 		$aInformationsystem_Items = $this->findAll();
@@ -1295,6 +1295,7 @@ class Informationsystem_Item_Model extends Core_Entity
 					$oComment
 						->clearEntities()
 						->showXmlProperties($this->_showXmlSiteuserProperties)
+						->showXmlVotes($this->_showXmlVotes)
 						->dateFormat($this->InformationSystem->format_date)
 						->dateTimeFormat($this->InformationSystem->format_datetime)
 				);

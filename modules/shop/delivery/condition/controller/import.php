@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -232,7 +232,7 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 		// Кнопка "Отправить"
 		$oAdmin_Form_Entity_Button_Send = Admin_Form_Entity::factory('Button')
 			->name('doImport')
-			->class('applyButton')
+			->class('applyButton btn btn-blue')
 			->value(Core::_('Shop_Delivery_Condition.import_button'))
 			->onclick(
 				$this->_Admin_Form_Controller->getAdminSendForm('import', 'doImport')

@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Kruglov Sergei
  * @author Hostmake LLC
  * @copyright © 2006, 2007, 2008, 2011 Kruglov Sergei, http://www.captcha.ru
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Captcha
 {
@@ -147,7 +147,7 @@ class Core_Captcha
 
 	/**
 	 * Create value for CAPTCHA
-	 * @return string 
+	 * @return string
 	 */
 	static public function createValue()
 	{
@@ -521,7 +521,14 @@ class Core_Captcha
 	 */
 	public static function contentLength($content)
 	{
-		header('Content-Length: ' . strlen($content));
+		$func_overload = intval(ini_get('mbstring.func_overload'));
+
+		header('Content-Length: ' . (
+			$func_overload && ($func_overload & 2)
+				? mb_strlen($content, 'latin1')
+				: strlen($content)
+		));
+
 		return $content;
 	}
 

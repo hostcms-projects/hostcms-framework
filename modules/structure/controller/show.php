@@ -94,6 +94,12 @@ class Structure_Controller_Show extends Core_Controller
 	protected $_aSiteuserGroups = array();
 
 	/**
+	 * Cache name
+	 * @var string
+	 */
+	protected $_cacheName = 'structure_show';
+	
+	/**
 	 * Constructor.
 	 * @param Site_Model $oSite site
 	 */
@@ -164,6 +170,21 @@ class Structure_Controller_Show extends Core_Controller
 	protected $_Shops = array();
 
 	/**
+	 * Check if data is cached
+	 * @return NULL|TRUE|FALSE
+	 */
+	public function inCache()
+	{
+		if ($this->cache && Core::moduleIsActive('cache'))
+		{
+			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+		}
+
+		return FALSE;
+	}
+	
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Structure_Controller_Show.onBeforeRedeclaredShow
@@ -177,7 +198,7 @@ class Structure_Controller_Show extends Core_Controller
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
-			$inCache = $oCore_Cache->get($cacheKey = strval($this), $cacheName = 'structure_show');
+			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
 
 			if (!is_null($inCache))
 			{
@@ -258,7 +279,7 @@ class Structure_Controller_Show extends Core_Controller
 			= $this->_Informationsystems = $this->_Shops = array();
 
 		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set($cacheKey, $content, $cacheName);
+		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set($cacheKey, $content, $this->_cacheName);
 
 		return $this;
 	}

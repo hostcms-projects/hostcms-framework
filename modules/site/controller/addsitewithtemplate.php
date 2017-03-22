@@ -496,7 +496,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 		$oAdmin_Form_Entity_Button_Save = Admin_Form_Entity::factory('Button')
 			->name($this->_formOperation)
-			->class('applyButton')
+			->class('applyButton btn btn-blue')
 			->value(Core::_('Install.next'))
 			->onclick(
 				$this->_Admin_Form_Controller->getAdminSendForm(NULL, $this->_formOperation)

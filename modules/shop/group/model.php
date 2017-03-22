@@ -138,9 +138,11 @@ class Shop_Group_Model extends Core_Entity
 	 */
 	public function getPropertyValues($bCache = TRUE, $aPropertiesId = array())
 	{
-		if ($bCache && !is_null($this->_propertyValues))
+		$iMd5 = md5(serialize($aPropertiesId));
+
+		if ($bCache && isset($this->_propertyValues[$iMd5]))
 		{
-			return $this->_propertyValues;
+			return $this->_propertyValues[$iMd5];
 		}
 
 		if (!is_array($aPropertiesId) || !count($aPropertiesId))
@@ -169,10 +171,7 @@ class Shop_Group_Model extends Core_Entity
 			}
 		}
 
-		if ($bCache)
-		{
-			$this->_propertyValues = $aReturn;
-		}
+		$bCache && $this->_propertyValues[$iMd5] = $aReturn;
 
 		return $aReturn;
 	}
@@ -885,11 +884,12 @@ class Shop_Group_Model extends Core_Entity
 		//$aGroupIDs = array($this->id);
 		$aGroupIDs = array();
 
-		$aShopGroups = $this->findAll();
-		foreach($aShopGroups as $oShopGroup)
+		$aShop_Groups = $this->findAll();
+		foreach($aShop_Groups as $oShop_Group)
 		{
-			$aGroupIDs = array_merge($aGroupIDs, array($oShopGroup->id), $oShopGroup->Shop_Groups->getGroupChildrenId());
+			$aGroupIDs = array_merge($aGroupIDs, array($oShop_Group->id), $oShop_Group->Shop_Groups->getGroupChildrenId());
 		}
+
 		return $aGroupIDs;
 	}
 

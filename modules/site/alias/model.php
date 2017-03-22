@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Alias_Model extends Core_Entity
 {
@@ -60,7 +60,9 @@ class Site_Alias_Model extends Core_Entity
 	{
 		if ($property == 'alias_name_without_mask')
 		{
-			return !$this->isEmptyPrimaryKey() ? $this->replaceMask($this->name) : NULL;
+			return !$this->isEmptyPrimaryKey()
+				? $this->replaceMask($this->name)
+				: NULL;
 		}
 
 		return parent::__get($property);
@@ -86,8 +88,24 @@ class Site_Alias_Model extends Core_Entity
 			$oSiteAlias->update();
 		}
 
+		$this->redirect = 0;
 		$this->current = 1;
 		$this->save();
+		return $this;
+	}
+
+	/**
+	 * Set redirect
+	 * @return self
+	 */
+	public function setRedirect()
+	{
+		if (!$this->current)
+		{
+			$this->redirect = 1 - $this->redirect;
+			$this->save();
+		}
+
 		return $this;
 	}
 
@@ -207,6 +225,42 @@ class Site_Alias_Model extends Core_Entity
 			$aSiteAlias[0]->name = $aSiteAlias[0]->alias_name_without_mask;
 
 			return $aSiteAlias[0];
+		}
+
+		return NULL;
+	}
+
+	public function findAlias($aliasName)
+	{
+		$this->queryBuilder()
+			->clear()
+			->select('site_aliases.*')
+			->join('sites', 'sites.id', '=', 'site_aliases.site_id')
+			->where('site_aliases.name', 'LIKE', $aliasName)
+			->where('sites.deleted', '=', 0)
+			->limit(1);
+
+		$aSiteAlias = $this->findAll();
+
+		if (isset($aSiteAlias[0]))
+		{
+			return $aSiteAlias[0];
+		}
+
+		// Удаляем все переданные *. если они были
+		$newAliasName = $this->ReplaceMask($aliasName);
+
+		// Если в переданном алиасе небыло *.
+		if (mb_strpos($aliasName, '*.') === FALSE)
+		{
+			$newAliasName = "*." . $aliasName;
+			return $this->findAlias($newAliasName);
+		}
+		// Если в пути осталась хоть одна точка
+		elseif (mb_strpos($newAliasName, '.') !== FALSE)
+		{
+			$newAliasName = "*." . mb_substr($newAliasName, mb_strpos($newAliasName, '.') + 1);
+			return $this->findAlias($newAliasName);
 		}
 
 		return NULL;

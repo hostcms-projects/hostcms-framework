@@ -150,41 +150,16 @@ class Site_Model extends Core_Entity
 
 	/**
 	 * Get alias by name
-	 * @param string $alias_name name
+	 * @param string $aliasName name
 	 * @return Site_Alias_Model|NULL
 	 */
-	public function getByAlias($alias_name)
+	public function getByAlias($aliasName)
 	{
-		$oSiteAliases = Core_Entity::factory('Site_Alias');
-		$oSiteAliases->queryBuilder()
-			->join('sites', 'sites.id', '=', 'site_aliases.site_id')
-			->where('site_aliases.name', 'LIKE', $alias_name)
-			->where('sites.deleted', '=', 0)
-			->limit(1);
-		$aSiteAlias = $oSiteAliases->findAll();
+		$oSiteAliases = Core_Entity::factory('Site_Alias')->findAlias($aliasName);
 
-		if (isset($aSiteAlias[0]))
-		{
-			return $aSiteAlias[0]->Site;
-		}
-
-		// Удаляем все переданные *. если они были
-		$new_alias_name = $this->Site_Aliases->ReplaceMask($alias_name);
-
-		// Если в переданном алиасе небыло *.
-		if (mb_strpos($alias_name, '*.') === FALSE)
-		{
-			$new_alias_name = "*." . $alias_name;
-			return $this->GetByAlias($new_alias_name);
-		}
-		// Если в пути осталась хоть одна точка
-		elseif (mb_strpos($new_alias_name, '.') !== FALSE)
-		{
-			$new_alias_name = "*." . mb_substr($new_alias_name, mb_strpos($new_alias_name, '.') + 1);
-			return $this->GetByAlias($new_alias_name);
-		}
-
-		return NULL;
+		return !is_null($oSiteAliases)
+			? $oSiteAliases->Site
+			: NULL;
 	}
 
 	/**
@@ -1088,7 +1063,7 @@ class Site_Model extends Core_Entity
 
 			unset($aMatchInformationsystem_Dirs);
 		}
-		
+
 		$aMatchShops = array();
 		if (Core::moduleIsActive('shop'))
 		{

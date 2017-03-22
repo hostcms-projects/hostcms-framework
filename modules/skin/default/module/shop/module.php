@@ -49,9 +49,10 @@ class Skin_Default_Module_Shop_Module extends Shop_Module
 		$oComments = Core_Entity::factory('Comment');
 
 		$oComments->queryBuilder()
-			->leftJoin('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
-			->leftJoin('shop_items', 'comment_shop_items.shop_item_id', '=', 'shop_items.id')
-			->leftJoin('shops', 'shop_items.shop_id', '=', 'shops.id')
+			->straightJoin()
+			->join('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
+			->join('shop_items', 'comment_shop_items.shop_item_id', '=', 'shop_items.id')
+			->join('shops', 'shop_items.shop_id', '=', 'shops.id')
 			->where('shop_items.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('site_id', '=', CURRENT_SITE)

@@ -176,6 +176,10 @@ class Update_Entity extends Core_Entity
 
 					$current_update_name = (string)$value->update_name;
 
+					Core_Log::instance()->clear()
+						->status(Core_Log::$MESSAGE)
+						->write(Core::_('Update.msg_update_required', $current_update_name));
+
 					// по умолчанию ошибок обновления нет
 					$error_update = FALSE;
 
@@ -184,6 +188,10 @@ class Update_Entity extends Core_Entity
 					{
 						$current_update_list_id = (int)$module->attributes()->id;
 
+						Core_Log::instance()->clear()
+							->status(Core_Log::$MESSAGE)
+							->write(Core::_('Update.msg_installing_package', $current_update_list_id));
+						
 						$current_update_dir = $update_dir . '/' . $current_update_id;
 						!is_dir($current_update_dir) && Core_File::mkdir($current_update_dir);
 
@@ -215,13 +223,23 @@ class Update_Entity extends Core_Entity
 
 								$Core_Tar = new Core_Tar($source_file);
 
+								Core_Log::instance()->clear()
+									->status(Core_Log::$MESSAGE)
+									->write(Core::_('Update.msg_unpack_package', $original_filename));
+								
 								// Распаковываем файлы
 								if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
 								{
 									$error_update = TRUE;
 
+									$message = Core::_('Update.update_files_error');
+
+									Core_Log::instance()->clear()
+										->status(Core_Log::$WARNING)
+										->write($message);
+									
 									// Возникла ошибка распаковки
-									Core_Message::show(Core::_('Update.update_files_error'), 'error');
+									Core_Message::show($message, 'error');
 								}
 							}
 						}
@@ -263,7 +281,6 @@ class Update_Entity extends Core_Entity
 
 						$update_file = Update_Controller::instance()->getFilePath();
 						is_file($update_file) && Core_File::delete($update_file);
-
 					}
 
 					// Если не было ошибок
@@ -272,7 +289,13 @@ class Update_Entity extends Core_Entity
 						$oHOSTCMS_UPDATE_NUMBER = Core_Entity::factory('Constant')->getByName('HOSTCMS_UPDATE_NUMBER');
 						!is_null($oHOSTCMS_UPDATE_NUMBER) && $oHOSTCMS_UPDATE_NUMBER->value($current_update_id)->save();
 
-						Core_Message::show(Core::_('Update.install_success', $this->name));
+						$message = Core::_('Update.install_success', $this->name);
+
+						Core_Log::instance()->clear()
+							->status(Core_Log::$SUCCESS)
+							->write($message);
+
+						Core_Message::show($message);
 					}
 				}
 			}

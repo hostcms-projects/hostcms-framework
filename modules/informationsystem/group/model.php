@@ -105,9 +105,11 @@ class Informationsystem_Group_Model extends Core_Entity
 	 */
 	public function getPropertyValues($bCache = TRUE, $aPropertiesId = array())
 	{
-		if ($bCache && !is_null($this->_propertyValues))
+		$iMd5 = md5(serialize($aPropertiesId));
+
+		if ($bCache && isset($this->_propertyValues[$iMd5]))
 		{
-			return $this->_propertyValues;
+			return $this->_propertyValues[$iMd5];
 		}
 
 		if (!is_array($aPropertiesId) || !count($aPropertiesId))
@@ -136,10 +138,7 @@ class Informationsystem_Group_Model extends Core_Entity
 			}
 		}
 
-		if ($bCache)
-		{
-			$this->_propertyValues = $aReturn;
-		}
+		$bCache && $this->_propertyValues[$iMd5] = $aReturn;
 
 		return $aReturn;
 	}
@@ -898,5 +897,23 @@ class Informationsystem_Group_Model extends Core_Entity
 		}
 
 		return parent::getXml();
+	}
+	
+	/**
+	 * Get IDs of child groups
+	 * @return array
+	 */
+	public function getGroupChildrenId()
+	{
+		//$aGroupIDs = array($this->id);
+		$aGroupIDs = array();
+
+		$aInformationsystem_Groups = $this->findAll();
+		foreach($aInformationsystem_Groups as $oInformationsystem_Group)
+		{
+			$aGroupIDs = array_merge($aGroupIDs, array($oInformationsystem_Group->id), $oInformationsystem_Group->Informationsystem_Groups->getGroupChildrenId());
+		}
+
+		return $aGroupIDs;
 	}
 }

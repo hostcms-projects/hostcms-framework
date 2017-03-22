@@ -177,7 +177,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		// Кнопка "Отправить"
 		$oAdmin_Form_Entity_Button_Send = Admin_Form_Entity::factory('Button')
 			->name('generate')
-			->class('applyButton')
+			->class('applyButton btn btn-blue')
 			->value(Core::_('Seo.generate'))
 			->onclick($this->_Admin_Form_Controller->getAdminSendForm(NULL, 'generate'));
 

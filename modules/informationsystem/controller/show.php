@@ -241,7 +241,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$this->_Informationsystem_Items
 					->queryBuilder()
 					->orderBy('informationsystem_items.name', $items_sorting_direction)
-					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
+					//->orderBy('informationsystem_items.sorting', $items_sorting_direction)
+					;
 				break;
 			case 2:
 				$this->_Informationsystem_Items
@@ -254,9 +255,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$this->_Informationsystem_Items
 					->queryBuilder()
 					->orderBy('informationsystem_items.datetime', $items_sorting_direction)
-					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
+					//->orderBy('informationsystem_items.sorting', $items_sorting_direction)
+					;
 		}
-
 
 		$this->_Informationsystem_Items
 			->queryBuilder()
@@ -360,6 +361,21 @@ class Informationsystem_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Check if data is cached
+	 * @return NULL|TRUE|FALSE
+	 */
+	public function inCache()
+	{
+		if ($this->cache && Core::moduleIsActive('cache'))
+		{
+			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+		}
+
+		return FALSE;
+	}
+
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Informationsystem_Controller_Show.onBeforeRedeclaredShow
@@ -369,6 +385,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
 
 		$this->showPanel && Core::checkPanel() && $this->_showPanel();
+
+		$this->item && $this->_incShowed();
 
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
@@ -470,7 +488,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			if ($this->groupsPropertiesList)
 			{
 				$Informationsystem_Group_Properties = Core::factory('Core_Xml_Entity')
-						->name('informationsystem_group_properties');
+					->name('informationsystem_group_properties');
 
 				$this->addEntity($Informationsystem_Group_Properties);
 
@@ -526,7 +544,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			if ($this->itemsPropertiesList)
 			{
 				$Informationsystem_Item_Properties = Core::factory('Core_Xml_Entity')
-						->name('informationsystem_item_properties');
+					->name('informationsystem_item_properties');
 
 				$this->addEntity($Informationsystem_Item_Properties);
 
@@ -635,9 +653,6 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$this->_Informationsystem_Items
 				->queryBuilder()
 				->where('informationsystem_items.id', '=', intval($this->item));
-
-			// Inc
-			$this->_incShowed();
 		}
 		elseif (!is_null($this->tag) && Core::moduleIsActive('tag'))
 		{
