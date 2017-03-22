@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Processor_Observer
 {
@@ -62,7 +62,7 @@ class Xsl_Processor_Observer
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', title: '" . Core_Str::escapeJavascriptVariable($sTitle) . "'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -85,13 +85,16 @@ class Xsl_Processor_Observer
 
 			$sTitle = Core::_('Xsl.panel_edit_xml', $oXsl->name);
 			$oXslSubPanel->add(
-				Core::factory('Core_Html_Entity_Img')
-					->src('/hostcmsfiles/images/xml.gif')
-					->id('hostcmsShowXml')
-					->alt($sTitle)
-					->title($sTitle)
-					->class('pointer')
-					->onclick("$.showWindow('xmlWindow{$iCount}', '" . Core_Str::escapeJavascriptVariable($form_content) . "', {width: 600, height: 450, title: '{$sTitle}'})")
+				Core::factory('Core_Html_Entity_A')
+					->onclick("hQuery.showWindow('xmlWindow{$iCount}', '" . Core_Str::escapeJavascriptVariable($form_content) . "', {width: 600, height: 450, title: '{$sTitle}'})")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->src('/hostcmsfiles/images/xml.gif')
+							->id('hostcmsShowXml')
+							->alt($sTitle)
+							->title($sTitle)
+							->class('pointer')
+					)
 			);
 
 			$oXslSubPanel->add(

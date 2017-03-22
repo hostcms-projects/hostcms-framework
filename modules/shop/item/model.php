@@ -698,7 +698,7 @@ class Shop_Item_Model extends Core_Entity
 			$newWarehouseValue->save();
 		}
 
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
 		{
 			$oNewPropertyValue = clone $oPropertyValue;
@@ -945,7 +945,7 @@ class Shop_Item_Model extends Core_Entity
 			}
 		}
 
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach ($aPropertyValues as $oPropertyValue)
 		{
 			// List
@@ -1160,7 +1160,7 @@ class Shop_Item_Model extends Core_Entity
 		$this->id = $primaryKey;
 
 		// Удаляем значения доп. свойств
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
 		{
 			$oPropertyValue->Property->type == 2 && $oPropertyValue->setDir($this->getItemPath());
@@ -1466,7 +1466,7 @@ class Shop_Item_Model extends Core_Entity
 		$this->_showXmlVotes = $showXmlVotes;
 		return $this;
 	}
-	
+
 	/**
 	 * Show siteuser properties in XML
 	 * @var boolean

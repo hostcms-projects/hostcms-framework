@@ -595,7 +595,7 @@ class Core
 
 	/**
 	 * Parse URL and set controller properties
-	 * @return Shop_Controller_Show
+	 * @return Core::$url
 	 */
 	static public function parseUrl()
 	{

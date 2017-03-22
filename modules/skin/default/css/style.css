@@ -1557,7 +1557,6 @@ div.form-group .caption {
     padding: 0;
 }
 
-
 /* Стили для исправления формы добавления сайта с шаблоном */
 .bottom.bottom_patch input{
 	width:auto;
@@ -1579,3 +1578,6 @@ div.form-group .caption {
 .chart-lg {
     height: 250px;
 }
+
+body.body-blank { background: #FFF !important }
+body.body-blank .hostcmsWindow { padding: 5px 30px }

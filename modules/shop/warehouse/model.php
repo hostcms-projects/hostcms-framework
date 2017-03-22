@@ -56,6 +56,7 @@ class Shop_Warehouse_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			$this->_preloadValues['guid'] = Core_Guid::get();
 		}
 	}
 

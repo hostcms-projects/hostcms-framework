@@ -186,7 +186,7 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 		}
 
 		$oLarge_Input_Div = Core::factory('Core_Html_Entity_Div')
-			->style('margin-right: 10px; float: left')
+			->style('margin-right: 10px; float: left; width:300px; overflow: hidden')
 			->id('file_large_' . $iAdmin_Form_Count)
 			->add(
 				Core::factory('Core_Html_Entity_Span')
@@ -205,11 +205,17 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 					->onblur("FieldCheck('{$windowId}', this)")
 			);
 
+		$oLarge_Div = new Core_Html_Entity_Div();
+		$oLarge_Div
+			->style('float: left; width: 650px');
+		
 		$oLarge_Core_Html_Entity_Div
 			->style("margin-right: 10px;" . $oLarge_Core_Html_Entity_Div->style)
 			//->id($this->id . '_' . $iAdmin_Form_Count)
 			->class('item_div')
-			->add($oLarge_Input_Div);
+			->add($oLarge_Div
+				->add($oLarge_Input_Div)
+			);
 
 		if ($this->largeImage['path'] != '' || $this->largeImage['show_params'])
 		{
@@ -457,7 +463,7 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 
 		if ($this->largeImage['show_description'])
 		{
-			$oLarge_Core_Html_Entity_Div
+			$oLarge_Div
 			->add(
 				Core::factory('Core_Html_Entity_Span')
 					->class('caption')
@@ -491,7 +497,7 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			}*/
 
 			$oSmall_Input_Div = Core::factory('Core_Html_Entity_Div')
-				->style('margin-right: 10px')
+				->style('margin-right: 10px; float: left; width:300px; overflow: hidden')
 				->id('file_small_' . $iAdmin_Form_Count)
 				->add(
 					Core::factory('Core_Html_Entity_Span')
@@ -724,23 +730,21 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 						->style($oSmall_Input_Div->style . '; float: left');
 
 					$oSmall_Core_Html_Entity_Div
-						->style($oSmall_Core_Html_Entity_Div->style . '; float: left; width: 700px');
-
-					$oSmall_Core_Html_Entity_Div
-					->add(
-						Core::factory('Core_Html_Entity_Span')
-							->class('caption')
-							->value(Core::_('Admin_Form.file_description'))
-					)
-					->add(
-						Core::factory('Core_Html_Entity_Input')
-							->type('text')
-							->id('description_small')
-							->name("description_{$this->smallImage['name']}")
-							->size(45)
-							->class('clear')
-							->value($this->smallImage['description'])
-					);
+						->style($oSmall_Core_Html_Entity_Div->style . '; float: left; width: 650px')
+						->add(
+							Core::factory('Core_Html_Entity_Span')
+								->class('caption')
+								->value(Core::_('Admin_Form.file_description'))
+						)
+						->add(
+							Core::factory('Core_Html_Entity_Input')
+								->type('text')
+								->id('description_small')
+								->name("description_{$this->smallImage['name']}")
+								->size(45)
+								->class('clear')
+								->value($this->smallImage['description'])
+						);
 				}
 
 				// -----------------

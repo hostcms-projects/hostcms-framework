@@ -178,7 +178,7 @@ class Structure_Controller_Show extends Core_Controller
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
-			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);
 		}
 
 		return FALSE;
@@ -786,7 +786,7 @@ class Structure_Controller_Show extends Core_Controller
 		$oXslSubPanel->add(
 			Core::factory('Core_Html_Entity_A')
 				->href("{$sPath}?{$sAdditional}")
-				->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+				->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 				->add(
 					Core::factory('Core_Html_Entity_Img')
 						->width(16)->height(16)

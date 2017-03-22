@@ -166,72 +166,76 @@ class Skin_Default extends Core_Skin
 <link rel="shortcut icon" href="/admin/favicon.ico"></link>
 <?php $this->showHead()?>
 </head>
-<body class="hostcms6 backendBody">
-
+<body class="body-<?php echo htmlspecialchars($this->_mode)?> hostcms6 backendBody">
+<?php
+if ($this->_mode != 'blank')
+{
+?>
 <div id="top">
-		<div id="hostCmsLogo">
-			<a href="/admin/"><img id="hostCmsLogoImg" src="<?php echo $this->getImageHref()?>logo.png" alt="(^) HostCMS" title="HostCMS<?php echo Core_Auth::logged() ? ' v. ' . htmlspecialchars(CURRENT_VERSION) : ''?>"></img></a>
+	<div id="hostCmsLogo">
+		<a href="/admin/"><img id="hostCmsLogoImg" src="<?php echo $this->getImageHref()?>logo.png" alt="(^) HostCMS" title="HostCMS<?php echo Core_Auth::logged() ? ' v. ' . htmlspecialchars(CURRENT_VERSION) : ''?>"></img></a>
+	</div>
+	<?php if (Core_Auth::logged() && defined('CURRENT_SITE'))
+	{ ?>
+	<div id="topMenu" class="disableSelect">
+		<div id="selectSite" class="rootVoice {menu: 'submenuSites'}">
+			<span><?php $oCurrentSite = Core_Entity::factory('Site', CURRENT_SITE);
+			echo Core_Str::escapeJavascriptVariable(
+				Core_Str::cut($oCurrentSite->name, 25)
+			)?></span> ▼
 		</div>
-		<?php if (Core_Auth::logged() && defined('CURRENT_SITE'))
-		{ ?>
-		<div id="topMenu" class="disableSelect">
-			<div id="selectSite" class="rootVoice {menu: 'submenuSites'}">
-				<span><?php $oCurrentSite = Core_Entity::factory('Site', CURRENT_SITE);
-				echo Core_Str::escapeJavascriptVariable(
-					Core_Str::cut($oCurrentSite->name, 25)
-				)?></span> ▼
-			</div>
 
-			<div id="selectWidget" class="rootVoice {menu: 'submenuWidgets'}">
-				<span><?php echo Core::_('Core.widgets')?></span> ▼
-			</div>
+		<div id="selectWidget" class="rootVoice {menu: 'submenuWidgets'}">
+			<span><?php echo Core::_('Core.widgets')?></span> ▼
+		</div>
 
-			<div id="viewSite">
-				<a target="_blank"><img src="<?php echo $this->getImageHref()?>external-link.png" alt="<?php echo Core::_('Admin.viewSite')?>" title="<?php echo Core::_('Admin.viewSite')?>"></img></a>
+		<div id="viewSite">
+			<a target="_blank"><img src="<?php echo $this->getImageHref()?>external-link.png" alt="<?php echo Core::_('Admin.viewSite')?>" title="<?php echo Core::_('Admin.viewSite')?>"></img></a>
+		</div>
+	</div>
+	<?php
+	}
+	?><div id="taskBar">
+		<div id="subTaskBar">
+			<div class="nav" onclick="$.tasksScroll(-42)">
+				<img src="<?php echo $this->getImageHref()?>taskbar_left.png"></img>
+			</div>
+			<div id="tasks">
+				<div id="tasksScroll"></div>
+			</div>
+			<div class="nav" onclick="$.tasksScroll(42)">
+				<img src="<?php echo $this->getImageHref()?>taskbar_right.png"></img>
 			</div>
 		</div>
-		<?php
+	</div>
+
+	<script type="text/javascript">
+	(function($){
+		$.UpdateTaskbar();
+
+		// Check CPU performance
+		var cookieFxOff = $.cookie('hostcms6FxOff');
+		if (cookieFxOff == null) {
+			var start = (new Date).getTime();
+			for (var i=1, x = 0;i<99999;i++) { x += Math.floor(Math.random() * 1000 * i) / (Math.random() + 1)}
+			var diff = (new Date).getTime() - start;
+			cookieFxOff = diff < 20 ? 0 : 1;
+			$.cookie('hostcms6FxOff', cookieFxOff, {expires: 1});
 		}
-		?><div id="taskBar">
-			<div id="subTaskBar">
-				<div class="nav" onclick="$.tasksScroll(-42)">
-					<img src="<?php echo $this->getImageHref()?>taskbar_left.png"></img>
-				</div>
-				<div id="tasks">
-					<div id="tasksScroll"></div>
-				</div>
-				<div class="nav" onclick="$.tasksScroll(42)">
-					<img src="<?php echo $this->getImageHref()?>taskbar_right.png"></img>
-				</div>
-			</div>
-		</div>
 
-		<script type="text/javascript">
-		(function($){
-			$.UpdateTaskbar();
+		$.fx.off = cookieFxOff == 1;
+	})(jQuery);
+	</script>
 
-			// Check CPU performance
-			var cookieFxOff = $.cookie('hostcms6FxOff');
-			if (cookieFxOff == null) {
-				var start = (new Date).getTime();
-				for (var i=1, x = 0;i<99999;i++) { x += Math.floor(Math.random() * 1000 * i) / (Math.random() + 1)}
-				var diff = (new Date).getTime() - start;
-				cookieFxOff = diff < 20 ? 0 : 1;
-				$.cookie('hostcms6FxOff', cookieFxOff, {expires: 1});
-			}
-
-			$.fx.off = cookieFxOff == 1;
-		})(jQuery);
-		</script>
-
-		<?php if (Core_Auth::logged())
-		{
-		?><div id="logout">
-			<div><a href="/admin/logout.php"><img src="<?php echo $this->getImageHref()?>logout.png"></img></a></div>
-			<div id="login"><a href="/admin/logout.php"><?php echo Core_Entity::factory('User')->getCurrent()->login?></a></div>
-		</div><?php
+	<?php if (Core_Auth::logged())
+	{
+	?><div id="logout">
+		<div><a href="/admin/logout.php"><img src="<?php echo $this->getImageHref()?>logout.png"></img></a></div>
+		<div id="login"><a href="/admin/logout.php"><?php echo Core_Entity::factory('User')->getCurrent()->login?></a></div>
+	</div><?php
+	}
+	?></div><?php
 		}
-		?></div><?php
 
 		return $this;
 	}
@@ -419,6 +423,10 @@ class Skin_Default extends Core_Skin
 	 */
 	public function index()
 	{
+		if ($this->_mode == 'blank')
+		{
+			return $this;
+		}
 		$this->_mode = 'index';
 
 		$oUser = Core_Entity::factory('User')->getCurrent();
@@ -868,6 +876,8 @@ class Skin_Default extends Core_Skin
 	 */
 	public function footer()
 	{
+		if ($this->_mode != 'blank')
+		{
 		?><div id="footer">
 			<div id="copyright">&copy; 2005–2015 ООО «Хостмэйк»</div>
 			<div id="links">
@@ -875,6 +885,9 @@ class Skin_Default extends Core_Skin
 				<p><?php echo Core::_('Admin.support_email')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a></p>
 			</div>
 		</div>
+		<?php
+		}
+		?>
 	</body>
 	</html><?php
 	}

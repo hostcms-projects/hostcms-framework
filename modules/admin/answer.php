@@ -58,6 +58,7 @@ class Admin_Answer extends Core_Servant_Properties
 	protected function _showHeader()
 	{
 		$this->skin && Core_Skin::instance()
+			->setMode(Core_Array::getRequest('hostcmsMode'))
 			->title($this->title)
 			->header();
 

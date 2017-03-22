@@ -9,6 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - itemsProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
+ * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -31,7 +32,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected $_allowedProperties = array(
 		'itemsProperties',
-		'modifications'
+		'modifications',
+		'type'
 	);
 
 	/**
@@ -51,6 +53,136 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 * @var array
 	 */
 	protected $_aSiteuserGroups = array();
+
+	/**
+	 * List's offer tags
+	 * @var array
+	 */
+	public $aOfferTags = array(
+		'adult' => 'adult',
+		'cpa' => 'cpa',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+		'barcode' => 'barcode',
+	);
+
+	/**
+	 * List's vendor tags
+	 * @var array
+	 */
+	public $aVendorTags = array(
+		'typePrefix' => 'typePrefix',
+		'model' => 'model',
+		'adult' => 'adult',
+		'cpa' => 'cpa',
+		'rec' => 'rec',
+		'expiry' => 'expiry',
+		'weight' => 'weight',
+		'dimensions' => 'dimensions',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+	);
+
+	/**
+	 * List's book tags
+	 * @var array
+	 */
+	public $aBookTags = array(
+		//http://help.yandex.ru/partnermarket/offers.xml#book
+		'author' => 'author',
+		'publisher' => 'publisher',
+		'series' => 'series',
+		'year' => 'year',
+		'ISBN' => 'ISBN',
+		'volume' => 'volume',
+		'part' => 'part',
+		'language' => 'language',
+		'binding' => 'binding',
+		'page_extent' => 'page_extent',
+		'table_of_contents' => 'table_of_contents',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+	);
+
+	/**
+	 * List's audiobook tags
+	 * @var array
+	 */
+	public $aAudiobookTags = array(
+		//http://help.yandex.ru/partnermarket/offers.xml#audiobook
+		'author' => 'author',
+		'publisher' => 'publisher',
+		'series' => 'series',
+		'year' => 'year',
+		'ISBN' => 'ISBN',
+		'volume' => 'volume',
+		'part' => 'part',
+		'language' => 'language',
+		'table_of_contents' => 'table_of_contents',
+		'performed_by' => 'performed_by',
+		'performance_type' => 'performance_type',
+		'storage' => 'storage',
+		'format' => 'format', //Время звучания задается в формате mm.ss (минуты.секунды).
+		'recording_length' => 'recording_length',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+	);
+
+	/**
+	 * List's artist.title tags
+	 * @var array
+	 */
+	public $aArtistTitleTags = array(
+		'artist' => 'artist',
+		'title' => 'title',
+		'year' => 'year',
+		'media' => 'media',
+		'starring' => 'starring',
+		'director' => 'director',
+		'originalName' => 'originalName',
+		'country' => 'country',
+		'adult' => 'adult',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+		'barcode' => 'barcode',
+	);
+
+	/**
+	 * List's tour tags
+	 * @var array
+	 */
+	public $aTourTags = array(
+		'worldRegion' => 'worldRegion',
+		'country' => 'country',
+		'region' => 'region',
+		'days' => 'days',
+		'dataTour' => 'dataTour', //Даты заездов. Предпочтительный формат: YYYY-MM-DD hh:mm:ss.
+		'hotel_stars' => 'hotel_stars',
+		'room' => 'room',
+		'meal' => 'meal',
+		'included' => 'included',
+		'transport' => 'transport',
+		'price_min' => 'price_min',
+		'price_max' => 'price_max',
+		'options' => 'options',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+	);
+
+	/**
+	 * List's event ticket tags
+	 * @var array
+	 */
+	public $aEventTicketTags = array(
+		'place' => 'place',
+		'hall' => 'hall',
+		'hall_part' => 'hall_part',
+		'date' => 'date', //Дата и время сеанса. Предпочтительный формат: YYYY-MM-DD hh:mm:ss.
+		'is_premiere' => 'is_premiere',
+		'is_kids' => 'is_kids',
+		'age-year' => 'age-year',
+		'age-month' => 'age-month',
+	);
 
 	/**
 	 * Constructor.
@@ -155,6 +287,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->orderBy('shop_groups.parent_id');
 
 		$this->itemsProperties = $this->modifications = TRUE;
+
+		$this->type = 'offer';
 	}
 
 	/**
@@ -253,6 +387,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				->where('shop_items.modification_id', '=', 0);
 		}
 
+		$sType = $this->type != 'offer'
+			? ' type="' . Core_Str::xml($this->type) . '"'
+			: '';
+
 		echo "<offers>\n";
 
 		$offset = 0;
@@ -273,14 +411,14 @@ class Shop_Controller_YandexMarket extends Core_Controller
 					? ' bid="' . Core_Str::xml($oShop_Item->yandex_market_bid) . '"'
 					: '';
 
-				$tag_cid = $oShop_Item->yandex_market_cid
+				$tag_cbid = $oShop_Item->yandex_market_cid
 					? ' cbid="' . Core_Str::xml($oShop_Item->yandex_market_cid) . '"'
 					: '';
 
 				$oShop_Warehouse_Item = $oShop_Item->Shop_Warehouse_Items->getByShopItemId($oShop_Item->id, FALSE);
 				$available = !is_null($oShop_Warehouse_Item) && $oShop_Warehouse_Item->count > 0 ? 'true' : 'false';
 
-				echo '<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cid . " available=\"{$available}\">\n";
+				echo '<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cbid . $sType . " available=\"{$available}\">\n";
 
 				Core_Event::notify(get_class($this) . '.onBeforeOffer', $this, array($oShop_Item));
 
@@ -464,11 +602,50 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			if (!is_null($value))
 			{
+				$sTagName = 'param';
+
 				$unit = $oProperty->type == 0 && $oProperty->Shop_Item_Property->Shop_Measure->id
 					? ' unit="' . Core_Str::xml($oProperty->Shop_Item_Property->Shop_Measure->name) . '"'
 					: '';
 
-				echo '<param name="' . Core_Str::xml($oProperty->name) . '"' . $unit . '>' . Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8')) . '</param>'. "\n";
+				$sAttr = ' name="' . Core_Str::xml($oProperty->name) . '"' . $unit;
+
+				if ($this->type != 'offer')
+				{
+					switch ($this->type)
+					{
+						case 'vendor.model':
+							$aTmpArray = $this->aVendorTags;
+						break;
+						case 'book':
+							$aTmpArray = $this->aBookTags;
+						break;
+						case 'audiobook':
+							$aTmpArray = $this->aAudiobookTags;
+						break;
+						case 'artist.title':
+							$aTmpArray = $this->aArtistTitleTags;
+						break;
+						case 'tour':
+							$aTmpArray = $this->aTourTags;
+						break;
+						case 'event-ticket':
+							$aTmpArray = $this->aEventTicketTags;
+						break;
+						default:
+							throw new Core_Exception("Wrong type '%type'",
+								array('%type' => $this->type)
+							);
+					}
+
+					if (isset($aTmpArray[$oProperty->tag_name]))
+					{
+						$sTagName = $aTmpArray[$oProperty->tag_name];
+						$sAttr = '';
+					}
+				}
+
+				echo '<' . $sTagName . $sAttr . '>' . Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8')) . '</' . $sTagName . '>'. "\n";
 			}
 		}
 

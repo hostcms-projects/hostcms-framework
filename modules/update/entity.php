@@ -184,14 +184,14 @@ class Update_Entity extends Core_Entity
 					$error_update = FALSE;
 
 					$aModules = $value->xpath('modules/module');
-					foreach ($aModules as $module)
+					foreach ($aModules as $key => $module)
 					{
 						$current_update_list_id = (int)$module->attributes()->id;
 
 						Core_Log::instance()->clear()
 							->status(Core_Log::$MESSAGE)
 							->write(Core::_('Update.msg_installing_package', $current_update_list_id));
-						
+
 						$current_update_dir = $update_dir . '/' . $current_update_id;
 						!is_dir($current_update_dir) && Core_File::mkdir($current_update_dir);
 
@@ -215,33 +215,41 @@ class Update_Entity extends Core_Entity
 							// Убираем кавычки
 							$original_filename = trim(str_replace('"', '', $original_filename));
 
-							if (!empty($original_filename))
+							if (empty($original_filename))
 							{
-								$source_file = $current_update_dir . '/' . $current_update_list_id . '_' . $original_filename;
+								$original_filename = $key . 'tar.gz';
+							}
 
-								Core_File::write($source_file, $Core_Http->getBody());
+							$source_file = $current_update_dir . '/' . $current_update_list_id . '_' . $original_filename;
 
-								$Core_Tar = new Core_Tar($source_file);
+							Core_File::write($source_file, $Core_Http->getBody());
+
+							$Core_Tar = new Core_Tar($source_file);
+
+							Core_Log::instance()->clear()
+								->status(Core_Log::$MESSAGE)
+								->write(Core::_('Update.msg_unpack_package', $original_filename));
+
+							// Распаковываем файлы
+							if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
+							{
+								$error_update = TRUE;
+
+								$message = Core::_('Update.update_files_error');
 
 								Core_Log::instance()->clear()
-									->status(Core_Log::$MESSAGE)
-									->write(Core::_('Update.msg_unpack_package', $original_filename));
-								
-								// Распаковываем файлы
-								if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
-								{
-									$error_update = TRUE;
+									->status(Core_Log::$WARNING)
+									->write($message);
 
-									$message = Core::_('Update.update_files_error');
-
-									Core_Log::instance()->clear()
-										->status(Core_Log::$WARNING)
-										->write($message);
-									
-									// Возникла ошибка распаковки
-									Core_Message::show($message, 'error');
-								}
+								// Возникла ошибка распаковки
+								Core_Message::show($message, 'error');
 							}
+						}
+						else
+						{
+							Core_Log::instance()->clear()
+								->status(Core_Log::$MESSAGE)
+								->write('Empty update_list_file');
 						}
 
 						$update_list_sql = (string)$module->update_list_sql;

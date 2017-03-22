@@ -1,0 +1,389 @@
+@charset "UTF-8";
+
+/* Панель в клиентском разделе */
+.hostcmsPanel{padding: 10px 10px; box-shadow: 0 0 5px rgba(100, 100, 100, 0.60); border-radius: 10px; zoom: 1; z-index: 991; position: absolute; margin-top: 10px; background-color: #FFF; cursor: move; opacity: .9; line-height: normal }
+.hostcmsPanel a:link,.hostcmsPanel a:visited,.hostcmsPanel a:hover{color:#0070BD;text-decoration:underline}
+.hostcmsPanel .hostcmsSubPanel{margin-bottom:-3px; white-space: nowrap}
+.hostcmsPanel .hostcmsSubPanel a img{margin: 0 2px; cursor: pointer; }
+.hostcmsTopPanel{left:50%;margin-left:-110px;top:0}
+/* Панель для XSL */
+.hostcmsXsl {margin: 3px 0}
+.hostcmsXsl div.hostcmsButton {border-top: 1px solid #DFDDD8; border-right: 1px solid #D1D0CB;
+	border-bottom: 1px solid #ACAAA6; border-left: 1px solid #D1D0CB; 
+	color: #5A6973; font-size: 8pt; text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
+	border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+	background: -moz-linear-gradient(90deg, #EFEEEA, #F6F5F3) repeat scroll 0 0 transparent;
+	background: -webkit-gradient(linear, center top, center bottom, from(#EFEEEA), to(#F6F5F3));
+	box-shadow: 0 1px 0 #EFEEEA; display: inline-block; margin: -1px 2px 0; padding: 0 3px 0 2px; vertical-align: top; height: 17px;
+}
+.hostcmsXsl div.hostcmsButton div {margin-top: 1px; font-weight: bold; vertical-align: top; display: inline-block; }
+
+/*.hostcmsWindowUI {position: absolute; z-index: 999;}*/
+.hostcmsWindow, .hostcmsWindow textarea {font-family:Arial,Verdana,'MS Sans Serif'; line-height: normal }
+.hostcmsWindow iframe { box-sizing: border-box; width: 100%; height: 100%; border: 0 }
+.hostcmsWindow .hostcmsModalWindow { line-height: 110%; font-size: 10pt; color:#000; padding: 5px 10px }
+.hostcmsWindow .hostcmsModalWindow ul {margin: 2px 0}
+.hostcmsWindow textarea { box-sizing: border-box; resize: none; white-space:pre; font-size: 10pt !important; margin: 0; padding: 2px; overflow: auto; width: 99%; height: 99%; border: 0}
+
+/* SQL */
+.hostcmsWindow .sql_q,.hostcmsWindow .sql_qd{font-size:8pt;background-color:#F6F7EF;border:1px dashed #98D800;white-space:pre-wrap;color:#000;padding:5px}
+.hostcmsWindow .sql_qd{background-color:#F8EEE7;border:1px dashed #D80000}
+.hostcmsWindow .sql_t,.hostcmsWindow .sql_t a,.hostcmsWindow .sql_t a:link,.hostcmsWindow .sql_t a:hover,.hostcmsWindow .sql_t a:visited{font-size:8pt;color:#555; cursor: pointer}
+.hostcmsWindow .sql_db{font-size:8pt;color:#777;white-space:pre-wrap;display:none}
+.hostcmsWindow table.sql_explain{empty-cells:show;margin:1px}
+.hostcmsWindow table.sql_explain,.hostcmsWindow table.sql_explain td{border:1px solid #AAA;border-collapse:collapse}
+.hostcmsWindow table.sql_explain td{font-size:8pt;color:#333;padding:0 2px}
+
+/* Editable */
+.hostcmsEditable {border: 1px dashed #E83531 !important; border-radius: 5px !important; box-shadow:  1px 1px 1px 0px rgba(100, 100, 100, 0.1) !important; cursor: pointer !important }
+
+/*! jQuery UI - v1.11.4
+* http://jqueryui.com
+* Includes: core.css, draggable.css, resizable.css, button.css, dialog.css
+* Copyright 2015 jQuery Foundation and other contributors; Licensed MIT */
+
+/* Layout helpers
+----------------------------------*/
+.backendBody .ui-helper-hidden {
+	display: none;
+}
+.backendBody .ui-helper-hidden-accessible {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+.backendBody .ui-helper-reset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	line-height: 1.3;
+	text-decoration: none;
+	font-size: 100%;
+	list-style: none;
+}
+.backendBody .ui-helper-clearfix:before,
+.backendBody .ui-helper-clearfix:after {
+	content: "";
+	display: table;
+	border-collapse: collapse;
+}
+.backendBody .ui-helper-clearfix:after {
+	clear: both;
+}
+.backendBody .ui-helper-clearfix {
+	min-height: 0; /* support: IE7 */
+}
+.backendBody .ui-helper-zfix {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	position: absolute;
+	opacity: 0;
+	filter:Alpha(Opacity=0); /* support: IE8 */
+}
+
+.backendBody .ui-front {
+	z-index: 100;
+}
+
+
+/* Interaction Cues
+----------------------------------*/
+.backendBody .ui-state-disabled {
+	cursor: default !important;
+}
+
+
+/* Icons
+----------------------------------*/
+
+/* states and images */
+.backendBody .ui-icon {
+	display: block;
+	text-indent: -99999px;
+	overflow: hidden;
+	background-repeat: no-repeat;
+}
+
+
+/* Misc visuals
+----------------------------------*/
+
+/* Overlays */
+.backendBody .ui-widget-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.backendBody .ui-draggable-handle {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.backendBody .ui-resizable {
+	position: relative;
+}
+.backendBody .ui-resizable-handle {
+	position: absolute;
+	font-size: 0.1px;
+	display: block;
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.backendBody .ui-resizable-disabled .ui-resizable-handle,
+.backendBody .ui-resizable-autohide .ui-resizable-handle {
+	display: none;
+}
+.backendBody .ui-resizable-n {
+	cursor: n-resize;
+	height: 7px;
+	width: 100%;
+	top: -5px;
+	left: 0;
+}
+.backendBody .ui-resizable-s {
+	cursor: s-resize;
+	height: 7px;
+	width: 100%;
+	bottom: -5px;
+	left: 0;
+}
+.backendBody .ui-resizable-e {
+	cursor: e-resize;
+	width: 7px;
+	right: -5px;
+	top: 0;
+	height: 100%;
+}
+.backendBody .ui-resizable-w {
+	cursor: w-resize;
+	width: 7px;
+	left: -5px;
+	top: 0;
+	height: 100%;
+}
+.backendBody .ui-resizable-se {
+	cursor: se-resize;
+	width: 12px;
+	height: 12px;
+	right: 1px;
+	bottom: 1px;
+}
+.backendBody .ui-resizable-sw {
+	cursor: sw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	bottom: -5px;
+}
+.backendBody .ui-resizable-nw {
+	cursor: nw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	top: -5px;
+}
+.backendBody .ui-resizable-ne {
+	cursor: ne-resize;
+	width: 9px;
+	height: 9px;
+	right: -5px;
+	top: -5px;
+}
+.backendBody .ui-button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	line-height: normal;
+	margin-right: .1em;
+	cursor: pointer;
+	vertical-align: middle;
+	text-align: center;
+	overflow: visible; /* removes extra width in IE */
+}
+.backendBody .ui-button,
+.backendBody .ui-button:link,
+.backendBody .ui-button:visited,
+.backendBody .ui-button:hover,
+.backendBody .ui-button:active {
+	text-decoration: none;
+}
+/* to make room for the icon, a width needs to be set here */
+.backendBody .ui-button-icon-only {
+	width: 2.2em;
+}
+/* button elements seem to need a little more width */
+button.backendBody .ui-button-icon-only {
+	width: 2.4em;
+}
+.backendBody .ui-button-icons-only {
+	width: 3.4em;
+}
+button.backendBody .ui-button-icons-only {
+	width: 3.7em;
+}
+
+/* button text element */
+.backendBody .ui-button .ui-button-text {
+	display: block;
+	line-height: normal;
+}
+.backendBody .ui-button-text-only .ui-button-text {
+	padding: .4em 1em;
+}
+.backendBody .ui-button-icon-only .ui-button-text,
+.backendBody .ui-button-icons-only .ui-button-text {
+	padding: .4em;
+	text-indent: -9999999px;
+}
+.backendBody .ui-button-text-icon-primary .ui-button-text,
+.backendBody .ui-button-text-icons .ui-button-text {
+	padding: .4em 1em .4em 2.1em;
+}
+.backendBody .ui-button-text-icon-secondary .ui-button-text,
+.backendBody .ui-button-text-icons .ui-button-text {
+	padding: .4em 2.1em .4em 1em;
+}
+.backendBody .ui-button-text-icons .ui-button-text {
+	padding-left: 2.1em;
+	padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.backendBody .ui-button {
+	padding: .4em 1em;
+}
+
+/* button icon element(s) */
+.backendBody .ui-button-icon-only .ui-icon,
+.backendBody .ui-button-text-icon-primary .ui-icon,
+.backendBody .ui-button-text-icon-secondary .ui-icon,
+.backendBody .ui-button-text-icons .ui-icon,
+.backendBody .ui-button-icons-only .ui-icon {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+}
+.backendBody .ui-button-icon-only .ui-icon {
+	left: 50%;
+	margin-left: -8px;
+}
+.backendBody .ui-button-text-icon-primary .ui-button-icon-primary,
+.backendBody .ui-button-text-icons .ui-button-icon-primary,
+.backendBody .ui-button-icons-only .ui-button-icon-primary {
+	left: .5em;
+}
+.backendBody .ui-button-text-icon-secondary .ui-button-icon-secondary,
+.backendBody .ui-button-text-icons .ui-button-icon-secondary,
+.backendBody .ui-button-icons-only .ui-button-icon-secondary {
+	right: .5em;
+}
+
+/* button sets */
+.backendBody .ui-buttonset {
+	margin-right: 7px;
+}
+.backendBody .ui-buttonset .ui-button {
+	margin-left: 0;
+	margin-right: -.3em;
+}
+
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.backendBody .ui-button::-moz-focus-inner,
+button.backendBody .ui-button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+.backendBody .ui-dialog {
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: .2em;
+	outline: 0;
+}
+.backendBody .ui-dialog .ui-dialog-titlebar {
+	padding: .4em 1em;
+	position: relative;
+	line-height: normal;
+}
+.backendBody .ui-dialog .ui-dialog-titlebar button {
+	background: none !important
+}
+.backendBody .ui-dialog .ui-dialog-title {
+	float: left;
+	margin: .1em 0;
+	white-space: nowrap;
+	width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.backendBody .ui-dialog .ui-dialog-titlebar-close {
+	position: absolute;
+	right: .3em;
+	top: 50%;
+	width: 20px;
+	margin: -10px 0 0 0;
+	padding: 1px;
+	height: 20px;
+}
+.backendBody .ui-dialog .ui-dialog-content {
+	position: relative;
+	border: 0;
+	padding: .5em 1em;
+	background: none;
+	overflow: auto;
+}
+.backendBody .ui-dialog .ui-dialog-buttonpane {
+	text-align: left;
+	border-width: 1px 0 0 0;
+	background-image: none;
+	margin-top: .5em;
+	padding: .3em 1em .5em .4em;
+}
+.backendBody .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+	float: right;
+}
+.backendBody .ui-dialog .ui-dialog-buttonpane button {
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+}
+.backendBody .ui-dialog .ui-resizable-se {
+	width: 12px;
+	height: 12px;
+	right: -5px;
+	bottom: -5px;
+	background-position: 16px 16px;
+}
+.backendBody .ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}
+
+/* -- Added -- */
+.backendBody .ui-dialog {background-color: #FFF; border: 1px solid #D8D8D8; border-radius: 9px; box-shadow: 0 2px 2px rgba(204, 204, 204, 0.7); padding: 0; z-index: 999 }
+.backendBody .ui-dialog-content-transparent{ background: #FFF; padding-top: 2px; background: url("images/transparent_bg_white.png") repeat scroll 0 0 transparent
+}
+.backendBody .ui-dialog .ui-dialog-titlebar {  box-sizing: border-box; user-select: none; padding: .4em .5em;
+background: #F2F2F2 !important; font-size: 10pt;
+font-family: Arial, Verdana, 'MS Sans Serif', sans-serif !important;
+border-width: 0px 0px 1px 0px; border-color: #F2F2F2;
+text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
+.backendBody .ui-dialog .ui-dialog-title { color: #000; font-weight: bold; margin: .1em 16px .2em 0; text-shadow: 1px 1px 0 rgba(255,255,255,0.8); white-space: nowrap }
+.backendBody .ui-dialog .ui-dialog-content {  box-sizing: border-box; background: #FFF; border-radius: 0 0 9px 9px; padding: 0 0 0.3em 0 }
+
+.backendBody .ui-dialog .ui-dialog-titlebar .ui-button-icon-only { background: none; border: 0 }
+.backendBody .ui-dialog .ui-dialog-content iframe {  box-sizing: border-box; }
+.backendBody .ui-draggable-dragging {opacity: 0.5; box-shadow: none !important}
+.backendBody .ui-draggable-dragging .ui-dialog-content {display: none !important}
+
+/* states and images */
+.backendBody .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png) !important }
+.backendBody .ui-icon-closethick { background-position: -96px -128px; }

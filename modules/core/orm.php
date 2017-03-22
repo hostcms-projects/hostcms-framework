@@ -999,19 +999,18 @@ class Core_ORM
 			}
 			else
 			{
-				$cacheName = 'Core_ORM_ColumnCache';
-				$inCache = self::$columnCache->get($this->_modelName, $cacheName);
+				$bCache = Core::moduleIsActive('cache');
 
-				if (!is_null($inCache))
-				{
-					$this->_tableColumns = $inCache;
-				}
-				else
-				{
-					self::$columnCache->set($this->_modelName,
-						$this->_tableColumns = $this->_dataBase->getColumns($this->_tableName), $cacheName);
-				}
-				self::$_columnCache[$this->_modelName] = $this->_tableColumns;
+				$cacheName = 'Core_ORM_ColumnCache';
+				$inCache = $bCache
+					? self::$columnCache->get($this->_modelName, $cacheName)
+					: NULL;
+
+				self::$_columnCache[$this->_modelName] = $this->_tableColumns = is_array($inCache)
+					? $inCache
+					: $this->_dataBase->getColumns($this->_tableName);
+
+				$bCache && self::$columnCache->set($this->_modelName, $this->_tableColumns, $cacheName);
 			}
 
 			/*$this->_tableColumns = isset(self::$_columnCache[$this->_modelName])

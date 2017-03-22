@@ -1042,3 +1042,5 @@ div.fm_preview {
 	font-family: monospace;
 	font-size: 10pt;
 }
+
+.body-blank #body  {padding-right: 20px !important}

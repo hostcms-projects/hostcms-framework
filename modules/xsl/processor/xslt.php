@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Processor_Xslt extends Xsl_Processor
 {
@@ -31,10 +31,7 @@ class Xsl_Processor_Xslt extends Xsl_Processor
 
 		$sXsl = $this->_xsl->loadXslFile();
 
-		if (!Core::checkPanel())
-		{
-			$sXsl = $this->_clearXmlns($sXsl);
-		}
+		!Core::checkPanel() && $sXsl = $this->_clearXmlns($sXsl);
 
 		if ($xsl->loadXML($sXsl))
 		{
@@ -49,9 +46,22 @@ class Xsl_Processor_Xslt extends Xsl_Processor
 				$XsltProcessor->importStylesheet($xsl);
 				$XsltProcessor->setParameter(NULL, "titles", "Titles");
 
+				libxml_use_internal_errors(TRUE);
 				// Transform and output the xml document
 				$newdom = $XsltProcessor->transformToDoc($inputdom);
 
+				foreach (libxml_get_errors() as $error)
+				{
+					// Buf with libxml 2.9.2 + edit-in-place = error with same IDs
+					if ($error->code != 513)
+					{
+						echo "Libxml error {$error->code}: <strong>{$error->message}</strong>, Line: {$error->line}\n";
+					}
+				}
+
+				libxml_clear_errors();
+				libxml_use_internal_errors(FALSE);
+				
 				if ($newdom)
 				{
 					$newdom->formatOutput = Core_Array::get(

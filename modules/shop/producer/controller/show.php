@@ -156,10 +156,14 @@ class Shop_Producer_Controller_Show extends Core_Controller
 
 	/**
 	 * Parse URL and set controller properties
-	 * @return Shop_Controller_Show
+	 * @return Shop_Producer_Controller_Show
+	 * @hostcms-event Shop_Controller_Show.onBeforeParseUrl
+	 * @hostcms-event Shop_Controller_Show.onAfterParseUrl
 	 */
 	public function parseUrl()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeParseUrl', $this);
+
 		$oShop = $this->getEntity();
 
 		$Core_Router_Route = new Core_Router_Route($this->pattern);
@@ -220,6 +224,8 @@ class Shop_Producer_Controller_Show extends Core_Controller
 				}
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
 
 		return $this;
 	}

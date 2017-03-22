@@ -3,12 +3,12 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Sites.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Controller_Markdeleted extends Admin_Form_Action_Controller
 {

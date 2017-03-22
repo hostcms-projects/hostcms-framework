@@ -152,7 +152,7 @@ abstract class Core_Http
 		$this->_rawData = $data;
 		return $this;
 	}
-	
+
 	/**
 	 * Request User-Agent
 	 * @var string
@@ -326,7 +326,7 @@ abstract class Core_Http
 	 */
 	public function getDecompressedBody()
 	{
-		$aHeaders = array_change_key_case($this->parseHeaders(), CASE_LOWER);;
+		$aHeaders = array_change_key_case($this->parseHeaders(), CASE_LOWER);
 
 		if (isset($aHeaders['content-encoding']))
 		{

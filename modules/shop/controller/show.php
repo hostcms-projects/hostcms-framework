@@ -31,11 +31,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным товаром, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
  * - comparing(TRUE|FALSE) выводить сравниваемые товары, по умолчанию TRUE
+ * - comparingLimit(10) максимальное количество выводимых сравниваемых товаров, по умолчанию 10
  * - favorite(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
+ * - favoriteLimit(10) максимальное количество выводимых избранных товаров, по умолчанию 10
  * - favoriteOrder('ASC'|'DESC'|'RAND') направление сортировки избранных товаров, по умолчанию RAND
  * - viewed(TRUE|FALSE) выводить просмотренные товары, по умолчанию TRUE
- * - cart(TRUE|FALSE) выводить товары в корзине, по умолчанию FALSE
+ * - viewedLimit(10) максимальное количество выводимых просмотренных товаров, по умолчанию 10
  * - viewedOrder('ASC'|'DESC'|'RAND') направление сортировки просмотренных товаров, по умолчанию DESC
+ * - cart(TRUE|FALSE) выводить товары в корзине, по умолчанию FALSE
  * - warehousesItems(TRUE|FALSE) выводить остаток на каждом складе для товара, по умолчанию FALSE
  * - taxes(TRUE|FALSE) выводить список налогов, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить товары. По умолчанию 0
@@ -101,9 +104,12 @@ class Shop_Controller_Show extends Core_Controller
 		'siteuser',
 		'siteuserProperties',
 		'comparing',
+		'comparingLimit',
 		'favorite',
+		'favoriteLimit',
 		'favoriteOrder',
 		'viewed',
+		'viewedLimit',
 		'viewedOrder',
 		'cart',
 		'warehousesItems',
@@ -225,6 +231,8 @@ class Shop_Controller_Show extends Core_Controller
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->taxes = $this->cart = FALSE;
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
+
+		$this->viewedLimit = $this->comparingLimit = $this->favoriteLimit = 10;
 
 		$this->favoriteOrder = 'RAND';
 		$this->viewedOrder = 'DESC';
@@ -429,6 +437,9 @@ class Shop_Controller_Show extends Core_Controller
 					->name('comparing')
 			);
 
+			// Extract a slice of the array
+			$hostcmsCompare = array_slice($hostcmsCompare, 0, $this->comparingLimit, TRUE);
+
 			while (list($key) = each($hostcmsCompare))
 			{
 				$oShop_Item = Core_Entity::factory('Shop_Item')->find($key);
@@ -477,6 +488,9 @@ class Shop_Controller_Show extends Core_Controller
 					);
 			}
 
+			// Extract a slice of the array
+			$hostcmsFavorite = array_slice($hostcmsFavorite, 0, $this->favoriteLimit);
+
 			foreach ($hostcmsFavorite as $shop_item_id)
 			{
 				$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
@@ -524,6 +538,9 @@ class Shop_Controller_Show extends Core_Controller
 						array('%direction' => $this->viewedOrder)
 					);
 			}
+
+			// Extract a slice of the array
+			$hostcmsViewed = array_slice($hostcmsViewed, 0, $this->viewedLimit);
 
 			foreach ($hostcmsViewed as $view_item_id)
 			{
@@ -1535,7 +1552,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1552,7 +1569,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1573,7 +1590,7 @@ class Shop_Controller_Show extends Core_Controller
 				$oXslSubPanel->add(
 					Core::factory('Core_Html_Entity_A')
 						->href("{$sPath}?{$sAdditional}")
-						->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+						->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 						->add(
 							Core::factory('Core_Html_Entity_Img')
 								->width(16)->height(16)
@@ -1591,7 +1608,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1610,7 +1627,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1627,7 +1644,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { $.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'});} return false")
+					->onclick("res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'});} return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Answer extends Admin_Answer
 {
@@ -40,32 +40,38 @@ class Skin_Default_Answer extends Admin_Answer
 					'Minimize' => TRUE,
 				);
 
-				$aTmp = array();
-				foreach ($windowSettings as $key => $value)
+				$mode = Core_Skin::instance()->getMode();
+				if ($mode != 'blank')
 				{
-					if ($value === TRUE)
+					$aTmp = array();
+					foreach ($windowSettings as $key => $value)
 					{
-						$value = 'true';
+						if ($value === TRUE)
+						{
+							$value = 'true';
+						}
+						elseif ($value === FALSE)
+						{
+							$value = 'false';
+						}
+						else
+						{
+							$value = "'" . Core_Str::escapeJavascriptVariable($value) . "'";
+						}
+						$aTmp[] = $key . ': ' . $value;
 					}
-					elseif ($value === FALSE)
-					{
-						$value = 'false';
-					}
-					else
-					{
-						$value = "'" . Core_Str::escapeJavascriptVariable($value) . "'";
-					}
-					$aTmp[] = $key . ': ' . $value;
-				}
 
-				?>var jDivWin = $("#<?php echo htmlspecialchars($windowId)?>");
-				jDivWin.HostCMSWindow($.windowSettings({<?php echo implode(',', $aTmp)?>})).HostCMSWindow('open');
-				<?php if ($this->_addTaskbar)
-				{
-					?>$.addTaskbar(jDivWin, {shortcutImg: '/modules/skin/default/images/module/<?php echo $moduleName?>', shortcutTitle: '<?php echo Core_Str::escapeJavascriptVariable($this->title)?>'});<?php
+					?>var jDivWin = $("#<?php echo htmlspecialchars($windowId)?>");
+					jDivWin.HostCMSWindow($.windowSettings({<?php echo implode(',', $aTmp)?>})).HostCMSWindow('open');
+					<?php if ($this->_addTaskbar)
+					{
+						?>$.addTaskbar(jDivWin, {shortcutImg: '/modules/skin/default/images/module/<?php echo $moduleName?>', shortcutTitle: '<?php echo Core_Str::escapeJavascriptVariable($this->title)?>'});<?php
+					}
+					?>
+					$.afterContentLoad(jDivWin);
+				<?php
 				}
 				?>
-				$.afterContentLoad(jDivWin);
 			});</script><?php
 		}
 
@@ -80,9 +86,7 @@ class Skin_Default_Answer extends Admin_Answer
 		// Before show index()
 		$mode = Core_Skin::instance()->getMode();
 
-		$this->skin && Core_Skin::instance()
-			->title($this->title)
-			->header();
+		$this->_showHeader();
 
 		try
 		{

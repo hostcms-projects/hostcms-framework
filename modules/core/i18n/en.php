@@ -28,7 +28,7 @@ return array(
 	'administration_center' => 'Administration center',
 	'debug_information' => 'Debug information',
 	'sql_queries' => 'SQL queries',
-	'sql_statistics' => 'Time: <strong>%.3f</strong> s. <a onclick="ShowHide(\'sql_h%d\')" class="pointer">Backtrace</a>',
+	'sql_statistics' => 'Time: <strong>%.3f</strong> s. <a onclick="hQuery(\'#sql_h%d\').toggle()" class="pointer">Backtrace</a>',
 	'sql_debug_backtrace' => '%s, line %d<br/>',
 	'show_xml' => 'Show XML/XSL',
 	'hide_xml' => 'Hide XML/XSL',

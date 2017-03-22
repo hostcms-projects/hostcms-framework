@@ -166,110 +166,113 @@ class Skin_Hostcms5 extends Core_Skin
 <link rel="shortcut icon" href="/admin/favicon.ico"></link>
 <?php $this->showHead()?>
 </head>
-<body class="hostcmsWindow backendBody">
-<div id="header">
-<div class="left_box">
-
-<div class="logo"><a href="/admin/"
-<?php echo isset ($_SESSION['valid_user']) ? 'onclick="'."$.adminLoad({path: '/admin/index.php'}); return false".'"' : ''?>><img
-	src="/admin/images/logo.gif" alt="(^) HostCMS"
-	title="HostCMS <?php echo (isset($_SESSION["valid_user"])) ? 'v. ' . strip_tags(CURRENT_VERSION) : ''?>" /></a>
-</div>
+<body class="body-<?php echo htmlspecialchars($this->_mode)?> hostcmsWindow backendBody">
 
 <?php
-if (Core_Auth::logged())
+if ($this->_mode != 'blank')
 {
-	$oUser = Core_Entity::factory('User')->getCurrent();
+?><div id="header">
+	<div class="left_box">
+		<div class="logo"><a href="/admin/"
+		<?php echo isset ($_SESSION['valid_user']) ? 'onclick="'."$.adminLoad({path: '/admin/index.php'}); return false".'"' : ''?>><img
+			src="/admin/images/logo.gif" alt="(^) HostCMS"
+			title="HostCMS <?php echo (isset($_SESSION["valid_user"])) ? 'v. ' . strip_tags(CURRENT_VERSION) : ''?>" /></a>
+		</div>
 
-	if (is_null($oUser))
+	<?php
+	if (Core_Auth::logged())
 	{
-		throw new Core_Exception('Undefined user.', array(), 0, FALSE, 0, FALSE);
-	}
+		$oUser = Core_Entity::factory('User')->getCurrent();
 
-	?><div class="box3" style="float: right; margin: 0px 10px 10px 0px;"><img class="left_img" src="/admin/images/language.gif" /> <?php
-
-	$oAdmin_Languages = Core_Entity::factory('Admin_Language')->findAll();
-
-	$aOptions = array();
-
-	foreach ($oAdmin_Languages as $oAdmin_Language)
-	{
-		if ($oAdmin_Language->active == 1)
+		if (is_null($oUser))
 		{
-			$aOptions[$oAdmin_Language->shortname] = $oAdmin_Language->name;
+			throw new Core_Exception('Undefined user.', array(), 0, FALSE, 0, FALSE);
 		}
+
+		?><div class="box3" style="float: right; margin: 0px 10px 10px 0px;"><img class="left_img" src="/admin/images/language.gif" /> <?php
+
+		$oAdmin_Languages = Core_Entity::factory('Admin_Language')->findAll();
+
+		$aOptions = array();
+
+		foreach ($oAdmin_Languages as $oAdmin_Language)
+		{
+			if ($oAdmin_Language->active == 1)
+			{
+				$aOptions[$oAdmin_Language->shortname] = $oAdmin_Language->name;
+			}
+		}
+
+		Core::factory('Core_Html_Entity_Select')
+			->style('margin-right: 10px')
+			->name('lng_value')
+			->onchange("window.location=('?lng_value='+this.options[this.selectedIndex].value)")
+			->options($aOptions)
+			->value(Core_Array::get($_SESSION, 'current_lng'))
+			->execute();
+
+		?></div>
+		<div class="box3" style="float: right; margin: 0px 10px 0px 0px;"><img class="left_img" src="/admin/images/sites.gif" /><?php
+
+		$aSites = $oUser->getSites();
+
+		$aOptions = array();
+		foreach ($aSites as $oSite)
+		{
+			$aOptions[$oSite->id] = Core_Str::cut($oSite->name, 35);
+		}
+
+		Core::factory('Core_Html_Entity_Select')
+			->name("changeSiteId")
+			->onchange("window.location=('?changeSiteId='+this.options[this.selectedIndex].value)")
+			->options($aOptions)
+			->value(Core_Array::get($_SESSION, 'current_site_id'))
+			->execute();
+
+		if (isset($_SESSION['current_site_id']))
+		{
+			$oSite_Alias = Core_Entity::factory('Site', $_SESSION['current_site_id'])->getCurrentAlias();
+			$alias = $oSite_Alias
+				? $oSite_Alias->name
+				: '';
+		}
+		else
+		{
+			$alias = '';
+		}
+
+		?><a href="http://<?php echo $alias?>" target="_blank" title="<?php echo Core::_('Admin.viewSite')?>"><img class="right_img" src="/admin/images/eye.gif" alt="<&bull;>" title="<&bull;>" /></a></div><?php
 	}
+	?></div><?php
 
-	Core::factory('Core_Html_Entity_Select')
-		->style('margin-right: 10px')
-		->name('lng_value')
-		->onchange("window.location=('?lng_value='+this.options[this.selectedIndex].value)")
-		->options($aOptions)
-		->value(Core_Array::get($_SESSION, 'current_lng'))
-		->execute();
-
-?></div>
-
-<div class="box3" style="float: right; margin: 0px 10px 0px 0px;"><img
-	class="left_img" src="/admin/images/sites.gif" />
-
-	<?php
-	$aSites = $oUser->getSites();
-
-	$aOptions = array();
-	foreach ($aSites as $oSite)
+	if (Core_Auth::logged())
 	{
-		$aOptions[$oSite->id] = Core_Str::cut($oSite->name, 35);
-	}
+		?><div class="right_box">
+		<div class="box3" style="float: left; margin-bottom: 8px">
+		<div style="margin: 4px 0px"><img class="left_img" src="<?php echo ($oUser && $oUser->superuser == 1)
+		? "/admin/images/superuser.gif"
+		: "/admin/images/user.gif"?>" /> <?php echo $_SESSION['valid_user']?>
+		<a href="/admin/logout.php"><img class="right_img" src="/admin/images/exit.gif" alt="&rarr;" title="&rarr;" style="margin-left: 10px" /></a></div>
+		</div><?php
 
-	Core::factory('Core_Html_Entity_Select')
-		->name("changeSiteId")
-		->onchange("window.location=('?changeSiteId='+this.options[this.selectedIndex].value)")
-		->options($aOptions)
-		->value(Core_Array::get($_SESSION, 'current_site_id'))
-		->execute();
-
-	if (isset($_SESSION['current_site_id']))
-	{
-		$oSite_Alias = Core_Entity::factory('Site', $_SESSION['current_site_id'])->getCurrentAlias();
-		$alias = $oSite_Alias
-			? $oSite_Alias->name
-			: '';
+		if (!((~Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms')) & (~1835217467)))
+		{
+			!defined('HTTP_PURCHASE') && define('HTTP_PURCHASE', 'www.hostcms.ru/orders/');
+			?><div class="box3" style="float: left; width: 180px;"><img class="left_img" src="/admin/images/buy.gif" /> <a href="http://<?php echo HTTP_PURCHASE?>" class="order" target="_blank"><?php echo Core::_('Core.purchase_commercial_version')?></a></div><?php
+		}
+		?></div><?php
 	}
-	else
-	{
-		$alias = '';
-	}
-
-	?><a href="http://<?php echo $alias?>" target="_blank" title="<?php echo Core::_('Admin.viewSite')?>"><img class="right_img" src="/admin/images/eye.gif" alt="<&bull;>" title="<&bull;>" /></a></div><?php
-}
 ?></div><?php
-
-if (Core_Auth::logged())
-{
-?><div class="right_box">
-<div class="box3" style="float: left; margin-bottom: 8px">
-<div style="margin: 4px 0px"><img class="left_img" src="<?php echo ($oUser && $oUser->superuser == 1)
-? "/admin/images/superuser.gif"
-: "/admin/images/user.gif"?>" /> <?php echo $_SESSION['valid_user']?>
-<a href="/admin/logout.php"><img class="right_img" src="/admin/images/exit.gif" alt="&rarr;" title="&rarr;" style="margin-left: 10px" /></a></div>
-</div>
-
-	<?php
-	if (!((~Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms')) & (~1835217467)))
-	{
-		!defined('HTTP_PURCHASE') && define('HTTP_PURCHASE', 'www.hostcms.ru/orders/');
-		?><div class="box3" style="float: left; width: 180px;">
-<img class="left_img" src="/admin/images/buy.gif" /> <a href="http://<?php echo HTTP_PURCHASE?>" class="order" target="_blank"><?php echo Core::_('Core.purchase_commercial_version')?></a></div>
-<?php
-	}
 }
-?></div>
-</div>
+?>
+<div id="body"><?php
 
-<div id="body"><!-- Левый блок -->
-<div class="left_box" id="body_left_box" style="margin-right: 0px; border-right: 0px">
-<div style="padding-right: 30px"><?php
+	if ($this->_mode != 'blank')
+	{
+		?><!-- Левый блок -->
+		<div class="left_box" id="body_left_box" style="margin-right: 0px; border-right: 0px">
+		<div style="padding-right: 30px"><?php
+	}
 
 		return $this;
 	}
@@ -320,162 +323,166 @@ if (Core_Auth::logged())
 	 */
 	public function footer()
 	{
-		?></div>
-</div><?php
-
-?><div id="body_right_box" class="right_box"><?php
-if (Core_Auth::logged())
-{
-	// Список основных меню
-	$aSkin_Config = Core_Config::instance()->get('skin_hostcms5_config');
-
-	$oUser = Core_Entity::factory('User')->getCurrent();
-
-	if (isset($aSkin_Config['adminMenu']))
-	{
-		$aModules = $this->_getAllowedModules();
-		foreach ($aModules as $oModule)
+		if ($this->_mode != 'blank')
 		{
-			$oCore_Module = Core_Module::factory($oModule->path);
-
-			if ($oCore_Module && is_array($oCore_Module->menu))
-			{
-				foreach ($oCore_Module->menu as $aMenu)
-				{
-					$aSkin_Config['adminMenu']
-						[$aMenu['block']]
-						['sub'][] = $aMenu + array('sorting' => 0, 'block' => 0);
-				}
-			}
+		?></div></div><?php
 		}
 
-		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
-			->id('MainMenu');
-
-		foreach ($aSkin_Config['adminMenu'] as $key => $aAdminMenu)
+		if ($this->_mode != 'blank' && Core_Auth::logged())
 		{
-			$aAdminMenu += array(
-				'image' => '/admin/images/system.gif'
-			);
+			?><div id="body_right_box" class="right_box"><?php
 
-			$key = intval($key);
+			// Список основных меню
+			$aSkin_Config = Core_Config::instance()->get('skin_hostcms5_config');
 
-			if (isset($aAdminMenu['sub']))
+			$oUser = Core_Entity::factory('User')->getCurrent();
+
+			if (isset($aSkin_Config['adminMenu']))
 			{
-				array_multisort($aAdminMenu['sub']);
+				$aModules = $this->_getAllowedModules();
+				foreach ($aModules as $oModule)
+				{
+					$oCore_Module = Core_Module::factory($oModule->path);
 
-				$oCore_Html_Entity_Div_Box = Core::factory('Core_Html_Entity_Div')
-					->class("box{$key}")
-					->add(
-						Core::factory('Core_Html_Entity_Img')
-							->class('left_img')
-							->src($aAdminMenu['image'])
-					)
-					->add(
-						Core::factory('Core_Html_Entity_Span')
-							->onclick("SubMenu('id_{$key}')")
-							->value(nl2br(htmlspecialchars(Core::_("Skin_Hostcms5.admin_menu_{$key}"))))
+					if ($oCore_Module && is_array($oCore_Module->menu))
+					{
+						foreach ($oCore_Module->menu as $aMenu)
+						{
+							$aSkin_Config['adminMenu']
+								[$aMenu['block']]
+								['sub'][] = $aMenu + array('sorting' => 0, 'block' => 0);
+						}
+					}
+				}
+
+				$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
+					->id('MainMenu');
+
+				foreach ($aSkin_Config['adminMenu'] as $key => $aAdminMenu)
+				{
+					$aAdminMenu += array(
+						'image' => '/admin/images/system.gif'
 					);
 
-				// Sub menu
-				$oCore_Html_Entity_Div_SubMenu = Core::factory('Core_Html_Entity_Div')
-					->id("id_{$key}")
-					->class('sub_menu');
+					$key = intval($key);
 
-				$oCore_Html_Entity_Ul = Core::factory('Core_Html_Entity_Ul');
+					if (isset($aAdminMenu['sub']))
+					{
+						array_multisort($aAdminMenu['sub']);
 
-				foreach ($aAdminMenu['sub'] as $aSubMenu)
-				{
-					$oCore_Html_Entity_Ul
-						->add(
-							Core::factory('Core_Html_Entity_Li')
+						$oCore_Html_Entity_Div_Box = Core::factory('Core_Html_Entity_Div')
+							->class("box{$key}")
+							->add(
+								Core::factory('Core_Html_Entity_Img')
+									->class('left_img')
+									->src($aAdminMenu['image'])
+							)
+							->add(
+								Core::factory('Core_Html_Entity_Span')
+									->onclick("SubMenu('id_{$key}')")
+									->value(nl2br(htmlspecialchars(Core::_("Skin_Hostcms5.admin_menu_{$key}"))))
+							);
+
+						// Sub menu
+						$oCore_Html_Entity_Div_SubMenu = Core::factory('Core_Html_Entity_Div')
+							->id("id_{$key}")
+							->class('sub_menu');
+
+						$oCore_Html_Entity_Ul = Core::factory('Core_Html_Entity_Ul');
+
+						foreach ($aAdminMenu['sub'] as $aSubMenu)
+						{
+							$oCore_Html_Entity_Ul
 								->add(
-									Core::factory('Core_Html_Entity_A')
-										->value($aSubMenu['name'])
-										->href($aSubMenu['href'])
-										->onclick($aSubMenu['onclick'])
-								)
-						);
+									Core::factory('Core_Html_Entity_Li')
+										->add(
+											Core::factory('Core_Html_Entity_A')
+												->value($aSubMenu['name'])
+												->href($aSubMenu['href'])
+												->onclick($aSubMenu['onclick'])
+										)
+								);
+						}
+
+						$oCore_Html_Entity_Div_SubMenu
+							->add($oCore_Html_Entity_Ul);
+
+						$oCore_Html_Entity_Div
+							->add($oCore_Html_Entity_Div_Box)
+							->add($oCore_Html_Entity_Div_SubMenu);
+
+						// Скрываем меню, если надо
+						if (Core_Bit::getBit($oUser->settings, $key) == 1)
+						{
+							$oCore_Html_Entity_Div
+								->add(
+									Core::factory('Core_Html_Entity_Script')
+										->type("text/javascript")
+										->value(
+											"var divId = 'id_{$key}';" .
+											"var div = document.getElementById(divId);" .
+											"aHeights[divId] = div.clientHeight;" .
+											"div.style.height = '0px';"
+										)
+								);
+						}
+					}
 				}
 
-				$oCore_Html_Entity_Div_SubMenu
-					->add($oCore_Html_Entity_Ul);
-
-				$oCore_Html_Entity_Div
-					->add($oCore_Html_Entity_Div_Box)
-					->add($oCore_Html_Entity_Div_SubMenu);
-
-				// Скрываем меню, если надо
-				if (Core_Bit::getBit($oUser->settings, $key) == 1)
-				{
-					$oCore_Html_Entity_Div
-						->add(
-							Core::factory('Core_Html_Entity_Script')
-								->type("text/javascript")
-								->value(
-									"var divId = 'id_{$key}';" .
-									"var div = document.getElementById(divId);" .
-									"aHeights[divId] = div.clientHeight;" .
-									"div.style.height = '0px';"
-								)
-						);
-				}
+				$oCore_Html_Entity_Div->execute();
 			}
+
+			$oMainMenuShowHide_Div = Core::factory('Core_Html_Entity_Div')
+				->id('MainMenuShowHide')
+				->add(
+					Core::factory('Core_Html_Entity_Img')
+						->class('right_img')
+						->id("MainMenuImg")
+						->onclick("MainMenu('MainMenu')")
+						->src("/admin/images/menu_show.gif")
+						->alt("<>")
+						->title("<>")
+				)
+				->execute();
+
+			// Скрываем основное меню, если надо. Его состояние хранится в 7 бите
+			if (Core_Bit::getBit($oUser->settings, 7) == 1)
+			{
+				Core::factory('Core_Html_Entity_Script')
+					->type("text/javascript")
+					->value("HideMainMenu('MainMenu');")
+					->execute();
+			}
+			?></div><?php
 		}
 
-		$oCore_Html_Entity_Div->execute();
-	}
+		?></div><?php
 
-	$oMainMenuShowHide_Div = Core::factory('Core_Html_Entity_Div')
-		->id('MainMenuShowHide')
-		->add(
-			Core::factory('Core_Html_Entity_Img')
-				->class('right_img')
-				->id("MainMenuImg")
-				->onclick("MainMenu('MainMenu')")
-				->src("/admin/images/menu_show.gif")
-				->alt("<>")
-				->title("<>")
-		)
-		->execute();
+		if ($this->_mode != 'blank')
+		{
+		?><div id="copyright" onmousemove="clear_timeout_copiright()" onmouseout="set_timeout_copyright()" style="white-space: nowrap">
+			<div class="shadow_tail"><img src="/admin/images/shadow_tail.gif"></div>
 
-	// Скрываем основное меню, если надо. Его состояние хранится в 7 бите
-	if (Core_Bit::getBit($oUser->settings, 7) == 1)
-	{
-		Core::factory('Core_Html_Entity_Script')
-			->type("text/javascript")
-			->value("HideMainMenu('MainMenu');")
-			->execute();
-	}
-}
-?></div>
+			<strong><?php echo Core::_('Core.info_cms')?> HostCMS v. 6</strong>
+			<br />
+			<br />
+			<?php echo Core::_('Core.info_cms_site')?> <a href="http://www.hostcms.ru" target="_blank">www.hostcms.ru</a>
+			<br />
+			<?php echo Core::_('Core.info_cms_support')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a>
+			<br />
+			<?php echo Core::_('Core.info_cms_sales')?> <a href="mailto:sales@hostcms.ru">sales@hostcms.ru</a>
+		</div>
 
-</div>
+		<div id="footer">
+			<div>Copyright &copy; 2005&ndash;2015 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
+		</div>
 
-<div id="copyright"
-	onmousemove="clear_timeout_copiright();"
-	onmouseout="set_timeout_copyright();" style="white-space: nowrap;">
-
-	<div class="shadow_tail"><img src="/admin/images/shadow_tail.gif"></div>
-
-	<strong><?php echo Core::_('Core.info_cms')?> HostCMS v. 6</strong>
-	<br />
-	<br />
-	<?php echo Core::_('Core.info_cms_site')?> <a href="http://www.hostcms.ru" target="_blank">www.hostcms.ru</a>
-	<br />
-	<?php echo Core::_('Core.info_cms_support')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a>
-	<br />
-	<?php echo Core::_('Core.info_cms_sales')?> <a href="mailto:sales@hostcms.ru">sales@hostcms.ru</a>
-	</div>
-
-<div id="footer">
-	<div>Copyright &copy; 2005&ndash;2015 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
-</div>
-
-<!--[if lte IE 6]>
-<script type="text/javascript" src="/modules/skin/<?php echo $this->_skinName?>/js/ie_resize.js"></script>
-<![endif]-->
-
+		<!--[if lte IE 6]>
+		<script type="text/javascript" src="/modules/skin/<?php echo $this->_skinName?>/js/ie_resize.js"></script>
+		<![endif]-->
+		<?php
+		}
+		?>
 </body>
 </html>
 <?php
@@ -815,7 +822,6 @@ if (Core_Auth::logged())
 		}
 
 		?><td width="50%" valign="top" class="index_table_td">
-
 		<div class="main_div"><span class="div_title"><?php echo Core::_('Admin.index_title2')?></span>
 		<div class="div_content">
 

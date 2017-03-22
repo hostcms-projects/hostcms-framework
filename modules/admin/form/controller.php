@@ -349,6 +349,24 @@ class Admin_Form_Controller
 		return $this->_Admin_Form;
 	}
 
+	protected $_module = NULL;
+
+	/**
+	 * Set module
+	 * @param Core_Module $oModule
+	 * @return self
+	 */
+	public function module(Core_Module $oModule)
+	{
+		$this->_module = $oModule;
+		return $this;
+	}
+
+	public function getModule()
+	{
+		return $this->_module;
+	}
+
 	/**
 	 * Constructor.
 	 * @param Admin_Form_Model $oAdmin_Form admin form
@@ -1017,6 +1035,11 @@ class Admin_Form_Controller
 	{
 		$oAdmin_Answer = Core_Skin::instance()->answer();
 
+		if (!is_null($this->_module))
+		{
+			$oAdmin_Answer->module($this->_module->getModuleName());
+		}
+
 		$oAdmin_Answer
 			->ajax($this->_ajax)
 			->skin($this->_skin)
@@ -1130,9 +1153,10 @@ class Admin_Form_Controller
 								if ($actionResult === TRUE)
 								{
 									$this->addMessage(ob_get_clean())
-										->addContent('')
+										/*->addContent('')
 										->pageTitle('')
-										->title('');
+										->title('')*/;
+
 									return $this->show();
 								}
 								elseif ($actionResult !== NULL)
@@ -1162,6 +1186,7 @@ class Admin_Form_Controller
 			{
 				Core_Message::show($e->getMessage(), 'error');
 			}
+
 
 			// были успешные операции
 			foreach ($aReadyAction as $modelName => $actionChangedCount)
@@ -1198,13 +1223,9 @@ class Admin_Form_Controller
 	protected function _showFormTitle()
 	{
 		// Заголовок формы
-		if (strlen($this->_pageTitle) > 0)
-		{
-			// Заголовок
-			Admin_Form_Entity::factory('Title')
-				->name($this->_pageTitle)
-				->execute();
-		}
+		strlen($this->_pageTitle) && Admin_Form_Entity::factory('Title')
+			->name($this->_pageTitle)
+			->execute();
 
 		return $this;
 	}
@@ -1240,7 +1261,9 @@ class Admin_Form_Controller
 			Core::factory('Core_Html_Entity_Script')
 				->type("text/javascript")
 				->value("(function($){
-					$('#{$windowId} table.admin_table .editable').editable({windowId: '{$windowId}', path: '{$path}'});
+					//console.log($('#{$windowId} table.admin_table .editable'));
+					//$('#{$windowId} table.admin_table .editable').editable({windowId: '{$windowId}', path: '{$path}'});
+					$('#{$windowId} table .editable').editable({windowId: '{$windowId}', path: '{$path}'});
 				})(jQuery);")
 				->execute();
 		}

@@ -28,7 +28,7 @@ return array(
 	'administration_center' => 'Центр администрирования',
 	'debug_information' => 'Отладочная информация',
 	'sql_queries' => 'SQL-запросы',
-	'sql_statistics' => 'Время: <strong>%.3f</strong> сек. <a onclick="ShowHide(\'sql_h%d\')" class="pointer">Вызовы</a>',
+	'sql_statistics' => 'Время: <strong>%.3f</strong> сек. <a onclick="hQuery(\'#sql_h%d\').toggle()" class="pointer">Вызовы</a>',
 	'sql_debug_backtrace' => '%s, строка %d<br/>',
 	'show_xml' => 'Показать XML/XSL',
 	'hide_xml' => 'Скрыть XML/XSL',

@@ -1137,7 +1137,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1154,7 +1154,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1173,7 +1173,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$oXslSubPanel->add(
 					Core::factory('Core_Html_Entity_A')
 						->href("{$sPath}?{$sAdditional}")
-						->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+						->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 						->add(
 							Core::factory('Core_Html_Entity_Img')
 								->width(16)->height(16)
@@ -1191,7 +1191,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1210,7 +1210,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("$.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
@@ -1227,7 +1227,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oXslSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { $.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'});} return false")
+					->onclick("res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'});} return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
