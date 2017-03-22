@@ -551,7 +551,7 @@ class Shop_Controller_Show extends Core_Controller
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
-			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);
 		}
 
 		return FALSE;
@@ -786,11 +786,6 @@ class Shop_Controller_Show extends Core_Controller
 
 				$oShop_Item->clearEntities();
 
-				// ID оригинального ярлыка
-				$iShortcut && $oShop_Item->addEntity(
-					Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
-				);
-
 				if ($oShop_Item->active == $desiredActivity
 					&& (!$iShortcut
 						|| (Core_Date::sql2timestamp($oShop_Item->end_datetime) >= $iCurrentTimestamp
@@ -800,6 +795,11 @@ class Shop_Controller_Show extends Core_Controller
 					)
 				)
 				{
+					// ID оригинального ярлыка
+					$iShortcut && $oShop_Item->addEntity(
+						Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
+					);
+
 					$this->applyItemsForbiddenTags($oShop_Item);
 
 					// Comments
@@ -1036,9 +1036,13 @@ class Shop_Controller_Show extends Core_Controller
 	/**
 	 * Parse URL and set controller properties
 	 * @return self
+	 * @hostcms-event Shop_Controller_Show.onBeforeParseUrl
+	 * @hostcms-event Shop_Controller_Show.onAfterParseUrl
 	 */
 	public function parseUrl()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeParseUrl', $this);
+
 		$oShop = $this->getEntity();
 
 		$Core_Router_Route = new Core_Router_Route($this->pattern, $this->patternExpressions);
@@ -1189,6 +1193,8 @@ class Shop_Controller_Show extends Core_Controller
 		// Ограничение на список товаров
 		//!$this->item && is_null($this->tag) && $this->forbidSelectModifications();
 		!$this->item && is_null($this->tag) && $this->_selectModifications = FALSE;
+
+		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
 
 		return $this;
 	}
@@ -1693,7 +1699,7 @@ class Shop_Controller_Show extends Core_Controller
 				$oShop_Currency, $oShop->Shop_Currency
 			);
 
-			$query_currency_switch = "IF (`shop_items`.`shop_currency_id` = '{$oShop_Currency->id}', IF (shop_discounts.percent, price * (100 - shop_discounts.percent) * {$currency_coefficient} / 100, shop_items.price * {$currency_coefficient}), {$query_currency_switch})";
+			$query_currency_switch = "IF (`shop_items`.`shop_currency_id` = '{$oShop_Currency->id}', IF (shop_discounts.value, IF(shop_discounts.type, price * {$currency_coefficient} - shop_discounts.value, price * (100 - shop_discounts.value) * {$currency_coefficient} / 100), shop_items.price * {$currency_coefficient}), {$query_currency_switch})";
 		}
 
 		$current_date = date('Y-m-d H:i:s');

@@ -31,7 +31,7 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 
 			foreach ($this->_children as $oAdmin_Form_Entity)
 			{
-				$oAdmin_Form_Entity->controller($controller);
+				method_exists($oAdmin_Form_Entity, 'controller') && $oAdmin_Form_Entity->controller($controller);
 			}
 		}
 
@@ -50,7 +50,7 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 		if (!class_exists($className))
 		{
 			throw new Core_Exception("Class '%className' does not exist",
-					array('%className' => $className));
+				array('%className' => $className));
 		}
 
 		return new $className();
@@ -112,8 +112,14 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 	 */
 	public function add($oAdmin_Form_Entity)
 	{
+		if (!is_object($oAdmin_Form_Entity))
+		{
+			throw new Core_Exception("Wrong variable type '%type'. Expecting object.",
+					array('%type' => gettype($oAdmin_Form_Entity)));
+		}
 		// Set link to controller
-		$oAdmin_Form_Entity->controller($this->_Admin_Form_Controller);
+		method_exists($oAdmin_Form_Entity, 'controller') && $oAdmin_Form_Entity->controller($this->_Admin_Form_Controller);
+
 		return parent::add($oAdmin_Form_Entity);
 	}
 

@@ -293,22 +293,28 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				if (count($aShop_Item_Discounts))
 				{
 					// определяем количество скидок на товар
-					$percent = 0;
+					$discountPercent = $discountAmount = 0;
 
 					// Цикл по идентификаторам скидок для товара
 					foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
 					{
-						if ($oShop_Item_Discount->Shop_Discount->isActive())
+						$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
+						if ($oShop_Discount->isActive())
 						{
-							$price['discounts'][] = $oShop_Item_Discount->Shop_Discount;
-							$percent += $oShop_Item_Discount->Shop_Discount->percent;
+							$price['discounts'][] = $oShop_Discount;
+							$oShop_Discount->type == 0
+								? $discountPercent += $oShop_Discount->value
+								: $discountAmount += $oShop_Discount->value;
 						}
 					}
 
-					// определяем суммарную величину скидки в валюте
-					$price['discount'] = $oShop_Item->price * $percent / 100;
+					// Определяем суммарную величину скидки в %
+					$price['discount'] = $oShop_Item->price * $discountPercent / 100;
 
-					// вычисляем цену со скидкой как ее разность с величиной скидки
+					// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
+					($price['discount'] - $price['discount']) > $discountAmount && $price['discount'] += $discountAmount;
+
+					// Вычисляем цену со скидкой как ее разность с величиной скидки в %
 					$price['price_discount'] = $oShop_Item->price - $price['discount'];
 				}
 				else

@@ -34,8 +34,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	 * @var array
 	 */
 	protected $_preloadValues = array(
-		'percent' => 0,
-		'active' => 1
+		'value' => 0,
+		'active' => 1,
+		'type' => 0
 	);
 
 	/**
@@ -97,4 +98,21 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 		return parent::delete($primaryKey);
 	}
+	
+	/**
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_discount.onBeforeRedeclaredGetXml
+	 */
+	public function getXml()
+	{
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
+
+		$this->clearXmlTags();
+		$this->type == 0
+			? $this->addXmlTag('percent', $this->value)
+			: $this->addXmlTag('amount', $this->value);
+
+		return parent::getXml();
+	}	
 }

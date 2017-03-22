@@ -16,7 +16,7 @@ return array(
 	'edit_order_discount_form_title' => 'Edit discount from order amount',
 	'name' => '<acronym title="Name of discount from total order amount">Name</acronym>',
 	'active' => '<acronym title="Discount activity from total order amount">Activity</acronym>',
-	'coupon' => '<acronym title="Use discount only in the presence of discount ticket">Use only with discount ticket</acronym>',
+	'coupon' => '<acronym title="Use discount only in the presence of discount coupon">Use only with discount coupon</acronym>',
 	'value' => '<acronym title="Discount amount; can be measured by per cents or a currency">Discount amount</acronym>',
 	'type' => '<acronym title="Discount type - per cent or a sum in a selected currency">Discount type</acronym>',
 	'start_datetime' => '<acronym title="Starting date of discount activity">Discount active from</acronym>',

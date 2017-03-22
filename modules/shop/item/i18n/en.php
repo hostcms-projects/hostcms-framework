@@ -117,7 +117,7 @@ return array(
 	'shop_menu_title' => "Discounts",
 	'show_discount_link' => "Discounts for products",
 	'order_discount_show_title' => 'Discounts from order amount',
-	'coupon_group_link' => 'Discount tickets',
+	'coupon_group_link' => 'Discount coupon',
 	'affiliate_menu_title' => 'Affiliate program',
 	'add_item_shortcut_shop_groups_id' => "<acronym title=\"Group to which the product shortcut belongs\">Parent group</acronym>",
 	'add_shop_item_shortcut_title' => "Shortcut for %s",

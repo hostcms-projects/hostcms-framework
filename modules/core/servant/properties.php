@@ -102,7 +102,7 @@ class Core_Servant_Properties
 			array('%property' => $property));*/
 		return $this->__set($property, $value);
 	}
-	
+
 	/**
 	 * Utilized for reading data from inaccessible properties
 	 * @param string $property property name
@@ -175,7 +175,7 @@ class Core_Servant_Properties
 	 * @return string
 	 */
 	public function __toString()
-    {
+	{
 		$return = array();
 
 		if (!empty($this->_allowedProperties))
@@ -191,5 +191,5 @@ class Core_Servant_Properties
 		}
 
 		return '';
-    }
+	}
 }

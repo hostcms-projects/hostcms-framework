@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Property_List_Model extends Site_Model
 {
@@ -59,7 +59,7 @@ class Structure_Property_List_Model extends Site_Model
 	 */
 	public function getLargeImageMaxWidth()
 	{
-		return $this->max_size_load_image;
+		return $this->max_size_load_image_big;
 	}
 
 	/**
@@ -68,7 +68,7 @@ class Structure_Property_List_Model extends Site_Model
 	 */
 	public function getLargeImageMaxHeight()
 	{
-		return $this->max_size_load_image;
+		return $this->max_size_load_image_big;
 	}
 
 	/**
@@ -77,7 +77,7 @@ class Structure_Property_List_Model extends Site_Model
 	 */
 	public function getSmallImageMaxWidth()
 	{
-		return $this->max_size_load_image_big;
+		return $this->max_size_load_image;
 	}
 
 	/**
@@ -86,7 +86,7 @@ class Structure_Property_List_Model extends Site_Model
 	 */
 	public function getSmallImageMaxHeight()
 	{
-		return $this->max_size_load_image_big;
+		return $this->max_size_load_image;
 	}
 
 	/**

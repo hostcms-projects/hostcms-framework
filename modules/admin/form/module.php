@@ -14,13 +14,19 @@ class Admin_Form_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.1';
+	public $version = '6.2';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2014-12-05';
+	public $date = '2015-03-16';
+	/**
+	 * Module name
+	 * @var string
+	 */
+	protected $_moduleName = 'admin_form';
+	
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

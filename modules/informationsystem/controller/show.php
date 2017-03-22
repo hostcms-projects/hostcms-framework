@@ -369,7 +369,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		if ($this->cache && Core::moduleIsActive('cache'))
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
-			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);;
+			return $oCore_Cache->check($cacheKey = strval($this), $this->_cacheName);
 		}
 
 		return FALSE;
@@ -702,9 +702,13 @@ class Informationsystem_Controller_Show extends Core_Controller
 	/**
 	 * Parse URL and set controller properties
 	 * @return informationsystem_Controller_Show
+	 * @hostcms-event Informationsystem_Controller_Show.onBeforeParseUrl
+	 * @hostcms-event Informationsystem_Controller_Show.onAfterParseUrl
 	 */
 	public function parseUrl()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeParseUrl', $this);
+
 		$oInformationsystem = $this->getEntity();
 
 		$Core_Router_Route = new Core_Router_Route($this->pattern, $this->patternExpressions);
@@ -808,6 +812,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 				}
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
 
 		return $this;
 	}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Purchase_Discount_Model extends Core_Entity
 {
@@ -106,6 +106,8 @@ class Shop_Purchase_Discount_Model extends Core_Entity
 	 */
 	public function getByCouponText($couponText)
 	{
+		$sDatetime = Core_Date::timestamp2sql(time());
+
 		$this->queryBuilder()
 			->select('shop_purchase_discounts.*',
 				array('shop_purchase_discount_coupons.id', 'shop_purchase_discount_coupon_id')
@@ -114,6 +116,8 @@ class Shop_Purchase_Discount_Model extends Core_Entity
 			->where('shop_purchase_discount_coupons.active', '=', 1)
 			->where('shop_purchase_discount_coupons.deleted', '=', 0)
 			->where('shop_purchase_discount_coupons.text', 'LIKE', $couponText)
+			->where('shop_purchase_discount_coupons.start_datetime', '<=', $sDatetime)
+			->where('shop_purchase_discount_coupons.end_datetime', '>=', $sDatetime)
 			->open()
 			->where('shop_purchase_discount_coupons.count', '>', 0)
 			->setOr()

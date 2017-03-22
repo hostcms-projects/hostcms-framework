@@ -95,23 +95,30 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll();
 		if (count($aShop_Item_Discounts))
 		{
-			// определяем количество скидок на товар
-			$discountPercent = 0;
+			// Определяем количество скидок на товар
+			$discountPercent = $discountAmount = 0;
 
 			// Цикл по идентификаторам скидок для товара
 			foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
 			{
-				if ($oShop_Item_Discount->Shop_Discount->isActive())
+				$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
+				if ($oShop_Discount->isActive())
 				{
-					$this->_aPrice['discounts'][] = $oShop_Item_Discount->Shop_Discount;
-					$discountPercent += $oShop_Item_Discount->Shop_Discount->percent;
+					$this->_aPrice['discounts'][] = $oShop_Discount;
+
+					$oShop_Discount->type == 0
+						? $discountPercent += $oShop_Discount->value
+						: $discountAmount += $oShop_Discount->value;
 				}
 			}
 
-			// определяем суммарную величину скидки в валюте
+			// Определяем суммарную величину скидки в %
 			$this->_aPrice['discount'] = $this->_aPrice['price'] * $discountPercent / 100;
 
-			// вычисляем цену со скидкой как ее разность с величиной скидки
+			// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
+			($this->_aPrice['price'] - $this->_aPrice['discount']) > $discountAmount && $this->_aPrice['discount'] += $discountAmount;
+
+			// Вычисляем цену со скидкой как ее разность с величиной скидки в %
 			$this->_aPrice['price_discount'] = $this->_aPrice['price'] - $this->_aPrice['discount'];
 		}
 		else

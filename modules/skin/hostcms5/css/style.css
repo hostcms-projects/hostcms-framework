@@ -223,20 +223,32 @@ input.input-lg, div.input-lg, input.calendar_field_large, select.input-lg {
 .hostcmsWindow .admin_table td div{clear:both;position:relative;margin:0;padding:0}
 .hostcmsWindow .admin_table td div.dl{overflow:hidden}
 .hostcmsWindow .admin_table td .editable {min-width: 10px; min-height: 10px; cursor: url('/modules/skin/default/images/cursor/edit.png'), text }
-.hostcmsWindow .admin_table .row{background-color:#FFF}
+/*.hostcmsWindow .admin_table .row{background-color:#FFF}*/
 .hostcmsWindow .admin_table .row .hl{background-color:#F6F6F6}
-.hostcmsWindow .admin_table .row_odd{background-color:#F5F5F5}
+/*.hostcmsWindow .admin_table .row_odd{background-color:#F5F5F5}*/
 .hostcmsWindow .admin_table .row_odd .hl{background-color:#EEE}
-.hostcmsWindow .admin_table .row:hover,.hostcmsWindow .admin_table .row_odd:hover{background-color:#E5E5E5}
-.hostcmsWindow .row td,.hostcmsWindow .admin_td,.hostcmsWindow .row_odd td{padding-left:4px;padding-right:4px;padding-bottom:2px;border-bottom:1px;border-bottom-style:solid;overflow:hidden;border-color:#ddd}
+/*.hostcmsWindow .admin_table .row:hover,.hostcmsWindow .admin_table .row_odd:hover{background-color:#E5E5E5}*/
+.hostcmsWindow .row td,.hostcmsWindow .admin_td/*,.hostcmsWindow .row_odd*/ td{padding-left:4px;padding-right:4px;padding-bottom:2px;border-bottom:1px;border-bottom-style:solid;overflow:hidden;border-color:#ddd}
 
-.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > td,
-.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > th {
-  background-color: #E2E0DB;
+.hostcmsWindow .admin_table > tbody > tr:nth-child(even) > td,
+.hostcmsWindow .admin_table > tbody > tr:nth-child(even) > th {
+  background-color: #F5F5F5;
 }
 .hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(odd) > td,
 .hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(odd) > th {
   background-color: #F2F0EB;
+}
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > td,
+.hostcmsWindow .admin_table > tbody > tr.cheked:nth-child(even) > th {
+  background-color: #E2E0DB;
+}
+.hostcmsWindow .admin_table > tbody > tr:hover > td,
+.hostcmsWindow .admin_table > tbody > tr:hover > th {
+  background-color: #E5E5E5;
+}
+.hostcmsWindow .admin_table > tbody > tr.cheked:hover > td,
+.hostcmsWindow .admin_table > tbody > tr.cheked:hover > th {
+  background-color: #DDDAD1;
 }
 
 .hostcmsWindow .report_height td{height:25px}

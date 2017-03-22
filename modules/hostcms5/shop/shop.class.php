@@ -642,7 +642,7 @@ class shop
 			'shop_discount_from' => $oShopDiscount->start_datetime,
 			'shop_discount_to' => $oShopDiscount->end_datetime,
 			'shop_discount_is_active' => $oShopDiscount->active,
-			'shop_discount_percent' => $oShopDiscount->percent,
+			'shop_discount_percent' => $oShopDiscount->value,
 			'users_id' => $oShopDiscount->user_id
 		);
 	}
@@ -5428,7 +5428,7 @@ class shop
 		$oShop_Discount->start_datetime = Core_Type_Conversion::toStr($param['from']);
 		$oShop_Discount->end_datetime = Core_Type_Conversion::toStr($param['to']);
 		$oShop_Discount->active = Core_Type_Conversion::toInt($param['is_active']);
-		$oShop_Discount->percent = Core_Type_Conversion::toFloat($param['percent']);
+		$oShop_Discount->value = Core_Type_Conversion::toFloat($param['percent']);
 		$oShop_Discount->shop_id = Core_Type_Conversion::toInt($param['shop_shops_id']);
 
 		if (is_null($oShop_Discount->id) && isset($param['users_id']) && $param['users_id'])
@@ -5557,7 +5557,7 @@ class shop
 				array('start_datetime', 'shop_discount_from'),
 				array('end_datetime', 'shop_discount_to'),
 				array('active', 'shop_discount_is_active'),
-				array('percent', 'shop_discount_percent'),
+				array('value', 'shop_discount_percent'),
 				array('user_id', 'users_id')
 			)
 			->from('shop_discounts')
@@ -23317,14 +23317,14 @@ class shop
 				array('shop_id', 'shop_shops_id'),
 				'shop_currency_id',
 				array('shop_purchase_discounts.name', 'shop_order_discount_name'),
-				array('min_amount', 'shop_order_discount_sum_from'),
-				array('max_amount', 'shop_order_discount_sum_to'),
-				array('min_count', 'shop_order_discount_count_from'),
-				array('max_count', 'shop_order_discount_count_to'),
+				array('shop_purchase_discounts.min_amount', 'shop_order_discount_sum_from'),
+				array('shop_purchase_discounts.max_amount', 'shop_order_discount_sum_to'),
+				array('shop_purchase_discounts.min_count', 'shop_order_discount_count_from'),
+				array('shop_purchase_discounts.max_count', 'shop_order_discount_count_to'),
 				array('mode', 'shop_order_discount_logic_between_elements'),
 				array('shop_purchase_discounts.active', 'shop_order_discount_active'),
-				array('start_datetime', 'shop_order_discount_active_from'),
-				array('end_datetime', 'shop_order_discount_active_to'),
+				array('shop_purchase_discounts.start_datetime', 'shop_order_discount_active_from'),
+				array('shop_purchase_discounts.end_datetime', 'shop_order_discount_active_to'),
 				array('type', 'shop_order_discount_type'),
 				array('value', 'shop_order_discount_value'),
 				array('coupon', 'shop_order_discount_is_coupon'),
@@ -23394,7 +23394,7 @@ class shop
 				array('start_datetime', 'shop_discount_from'),
 				array('end_datetime', 'shop_discount_to'),
 				array('active', 'shop_discount_is_active'),
-				array('percent', 'shop_discount_percent'),
+				array('value', 'shop_discount_percent'),
 				array('user_id', 'users_id')
 			)
 			->from('shop_discounts')
