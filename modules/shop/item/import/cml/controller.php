@@ -44,6 +44,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		"АКТИВНОСТЬ");
 
 	/**
+	 * List of predefined additional properties
+	 * @var array
+	 */
+	protected $aPredefinedAdditionalProperties = array();
+		
+	/**
 	 * List of base properties
 	 * @var array
 	 */
@@ -74,6 +80,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @var array
 	 */
 	protected $_aPropertyValues = array();
+	
+	protected $_temporaryPropertyFile = '';
 
 	/**
 	 * Constructor.
@@ -83,6 +91,14 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		parent::__construct();
 
+		$aConfig = Core_Config::instance()->get('shop_cml', array()) + array(
+			'predefinedAdditionalProperties' => array()
+		);
+		
+		$this->aPredefinedAdditionalProperties = is_array($aConfig['predefinedAdditionalProperties'])
+			? $aConfig['predefinedAdditionalProperties']
+			: array();
+			
 		$this->_oSimpleXMLElement = new SimpleXMLElement(
 			// Delete  xmlns="urn:1C.ru:commerceml_2"
 			/*str_replace(array(' xmlns="urn:1C.ru:commerceml_2"', ' xmlns="urn:1C.ru:commerceml_205"'), '',*/
@@ -91,6 +107,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		);
 		$this->sShopDefaultPriceName = 'РОЗНИЧНАЯ';
 		$this->sShopDefaultPriceGUID = '';
+		
+		$this->_temporaryPropertyFile = CMS_FOLDER . TMP_DIR . "1c_exchange_files/modproplist.tmp";
+		Core_File::mkdir(dirname($this->_temporaryPropertyFile));
 	}
 
 	/**
@@ -107,6 +126,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			is_null($oShopGroup) && $oShopGroup = Core_Entity::factory('Shop_Group');
 			$oShopGroup->name = strval($oXMLGroupNode->Наименование);
 			$oShopGroup->guid = strval($oXMLGroupNode->Ид);
+			
+			if(count($aDescriptionArray = $this->xpath($oXMLGroupNode, 'Описание')))
+			{
+				$oShopGroup->description = strval($aDescriptionArray[0]);
+			}
+			
 			$oShopGroup->parent_id = $iParentId;
 			$oShopGroup->shop_id = $this->iShopId;
 
@@ -124,6 +149,29 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$this->_importGroups($Groups, $oShopGroup->id);
 			}
 
+		}
+		return $this;
+	}
+	
+	/**
+	 * Check if property exists in array and save it if so
+	 * @return self
+	 */
+	protected function _addPredefinedAdditionalProperty($oShopItem, $sPropertyGUID, $sValue, $bForcedAdd = FALSE)
+	{
+		if(is_null($oShopItem))
+		{
+			return $this;
+		}
+		if (mb_strtoupper($sPropertyGUID) == 'ВЕС')
+		{
+			$oShopItem->weight = Shop_Controller::instance()->convertPrice($sValue);
+			$oShopItem->save();
+			return $this;
+		}
+		if($bForcedAdd || (in_array(mb_strtoupper($sPropertyGUID), array_map('mb_strtoupper', $this->aPredefinedAdditionalProperties))!==FALSE))
+		{
+			$this->_addItemProperty($oShopItem, $sPropertyGUID, $sValue);
 		}
 		return $this;
 	}
@@ -182,7 +230,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			$oShop_Item_Property_List->add($oProperty);
 		}
-		$xxx = $oShopItem->modification_id == 0
+		$oShopItem->modification_id == 0
 			? intval($oShopItem->Shop_Group->id)
 			: intval($oShopItem->Modification->Shop_Group->id);
 		$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
@@ -378,10 +426,23 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		{
 			list(, $this->namespace) = each($aNamespaces);
 		}
+		
+		// Проверяем, есть ли файл с дополнительными свойствами для модификаций, если есть - извлекаем данные
+		if(is_file($this->_temporaryPropertyFile))
+		{
+			$aModificationProperties = unserialize(file_get_contents($this->_temporaryPropertyFile));
+		}
+		else
+		{
+			$aModificationProperties = array();
+		}
 
 		// Файл import.xml
 		if (count((array)$this->_oSimpleXMLElement->Классификатор))
 		{
+			// Удаляем временный файл с дополнительными свойствами для модификаций
+			is_file($this->_temporaryPropertyFile) && Core_File::delete($this->_temporaryPropertyFile);
+		
 			$classifier = $this->_oSimpleXMLElement->Классификатор;
 
 			//print_r($classifier->xpath($sXmlns . 'Группы'));
@@ -415,7 +476,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->aAdditionalProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
 				}
 			}
-
+			
 			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oItem)
 			{
 				$sGUID = strval($oItem->Ид);
@@ -446,6 +507,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				{
 					$this->_aReturn['updateItemCount']++;
 				}
+				
+				
 
 				// Если передан GUID модификации и товар, для которого загружается модификация, уже существует
 				if (strlen($sGUIDmod) && $oShopItem->id)
@@ -789,11 +852,50 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}*/
 					$this->_importProperties($oShopItem, $ItemPropertyValue);
 				}
-
-				// Обрабатываем свойства/значения свойств для конкретно данного товара
-				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара | ЗначенияРеквизитов/ЗначениеРеквизита')
+				
+				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара')
 						  as $oItemProperty)
 				{
+					$oTempShopItem = $oShopItem;
+				
+					// Проверяем, есть ли у характеристики идентификатор модификации
+					if(count($aIdModificationArray = $this->xpath($oItemProperty, 'Ид')))
+					{
+						$oTempShopItem = NULL;
+						$sModificationGuid = strval($aIdModificationArray[0]);
+						
+						// Модификация найдена - добавляем ей это свойство
+						if(count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
+						{
+							$oTempShopItem = $aShop_Items[0];
+						}
+						else
+						{
+							// модификация не найдена, возможно, она будет загружена из файла offers.xml, сохраняем свойства в массив
+							$aModificationProperties[$sModificationGuid][] = array('name'=>strval($oItemProperty->Наименование),'value'=>strval($oItemProperty->Значение));
+						}
+					}
+				
+					// Характеристики загружаются безотносительно содержимого конфигурационного файла cml.php
+					$this->_addPredefinedAdditionalProperty($oTempShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
+				}
+				
+				// Сохраняем список характеристик модификаций во временный файл
+				if(count($aModificationProperties))
+				{
+					file_put_contents($this->_temporaryPropertyFile, serialize($aModificationProperties));
+				}
+				
+				foreach ($this->xpath($oItem, 'ЗначенияРеквизитов/ЗначениеРеквизита')
+						  as $oItemProperty)
+				{
+					$this->_addPredefinedAdditionalProperty($oShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение));
+				}
+				
+				// Обрабатываем свойства/значения свойств для конкретно данного товара
+				/*foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара or ЗначенияРеквизитов/ЗначениеРеквизита')
+						  as $oItemProperty)
+				{echo "111<br/>";
 					if (mb_strtoupper(strval($oItemProperty->Наименование)) == 'ВЕС')
 					{
 						$oShopItem->weight = Shop_Controller::instance()->convertPrice(strval($oItemProperty->Значение));
@@ -807,7 +909,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					$this->_addItemProperty($oShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение));
-				}
+				}*/
 
 				// Обрабатываем налоги
 				foreach ($this->xpath($oItem, 'СтавкиНалогов/СтавкаНалога') as $oTax)
@@ -860,6 +962,30 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopPrice->save();
 				}
 			}
+			
+			// Обработка складов
+			foreach ($this->xpath($packageOfProposals, 'Склады/Склад') as $oWarehouse)
+			{
+				$sWarehouseGuid = strval($oWarehouse->Ид);
+				$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByGuid($sWarehouseGuid, FALSE);
+				if(is_null($oShopWarehouse))
+				{
+					$oShopWarehouse = Core_Entity::factory('Shop_Warehouse');
+					$oShopWarehouse->shop_id = $this->iShopId;
+					$oShopWarehouse->guid = $sWarehouseGuid;
+				}
+				// у склада не всегда есть название
+				if($sWarehouseName = strval($oWarehouse->Наименование))
+				{
+					$oShopWarehouse->name = $sWarehouseName;
+				}
+				$oShopWarehouse->address = strval($oWarehouse->Адрес->Представление);
+				$oShopWarehouse->save();
+				/*foreach ($this->xpath($oWarehouse, 'Адрес/АдресноеПоле') as $oWarehouseAddressField)
+				{
+					//echo "Адресное поле: " . strval($oWarehouseAddressField->Тип) . " - " . strval($oWarehouseAddressField->Значение) . "<br/>";
+				}*/
+			}
 
 			// Обработка предложений
 			foreach ($this->xpath($packageOfProposals, 'Предложения/Предложение') as $oProposal)
@@ -897,6 +1023,15 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 						// Подменяем товар на модификацию
 						$oShopItem = $oModificationItem;
+						
+						// извлекаем список допсвойств для данной модификации
+						if(isset($aModificationProperties[$oShopItem->guid]) && is_array($aModificationProperties[$oShopItem->guid]))
+						{
+							foreach($aModificationProperties[$oShopItem->guid] as $aModificationPropertyData)
+							{
+								$this->_addPredefinedAdditionalProperty($oShopItem, $aModificationPropertyData['name'], $aModificationPropertyData['value'], TRUE);
+							}
+						}
 					}
 
 					// Товар найден, начинаем обновление
@@ -1016,9 +1151,27 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 						$oShop_Warehouse_Item->count(floatval($oCount))->save();
 					}
-
+					
+					// склады
+					foreach ($this->xpath($oProposal, 'Склад') as $oWarehouseCount)
+					{
+						$sWarehouseGuid = strval($oWarehouseCount['ИдСклада']);
+						$sWarehouseCount = strval($oWarehouseCount['КоличествоНаСкладе']);
+						
+						$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByGuid($sWarehouseGuid, FALSE);
+						if(!is_null($oShopWarehouse))
+						{
+							$oShop_Warehouse_Item = $oShopWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
+							if (is_null($oShop_Warehouse_Item))
+							{
+								$oShop_Warehouse_Item = Core_Entity::factory('Shop_Warehouse_Item')
+									->shop_warehouse_id($oShopWarehouse->id)
+									->shop_item_id($oShopItem->id);
+							}
+							$oShop_Warehouse_Item->count(floatval($sWarehouseCount))->save();
+						}
+					}
 					$oShopItem->save();
-
 					$this->_aReturn['updateItemCount']++;
 				}
 			}

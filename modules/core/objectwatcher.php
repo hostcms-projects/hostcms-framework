@@ -8,12 +8,12 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_ObjectWatcher
 {
 	/**
-	 * Cache 
+	 * Cache
 	 * @var array
 	 */
 	private $_cache = array();
@@ -53,7 +53,7 @@ class Core_ObjectWatcher
 			self::$_instance = new Core_ObjectWatcher();
 
 			self::$config = Core::$config->get('core_objectwatcher') + array(
-				'maxObjects' => 256
+				'maxObjects' => 512
 			);
 
 			self::$_maxObjects = self::$config['maxObjects'];
@@ -73,7 +73,7 @@ class Core_ObjectWatcher
 
 	/**
 	 * Add instance of $model to cahce
-	 * @param Core_Entity $model 
+	 * @param Core_Entity $model
 	 */
 	static public function add(Core_Entity $model)
 	{
@@ -83,6 +83,9 @@ class Core_ObjectWatcher
 		if (/*rand(0, self::$_maxObjects) == 0 && */count($instance->_cache) > self::$_maxObjects)
 		{
 			$instance->_cache = array_slice($instance->_cache, floor(self::$_maxObjects / 4));
+
+			// Forces collection of any existing garbage cycles
+			function_exists('gc_collect_cycles') && gc_collect_cycles();
 		}
 
 		$instance->_cache[$instance->getKey($model)] = $model;
@@ -90,7 +93,7 @@ class Core_ObjectWatcher
 
 	/**
 	 * Delete instance of $model from cahce
-	 * @param Core_Entity $model 
+	 * @param Core_Entity $model
 	 */
 	static public function delete(Core_Entity $model)
 	{

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Edit_In_Place extends Core_Command_Controller
 {
@@ -59,9 +59,9 @@ class Core_Command_Controller_Edit_In_Place extends Core_Command_Controller
 
 		$oCore_Response
 			->status(200)
-			->header('Pragma', "no-cache")
-			->header('Cache-Control', "private, no-cache")
-			->header('Vary', "Accept")
+			->header('Pragma', 'no-cache')
+			->header('Cache-Control', 'private, no-cache')
+			->header('Vary', 'Accept')
 			->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . ' GMT')
 			->header('X-Powered-By', 'HostCMS')
 			->body(json_encode($result));

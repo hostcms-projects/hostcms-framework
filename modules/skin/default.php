@@ -869,7 +869,7 @@ class Skin_Default extends Core_Skin
 	public function footer()
 	{
 		?><div id="footer">
-			<div id="copyright">&copy; 2005–2014 ООО «Хостмэйк»</div>
+			<div id="copyright">&copy; 2005–2015 ООО «Хостмэйк»</div>
 			<div id="links">
 				<p><?php echo Core::_('Admin.website')?> <a href="http://www.hostcms.ru" target="_blank">www.hostcms.ru</a></p>
 				<p><?php echo Core::_('Admin.support_email')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a></p>

@@ -29,6 +29,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	protected $_allowedProperties = array(
 		'shop_item_id',
 		'quantity',
+		'marking',
 		'postpone',
 		'shop_warehouse_id',
 		'siteuser_id',
@@ -45,6 +46,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 		$this->quantity = 1;
 		$this->postpone = 0;
 		$this->shop_warehouse_id = 0;
+		$this->marking = '';
 
 		$this->siteuser_id = 0;
 		if (Core::moduleIsActive('siteuser'))
@@ -98,6 +100,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 					$this->clear()
 						->shop_item_id($oShop_Cart->shop_item_id)
 						->quantity($oShop_Cart->quantity)
+						->marking($oShop_Cart->marking)
 						->postpone($oShop_Cart->postpone)
 						->shop_warehouse_id($oShop_Cart->shop_warehouse_id)
 						->siteuser_id($this->siteuser_id)
@@ -179,6 +182,13 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 		$aShop_Cart = array();
 		foreach ($aCart[$shop_id] as $shop_item_id => $aCartItem)
 		{
+			$aCartItem += array(
+				'quantity' => 0,
+				'postpone' => 0,
+				'marking' => '',
+				'shop_warehouse_id' => 0
+			);
+
 			$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
 
 			if (!is_null($oShop_Item) && $oShop_Item->active)
@@ -188,6 +198,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				$oShop_Cart->shop_item_id = $shop_item_id;
 				$oShop_Cart->quantity = $aCartItem['quantity'];
 				$oShop_Cart->postpone = $aCartItem['postpone'];
+				$oShop_Cart->marking = $aCartItem['marking'];
 				$oShop_Cart->shop_id = $shop_id;
 				$oShop_Cart->shop_warehouse_id = $aCartItem['shop_warehouse_id'];
 				$oShop_Cart->siteuser_id = 0;
@@ -222,12 +233,15 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 			Core_Session::start();
 
 			$Shop_Item = Core_Entity::factory('Shop_Item', $this->shop_item_id);
+
 			$aCart = Core_Array::get($_SESSION, 'hostcmsCart', array());
 			$aCart[$Shop_Item->shop_id] = Core_Array::get($aCart, $Shop_Item->shop_id, array());
+
 			$aReturn = Core_Array::get($aCart[$Shop_Item->shop_id], $this->shop_item_id, array()) + array(
 				'shop_item_id' => $this->shop_item_id,
 				'quantity' => 0,
 				'postpone' => 0,
+				'marking' => '',
 				'shop_id' => $Shop_Item->shop_id,
 				'shop_warehouse_id' => 0
 			);
@@ -360,6 +374,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 						// Вставляем данные в таблицу корзины
 						$oShop_Cart->quantity = $this->quantity;
 						$oShop_Cart->postpone = $this->postpone;
+						strlen($this->marking) && $oShop_Cart->marking = $this->marking;
 						$oShop_Cart->shop_id = $oShop_Item->shop_id;
 						$oShop_Cart->shop_warehouse_id = $this->shop_warehouse_id;
 						$oShop_Cart->save();
@@ -370,6 +385,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 						$_SESSION['hostcmsCart'][$oShop_Item->shop_id][$this->shop_item_id] = array(
 							'quantity' => $this->quantity,
 							'postpone' => $this->postpone,
+							'marking' => $this->marking,
 							'siteuser_id' => $this->siteuser_id,
 							'shop_warehouse_id' => $this->shop_warehouse_id
 						);

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Sql
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Sql_Dataset_Repair extends Admin_Form_Dataset
 {
@@ -48,23 +48,36 @@ class Sql_Dataset_Repair extends Admin_Form_Dataset
 	public function load()
 	{
 		$aTables = $this->_database->getTables();
-
+		$aRepair = array();
+		
 		foreach ($aTables as $key => $sTable)
 		{
-			$aTables[$key] = $this->_database->quoteColumnName($sTable);
+			$aTableStatus = $this->_database->setQueryType(0)
+				->asAssoc()
+				->query("SHOW TABLE STATUS LIKE " . $this->_database->quote($sTable))
+				->current();
+
+			// Just for MyISAM
+			if (strtolower(Core_Array::get($aTableStatus, 'Engine')) == 'myisam')
+			{
+				$aRepair[] = $this->_database->quoteColumnName($sTable);
+			}
 		}
 
-		try
+		if (count($aRepair))
 		{
-			$this->_database->setQueryType(0)
-					->query("REPAIR TABLE " . implode(',', $aTables));
-		}
-		catch (Exception $e)
-		{
-			Core_Message::show($e->getMessage(), 'error');
-		}
+			try
+			{
+				$this->_database->setQueryType(0)
+					->query("REPAIR TABLE " . implode(',', $aRepair));
+			}
+			catch (Exception $e)
+			{
+				Core_Message::show($e->getMessage(), 'error');
+			}
 
-		$this->_objects = $this->_database->asObject(NULL)->result();
+			$this->_objects = $this->_database->asObject(NULL)->result();
+		}
 
 		return $this->_objects;
 	}

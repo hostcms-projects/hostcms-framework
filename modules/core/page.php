@@ -188,7 +188,18 @@ class Core_Page extends Core_Servant_Properties
 	public $css = array();
 
 	/**
-	 * Link css
+	 * Link $css to the beginning of list
+	 * @param string $css path
+	 * @return Core_Page
+	 */
+	public function prependCss($css)
+	{
+		array_unshift($this->css, $css);
+		return $this;
+	}
+
+	/**
+	 * Link $css onto the end of array
 	 * @param string $css path
 	 * @return Core_Page
 	 */
@@ -285,11 +296,12 @@ class Core_Page extends Core_Servant_Properties
 	/**
 	 * Link js
 	 * @param string $js path
+	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return Core_Page
 	 */
-	public function js($js)
+	public function js($js, $async = FALSE)
 	{
-		$this->js[] = $js;
+		$this->js[] = array($js, $async);
 		return $this;
 	}
 
@@ -301,9 +313,10 @@ class Core_Page extends Core_Servant_Properties
 	{
 		$sReturn = '';
 
-		foreach ($this->js as $js)
+		foreach ($this->js as $aJs)
 		{
-			$sReturn .= '<script type="text/javascript" src="' . $js . '"></script>' . "\n";
+			$sAsync = $aJs[1] ? ' async="async"' : '';
+			$sReturn .= '<script type="text/javascript"' . $sAsync . ' src="' . $aJs[0] . '"></script>' . "\n";
 		}
 
 		return $sReturn;
@@ -311,9 +324,10 @@ class Core_Page extends Core_Servant_Properties
 
 	/**
 	 * Get block of linked compressed js
+	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return string
 	 */
-	protected function _getJsCompressed()
+	protected function _getJsCompressed($async = FALSE)
 	{
 		try
 		{
@@ -321,13 +335,15 @@ class Core_Page extends Core_Servant_Properties
 
 			$oCompression_Controller = Compression_Controller::instance('js');
 
-			foreach ($this->js as $js)
+			foreach ($this->js as $aJs)
 			{
-				$oCompression_Controller->addJs($js);
+				$oCompression_Controller->addJs($aJs[0]);
 			}
 
+			$sAsync = $async ? ' async="async"' : '';
+
 			$sPath = $oCompression_Controller->getPath();
-			$sReturn .= '<script type="text/javascript" src="' . $sPath . '"></script>' . "\n";
+			$sReturn .= '<script type="text/javascript"' . $sAsync . ' src="' . $sPath . '"></script>' . "\n";
 		}
 		catch (Exception $e)
 		{
@@ -339,22 +355,24 @@ class Core_Page extends Core_Servant_Properties
 
 	/**
 	 * Get block of linked js
+	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return string
 	 */
-	public function getJs()
+	public function getJs($async = FALSE)
 	{
 		return Core::moduleIsActive('compression')
-			? $this->_getJsCompressed()
+			? $this->_getJsCompressed($async)
 			: $this->_getJs();
 	}
 
 	/**
 	 * Show block of linked js
+	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return Core_Page
 	 */
-	public function showJs()
+	public function showJs($async = FALSE)
 	{
-		echo $this->getJs();
+		echo $this->getJs($async);
 		return $this;
 	}
 

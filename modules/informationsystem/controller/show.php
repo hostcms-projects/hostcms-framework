@@ -393,9 +393,10 @@ class Informationsystem_Controller_Show extends Core_Controller
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
 			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
 
-			if (!is_null($inCache))
+			if (is_array($inCache))
 			{
-				echo $inCache;
+				$this->_shownIDs = $inCache['shown'];
+				echo $inCache['content'];
 				return $this;
 			}
 		}
@@ -552,10 +553,14 @@ class Informationsystem_Controller_Show extends Core_Controller
 			}
 		}
 
+		$this->_shownIDs = array();
+
 		if ($this->limit > 0)
 		{
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 			{
+				$this->_shownIDs[] = $oInformationsystem_Item->id;
+
 				// Shortcut
 				$iShortcut = $oInformationsystem_Item->shortcut_id;
 
@@ -620,7 +625,11 @@ class Informationsystem_Controller_Show extends Core_Controller
 			= $this->_aGroup_Properties = $this->_aGroup_Property_Dirs = array();
 
 		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set($cacheKey, $content, $this->_cacheName);
+		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set(
+			$cacheKey,
+			array('content' => $content, 'shown' => $this->_shownIDs),
+			$this->_cacheName
+		);
 
 		return $this;
 	}

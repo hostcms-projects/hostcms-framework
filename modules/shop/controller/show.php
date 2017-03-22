@@ -575,9 +575,10 @@ class Shop_Controller_Show extends Core_Controller
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
 			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
 
-			if (!is_null($inCache))
+			if (is_array($inCache))
 			{
-				echo $inCache;
+				$this->_shownIDs = $inCache['shown'];
+				echo $inCache['content'];
 				return $this;
 			}
 		}
@@ -638,6 +639,8 @@ class Shop_Controller_Show extends Core_Controller
 				}
 			}
 		}
+
+		$this->_shownIDs = array();
 
 		// До вывода свойств групп
 		if ($this->limit > 0 || $this->item)
@@ -766,6 +769,8 @@ class Shop_Controller_Show extends Core_Controller
 
 			foreach ($aShop_Items as $oShop_Item)
 			{
+				$this->_shownIDs[] = $oShop_Item->id;
+
 				// Shortcut
 				$iShortcut = $oShop_Item->shortcut_id;
 
@@ -836,7 +841,11 @@ class Shop_Controller_Show extends Core_Controller
 			= $this->_aGroup_Properties = $this->_aGroup_Property_Dirs = array();
 
 		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set($cacheKey, $content, $this->_cacheName);
+		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set(
+			$cacheKey,
+			array('content' => $content, 'shown' => $this->_shownIDs),
+			$this->_cacheName
+		);
 
 		return $this;
 	}

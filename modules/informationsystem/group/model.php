@@ -902,6 +902,20 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Get IDs of child groups
 	 * @return array
+	 *
+	 * <code>
+	 *	// Дочерние группы $informationsystem_group_id магазина 1
+	 *	$informationsystem_group_id = 777;
+	 *	$oInformationsystem_Groups = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Groups;
+	 *	$oInformationsystem_Groups->queryBuilder()
+	 *		->where('parent_id', '=', $informationsystem_group_id);
+	 *
+	 *	$aChildrenId =  $oInformationsystem_Groups->getGroupChildrenId();
+	 *	foreach ($aChildrenId as $iGroupId)
+	 *	{
+	 *		var_dump($iGroupId);
+	 *	}
+	 * </code>
 	 */
 	public function getGroupChildrenId()
 	{

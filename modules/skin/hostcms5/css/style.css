@@ -66,7 +66,7 @@ html { height: 100%; margin: 0px; padding: 0px;}
 .hostcmsWindow *{font-family:Arial, Verdana, 'MS Sans Serif', sans-serif;font-style:normal;font-size:auto}
 
 body.hostcmsWindow {
-background-color: #FFFFFF;
+background-color: #FFF;
 font-size: 75%;
 height: auto !important;
 /* для Firefox и Opera — чтобы не сработало следующее объявление */
@@ -120,7 +120,7 @@ position: relative;
 
 /* Стили для групбоксов на главной */
 .hostcmsWindow .main_div { height: 100%; margin: 0px 0px 10px 0px; }
-.hostcmsWindow .div_title { position: absolute; background-color: #ffffff; padding: 0px 4px 0px 4px; margin: -8px 0px 0px 20px; font-weight: bold; }
+.hostcmsWindow .div_title { position: absolute; background-color: #FFF; padding: 0px 4px 0px 4px; margin: -8px 0px 0px 20px; font-weight: bold; }
 .hostcmsWindow .div_content{border:1px solid #ddd;height:100%;padding:10px 5px}
 /* / Стили для групбоксов на главной */
 
@@ -134,7 +134,7 @@ select:focus
 
 .hostcmsWindow input[type=text], .hostcmsWindow input[type=password], .hostcmsWindow textarea, .hostcmsWindow select
 {
-	background: none repeat scroll 0 0 #FFFFFF;
+	background: none repeat scroll 0 0 #FFF;
 	border-radius: 5px;
 	-moz-box-sizing: padding-box;
 	-webkit-box-sizing: padding-box;
@@ -193,7 +193,7 @@ input.input-lg, div.input-lg, input.calendar_field_large, select.input-lg {
 	padding: 5px 5px 5px 25px;
 	font-size: 8pt;
 	border-collapse: collapse;
-	background-color: #FFFFFF;
+	background-color: #FFF;
 	border-radius: 5px;
 }
 
@@ -837,7 +837,7 @@ input.input-lg, div.input-lg, input.calendar_field_large, select.input-lg {
 	clear: both;
 }
 .hostcmsWindow div.section {
-	border-color: #FFFFFF #DDDDDD #DDDDDD;
+	border-color: #FFF #DDDDDD #DDDDDD;
 	border-style: solid;
 	border-width: 1px;
 	margin-bottom: 15px;
@@ -878,8 +878,8 @@ div.fm_preview {
 }
 
 .admin-tags {
-    /*background-color: #FFFFFF;*/
-	background: none repeat scroll 0 0 #FFFFFF;
+    /*background-color: #FFF;*/
+	background: none repeat scroll 0 0 #FFF;
     border-radius: 5px;
     border: 2px solid #75736E ;
 	border-bottom-color: #F1F0EE;
@@ -908,7 +908,7 @@ div.fm_preview {
     /*background-color: #91B8D0;*/
 	background-color: #40A5D8;
 	border-radius: 7px;
-    color: #FFFFFF;
+    color: #FFF;
     display: inline-block;
     font-size: 13px;
     font-weight: normal;
@@ -939,7 +939,7 @@ div.fm_preview {
 
 .admin-tags .admin-tag .close {
     bottom: 0;
-    color: #FFFFFF;
+    color: #FFF;
     float: none;
     font-size: 15px;
     line-height: 20px;
@@ -958,7 +958,7 @@ div.fm_preview {
 }
 .admin-tags .dropdown-menu {
     background-clip: padding-box;
-    background-color: #FFFFFF;
+    background-color: #FFF;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
@@ -997,11 +997,11 @@ div.fm_preview {
 
 .admin-tags .dropdown-menu li a:hover, .admin-tags .dropdown-menu li a:focus, .admin-tags .dropdown-menu li a:active, .admin-tags .dropdown-menu li.active a, .admin-tags .dropdown-menu li.active a:hover, .admin-tags .dropdown-menu .dropdown-submenu:hover > a, .admin-tags.nav-tabs .dropdown-menu li > a:focus {
     background: none repeat scroll 0 0 #4F99C6;
-    color: #FFFFFF;
+    color: #FFF;
 }
 .admin-tags .dropdown-menu > .active > a, .admin-tags .dropdown-menu > .active > a:hover, .admin-tags .dropdown-menu > .active > a:focus {
     background-color: #428BCA;
-    color: #FFFFFF;
+    color: #FFF;
     outline: 0 none;
     text-decoration: none;
 }
@@ -1009,6 +1009,18 @@ div.fm_preview {
 .hostcmsWindow td.importantField {
 	font-weight: bold;
 }
+
+/* Market */
+.market{margin:0 0 15px -5px}
+.pagination{clear:both;padding-top:15px}
+.module_block{border:1px solid #D4D0C8;border-radius:4px;background-color:#F9F9F9;padding:5px;margin:5px;float:left;height:125px;width:30%}
+.market img{margin:5px 10px 0 5px;float:left;border-radius:10px}
+.market .title{padding:0 0 5px 0;display:block;font-size:9pt;font-weight:bold;margin-top:5px}
+.market .category_name{padding:0 0 5px 0;display:block;font-size:8pt;color:#898686}
+.market a.price:visited,.market a.price:link,.market a.price:hover,.market a.install:visited,.market a.install:link,.market a.install:hover,.installed{text-decoration:none;padding:5px 10px;display:block;border-radius:5px;background-color:#B0AEAE;float:left;color:#FFF;font-weight:bold}
+.market a.install:visited,.market a.install:link,.market a.install:hover{background-color:#6DBE45}
+.installed{cursor:default;background-color:#F3AE00}
+/* /Market */
 
 .hostcmsWindow .CodeMirror {
 	border: 1px solid #ddd;

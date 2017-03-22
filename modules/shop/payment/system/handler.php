@@ -362,7 +362,9 @@ abstract class Shop_Payment_System_Handler
 					$oShop_Order_Item->price = $aPrices['price_discount'] - $aPrices['tax'];
 					$oShop_Order_Item->rate = $aPrices['rate'];
 					$oShop_Order_Item->name = $oShop_Item->name;
-					$oShop_Order_Item->marking = $oShop_Item->marking;
+					$oShop_Order_Item->marking = strlen($oShop_Cart->marking)
+						? $oShop_Cart->marking
+						: $oShop_Item->marking;
 
 					$this->_shopOrder->add($oShop_Order_Item);
 
@@ -935,15 +937,15 @@ abstract class Shop_Payment_System_Handler
 
 		$aEmails = $this->getAdminEmails();
 
-		foreach ($aEmails as $sEmail)
+		foreach ($aEmails as $key => $sEmail)
 		{
+			// Delay 0.350s for second mail and others
+			$key > 0 && usleep(350000);
+
 			$sEmail = trim($sEmail);
 			if (Core_Valid::email($sEmail))
 			{
 				$oCore_Mail->to($sEmail)->send();
-
-				// Anti spam filter
-				sleep(1);
 			}
 		}
 

@@ -343,7 +343,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				/* PICTURE */
 				if ($oShop_Item->image_large != '')
 				{
-						echo '<picture>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
+					echo '<picture>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
 				}
 
 				// (name, vendor?, vendorCode?)

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Sql
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'SQL-запросы',
@@ -22,7 +22,7 @@ return array(
 
 	'table' => 'База данных',
 	'optimize_table' => 'Оптимизировать',
-	'repair_table' => 'Исправить',
+	'repair_table' => 'Исправить (только для MyISAM)',
 	'optimize_table_title' => 'Оптимизация таблиц',
 	'repair_table_title' => 'Исправление таблиц',
 	//'optimize_success' => 'Таблицы успешно оптимизированы',

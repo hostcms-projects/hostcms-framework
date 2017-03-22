@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Module
 {
@@ -31,6 +31,12 @@ abstract class Core_Module
 	public $menu = array();
 
 	/**
+	 * Module name
+	 * @var string
+	 */
+	protected $_moduleName = NULL;
+
+	/**
 	 * Create module instance
 	 * @param string $moduleName module name
 	 * @return mixed
@@ -40,10 +46,23 @@ abstract class Core_Module
 		$modelName = ucfirst($moduleName) . '_Module';
 		if (class_exists($modelName))
 		{
-			return new $modelName();
+			$oReflectionClass = new ReflectionClass($modelName);
+
+			return !$oReflectionClass->isAbstract()
+				? new $modelName()
+				: NULL;
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Get module name
+	 * @return array
+	 */
+	public function getModuleName()
+	{
+		return $this->_moduleName;
 	}
 
 	/**

@@ -184,6 +184,17 @@ class Core_Session
 	}
 
 	/**
+	 * Show error
+	 * @param string $content
+	 */
+	protected function _error($content)
+	{
+		Core_Array::getRequest('_', FALSE)
+			? Core::showJson($content)
+			: exit($content);
+	}
+
+	/**
 	 * Lock session
 	 * @param int $id session ID
 	 * @return boolean
@@ -202,7 +213,7 @@ class Core_Session
 
 			if (!is_array($row))
 			{
-				exit('HostCMS session lock error: Get row failure');
+				$this->_error('HostCMS session lock error: Get row failure.');
 			}
 
 			if (isset($row['lock']) && $row['lock'] == 1)
@@ -216,7 +227,7 @@ class Core_Session
 
 			if ($iTime > $this->_lockTimeout)
 			{
-				exit('HostCMS session lock error: Timeout');
+				$this->_error('HostCMS session lock error: Timeout. Please wait!');
 			}
 
 			usleep($this->_nextStepDelay);
@@ -239,7 +250,7 @@ class Core_Session
 
 		if (!is_array($row))
 		{
-			exit('HostCMS session unlock error: Get row failure');
+			$this->_error('HostCMS session unlock error: Get row failure');
 		}
 
 		return TRUE;

@@ -211,6 +211,21 @@ class Core_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Shown IDs
+	 * @var array
+	 */
+	protected $_shownIDs = array();
+
+	/** 
+	 * Get shown IDs
+	 * @return array
+	 */
+	public function getShownIDs()
+	{
+		return $this->_shownIDs;
+	}
+	
+	/**
 	 * Convert object to string
 	 * @return string
 	 */

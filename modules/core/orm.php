@@ -917,6 +917,15 @@ class Core_ORM
 	 * Load values from database
 	 * @return Core_ORM
 	 */
+	public function load()
+	{
+		return $this->_load();
+	}
+
+	/**
+	 * Load values from database
+	 * @return Core_ORM
+	 */
 	protected function _load()
 	{
 		if (!$this->loaded())

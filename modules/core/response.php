@@ -245,7 +245,7 @@ class Core_Response
 
 		foreach ($this->_headers as $value)
 		{
-			header($value[0] . ': ' . str_replace(array("\r", "\n"), '', $value[1]));
+			header($value[0] . ': ' . str_replace(array("\r", "\n", "\0"), '', $value[1]));
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterSendHeaders', $this);

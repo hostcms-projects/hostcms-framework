@@ -164,7 +164,8 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
-			if ($oShop_Cart->Shop_Item->id)
+			$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
+			if (!is_null($oShop_Item->id))
 			{
 				$this->itemsProperties && $oShop_Cart->showXmlProperties(TRUE);
 

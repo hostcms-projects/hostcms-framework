@@ -32,4 +32,5 @@ return array(
 	'warehouse_default_not_exist' => "Attention! Default warehouse is missing, please set default warehouse!",
 	'warehouse_default_name' => "Primary",
 	'warehouse_default_count' => "<acronym title=\"Set a zero rest in the warehouse\">Set rest in the warehouse</acronym>",
+	'guid' => '<acronym title="Warehouse identifier">Warehouse identifier</acronym>',
 );

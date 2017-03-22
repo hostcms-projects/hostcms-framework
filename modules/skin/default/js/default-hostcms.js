@@ -1,14 +1,16 @@
 (function($){
 	jQuery.extend({
+		ajaxCallbackSkin: function(data, status, jqXHR)
+		{
+			var jObject = jQuery(this);
+			if (typeof data.title != 'undefined' && data.title != '' && jObject.hasClass('hostcmsWindow'))
+			{
+				jObject.HostCMSWindow({title: data.title});
+			}
+		},
 		afterContentLoad: function(jWindow)
 		{
 			var windowId = jWindow.attr('id');
-
-			// Format table
-			jQuery("#"+windowId+" table.admin_table tr:not(.admin_table_title, .admin_table_filter):nth-child(odd)")
-			.attr('class', 'row');
-
-			jQuery("#"+windowId+" table.admin_table tr:not(.admin_table_title, .admin_table_filter):nth-child(even)").attr('class', 'row_odd');
 
 			// Format textarea
 			//jQuery('#'+windowId+' textarea').elastic();

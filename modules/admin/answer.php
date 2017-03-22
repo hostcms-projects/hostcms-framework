@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Answer extends Core_Servant_Properties
 {
@@ -17,6 +17,7 @@ class Admin_Answer extends Core_Servant_Properties
 	 * @var array
 	 */
 	protected $_allowedProperties = array(
+		'module',
 		'ajax',
 		'title',
 		'message',
@@ -30,6 +31,7 @@ class Admin_Answer extends Core_Servant_Properties
 	public function __construct()
 	{
 		parent::__construct();
+		$this->module = NULL;
 		$this->skin = TRUE;
 		$this->title = '';
 		$this->message = '';
@@ -41,59 +43,73 @@ class Admin_Answer extends Core_Servant_Properties
 	 */
 	protected function _sendAjax()
 	{
-		header('Pragma: no-cache');
-		header('Cache-Control: private, no-cache');
-		header('Content-Disposition: inline; filename="files.json"');
-		header('Vary: Accept');
-
-		if (strpos(Core_Array::get($_SERVER, 'HTTP_ACCEPT', ''), 'application/json') !== FALSE)
-		{
-			header('Content-type: application/json; charset=utf-8');
-		}
-		else
-		{
-			header('X-Content-Type-Options: nosniff');
-			header('Content-type: text/plain; charset=utf-8');
-		}
-
-		// utf-8: http://www.iana.org/assignments/character-sets
-		//header('Content-Type: text/javascript; charset=utf-8');
-
-		// bug in Chrome
-		//header("Content-Length: " . strlen($content));
-		echo json_encode(
-			array(
-				'form_html' => $this->content,
-				'error' => $this->message,
-				'title' => $this->title
-			)
-		);
-
-		exit();
+		Core::showJson(array(
+			'form_html' => $this->content,
+			'error' => $this->message,
+			'title' => $this->title,
+			'module' => $this->module
+		));
 	}
 
 	/**
-	 * Send header and HTML answer
+	 * Show header
+	 * @return self
 	 */
-	protected function _sendHtml()
+	protected function _showHeader()
 	{
 		$this->skin && Core_Skin::instance()
 			->title($this->title)
 			->header();
 
-		?><div id="id_content"><?php
-		?><div id="id_message"><?php echo $this->message?></div><?php echo $this->content?><?php
-		?></div><?php
+		return $this;
+	}
 
+	/**
+	 * Show footer
+	 * @return self
+	 */
+	protected function _showFooter()
+	{
+		$this->skin && Core_Skin::instance()->footer();
+
+		return $this;
+	}
+
+	/**
+	 * Execute afterload logic
+	 * @return self
+	 */
+	protected function _afterLoad()
+	{
 		?><script type="text/javascript"><?php
 		if (!is_null($this->title))
 		{
-			?>document.title = '<?php echo str_replace("'", "\'", $this->title)?>';<?php
+			?>document.title = '<?php echo Core_Str::escapeJavascriptVariable($this->title)?>';<?php
 		}
 		?>$.afterContentLoad($("#id_content"));<?php
 		?></script><?php
 
-		$this->skin && Core_Skin::instance()->footer();
+		return $this;
+	}
+
+	/**
+	 * Send header and HTML answer
+	 * @return self
+	 */
+	protected function _sendHtml()
+	{
+		$this->_showHeader();
+
+		?><div id="id_content"><?php
+			?><div id="id_message"><?php echo $this->message?></div><?php
+			echo $this->content;
+		?></div><?php
+
+		$this
+			->_afterLoad()
+			->_showFooter();
+
+		return $this;
 	}
 
 	/**

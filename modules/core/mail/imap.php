@@ -109,11 +109,11 @@ class Core_Mail_Imap extends Core_Servant_Properties
 		switch ($this->type)
 		{
 			case 'imap':
-				is_null($this->port) && $this->port = 143;
+				is_null($this->port) && $this->port = $this->ssl ? 993 : 143;
 				$this->_protocol = '/imap';
 			break;
 			case 'pop3':
-				is_null($this->port) && $this->port = 110;
+				is_null($this->port) && $this->port = $this->ssl ? 995 : 110;
 				$this->_protocol = '/pop3';
 			break;
 			default:
@@ -123,17 +123,23 @@ class Core_Mail_Imap extends Core_Servant_Properties
 		}
 
 		// Безопасное соединение TSL/SSL
-		$this->_protocol .= $this->ssl
-			? '/ssl/novalidate-cert/notls'
-			: '/novalidate-cert/notls';
+		$this->ssl && $this->_protocol .= '/ssl';
+
+		$this->_protocol .= '/novalidate-cert/notls';
 
 		// Формируем имя ящика
 		$mailbox = '{' . $this->server . ':' . $this->port . $this->_protocol . '}INBOX';
 
 		//echo $this->login, '  *** ', $this->password, '  **** ', $mailbox, ' ';
 
+		$aParam = $this->ssl
+			? array('DISABLE_AUTHENTICATOR' => 'GSSAPI') // PLAIN
+			: array();
+
 		// Устанавливаем соединение с почтовым сервером
-		$this->_stream = @imap_open($mailbox, $this->login, $this->password);
+		$this->_stream = version_compare(PHP_VERSION, '5.3.2') >= 0
+			? @imap_open($mailbox, $this->login, $this->password, NULL, 0, $aParam)
+			: @imap_open($mailbox, $this->login, $this->password);
 
 		// Соединение с почтовым сервером не установлено
 		if (!$this->_stream)
@@ -443,14 +449,15 @@ class Core_Mail_Imap extends Core_Servant_Properties
 				case 0:
 				// message
 				case 2:
-					if (strlen($this->_aMessages[$i]['body']))
+					// Если уже было тело письма, остальные идут как вложения
+					if (!strlen($this->_aMessages[$i]['body']))
 					{
-						// Если уже было тело письма, остальные идут как вложения
-						continue;
+						$this->_aMessages[$i]['subtype'] = Core_Array::get($aStructurePart, 'subtype', 'text');
+						$this->_aMessages[$i]['body'] .= $body;
+
+						// Если было тело письма, то остальное пойдет во вложения
+						break;
 					}
-					$this->_aMessages[$i]['subtype'] = Core_Array::get($aStructurePart, 'subtype', 'text');
-					$this->_aMessages[$i]['body'] .= $body;
-				break;
 				// Other files
 				default:
 					// Тип вложения

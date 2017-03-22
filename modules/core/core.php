@@ -697,4 +697,35 @@ class Core
 		  . (!$secure ? '' : '; secure')
 		  . (!$httponly ? '' : '; HttpOnly'), $replace);
 	}
+
+	/**
+	 * Show headers and JSON
+	 * @param mixed $content
+	 */
+	static public function showJson($content)
+	{
+		header('Pragma: no-cache');
+		header('Cache-Control: private, no-cache');
+		header('Content-Disposition: inline; filename="files.json"');
+		header('Vary: Accept');
+
+		if (strpos(Core_Array::get($_SERVER, 'HTTP_ACCEPT', ''), 'application/json') !== FALSE)
+		{
+			header('Content-type: application/json; charset=utf-8');
+		}
+		else
+		{
+			header('X-Content-Type-Options: nosniff');
+			header('Content-type: text/plain; charset=utf-8');
+		}
+
+		// utf-8: http://www.iana.org/assignments/character-sets
+		//header('Content-Type: text/javascript; charset=utf-8');
+
+		// bug in Chrome
+		//header("Content-Length: " . strlen($content));
+		echo json_encode($content);
+
+		exit();
+	}
 }

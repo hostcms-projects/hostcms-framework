@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_File_Model extends Core_Entity
 {
@@ -204,9 +204,9 @@ class Property_Value_File_Model extends Core_Entity
 	 */
 	public function getXml()
 	{
-		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
-
 		$this->clearXmlTags();
+		
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		if (!is_null($this->_href))
 		{

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Model extends Core_Entity{
 	/**
@@ -103,7 +103,7 @@ class Shop_Cart_Model extends Core_Entity{
 		if ($this->Shop_Item->modification_id)
 		{
 			$oModification = Core_Entity::factory('Shop_Item')->find($this->Shop_Item->modification_id);
-			!is_null($oModification) && $oShop_Item->addEntity(
+			!is_null($oModification->id) && $oShop_Item->addEntity(
 				$oModification->showXmlProperties($this->_showXmlProperties)
 			);
 		}

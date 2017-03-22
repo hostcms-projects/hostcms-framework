@@ -187,7 +187,6 @@ class Market_Controller extends Core_Servant_Properties
 						? $aShop_Groups[$shop_group_id]->name
 						: '';
 
-					$oObject->currency = strval($value->currency);
 					$oObject->name = strval($value->name);
 					$oObject->description = strval($value->description);
 					$oObject->image_large = 'http://' . $this->update_server . strval($value->dir) . strval($value->image_large);
@@ -195,6 +194,7 @@ class Market_Controller extends Core_Servant_Properties
 					$oObject->url = 'http://' . $this->update_server . strval($value->url) . '?contract=' . $md5_contract . '&pin=' . $md5_pin;
 					$oObject->siteuser_id = intval($value->siteuser_id);
 					$oObject->price = strval($value->price);
+					$oObject->currency = strval($value->currency);
 					$oObject->paid = isset($value->paid)
 						? intval($value->paid)
 						: 0;

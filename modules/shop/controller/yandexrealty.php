@@ -218,7 +218,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 
 			->where('shop_items.shortcut_id', '=', 0)
 			->where('shop_items.active', '=', 1)
-			->where('shop_items.siteuser_id', 'IN', $this->_aSiteuserGroups)
+			->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 			->open()
 			->where('shop_items.start_datetime', '<', $dateTime)
 			->setOr()
@@ -284,10 +284,10 @@ class Shop_Controller_YandexRealty extends Core_Controller
 				$value = NULL;
 			break;
 		}
-		
+
 		return $value;
 	}
-	
+
 	/**
 	 * Show offers
 	 * @return self
@@ -317,8 +317,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 
 		foreach ($this->aAreaTags as $areaTagName)
 		{
-			$aAreaProperties[$areaTagName]['value'] = $oShop_Item_Property_List->Properties->getByTag_name($areaTagName . '-value');
-			$aAreaProperties[$areaTagName]['unit'] = $oShop_Item_Property_List->Properties->getByTag_name($areaTagName . '-unit');
+			$aAreaProperties[$areaTagName] = $oShop_Item_Property_List->Properties->getByTag_name($areaTagName);
 		}
 
 		/* Описание параметров, входящих в элемент */
@@ -368,10 +367,10 @@ class Shop_Controller_YandexRealty extends Core_Controller
 					if (!is_null($oLocation))
 					{
 						$aLocationValues = $oLocation->getValues($oShop_Item->id);
-						if(isset($aLocationValues[0]))
+						if (isset($aLocationValues[0]))
 						{
 							$value = $this->_getValue($aLocationValues[0]);
-							
+
 							echo '<' . $locationTagName . '>' . $value . '</' . $locationTagName . '>'."\n";
 						}
 					}
@@ -411,6 +410,23 @@ class Shop_Controller_YandexRealty extends Core_Controller
 					echo '<image>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</image>'."\n";
 				}
 
+				/* Дополнительные изображения */
+				$oImageProperty = Core_Entity::factory('Property')->getByTag_name('realty_image');
+				if (!is_null($oImageProperty))
+				{
+					$aImageValues = $oImageProperty->getValues($oShop_Item->id);
+					if (isset($aImageValues[0]))
+					{
+						foreach ($aImageValues as $oImageValue)
+						{
+							if ($oImageValue->file)
+							{
+								echo '<image>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getItemHref() . $oImageValue->file) . '</image>'."\n";
+							}
+						}
+					}
+				}
+
 				if ($oShop_Item->description != '')
 				{
 					echo '<description>' . $oShop_Item->description . '</description>'."\n";
@@ -418,24 +434,21 @@ class Shop_Controller_YandexRealty extends Core_Controller
 
 				foreach ($this->aAreaTags as $areaTagName)
 				{
-					echo '<'. $areaTagName . '>'."\n";
-					foreach (array('value', 'unit') as $subAreaTagName)
-					{
-						$oArea = $aAreaProperties[$areaTagName][$subAreaTagName];
+					$oArea = $aAreaProperties[$areaTagName];
 
-						if (!is_null($oArea))
+					if (!is_null($oArea))
+					{
+						$unit = Core_Entity::factory('Shop_Measure', $oArea->Shop_Item_Property->shop_measure_id)->name;
+						$aAreaValues = $oArea->getValues($oShop_Item->id);
+
+						if (isset($aAreaValues[0]) && strlen(trim($aAreaValues[0]->value)))
 						{
-							$aAreaValues = $oArea->getValues($oShop_Item->id);
-							if(isset($aAreaValues[0]))
-							{
-								$value = $this->_getValue($aAreaValues[0]);
-								
-								echo '<' . $subAreaTagName . '>' . $value . '</' . $subAreaTagName . '>' . "\n";
-							}
+							echo '<'. $areaTagName . '>'."\n";
+							echo '<value>' . $this->_getValue($aAreaValues[0]) . '</value>' . "\n";
+							echo '<unit>' . $unit . '</unit>' . "\n";
+							echo '</'. $areaTagName . '>'."\n";
 						}
 					}
-
-					echo '</'. $areaTagName . '>'."\n";
 				}
 
 				echo '</offer>'."\n";

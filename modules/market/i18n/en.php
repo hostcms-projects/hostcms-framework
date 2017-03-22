@@ -15,4 +15,5 @@ return array(
 	'server_error_respond_0' => 'Server is temporarily unavailable.',
 	'server_error_respond_10' => 'Not suitable version found, contact the support.',
 	'server_error_respond_11' => 'Module has not been purchased for the current license.',
+	'install_warning' => 'Are you sure you want to install?',
 );

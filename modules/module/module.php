@@ -14,13 +14,19 @@ class Module_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.1';
+	public $version = '6.2';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-01-29';
+	public $date = '2015-03-05';
+	/**
+	 * Module name
+	 * @var string
+	 */
+	protected $_moduleName = 'module';
+	
 	/**
 	 * Constructor.
 	 */	public function __construct()	{

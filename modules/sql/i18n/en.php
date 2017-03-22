@@ -5,7 +5,7 @@
  * @package HostCMS 6\Sql
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'SQL queries',
@@ -20,9 +20,9 @@ return array(
 	'error_message' => 'The query contains any data or an error! <br> Please check the query or the path or file name.',
 	'table' => 'Database',
 	'optimize_table' => 'Optimize',
-	'repair_table' => 'Recover',
+	'repair_table' => 'Repair (just for MyISAM)',
 	'optimize_table_title' => 'Tables optimization',
-	'repair_table_title' => 'Tables recovery',
+	'repair_table_title' => 'Tables repairing',
 	'rows_count' => 'Found <b>%d</b> rows, showed <b>%d</b> rows.',
 	'drop_index' => 'Duplicate index %s table %s was deleted.',
 	'delete_success' => 'Item deleted successfully!',

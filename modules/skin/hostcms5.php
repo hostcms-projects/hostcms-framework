@@ -469,7 +469,7 @@ if (Core_Auth::logged())
 	</div>
 
 <div id="footer">
-	<div>Copyright &copy; 2005&ndash;2014 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
+	<div>Copyright &copy; 2005&ndash;2015 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
 </div>
 
 <!--[if lte IE 6]>

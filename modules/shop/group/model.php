@@ -878,6 +878,20 @@ class Shop_Group_Model extends Core_Entity
 	/**
 	 * Get IDs of child groups
 	 * @return array
+	 *
+	 * <code>
+	 *	// Дочерние группы $shop_group_id магазина 1
+	 *	$shop_group_id = 777;
+	 *	$oShop_Groups = Core_Entity::factory('Shop', $shop_id)->Shop_Groups;
+	 *	$oShop_Groups->queryBuilder()
+	 *		->where('parent_id', '=', $shop_group_id);
+	 *
+	 *	$aChildrenId =  $oShop_Groups->getGroupChildrenId();
+	 *	foreach ($aChildrenId as $iGroupId)
+	 *	{
+	 *		var_dump($iGroupId);
+	 *	}
+	 * </code>
 	 */
 	public function getGroupChildrenId()
 	{
