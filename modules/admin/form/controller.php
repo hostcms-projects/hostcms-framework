@@ -605,11 +605,8 @@ class Admin_Form_Controller
 	public function limit($limit)
 	{
 		$limit = intval($limit);
+		$limit && $this->_limit = $limit;
 
-		if ($limit > 0)
-		{
-			$this->_limit = $limit;
-		}
 		return $this;
 	}
 
@@ -997,7 +994,7 @@ class Admin_Form_Controller
 							}
 						}
 					}
-					
+
 					// Log
 					$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Word->getWordByLanguage();
 					$sEventName = $oAdmin_Word_Value
@@ -1009,7 +1006,7 @@ class Admin_Form_Controller
 					$sFormName = $oAdmin_Word_Value
 						? $oAdmin_Word_Value->name
 						: Core::_('Core.default_form_name');
-					
+
 					Core_Log::instance()->clear()
 						->status(Core_Log::$SUCCESS)
 						->write(Core::_('Core.error_log_action_access_allowed', $sEventName, $sFormName));
@@ -1152,7 +1149,7 @@ class Admin_Form_Controller
 		foreach ($aColumns as $columnName => $columnArray)
 		{
 			$subject = str_replace(
-				'{'.$columnName.'}', 
+				'{'.$columnName.'}',
 				$mode == 'link'
 					? $oEntity->$columnName
 					: Core_Str::escapeJavascriptVariable($this->jQueryEscape($oEntity->$columnName)),
@@ -1310,12 +1307,12 @@ class Admin_Form_Controller
 		);
 		$aData[] = "additionalParams: '{$additionalParams}'";
 
-		if (is_null($limit))
+		/*if (is_null($limit))
 		{
 			$limit = $this->_limit;
-		}
+		}*/
 		$limit = intval($limit);
-		$aData[] = "limit: '{$limit}'";
+		$limit && $aData[] = "limit: '{$limit}'";
 
 		if (is_null($current))
 		{
@@ -1394,12 +1391,12 @@ class Admin_Form_Controller
 		$operation = rawurlencode($operation);
 		$aData[] = "hostcms[operation]={$operation}";
 
-		if (is_null($limit))
+		/*if (is_null($limit))
 		{
 			$limit = $this->_limit;
-		}
+		}*/
 		$limit = intval($limit);
-		$aData[] = "hostcms[limit]={$limit}";
+		$limit && $aData[] = "hostcms[limit]={$limit}";
 
 		if (is_null($current))
 		{
@@ -1490,11 +1487,11 @@ class Admin_Form_Controller
 		}
 		$aData[] = "additionalParams: '{$additionalParams}'";
 
-		if (is_null($limit))
+		/*if (is_null($limit))
 		{
 			$limit = $this->_limit;
-		}
-		$limit = intval($limit);
+		}*/
+		$limit && $limit = intval($limit);
 		$aData[] = "limit: '{$limit}'";
 
 		if (is_null($current))

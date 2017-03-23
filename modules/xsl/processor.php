@@ -148,6 +148,12 @@ abstract class Xsl_Processor
 			}
 
 			self::$instance = new $driver();
+
+			$bExist = in_array('lang', stream_get_wrappers());
+			if (!$bExist)
+			{
+				stream_wrapper_register('lang', 'Xsl_Stream_Lang');
+			}
 		}
 
 		return self::$instance;

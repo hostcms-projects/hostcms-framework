@@ -244,17 +244,18 @@ class Market_Controller extends Core_Servant_Properties
 	public function getModule($module_id)
 	{
 		$url = 'http://' . $this->update_server . "/hostcmsupdate/market/?action=get_module&domain=" . rawurlencode($this->domain) .
-			"&login=" . rawurlencode($this->login) .
-			"&contract=" . rawurlencode(md5($this->contract)) .
-			"&pin=" . rawurlencode(md5($this->pin)) .
-			"&cms_folder=" . rawurlencode($this->cms_folder) .
-			"&php_version=" . rawurlencode($this->php_version) .
-			"&mysql_version=" . rawurlencode($this->mysql_version) .
-			"&update_id=" . $this->update_id .
-			"&category_id=" . intval($this->category_id) .
-			"&module_id=" . intval($module_id) .
-			"&current=" . intval($this->page) .
-			"&limit=" . intval($this->limit);
+			'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
+			'&login=' . rawurlencode($this->login) .
+			'&contract=' . rawurlencode(md5($this->contract)) .
+			'&pin=' . rawurlencode(md5($this->pin)) .
+			'&cms_folder=' . rawurlencode($this->cms_folder) .
+			'&php_version=' . rawurlencode($this->php_version) .
+			'&mysql_version=' . rawurlencode($this->mysql_version) .
+			'&update_id=' . $this->update_id .
+			'&category_id=' . intval($this->category_id) .
+			'&module_id=' . intval($module_id) .
+			'&current=' . intval($this->page) .
+			'&limit=' . intval($this->limit);
 
 		try
 		{
@@ -374,7 +375,7 @@ class Market_Controller extends Core_Servant_Properties
 									$oAdminModule->setupModule();
 								}
 
-								// Удаляем папку с файлами
+								// Удаляем папку с файлами в случае с успешной установкой
 								is_dir($sInstallDir) && Core_File::deleteDir($sInstallDir);
 
 								// Если не было ошибок
@@ -416,6 +417,7 @@ class Market_Controller extends Core_Servant_Properties
 	public function getModuleFile($path)
 	{
 		$url = 'http://' . $this->update_server . $path . "&domain=".rawurlencode($this->domain) .
+		'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
 		"&login=" . rawurlencode($this->login) .
 		"&contract=" . rawurlencode(md5($this->contract)) .
 		"&pin=" . rawurlencode(md5($this->pin)) .

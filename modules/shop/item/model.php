@@ -987,7 +987,7 @@ class Shop_Item_Model extends Core_Entity
 
 		$oSearch_Page->title = $this->name;
 
-		// комментарии к информационному элементу
+		// комментарии к товару
 		$aComments = $this->Comments->findAll();
 		foreach ($aComments as $oComment)
 		{

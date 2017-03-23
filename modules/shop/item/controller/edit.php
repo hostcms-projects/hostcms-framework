@@ -1123,14 +1123,17 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();
 				foreach($aShop_Specialprices as $oShop_Specialprice)
 				{
-					if(!is_null(Core_Array::getPost("specPrice_{$oShop_Specialprice->id}")))
+					if (!is_null(Core_Array::getPost("specPrice_{$oShop_Specialprice->id}")))
 					{
 						$oShop_Specialprice
 							->min_quantity(intval(Core_Array::getPost("specMinQuantity_{$oShop_Specialprice->id}", 0)))
 							->max_quantity(intval(Core_Array::getPost("specMaxQuantity_{$oShop_Specialprice->id}", 0)))
 							->price(Shop_Controller::instance()->convertPrice(Core_Array::getPost("specPrice_{$oShop_Specialprice->id}", 0)))
-							->percent(Shop_Controller::instance()->convertPrice(Core_Array::getPost("specPercent_{$oShop_Specialprice->id}", 0)))
-							->save();
+							->percent(Shop_Controller::instance()->convertPrice(Core_Array::getPost("specPercent_{$oShop_Specialprice->id}", 0)));
+							
+						$oShop_Specialprice->price || $oShop_Specialprice->percent
+							? $oShop_Specialprice->save()
+							: $oShop_Specialprice->delete();
 					}
 					else
 					{
@@ -1152,7 +1155,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						$price = Shop_Controller::instance()->convertPrice($specPrice);
 						$percent = Shop_Controller::instance()->convertPrice(Core_Array::get($aSpecPercent, $key));
 
-						if (!empty($price) || !empty($percent))
+						if ($price || $percent)
 						{
 							$oShop_Specialprice = Core_Entity::factory('Shop_Specialprice')
 								->min_quantity(intval(Core_Array::get($aSpecMinQuantity, $key)))

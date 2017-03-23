@@ -33,7 +33,8 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 
 		$this->_adminPages = array(
 			1 => array('title' => Core::_('Admin.index_systems_events')),
-			2 => array('title' => Core::_('Admin.index_systems_characteristics'))
+			2 => array('title' => Core::_('Admin.index_systems_characteristics')),
+			3 => array('title' => Core::_('Admin.notes'))
 		);
 	}
 
@@ -51,19 +52,38 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 
 		switch ($type)
 		{
-			// Журнал событий
+			//Заметки
 			case 1:
-			$windowId = 'modalEvents';
+				$windowId = 'modalNotes';
+			break;
+			// Журнал событий
+			case 2:
+				$windowId = 'modalEvents';
 			break;
 			default:
-			$windowId = 'modalCharacteristics';
+				$windowId = 'modalCharacteristics';
 			break;
 		}
 
 		switch ($type)
 		{
-			// Журнал событий
+			// Заметки
 			case 1:
+				if ($ajax)
+				{
+					$this->_notesContent();
+				}
+				else
+				{
+					?><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="notesAdminPage">
+						<script type="text/javascript">
+						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#notesAdminPage') });
+						</script>
+					</div><?php
+				}
+			break;
+			// Журнал событий
+			case 2:
 				if ($ajax)
 				{
 					$this->_eventsContent();
@@ -524,6 +544,66 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 			</div>
 		</div>
 		<?php
+		return $this;
+	}
+
+	protected function _notesContent()
+	{
+		$oUser = Core_Entity::factory('User', 0)->getCurrent();
+
+		if (!is_null($oUser))
+		{
+			$aUser_Notes = $oUser->User_Notes->findAll(FALSE);
+
+			?><div id="overview" class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-darkorange">
+							<i class="widget-icon fa fa-tasks darkorange"></i>
+							<span class="widget-caption darkorange"><?php echo Core::_('Admin.notes')?></span>
+							<div class="widget-buttons">
+								<a onclick="$.addNote()">
+									<i class="fa fa-plus darkorange" title="Добавить заметку"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">
+							<div id="user-notes" class="row">
+
+								<!-- Default note -->
+								<div id="default-user-note" class="user-note col-lg-3 col-md-4 col-sm-6 col-xs-12">
+									<div class="row">
+										<div class="user-note-block">
+											<div>
+												<textarea></textarea>
+											</div>
+											<div class="user-note-state bg-darkorange">
+												<a data-id="0" onclick="res = confirm('<?php echo Core::_('Admin_form.msg_information_delete')?>'); if (res) { $.destroyNote($(this).parents('div.user-note')) } return false"><i class="fa fa-remove"></i></a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<script type="text/javascript">
+								<?php
+								foreach ($aUser_Notes as $oUser_Note)
+								{
+									?>
+									$.createNote({
+										'id': <?php echo $oUser_Note->id?>,
+										'value': '<?php echo Core_Str::escapeJavascriptVariable($oUser_Note->value)?>'
+									});
+									<?php
+								}
+								?>
+								</script>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php
+		}
+
 		return $this;
 	}
 }

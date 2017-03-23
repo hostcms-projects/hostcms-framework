@@ -15,12 +15,12 @@ class Shop_Dir_Model extends Core_Entity{
 	 * Backend property
 	 * @var string
 	 */	public $img = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */	public $shop_currency_name = NULL;
-	
+
 	/**
 	 * Backend property
 	 * @var string

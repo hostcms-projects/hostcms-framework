@@ -571,6 +571,10 @@ body.hostcms-bootstrap1:before {
  background-color: rgba(100, 100, 100, 0.1);
 }
 
+.account-area-site-name  {
+	max-width: 150px; overflow: hidden; display: inline-block; white-space: nowrap; color: #FFF
+}
+
 .hostcms-bootstrap1.body-authorization footer,
 .hostcms-bootstrap1.body-authorization footer a,
 .hostcms-bootstrap1.body-authorization .hostcms-notice .widget-body,
@@ -1294,16 +1298,19 @@ div.inactive, .line-through {text-decoration: line-through}
 .large-link i {font-size: 14px}
 .input-group .input-group-input {margin-right: 4px; width: 150px}
 
-/* Market */
 .pagination{clear:both;padding-top:15px}
-.module_block{height:125px;overflow: hidden;padding: 20px;}
-.market .title{padding:0 0 5px 0;display:block;font-size:9pt;font-weight:bold;margin-top:5px}
-.market .category_name{padding:0 0 5px 0;display:block;font-size:8pt;color:#898686}
-.market a.price:visited,.market a.price:link,.market a.price:hover,.market a.install:visited,.market a.install:link,.market a.install:hover,.installed{text-decoration:none;padding:5px 10px;display:block;background-color:#B0AEAE;float:left;color:#FFF;font-weight:bold}
-.market a.install:visited,.market a.install:link,.market a.install:hover{background-color:#6DBE45}
-div.module-img {min-width: 100px; float: left; margin: 5px 10px 0px 5px; text-align: center;}
-.installed{cursor:default;background-color:#F3AE00}
+
 /* Market */
+.market a.price:visited,.market a.price:link,.market a.price:hover,.market a.install:visited,.market a.install:link,.market a.install:hover,.market-item-installed{text-decoration:none;padding:5px 10px;display:block;background-color:#B0AEAE;float:left;color:#FFF;font-weight:bold}
+.market a.install:visited,.market a.install:link,.market a.install:hover{background-color:#6DBE45}
+.market-item {height:145px;overflow: hidden;padding: 20px }
+.market-item .market-item-title {padding:0 0 5px 0;display:block;font-size:14pt;font-weight:300;margin-top:5px}
+.market-item .market-item-title a {color: #333}
+.market-item .market-item-category {padding:0 0 5px 0;display:block;font-size:8pt;color:#898686}
+.market-item-image {min-width: 130px; float: left }
+.market-item-image img { border-radius: 50px; border: 1px solid #eee; background-color: #FFF }
+.market-item-installed {cursor:default;background-color:#F3AE00}
+/* /Market */
 
 /* oneps */
 .oneps_patch p{text-align: justify;margin: 5px 15px 5px 0px;}
@@ -1320,9 +1327,6 @@ div.module-img {min-width: 100px; float: left; margin: 5px 10px 0px 5px; text-al
 	display: block;
     overflow: hidden;
 }
-
-
-
 
 /* UI */
 /* http://jqueryui.com
@@ -1696,26 +1700,62 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 	border-left-color: #eee;
 }
 
-/* --- Note --- */
-#overview .note textarea {
+.badge-hostcms {
+	background-color: #eee !important;
+    color: #000;
+    padding: 3px;
+}
+
+/* --- Notes --- */
+#user-notes { padding: 0 10px }
+#default-user-note { display: none }
+.user-note-block {
+	background-clip: padding-box;
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    padding-right: 10px;
+    position: relative;
+    vertical-align: top;
+	margin: 10px;
+}
+.user-note-block  textarea {
     background: transparent none repeat scroll 0 0;
     border: medium none;
     box-shadow: none;
     color: #999;
     font-size: 95%;
-    height: 40px;
+    height: 65px;
     left: 10px;
     line-height: 120%;
     margin: 0;
     outline: medium none;
     overflow: hidden;
-    padding: 0;
+    padding: 5px;
     resize: none;
     right: 10px;
     width: 100%;
-	padding-bottom: 10px;
 }
-
-#user_notes .databox-stat i { cursor: pointer; color: #fb6e52; }
-.row-title i { cursor: pointer; }
-/* --- /Note --- */
+.user-note-block  textarea.ajax {
+	background: url('/modules/skin/bootstrap/img/note-ajax-loader.gif') center center no-repeat;
+}
+.user-note-state {
+    background-clip: padding-box;
+    background-color: #e5e5e5;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    height: 24px;
+    position: absolute;
+    right: -12px;
+    text-align: center;
+    top: 13px;
+    width: 24px;
+}
+.user-note-state i {
+    color: #fff;
+    font-size: 13px;
+    line-height: 20px;
+	cursor: pointer;
+}
+/* --- /Notes --- */

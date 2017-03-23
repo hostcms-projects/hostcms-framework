@@ -85,4 +85,7 @@ return array(
 	'delete_current_site' => 'User that belongs to the website cannot delete it!',
 	'delete_last_site' => 'You cannot delete the last website!',
 	'delete_site_all_superusers_belongs' => 'Unable to delete website that all superusers belong to!',
+
+	'lng' => 'Site language',
+	'lng_default' => 'en',
 );

@@ -778,7 +778,7 @@ class Informationsystem_Group_Model extends Core_Entity
 		$this->items_total_count > 0 && $oCore_Html_Entity_Div
 			->add(
 				Core::factory('Core_Html_Entity_Span')
-					->class('badge badge-default badge-square')
+					->class('badge badge-hostcms badge-square')
 					->value($this->items_total_count)
 			);
 

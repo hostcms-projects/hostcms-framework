@@ -185,6 +185,9 @@ class Skin_Bootstrap extends Core_Skin
 								?>
 								</li>
 								<li>
+									<span class="account-area-site-name hidden-xs">
+										<?php echo htmlspecialchars($oCurrentSite->name)?>
+									</span>
 									<?php
 									$aSites = $oUser->getSites();
 									?>

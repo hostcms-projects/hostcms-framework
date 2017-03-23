@@ -19,6 +19,11 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function setObject($object)
 	{
+		if (!$object->id)
+		{
+			$object->lng = Core::_('Site.lng_default');
+		}
+		
 		parent::setObject($object);
 
 		$oSiteTabAccessRights = Admin_Form_Entity::factory('Tab')
@@ -177,6 +182,8 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		/* $oMainRow4 */
 		$this->getField('admin_email')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
 		$oMainTab->move($this->getField('admin_email'), $oMainRow4);
+		$this->getField('lng')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$oMainTab->move($this->getField('lng'), $oMainRow4);
 
 		/* $oMainRow5 */
 		$this->getField('send_attendance_report')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));

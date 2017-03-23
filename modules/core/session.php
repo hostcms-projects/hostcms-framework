@@ -64,7 +64,7 @@ class Core_Session
 	static protected $_started = FALSE;
 
 	/**
-	 * Callback function
+	 * Start session
 	 * @return boolean
 	 */
 	static public function start()
@@ -149,7 +149,7 @@ class Core_Session
 	}*/
 
 	/**
-	 * Callback function
+	 * Close session
 	 * @return boolean
 	 */
 	static public function close()

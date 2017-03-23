@@ -112,7 +112,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 					$oShop_Orders = $oSiteuser->Shop_Orders->getAllBypaid(1);
 					foreach($oShop_Orders as $oShop_Order)
 					{
-						$fSum += $oShop_Order->getAmount(); 
+						$fSum += $oShop_Order->getAmount();
 					}
 
 					$bCheckOrdersSum = $fSum >= $min_amount
@@ -128,11 +128,13 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 			|| $oShop_Purchase_Discount->mode == 2 && $bCheckOrdersSum)
 			{
 				// Учитываем перерасчет суммы скидки в валюту магазина
-				$discount = $fCoefficient * $oShop_Purchase_Discount->type == 0
+				$discount = $fCoefficient * ($oShop_Purchase_Discount->type == 0
 					// Процент
 					? $amount * $oShop_Purchase_Discount->value / 100
 					// Фиксированная скидка
-					: $oShop_Purchase_Discount->value;
+					: $oShop_Purchase_Discount->value);
+
+				$discount = $oShop_Controller->round($discount);
 
 				$aReturn[] = $oShop_Purchase_Discount->discountAmount($discount);
 			}

@@ -86,6 +86,9 @@ return array(
 	'delete_last_site' => 'Запрещено удаление последнего сайта!',
 	'delete_site_all_superusers_belongs' => 'Невозможно удалить сайт,так как все суперпользователи принадлежат ему!',
 
+	'lng' => 'Язык сайта',
+	'lng_default' => 'ru',	
+
 	/*
 	'site_add_edit_domen_error' => 'Домен с таким именем уже создан для сайта %s!',
 	'error_domen_name' => 'Не задано название домена!',

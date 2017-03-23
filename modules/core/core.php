@@ -455,9 +455,13 @@ class Core
 	/**
 	 * Initialize constants for site
 	 * @param Site_Model $oSite site
+	 * @hostcms-event Core.onBeforeInitConstants
+	 * @hostcms-event Core.onAfterInitConstants
 	 */
 	static public function initConstants(Site_Model $oSite)
 	{
+		Core_Event::notify('Core.onBeforeInitConstants', $oSite);
+		
 		!defined('UPLOADDIR') && define('UPLOADDIR', $oSite->uploaddir);
 
 		define('SITE_LOCAL', $oSite->locale);
@@ -476,8 +480,12 @@ class Core
 			define('SITE_TIMEZONE', $timezone);
 		}
 
+		// Язык
+		define('SITE_LNG', $oSite->lng);
+		
 		// Кодировка
 		define('SITE_CODING', $oSite->coding);
+		
 		// Максимальный размер в одном из измерений при преобразовании загруженных изображений (малое изображение)
 		define('MAX_SIZE_LOAD_IMAGE', $oSite->max_size_load_image);
 		// Максимальный размер в одном из измерений при преобразовании загруженных изображений (большое изображение)
@@ -510,8 +518,6 @@ class Core
 		// Число уровней вложенности для UPLOADDIR
 		define('SITE_NESTING_LEVEL', $oSite->nesting_level);
 
-		// Вывод ошибок и предупреждений
-
 		// Объявляем константу SITE_ERROR
 		$error_level = trim($oSite->error);
 		@eval("define('SITE_ERROR', $error_level);");
@@ -522,6 +528,8 @@ class Core
 
 		// Изменяем уровень вывода ошибок
 		error_reporting(SITE_ERROR);
+		
+		Core_Event::notify('Core.onAfterInitConstants', $oSite);
 	}
 
 	/**

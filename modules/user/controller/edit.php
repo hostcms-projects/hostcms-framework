@@ -61,7 +61,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->delete($this->getField('password'));
 
 		$aPasswordFormat = array(
-			'minlen' => array('value' => 5),
+			'minlen' => array('value' => 9),
 			'maxlen' => array('value' => 255)
 		);
 

@@ -28,6 +28,8 @@ class Xsl_Processor_Xslt extends Xsl_Processor
 
 		// Load the xml file and stylesheet as domdocuments
 		$xsl = new DomDocument();
+		$xsl->substituteEntities = TRUE;
+		$xsl->resolveExternals = TRUE;
 
 		$sXsl = $this->_xsl->loadXslFile();
 
@@ -61,7 +63,7 @@ class Xsl_Processor_Xslt extends Xsl_Processor
 
 				libxml_clear_errors();
 				libxml_use_internal_errors(FALSE);
-				
+
 				if ($newdom)
 				{
 					$newdom->formatOutput = Core_Array::get(

@@ -276,8 +276,9 @@ class Core_ORM
 
 	/**
 	 * Model has already been saved into database
+	 * NULL value used in the __set() for separate value settings through mysql_fetch_object()
 	 */
-	protected $_saved = FALSE;
+	protected $_saved = NULL;
 
 	/**
 	 * Init has already been called
@@ -746,11 +747,8 @@ class Core_ORM
 			$this->_modelColumns[$this->_primaryKey] = $primaryKey;
 		}
 
-		// Mark saved
-		if (!is_null($this->_modelColumns[$this->_primaryKey]))
-		{
-			$this->_saved = TRUE;
-		}
+		// Check saved status
+		$this->_saved = !is_null($this->_modelColumns[$this->_primaryKey]);
 
 		// Columns were changed throw mysql_fetch_object()
 		$this->changed() && $this->_loaded = TRUE;
@@ -1045,7 +1043,9 @@ class Core_ORM
 					? $inCache
 					: $this->_dataBase->getColumns($this->_tableName);
 
-				$bCache && self::$columnCache->set($this->_modelName, $this->_tableColumns, $cacheName);
+				$bCache
+					&& is_null($inCache)
+					&& self::$columnCache->set($this->_modelName, $this->_tableColumns, $cacheName);
 
 				$this->_loadColumnCacheDefaultValues();
 			}
@@ -1352,6 +1352,10 @@ class Core_ORM
 				// isset() will return FALSE if testing a variable that has been set to NULL
 				|| isset($this->_modelColumns[$this->_primaryKey]);
 
+			// Convert property. $this->_saved is NULL until call __construct()
+			!is_null($this->_saved)
+				&& $value = $this->_convertPropertyValue($property, $value);
+
 			$this->setValues(array($property => $value), $changed);
 
 			// If property was changed
@@ -1410,6 +1414,62 @@ class Core_ORM
 	}
 
 	/**
+	 * Convert field value
+	 * @param string $property Property name
+	 * @param mixed $value Property value
+	 * @return mixed converted value
+	 */
+	protected function _convertPropertyValue($property, $value)
+	{
+		$aField = $this->_tableColumns[$property];
+
+		// Value is not NULL or value is NULL and default value does not exist
+		if (!is_null($value)
+			|| is_null($aField['default']) && $aField['null'] != 1 && $aField['extra'] != 'auto_increment'
+		)
+		{
+			switch ($aField['type'])
+			{
+				case 'int':
+					if (!is_numeric($value))
+					{
+						$value = intval($value);
+					}
+
+					if ($value < $aField['min'] || $value > $aField['max'])
+					{
+						$value = ($value < $aField['min']) ? $aField['min'] : $aField['max'];
+					}
+				break;
+				case 'float':
+					// Convert "," to "."
+					$value = str_replace(',', '.', $value);
+
+					// Remove everything except numbers and dot
+					$value = preg_replace('/[^0-9\.\-]/', '', $value);
+
+					$value = floatval($value);
+				break;
+				case 'string':
+					$strlen = mb_strlen($value);
+
+					if (!is_null($aField['max_length'])
+						&& $aField['datatype'] != 'enum'
+						&& $strlen > $aField['max_length'])
+					{
+						$value = mb_substr($value, 0, $aField['max_length']);
+					}
+				break;
+				default:
+					throw new Core_Exception("Unchecked property '%property' type '%type' in the model '%model'",
+						array('%property' => $property, '%type' => $aField['type'], '%model' => $this->getModelName()));
+			}
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Check model values. If model has incorrect value, one will correct or call exception.
 	 *
 	 * <code>
@@ -1430,14 +1490,6 @@ class Core_ORM
 		{
 			foreach ($this->_tableColumns as $property => $aField)
 			{
-				/*
-				// Проверка идет при получении св-ва модели, здесь не нужна
-				if (!array_key_exists($property, $this->_modelColumns))
-				{
-					throw new Core_Exception("The property '%property' does not exist for check in the model '%model'",
-						array('%property' => $property, '%model' => $this->getModelName()));
-				}*/
-
 				//$value = $this->_modelColumns[$property];
 				$value = $this->$property;
 
@@ -1472,7 +1524,7 @@ class Core_ORM
 							// Remove everything except numbers and dot
 							$value = preg_replace('/[^0-9\.\-]/', '', $value);
 
-							$this->$property = floatval($value);
+							$value = floatval($value);
 						break;
 						case 'string':
 							$strlen = mb_strlen($value);

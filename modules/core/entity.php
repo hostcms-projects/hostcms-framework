@@ -528,7 +528,7 @@ class Core_Entity extends Core_ORM
 	 * Check model values. If model has incorrect value, one will correct or call exception.
 	 * @var boolean
 	 */
-	protected $_check = TRUE;
+	protected $_check = FALSE;
 
 	/**
 	 * Set _check flag

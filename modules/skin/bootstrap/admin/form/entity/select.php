@@ -151,7 +151,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 				->add(
 					Admin_Form_Entity::factory('Code')
 						->html('<label class="checkbox-inline">' .
-						'<input id="field_id_15" class="form-control" type="checkbox" value="1" checked="checked" name="indexing" />' .
+						'<input id="IgnoreCase_' . $this->id . '" class="form-control" type="checkbox" value="1" onclick="oSelectFilter' . $iFilterCount . '.SetIgnoreCase(!this.checked);oSelectFilter' . $iFilterCount . '.Filter()" />' .
 						'<span class="text"> ' . Core::_('Admin_Form.input_case_sensitive') . '</span></label>')
 				)
 				->execute();

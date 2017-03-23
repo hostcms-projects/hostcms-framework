@@ -68,6 +68,43 @@ class Xsl_Model extends Core_Entity
 	}
 
 	/**
+	 * Get DTD language path
+	 * @param string $lng
+	 * @return string
+	 */
+	public function getLngDtdPath($lng)
+	{
+		return CMS_FOLDER . "hostcmsfiles/xsl/" . intval($this->id) . "." . $lng . ".dtd";
+	}
+
+	/**
+	 * Get DTD language file content
+	 * @param string $lng
+	 * @return string|NULL
+	 */
+	public function loadLngDtdFile($lng)
+	{
+		$path = $this->getLngDtdPath($lng);
+
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
+	}
+
+	/**
+	 * Specify XSL file content
+	 * @param string $lng
+	 * @param string $content content
+	 */
+	public function saveLngDtdFile($lng, $content)
+	{
+		$this->save();
+
+		$content = trim($content);
+		Core_File::write($this->getLngDtdPath($lng), $content);
+	}
+	
+	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
@@ -112,12 +149,9 @@ class Xsl_Model extends Core_Entity
 	{
 		$path = $this->getXslFilePath();
 
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
-
-		return NULL;
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**

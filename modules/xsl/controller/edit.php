@@ -90,7 +90,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab->move($this->getField('sorting'), $oMainRow3);
 				$oMainTab->move($this->getField('format'), $oMainRow3);
 
-				// Объект вкладки 'Комментарий'
+				// Комментарий
 				$oDescriptionTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Xsl.tab2'))
 					->name('tab_xsl_description');
@@ -102,8 +102,40 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
-				// Перемещаем поле "Комментарий"
 				$oMainTab->move($this->getField('description'), $oMainRow6);
+
+				// DTD для всех языков
+				$aRows = $this->_getLngList();
+
+				foreach ($aRows as $aRow)
+				{
+					$oTab_Lng = Admin_Form_Entity::factory('Tab')
+						->caption(Core::_('Xsl.tab_dtd', $aRow['lng']))
+						->name('lng_' . $aRow['lng']);
+
+					$this->addTabAfter($oTab_Lng, $oMainTab);
+
+					$oTab_Lng->add($oLng_Tab_Row1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+					$oTextarea_Lng = Admin_Form_Entity::factory('Textarea');
+
+					$oTmpOptions = $oTextarea_Lng->syntaxHighlighterOptions;
+					$oTmpOptions['mode'] = 'xml';
+
+					$oTextarea_Lng
+						->value(
+							$this->_object->loadLngDtdFile($aRow['lng'])
+						)
+						->rows(30)
+						->caption(Core::_('Xsl.dtd', $aRow['lng']))
+						->name('lng_' . $aRow['lng'])
+						->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
+						->syntaxHighlighterOptions($oTmpOptions)
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+
+					$oLng_Tab_Row1->add($oTextarea_Lng);
+				}
+
 			break;
 
 			case 'xsl_dir':
@@ -143,6 +175,22 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this->title($title);
 
 		return $this;
+	}
+
+	/**
+	 * Get list of languages
+	 * @return array
+	 */
+	protected function _getLngList()
+	{
+		$queryBuilder = Core_QueryBuilder::select('lng')
+			->from('sites')
+			->where('lng', '!=', '')
+			->groupBY('lng');
+
+		$aRows = $queryBuilder->execute()->asAssoc()->result();
+
+		return $aRows;
 	}
 
 	/**
@@ -200,6 +248,16 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$this->_object->saveXslFile($xsl_value);
+
+				// DTD для всех языков
+				$aRows = $this->_getLngList();
+
+				foreach ($aRows as $aRow)
+				{
+					$content = Core_Array::getPost('lng_' . $aRow['lng']);
+
+					$this->_object->saveLngDtdFile($aRow['lng'], $content);
+				}
 			break;
 		}
 

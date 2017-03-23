@@ -126,7 +126,48 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		$this->_tabs[$oAdmin_Form_Entity_Tab->name] = $oAdmin_Form_Entity_Tab;
 		return $this;
 	}
+	
+	/**
+	 * Delete tab
+	 * @param string $tabName Name of tab
+	 * @return self
+	 */
+	public function deleteTab($tabName)
+	{
+		if (isset($this->_tabs[$tabName]))
+		{
+			unset($this->_tabs[$tabName]);
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * Move tab before some another tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab tab you want to move
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before tab before which you want to place
+	 * @return self
+	 */
+	public function moveTabBefore(Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_Before)
+	{
+		$this->deleteTab($oAdmin_Form_Entity_Tab);
+		$oTabTo->addTabBefore($oAdmin_Form_Entity_Tab, $oAdmin_Form_Entity_Tab_Before);
+		return $this;
+	}
 
+	/**
+	 * Move tab after some another tab
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab tab you want to move
+	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After tab after which you want to place
+	 * @return self
+	 */
+	public function moveTabAfter(Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab, Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab_After)
+	{
+		$this->deleteTab($oAdmin_Form_Entity_Tab);
+		$this->addTabAfter($oAdmin_Form_Entity_Tab, $oAdmin_Form_Entity_Tab_After);
+		return $this;
+	}
+	
 	/**
 	 * Add new tab into form before $oAdmin_Form_Entity_Tab_Before
 	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab

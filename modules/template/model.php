@@ -341,7 +341,7 @@ class Template_Model extends Core_Entity
 	{
 		$count = $this->Templates->getCount();
 		$count > 0 && Core::factory('Core_Html_Entity_Span')
-			->class('badge badge-default badge-square')
+			->class('badge badge-hostcms badge-square')
 			->value($count)
 			->execute();
 	}

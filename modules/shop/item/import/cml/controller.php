@@ -419,7 +419,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oShopGroup->name = strval($oXMLGroupNode->Наименование);
 			$oShopGroup->guid = strval($oXMLGroupNode->Ид);
 
-			if(count($aDescriptionArray = $this->xpath($oXMLGroupNode, 'Описание')))
+			if (count($aDescriptionArray = $this->xpath($oXMLGroupNode, 'Описание')))
 			{
 				$oShopGroup->description = strval($aDescriptionArray[0]);
 			}
@@ -456,13 +456,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$oTempShopItem = $oShopItem;
 
 		// Проверяем, есть ли у характеристики идентификатор модификации
-		if(count($aIdModificationArray = $this->xpath($oItemProperty, 'Ид')))
+		if (count($aIdModificationArray = $this->xpath($oItemProperty, 'Ид')))
 		{
 			$oTempShopItem = NULL;
 			$sModificationGuid = strval($aIdModificationArray[0]);
 
 			// Модификация найдена - добавляем ей это свойство
-			if(count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
+			if (count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
 			{
 				$oTempShopItem = $aShop_Items[0];
 			}
@@ -485,7 +485,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 */
 	protected function _addPredefinedAdditionalProperty($oShopItem, $sPropertyGUID, $sValue, $bForcedAdd = FALSE)
 	{
-		if(is_null($oShopItem))
+		if (is_null($oShopItem))
 		{
 			return $this;
 		}
@@ -547,7 +547,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 		$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE);
+		
 		$oShop = Core_Entity::factory('Shop', $this->iShopId);
+		
 		if (is_null($oProperty))
 		{
 			$oProperty = Core_Entity::factory('Property');
@@ -564,17 +566,18 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			$oShop_Item_Property_List->add($oProperty);
 		}
-		$oShopItem->modification_id == 0
-			? intval($oShopItem->Shop_Group->id)
-			: intval($oShopItem->Modification->Shop_Group->id);
+
 		$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
 			? intval($oShopItem->Shop_Group->id)
 			: intval($oShopItem->Modification->Shop_Group->id)
 		));
+
 		$sPropertyValue = isset($this->_aPropertyValues[$sValue])
 			? $this->_aPropertyValues[$sValue]
 			: $sValue;
+
 		$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
+
 		$oProperty_Value = isset($aPropertyValues[0])
 			? $aPropertyValues[0]
 			: $oProperty->createNewValue($oShopItem->id);
@@ -634,7 +637,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				break;
 				case 'ПРОИЗВОДИТЕЛЬ':
 
-					if(trim($sPropertyValue) != '')
+					if (trim($sPropertyValue) != '')
 					{
 						$oProducer = Core_Entity::factory('Shop', $this->iShopId)->Shop_Producers->getByName($sPropertyValue, FALSE);
 
@@ -660,7 +663,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			$oItem->save();
 		}
-		else
+		elseif ($sValue != '')
 		{
 			/*$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 			$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE);
@@ -767,7 +770,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		}
 
 		// Проверяем, есть ли файл с дополнительными свойствами для модификаций, если есть - извлекаем данные
-		if(is_file($this->_temporaryPropertyFile))
+		if (is_file($this->_temporaryPropertyFile))
 		{
 			$aModificationProperties = unserialize(file_get_contents($this->_temporaryPropertyFile));
 		}
@@ -1186,7 +1189,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 					$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
 
-					if(count($aPropertyValues) == 0)
+					if (count($aPropertyValues) == 0)
 					{
 						$oProperty_Value = $oProperty->createNewValue($oShopItem->id);
 						$oProperty_Value->setValue($oProperty->default_value);
@@ -1211,7 +1214,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Сохраняем список характеристик модификаций во временный файл
-				if(count($aModificationProperties))
+				if (count($aModificationProperties))
 				{
 					file_put_contents($this->_temporaryPropertyFile, serialize($aModificationProperties));
 				}
@@ -1298,20 +1301,21 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			foreach ($this->xpath($packageOfProposals, 'Склады/Склад') as $oWarehouse)
 			{
 				$sWarehouseGuid = strval($oWarehouse->Ид);
-				$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByGuid($sWarehouseGuid, FALSE);
-				if(is_null($oShopWarehouse))
+
+				$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)
+					->Shop_Warehouses
+					->getByGuid($sWarehouseGuid, FALSE);
+
+				if (is_null($oShopWarehouse))
 				{
 					$oShopWarehouse = Core_Entity::factory('Shop_Warehouse');
 					$oShopWarehouse->shop_id = $this->iShopId;
 					$oShopWarehouse->guid = $sWarehouseGuid;
+					$oShopWarehouse->name = strval($oWarehouse->Наименование);
+					$oShopWarehouse->address = strval($oWarehouse->Адрес->Представление);
+					$oShopWarehouse->save();
 				}
-				// у склада не всегда есть название
-				if ($sWarehouseName = strval($oWarehouse->Наименование))
-				{
-					$oShopWarehouse->name = $sWarehouseName;
-				}
-				$oShopWarehouse->address = strval($oWarehouse->Адрес->Представление);
-				$oShopWarehouse->save();
+
 				/*foreach ($this->xpath($oWarehouse, 'Адрес/АдресноеПоле') as $oWarehouseAddressField)
 				{
 					//echo "Адресное поле: " . strval($oWarehouseAddressField->Тип) . " - " . strval($oWarehouseAddressField->Значение) . "<br/>";
@@ -1356,7 +1360,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oShopItem = $oModificationItem;
 
 						// извлекаем список допсвойств для данной модификации
-						if(isset($aModificationProperties[$oShopItem->guid]) && is_array($aModificationProperties[$oShopItem->guid]))
+						if (isset($aModificationProperties[$oShopItem->guid]) && is_array($aModificationProperties[$oShopItem->guid]))
 						{
 							foreach($aModificationProperties[$oShopItem->guid] as $aModificationPropertyData)
 							{
@@ -1423,7 +1427,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							{
 								$sCurrency = strval($baseCurrencyNode[0]->Валюта);
 
-								if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+								if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 								{
 									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
 								}
@@ -1432,7 +1436,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 								$sCurrency = strval($oPrice->Валюта);
 
-								if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+								if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 								{
 									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
 								}
@@ -1458,7 +1462,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						elseif ($this->sShopDefaultPriceGUID == strval($oPrice->ИдТипаЦены))
 						{
 							$sCurrency = strval($oPrice->Валюта);
-							if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+							if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 							{
 								$sCurrency = $this->_aCurrencyCodes[$sCurrency];
 							}
@@ -1476,7 +1480,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							$oShopItem->price = Shop_Controller::instance()->convertPrice(strval($oPrice->ЦенаЗаЕдиницу));
 							$oShopItem->add($oShop_Currency);
 
-							if(!is_null($this->_oTaxForBasePrice))
+							if (!is_null($this->_oTaxForBasePrice))
 							{
 								$oShopItem->add($this->_oTaxForBasePrice);
 								$this->_oTaxForBasePrice = NULL;
@@ -1505,7 +1509,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							$sWarehouseCount = strval($oWarehouseCount['КоличествоНаСкладе']);
 
 							$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByGuid($sWarehouseGuid, FALSE);
-							if(!is_null($oShopWarehouse))
+							if (!is_null($oShopWarehouse))
 							{
 								$oShop_Warehouse_Item = $oShopWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
 								if (is_null($oShop_Warehouse_Item))

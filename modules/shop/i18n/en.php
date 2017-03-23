@@ -66,6 +66,8 @@ return array(
 	'watermark_file' => '<acronym title="Image file used as watermark">Image for watermark</acronym>',
 	'preserve_aspect_ratio' => 'Preserve aspect ratio',
 	'preserve_aspect_ratio_small' => 'Preserve aspect ratio for small images',
+	'preserve_aspect_ratio_group' => 'Preserve aspect ratio for group',
+	'preserve_aspect_ratio_group_small' => 'Preserve aspect ratio for group small images',
 	'watermark_default_use_large_image' => '<acronym title="Property to specify whether watermark should be used by default">Use watermark by default</acronym>',
 	'watermark_default_use_small_image' => '<acronym title="Property to specify whether watermark should be used by default for small images">Use watermark by default for small images</acronym>',
 	'watermark_default_position_x' => "<acronym title=\"Property to specify the default watermark position in X-direction, e.g. 200 (in pixels) or 50% (in percentage)\">Default position in X-direction</acronym>",

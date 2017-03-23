@@ -144,32 +144,42 @@
 				jObject.find(".modal-title").html(data.title);
 			}
 		},
-		// Создание заметки
-		createNote: function(settings)
+		// Добавление новой заметки
+		addNote: function()
 		{
-			var jObj = jQuery(object), text = jObj.text();
-
 			// add ajax '_'
 			var data = jQuery.getData({});
 
 			jQuery.ajax({
-				context: jObj,
 				url: '/admin/index.php?ajaxCreateNote',
 				data: data,
 				dataType: 'json',
 				type: 'POST',
 				success: function(data) {
-					$.changeNote(data.form_html);
-					$("#user_notes").prepend('<div id=note_' + data.form_html + ' class="col-lg-3 col-sm-6 col-xs-12"><div class="databox databox-graded"><div class="databox padding-top-20 bg-whitesmoke"><div class="databox-stat orange radius-bordered margin-right-10"><a onclick="$.destroyNote(' + data.form_html + ')"><i class="stat-icon fa fa-remove" title="Удалить заметку"></i></a></div><div class="databox-text darkgray padding-left-10 note"><textarea></textarea></div></div></div></div>');
+					$.createNote({'id': data.form_html});
 				}
 			});
 		},
-		// Изменение заметки
-		changeNote: function(noteId)
+		// Создание заметки по id и value
+		createNote: function(settings)
 		{
-			object = $("#note_" + noteId);
+			settings = $.extend({
+				'id': null,
+				'value': ''
+			}, settings);
 
-			object.on('change', function(){
+			var jClone = $('#default-user-note').clone(),
+				noteId = settings.id;
+
+			jClone
+				.prop('id', noteId)
+				.data('user-note-id', noteId);
+
+			jClone.find('textarea').eq(0).val(settings.value);
+
+			$("#user-notes").prepend(jClone.show());
+
+			jClone.on('change', function(){
 				var object = jQuery(this), timer = object.data('timer');
 
 				if (timer){
@@ -199,17 +209,17 @@
 			});
 		},
 		// Удаление заметки
-		destroyNote: function(noteId)
+		destroyNote: function(jDiv)
 		{
 			jQuery.ajax({
 				url: '/admin/index.php?' + 'ajaxNote&action=delete'
-					+ '&entity_id=' + noteId,
+					+ '&entity_id=' + jDiv.data('user-note-id'),
 				type: 'get',
 				dataType: 'json',
 				success: function(){}
 			});
 
-			$("#note_" + noteId).remove();
+			jDiv.remove();
 		},
 		widgetRequest: function(settings){
 			$.loadingScreen('show');
@@ -367,8 +377,8 @@
 
 })(jQuery);
 
-$(function(){
-	$('.page-content').on('click', '[id ^= \'file_\'][id *= \'_settings_\']', function() {
+$(function(){	
+	$('body').on('click', '[id ^= \'file_\'][id *= \'_settings_\']', function() {
 		$(this)
 		.popover({
 			placement: 'left',
@@ -380,7 +390,8 @@ $(function(){
 		.popover('toggle');
 	});
 
-	$('.page-content').on('hide.bs.popover', '[id ^= \'file_\'][id *= \'_settings_\']', function () {
+	//$('.page-content')
+	$('body').on('hide.bs.popover', '[id ^= \'file_\'][id *= \'_settings_\']', function () {
 		var popoverContent = $(this).data('bs.popover').$tip.find('.popover-content div[id *= "_watermark_"], .popover-content [id *= "_watermark_small_"]');
 
 		if (popoverContent.length)
@@ -393,12 +404,13 @@ $(function(){
 		$(this).find("i.fa").toggleClass("fa-times fa-cog");
 	});
 
-	$('.page-content').on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+	//$('.page-content')
+	$('body').on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
 		$(e.target.getAttribute('href')).refreshEditor();
 	});
 
-	$('.page-container')
-	.on('touchend', '.page-sidebar.menu-compact .sidebar-menu .submenu > li', function(e) {
+	//$('.page-container')
+	$('body').on('touchend', '.page-sidebar.menu-compact .sidebar-menu .submenu > li', function(e) {
 		$(this).find('a').click();
 	});
 

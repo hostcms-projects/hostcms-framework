@@ -254,18 +254,22 @@ class Update_Controller extends Core_Servant_Properties
 			'&update_id=' . $this->update_id .
 			'&install_beta_update=' . rawurlencode($this->install_beta);
 
+		$Core_Http = Core_Http::instance()
+			->port(80)
+			->timeout(5)
+			->method('POST');
+
 		if (is_array($this->keys))
 		{
 			foreach ($this->keys as $keyName)
 			{
-				$url .= '&key[]=' . rawurlencode($keyName);
+				//$url .= '&key[]=' . rawurlencode($keyName);
+				$Core_Http->data('key[]', $keyName);
 			}
 		}
 
-		$Core_Http = Core_Http::instance()
+		$Core_Http
 			->url($url)
-			->port(80)
-			->timeout(5)
 			->execute();
 
 		$aHeaders = $Core_Http->parseHeaders();
