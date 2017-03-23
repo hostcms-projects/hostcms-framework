@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -25,35 +25,21 @@ class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Ty
 
 		$oMainTab = $this->getTab('main');
 
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
+
 		$aFormat = array(
 			'minlen' => array('value' => 1),
 			'maxlen' => array('value' => 5),
 			'lib' => array('value' => 'integer')
 		);
 
-		$this->getField('yandex')
-			->style('width: 300px;')
-			->divAttr(array('style' => 'float: left;'))
-			->format($aFormat);
-
-		$oMainTab->addAfter(
-			Admin_Form_Entity::factory('Separator'), $this->getField('rambler')
-				->style('width: 300px;')
-				->format($aFormat));
-
-		$this->getField('google')
-			->style('width: 300px;')
-			->divAttr(array('style' => 'float: left;'))
-			->format($aFormat);
-
-		$oMainTab->addAfter(
-			Admin_Form_Entity::factory('Separator'), $this->getField('yahoo')
-			->style('width: 300px;')
-			->format($aFormat));
-
-		$this->getField('bing')
-			->style('width: 300px;')
-			->format($aFormat);
+		$oMainTab
+			->move($this->getField('yandex')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow1)
+			->move($this->getField('google')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow1)
+			->move($this->getField('yahoo')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2)
+			->move($this->getField('bing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
 
 		return $this;
 	}

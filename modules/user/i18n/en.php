@@ -1,17 +1,17 @@
 <?php 
 /**
- * Administration center users.
+ * Backend users.
  *
  * @package HostCMS 6\User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */ 
 return array(
-	'model_name' => 'Administration center users',
-	'menu' => 'Administration center users',
-	'ua_link_users' => 'Administration center user',
-	'ua_link_users_site' => 'Administration center users',
+	'model_name' => 'Backend users',
+	'menu' => 'Backend users',
+	'ua_link_users' => 'Backend user',
+	'ua_link_users_site' => 'Backend users',
 	'ua_add_user_link' => 'Add',
 	'ua_link_user_access' => 'Access rights for modules',
 	'ua_link_user_form_access' => 'Access rights for actions',
@@ -35,7 +35,7 @@ return array(
 	'site' => '<acronym title="User website">Website</acronym>',
 	'active' => "<acronym title=\"Active user\">Active user</acronym>",	
 	'position' => '<acronym title="User position">Position</acronym>',
-	'only_access_my_own' => '<acronym title="Access only to elements created by user">Access only to elements created by user</acronym>',
+	'only_access_my_own' => '<acronym title="Access only to items created by user">Access only to items created by user</acronym>',
 	'read_only' => '<acronym title="Read only mode just for unprivileged users">Read only</acronym>',
 	'markDeleted_success' => 'User entry deleted successfully',
 	'markDeleted_error' => 'Error! User entry has not been deleted!',

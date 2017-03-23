@@ -13,6 +13,289 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 {
 	/**
+	 * Коды валют для МойСклад
+	 * @var array
+	 */
+	protected $_aCurrencyCodes = array(
+		'971' => 'AFN',
+		'978' => 'EUR',
+		'008' => 'ALL',
+		'012' => 'DZD',
+		'840' => 'USD',
+		'978' => 'EUR',
+		'973' => 'AOA',
+		'951' => 'XCD',
+		'951' => 'XCD',
+		'032' => 'ARS',
+		'051' => 'AMD',
+		'533' => 'AWG',
+		'036' => 'AUD',
+		'978' => 'EUR',
+		'944' => 'AZN',
+		'044' => 'BSD',
+		'048' => 'BHD',
+		'050' => 'BDT',
+		'052' => 'BBD',
+		'974' => 'BYR',
+		'978' => 'EUR',
+		'084' => 'BZD',
+		'952' => 'XOF',
+		'060' => 'BMD',
+		'064' => 'BTN',
+		'356' => 'INR',
+		'068' => 'BOB',
+		'984' => 'BOV',
+		'840' => 'USD',
+		'977' => 'BAM',
+		'072' => 'BWP',
+		'578' => 'NOK',
+		'986' => 'BRL',
+		'840' => 'USD',
+		'096' => 'BND',
+		'975' => 'BGN',
+		'952' => 'XOF',
+		'108' => 'BIF',
+		'116' => 'KHR',
+		'950' => 'XAF',
+		'124' => 'CAD',
+		'132' => 'CVE',
+		'136' => 'KYD',
+		'950' => 'XAF',
+		'950' => 'XAF',
+		'990' => 'CLF',
+		'152' => 'CLP',
+		'156' => 'CNY',
+		'036' => 'AUD',
+		'036' => 'AUD',
+		'170' => 'COP',
+		'970' => 'COU',
+		'174' => 'KMF',
+		'950' => 'XAF',
+		'976' => 'CDF',
+		'554' => 'NZD',
+		'188' => 'CRC',
+		'952' => 'XOF',
+		'191' => 'HRK',
+		'931' => 'CUC',
+		'192' => 'CUP',
+		'532' => 'ANG',
+		'978' => 'EUR',
+		'203' => 'CZK',
+		'208' => 'DKK',
+		'262' => 'DJF',
+		'951' => 'XCD',
+		'214' => 'DOP',
+		'840' => 'USD',
+		'818' => 'EGP',
+		'222' => 'SVC',
+		'840' => 'USD',
+		'950' => 'XAF',
+		'232' => 'ERN',
+		'978' => 'EUR',
+		'230' => 'ETB',
+		'978' => 'EUR',
+		'238' => 'FKP',
+		'208' => 'DKK',
+		'242' => 'FJD',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'953' => 'XPF',
+		'978' => 'EUR',
+		'950' => 'XAF',
+		'270' => 'GMD',
+		'981' => 'GEL',
+		'978' => 'EUR',
+		'936' => 'GHS',
+		'292' => 'GIP',
+		'978' => 'EUR',
+		'208' => 'DKK',
+		'951' => 'XCD',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'320' => 'GTQ',
+		'826' => 'GBP',
+		'324' => 'GNF',
+		'952' => 'XOF',
+		'328' => 'GYD',
+		'332' => 'HTG',
+		'840' => 'USD',
+		'036' => 'AUD',
+		'978' => 'EUR',
+		'340' => 'HNL',
+		'344' => 'HKD',
+		'348' => 'HUF',
+		'352' => 'ISK',
+		'356' => 'INR',
+		'360' => 'IDR',
+		'960' => 'XDR',
+		'364' => 'IRR',
+		'368' => 'IQD',
+		'978' => 'EUR',
+		'826' => 'GBP',
+		'376' => 'ILS',
+		'978' => 'EUR',
+		'388' => 'JMD',
+		'392' => 'JPY',
+		'826' => 'GBP',
+		'400' => 'JOD',
+		'398' => 'KZT',
+		'404' => 'KES',
+		'036' => 'AUD',
+		'408' => 'KPW',
+		'410' => 'KRW',
+		'414' => 'KWD',
+		'417' => 'KGS',
+		'418' => 'LAK',
+		'978' => 'EUR',
+		'422' => 'LBP',
+		'426' => 'LSL',
+		'710' => 'ZAR',
+		'430' => 'LRD',
+		'434' => 'LYD',
+		'756' => 'CHF',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'446' => 'MOP',
+		'807' => 'MKD',
+		'969' => 'MGA',
+		'454' => 'MWK',
+		'458' => 'MYR',
+		'462' => 'MVR',
+		'952' => 'XOF',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'978' => 'EUR',
+		'478' => 'MRO',
+		'480' => 'MUR',
+		'978' => 'EUR',
+		'965' => 'XUA',
+		'484' => 'MXN',
+		'979' => 'MXV',
+		'840' => 'USD',
+		'498' => 'MDL',
+		'978' => 'EUR',
+		'496' => 'MNT',
+		'978' => 'EUR',
+		'951' => 'XCD',
+		'504' => 'MAD',
+		'943' => 'MZN',
+		'104' => 'MMK',
+		'516' => 'NAD',
+		'710' => 'ZAR',
+		'036' => 'AUD',
+		'524' => 'NPR',
+		'978' => 'EUR',
+		'953' => 'XPF',
+		'554' => 'NZD',
+		'558' => 'NIO',
+		'952' => 'XOF',
+		'566' => 'NGN',
+		'554' => 'NZD',
+		'036' => 'AUD',
+		'840' => 'USD',
+		'578' => 'NOK',
+		'512' => 'OMR',
+		'586' => 'PKR',
+		'840' => 'USD',
+		'590' => 'PAB',
+		'840' => 'USD',
+		'598' => 'PGK',
+		'600' => 'PYG',
+		'604' => 'PEN',
+		'608' => 'PHP',
+		'554' => 'NZD',
+		'985' => 'PLN',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'634' => 'QAR',
+		'978' => 'EUR',
+		'946' => 'RON',
+		'643' => 'RUB',
+		'810' => 'RUR',
+		'646' => 'RWF',
+		'978' => 'EUR',
+		'654' => 'SHP',
+		'951' => 'XCD',
+		'951' => 'XCD',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'951' => 'XCD',
+		'882' => 'WST',
+		'978' => 'EUR',
+		'678' => 'STD',
+		'682' => 'SAR',
+		'952' => 'XOF',
+		'941' => 'RSD',
+		'690' => 'SCR',
+		'694' => 'SLL',
+		'702' => 'SGD',
+		'532' => 'ANG',
+		'994' => 'XSU',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'090' => 'SBD',
+		'706' => 'SOS',
+		'710' => 'ZAR',
+		'728' => 'SSP',
+		'978' => 'EUR',
+		'144' => 'LKR',
+		'938' => 'SDG',
+		'968' => 'SRD',
+		'578' => 'NOK',
+		'748' => 'SZL',
+		'752' => 'SEK',
+		'947' => 'CHE',
+		'756' => 'CHF',
+		'948' => 'CHW',
+		'760' => 'SYP',
+		'901' => 'TWD',
+		'972' => 'TJS',
+		'834' => 'TZS',
+		'764' => 'THB',
+		'840' => 'USD',
+		'952' => 'XOF',
+		'554' => 'NZD',
+		'776' => 'TOP',
+		'780' => 'TTD',
+		'788' => 'TND',
+		'949' => 'TRY',
+		'934' => 'TMT',
+		'840' => 'USD',
+		'036' => 'AUD',
+		'800' => 'UGX',
+		'980' => 'UAH',
+		'784' => 'AED',
+		'826' => 'GBP',
+		'840' => 'USD',
+		'997' => 'USN',
+		'840' => 'USD',
+		'940' => 'UYI',
+		'858' => 'UYU',
+		'860' => 'UZS',
+		'548' => 'VUV',
+		'937' => 'VEF',
+		'704' => 'VND',
+		'840' => 'USD',
+		'840' => 'USD',
+		'953' => 'XPF',
+		'504' => 'MAD',
+		'886' => 'YER',
+		'967' => 'ZMW',
+		'932' => 'ZWL',
+		'955' => 'XBA',
+		'956' => 'XBB',
+		'957' => 'XBC',
+		'958' => 'XBD',
+		'963' => 'XTS',
+		'999' => 'XXX',
+		'959' => 'XAU',
+		'964' => 'XPD',
+		'962' => 'XPT',
+		'961' => 'XAG'
+	);
+
+	/**
 	 * Return data
 	 * @var array
 	 */
@@ -62,10 +345,17 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	protected $aAdditionalProperties = array();
 
 	/**
+	 * Tax for default price
+	 * @var object
+	 */
+	protected $_oTaxForBasePrice = NULL;
+
+	/**
 	 * Allowed object properties
 	 * @var array
 	 */
 	protected $_allowedProperties = array(
+		'itemDescription',
 		'iShopId',
 		'iShopGroupId',
 		'sShopDefaultPriceName',
@@ -107,6 +397,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		);
 		$this->sShopDefaultPriceName = 'РОЗНИЧНАЯ';
 		$this->sShopDefaultPriceGUID = '';
+
+		$this->itemDescription = 'text';
 
 		$this->_temporaryPropertyFile = CMS_FOLDER . TMP_DIR . "1c_exchange_files/modproplist.tmp";
 		Core_File::mkdir(dirname($this->_temporaryPropertyFile));
@@ -154,6 +446,40 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Add characteristic to item
+	 * @param object $oShopItem shop item
+	 * @param object $oItemProperty item property
+	 * @return self
+	 */
+	protected function _addCharacteristic($oShopItem, $oItemProperty)
+	{
+		$oTempShopItem = $oShopItem;
+
+		// Проверяем, есть ли у характеристики идентификатор модификации
+		if(count($aIdModificationArray = $this->xpath($oItemProperty, 'Ид')))
+		{
+			$oTempShopItem = NULL;
+			$sModificationGuid = strval($aIdModificationArray[0]);
+
+			// Модификация найдена - добавляем ей это свойство
+			if(count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
+			{
+				$oTempShopItem = $aShop_Items[0];
+			}
+			else
+			{
+				// модификация не найдена, возможно, она будет загружена из файла offers.xml, сохраняем свойства в массив
+				$aModificationProperties[$sModificationGuid][] = array('name'=>strval($oItemProperty->Наименование),'value'=>strval($oItemProperty->Значение));
+			}
+		}
+
+		// Характеристики загружаются безотносительно содержимого конфигурационного файла cml.php
+		$this->_addPredefinedAdditionalProperty($oTempShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
+
+		return $this;
+	}
+
+	/**
 	 * Check if property exists in array and save it if so
 	 * @return self
 	 */
@@ -169,7 +495,15 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oShopItem->save();
 			return $this;
 		}
-		if($bForcedAdd || (in_array(mb_strtoupper($sPropertyGUID), array_map('mb_strtoupper', $this->aPredefinedAdditionalProperties))!==FALSE))
+		/*// для совместимости с МойСклад
+		// не импортируется, т.к. затирает значение поля "Описание"
+		if (mb_strtoupper($sPropertyGUID) == 'ПОЛНОЕ НАИМЕНОВАНИЕ')
+		{
+			$oShopItem->description = $sValue;
+			$oShopItem->save();
+			return $this;
+		}*/
+		if ($bForcedAdd || (in_array(mb_strtoupper($sPropertyGUID), array_map('mb_strtoupper', $this->aPredefinedAdditionalProperties))!==FALSE))
 		{
 			$this->_addItemProperty($oShopItem, $sPropertyGUID, $sValue);
 		}
@@ -270,7 +604,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				? $this->_aPropertyValues[$sValue]
 				: $sValue;
 
-			switch(mb_strtoupper($this->aBaseProperties[$sPropertyGUID]))
+			switch (mb_strtoupper($this->aBaseProperties[$sPropertyGUID]))
 			{
 				case 'HOSTCMS_TITLE':
 					$oItem->seo_title = $sPropertyValue;
@@ -409,8 +743,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		/*
 		 Удаляем товары/группы только при получении import.xml
 		*/
-		if ($this->importAction == 0 
-			&& count((array)$this->_oSimpleXMLElement->Классификатор) 
+		if ($this->importAction == 0
+			&& count((array)$this->_oSimpleXMLElement->Классификатор)
 			&& count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0)
 		{
 			Core_QueryBuilder::update('shop_groups')
@@ -513,8 +847,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->_aReturn['updateItemCount']++;
 				}
 
-
-
 				// Если передан GUID модификации и товар, для которого загружается модификация, уже существует
 				if (strlen($sGUIDmod) && $oShopItem->id)
 				{
@@ -561,9 +893,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$oShopItem->shop_id = $this->iShopId;
 
 				// check item path
-				$oShopItem->makePath();
+				$oShopItem->path == '' && $oShopItem->makePath();
 
-				$oSameShopItem = Core_Entity::factory('Shop', $this->iShopId)->Shop_Items->getByGroupIdAndPath($oShopItem->shop_group_id, $oShopItem->path);
+				$oSameShopItem = Core_Entity::factory('Shop', $this->iShopId)
+					->Shop_Items
+					->getByGroupIdAndPath($oShopItem->shop_group_id, $oShopItem->path);
 
 				if (!is_null($oSameShopItem) && $oSameShopItem->id != $oShopItem->id)
 				{
@@ -578,7 +912,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oShopItem->path = Core_Guid::get();
 					}
 				}
-
 
 				if (($oShopItem->id
 				&& $this->importAction == 1
@@ -597,11 +930,17 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					throw new Core_Exception(Core::_('Shop_Item.error_save_without_name'));
 				}
 
-
 				// Обрабатываем описание товара
 				foreach ($this->xpath($oItem, 'Описание') as $DescriptionData)
 				{
-					$oShopItem->text = nl2br(strval($DescriptionData));
+					if ($this->itemDescription == 'text')
+					{
+						$oShopItem->text = nl2br(strval($DescriptionData));
+					}
+					elseif ($this->itemDescription == 'description')
+					{
+						$oShopItem->description = nl2br(strval($DescriptionData));
+					}
 					$oShopItem->save();
 				}
 
@@ -838,7 +1177,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 				foreach($aProperties as $oProperty)
 				{
-					if($oProperty->type==2)
+					if ($oProperty->type==2)
 					{
 						continue;
 					}
@@ -866,28 +1205,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара')
 						  as $oItemProperty)
 				{
-					$oTempShopItem = $oShopItem;
-
-					// Проверяем, есть ли у характеристики идентификатор модификации
-					if(count($aIdModificationArray = $this->xpath($oItemProperty, 'Ид')))
-					{
-						$oTempShopItem = NULL;
-						$sModificationGuid = strval($aIdModificationArray[0]);
-
-						// Модификация найдена - добавляем ей это свойство
-						if(count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
-						{
-							$oTempShopItem = $aShop_Items[0];
-						}
-						else
-						{
-							// модификация не найдена, возможно, она будет загружена из файла offers.xml, сохраняем свойства в массив
-							$aModificationProperties[$sModificationGuid][] = array('name'=>strval($oItemProperty->Наименование),'value'=>strval($oItemProperty->Значение));
-						}
-					}
-
-					// Характеристики загружаются безотносительно содержимого конфигурационного файла cml.php
-					$this->_addPredefinedAdditionalProperty($oTempShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
+					$this->_addCharacteristic($oShopItem, $oItemProperty);
 				}
 
 				// Сохраняем список характеристик модификаций во временный файл
@@ -957,13 +1275,14 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$sTaxGUID = md5(mb_strtoupper($oPrice->Налог->Наименование));
 					$oShopTax = Core_Entity::factory('Shop_Tax')->getByGuid($sTaxGUID, FALSE);
 
-					/*if (!is_null($oShopTax))
+					// код введён в эксплуатацию 10.06.2015 для совместимости с МойСклад
+					if (!is_null($oShopTax))
 					{
 						// В связи с разницей логик HostCMS и 1С по хранению налогов, поле "учтено в сумме" больше не будет импортироваться
 						$iInSum = strval($oPrice->Налог->УчтеноВСумме);
 						strtoupper($iInSum) == 'TRUE' ? $oShopTax->tax_is_included = 1 : $oShopTax->tax_is_included = 0;
-						$oShopTax->save();
-					}*/
+						$this->_oTaxForBasePrice = $oShopTax->save();
+					}
 
 					$this->sShopDefaultPriceGUID = $oShopPrice->guid;
 				}
@@ -985,7 +1304,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopWarehouse->guid = $sWarehouseGuid;
 				}
 				// у склада не всегда есть название
-				if($sWarehouseName = strval($oWarehouse->Наименование))
+				if ($sWarehouseName = strval($oWarehouse->Наименование))
 				{
 					$oShopWarehouse->name = $sWarehouseName;
 				}
@@ -1070,6 +1389,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$this->_importProperties($oShopItem, $ItemPropertyValue);
 					}
 
+					// Обработка характеристик товара из файла offers для совместимости с МойСклад
+					foreach ($this->xpath($oProposal, 'ХарактеристикиТовара/ХарактеристикаТовара')
+						  as $oItemProperty)
+					{
+						$this->_addCharacteristic($oShopItem, $oItemProperty);
+					}
+
 					foreach ($this->xpath($oProposal, 'Цены/Цена') as $oPrice)
 					{
 						// Ищем цену
@@ -1093,11 +1419,29 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 							if (isset($baseCurrencyNode[0]))
 							{
-								$oItem_Shop_Currency = Core_Entity::factory('Shop_Currency')->getByLike(strval($baseCurrencyNode[0]->Валюта), FALSE);
-								// Валюта спеццены
-								$oPrice_Currency = Core_Entity::factory('Shop_Currency')->getByLike(strval($oPrice->Валюта), FALSE);
+								$sCurrency = strval($baseCurrencyNode[0]->Валюта);
 
-								if ($oItem_Shop_Currency->exchange_rate && $oPrice_Currency->exchange_rate)
+								if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+								{
+									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
+								}
+
+								$oItem_Shop_Currency = Core_Entity::factory('Shop_Currency')->getByLike($sCurrency, FALSE);
+
+								$sCurrency = strval($oPrice->Валюта);
+
+								if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+								{
+									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
+								}
+
+								// Валюта спеццены
+								$oPrice_Currency = Core_Entity::factory('Shop_Currency')->getByLike($sCurrency, FALSE);
+
+								if (!is_null($oItem_Shop_Currency)
+									&& !is_null($oPrice_Currency)
+									&& $oItem_Shop_Currency->exchange_rate
+									&& $oPrice_Currency->exchange_rate)
 								{
 									$currencyCoefficient = Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency($oPrice_Currency, $oItem_Shop_Currency);
 
@@ -1111,17 +1455,30 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						}
 						elseif ($this->sShopDefaultPriceGUID == strval($oPrice->ИдТипаЦены))
 						{
-							$oShop_Currency = Core_Entity::factory('Shop_Currency')->getByLike(strval($oPrice->Валюта), FALSE);
+							$sCurrency = strval($oPrice->Валюта);
+							if(is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
+							{
+								$sCurrency = $this->_aCurrencyCodes[$sCurrency];
+							}
+
+							$oShop_Currency = Core_Entity::factory('Shop_Currency')->getByLike($sCurrency, FALSE);
 
 							if (is_null($oShop_Currency))
 							{
 								$oShop_Currency = Core_Entity::factory('Shop_Currency');
-								$oShop_Currency->name = strval($oPrice->Валюта);
+								$oShop_Currency->name = $sCurrency;
+								$oShop_Currency->code = $sCurrency;
 								$oShop_Currency->exchange_rate = 1;
 							}
 
 							$oShopItem->price = Shop_Controller::instance()->convertPrice(strval($oPrice->ЦенаЗаЕдиницу));
 							$oShopItem->add($oShop_Currency);
+
+							if(!is_null($this->_oTaxForBasePrice))
+							{
+								$oShopItem->add($this->_oTaxForBasePrice);
+								$this->_oTaxForBasePrice = NULL;
+							}
 
 							if (($sMeasureName = strval($oPrice->Единица)) != '')
 							{
@@ -1135,12 +1492,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					$iItemCount = 0;
-					
+
 					foreach ($this->xpath($oProposal, 'Количество') as $oCount)
 					{
 						$iItemCount = $oCount;
 					}
-					
+
 					// если нет тега "Количество", ставим количество товара на главном складе равным нулю
 					// Ищем главный склад
 					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
@@ -1361,7 +1718,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		$oProperty = $oProperty_Value->Property;
 
-		switch($oProperty->type)
+		switch ($oProperty->type)
 		{
 			// целое число
 			case 0:

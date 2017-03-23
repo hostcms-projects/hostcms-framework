@@ -187,6 +187,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	);
 
 	/**
+	 * Shop_Item_Controller
+	 * @var Shop_Item_Controller
+	 */
+	protected $_Shop_Item_Controller = NULL;
+	
+	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
 	 */
@@ -293,6 +299,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->type = 'offer';
 		$this->onStep = 100;
+		
+		$this->_Shop_Item_Controller = new Shop_Item_Controller();
 	}
 
 	/**
@@ -375,6 +383,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	}
 
 	/**
+	 * Property_Model for <market_category>
+	 * @var mixed
+	 */
+	protected $_MarketCategory = NULL;
+	
+	/**
 	 * Show offers
 	 * @return self
 	 * @hostcms-event Shop_Controller_YandexMarket.onBeforeOffer
@@ -387,6 +401,11 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$offset = 0;
 		$limit = $this->onStep;
 
+		$oShop = $this->getEntity();
+		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
+		
+		$this->_MarketCategory = $oShop_Item_Property_List->Properties->getByTag_name('market_category');
+		
 		do {
 			$oShop_Items = $this->_Shop_Items;
 			$oShop_Items->queryBuilder()
@@ -398,18 +417,18 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			foreach ($aShop_Items as $oShop_Item)
 			{
 				$this->_showOffer($oShop_Item);
-				
+
 				if ($this->modifications)
 				{
 					$aModifications = $oShop_Item->Modifications->findAll(FALSE);
-					
+
 					foreach ($aModifications as $oModification)
 					{
 						$this->_showOffer($oModification);
 					}
 				}
 			}
-			
+
 			Core_File::flush();
 			$offset += $limit;
 		}
@@ -447,45 +466,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		/* URL */
 		echo '<url>' . Core_Str::xml($this->_shopPath . $oShop_Item->getPath()) . '</url>'. "\n";
 
-		// Определяем цену со скидкой.
-		$price = array();
-		$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll(FALSE);
-		if (count($aShop_Item_Discounts))
-		{
-			// определяем количество скидок на товар
-			$discountPercent = $discountAmount = 0;
-
-			// Цикл по идентификаторам скидок для товара
-			foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
-			{
-				$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
-				if ($oShop_Discount->isActive())
-				{
-					$price['discounts'][] = $oShop_Discount;
-					$oShop_Discount->type == 0
-						? $discountPercent += $oShop_Discount->value
-						: $discountAmount += $oShop_Discount->value;
-				}
-			}
-
-			// Определяем суммарную величину скидки в %
-			$price['discount'] = $oShop_Item->price * $discountPercent / 100;
-
-			// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
-			($price['discount'] - $price['discount']) > $discountAmount && $price['discount'] += $discountAmount;
-
-			// Вычисляем цену со скидкой как ее разность с величиной скидки в %
-			$price['price_discount'] = $oShop_Item->price - $price['discount'];
-		}
-		else
-		{
-			// если скидок нет, то price_discount положим равным price
-			$price['price_discount'] = $oShop_Item->price;
-			$price['discount'] = 0;
-		}
-
+		/* Определяем цену со скидкой */
+		$aPrices = $this->_Shop_Item_Controller->calculatePriceInItemCurrency($oShop_Item->price, $oShop_Item);
+		
 		/* Цена */
-		echo '<price>' . $price['price_discount'] . '</price>'. "\n";
+		echo '<price>' . $aPrices['price_discount'] . '</price>'. "\n";		
+		
+		if ($aPrices['price'] > $aPrices['price_discount'])
+		{
+			/* Старая цена */
+			echo '<oldprice>' . $aPrices['price'] . '</oldprice>'. "\n";
+		}
 
 		/* CURRENCY */
 		// Обязательно поле в модели:
@@ -506,6 +497,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		}
 		echo '<categoryId>' . $categoryId . '</categoryId>'. "\n";
 
+		if (!is_null($this->_MarketCategory))
+		{
+			$aProperty_Value_Market_Category = $this->_MarketCategory->getValues($oShop_Item->id);
+			if (isset($aProperty_Value_Market_Category[0]))
+			{
+				echo '<market_category>' .
+					Core_Str::xml($aProperty_Value_Market_Category[0]->velue) .
+				'</market_category>'. "\n";
+			}
+		}
+		
 		/* PICTURE */
 		if ($oShop_Item->image_large != '')
 		{
@@ -578,7 +580,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		if (is_array($this->itemsProperties))
 		{
-			$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id);
+			$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id, FALSE);
 		}
 		else
 		{

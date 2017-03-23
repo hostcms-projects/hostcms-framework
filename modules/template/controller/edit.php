@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -21,7 +21,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$modelName = $object->getModelName();
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->site_id = CURRENT_SITE;
 
@@ -44,7 +44,12 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 		$oSelect_Templates = Admin_Form_Entity::factory('Select');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		switch ($modelName)
 		{
 			case 'template':
 				$title = $this->_object->id
@@ -59,9 +64,14 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->caption(Core::_('Template.tab_2'))
 					->name('Css');
 
+				$oMainTab
+					->move($this->getField('name'), $oMainRow1);
+
+
 				$this
 					->addTabAfter($oTemplateTab, $oMainTab)
 					->addTabAfter($oCssTab, $oTemplateTab);
+
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
@@ -77,9 +87,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->template_dir_id)
 					->caption(Core::_('Template.template_dir_id'));
 
-				$oMainTab->addAfter(
-					$oSelect_Dirs, $this->getField('name')
-				);
+				$oMainRow2->add($oSelect_Dirs);
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
@@ -95,12 +103,16 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->template_id)
 					->caption(Core::_('Template.template_id'));
 
-				$oMainTab->addAfter(
-					$oSelect_Templates, $oSelect_Dirs
-				);
+				$oMainRow3->add($oSelect_Templates);
+
+				$oMainTab
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$this->getField('sorting')
-					->style('width: 220px');
+					->divAttr(array('class' => 'form-group col-sm-5 col-md-4 col-lg-3'));
+
+				$oMainTab
+					->move($this->getField('sorting'), $oMainRow4);
 
 				$oTemplate_Textarea = Admin_Form_Entity::factory('Textarea');
 
@@ -116,9 +128,13 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->caption(Core::_('Template.template'))
 					->name('template')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
-					->syntaxHighlighterOptions($oTmpOptions);
+					->syntaxHighlighterOptions($oTmpOptions)
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				$oTemplateTab->add($oTemplate_Textarea);
+				$oTemplateTab
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainRow5->add($oTemplate_Textarea);
 
 				$oCss_Textarea = Admin_Form_Entity::factory('Textarea');
 
@@ -129,14 +145,17 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value(
 						$this->_object->loadTemplateCssFile()
 					)
-					->cols(140)
 					->rows(30)
 					->caption(Core::_('Template.css'))
 					->name('css')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
-					->syntaxHighlighterOptions($oTmpOptions);
+					->syntaxHighlighterOptions($oTmpOptions)
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				$oCssTab->add($oCss_Textarea);
+				$oCssTab
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainRow6->add($oCss_Textarea);
 
 			break;
 			case 'template_dir':
@@ -146,10 +165,10 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					: Core::_('Template_Dir.title_add');
 
 				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
-				{
-					$this->_object->parent_id = Core_Array::getGet('template_dir_id');
-				}
+				!$this->_object->id && $this->_object->parent_id = Core_Array::getGet('template_dir_id');
+
+				$oMainTab
+					->move($this->getField('name'), $oMainRow1);
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
@@ -164,10 +183,13 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->parent_id)
 					->caption(Core::_('Template_Dir.parent_id'));
 
-				$oMainTab->addAfter($oSelect_Dirs,  $this->getField('name'));
+				$oMainRow2->add($oSelect_Dirs);
 
 				$this->getField('sorting')
-					->style('width: 220px');
+					->divAttr(array('class' => 'form-group col-sm-5 col-md-4 col-lg-3'));
+
+				$oMainTab
+					->move($this->getField('sorting'), $oMainRow3);
 			break;
 		}
 

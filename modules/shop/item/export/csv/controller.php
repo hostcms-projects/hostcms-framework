@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 {
@@ -24,7 +24,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		'exportGroupExternalProperties',
 		'exportItemModifications',
 		'exportOrders',
-		'shopId'
+		'shopId',
+		'start_order_date',
+		'end_order_date'
 	);
 
 	/**
@@ -124,6 +126,8 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		$this->exportItemModifications = $bExportItemModifications;
 		$this->_iItem_Properties_Count = 0;
 		$this->_iGroup_Properties_Count = 0;
+		$this->start_order_date = NULL;
+		$this->end_order_date = NULL;
 
 		$this->exportOrders = $bExportOrders;
 
@@ -216,7 +220,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString($oItem_Property->name));
 				$this->_iItem_Properties_Count++;
 
-				if($oItem_Property->type == 2)
+				if ($oItem_Property->type == 2)
 				{
 					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString(Core::_('Shop_item.import_small_images') . $oItem_Property->name));
 					$this->_iItem_Properties_Count++;
@@ -229,7 +233,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString($oGroup_Property->name));
 				$this->_iGroup_Properties_Count++;
 
-				if($oGroup_Property->type == 2)
+				if ($oGroup_Property->type == 2)
 				{
 					$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->_prepareString(Core::_('Shop_item.import_small_images') . $oGroup_Property->name));
 					$this->_iGroup_Properties_Count++;
@@ -303,9 +307,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 								)
 								: ''));
 
-			if($oItem_Property->type == 2)
+			if ($oItem_Property->type == 2)
 			{
-				if($iProperty_Values_Count)
+				if ($iProperty_Values_Count)
 				{
 					$aItemProperties[] = ($aProperty_Values[0]->file_small == '' ? '' : sprintf('"%s"', $aProperty_Values[0]->getSmallFileHref()));
 				}
@@ -337,7 +341,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 		$aTmpArray[1] = is_null($oShopItem->Shop_Group->id) ? 'ID00000000' : $oShopItem->Shop_Group->guid;
 
-		if($oShopItem->Shop_Group->id)
+		if ($oShopItem->Shop_Group->id)
 		{
 			/*$aTmpArray[3] = $oShopItem->Shop_Group->seo_title;
 			$aTmpArray[4] = $oShopItem->Shop_Group->seo_description;
@@ -423,7 +427,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					->where('modification_id', '=', 0)
 					->where('shortcut_id', '=', 0);
 
-				if($iShopGroupId != 0)
+				if ($iShopGroupId != 0)
 				{
 					$aTmpArray = array(
 						sprintf('"%s"', $this->_prepareString($oShopGroup->name)),
@@ -474,7 +478,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 											: $aProperty_Values[0]->setHref($oShopGroup->getGroupHref())->getLargeFileHref()))
 												: ''));
 
-						if($oGroup_Property->type == 2)
+						if ($oGroup_Property->type == 2)
 						{
 							$aTmpArray[] = $iProperty_Values_Count
 								? ($aProperty_Values[0]->file_small == ''
@@ -532,7 +536,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 													: ($oProperty_Value->file == '' ? '' : $oProperty_Value->setHref($oShopItem->getItemHref())->getLargeFileHref())
 													)));
 
-									if($oItem_Property->type == 2)
+									if ($oItem_Property->type == 2)
 									{
 										$aCurrentPropertyLine[$iPropertyFieldOffset+1] = sprintf('"%s"', $this->_prepareString($oProperty_Value->setHref($oShopItem->getItemHref())->getSmallFileHref()));
 									}
@@ -541,7 +545,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 								}
 							}
 
-							if($oItem_Property->type==2)
+							if ($oItem_Property->type==2)
 							{
 								$aCurrentPropertyLine[$iPropertyFieldOffset] = '""';
 								$aCurrentPropertyLine[$iPropertyFieldOffset+1] = '""';
@@ -618,8 +622,20 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 			$oShop = Core_Entity::factory('Shop', $this->shopId);
 
+			$oShop_Orders = $oShop->Shop_Orders;
+			
+			if(!is_null($this->start_order_date) && !is_null($this->end_order_date))
+			{
+				$sStartDate = Core_Date::timestamp2sql(Core_Date::datetime2timestamp($this->start_order_date . " 00:00:00"));
+				$sEndDate = Core_Date::timestamp2sql(Core_Date::datetime2timestamp($this->end_order_date . " 23:59:59"));
+				
+				$oShop_Orders
+					->queryBuilder()
+					->where('datetime', 'BETWEEN', array($sStartDate, $sEndDate));
+			}
+			
 			do {
-				$oShop_Orders = $oShop->Shop_Orders;
+				
 				$oShop_Orders
 					->queryBuilder()
 					->orderBy('id', 'ASC')

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Module
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Module_Model extends Core_Entity
 {
@@ -142,13 +142,21 @@ class Module_Model extends Core_Entity
 	/**
 	 * Change module status
 	 * @return Module_Model
+	 * @hostcms-event module.onBeforeChangeActive
+	 * @hostcms-event module.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+		
 		$this->active = 1 - $this->active;
 		$this->save();
 
-		return $this->setupModule();
+		$this->setupModule();
+		
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+		
+		return $this;
 	}
 
 	/**

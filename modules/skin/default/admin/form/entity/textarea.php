@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 {
@@ -78,6 +78,9 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 					'smartIndent' => 'false',
 				)
 			);
+
+		$this->class .= ' form-control';
+		$this->divAttr = array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12');
 	}
 
 	/**
@@ -87,7 +90,8 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 	{
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
-		$this->id = $windowId . '_' . $this->id;
+		($this->wysiwyg || $this->syntaxHighlighter)
+			&& $this->id = $windowId . '_' . $this->id;
 
 		if (is_null($this->onkeydown))
 		{
@@ -113,7 +117,29 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
 
 		?><span class="caption"><?php echo $this->caption?></span><?php
+
+		if (count($this->_children))
+		{
+			?><div class="input-group"><?php
+		}
+
 		?><textarea <?php echo implode(' ', $aAttr) ?>><?php echo htmlspecialchars($this->value)?></textarea><?php
+
+		$this->_format();
+
+		if (count($this->_children))
+		{
+			// Могут быть дочерние элементы элементы
+			$this->executeChildren();
+			?></div><?php
+		}
+
+		?></div><?php
+	}
+
+	protected function _format()
+	{
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		if ($this->wysiwyg)
 		{
@@ -136,11 +162,15 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 
 				// add
 				$this->_init['script_url'] = "'/admin/wysiwyg/tiny_mce.js'";
-
 				$this->_init['language'] = '"' . $lng . '"';
 				$this->_init['docs_language'] = '"' . $lng . '"';
 				$this->_init['elements'] = '"' . $this->id . '"';
-				$this->_init['content_css'] = '"' . implode(',', $aCSS) . '"';
+				$this->_init['height'] = '"' . ($this->rows * 30) . '"';
+
+				$this->_init['theme'] = '$(window).width() < 700 ? "simple" : "advanced"';
+				
+				$aUserCsses = explode(',', trim(Core_Array::get($this->_init, 'content_css', ''), '\'"'));
+				$this->_init['content_css'] = '"' . implode(',', $aUserCsses + $aCSS) . '"';
 
 				// Array of structures
 				$aStructure = $this->_fillStructureList(CURRENT_SITE);
@@ -211,12 +241,8 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 		}
 		else
 		{
-			// Могут быть дочерние элементы элементы
-			parent::execute();
-
 			$this->_showFormat();
 		}
-		?></div><?php
 	}
 
 	/**
@@ -251,5 +277,4 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 
 		return $aReturn;
 	}
-
 }

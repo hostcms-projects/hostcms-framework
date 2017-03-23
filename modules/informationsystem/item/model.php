@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Model extends Core_Entity
 {
@@ -654,9 +654,13 @@ class Informationsystem_Item_Model extends Core_Entity
 	/**
 	 * Change item status
 	 * @return self
+	 * @hostcms-event informationsystem_item.onBeforeChangeActive
+	 * @hostcms-event informationsystem_item.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+
 		$this->active = 1 - $this->active;
 		$this->save();
 
@@ -674,7 +678,20 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		$this->clearCache();
 
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+
 		return $this;
+	}
+
+	/**
+	 * Mark entity as deleted
+	 * @return Core_Entity
+	 */
+	public function markDeleted()
+	{
+		$this->clearCache();
+
+		return parent::markDeleted();
 	}
 
 	/**
@@ -768,7 +785,8 @@ class Informationsystem_Item_Model extends Core_Entity
 			htmlspecialchars($object->name)
 		);
 
-		$bRightTime = ($this->start_datetime == '0000-00-00 00:00:00' || time() > Core_Date::sql2timestamp($this->start_datetime))
+		$bRightTime =
+			($this->start_datetime == '0000-00-00 00:00:00' || time() > Core_Date::sql2timestamp($this->start_datetime))
 			&& ($this->end_datetime == '0000-00-00 00:00:00' || time() < Core_Date::sql2timestamp($this->end_datetime));
 
 		!$bRightTime && $oCore_Html_Entity_Div->class('wrongTime');
@@ -789,25 +807,23 @@ class Informationsystem_Item_Model extends Core_Entity
 					. $object->getPath();
 
 				$oCore_Html_Entity_Div
-				->add(
-					Core::factory('Core_Html_Entity_A')
-						->href($href)
-						->target('_blank')
-						->add(
-							Core::factory('Core_Html_Entity_Img')
-							->src('/admin/images/new_window.gif')
-							->class('img_line')
-						)
-				);
+					->add(
+						Core::factory('Core_Html_Entity_A')
+							->href($href)
+							->target('_blank')
+							->add(
+								Core::factory('Core_Html_Entity_I')
+									->class('fa fa-external-link')
+							)
+					);
 			}
 		}
 		elseif (!$bRightTime)
 		{
 			$oCore_Html_Entity_Div
 				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->src('/admin/images/mesures.gif')
-						->class('img_line')
+					Core::factory('Core_Html_Entity_I')
+						->class('fa fa-clock-o black')
 				);
 		}
 
@@ -1348,7 +1364,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			// Clear item's cache
 			Core_Cache::instance(Core::$mainConfig['defaultCache'])
 				->deleteByTag('informationsystem_item_' . $this->id);
-				
+
 			// Clear group's cache
 			$this->informationsystem_group_id
 				? $this->Informationsystem_Group->clearCache()

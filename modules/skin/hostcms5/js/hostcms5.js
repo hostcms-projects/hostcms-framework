@@ -10,7 +10,7 @@ function function_exists(function_name){
 // Установка или снятие всех флажков для checkbox'ов элементов.
 function SelectAllItems(WindowId, checked)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 	$("#"+WindowId).highlightAllRows(checked);
 }
 
@@ -18,7 +18,7 @@ function SelectAllItems(WindowId, checked)
 // RowId - идентификатор строки
 function RowHighlight(WindowId, RowId)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 	$('#' + WindowId + ' #' + RowId).toggleHighlight();
 }
 
@@ -26,7 +26,7 @@ function RowHighlight(WindowId, RowId)
 // если не установлены, снимает флажок с главного.
 function SetTopCheckbox(WindowId)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 	$("#"+WindowId).setTopCheckbox();
 }
 
@@ -71,7 +71,7 @@ function DisableTinyMCE()
 // AOrderDirection - направление сортировки, 1 - по возрастанию, 2 - по убыванию
 function TrigerSingleAction(AAction, AAdditionalParams, AOperation, AItemName, AAdminFromsId, ALimit, AOnPage, AOrderFieldId, AOrderDirection, WindowId)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 
 	var ElementID = 'id_' + AItemName;
 
@@ -182,7 +182,7 @@ function doSendForm(AAction, AAdditionalParams, ButtonObject, AAdminFromsId, AOp
 // AAdminFromsId - идентификатор формы центра администрирования
 function SendForm(WindowId, AAction, AAdditionalParams, ButtonObject, AAdminFromsId, AOperation, ALimit, AOnPage)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 
 	var FormNode = $(ButtonObject).closest('form');
 
@@ -336,7 +336,7 @@ function sendRequest(action, method, callback_function)
 // AOrderDirection - направление сортировки, 1 - по возрастанию, 2 - по убыванию
 function DoLoadAjax(AAction, AAdditionalParams, AAdminFromsId, AOperation, ALimit, AOnPage, AOrderFieldId, AOrderDirection, WindowId)
 {
-	WindowId = getWindowId(WindowId);
+	WindowId = $.getWindowId(WindowId);
 
 	if (AOperation == '')
 	{

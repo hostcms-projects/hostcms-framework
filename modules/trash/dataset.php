@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Trash
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Trash_Dataset extends Admin_Form_Dataset
 {
@@ -114,7 +114,14 @@ class Trash_Dataset extends Admin_Form_Dataset
 
 					$oTrash_Entity->id = $id;
 					$oTrash_Entity->table_name = $name;
-					$oTrash_Entity->name = Core::_($singular . '.model_name');
+					
+					try {
+						$oTrash_Entity->name = Core::_($singular . '.model_name');
+					}
+					catch (Exception $e) {
+						$oTrash_Entity->name = 'Unknown';
+					}
+
 					$oTrash_Entity->count = $row['count'];
 				}
 			}

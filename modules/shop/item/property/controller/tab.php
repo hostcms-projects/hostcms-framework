@@ -8,27 +8,24 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Controller_Tab extends Property_Controller_Tab
 {
 	/**
-	 * Get properties
-	 * @return array
+	 * Create and return an object of Property_Controller_Tab for current skin
+	 * @return object
 	 */
-	protected function _getProperties()
+	static public function factory(Admin_Form_Controller $Admin_Form_Controller)
 	{
-		$shop_group_id = $this->_object->modification_id
-			? $this->_object->Modification->shop_group_id
-			: $this->_object->shop_group_id;
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
 
-		// Properties
-		$oProperties = $this->linkedObject->Properties;
-		$oProperties
-			->queryBuilder()
-			->join('shop_item_property_for_groups', 'shop_item_property_for_groups.shop_item_property_id', '=', 'shop_item_properties.id')
-			->where('shop_item_property_for_groups.shop_id', '=', $this->_object->shop_id)
-			->where('shop_item_property_for_groups.shop_group_id', '=', $shop_group_id);
-		return $oProperties;
+		if (!class_exists($className))
+		{
+			throw new Core_Exception("Class '%className' does not exist",
+				array('%className' => $className));
+		}
+
+		return new $className($Admin_Form_Controller);
 	}
 }

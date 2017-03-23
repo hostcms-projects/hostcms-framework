@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -21,7 +21,7 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$oShop = Core_Entity::factory('Shop', Core_Array::getGet('shop_id', 0));
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_id = Core_Array::getGet('shop_id');
 		}
@@ -36,46 +36,31 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		parent::setObject($object);
 
-		$oSeparator = Admin_Form_Entity::factory('Separator');
-
 		$oMainTab = $this->getTab('main');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
 		$oDescriptionField = $this->getField('description');
 
 		$oDescriptionField->wysiwyg = TRUE;
 
-		$this->getField('contact_person')
-			->style("width: 220px;")
-			->divAttr(array('style' => 'float: left'));
+		$oMainTab->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2')), $oMainRow1);
 
-		$this->getField('address')
-			->style("width: 440px;");
+		$oMainTab->move($this->getField('contact_person')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
+		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
 
-		$this->getField('path')
-			->style("width: 220px")
-			->divAttr(array('style' => 'float: left'));
-		$this->getField('sorting')
-			->style("width: 110px");
+		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
 
-		$oMainTab->addAfter($oSeparator, $this->getField('sorting'));
-
-		$this->getField('phone')
-			->style("width: 320px;")
-			->divAttr(array('style' => 'float: left'));
-
-		$this->getField('fax')
-			->style("width: 320px;");
-
-		$this->getField('site')
-			->style("width: 220px;")
-			->divAttr(array('style' => 'float: left'));
-
-		$this->getField('email')
-			->style("width: 220px;")
-			->divAttr(array('style' => 'float: left'));
-
-		$this->getField('tin')
-			->style("width: 220px;");
+		$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
 
 		// Добавляем новое поле типа файл
 		$oImageField = Admin_Form_Entity::factory('File');
@@ -93,35 +78,35 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oImageField
-		->style("width: 400px;")
-		->name("image")
-		->id("image")
-		->largeImage(
-			array('max_width' => $oShop->image_large_max_width,
-				'max_height' => $oShop->image_large_max_height,
-				'path' => $oLargeFilePath,
-				'show_params' => TRUE,
-				'watermark_position_x' => $oShop->watermark_default_position_x,
-				'watermark_position_y' => $oShop->watermark_default_position_y,
-				'place_watermark_checkbox_checked' => $oShop->watermark_default_use_large_image,
-				'delete_onclick' => "$.adminLoad({path: '{$sFormPath}', additionalParams: 'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1', action: 'deleteLargeImage', windowId: '{$windowId}'}); return false",
-				'caption' => Core::_('Shop_Producer.image_large'),
-				'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->name("image")
+			->id("image")
+			->largeImage(
+				array('max_width' => $oShop->image_large_max_width,
+					'max_height' => $oShop->image_large_max_height,
+					'path' => $oLargeFilePath,
+					'show_params' => TRUE,
+					'watermark_position_x' => $oShop->watermark_default_position_x,
+					'watermark_position_y' => $oShop->watermark_default_position_y,
+					'place_watermark_checkbox_checked' => $oShop->watermark_default_use_large_image,
+					'delete_onclick' => "$.adminLoad({path: '{$sFormPath}', additionalParams: 'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1', action: 'deleteLargeImage', windowId: '{$windowId}'}); return false",
+					'caption' => Core::_('Shop_Producer.image_large'),
+					'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio
+				)
 			)
-		)
-		->smallImage
-		(
-			array('max_width' => $oShop->image_small_max_width,
-				'max_height' => $oShop->image_small_max_height,
-				'path' => $oSmallFilePath,
-				'create_small_image_from_large_checked' => $this->_object->image_small == '',
-				'place_watermark_checkbox_checked' => $oShop->watermark_default_use_small_image,
-				'delete_onclick' => "$.adminLoad({path: '{$sFormPath}', additionalParams: 'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1', action: 'deleteSmallImage', windowId: '{$windowId}'}); return false",
-				'caption' => Core::_('Shop_Producer.image_small'),
-				'show_params' => TRUE,
-				'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small
-			)
-		);
+			->smallImage
+			(
+				array('max_width' => $oShop->image_small_max_width,
+					'max_height' => $oShop->image_small_max_height,
+					'path' => $oSmallFilePath,
+					'create_small_image_from_large_checked' => $this->_object->image_small == '',
+					'place_watermark_checkbox_checked' => $oShop->watermark_default_use_small_image,
+					'delete_onclick' => "$.adminLoad({path: '{$sFormPath}', additionalParams: 'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1', action: 'deleteSmallImage', windowId: '{$windowId}'}); return false",
+					'caption' => Core::_('Shop_Producer.image_small'),
+					'show_params' => TRUE,
+					'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small
+				)
+			);
 
 		$oMainTab->addAfter($oImageField, $oDescriptionField);
 
@@ -160,7 +145,7 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		// и передан файл
 		&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
 			if (Core_File::isValidExtension($aFileData['name'],
@@ -190,10 +175,8 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 			else
 			{
-				$this->addMessage(Core_Message::get(Core::_('Core.extension_does_not_allow',
-				Core_File::getExtension($aFileData['name'])),
-								'error'
-				)
+				$this->addMessage(
+					Core_Message::get(Core::_('Core.extension_does_not_allow', Core_File::getExtension($aFileData['name'])), 'error')
 				);
 			}
 		}
@@ -203,7 +186,6 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		// Поле файла малого изображения существует
 		!is_null($aSmallFileData)
 		&& $aSmallFileData['size'];
-
 
 		// Задано малое изображение и при этом не задано создание малого изображения
 		// из большого или задано создание малого изображения из большого и

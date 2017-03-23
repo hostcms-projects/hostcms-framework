@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Auth
 {
@@ -422,7 +422,6 @@ class Core_Auth
 			$expiry = 60*60*4;
 			setcookie(session_name(),session_id(), time()+$expiry, "/");
 			*/
-			/****/
 
 			// Сессия может быть уже запущена и при повторном отправке данных POST-ом при авторизации
 			//if (!isset($_SESSION['valid_user']))

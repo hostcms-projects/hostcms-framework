@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Div extends Admin_Form_Entity
 {
@@ -28,8 +28,8 @@ class Skin_Default_Admin_Form_Entity_Div extends Admin_Form_Entity
 	{
 		$aAttr = $this->getAttrsString();
 
-		$aDefaultDivAttr = array('class' => 'item_div');
-		$this->divAttr = Core_Array::union($this->divAttr, $aDefaultDivAttr);
+		//$aDefaultDivAttr = array('class' => 'item_div');
+		//$this->divAttr = Core_Array::union($this->divAttr, $aDefaultDivAttr);
 
 		$aDivAttr = array();
 
@@ -42,14 +42,12 @@ class Skin_Default_Admin_Form_Entity_Div extends Admin_Form_Entity
 			}
 		}
 
-		?><div <?php echo implode(' ', $aDivAttr)?>><?php
+		/*?><div <?php echo implode(' ', $aDivAttr)?>><?php*/
 		?><div <?php echo implode(' ', $aAttr) ?>><?php echo htmlspecialchars($this->value)?><?php
-		//parent::execute();
-		foreach ($this->_children as $oCore_Html_Entity)
-		{
-			$oCore_Html_Entity->execute();
-		}
+
+		$this->executeChildren();
+
 		?></div><?php
-		?></div><?php
+		/*?></div><?php*/
 	}
 }

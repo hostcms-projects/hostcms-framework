@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 {
@@ -29,8 +29,9 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 
 		$allow_filter = FALSE;
 
-		?><table width="100%" cellpadding="2" cellspacing="2" class="admin_table"><?php
-		?><tr class="admin_table_title"><?php
+		?><table width="100%" cellpadding="2" cellspacing="2" class="admin_table table">
+		<thead>
+		<tr class="admin_table_title"><?php
 
 		// Ячейку над групповыми чекбоксами показываем только при наличии действий
 		if ($this->_Admin_Form->show_operations && $this->_showOperations)
@@ -38,16 +39,13 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 			?><td width="25">&nbsp;</td><?php
 		}
 
-		foreach ($aAdmin_Form_Fields as $iAdmin_Form_Field_key => $oAdmin_Form_Field)
+		foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)
 		{
-			// Если был хотя бы один фильтр
+			// There is at least one filter
 			$oAdmin_Form_Field->allow_filter && $allow_filter = TRUE;
 
-			$align = $oAdmin_Form_Field->align
-				? ' align="' . htmlspecialchars($oAdmin_Form_Field->align) . '"'
-				: '';
-
-			$width = htmlspecialchars(trim($oAdmin_Form_Field->width));
+			$width = htmlspecialchars($oAdmin_Form_Field->width);
+			$class = htmlspecialchars($oAdmin_Form_Field->class);
 
 			$Admin_Word_Value = $oAdmin_Form_Field->Admin_Word->getWordByLanguage($this->_Admin_Language->id);
 
@@ -56,51 +54,49 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 				? htmlspecialchars($Admin_Word_Value->name)
 				: '&mdash;';
 
-			// Определяем нужно ли отображать стрелки сортировки
-			ob_start();
-
-			// Не подсвечивать
-			$highlight = FALSE;
-
-			if ($oAdmin_Form_Field->allow_sorting)
+			// Change to Font Awesome
+			if (strlen($oAdmin_Form_Field->ico))
 			{
-				$hrefDown = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 1);
-				$onclickDown = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 1);
+				$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field->ico) . '" title="' . $fieldName .  '" />';
+			}
 
-				$hrefUp = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 0);
-				$onclickUp = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 0);
+			$oAdmin_Form_Field->allow_sorting
+				&& $oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id
+				&& $class .= ' highlight';
 
-				if ($oAdmin_Form_Field->id == $this->_sortingFieldId)
+			?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
+				?><nobr><?php echo $fieldName?> <?php
+				if ($oAdmin_Form_Field->allow_sorting)
 				{
-					// Подсвечивать
-					$highlight = TRUE;
+					$hrefDown = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 1);
+					$onclickDown = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 1);
 
-					if ($this->_sortingDirection == 0)
+					$hrefUp = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 0);
+					$onclickUp = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, NULL, $oAdmin_Form_Field->id, 0);
+
+					if ($oAdmin_Form_Field->id == $this->_sortingFieldId)
 					{
-						?><img src="/admin/images/arrow_up.gif" alt="&uarr" /> <?php
-						?><a href="<?php echo $hrefDown?>" onclick="<?php echo $onclickDown?>"><img src="/admin/images/arrow_down_gray.gif" alt="&darr" /></a><?php
+						if ($this->_sortingDirection == 0)
+						{
+							?><img src="/admin/images/arrow_up.gif" alt="&uarr" /> <?php
+							?><a href="<?php echo $hrefDown?>" onclick="<?php echo $onclickDown?>"><img src="/admin/images/arrow_down_gray.gif" alt="&darr" /></a><?php
+						}
+						else
+						{
+							?><a href="<?php echo $hrefUp?>" onclick="<?php echo $onclickUp?>"><img src="/admin/images/arrow_up_gray.gif" alt="&uarr" /></a> <?php
+							?><img src="/admin/images/arrow_down.gif" alt="&darr" /><?php
+						}
 					}
 					else
 					{
 						?><a href="<?php echo $hrefUp?>" onclick="<?php echo $onclickUp?>"><img src="/admin/images/arrow_up_gray.gif" alt="&uarr" /></a> <?php
-						?><img src="/admin/images/arrow_down.gif" alt="&darr" /><?php
+						?><a href="<?php echo $hrefDown?>" onclick="<?php echo $onclickDown?>"><img src="/admin/images/arrow_down_gray.gif" alt="&darr" /></a><?php
 					}
 				}
-				else
-				{
-					?><a href="<?php echo $hrefUp?>" onclick="<?php echo $onclickUp?>"><img src="/admin/images/arrow_up_gray.gif" alt="&uarr" /></a> <?php
-					?><a href="<?php echo $hrefDown?>" onclick="<?php echo $onclickDown?>"><img src="/admin/images/arrow_down_gray.gif" alt="&darr" /></a><?php
-				}
-			}
-
-			$sort_arrows = ob_get_clean();
-
-			?><td <?php if (!empty($width)) { echo 'width="' . $width . '"'; }?><?php echo $align?><?php echo $highlight ? ' class="hl"' : ''?>><?php
-				?><nobr><?php echo $fieldName?> <?php echo $sort_arrows?></nobr><?php
+				?></nobr><?php
 			?></td><?php
 		}
 
-		// Текущий пользователь
 		$oUser = Core_Entity::factory('User')->getCurrent();
 
 		// Доступные действия для пользователя
@@ -109,37 +105,26 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 		if ($this->_Admin_Form->show_operations && $this->_showOperations
 		|| $allow_filter && $this->_showFilter)
 		{
-			/*if (isset($this->form_params['actions_width']))
-			{
-				$width = Core_Type_Conversion::toStr($this->form_params['actions_width']);
-			}
-			else
-			{*/
 				// min width action column
 				$width = 10;
 
 				foreach ($aAllowed_Admin_Form_Actions as $o_Admin_Form_Action)
 				{
-					// Отображаем действие, только если разрешено.
-					if ($o_Admin_Form_Action->single)
-					{
-						$width += 16;
-					}
+					$o_Admin_Form_Action->single && $width += 15;
 				}
-			//}
 
 			?><td width="<?php echo $width?>">&nbsp;</td><?php
 		}
-		?></tr><?php
-		?><tr class="admin_table_filter"><?php
+		?></tr>
+		<tr class="admin_table_filter"><?php
 		// Чекбокс "Выбрать все" показываем только при наличии действий
 		if ($this->_Admin_Form->show_operations && $this->_showOperations)
 		{
 			?><td align="center" width="25"><input type="checkbox" name="admin_forms_all_check" id="id_admin_forms_all_check" onclick="$('#<?php echo $windowId?>').highlightAllRows(this.checked)" /></td><?php
 		}
 
-		// Фильтр.
-		foreach ($aAdmin_Form_Fields as $iAdmin_Form_Field_key => $oAdmin_Form_Field)
+		// Filter
+		foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)
 		{
 			// Перекрытие параметров для данного поля
 			foreach ($this->_datasets as $datasetKey => $oAdmin_Form_Dataset)
@@ -147,138 +132,138 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 				$oAdmin_Form_Field_Changed = $this->_changeField($oAdmin_Form_Dataset, $oAdmin_Form_Field);
 			}
 
-			$width = htmlspecialchars(trim($oAdmin_Form_Field->width));
+			$width = htmlspecialchars($oAdmin_Form_Field->width);
+			$class = htmlspecialchars($oAdmin_Form_Field->class);
 
 			// Подсвечивать
-			$highlight = $oAdmin_Form_Field->allow_sorting
-				? ($oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id)
-				: FALSE;
+			$oAdmin_Form_Field->allow_sorting
+				&& $oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id
+				&& $class .= ' highlight';
 
-			?><td <?php echo !empty($width) ? 'width="'.$width.'"' : ''?><?php echo $highlight ? ' class="hl"' : ''?>><?php
+			?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
+			if ($oAdmin_Form_Field->allow_filter)
+			{
+				$value = trim(Core_Array::get($this->request, "admin_form_filter_{$oAdmin_Form_Field->id}"));
 
-				if ($oAdmin_Form_Field->allow_filter)
+				// Функция обратного вызова для фильтра
+				if (isset($this->_filters[$oAdmin_Form_Field->name]))
 				{
-					$value = trim(Core_Array::get($this->request, "admin_form_filter_{$oAdmin_Form_Field->id}"));
-
-					// Функция обратного вызова для фильтра
-					if (isset($this->_filters[$oAdmin_Form_Field->name]))
+					switch ($oAdmin_Form_Field->type)
 					{
-						switch ($oAdmin_Form_Field->type)
-						{
-							case 1: // Строка
-							case 2: // Поле ввода
-							case 4: // Ссылка
-							case 10: // Функция обратного вызова
-							case 3: // Checkbox.
-							case 8: // Выпадающий список
-								echo call_user_func($this->_filters[$oAdmin_Form_Field->name], $value, $oAdmin_Form_Field);
-							break;
+						case 1: // Строка
+						case 2: // Поле ввода
+						case 4: // Ссылка
+						case 10: // Функция обратного вызова
+						case 3: // Checkbox.
+						case 8: // Выпадающий список
+							echo call_user_func($this->_filters[$oAdmin_Form_Field->name], $value, $oAdmin_Form_Field);
+						break;
 
-							case 5: // Дата-время.
-							case 6: // Дата.
-								$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
-								$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
+						case 5: // Дата-время.
+						case 6: // Дата.
+							$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
+							$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
 
-								echo call_user_func($this->_filters[$oAdmin_Form_Field->name], $date_from, $date_to, $oAdmin_Form_Field);
-							break;
-						}
-					}
-					else
-					{
-						$style = !empty($width)
-							? "width: {$width};"
-							: "width: 97%;";
-
-						switch ($oAdmin_Form_Field->type)
-						{
-							case 1: // Строка
-							case 2: // Поле ввода
-							case 4: // Ссылка
-							case 10: // Функция обратного вызова
-								$value = htmlspecialchars($value);
-								?><input type="text" name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $value?>" style="<?php echo $style?>" /><?php
-							break;
-
-							case 3: // Checkbox.
-								?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>">
-									<option value="0" <?php echo $value == 0 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
-									<option value="1" <?php echo $value == 1 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected'))?></option>
-									<option value="2" <?php echo $value == 2 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_not_selected'))?></option>
-								</select><?php
-							break;
-
-							case 5: // Дата-время.
-								$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
-								$date_from = htmlspecialchars($date_from);
-
-								$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
-								$date_to = htmlspecialchars($date_to);
-
-								?><input type="text" name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="17" class="calendar_field" />
-								<div><input type="text" name="admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_to?>" size="17" class="calendar_field" /></div>
-								<script type="text/javascript">
-								(function($) {
-									$("#id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true, timeFormat: 'hh:mm:ss'});
-									$("#id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true, timeFormat: 'hh:mm:ss'});
-								})(jQuery);
-								</script><?php
-							break;
-
-							case 6: // Дата.
-								$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
-								$date_from = htmlspecialchars($date_from);
-
-								$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
-								$date_to = htmlspecialchars($date_to);
-
-								?><input type="text" name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="8" class="calendar_field" />
-								<div><input type="text" name="admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_to?>" size="8" class="calendar_field" /></div>
-								<script type="text/javascript">
-								(function($) {
-									$("#id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>").datepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true});
-									$("#id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>").datepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true});
-								})(jQuery);
-								</script>
-								<?php
-							break;
-
-							case 8: // Выпадающий список.
-
-							?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" style="<?php echo $style?>">
-							<option value="HOST_CMS_ALL" <?php echo $value == 'HOST_CMS_ALL' ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
-							<?php
-							$str_array = explode("\n", $oAdmin_Form_Field_Changed->list);
-							$value_array = array();
-
-							foreach ($str_array as $str_value)
-							{
-								// Каждую строку разделяем по равно
-								$str_explode = explode('=', $str_value);
-
-								if ($str_explode[0] != 0 && count($str_explode) > 1)
-								{
-									// сохраняем в массив варинаты значений и ссылки для них
-									$value_array[intval(trim($str_explode[0]))] = trim($str_explode[1]);
-
-									?><option value="<?php echo htmlspecialchars($str_explode[0])?>" <?php echo $value == $str_explode[0] ? "selected" : ''?>><?php echo htmlspecialchars(trim($str_explode[1]))?></option><?php
-								}
-							}
-							?>
-							</select>
-							<?php
-							break;
-
-							default:
-							?><div style="color: #CEC3A3; text-align: center">&mdash;</div><?php
-							break;
-						}
+							echo call_user_func($this->_filters[$oAdmin_Form_Field->name], $date_from, $date_to, $oAdmin_Form_Field);
+						break;
 					}
 				}
 				else
 				{
-					// Фильтр не разрешен.
-					?><div style="color: #CEC3A3; text-align: center">&mdash;</div><?php
+					$style = /*!empty($width)
+						? "width: {$width};"
+						: */"width: 97%;";
+
+					switch ($oAdmin_Form_Field->type)
+					{
+						case 1: // Строка
+						case 2: // Поле ввода
+						case 4: // Ссылка
+						case 10: // Функция обратного вызова
+							$value = htmlspecialchars($value);
+							?><input type="text" name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $value?>" style="<?php echo $style?>" class="form-control input-sm" /><?php
+						break;
+
+						case 3: // Checkbox.
+							?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" class="form-control">
+								<option value="0" <?php echo $value == 0 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
+								<option value="1" <?php echo $value == 1 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected'))?></option>
+								<option value="2" <?php echo $value == 2 ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_not_selected'))?></option>
+							</select><?php
+						break;
+
+						case 5: // Дата-время.
+							$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
+							$date_from = htmlspecialchars($date_from);
+
+							$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
+							$date_to = htmlspecialchars($date_to);
+
+							?><input name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="17"  class="form-control input-sm calendar_field" type="text" />
+							<div><input name="admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_to?>" size="17" class="form-control input-sm calendar_field" type="text" /></div>
+							<script type="text/javascript">
+							(function($) {
+								$("#id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true, timeFormat: 'hh:mm:ss'});
+								$("#id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true, timeFormat: 'hh:mm:ss'});
+							})(jQuery);
+							</script><?php
+						break;
+
+						case 6: // Дата.
+							$date_from = Core_Array::get($this->request, "admin_form_filter_from_{$oAdmin_Form_Field->id}", NULL);
+							$date_from = htmlspecialchars($date_from);
+
+							$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
+							$date_to = htmlspecialchars($date_to);
+
+							?><input type="text" name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="8" class="form-control input-sm calendar_field" />
+							<div><input type="text" name="admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_to?>" size="8" class="form-control input-sm calendar_field" /></div>
+							<script type="text/javascript">
+							(function($) {
+								$("#id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true});
+								$("#id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>").datetimepicker({showOtherMonths: true, selectOtherMonths: true, changeMonth: true, changeYear: true});
+							})(jQuery);
+							</script>
+							<?php
+						break;
+
+						case 8: // Выпадающий список.
+
+						?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" style="<?php echo $style?>">
+						<option value="HOST_CMS_ALL" <?php echo $value == 'HOST_CMS_ALL' ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
+						<?php
+						$str_array = explode("\n", $oAdmin_Form_Field_Changed->list);
+						$value_array = array();
+
+						foreach ($str_array as $str_value)
+						{
+							// Каждую строку разделяем по равно
+							$str_explode = explode('=', $str_value);
+
+							if ($str_explode[0] != 0 && count($str_explode) > 1)
+							{
+								// сохраняем в массив варинаты значений и ссылки для них
+								$value_array[intval(trim($str_explode[0]))] = trim($str_explode[1]);
+
+								?><option value="<?php echo htmlspecialchars($str_explode[0])?>" <?php echo $value == $str_explode[0] ? "selected" : ''?>><?php echo htmlspecialchars(trim($str_explode[1]))?></option><?php
+							}
+						}
+						?>
+						</select>
+						<?php
+						break;
+
+						default:
+						?><div style="color: #CEC3A3; text-align: center">&mdash;</div><?php
+						break;
+					}
 				}
+			}
+			else
+			{
+				// Фильтр не разрешен.
+				?><div style="color: #CEC3A3; text-align: center">&mdash;</div><?php
+			}
 			?></td><?php
 		}
 
@@ -291,7 +276,8 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 				?><input title="<?php echo Core::_('Admin_Form.button_to_filter')?>" type="image" src="/admin/images/filter.gif" id="admin_forms_apply_button" type="button" value="<?php echo Core::_('Admin_Form.button_to_filter')?>" onclick="<?php echo $onclick?>" /> <input title="<?php echo Core::_('Admin_Form.button_to_clear')?>" type="image" src="/admin/images/clear.png" type="button" value="<?php echo Core::_('Admin_Form.button_to_clear')?>" onclick="$.clearFilter('<?php echo $windowId?>')" /><?php
 			?></td><?php
 		}
-		?></tr><?php
+		?></tr>
+		</thead><?php
 
 		$aEntities = array();
 
@@ -315,7 +301,11 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 						$key_field_value = $oEntity->$key_field_name;
 
 						// Экранируем ' в имени индексного поля, т.к. дальше это значение пойдет в JS
-						$key_field_value = str_replace("'", "\'", $key_field_value);
+						$key_field_value = str_replace(
+							array("'", '%'),
+							array("\'", '\\%'),
+							$key_field_value
+						);
 					}
 					catch (Exception $e)
 					{
@@ -323,70 +313,30 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 						$key_field_value = NULL;
 					}
 
-					?><tr id="row_<?php echo $datasetKey?>_<?php echo $key_field_value?>">
+					?><tr id="row_<?php echo htmlspecialchars($datasetKey)?>_<?php echo htmlspecialchars($key_field_value)?>">
 						<?php
 						// Чекбокс "Для элемента" показываем только при наличии действий
 						if ($this->_Admin_Form->show_operations && $this->_showOperations)
 						{
 							?><td align="center" width="25">
-								<input type="checkbox" id="check_<?php echo $datasetKey?>_<?php echo $key_field_value?>" onclick="$('#<?php echo $windowId?>').setTopCheckbox(); $('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" /><?php
+								<input type="checkbox" id="check_<?php echo htmlspecialchars($datasetKey)?>_<?php echo htmlspecialchars($key_field_value)?>" onclick="$('#<?php echo $windowId?>').setTopCheckbox(); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $this->jQueryEscape(Core_Str::escapeJavascriptVariable($datasetKey))?>_<?php echo $this->jQueryEscape(Core_Str::escapeJavascriptVariable($key_field_value))?>').toggleHighlight()" /><?php
 							?></td><?php
 						}
 
-						foreach ($aAdmin_Form_Fields AS $iAdmin_Form_Field_key => $oAdmin_Form_Field)
+						foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)
 						{
 							// Перекрытие параметров для данного поля
 							$oAdmin_Form_Field_Changed = $this->_changeField($oAdmin_Form_Dataset, $oAdmin_Form_Field);
 
-							/*
-							// Проверяем, установлено ли пользователем перекрытие параметров
-							// для данного поля.
-							if (isset($this->form_params['field_params'][$datasetKey][$field_value['admin_forms_field_name']]))
-							{
-								// Пользователь перекрыл параметры для данного поля.
-								$field_value = array_merge($field_value, $this->form_params['field_params'][$datasetKey][$field_value['admin_forms_field_name']]);
-							}
-							elseif (isset($this->form_params['field_params'][$datasetKey][$oAdmin_Form_Field_Changed->id]))
-							{
-								// Проверка перекрытых параметров по идентификатору.
-								$field_value = array_merge($field_value, $this->form_params['field_params'][$datasetKey][$oAdmin_Form_Field_Changed->id]);
-							}
-							*/
 
-							// Параметры поля.
-							$width_value = htmlspecialchars(trim($oAdmin_Form_Field_Changed->width));
+							$width = htmlspecialchars(trim($oAdmin_Form_Field_Changed->width));
+							$class = htmlspecialchars($oAdmin_Form_Field_Changed->class);
 
-							$width = !empty($width_value)
-								? 'width="'.$width_value.'"'
-								: '';
+							$oAdmin_Form_Field->allow_sorting
+								&& $oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id
+								&& $class .= ' highlight';
 
-							$style = htmlspecialchars(trim($oAdmin_Form_Field_Changed->style));
-							$style = empty($style)
-								? ''
-								: 'style="'.$style.'"';
-
-							$align = htmlspecialchars(trim($oAdmin_Form_Field_Changed->align));
-
-							if (!empty($align))
-							{
-								$align = 'align="'.$align.'"';
-							}
-
-							$attrib = trim($oAdmin_Form_Field_Changed->attributes);
-
-							// Не подсвечивать
-							$highlight = false;
-
-							if ($oAdmin_Form_Field_Changed->allow_sorting)
-							{
-								if ($oAdmin_Form_Field_Changed->id == $this->_sortingAdmin_Form_Field->id)
-								{
-									// Подсвечивать
-									$highlight = TRUE;
-								}
-							}
-
-							?><td <?php echo $width?> <?php echo $style?> <?php echo $align?> <?php echo $attrib?><?php echo $highlight ? ' class="hl"' : ''?>><?php
+							?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
 
 							$fieldName = $oAdmin_Form_Field_Changed->name;
 
@@ -419,7 +369,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 									// Выполним функцию обратного вызова
 									echo $oEntity->$methodName();
 								}
-								
+
 								// Отображения элементов полей, в зависимости от их типа.
 								switch ($oAdmin_Form_Field_Changed->type)
 								{
@@ -435,10 +385,10 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										?></div></div><?php
 									break;
 									case 2: // Поле ввода.
-										?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>" <?php echo $style?> <?php echo ''/*$size*/?> onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" /><?php
+										?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>"  onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" class="form-control input-xs" /><?php
 									break;
 									case 3: // Checkbox.
-										?><input type="checkbox" name="<?php echo $element_name?>" id="<?php echo $element_name?>" <?php echo intval($value) ? 'checked="checked"' : ''?> onclick="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();" value="1" /><?php
+										?><input type="checkbox" name="<?php echo $element_name?>" id="<?php echo $element_name?>" <?php echo intval($value) ? 'checked="checked"' : ''?> onclick="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();" value="1" /><?php
 									break;
 									case 4: // Ссылка.
 										$link = $oAdmin_Form_Field_Changed->link;
@@ -448,7 +398,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										$link_text = $this->applyFormat($value, $oAdmin_Form_Field_Changed->format);
 
 										$link = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $link);
-										$onclick = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $onclick);
+										$onclick = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $onclick, 'onclick');
 
 										// Нельзя применять, т.к. 0 является пустотой if (empty($link_text))
 										if (mb_strlen($link_text) != 0)
@@ -479,7 +429,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										$onclick = $oAdmin_Form_Field_Changed->onclick;
 
 										$link = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $link);
-										$onclick = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $onclick);
+										$onclick = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $onclick, 'onclick');
 
 										// ALT-ы к картинкам
 										$alt_array = array();
@@ -585,7 +535,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										// Отображаем картинку ссылкой
 										if (!empty($link) && !is_null($src))
 										{
-											?><a href="<?php echo $link?>" onclick="$('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();<?php echo $onclick?>"><img src="<?php echo htmlspecialchars($src)?>" alt="<?php echo Core_Type_Conversion::toStr($alt_array[$value])?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>"></a><?php
+											?><a href="<?php echo $link?>" onclick="$('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();<?php echo $onclick?>"><img src="<?php echo htmlspecialchars($src)?>" alt="<?php echo Core_Type_Conversion::toStr($alt_array[$value])?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>"></a><?php
 										}
 										// Отображаем картинку без ссылки
 										elseif (!is_null($src))
@@ -595,7 +545,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										/*elseif (!empty($link) && !isset($value_array[$value]))
 										{
 											// Картинки для такого значения не найдено, но есть ссылка
-											?><a href="<?php echo $link?>" onclick="$('#' + getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();<?php echo $onclick?> ">&mdash;</a><?php
+											?><a href="<?php echo $link?>" onclick="$('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();<?php echo $onclick?> ">&mdash;</a><?php
 										}*/
 										else
 										{
@@ -614,7 +564,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 
 										$value_array = array();
 
-										?><select name="<?php echo $element_name?>" id="<?php echo $element_name?>" onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>');" <?php echo $style?>><?php
+										?><select name="<?php echo $element_name?>" id="<?php echo $element_name?>" onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>');"><?php
 
 										foreach ($str_array as $str_value)
 										{
@@ -669,7 +619,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										?>&nbsp;<?php
 									break;
 								}
-								
+
 								// Функция, выполняемая после отображением поля
 								$methodName = 'suffix' . ucfirst($fieldName);
 								if (method_exists($oEntity, $methodName))
@@ -724,8 +674,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 									$name = '';
 								}
 
-								$href = $this->getAdminActionLoadHref($this->getPath(), $o_Admin_Form_Action->name, NULL,
-										$datasetKey, $key_field_value);
+								$href = $this->getAdminActionLoadHref($this->getPath(), $o_Admin_Form_Action->name, NULL, $datasetKey, $key_field_value);
 
 								$onclick = $this->getAdminActionLoadAjax($this->getPath(), $o_Admin_Form_Action->name, NULL, $datasetKey, $key_field_value);
 
@@ -754,7 +703,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show action panel in administration center
 	 * @return self
 	 */
-	protected function _showBottomActions()
+	protected function _bottomActions()
 	{
 		// Строка с действиями
 		if ($this->_showBottomActions)
@@ -829,34 +778,206 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 			</div>
 			</td>
 			<td width="110" align="center">
-				<div class="admin_form_action">
-				<?php
-				// Дописываем параметры фильтра
-				/*if (count($_REQUEST) > 0)
-				{
-					foreach ($_REQUEST as $rkey => $rvalue)
-					{
-						// Передаем параметры фильтра
-						if (mb_strpos($rkey, 'admin_form_filter_') === 0)
-						{
-							$this->AAdditionalParams .= "&{$rkey}=".urlencode($rvalue);
-						}
-					}
-				}
-				$action_href = '';
-				?>
-				<nobr>
-				<a href="<?php echo $action_href?>" target="_blank"><img src="/admin/images/export.gif" title="<?php echo Core::_('Admin_Form.export_csv')?>"></a>
-				<a href="<?php echo $action_href?>" target="_blank"><?php echo Core::_('Admin_Form.export_csv')?></a>
-				</nobr><?php */
-				?></div>
+				<div class="admin_form_action"></div>
 			</td>
 			<td width="60" align="center"><?php
-				$this->_onPageSelector()
+				$this->_pageSelector()
 			?></td>
 		</tr>
 		</table>
 		<?php
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Show items count selector
+	 */
+	protected function _pageSelector()
+	{
+		$sCurrentValue = $this->_limit;
+		$windowId = Core_Str::escapeJavascriptVariable($this->getWindowId());
+		$additionalParams = Core_Str::escapeJavascriptVariable(
+			str_replace(array('"'), array('&quot;'), $this->_additionalParams)
+		);
+ 		$path = Core_Str::escapeJavascriptVariable($this->getPath());
+
+		$oCore_Html_Entity_Select = Core::factory('Core_Html_Entity_Select')
+			->name('admin_forms_on_page')
+			->id('id_on_page')
+			->onchange("$.adminLoad({path: '{$path}', additionalParams: '{$additionalParams}', limit: this.options[this.selectedIndex].value, windowId : '{$windowId}'}); return false")
+			->options($this->_onPage)
+			->value($sCurrentValue)
+			->execute();
+	}
+
+	/**
+	 * Показ строки ссылок
+	 * @return self
+	 */
+	protected function _pageNavigation()
+	{
+		$total_count = $this->getTotalCount();
+		$total_page = $total_count / $this->_limit;
+
+		// Округляем в большую сторону
+		if ($total_count % $this->_limit != 0)
+		{
+			$total_page = intval($total_page) + 1;
+		}
+
+		$this->_current > $total_page && $this->_current = $total_page;
+
+		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
+			->style('float: left; text-align: center; margin-top: 10px');
+
+		// Формируем скрытые ссылки навигации для перехода по Ctrl + стрелка
+		if ($this->_current < $total_page)
+		{
+			// Ссылка на следующую страницу
+			$page = $this->_current + 1 ? $this->_current + 1 : 1;
+			$oCore_Html_Entity_Div->add(
+				Core::factory('Core_Html_Entity_A')
+					->onclick($this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $page))
+					->id('id_next')
+			);
+		}
+
+		if ($this->_current > 1)
+		{
+			// Ссылка на предыдущую страницу
+			$page = $this->_current - 1 ? $this->_current - 1 : 1;
+			$oCore_Html_Entity_Div->add(
+				Core::factory('Core_Html_Entity_A')
+					->onclick($this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $page))
+					->id('id_prev')
+			);
+		}
+
+		// Отображаем строку ссылок, если общее число страниц больше 1.
+		if ($total_page > 1)
+		{
+			// Определяем номер ссылки, с которой начинается строка ссылок.
+			$link_num_begin = ($this->_current - $this->_pageNavigationDelta < 1)
+				? 1
+				: $this->_current - $this->_pageNavigationDelta;
+
+			// Определяем номер ссылки, которой заканчивается строка ссылок.
+			$link_num_end = $this->_current + $this->_pageNavigationDelta;
+			$link_num_end > $total_page && $link_num_end = $total_page;
+
+			// Определяем число ссылок выводимых на страницу.
+			$count_link = $link_num_end - $link_num_begin + 1;
+
+			if ($this->_current == 1)
+			{
+				$oCore_Html_Entity_Div->add(
+					Core::factory('Core_Html_Entity_Span')
+						->class('current')
+						->value($link_num_begin)
+				);
+			}
+			else
+			{
+				$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, 1);
+				$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, 1);
+
+				$oCore_Html_Entity_Div->add(
+					Core::factory('Core_Html_Entity_A')
+						->href($href)
+						->onclick($onclick)
+						->class('page_link')
+						->value(1)
+				);
+
+				// Выведем … со ссылкой на 2-ю страницу, если показываем с 3-й
+				if ($link_num_begin > 1)
+				{
+					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, 2);
+					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, 2);
+
+					$oCore_Html_Entity_Div->add(
+						Core::factory('Core_Html_Entity_A')
+							->href($href)
+							->onclick($onclick)
+							->class('page_link')
+							->value('…')
+					);
+				}
+			}
+
+			// Страница не является первой и не является последней.
+			for ($i = 1; $i < $count_link - 1; $i++)
+			{
+				$link_number = $link_num_begin + $i;
+
+				if ($link_number == $this->_current)
+				{
+					// Страница является текущей
+					$oCore_Html_Entity_Div->add(
+						Core::factory('Core_Html_Entity_Span')
+							->class('current')
+							->value($link_number)
+					);
+				}
+				else
+				{
+					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $link_number);
+					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $link_number);
+					$oCore_Html_Entity_Div->add(
+						Core::factory('Core_Html_Entity_A')
+							->href($href)
+							->onclick($onclick)
+							->class('page_link')
+							->value($link_number)
+					);
+				}
+			}
+
+			// Если последняя страница является текущей
+			if ($this->_current == $total_page)
+			{
+				$oCore_Html_Entity_Div->add(
+					Core::factory('Core_Html_Entity_Span')
+							->class('current')
+							->value($total_page)
+				);
+			}
+			else
+			{
+				// Выведем … со ссылкой на предпоследнюю страницу
+				if ($link_num_end < $total_page)
+				{
+					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
+					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
+
+					$oCore_Html_Entity_Div->add(
+						Core::factory('Core_Html_Entity_A')
+							->href($href)
+							->onclick($onclick)
+							->class('page_link')
+							->value('…')
+					);
+				}
+
+				$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $total_page);
+				$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $total_page);
+
+				// Последняя страница не является текущей
+				$oCore_Html_Entity_Div->add(
+					Core::factory('Core_Html_Entity_A')
+						->href($href)
+						->onclick($onclick)
+						->class('page_link')
+						->value($total_page)
+				);
+			}
+
+			$oCore_Html_Entity_Div->execute();
+			Core::factory('Core_Html_Entity_Div')
+				->style('clear: both')
+				->execute();
 		}
 
 		return $this;

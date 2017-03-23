@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -21,17 +21,71 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 	{
 		$modelName = $object->getModelName();
 
-		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
-		$oSeparatorField = Admin_Form_Entity::factory('Separator');
-
 		$informationsystem_id = Core_Array::getGet('informationsystem_id');
 		$informationsystem_group_id = Core_Array::getGet('informationsystem_group_id');
 
+		switch ($modelName)
+		{
+			case 'informationsystem_item':
+				$this
+					->addSkipColumn('shortcut_id')
+					->addSkipColumn('image_large')
+					->addSkipColumn('image_small')
+					->addSkipColumn('image_large_width')
+					->addSkipColumn('image_large_height')
+					->addSkipColumn('image_small_width')
+					->addSkipColumn('image_small_height');
+
+				if (!$object->id)
+				{
+					$object->informationsystem_id = $informationsystem_id;
+					$object->informationsystem_group_id = $informationsystem_group_id;
+				}
+			break;
+			case 'informationsystem_group':
+				$this
+					->addSkipColumn('image_large')
+					->addSkipColumn('image_small')
+					->addSkipColumn('top_parent_id')
+					->addSkipColumn('subgroups_count')
+					->addSkipColumn('subgroups_total_count')
+					->addSkipColumn('items_count')
+					->addSkipColumn('items_total_count')
+					->addSkipColumn('sns_type_id');
+
+				// Значения директории для добавляемого объекта
+				if (!$object->id)
+				{
+					$object->informationsystem_id = $informationsystem_id;
+					$object->parent_id = $informationsystem_group_id;
+				}
+			break;
+		}
+
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
+
+		$object = $this->_object;
+
+		$modelName = $object->getModelName();
+
 		$oInformationsystem = is_null($object->id)
-			? Core_Entity::factory('Informationsystem', $informationsystem_id)
+			? Core_Entity::factory('Informationsystem', $object->informationsystem_id)
 			: $object->Informationsystem;
 
-		switch($modelName)
+		$oMainTab = $this->getTab('main');
+		$oAdditionalTab = $this->getTab('additional');
+
+		switch ($modelName)
 		{
 			case 'informationsystem_item':
 
@@ -44,31 +98,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					? Core::_('Informationsystem_Item.information_items_edit_form_title')
 					: Core::_('Informationsystem_Item.information_items_add_form_title');
 
-				if (is_null($object->id))
-				{
-					//$object->informationsystem_id = $oInformationsystem->id;
-
-					$object->informationsystem_group_id = $informationsystem_group_id;
-					$object->informationsystem_id = $oInformationsystem->id;
-				}
-
-				$this
-					->addSkipColumn('shortcut_id')
-					->addSkipColumn('image_large')
-					->addSkipColumn('image_small')
-					->addSkipColumn('image_large_width')
-					->addSkipColumn('image_large_height')
-					->addSkipColumn('image_small_width')
-					->addSkipColumn('image_small_height');
-
-				parent::setObject($object);
-
 				$template_id = $this->_object->Informationsystem->Structure->template_id
 					? $this->_object->Informationsystem->Structure->template_id
 					: 0;
-
-				$oMainTab = $this->getTab('main');
-				$oAdditionalTab = $this->getTab('additional');
 
 				$oPropertyTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_4'))
@@ -76,9 +108,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$this->addTabBefore($oPropertyTab, $oAdditionalTab);
 
-				// ---- Дополнительные свойства
-				$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-				$oProperty_Controller_Tab
+				// Properties
+				Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 					->setObject($this->_object)
 					->setDatasetId($this->getDatasetId())
 					->linkedObject(Core_Entity::factory('Informationsystem_Item_Property_List', $oInformationsystem->id))
@@ -86,70 +117,86 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->template_id($template_id)
 					->fillTab();
 
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oAdditionalTab->delete($this->getField('informationsystem_group_id'));
+
+				$oMainTab->delete($this->getField('name'));
+
+				$oName = Admin_Form_Entity::factory('Input')
+					->name('name')
+					->value($this->_object->name)
+					->caption(Core::_('Informationsystem_Item.name'))
+					->class('form-control input-lg');
+
+				$oMainRow1->add($oName);
 
 				$oSelect_Group = Admin_Form_Entity::factory('Select')
 					->name('informationsystem_group_id')
 					->caption(Core::_('Informationsystem_Item.informationsystem_group_id'))
 					->options(
-						array(' … ') + self::fillInformationsystemGroup($informationsystem_id, 0)
+						array(' … ') + self::fillInformationsystemGroup($object->informationsystem_id, 0)
 					)
 					->value($this->_object->informationsystem_group_id)
-					->style('width:300px; float:left')
 					->filter(TRUE);
 
-				$oMainTab->addBefore($oSelect_Group, $this->getField('datetime'));
+				$oMainRow2->add($oSelect_Group);
 
-				$oMainTab->delete($this->getField('name'));
+				$this->getField('datetime')
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+				$this->getField('start_datetime')
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+				$this->getField('end_datetime')
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
 
-				$oName = Admin_Form_Entity::factory('Input');
+				$this->_object->start_datetime == '0000-00-00 00:00:00'
+					&& $this->getField('start_datetime')->value('');
 
-				$oName
-					->name('name')
-					->value($this->_object->name)
-					->caption(Core::_('Informationsystem_Item.name'))
-					->class('input-lg');
+				$this->_object->end_datetime == '0000-00-00 00:00:00'
+					&& $this->getField('end_datetime')->value('');
 
-				$oMainTab->addBefore($oName, $oSelect_Group);
+				$oMainTab
+					->move($this->getField('datetime'), $oMainRow3)
+					->move($this->getField('start_datetime'), $oMainRow3)
+					->move($this->getField('end_datetime'), $oMainRow3);
 
-				$this->getField('datetime')->divAttr(array('style' => 'float: left'));
-				$this->getField('start_datetime')->divAttr(array('style' => 'float: left'));
-				$this->getField('end_datetime')->divAttr(array('style' => 'float: left'));
+				$this->getField('active')
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
+				$this->getField('indexing')
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
 
-				if ($this->_object->start_datetime == '0000-00-00 00:00:00')
-				{
-					$this->getField('start_datetime')->value('');
-				}
+				$oMainTab->move($this->getField('active'), $oMainRow4);
+				$oMainTab->move($this->getField('indexing'), $oMainRow4);
 
-				if ($this->_object->end_datetime == '0000-00-00 00:00:00')
-				{
-					$this->getField('end_datetime')->value('');
-				}
-
-				$oMainTab->addAfter($oSeparatorField, $this->getField('end_datetime'));
-
-
-
-				$this->getField('active')->divAttr(array('style' => 'float: left; width: 180px'));
-
-				$oMainTab->moveAfter($this->getField('sorting'), $this->getField('active'));
 				$this->getField('sorting')
-					->style('width: 110px;')
-					->divAttr(array('style' => 'float: left;'));
-
-				$oMainTab->moveAfter($this->getField('ip'), $this->getField('sorting'));
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
 				$this->getField('ip')
-					->style('width: 220px;')
-					->divAttr(array('style' => 'float: left;'));
-
-				$oMainTab->moveAfter($this->getField('showed'), $this->getField('ip'));
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
 				$this->getField('showed')
-					->style('width: 110px;')
-					->divAttr(array('style' => 'float: left;'));
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
 
-				$oAdditionalTab->moveAfter($this->getField('siteuser_id'), $this->getField('showed'), $oMainTab);
-				$this->getField('siteuser_id')
-					->style('width: 110px;');
+				$oMainTab
+					->move($this->getField('sorting'), $oMainRow5)
+					->move($this->getField('ip'), $oMainRow5)
+					->move($this->getField('showed'), $oMainRow5);
+
+				$oAdditionalTab->delete($this->getField('siteuser_id'));
+
+				$oSiteuser = Admin_Form_Entity::factory('Input')
+					->value($this->_object->siteuser_id)
+					->caption(Core::_('Informationsystem_Group.siteuser_id'))
+					->name('siteuser_id')
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+
+				$oMainRow5->add($oSiteuser);
 
 				// Добавляем новое поле типа файл
 				$oImageField = Admin_Form_Entity::factory('File');
@@ -167,7 +214,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oImageField
 					//->caption(Core::_('Informationsystem_Group.image_large'))
-					->style("width: 400px;")
 					->name("image")
 					->id("image")
 					->largeImage(array(
@@ -201,7 +247,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 							'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio
 						)
 					)
-					->smallImage(		array(			// image_small_max_width - значение максимальной ширины малого изображения;
+					->smallImage(array(			// image_small_max_width - значение максимальной ширины малого изображения;
 							'max_width' => $oInformationsystem->image_small_max_width,
 
 							// image_small_max_height - значение максимальной высоты малого изображения;
@@ -231,24 +277,29 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						)
 					);
 
-				$oMainTab
-					->addAfter($oImageField, $this->getField('siteuser_id'))
-					->addAfter($oSeparatorField, $this->getField('siteuser_id')) // separator before img
-					->moveAfter($this->getField('path'), $oImageField)
-					->addAfter($oSeparatorField, $oImageField); // separator after img
+				$oMainRow6->add($oImageField);
 
 				$this->getField('path')
-					//->style('width: 320px')
-					->format(array(
-							'maxlen' => array('value' => 255)
-						)
-					);
+					->format(array('maxlen' => array('value' => 255)));
 
+				$oMainTab->move($this->getField('path'), $oMainRow7);
 
-				$oMainTab->moveAfter($this->getField('indexing'), $this->getField('active'));
+				if (Core::moduleIsActive('maillist'))
+				{
+					$oMaillist_Controller_Edit = new Maillist_Controller_Edit($this->_Admin_Form_Action);
 
-				$oAdditionalTab = $this->getTab('additional');
-				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
+					$oSelect_Maillist = Admin_Form_Entity::factory('Select');
+
+					$oSelect_Maillist->options(array(Core::_('Informationsystem_Item.maillist_default_value'))
+						+ $oMaillist_Controller_Edit->fillMaillist()
+					)
+					->name('maillist_id')
+					->value(0)
+					->caption(Core::_('Informationsystem_Item.maillist'))
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+					$oMainRow8->add($oSelect_Maillist);
+				}
 
 				if (Core::moduleIsActive('siteuser'))
 				{
@@ -261,8 +312,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 
 				// Список групп пользователей
-				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
-				$oSelect_SiteuserGroups
+				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select')
 					->options(
 						array(
 							0 => Core::_('Informationsystem.information_all'),
@@ -272,28 +322,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('siteuser_group_id')
 					->value($this->_object->siteuser_group_id)
 					->caption(Core::_('Informationsystem_Item.siteuser_group_id'))
-					->divAttr(array('style' => 'float: left;'));
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-				$oMainTab
-					->addAfter($oSelect_SiteuserGroups, $this->getField('path'))
-					->addAfter($oSeparatorField, $oSelect_SiteuserGroups);
+				$oMainRow8->add($oSelect_SiteuserGroups);
 
-				if (Core::moduleIsActive('maillist'))
-				{
-					$oMaillist_Controller_Edit = new Maillist_Controller_Edit($this->_Admin_Form_Action);
-
-					$oSelect_Maillist = Admin_Form_Entity::factory('Select');
-
-					$oSelect_Maillist->options(		array(Core::_('Informationsystem_Item.maillist_default_value'))
-						+ $oMaillist_Controller_Edit->fillMaillist()
-					)
-					->name('maillist_id')
-					->value(0)
-					->caption(Core::_('Informationsystem_Item.maillist'));
-
-					$oMainTab->addAfter($oSelect_Maillist, $this->getField('path'));
-					$oSelect_Maillist->divAttr(array('style' => 'float:left;'));
-				}
+				$oAdditionalTab = $this->getTab('additional');
+				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
 				$this->getField('informationsystem_id')->divAttr(array('style' => 'display: none'));
 
@@ -303,11 +337,19 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('Description');
 				$this->addTabAfter($oInformationsystemTabDescription, $oMainTab);
 
+				$oInformationsystemTabDescription
+					->add($oDescriptionRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oDescriptionRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oDescriptionRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oDescriptionRow4 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$this->getField('description')
 					->wysiwyg(TRUE)
+					->rows(7)
 					->template_id($template_id);
 
-				$oMainTab->move($this->getField('description'), $oInformationsystemTabDescription);
+				$oMainTab->move($this->getField('description'), $oDescriptionRow1);
+
 				if (Core::moduleIsActive('typograph'))
 				{
 					$this->getField('description')->value(
@@ -319,30 +361,29 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name("use_typograph_description")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_description'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
-
-					$oInformationsystemTabDescription->addAfter($oUseTypograph, $this->getField('description'));
+						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_description")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
+						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
 
-					$oInformationsystemTabDescription
-						->addAfter($oUseTrailingPunctuation, $oUseTypograph)
-						->addAfter($oSeparatorField, $oUseTrailingPunctuation);
+					$oDescriptionRow2
+						->add($oUseTypograph)
+						->add($oUseTrailingPunctuation);
 				}
 
 				// Text
 				$this->getField('text')
 					->wysiwyg(TRUE)
+					->rows(15)
 					->template_id($template_id);
 
-				$oMainTab->move($this->getField('text'), $oInformationsystemTabDescription);
+				$oMainTab->move($this->getField('text'), $oDescriptionRow3);
+
+				//$oMainTab->move($this->getField('text'), $oInformationsystemTabDescription);
 				if (Core::moduleIsActive('typograph'))
 				{
 					$this->getField('text')->value(
@@ -354,32 +395,36 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name("use_typograph_text")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_for_text'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
-
-					$oInformationsystemTabDescription->addAfter($oUseTypograph, $this->getField('text'));
+						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_text")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation_for_text'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
+						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
 
-					$oInformationsystemTabDescription->addAfter($oUseTrailingPunctuation, $oUseTypograph);
+					$oDescriptionRow4
+						->add($oUseTypograph)
+						->add($oUseTrailingPunctuation);
 				}
 
+				// SEO
 				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_2'))
 					->name('Seo');
 
 				$this->addTabAfter($oInformationsystemTabSeo, $oInformationsystemTabDescription);
 
+				$oInformationsystemTabSeo
+					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oMainTab
-					->move($this->getField('seo_title'), $oInformationsystemTabSeo)
-					->move($this->getField('seo_description'), $oInformationsystemTabSeo)
-					->move($this->getField('seo_keywords'), $oInformationsystemTabSeo);
+					->move($this->getField('seo_title'), $oSeoRow1)
+					->move($this->getField('seo_description'), $oSeoRow2)
+					->move($this->getField('seo_keywords'), $oSeoRow3);
 
 				if (Core::moduleIsActive('tag'))
 				{
@@ -388,22 +433,17 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name('Tags');
 					$this->addTabAfter($oTagsTab, $oInformationsystemTabSeo);
 
-					$html = '<label class="tags_label" for="form-field-tags">Метки (теги)</label>
+					$html = '<label class="tags_label" for="form-field-tags">' . Core::_('Informationsystem_Item.tags') . '</label>
 						<div class="item_div">
-							<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="Введите тэг ..." />
+							<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="' . Core::_('Informationsystem_Item.type_tag') . '" />
 						</div>
 						<script type="text/javascript">
 							jQuery(function($){
 								//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
-								//var tag_input = $(\'#' . $windowId .' #form-field-tags\');
 								var tag_input = $(\'#form-field-tags\');
 								if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
 								{
-									tag_input.tag(
-									  {
-										placeholder:tag_input.attr(\'placeholder\')
-									  }
-									);
+									tag_input.tag( { placeholder:tag_input.attr(\'placeholder\') } );
 								}
 								else {
 									//display a textarea for old IE, because it doesnt support this plugin or another one I tried!
@@ -421,31 +461,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			case 'informationsystem_group':
 			default:
 
-				$this
-					->addSkipColumn('image_large')
-					->addSkipColumn('image_small')
-					->addSkipColumn('top_parent_id')
-					->addSkipColumn('subgroups_count')
-					->addSkipColumn('subgroups_total_count')
-					->addSkipColumn('items_count')
-					->addSkipColumn('items_total_count')
-					->addSkipColumn('sns_type_id');
-
-				// Значения директории для добавляемого объекта
-				if (is_null($object->id))
-				{
-					$object->parent_id = $informationsystem_group_id;
-					$object->informationsystem_id = $oInformationsystem->id;
-				}
-
-				parent::setObject($object);
-
 				$template_id = $this->_object->Informationsystem->Structure->template_id
 					? $this->_object->Informationsystem->Structure->template_id
 					: 0;
-
-				$oMainTab = $this->getTab('main');
-				$oAdditionalTab = $this->getTab('additional');
 
 				$oPropertyTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_properties'))
@@ -453,9 +471,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$this->addTabBefore($oPropertyTab, $oAdditionalTab);
 
-				// ---- Дополнительные свойства
-				$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-				$oProperty_Controller_Tab
+				// Properties
+				Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 					->setObject($this->_object)
 					->setDatasetId($this->getDatasetId())
 					->linkedObject(Core_Entity::factory('Informationsystem_Group_Property_List', $oInformationsystem->id))
@@ -467,20 +484,35 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						? Core::_('Informationsystem_Group.information_groups_edit_form_title')
 						: Core::_('Informationsystem_Group.information_groups_add_form_title');
 
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				// Name
+				$oMainTab
+					->move($this->getField('name'), $oMainRow1);
+
+				// parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
 				$oSelect_Group = Admin_Form_Entity::factory('Select')
-				->name('parent_id')
-				->caption(Core::_('Informationsystem_Group.parent_id'))
-				->options(
-					array(' … ') + self::fillInformationsystemGroup($informationsystem_id, 0, array($this->_object->id))
-				)
-				->value($this->_object->parent_id)
-				->style('width:300px; float:left')
-				//->style('')
-				->filter(TRUE);
+					->name('parent_id')
+					->caption(Core::_('Informationsystem_Group.parent_id'))
+					->options(
+						array(' … ') + self::fillInformationsystemGroup($object->informationsystem_id, 0, array($this->_object->id))
+					)
+					->value($this->_object->parent_id)
+					->filter(TRUE);
 
-				$oMainTab->addAfter($oSelect_Group, $this->getField('name'));
+				$oMainRow2->add($oSelect_Group);
+
+				// Description
+				$oMainTab->move($this->getField('description'), $oMainRow3);
 
 				$this->getField('description')
 					->wysiwyg(TRUE)
@@ -491,10 +523,27 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$this->getField('description')->value(
 						Typograph_Controller::instance()->eraseOpticalAlignment($this->getField('description')->value)
 					);
+
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
+					$oUseTypograph
+						->name("use_typograph_description")
+						->caption(Core::_('Informationsystem_Item.exec_typograph_description'))
+						->value($oInformationsystem->typograph_default_items)
+						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
+					$oUseTrailingPunctuation
+						->name("use_trailing_punctuation_description")
+						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation'))
+						->value($oInformationsystem->typograph_default_items)
+						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+					$oMainRow3
+						->add($oUseTypograph)
+						->add($oUseTrailingPunctuation);
 				}
 
 				// Добавляем новое поле типа файл
-				//$oIcoFileField = Admin_Form_Entity::factory('Input');
 				$oImageField = Admin_Form_Entity::factory('File');
 
 				$oLargeFilePath = is_file($this->_object->getLargeFilePath())
@@ -576,34 +625,21 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						)
 					);
 
-				$oMainTab->addAfter($oImageField, $this->getField('description'));
-				$oMainTab->addAfter($oSeparatorField, $oImageField);
+				$oMainRow4->add($oImageField);
 
-				if (Core::moduleIsActive('typograph'))
-				{
-					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
-					$oUseTypograph
-						->name("use_typograph")
-						->caption(Core::_('Informationsystem_Group.exec_typograph_description'))
-						->value($oInformationsystem->typograph_default_groups)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
+				// Path
+				$this->getField('path')
+					->format(array('maxlen' => array('value' => 255)));
 
-					$oMainTab->addAfter($oUseTypograph, $this->getField('description'));
+				$oMainTab->move($this->getField('path'), $oMainRow5);
 
-					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
-					$oUseTrailingPunctuation
-						->name("use_trailing_punctuation")
-						->caption(Core::_('Informationsystem_Group.use_trailing_punctuation'))
-						->value($oInformationsystem->typograph_default_groups)
-						->divAttr(array('style' => 'float: left;'));
-						//->style('width: 320px;');
+				// Sorting
+				$this->getField('sorting')
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-					$oMainTab->addAfter($oUseTrailingPunctuation, $oUseTypograph);
+				$oMainTab->move($this->getField('sorting'), $oMainRow6);
 
-					$oMainTab->addAfter($oSeparatorField, $oUseTrailingPunctuation);
-				}
-
+				// Siteuser
 				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
 				if (Core::moduleIsActive('siteuser'))
@@ -617,64 +653,45 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 
 				// Список групп пользователей
-				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
-				$oSelect_SiteuserGroups
-					->options(		array(			0 => Core::_('Informationsystem.information_all'),
-							-1 => Core::_('Informationsystem_Group.information_parent')
+				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select')
+					->options(array(
+						0 => Core::_('Informationsystem.information_all'),
+						-1 => Core::_('Informationsystem_Group.information_parent')
 						) + $aSiteuser_Groups
 					)
 					->name('siteuser_group_id')
 					->value($this->_object->siteuser_group_id)
 					->caption(Core::_('Informationsystem_Group.siteuser_group_id'))
-					->divAttr(array('style' => 'float: left;'));
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-				$oMainTab->addBefore($oSelect_SiteuserGroups, $this->getField('sorting'));
+				$oMainRow6->add($oSelect_SiteuserGroups);
 
-				$this->getField('sorting')
-					->style("width: 110px;")
-					->divAttr(array('style' => 'float: left;'));
+				// Active
+				$this->getField('active')
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'));
+				$this->getField('indexing')
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'));
 
-				$oAdditionalTab->delete($this->getField('siteuser_id'));
+				$oMainTab->move($this->getField('active'), $oMainRow7);
+				$oMainTab->move($this->getField('indexing'), $oMainRow7);
 
-				$oSiteuser = Admin_Form_Entity::factory('Input');
-
-				$oSiteuser
-					->value($this->_object->siteuser_id)
-					->caption(Core::_('Informationsystem_Group.siteuser_id'))
-					->name('siteuser_id')
-					->style("width: 110px;");
-
-				$oMainTab->addAfter($oSiteuser, $this->getField('sorting'));
-
-				$this->getField('path')
-					->style('width: 320px')
-					->format(array(
-							'maxlen' => array('value' => 255)
-						)
-					);
-
-				$oMainTab->delete($this->getField('active'));
-				$oSelect_SiteuserGroups = Admin_Form_Entity::factory('Select');
-
-				$oActive_Group = Admin_Form_Entity::factory('Checkbox');
-				$oActive_Group
-					->name('active')
-					->value($this->_object->active)
-					->caption(Core::_('Informationsystem_Group.active'))
-					->divAttr(array('style' => 'float: left;'));
-
-				$oMainTab->addAfter($oActive_Group, $this->getField('path'));
-
+				// SEO
 				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_seo'))
 					->name('Seo');
 
 				$this->addTabAfter($oInformationsystemTabSeo, $oMainTab);
 
+				$oInformationsystemTabSeo
+					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oMainTab
-					->move($this->getField('seo_title'), $oInformationsystemTabSeo)
-					->move($this->getField('seo_description'), $oInformationsystemTabSeo)
-					->move($this->getField('seo_keywords'), $oInformationsystemTabSeo);
+					->move($this->getField('seo_title'), $oSeoRow1)
+					->move($this->getField('seo_description'), $oSeoRow2)
+					->move($this->getField('seo_keywords'), $oSeoRow3);
+
 			break;
 		}
 
@@ -833,7 +850,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			}
 		}
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'informationsystem_item':
 				// Проверяем подключен ли модуль типографики.
@@ -865,14 +882,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$this->_object->end_datetime = '0000-00-00 00:00:00';
 				}
 
-				// ---- Дополнительные свойства
-				$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-				$oProperty_Controller_Tab
+				// Properties
+				Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 					->setObject($this->_object)
 					->linkedObject(Core_Entity::factory('Informationsystem_Item_Property_List', $oInformationsystem->id))
-					->applyObjectProperty()
-					;
-				// ----
+					->applyObjectProperty();
 
 				break;
 			case 'informationsystem_group':
@@ -885,20 +899,18 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					{
 						$this->_object->description = Typograph_Controller::instance()->process($this->_object->description, Core_Array::getPost('use_trailing_punctuation', 0));
 					}
-
 				}
 
-				// ---- Дополнительные свойства
-				$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-				$oProperty_Controller_Tab
+				// Properties
+				Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 					->setObject($this->_object)
 					->linkedObject(Core_Entity::factory('Informationsystem_Group_Property_List', $oInformationsystem->id))
 					->applyObjectProperty();
-				// ----
 		}
 
+		// Clear tagged cache
 		$this->_object->clearCache();
-		
+
 		$param = array();
 
 		$large_image = '';
@@ -914,7 +926,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			// и передан файл
 			&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
 			if (Core_File::isValidExtension($aFileData['name'], $aCore_Config['availableExtension']))
@@ -1166,7 +1178,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 	 */
 	public function execute($operation = NULL)
 	{
-		if (!is_null($operation))
+		if (!is_null($operation) && $operation != '')
 		{
 			//$id = Core_Array::getPost('id');
 			$informationsystem_id = Core_Array::getPost('informationsystem_id');
@@ -1178,11 +1190,13 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$this->_object->path = Core_Array::getPost('path');
 				$this->_object->makePath();
 				$path = $this->_object->path;
+				
+				$this->addSkipColumn('path');
 			}
 
 			$modelName = $this->_object->getModelName();
 
-			switch($modelName)
+			switch ($modelName)
 			{
 				case 'informationsystem_item':
 					$informationsystem_group_id = Core_Array::getPost('informationsystem_group_id');

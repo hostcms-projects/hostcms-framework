@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -23,7 +23,7 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 
 		$oShop = $oShopItem->Shop;
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_id = $oShop->id;
 		}
@@ -34,10 +34,15 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			->caption(Core::_('Shop_Item.tab_description'))
 			->name('main');
 
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
 		$this
 			->addTab($oMainTab);
 
-		$oMainTab->add(Admin_Form_Entity::factory('Select')
+		$oMainRow1->add(Admin_Form_Entity::factory('Select')
 			->caption(Core::_('Shop_Discount.item_discount_name'))
 			->options($this->_fillDiscounts($oShop->id))
 			->name('shop_discount_id')
@@ -45,29 +50,31 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 
 		$windowId =  $this->_Admin_Form_Controller->getWindowId();
 
-		$oMainTab->add(Admin_Form_Entity::factory('Radiogroup')
+		$oMainRow2->add(Admin_Form_Entity::factory('Radiogroup')
 			->radio(array(
 				'—',
 				Core::_("Shop_Discount.shop_apply_modification_discount"),
 				Core::_("Shop_Discount.shop_not_apply_modification_discount")
 			))
-			//->caption('Caption')
+			->ico(
+				array(
+					'fa-minus-circle',
+					'fa-check',
+					'fa-ban'
+				)
+			)
 			->name('apply_for_modifications')
-			->divAttr(array('id' => 'import_types'))
+			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 		)
 		->add(Admin_Form_Entity::factory('Code')
 			->html("<script>$(function() {
 				$('#{$windowId} #import_types').buttonset();
 			});</script>")
 		);
-		/*$oMainTab->add(Admin_Form_Entity::factory('Checkbox')
-			->value(1)
-			->caption(Core::_("Shop_Discount.shop_apply_modification_discount"))
-			->name("apply_for_modifications"));*/
 
 		$title = $this->_object->id
-					? Core::_('Shop_Discount.item_discount_edit_form_title')
-					: Core::_('Shop_Discount.item_discount_add_form_title');
+			? Core::_('Shop_Discount.item_discount_edit_form_title')
+			: Core::_('Shop_Discount.item_discount_add_form_title');
 
 		$this->title($title);
 
@@ -109,15 +116,7 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			$oShopItem->add($oShopDiscount);
 		}
 
-		/*if (Core_Array::getPost('apply_for_modifications'))
-		{
-			$aModifications = $oShopItem->Modifications->findAll();
-			foreach ($aModifications as $oModification)
-			{
-				$oModification->add($oShopDiscount);
-			}
-		}*/
-		switch(Core_Array::getPost('apply_for_modifications'))
+		switch (Core_Array::getPost('apply_for_modifications'))
 		{
 			case 1:
 				$aModifications = $oShopItem->Modifications->findAll();

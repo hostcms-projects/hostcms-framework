@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -20,18 +20,18 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	public function setObject($object)
 	{
 		parent::setObject($object);
-		$modelName = $this->_object->getModelName();
+
 		$oMainTab = $this->getTab('main');
-		
-		switch($modelName)
+
+		switch ($this->_object->getModelName())
 		{
 			case 'constant':
-			
-				if (is_null($this->_object->id))
+
+				if (!$this->_object->id)
 				{
 					$this->_object->constant_dir_id = Core_Array::getGet('constant_dir_id');
 				}
-				
+
 				// Удаляем группу товаров
 				$oMainTab->delete($this->getField('constant_dir_id'));
 
@@ -40,12 +40,11 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->options(array(' … ') + $this->fillDir(0))
 					->name('constant_dir_id')
 					->value($this->_object->constant_dir_id)
-					->style('width:300px; float:left')
 					->filter(TRUE);
 
 				// Добавляем группу товаров
 				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
-			
+
 				$this->title(
 					$this->_object->id
 						? Core::_('Constant.edit_title', $object->name)
@@ -60,13 +59,14 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					);
 			break;
 			case 'constant_dir':
-				if (is_null($this->_object->id))
+
+				if (!$this->_object->id)
 				{
 					$this->_object->parent_id = Core_Array::getGet('constant_dir_id');
 				}
-				
+
 				$oAdditionalTab = $this->getTab('additional');
-				
+
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
@@ -75,24 +75,23 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->options(array(' … ') + $this->fillDir(0))
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->style('width:300px; float:left')
 					->filter(TRUE);
 
 				// Добавляем группу товаров
 				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
-				
+
 				$this->title(
 					$this->_object->id
 						? Core::_('Constant_Dir.edit')
 						: Core::_('Constant_Dir.add')
 					);
-			
+
 			break;
 		}
 
 		return $this;
 	}
-	
+
 	/**
 	 * Create visual tree of the directories
 	 * @param int $parent_id parent directory ID
@@ -134,7 +133,7 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function execute($operation = NULL)
 	{
-		if (!is_null($operation))
+		if (!is_null($operation) && $operation != '')
 		{
 			$name = Core_Array::getRequest('name');
 			$id = Core_Array::getRequest('id');

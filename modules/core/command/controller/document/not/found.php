@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Document_Not_Found extends Core_Command_Controller
 {
@@ -35,10 +35,11 @@ class Core_Command_Controller_Document_Not_Found extends Core_Command_Controller
 		ob_start();
 		$oSkin = Core_Skin::instance()
 			->title($title)
+			->setMode('authorization')
 			->header();
 
 		Core::factory('Core_Html_Entity_Div')
-			->id('indexMessage')
+			->class('indexMessage')
 			->add(Core::factory('Core_Html_Entity_H1')->value($title))
 			->add(Core::factory('Core_Html_Entity_P')->value(
 				'Внимание! Для страницы отсутствует текущая версия или с данным разделом не связана страница. Получить название страницы, связанной с данным разделом, можно в <b>"Раздел администрирования" &#8594; "Структура сайта"</b>. Выбрать текущую версию страницы можно в "Раздел администрирования" &#8594; "Страницы и документы"'

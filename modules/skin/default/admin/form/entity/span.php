@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Span extends Admin_Form_Entity
 {
@@ -44,11 +44,7 @@ class Skin_Default_Admin_Form_Entity_Span extends Admin_Form_Entity
 
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
 		?><span <?php echo implode(' ', $aAttr) ?>><?php echo htmlspecialchars($this->value)?><?php
-		//parent::execute();
-		foreach ($this->_children as $oCore_Html_Entity)
-		{
-			$oCore_Html_Entity->execute();
-		}
+		$this->executeChildren();
 		?></span><?php
 		?></div><?php
 	}

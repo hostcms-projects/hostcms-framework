@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Administration center',
@@ -43,7 +43,7 @@ return array(
 	'index_tech_date_simplexml' => 'SimpleXML:',
 	'index_tech_date_iconv' => 'Iconv:',
 	'index_tech_date_max_date_size' => 'Maximum size of uploaded data: ',
-	'index_tech_date_max_time' => 'Maximum execution time: %d sec',
+	'index_tech_date_max_time' => 'Maximum execution time: ',
 	'index_tech_date_session_save_path' => 'Path to save sessions: ',
 	'index_tmp_dir' => 'Temporary folder: ',
 	'index_tmp_not_dir' => 'Not identified',
@@ -79,9 +79,20 @@ return array(
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
 
-	'website' => 'Content management system website: ',
-	'support_email' => 'Support email: ',
+	'website' => 'Content management system: ',
+	'support_email' => 'Support: ',
 	'viewSite' => 'View site in a new window',
 
+	'company' => 'Hostmake LLC',
+	'company-website' => 'www.hostcms.ru',
+	'company-support' => 'support@hostcms.ru',
 	'copy' => '%s [Copy %s]',
+	'exit' => 'Exit',
+	'home' => 'Home',
+	'dashboard' => 'Dashboard',
+	'fixed' => 'Fixed: ',
+	'fixed-navbar' => 'Navbar',
+	'fixed-sideBar' => 'SideBar',
+	'fixed-breadcrumbs' => 'BreadCrumbs',
+	'fixed-header' => 'Header',
 );

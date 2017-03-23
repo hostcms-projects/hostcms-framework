@@ -6,7 +6,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Информационные системы',
@@ -85,7 +85,7 @@ return array(
 	'apply_tags_automatically' => '<acronym title="Автоматическое формирование меток (тегов) информационного элемента из его названия, описания и текста">Автоматически применять метки (теги)</acronym>',
 	'change_filename' => '<acronym title="Преобразование названий всех загружаемых файлов для всех объектов информационной системы - элементов, групп, дополнительных свойств элементов и групп">Изменять названия загружаемых файлов</acronym>',
 
-	'url_type' => '<acronym title="Тип формирования URL информационных элементов при незаполненном параметре \'Название элемента в URL\' ">Тип формирования URL информационных элементов</acronym>',
+	'url_type' => '<acronym title="Тип формирования URL при незаполненном параметре \'Название элемента в URL\' ">Тип формирования URL</acronym>',
 	'url_type_identificater' => 'Идентификатор',
 	'url_type_transliteration' => 'Транслитерация',
 	'apply_keywords_automatically' => '<acronym title="Автоматическое формирование ключевых слов информационного элемента и категории из их названия, описания и текста">Автоматически генерировать ключевые слова</acronym>',

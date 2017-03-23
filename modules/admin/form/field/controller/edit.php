@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,7 +22,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$this
 			->addSkipColumn('admin_word_id');
 
-		if (is_null($object->admin_form_id))
+		if (!$object->admin_form_id)
 		{
 			$object->admin_form_id = Core_Array::getGet('admin_form_id', 0);
 		}
@@ -42,6 +42,24 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$this
 			->addTabBefore($oNameTab, $oMainTab)
 			->addTabAfter($oViewTab, $oMainTab);
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oViewTab
+			->add($oViewRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oViewRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			;
+
 
 		// Название и описание для всех языков
 		$aAdmin_Languages = Core_Entity::factory('Admin_Language')->findAll();
@@ -69,35 +87,46 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Field.form_forms_field_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
-					->class('input-lg')
+					->class('form-control input-lg')
 					->format(
 						array(
 							// 'minlen' => array('value' => 1),
 							'maxlen' => array('value' => 255)
 						)
-					);
+					)
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
 				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Field.form_forms_field_lng_description') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($description)
-					->rows(2);
+					->rows(2)
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
 				$oNameTab
-					->add($oAdmin_Form_Entity_Input_Name)
-					->add($oAdmin_Form_Entity_Textarea_Description);
+					->add(
+						Admin_Form_Entity::factory('Div')
+							->class('row')
+							->add($oAdmin_Form_Entity_Input_Name)
+					)
+					->add(
+						Admin_Form_Entity::factory('Div')
+							->class('row')
+							->add($oAdmin_Form_Entity_Textarea_Description)
+					);
 			}
 		}
 
 		$this->getField('name')
-			->class('')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
+			->class('form-control')
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
 		$this->getField('sorting')
-			->style('width: 320px');
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-		$oMainTab->addAfter(Admin_Form_Entity::factory('Separator'), $this->getField('sorting'));
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1)
+			->move($this->getField('sorting'), $oMainRow1);
 
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
@@ -119,8 +148,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->name('type')
 			->value($this->_object->type)
 			->caption(Core::_('Admin_Form_Field.type'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px')
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
 			->onchange("ShowRowsAdminForm('{$windowId}', this.options[this.selectedIndex].value)");
 
 		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
@@ -130,29 +158,39 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 
 		$oMainTab->add($oAdmin_Form_Entity_Code);
 
-		$oMainTab
-			->delete($this->getField('type'))
-			->addBefore($oSelect_Type, $this->getField('format'));
+		$oMainTab->delete($this->getField('type'));
 
 		$this->getField('format')
-			//->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+		$oMainRow2->add($oSelect_Type);
+		$oMainTab->move($this->getField('format'), $oMainRow2);
+
+		$oMainTab->move($this->getField('allow_sorting'), $oMainRow3);
+		$oMainTab->move($this->getField('allow_filter'), $oMainRow4);
+		$oMainTab->move($this->getField('editable'), $oMainRow5);
+
+		$this->getField('image')
+			->divAttr(array('id' => 'image', 'class' => 'form-group col-lg-12'))
+			->rows(3);
 
 		$this->getField('link')
-			->divAttr(array('id' => 'link'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12'))
 			->rows(2);
 
 		$this->getField('onclick')
-			->divAttr(array('id' => 'link'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12'))
 			->rows(2);
 
-		$this->getField('image')
-			->divAttr(array('id' => 'image'))
+		$this->getField('list')
+			->divAttr(array('id' => 'list', 'class' => 'form-group col-lg-12'))
 			->rows(3);
 
-		$this->getField('list')
-			->divAttr(array('id' => 'list'))
-			->rows(3);
+		$oMainTab
+			->move($this->getField('image'), $oMainRow6)
+			->move($this->getField('link'), $oMainRow7)
+			->move($this->getField('onclick'), $oMainRow8)
+			->move($this->getField('list'), $oMainRow9);
 
 		$oFilter_Type = Admin_Form_Entity::factory('Select')
 			->options(array(
@@ -162,63 +200,25 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->name('filter_type')
 			->value($this->_object->filter_type)
 			->caption(Core::_('Admin_Form_Field.filter_type'))
-			//->divAttr(array('style' => 'float: left'))
-			->style('width: 110px');
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+		$oMainTab->delete($this->getField('filter_type'));
+		$oMainRow10->add($oFilter_Type);
+
+		$this->getField('class')
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+		$this->getField('width')
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+
+		$this->getField('ico')
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
 		$oMainTab
-			->delete($this->getField('filter_type'))
-			->add($oFilter_Type);
+			->move($this->getField('class'), $oViewRow1)
+			->move($this->getField('width'), $oViewRow2)
+			->move($this->getField('ico'), $oViewRow2);
 
-		// Вкладка "Вид"
-		$oSelect_Type_Title_Align = Admin_Form_Entity::factory('Select')
-			->options(
-				array(
-					'left' => Core::_('Admin_Form_Field.left'),
-					'center' => Core::_('Admin_Form_Field.center'),
-					'right' => Core::_('Admin_Form_Field.right')
-				)
-			)
-			->name('title_align')
-			->value($this->_object->title_align)
-			->caption(Core::_('Admin_Form_Field.title_align'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
-
-		$oSelect_Type_Align = Admin_Form_Entity::factory('Select')
-			->options(
-				array(
-					'left' => Core::_('Admin_Form_Field.left'),
-					'center' => Core::_('Admin_Form_Field.center'),
-					'right' => Core::_('Admin_Form_Field.right')
-				)
-			)
-			->name('align')
-			->value($this->_object->align)
-			->caption(Core::_('Admin_Form_Field.align'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
-
-		$oViewTab
-			->add($oSelect_Type_Title_Align)
-			->add($oSelect_Type_Align)
-			->add(Admin_Form_Entity::factory('Separator'));
-
-		$oMainTab
-			->delete($this->getField('title_align'))
-			->delete($this->getField('align'))
-			->move($this->getField('width')
-				->divAttr(array('style' => 'float: left'))
-			->style('width: 320px'), $oViewTab)
-			->move($this->getField('style')
-				->divAttr(array('style' => 'float: left'))
-				->style('width: 320px'), $oViewTab)
-			->move($this->getField('attributes')
-				->divAttr(array('style' => 'float: left'))
-				->style('width: 650px'), $oViewTab);
-
-		$oViewTab->addBefore(Admin_Form_Entity::factory('Separator'), $this->getField('attributes'));
-
-		//
 		$oAdmin_Word_Value = $this->_object->Admin_Word->getWordByLanguage(CURRENT_LANGUAGE_ID);
 		$form_name = $oAdmin_Word_Value ? $oAdmin_Word_Value->name : '';
 

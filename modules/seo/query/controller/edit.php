@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -32,6 +32,9 @@ class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		//	При редактировании запроса выводит <input> вместо <textarea>
 		if ($this->_object->id)
 		{
+			$oMainTab
+				->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+		
 			$oAdmin_Form_Entity_Input_Value = Admin_Form_Entity::factory('Input');
 			$oAdmin_Form_Entity_Input_Value
 				->name('query')
@@ -44,7 +47,7 @@ class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oMainTab->delete($this->getField('query'));
 
-			$oMainTab->add($oAdmin_Form_Entity_Input_Value);
+			$oMainRow1->add($oAdmin_Form_Entity_Input_Value);
 		}
 
 		return $this;
@@ -59,7 +62,7 @@ class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$id = $this->_object->id;
 
-		if (is_null($id))
+		if (!$id)
 		{
 			$sQuery = trim(Core_Array::getPost('query'));
 
@@ -77,7 +80,7 @@ class Seo_Query_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			parent::_applyObjectProperty();
 		}
 
-		if (is_null($id))
+		if (!$id)
 		{
 			foreach ($aQueries as $sQuery)
 			{

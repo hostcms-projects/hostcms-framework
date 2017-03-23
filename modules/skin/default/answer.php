@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Answer extends Admin_Answer
 {
@@ -117,7 +117,7 @@ class Skin_Default_Answer extends Admin_Answer
 		}
 		catch (Exception $e){
 			Core::factory('Core_Html_Entity_Div')
-				->id('indexMessage')
+				->class('indexMessage')
 				->value(Core_Message::get($e->getMessage(), 'error'))
 				->execute();
 		}

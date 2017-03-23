@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Controller_Ajaxload extends Admin_Form_Action_Controller
 {
@@ -45,8 +45,6 @@ class Tag_Controller_Ajaxload extends Admin_Form_Action_Controller
 			$aReturn[] = $oTag->name;
 		}
 
-		echo json_encode($aReturn);
-
-		die();
+		Core::showJson($aReturn);
 	}
 }

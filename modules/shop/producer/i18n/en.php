@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Manufacturers',
@@ -35,9 +35,9 @@ return array(
 	'correspondent_account' => '<acronym title="Correspondent account number of manufacturer">Correspondent account number</acronym>',
 	'bank_name' => '<acronym title="Bank name">Bank name</acronym>',
 	'bank_address' => '<acronym title="Bank address">Bank address</acronym>',
-	'seo_title' => "<acronym title=\"Value of meta-tag title for products manufacturer\">Title</acronym>",
-	'seo_description' => "<acronym title=\"Value of meta-tag description for products manufacturer\">Description</acronym>",
-	'seo_keywords' => "<acronym title=\"Value of meta-tag keywords for products manufacturer\">Keywords</acronym>",
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 	'id' => 'Id',
 	'shop_id' => 'Shop id',
 	'tab2' => 'Contact details',
@@ -48,6 +48,6 @@ return array(
 	'markDeleted_success' => "Manufacturer information deleted successfully!",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-	'active' => "<acronym title=\"Activity of producer\">Active producer</acronym>",
+	'active' => "<acronym title=\"Activity of manufacturer\">Active</acronym>",
 	'changeStatus_success' => "Information has been successfully changed",
 );

@@ -246,6 +246,10 @@ class Structure_Model extends Core_Entity
 		{
 			$this->path = Core_Str::transliteration($this->name);
 		}
+		elseif (in_array('path', $this->_changedColumns))
+		{
+			$this->checkDuplicatePath();
+		}
 
 		parent::save();
 
@@ -864,6 +868,17 @@ class Structure_Model extends Core_Entity
 	}
 
 	/**
+	 * Mark entity as deleted
+	 * @return Core_Entity
+	 */
+	public function markDeleted()
+	{
+		$this->clearCache();
+
+		return parent::markDeleted();
+	}
+
+	/**
 	 * Clear tagged cache
 	 * @return self
 	 */
@@ -872,7 +887,32 @@ class Structure_Model extends Core_Entity
 		if (Core::moduleIsActive('cache'))
 		{
 			Core_Cache::instance(Core::$mainConfig['defaultCache'])
-				->deleteByTag('structure_' . $this->id);
+				->deleteByTag('structure_' . $this->id)
+				->deleteByTag('structure_' . $this->parent_id);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Check and correct duplicate path
+	 * @return self
+	 */
+	public function checkDuplicatePath()
+	{
+		$oSameStructures = Core_Entity::factory('Structure');
+		$oSameStructures->queryBuilder()
+			->where('site_id', '=', $this->site_id)
+			->where('parent_id', '=', $this->parent_id)
+			->where('path', '=', $this->path)
+			->where('id', '!=', $this->id)
+			->limit(1);
+
+		$aSameStructures = $oSameStructures->findAll(FALSE);
+
+		if (count($aSameStructures))
+		{
+			$this->path = Core_Guid::get();
 		}
 
 		return $this;

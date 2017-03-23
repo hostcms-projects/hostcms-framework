@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Access_Forbidden extends Core_Command_Controller
 {
@@ -31,10 +31,11 @@ class Core_Command_Controller_Access_Forbidden extends Core_Command_Controller
 		ob_start();
 		$oSkin = Core_Skin::instance()
 			->title($title)
+			->setMode('authorization')
 			->header();
 
 		Core::factory('Core_Html_Entity_Div')
-			->id('indexMessage')
+			->class('indexMessage')
 			->add(Core::factory('Core_Html_Entity_H1')->value($title))
 			->add(Core::factory('Core_Html_Entity_P')->value(
 				'<p>За более подробной информацией обратитесь к администратору сайта.</p>'

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 {
@@ -25,7 +25,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		'filter',
 		'invertor',
 		'invertor_id',
-		'invertorCaption', 
+		'invertorCaption',
 		'inverted'
 	);
 
@@ -56,9 +56,12 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		$oCore_Registry->set('Admin_Form_Count', $iAdmin_Form_Count + 2);
 
 		$this->id = $this->name = 'field_id_' . $iAdmin_Form_Count;
-	
+
 		$iAdmin_Form_Count++;
 		$this->invertor_id = 'field_id_' . $iAdmin_Form_Count;
+		
+		$this->class .= ' form-control';
+		$this->divAttr = array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12');
 	}
 
 	/**
@@ -66,16 +69,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 	 */
 	public function execute()
 	{
-		if (is_null($this->size) && is_null($this->style))
-		{
-			$this->style('width: 100%');
-		}
-
-		/*$windowId = $this->_Admin_Form_Controller->getWindowId();
-		if (is_null($this->onkeydown))
-		{
-			$this->onkeydown = $this->onkeyup = $this->onblur = "FieldCheck('{$windowId}', this)";
-		}*/
+		is_null($this->size) && is_null($this->style) && $this->style('width: 100%');
 
 		$aDefaultDivAttr = array('class' => 'item_div');
 		$this->divAttr = Core_Array::union($this->divAttr, $aDefaultDivAttr);
@@ -96,24 +90,13 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 
 		?><span class="caption"><?php echo $this->caption?></span><?php
 
-		if($this->invertor)
+		if (count($this->_children))
 		{
-			$oCore_Html_Entity_Input = Core::factory('Core_Html_Entity_Input')
-				->type("checkbox")
-				->id($this->invertor_id)
-				->name($this->name . '_inverted')
-				->value(1);
-
-			$this->inverted && $oCore_Html_Entity_Input->checked(true);
-
-			$oCore_Html_Entity_Input->execute();
-
-			Core::factory('Core_Html_Entity_Span')
-				->class('caption')
-				->style('display:inline')
-				->value($this->invertorCaption . '&nbsp;')
-				->execute();
+			?><div class="input-group"><?php
 		}
+
+		$this->invertor && $this->_invertor();
+
 		?><select <?php echo implode(' ', $aAttr) ?>><?php
 		if (is_array($this->options))
 		{
@@ -144,58 +127,72 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		}
 		?></select><?php
 
-		if ($this->filter)
+		$this->executeChildren();
+
+		$this->filter && $this->_filter();
+
+		if (count($this->_children))
 		{
-			$windowId = $this->_Admin_Form_Controller->getWindowId();
-			$iFilterCount = self::$iFilterCount;
-
-			Core::factory('Core_Html_Entity_Div')
-				->style("float: left; opacity: 0.7")
-				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->src('/admin/images/filter.gif')
-						->class('img_line')
-						->style('margin-left: 10px')
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Input')
-						->size(15)
-						->id("filer_{$this->id}")
-						->onkeyup("clearTimeout(oSelectFilter{$iFilterCount}.timeout); oSelectFilter{$iFilterCount}.timeout = setTimeout(function(){oSelectFilter{$iFilterCount}.Set(document.getElementById('filer_{$this->id}').value); oSelectFilter{$iFilterCount}.Filter();}, 500)")
-						->onkeypress("if (event.keyCode == 13) return false;")
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Input')
-						->type("button")
-						->onclick("this.form.filer_{$this->id}.value = '';oSelectFilter{$iFilterCount}.Set('');oSelectFilter{$iFilterCount}.Filter();")
-						->value(Core::_('Admin_Form.input_clear_filter'))
-						->class('saveButton')
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Input')
-						->id("IgnoreCase_{$this->id}")
-						->type("checkbox")
-						->onclick("oSelectFilter{$iFilterCount}.SetIgnoreCase(!this.checked);oSelectFilter{$iFilterCount}.Filter()")
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Label')
-						->for("IgnoreCase_{$this->id}")
-						->value(Core::_('Admin_Form.input_case_sensitive'))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Script')
-						->type("text/javascript")
-						->value("var oSelectFilter{$iFilterCount} = new cSelectFilter('{$windowId}', '{$this->id}');")
-				)
-				->execute();
-
-			Admin_Form_Entity::factory('Separator')
-				->execute();
-
-			self::$iFilterCount++;
+			?></div><?php
 		}
 
-		parent::execute();
 		?></div><?php
+	}
+	
+	/**
+	 * Show filter
+	 * @return self
+	 */
+	protected function _filter()
+	{
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+		$iFilterCount = self::$iFilterCount;
+
+		Core::factory('Core_Html_Entity_Div')
+			->style("float: left; opacity: 0.7")
+			->add(
+				Core::factory('Core_Html_Entity_Img')
+					->src('/admin/images/filter.gif')
+					->class('img_line')
+					->style('margin-left: 10px')
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Input')
+					->size(15)
+					->id("filer_{$this->id}")
+					->onkeyup("clearTimeout(oSelectFilter{$iFilterCount}.timeout); oSelectFilter{$iFilterCount}.timeout = setTimeout(function(){oSelectFilter{$iFilterCount}.Set(document.getElementById('filer_{$this->id}').value); oSelectFilter{$iFilterCount}.Filter();}, 500)")
+					->onkeypress("if (event.keyCode == 13) return false;")
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Input')
+					->type("button")
+					->onclick("this.form.filer_{$this->id}.value = '';oSelectFilter{$iFilterCount}.Set('');oSelectFilter{$iFilterCount}.Filter();")
+					->value(Core::_('Admin_Form.input_clear_filter'))
+					->class('saveButton')
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Input')
+					->id("IgnoreCase_{$this->id}")
+					->type("checkbox")
+					->onclick("oSelectFilter{$iFilterCount}.SetIgnoreCase(!this.checked);oSelectFilter{$iFilterCount}.Filter()")
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Label')
+					->for("IgnoreCase_{$this->id}")
+					->value(Core::_('Admin_Form.input_case_sensitive'))
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Script')
+					->type("text/javascript")
+					->value("var oSelectFilter{$iFilterCount} = new cSelectFilter('{$windowId}', '{$this->id}');")
+			)
+			->execute();
+
+		Admin_Form_Entity::factory('Separator')
+			->execute();
+
+		self::$iFilterCount++;
+		
+		return $this;
 	}
 }

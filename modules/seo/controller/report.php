@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -21,146 +21,195 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	{
 		parent::setObject($object);
 
-		$this->title(Core::_('Seo.report_title', Core_Entity::factory('Site', $this->_object->site_id)->name));
+		$this->title(
+			Core::_('Seo.report_title', Core_Entity::factory('Site', $this->_object->site_id)->name)
+		);
 
 		$oMainTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('admin_form.form_forms_tab_1'))
 			->name('main');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
 		$this->addTab($oMainTab);
 
-		$oMainTab->add(Core::factory('Admin_Form_Entity_Datetime')
+		$oMainRow1->add(Admin_Form_Entity::factory('Datetime')
 			->caption(Core::_('Seo.start_datetime'))
 			->name('start_datetime')
-			->value(Core_Date::timestamp2sql(time() - 2678400))
-		)
-		->add($this->getField('datetime')
-			->caption(Core::_('Seo.end_datetime'))
-		)
-		->add(Admin_Form_Entity::factory('Input')
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->value(Core_Date::timestamp2sql(time() - 2678400)));
+
+		$oMainRow2->add($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+		$oMainRow3->add(Admin_Form_Entity::factory('Input')
 			->caption(Core::_('Seo.count'))
 			->name('count')
-			->style('width: 150px')
 			->value(10)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
 			->format(array(
 					'lib' => array('value' => 'positiveInteger'),
 					'minlen' => array('value' => 1)
 				)
-			)
-		)
-		->add(Admin_Form_Entity::factory('Checkbox')
+			));
+
+		$oMainRow4->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.tcy'))
 			->name('tcy')
 			->value(1)
-		)
-		->add(Admin_Form_Entity::factory('Checkbox')
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oMainRow5->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.pr'))
 			->name('pr')
 			->value(1)
-		);
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
 
 		// Закладка обратных ссылок
 		$oLinksTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_links'))
 			->name('links');
+
+		$oLinksTab
+			->add($oLinksTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oLinksTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oLinksTabRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 		$this->addTabAfter($oLinksTab, $oMainTab);
 
-		// Закладка обратных ссылок
-		$oLinksTab->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.yandex'))
-				->name('yandex_links')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.google'))
-				->name('google_links')
-				->value(1))
-			/*->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.yahoo'))
-				->name('yahoo_links')
-				->value(1))*/
-			->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.bing'))
-				->name('bing_links')
-				->value(1));
+		$oLinksTabRow1->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.yandex'))
+			->name('yandex_links')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oLinksTabRow2->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.google'))
+			->name('google_links')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oLinksTabRow3->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.bing'))
+			->name('bing_links')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
 
 		// Закладка проиндексированных страниц
 		$oIndexedTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_indexed'))
 			->name('indexed');
+
+		$oIndexedTab
+			->add($oIndexedTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oIndexedTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oIndexedTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oIndexedTabRow4 = Admin_Form_Entity::factory('Div')->class('row'));
+
 		$this->addTabAfter($oIndexedTab, $oLinksTab);
 
-		// Закладка проиндексированных страниц
-		$oIndexedTab->add(Admin_Form_Entity::factory('Checkbox')
+		$oIndexedTabRow1->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_indexed')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
+				->value(1)
+				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oIndexedTabRow2->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_indexed')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
+				->value(1)
+				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oIndexedTabRow3->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yahoo'))
 				->name('yahoo_indexed')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
+				->value(1)
+				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+
+		$oIndexedTabRow4->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.bing'))
 				->name('bing_indexed')
-				->value(1))
-			/*->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.rambler'))
-				->name('rambler_indexed')
-				->value(1))*/;
+				->value(1)
+				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
 
 		// Закладка каталогов
 		$oCatalogTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_catalog'))
 			->name('catalog');
+
+		$oCatalogTab
+			->add($oCatalogTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
 		$this->addTabAfter($oCatalogTab, $oIndexedTab);
 
-		// Закладка каталогов
-		$oCatalogTab->add($this->getField('yandex_catalog')->value(1))
-			->add($this->getField('rambler_catalog')->value(1))
-			->add($this->getField('dmoz_catalog')->value(1))
-			->add($this->getField('mail_catalog')->value(1));
+		$oCatalogTabRow1->add($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCatalogTabRow2->add($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCatalogTabRow3->add($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCatalogTabRow4->add($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
 
 		// Закладка счетчиков
 		$oCounterTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('Seo.tab_counter'))
 			->name('counter');
+
+		$oCounterTab
+			->add($oCounterTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
 		$this->addTabAfter($oCounterTab, $oCatalogTab);
 
 		// Закладка счетчиков
-		$oCounterTab->add($this->getField('rambler_counter')->value(1))
-			->add($this->getField('spylog_counter')->value(1))
-			->add($this->getField('hotlog_counter')->value(1))
-			->add($this->getField('liveinternet_counter')->value(1))
-			->add($this->getField('mail_counter')->value(1));
+		$oCounterTabRow1->add($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCounterTabRow2->add($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCounterTabRow3->add($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCounterTabRow4->add($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCounterTabRow5->add($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
 
 		// Позиции в поисковых системах
 		$oPositionTab = Admin_Form_Entity::factory('Tab')
-			->caption('Позиции в поисковых системах')
+			->caption(Core::_('Seo.tab_search_system'))
 			->name('position');
+
+		$oPositionTab
+			->add($oPositionTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPositionTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPositionTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPositionTabRow4 = Admin_Form_Entity::factory('Div')->class('row'));
+
 		$this->addTabAfter($oPositionTab, $oCounterTab);
 
-		$oPositionTab->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.yandex'))
-				->name('yandex_position')
-				->value(1))
-			/*->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.rambler'))
-				->name('rambler_position')
-				->value(1))*/
-			->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.google'))
-				->name('google_position')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.yahoo'))
-				->name('yahoo_position')
-				->value(1))
-			->add(Admin_Form_Entity::factory('Checkbox')
-				->caption(Core::_('Seo.bing'))
-				->name('bing_position')
-				->value(1));
+		$oPositionTabRow1->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.yandex'))
+			->name('yandex_position')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+		$oPositionTabRow2->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.google'))
+			->name('google_position')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+		$oPositionTabRow3->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.yahoo'))
+			->name('yahoo_position')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+		$oPositionTabRow4->add(Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Seo.bing'))
+			->name('bing_position')
+			->value(1)
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
 
 		return $this;
 	}
@@ -206,10 +255,14 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				ob_start();
 
+				$windowId = $this->_Admin_Form_Controller->getWindowId();
+
 				// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
+				/*
 				Admin_Form_Entity::factory('Title')
 					->name($this->title)
 					->execute();
+*/
 
 				$start_datetime = Core_Date::datetime2sql(Core_Array::get($this->_formValues, 'start_datetime', Core_Date::timestamp2sql(time() - 2678400)));
 				$end_datetime = Core_Date::datetime2sql(Core_Array::get($this->_formValues, 'datetime', $this->_object->datetime));
@@ -222,41 +275,183 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				$param = array('arrow' => TRUE);
 
-				$oCore_Html_Entity_Table_For_Clone = Core::factory('Core_Html_Entity_Table')
-					->border(0)
-					->cellpadding(2)
-					->cellspacing(2)
-					->class('admin_table');
+
+				$oCore_Html_Entity_Table_For_Clone = Core::factory('Core_Html_Entity_Table')				
+					->class('admin-table table table-bordered table-hover table-striped');
+				?>
+				<script type="text/javascript">
+				// Настройки графиков
+				var gridbordercolor = "#eee",  optionsForGraph = {
+						series: {
+							lines: {show: true}
+						},
+						legend: {
+							noColumns: 4,
+							backgroundOpacity: 0.65
+						},
+						xaxis: {
+							mode: "time",
+							//timeformat: "%d.%m.%Y %H:%M:%S",
+							timeformat: "%d.%m.%Y",
+							//tickSize: [1, 'hour'],
+							color: gridbordercolor,
+							timezone: "browser"
+						},
+						yaxis: {
+							min: 0,
+							color: gridbordercolor
+						},
+						grid: {
+							hoverable: true,
+							clickable: false,
+							borderWidth: 0,
+							aboveData: false
+						},
+						tooltip: true,
+						tooltipOpts: {
+							defaultTheme: false,
+							dateFormat: "%d.%m.%Y",
+							content: "<b>%s</b> : <span>%x</span> : <span>%y</span>"
+							/*
+							content: function(label, xval, yval, flotItem) {
+								//console.log(arguments);
+								var dateValue = new Date(xval);
+								return "<b>" + label + "</b> : <span>" + dateValue.getDate() + "." + (dateValue.getMonth() + 1) + "." + dateValue.getFullYear() + "</span> : <span>" + yval.toFixed(3) + " сек.</span>";
+
+							}	*/
+						},
+						/*
+						crosshair: {
+							mode: "x"
+						},*/
+						selection: {
+							mode: "x"
+						}
+					}
+				</script>
+				<?php
+				$site_id = intval(Core_Array::getGet('site_id', CURRENT_SITE));
 
 				//Если в отчете должен быть тИЦ
 				if (intval(Core_Array::get($this->_formValues, 'tcy')))
 				{
+					/*
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.tcy'))
 						->execute();
+						*/
+					//$aSeo = Core_Entity::factory('Site', $oSite->id)->Seos->getByDatetime($start_datetime, $end_datetime);
 
-					Core::factory('Core_Html_Entity_Img')
-						->src("/admin/seo/img.php?id_report=1&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}")
-						->align('center')
-						->execute();
+					$aTcyTitlesPerDay = array();
+					$aTcyValuesPerDay = array();
 
-					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
+					foreach ($aSeo as $oSeo)
+					{
 
-					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-					$report = $this->_buildMassReport($aSeo, "tcy", $count);
+						$aTcyTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
+						$aTcyValuesPerDay[] = $oSeo->tcy;
+						//$data[0][] = $oSeo->tcy;
+						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
+						//$legend[] = Core::_('Seo.tcy');
+					}
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.tcy') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">
+							<div id="tcy">
+								<div class="row">
+									<div class="col-sm-12">
+										<div id="tcy-chart" class="chart chart-lg"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-12">
+										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>									
+									</div>
+								</div>								
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="table-scrollable">
+										<?php
+										$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
-					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
+										// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
+										$report = $this->_buildMassReport($aSeo, "tcy", $count);
 
-					// тИЦ
-					$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.tcy'), "tcy", $param));
+										// Дата
+										$oCore_Html_Entity_Table
+											->add(
+												Core::factory('Core_Html_Entity_Thead')
+													->add($this->_showTableTitleReport($report))
+											);
 
-					$oCore_Html_Entity_Table->execute();
+										// тИЦ
+										$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.tcy'), "tcy", $param));
+
+										$oCore_Html_Entity_Table->execute();
+										?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
+						$(function(){
+							var tcyTitlesPerDay = [<?php echo implode(',',$aTcyTitlesPerDay)?>],
+								tcyValuesPerDay = [<?php echo implode(',', $aTcyValuesPerDay)?>],
+								tcyValueTitlesPerDay = [];
+
+								for(var i = 0; i < tcyValuesPerDay.length; i++) {
+									tcyValueTitlesPerDay.push([new Date(tcyTitlesPerDay[i]), tcyValuesPerDay[i]]);
+								}
+
+							var themeprimary = getThemeColorFromCss('themeprimary'), dataTcyPerDay = [{
+								color: themeprimary,
+								label: "<?php echo Core::_('Seo.tcy') ?>",
+								data: tcyValueTitlesPerDay
+							}],
+
+							placeholderTcyPerDay = $("#tcy-chart");
+
+							placeholderTcyPerDay.bind("plotselected", function (event, ranges) {
+									plotTcyPerDay = $.plot(placeholderTcyPerDay, dataTcyPerDay, $.extend(true, {}, optionsForGraph, {
+										xaxis: {
+											min: ranges.xaxis.from,
+											max: ranges.xaxis.to
+										}
+									}));
+							});
+
+							$('<?php echo '#' . $windowId ?> #tcy #setOriginalZoom').on('click', function(){
+								plotTcyPerDay = $.plot(placeholderTcyPerDay, dataTcyPerDay, optionsForGraph);
+							});
+
+							var plotTcyPerDay = $.plot(placeholderTcyPerDay, dataTcyPerDay, optionsForGraph);
+						})
+					</script>
+
+					<?php					
 				}
 
 				//Если в отчете должен быть PageRank
 				if (intval(Core_Array::get($this->_formValues, 'pr')))
 				{
+					/*
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.pr'))
 						->execute();
@@ -264,19 +459,116 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					Core::factory('Core_Html_Entity_Img')
 						->src("/admin/seo/img.php?id_report=5&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}")
 						->execute();
+						*/
 
-					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
+					//$site_id = intval(Core_Array::getGet('site_id', CURRENT_SITE));
 
-					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-					$report = $this->_buildMassReport($aSeo, "pr", $count);
+					//$aSeo = Core_Entity::factory('Site', $oSite->id)->Seos->getByDatetime($start_datetime, $end_datetime);
 
-					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
+					$aPrTitlesPerDay = array();
+					$aPrValuesPerDay = array();
 
-					// PageRank
-					$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.pr'), "pr", $param));
+					foreach ($aSeo as $oSeo)
+					{
+						$aPrTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
+						$aPrValuesPerDay[] = $oSeo->pr;
+						//$data[0][] = $oSeo->tcy;
+						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
+						//$legend[] = Core::_('Seo.tcy');
+					}
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.pr') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">
 
-					$oCore_Html_Entity_Table->execute();
+							<div id="pr">
+								<div class="row">
+									<div class="col-sm-12">
+										<div id="pr-chart" class="chart chart-lg"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-12">										
+										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="table-scrollable">
+										<?php
+										$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
+
+										// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
+										$report = $this->_buildMassReport($aSeo, "pr", $count);
+
+										// Дата
+										$oCore_Html_Entity_Table
+										//->add($this->_showTableTitleReport($report));					
+											->add(
+													Core::factory('Core_Html_Entity_Thead')
+														->add($this->_showTableTitleReport($report))
+												);
+
+										// PageRank
+										$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.pr'), "pr", $param));
+
+										$oCore_Html_Entity_Table->execute();
+										?>
+										</div>
+									</div>
+								</div>	
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
+						$(function(){
+							var prTitlesPerDay = [<?php echo implode(',',$aPrTitlesPerDay)?>],
+								prValuesPerDay = [<?php echo implode(',', $aPrValuesPerDay)?>],
+								prValueTitlesPerDay = [];
+
+								for(var i = 0; i < prValuesPerDay.length; i++) {
+									prValueTitlesPerDay.push([new Date(prTitlesPerDay[i]), prValuesPerDay[i]]);
+								}
+
+							var themeprimary = getThemeColorFromCss('themeprimary'), dataPrPerDay = [{
+								color: themeprimary,
+								label: "<?php echo Core::_('Seo.pr') ?>",
+								data: prValueTitlesPerDay
+							}],
+
+							placeholderPrPerDay = $("#pr-chart");
+
+							placeholderPrPerDay.bind("plotselected", function (event, ranges) {
+									plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, $.extend(true, {}, optionsForGraph, {
+										xaxis: {
+											min: ranges.xaxis.from,
+											max: ranges.xaxis.to
+										}
+									}));
+							});
+
+							$('<?php echo '#' . $windowId ?> #pr #setOriginalZoom').on('click', function(){
+								plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, optionsForGraph);
+							});
+
+							var plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, optionsForGraph);
+						})
+					</script>
+					<?php					
 				}
 
 				$google_links = intval(Core_Array::get($this->_formValues, 'google_links', 0));
@@ -286,6 +578,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				if ($google_links || $yandex_links /*|| $yahoo_links*/ || $bing_links)
 				{
+					/*
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.report_links'))
 						->execute();
@@ -293,36 +586,191 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					Core::factory('Core_Html_Entity_Img')
 						->src("/admin/seo/img.php?id_report=2&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&google_links={$google_links}&yandex_links={$yandex_links}&bing_links={$bing_links}")
 						->execute();
+						*/
 
-					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
+					$aLinksTitlesPerDay = array();
+					$aGoogleValuesPerDay = array();
+					$aYandexValuesPerDay = array();
+					$aBingValuesPerDay = array();
 
-					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-					$report = $this->_buildMassReport($aSeo, "links", $count);
-
-					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
-
-					if ($google_links)
+					foreach ($aSeo as $oSeo)
 					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google_links", $param));
+						$aLinksTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
+
+						$google_links && $aGoogleValuesPerDay[] = $oSeo->google_links;
+						$yandex_links && $aYandexValuesPerDay[] = $oSeo->yandex_links;
+						$bing_links && $aBingValuesPerDay[] = $oSeo->bing_links;
+
+						//$data[0][] = $oSeo->tcy;
+						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
+						//$legend[] = Core::_('Seo.tcy');
 					}
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.report_links') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">
+							<div id="links">
+								<div class="row">
+									<div class="col-sm-12">
+										<div id="links-chart" class="chart chart-lg"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-12">										
+										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>										
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="table-scrollable">
+										<?php
+										$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
-					if ($yandex_links)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_links", $param));
-					}
+										// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
+										$report = $this->_buildMassReport($aSeo, "links", $count);
 
-					/*if ($yahoo_links)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo_links", $param));
-					}*/
+										// Дата
+										$oCore_Html_Entity_Table
+											//->add($this->_showTableTitleReport($report));
+											->add(
+													Core::factory('Core_Html_Entity_Thead')
+														->add($this->_showTableTitleReport($report))
+												);
 
-					if ($bing_links)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing_links", $param));
-					}
+										if ($google_links)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google_links", $param));
+										}
 
-					$oCore_Html_Entity_Table->execute();
+										if ($yandex_links)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_links", $param));
+										}
+
+										/*if ($yahoo_links)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo_links", $param));
+										}*/
+
+										if ($bing_links)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing_links", $param));
+										}
+
+										$oCore_Html_Entity_Table->execute();
+										?>	
+										</div>
+									</div>
+								</div>	
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
+						$(function(){
+							var linksTitlesPerDay = [<?php echo implode(',',$aLinksTitlesPerDay)?>],
+								themeprimary = getThemeColorFromCss('themeprimary'),
+								dataLinksPerDay = [];
+
+							<?php
+							if ($google_links || $yandex_links || $bing_links)
+							{
+							?>
+								for(var i = 0; i < linksTitlesPerDay.length; i++)
+								{
+									linksTitlesPerDay[i] = new Date(linksTitlesPerDay[i]);
+								}
+							<?php
+							}
+
+							if ($google_links)
+							{
+							?>
+								googleValuesPerDay = [<?php echo implode(',', $aGoogleValuesPerDay)?>],
+								googleValueTitlesPerDay = [];
+
+								for(var i = 0; i < linksTitlesPerDay.length; i++) {
+									googleValueTitlesPerDay.push([linksTitlesPerDay[i], googleValuesPerDay[i]]);
+								}
+
+								dataLinksPerDay.push({
+									color: themeprimary,
+									label: "<?php echo Core::_('Seo.google') ?>",
+									data: googleValueTitlesPerDay
+								})
+							<?php
+							}
+
+							if ($yandex_links)
+							{
+							?>
+								yandexValuesPerDay = [<?php echo implode(',', $aYandexValuesPerDay)?>],
+								yandexValueTitlesPerDay = [];
+
+								for(var i = 0; i < linksTitlesPerDay.length; i++) {
+									yandexValueTitlesPerDay.push([linksTitlesPerDay[i], yandexValuesPerDay[i]]);
+								}
+
+								dataLinksPerDay.push({
+									color: themesecondary,
+									label: "<?php echo Core::_('Seo.yandex') ?>",
+									data: yandexValueTitlesPerDay
+								})
+							<?php
+							}
+
+							if ($bing_links)
+							{
+							?>
+								bingValuesPerDay = [<?php echo implode(',', $aBingValuesPerDay)?>],
+								bingValueTitlesPerDay = [];
+
+								for(var i = 0; i < linksTitlesPerDay.length; i++) {
+									bingValueTitlesPerDay.push([linksTitlesPerDay[i], bingValuesPerDay[i]]);
+								}
+
+								dataLinksPerDay.push({
+									color: themethirdcolor,
+									label: "<?php echo Core::_('Seo.bing') ?>",
+									data: bingValueTitlesPerDay
+								})
+							<?php
+							}
+							?>
+
+							var placeholderLinksPerDay = $("#links-chart");
+
+							placeholderLinksPerDay.bind("plotselected", function (event, ranges) {
+									plotLinksPerDay = $.plot(placeholderLinksPerDay, dataLinksPerDay, $.extend(true, {}, optionsForGraph, {
+										xaxis: {
+											min: ranges.xaxis.from,
+											max: ranges.xaxis.to
+										}
+									}));
+							});
+
+							$('<?php echo '#' . $windowId ?> #links #setOriginalZoom').on('click', function(){
+								plotLinksPerDay = $.plot(placeholderLinksPerDay, dataLinksPerDay, optionsForGraph);
+							});
+
+							var plotLinksPerDay = $.plot(placeholderLinksPerDay, dataLinksPerDay, optionsForGraph);
+						})
+					</script>
+
+					<?php
 				}
 
 				$yandex_indexed = intval(Core_Array::get($this->_formValues, 'yandex_indexed', 0));
@@ -333,6 +781,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				if ($yandex_indexed || $yahoo_indexed || $bing_indexed /*|| $rambler_indexed*/ || $google_indexed)
 				{
+					/*
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.report_indexed'))
 						->execute();
@@ -340,46 +789,221 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					Core::factory('Core_Html_Entity_Img')
 						->src("/admin/seo/img.php?id_report=3&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_indexed={$yandex_indexed}&yahoo_indexed={$yahoo_indexed}&bing_indexed={$bing_indexed}&google_indexed={$google_indexed}")
 						->execute();
+						*/
 
-					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-					$report = $this->_buildMassReport($aSeo, "indexed", $count);
+					$aIndexedTitlesPerDay = array();
+					$aGoogleValuesPerDay = array();
+					$aYandexValuesPerDay = array();
+					$aBingValuesPerDay = array();
+					$aYahooValuesPerDay = array();
 
-					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
-
-					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
-
-					// Yandex
-					if ($yandex_indexed)
+					foreach ($aSeo as $oSeo)
 					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_indexed", $param));
+						$aIndexedTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
+
+						$google_indexed && $aGoogleValuesPerDay[] = $oSeo->google_indexed;
+						$yandex_indexed && $aYandexValuesPerDay[] = $oSeo->yandex_indexed;
+						$bing_indexed && $aBingValuesPerDay[] = $oSeo->bing_indexed;
+						$yahoo_indexed && $aYahooValuesPerDay[] = $oSeo->yahoo_indexed;
+
+						//$data[0][] = $oSeo->tcy;
+						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
+						//$legend[] = Core::_('Seo.tcy');
 					}
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.report_indexed') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">
+							<div id="indexed">
+								<div class="row">
+									<div class="col-sm-12">
+										<div id="indexed-chart" class="chart chart-lg"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-12">										
+											<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>									
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="table-scrollable">
+										<?php
+										// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
+										$report = $this->_buildMassReport($aSeo, "indexed", $count);
 
-					// Rambler
-					/*if ($rambler_indexed)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.rambler'), "rambler_indexed", $param));
-					}*/
+										$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
-					// Google
-					if ($google_indexed)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google_indexed", $param));
-					}
+										// Дата
+										$oCore_Html_Entity_Table
+											//->add($this->_showTableTitleReport($report));
+											->add(
+													Core::factory('Core_Html_Entity_Thead')
+														->add($this->_showTableTitleReport($report))
+												);
 
-					// Yahoo
-					if ($yahoo_indexed)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo_indexed", $param));
-					}
+										// Yandex
+										if ($yandex_indexed)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_indexed", $param));
+										}
 
-					// Bing.com
-					if ($bing_indexed)
-					{
-						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing_indexed", $param));
-					}
+										// Rambler
+										/*if ($rambler_indexed)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.rambler'), "rambler_indexed", $param));
+										}*/
 
-					$oCore_Html_Entity_Table->execute();
+										// Google
+										if ($google_indexed)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google_indexed", $param));
+										}
+
+										// Yahoo
+										if ($yahoo_indexed)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo_indexed", $param));
+										}
+
+										// Bing.com
+										if ($bing_indexed)
+										{
+											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing_indexed", $param));
+										}
+
+										$oCore_Html_Entity_Table->execute();
+										?>
+										</div>
+									</div>	
+								</div>	
+							</div>
+						</div>
+					</div>
+					<script type="text/javascript">
+						$(function(){
+							var indexedTitlesPerDay = [<?php echo implode(',', $aIndexedTitlesPerDay)?>],
+								themeprimary = getThemeColorFromCss('themeprimary'),
+								dataIndexedPerDay = [];
+
+							<?php
+							if ($google_indexed || $yandex_indexed || $bing_indexed || $yahoo_indexed)
+							{
+							?>
+								for(var i = 0; i < indexedTitlesPerDay.length; i++)
+								{
+									indexedTitlesPerDay[i] = new Date(indexedTitlesPerDay[i]);
+								}
+							<?php
+							}
+
+							if ($google_indexed)
+							{
+							?>
+								googleValuesPerDay = [<?php echo implode(',', $aGoogleValuesPerDay)?>],
+								googleValueTitlesPerDay = [];
+
+								for(var i = 0; i < indexedTitlesPerDay.length; i++) {
+									googleValueTitlesPerDay.push([indexedTitlesPerDay[i], googleValuesPerDay[i]]);
+								}
+
+								dataIndexedPerDay.push({
+									color: themeprimary,
+									label: "<?php echo Core::_('Seo.google') ?>",
+									data: googleValueTitlesPerDay
+								})
+							<?php
+							}
+
+							if ($yandex_indexed)
+							{
+							?>
+								yandexValuesPerDay = [<?php echo implode(',', $aYandexValuesPerDay)?>],
+								yandexValueTitlesPerDay = [];
+
+								for(var i = 0; i < indexedTitlesPerDay.length; i++) {
+									yandexValueTitlesPerDay.push([indexedTitlesPerDay[i], yandexValuesPerDay[i]]);
+								}
+
+								dataIndexedPerDay.push({
+									color: themesecondary,
+									label: "<?php echo Core::_('Seo.yandex') ?>",
+									data: yandexValueTitlesPerDay
+								})
+							<?php
+							}
+
+							if ($bing_indexed)
+							{
+							?>
+								bingValuesPerDay = [<?php echo implode(',', $aBingValuesPerDay)?>],
+								bingValueTitlesPerDay = [];
+
+								for(var i = 0; i < indexedTitlesPerDay.length; i++) {
+									bingValueTitlesPerDay.push([indexedTitlesPerDay[i], bingValuesPerDay[i]]);
+								}
+
+								dataIndexedPerDay.push({
+									color: themethirdcolor,
+									label: "<?php echo Core::_('Seo.bing') ?>",
+									data: bingValueTitlesPerDay
+								})
+							<?php
+							}
+
+							if ($yahoo_indexed)
+							{
+							?>
+								yahooValuesPerDay = [<?php echo implode(',', $aYahooValuesPerDay)?>],
+								yahooValueTitlesPerDay = [];
+
+								for(var i = 0; i < indexedTitlesPerDay.length; i++) {
+									yahooValueTitlesPerDay.push([indexedTitlesPerDay[i], yahooValuesPerDay[i]]);
+								}
+
+								dataIndexedPerDay.push({
+									color: themefourthcolor,
+									label: "<?php echo Core::_('Seo.yahoo') ?>",
+									data: yahooValueTitlesPerDay
+								})
+							<?php
+							}
+							?>
+
+							var placeholderIndexedPerDay = $("#indexed-chart");
+
+							placeholderIndexedPerDay.bind("plotselected", function (event, ranges) {
+									plotIndexedPerDay = $.plot(placeholderIndexedPerDay, dataIndexedPerDay, $.extend(true, {}, optionsForGraph, {
+										xaxis: {
+											min: ranges.xaxis.from,
+											max: ranges.xaxis.to
+										}
+									}));
+							});
+
+							$('<?php echo '#' . $windowId ?> #indexed #setOriginalZoom').on('click', function(){
+								plotIndexedPerDay = $.plot(placeholderIndexedPerDay, dataIndexedPerDay, optionsForGraph);
+							});
+
+							var plotIndexedPerDay = $.plot(placeholderIndexedPerDay, dataIndexedPerDay, optionsForGraph);
+						})
+					</script>
+
+					<?php
 				}
 
 				$yandex_catalog = intval(Core_Array::get($this->_formValues, 'yandex_catalog', 0));
@@ -391,18 +1015,19 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				//Если в отчете должны быть данные о каталогах
 				if ($yandex_catalog || $rambler_catalog || $dmoz_catalog || $mail_catalog)
-				{
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.report_catalog'))
-						->execute();
-
+				{					
 					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
 					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
 					$report = $this->_buildMassReport($aSeo, "catalog", $count);
 
 					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
+					$oCore_Html_Entity_Table
+						//->add($this->_showTableTitleReport($report));
+						->add(
+							Core::factory('Core_Html_Entity_Thead')
+								->add($this->_showTableTitleReport($report))
+						);
 
 					// Яндекс каталог
 					if ($yandex_catalog)
@@ -426,9 +1051,37 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					if ($mail_catalog)
 					{
 						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.mail_catalog'), "mail_catalog", $param));
-					}
-
-					$oCore_Html_Entity_Table->execute();
+					}									
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.report_catalog') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">														
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="table-scrollable">
+									<?php
+									$oCore_Html_Entity_Table->execute();
+									?>
+									</div>
+								</div>	
+							</div>							
+						</div>
+					</div>	
+					<?php
 				}
 
 				$spylog_counter = intval(Core_Array::get($this->_formValues, 'spylog_counter', 0));
@@ -440,9 +1093,11 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				// Если в отчете должны быть данные о наличии счетчиков
 				if ($spylog_counter || $rambler_counter || $hotlog_counter || $liveinternet_counter || $mail_counter)
 				{
+					/*
 					Core::factory('Core_Html_Entity_H2')
 						->value(Core::_('Seo.report_counter'))
 						->execute();
+						*/
 
 					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
@@ -450,7 +1105,12 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					$report = $this->_buildMassReport($aSeo, "counter", $count);
 
 					// Дата
-					$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
+					$oCore_Html_Entity_Table
+						//->add($this->_showTableTitleReport($report));
+						->add(
+							Core::factory('Core_Html_Entity_Thead')
+								->add($this->_showTableTitleReport($report))
+						);
 
 					// Счетчик SpyLog
 					if ($spylog_counter)
@@ -482,7 +1142,37 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.mail_counter'), "mail_counter", $param));
 					}
 
-					$oCore_Html_Entity_Table->execute();
+					//$oCore_Html_Entity_Table->execute();
+					?>
+					<div class="widget">
+						<div class="widget-header bordered-bottom bordered-themeprimary">
+							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.report_counter') ?></span>
+							<div class="widget-buttons">
+								<a href="#" data-toggle="maximize">
+									<i class="fa fa-expand pink"></i>
+								</a>
+								<a href="#" data-toggle="collapse">
+									<i class="fa fa-minus blue"></i>
+								</a>
+								<a href="#" data-toggle="dispose">
+									<i class="fa fa-times darkorange"></i>
+								</a>
+							</div>
+						</div>
+						<div class="widget-body">														
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="table-scrollable">
+									<?php
+									$oCore_Html_Entity_Table->execute();
+									?>
+									</div>
+								</div>	
+							</div>							
+						</div>
+					</div>	
+					<?php
 				}
 
 				$param['status'] = FALSE;
@@ -503,54 +1193,265 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 					foreach ($aSeo_Queries as $oSeo_Query)
 					{
+						/*
 						Core::factory('Core_Html_Entity_H2')
 							->value(Core::_('Seo.report_position_text', $oSeo_Query->query))
 							->execute();
 
+
 						Core::factory('Core_Html_Entity_Img')
 							->src("/admin/seo/img.php?id_report=4&seo_query_id={$oSeo_Query->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_position={$yandex_position}&google_position{$google_position}&yahoo_position={$yahoo_position}&bing_position={$bing_position}")
-							->execute();
+							->execute();*/
 
-						$param['inverse'] = true;
-						$param['type'] = "position";
-
-						$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
-
-						$aSeo_Query_Positions = $oSeo_Query
+						$aSeo_Query_Positions = Core_Entity::factory('Seo_Query', $oSeo_Query->id)
 							->Seo_Query_Positions
 							->getByDatetime($start_datetime, $end_datetime);
 
-						// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-						$report = $this->_buildMassReport($aSeo_Query_Positions, "position", $count);
-
-						// Дата
-						$oCore_Html_Entity_Table->add($this->_showTableTitleReport($report));
-
-						if ($yandex_position)
+						if (count($aSeo_Query_Positions))
 						{
-							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex", $param));
-						}
+							$aQueryPositionTitlesPerDay = array();
+							$aGoogleValuesPerDay = array();
+							$aYandexValuesPerDay = array();
+							$aBingValuesPerDay = array();
+							$aYahooValuesPerDay = array();
+							$aRamblerValuesPerDay = array();
 
-						if ($google_position)
-						{
-							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google", $param));
-						}
+							foreach ($aSeo_Query_Positions as $oSeo_Query_Position)
+							{
+								$aQueryPositionTitlesPerDay[] = strtotime($oSeo_Query_Position->datetime) * 1000;
 
-						if ($yahoo_position)
-						{
-							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo", $param));
-						}
+								$google_position && $aGoogleValuesPerDay[] = -$oSeo_Query_Position->google;
+								$yandex_position && $aYandexValuesPerDay[] = -$oSeo_Query_Position->yandex;
+								$bing_position && $aBingValuesPerDay[] = -$oSeo_Query_Position->bing;
+								$yahoo_position && $aYahooValuesPerDay[] = -$oSeo_Query_Position->yahoo;
+								//$rambler_position && $aRamblerValuesPerDay[] = $oSeo_Query_Position->rambler;
 
-						if ($bing_position)
-						{
-							$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing", $param));
-						}
+								//$data[0][] = $oSeo->tcy;
+								//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
+								//$legend[] = Core::_('Seo.tcy');
+							}
+							?>
+							<div class="widget">
+								<div class="widget-header bordered-bottom bordered-themeprimary">
+									<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
+									<span class="widget-caption themeprimary"><?php echo Core::_('Seo.report_position_text', $oSeo_Query->query) ?></span>
+									<div class="widget-buttons">
+										<a href="#" data-toggle="maximize">
+											<i class="fa fa-expand pink"></i>
+										</a>
+										<a href="#" data-toggle="collapse">
+											<i class="fa fa-minus blue"></i>
+										</a>
+										<a href="#" data-toggle="dispose">
+											<i class="fa fa-times darkorange"></i>
+										</a>
+									</div>
+								</div>
+								<div class="widget-body">
+									<div id="queryPosition<?php echo $oSeo_Query->id;?>">
+										<div class="row">
+											<div class="col-sm-12">
+												<div id="queryPosition<?php echo $oSeo_Query->id;?>-chart" class="chart chart-lg"></div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="form-group col-sm-12">												
+												<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>												
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-lg-12">
+												<div class="table-scrollable">
+												<?php
+													$param['inverse'] = true;
+													$param['type'] = "position";
 
-						$oCore_Html_Entity_Table->execute();
+													$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
+
+													$aSeo_Query_Positions = $oSeo_Query
+														->Seo_Query_Positions
+														->getByDatetime($start_datetime, $end_datetime);
+
+													// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
+													$report = $this->_buildMassReport($aSeo_Query_Positions, "position", $count);
+
+													// Дата
+													$oCore_Html_Entity_Table
+														//->add($this->_showTableTitleReport($report));
+														->add(
+															Core::factory('Core_Html_Entity_Thead')
+																->add($this->_showTableTitleReport($report))
+														);
+
+													if ($yandex_position)
+													{
+														$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex", $param));
+													}
+
+													if ($google_position)
+													{
+														$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.google'), "google", $param));
+													}
+
+													if ($yahoo_position)
+													{
+														$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo", $param));
+													}
+
+													if ($bing_position)
+													{
+														$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing", $param));
+													}
+
+													$oCore_Html_Entity_Table->execute();
+												?>
+												</div>
+											</div>		
+										</div>
+									</div>
+								</div>
+							</div>
+							<script type="text/javascript">
+								$(function(){
+									var queryPositionTitlesPerDay = [<?php echo implode(',', $aQueryPositionTitlesPerDay)?>],
+										themeprimary = getThemeColorFromCss('themeprimary'),
+										dataQueryPositionPerDay = [];
+
+									<?php
+									if ($google_position || $yandex_position || $bing_position || $yahoo_position)
+									{
+									?>
+										for(var i = 0; i < queryPositionTitlesPerDay.length; i++)
+										{
+											queryPositionTitlesPerDay[i] = new Date(queryPositionTitlesPerDay[i]);
+										}
+									<?php
+									}
+
+									if ($google_position)
+									{
+									?>
+										googleValuesPerDay = [<?php echo implode(',', $aGoogleValuesPerDay)?>],
+										googleValueTitlesPerDay = [];
+
+										for(var i = 0; i < queryPositionTitlesPerDay.length; i++) {
+											googleValueTitlesPerDay.push([queryPositionTitlesPerDay[i], googleValuesPerDay[i]]);
+										}
+
+										dataQueryPositionPerDay.push({
+											color: themeprimary,
+											label: "<?php echo Core::_('Seo.google') ?>",
+											data: googleValueTitlesPerDay
+										})
+									<?php
+									}
+
+									if ($yandex_position)
+									{
+									?>
+										yandexValuesPerDay = [<?php echo implode(',', $aYandexValuesPerDay)?>],
+										yandexValueTitlesPerDay = [];
+
+										for(var i = 0; i < queryPositionTitlesPerDay.length; i++) {
+											yandexValueTitlesPerDay.push([queryPositionTitlesPerDay[i], yandexValuesPerDay[i]]);
+										}
+
+										dataQueryPositionPerDay.push({
+											color: themesecondary,
+											label: "<?php echo Core::_('Seo.yandex') ?>",
+											data: yandexValueTitlesPerDay
+										})
+									<?php
+									}
+
+									if ($bing_position)
+									{
+									?>
+										bingValuesPerDay = [<?php echo implode(',', $aBingValuesPerDay)?>],
+										bingValueTitlesPerDay = [];
+
+										for(var i = 0; i < queryPositionTitlesPerDay.length; i++) {
+											bingValueTitlesPerDay.push([queryPositionTitlesPerDay[i], bingValuesPerDay[i]]);
+										}
+
+										dataQueryPositionPerDay.push({
+											color: themethirdcolor,
+											label: "<?php echo Core::_('Seo.bing') ?>",
+											data: bingValueTitlesPerDay
+										})
+									<?php
+									}
+
+									if ($yahoo_position)
+									{
+									?>
+										yahooValuesPerDay = [<?php echo implode(',', $aYahooValuesPerDay)?>],
+										yahooValueTitlesPerDay = [];
+
+										for(var i = 0; i < queryPositionTitlesPerDay.length; i++) {
+											yahooValueTitlesPerDay.push([queryPositionTitlesPerDay[i], yahooValuesPerDay[i]]);
+										}
+
+										dataQueryPositionPerDay.push({
+											color: themefourthcolor,
+											label: "<?php echo Core::_('Seo.yahoo') ?>",
+											data: yahooValueTitlesPerDay
+										})
+									<?php
+									}
+									?>
+
+									var placeholderQueryPositionPerDay = $("#queryPosition<?php echo $oSeo_Query->id;?>-chart"),
+										optionsForQueryPositionGraph = $.extend(true, {}, optionsForGraph, {
+											yaxis: {
+												min: null,												
+												tickFormatter: function(val, axis){ return -val}
+											}
+										});
+
+									placeholderQueryPositionPerDay.bind("plotselected", function (event, ranges) {
+											plotQueryPositionPerDay = $.plot(placeholderQueryPositionPerDay, dataQueryPositionPerDay, $.extend(true, {}, optionsForQueryPositionGraph, {
+												xaxis: {
+													min: ranges.xaxis.from,
+													max: ranges.xaxis.to
+												}
+											}));
+									});
+
+									$('<?php echo '#' . $windowId ?> #queryPosition<?php echo $oSeo_Query->id;?> #setOriginalZoom').on('click', function(){
+										plotQueryPositionPerDay = $.plot(placeholderQueryPositionPerDay, dataQueryPositionPerDay, optionsForQueryPositionGraph);
+									});
+
+									var plotQueryPositionPerDay = $.plot(placeholderQueryPositionPerDay, dataQueryPositionPerDay, optionsForQueryPositionGraph);
+								})
+							</script>
+
+							<?php
+						}
 					}
 				}
 
-				$this->addContent(ob_get_clean());
+				//$this->addContent(ob_get_clean());
+
+				$this->addEntity(
+					Admin_Form_Entity::factory('Code')
+						->html(ob_get_clean())
+				);
+
+				// Контроллер показа формы редактирования с учетом скина
+				$oAdmin_Form_Action_Controller_Type_Edit_Show = Admin_Form_Action_Controller_Type_Edit_Show::create();
+
+				$oAdmin_Form_Action_Controller_Type_Edit_Show
+					->title($this->title)
+					->children($this->_children)
+					->Admin_Form_Controller($this->_Admin_Form_Controller)
+					->formId($this->_formId)
+					->buttons(NULL);
+
+				$this->addContent(
+					$oAdmin_Form_Action_Controller_Type_Edit_Show->showEditForm()
+				);
+
 				return TRUE;
 
 			default:
@@ -574,13 +1475,21 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	*/
 	protected function _drawStatusReport($value)
 	{
+		/*	
 		$oCore_Html_Entity_Img = Core::factory('Core_Html_Entity_Img');
 
 		$value ? $oCore_Html_Entity_Img->src('/admin/images/check.gif')
 			: $oCore_Html_Entity_Img->src('/admin/images/not_check.gif');
+			*/
 
 		ob_start();
-			$oCore_Html_Entity_Img->execute();
+		
+		if ($value)
+		{
+			echo '<i class="fa fa-check success"></i>';
+		}
+		
+		//$oCore_Html_Entity_Img->execute();
 		return ob_get_clean();
 	}
 
@@ -606,15 +1515,15 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		$oCore_Html_Entity_Tr = Core::factory('Core_Html_Entity_Tr')
-			->class('admin_table_title')
-			->add(Core::factory('Core_Html_Entity_Td')->width('150px'));
+			//->class('admin_table_title')
+			->add(Core::factory('Core_Html_Entity_Th')->width('150px'));
 
 		for($i = 0; $i < $count; $i++)
 		{
 			if (isset($report[$i]))
 			{
 				//Дата
-				$oCore_Html_Entity_Tr->add(Core::factory('Core_Html_Entity_Td')
+				$oCore_Html_Entity_Tr->add(Core::factory('Core_Html_Entity_Th')
 					->value(Core_Date::sql2date($report[$i]['datetime']))
 				);
 			}
@@ -692,7 +1601,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		$oCore_Html_Entity_Tr = Core::factory('Core_Html_Entity_Tr')
-			->class('row')
+			//->class('row')
 			->add(Core::factory('Core_Html_Entity_Td')->width('150px')
 				->value($field_name));
 
@@ -927,21 +1836,31 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	{
 		if ($prev_value != false && $current_value != false)
 		{
+			/*
 			$oCore_Html_Entity_Span = Core::factory('Core_Html_Entity_Span');
 
 			if ($prev_value < $current_value)
-			{
-				$oCore_Html_Entity_Span->class('arrow_up')
-					->value('&uarr;');
+			{				
+				 $oCore_Html_Entity_Span->class('arrow_up')
+					->value('&uarr;'); 
+				
 			}
 			elseif ($prev_value > $current_value)
 			{
-				$oCore_Html_Entity_Span->class('arrow_down')
-					->value('&darr;');
+				 $oCore_Html_Entity_Span->class('arrow_down')
+					->value('&darr;'); 
+					
 			}
-
-			ob_start();
-				$oCore_Html_Entity_Span->execute();
+			*/
+			ob_start();			
+			
+			if ($change_value = $current_value - $prev_value)
+			{
+				echo ' <i class="fa fa-' . ($change_value > 0 ? 'sort-asc success' : 'sort-desc danger') . '"></i>';
+			}	
+						
+			//$oCore_Html_Entity_Span->execute();
+			
 			return ob_get_clean();
 		}
 	}
@@ -964,12 +1883,14 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	*/
 	protected function _showArrowQuery($prev_value, $current_value)
 	{
-		if ($prev_value !== false && $current_value !== false)
+		if ($prev_value !== false && $current_value !== false && $current_value != 0)
 		{
-			if($current_value != 0)
-			{
+			//if ()
+			//{
+				/*
 				$oCore_Html_Entity_Span = Core::factory('Core_Html_Entity_Span');
 
+				
 				if ($prev_value > $current_value || $prev_value == 0)
 				{
 					$oCore_Html_Entity_Span->class('arrow_up')
@@ -980,11 +1901,18 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					$oCore_Html_Entity_Span->class('arrow_down')
 						->value('&darr;');
 				}
-
+				*/
+			
 				ob_start();
-					$oCore_Html_Entity_Span->execute();
+				
+				if ($change_value = $prev_value - $current_value)
+				{
+					echo ' <i class="fa fa-' . (($change_value > 0 || -$change_value == $current_value) ? 'sort-asc success' : 'sort-desc danger') . '"></i>';
+				}	
+				
+				//$oCore_Html_Entity_Span->execute();
 				return ob_get_clean();
-			}
+			//}
 		}
 	}
 }

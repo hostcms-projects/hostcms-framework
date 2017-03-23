@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controller
 {
@@ -20,7 +20,6 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	protected $_allowedProperties = array(
 		'title', // Form Title
 		'skipColumns', // Array of skipped columns
-		'xml'
 	);
 
 	/**
@@ -271,9 +270,38 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 */
 	public function setObject($object)
 	{
-		Core_Event::notify(get_class($this) . '.onBeforeSetObject', $this, array($object, $this->_Admin_Form_Controller));
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforeSetObject', $this, array($object, $this->_Admin_Form_Controller));
 
 		parent::setObject($object);
+
+		$className = get_class($this);
+
+		$oReflectionClass = new ReflectionClass($className);
+
+		// Получаем имя класса, в котором объявлен _prepareForm
+		$classNameWithPrepareForm = $oReflectionClass
+			->getMethod('_prepareForm')
+			->getDeclaringClass()
+			->name;
+
+		// В конечном объекте класс _prepareForm() не был переопределен
+		$classNameWithPrepareForm != $className && $this->_prepareForm();
+
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterSetObject', $this, array($object, $this->_Admin_Form_Controller));
+
+		return $this;
+	}
+
+	protected $_prepeared = FALSE;
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		$this->_prepeared = TRUE;
 
 		$this->_loadKeys();
 
@@ -360,8 +388,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 						{
 							$oAdmin_Form_Entity_For_Column = Admin_Form_Entity::factory('Checkbox');
 
-							$oAdmin_Form_Entity_For_Column
-							->value(
+							$oAdmin_Form_Entity_For_Column->value(
 								$this->_object->$columnName
 							);
 							break;
@@ -374,7 +401,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 							->value($this->_object->$columnName);
 
 						if ($sTabName == 'main'
-						&& $this->_tabs[$sTabName]->getCountChildren() == 0)
+							&& $this->_tabs[$sTabName]->getCountChildren() == 0)
 						{
 							$oAdmin_Form_Entity_For_Column->class($oAdmin_Form_Entity_For_Column->class . ' input-lg');
 						}
@@ -436,13 +463,17 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					? 'oAdmin_Form_Tab_EntityAdditional'
 					: 'oAdmin_Form_Tab_EntityMain';*/
 
+				$oEntity_Row = Admin_Form_Entity::factory('Div')->class('row');
+
 				if (/*!is_null($this->_object->getPrimaryKey())
 					|| $sTabName == 'main'*/
 					!(is_null($this->_object->getPrimaryKey()) && $columnName == $primaryKeyName)
 					)
 				{
 					$this->_tabs[$sTabName]->add(
-						$oAdmin_Form_Entity_For_Column
+						$oEntity_Row->add(
+							$oAdmin_Form_Entity_For_Column
+						)
 					);
 				}
 
@@ -450,16 +481,8 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			}
 		}
 
-		Core_Event::notify(get_class($this) . '.onAfterSetObject', $this, array($object, $this->_Admin_Form_Controller));
-
 		return $this;
 	}
-
-	/**
-	 * XML
-	 * @var SimpleXMLElement
-	 */
-	protected $_oSimpleXMLElement = NULL;
 
 	/**
 	 * Executes the business logic.
@@ -470,22 +493,17 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 */
 	public function execute($operation = NULL)
 	{
-		Core_Event::notify(get_class($this) . '.onBeforeExecute', $this, array($operation, $this->_Admin_Form_Controller));
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforeExecute', $this, array($operation, $this->_Admin_Form_Controller));
 
 		switch ($operation)
 		{
 			case NULL: // Показ формы
 
-				$this->_Admin_Form_Controller->title(
-					$this->title
-				);
+				!$this->_prepeared && $this->_prepareForm();
 
-				if ($this->xml)
-				{
-					$this->_oSimpleXMLElement = new SimpleXMLElement(
-						$this->xml
-					);
-				}
+				$this->_Admin_Form_Controller
+					->title($this->title)
+					->pageTitle($this->title);
 
 				$return = $this->_showEditForm();
 
@@ -522,7 +540,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			break;
 		}
 
-		Core_Event::notify(get_class($this) . '.onAfterExecute', $this, array($operation, $this->_Admin_Form_Controller));
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterExecute', $this, array($operation, $this->_Admin_Form_Controller));
 
 		return $return;
 	}
@@ -537,7 +555,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	{
 		ob_start();
 
-		Core_Event::notify(get_class($this) . '.onBeforeApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforeApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		$aColumns = $this->_object->getTableColums();
 
@@ -593,7 +611,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 		!empty($message) && $this->addMessage($message);
 
-		Core_Event::notify(get_class($this) . '.onAfterApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		return $this;
 	}
@@ -629,6 +647,6 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 */
 	protected function _addButtons()
 	{
-		return NULL;
+		return TRUE;
 	}
 }

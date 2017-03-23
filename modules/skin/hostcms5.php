@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Hostcms5 extends Core_Skin
 {
@@ -28,33 +28,32 @@ class Skin_Hostcms5 extends Core_Skin
 		$lng = $this->getLng();
 
 		$this
-			->addJs('/admin/js/jquery/jquery.elastic.js')
-			->addJs('/admin/js/jquery/jquery.tools.js')
-			->addJs('/admin/js/jquery/jquery.form.js')
-			->addJs('/admin/js/main.js')
-			->addJs('/admin/js/hostcms6.js')
-			->addJs('/admin/js/ui/jquery-ui.js')
+			->addJs('/modules/skin/default/js/jquery/jquery.elastic.js')
+			->addJs('/modules/skin/default/js/jquery/jquery.tools.js')
+			->addJs('/modules/skin/bootstrap/js/jquery.form.js')
+			->addJs('/modules/skin/bootstrap/js/main.js')
+			->addJs('/modules/skin/default/js/ui/jquery-ui.js')
 			->addJs('/modules/skin/default/js/default-hostcms.js')
-			->addJs('/admin/js/ui/i18n/jquery.ui.datepicker-' . $lng . '.js')
-			->addJs('/admin/js/ui/jquery-HostCMSWindow.js')
-			->addJs('/admin/js/ui/timepicker/timepicker.js')
-			->addJs('/admin/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
-			->addJs('/admin/js/ui/stars/jquery.ui.stars.js')
-			->addJs('/admin/js/fusionchart/FusionCharts.js')
-			->addJs('/admin/js/typeahead-bs2.min.js')
-			->addJs('/admin/js/bootstrap-tag.js')
-			->addJs('/admin/js/ace.js')
-			->addJs('/admin/js/codemirror/lib/codemirror.js')
-			->addJs('/admin/js/codemirror/mode/css/css.js')
-			->addJs('/admin/js/codemirror/mode/htmlmixed/htmlmixed.js')
-			->addJs('/admin/js/codemirror/mode/javascript/javascript.js')
-			->addJs('/admin/js/codemirror/mode/clike/clike.js')
-			->addJs('/admin/js/codemirror/mode/php/php.js')
-			->addJs('/admin/js/codemirror/mode/xml/xml.js')
-			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
-			->addJs('/admin/js/codemirror/addon/search/searchcursor.js')
-			->addJs('/admin/js/codemirror/addon/search/search.js')
-			->addJs('/admin/js/codemirror/addon/dialog/dialog.js')
+			->addJs('/modules/skin/default/js/ui/i18n/jquery.ui.datepicker-' . $lng . '.js')
+			->addJs('/modules/skin/default/js/ui/jquery-HostCMSWindow.js')
+			->addJs('/modules/skin/default/js/ui/timepicker/timepicker.js')
+			->addJs('/modules/skin/default/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
+			->addJs('/modules/skin/default/js/ui/stars/jquery.ui.stars.js')
+			->addJs('/modules/skin/default/js/fusionchart/FusionCharts.js')
+			->addJs('/modules/skin/bootstrap/js/typeahead-bs2.min.js')
+			->addJs('/modules/skin/bootstrap/js/bootstrap-tag.js')
+			->addJs('/modules/skin/bootstrap/js/ace.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/lib/codemirror.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/css/css.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/htmlmixed/htmlmixed.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/javascript/javascript.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/clike/clike.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/php/php.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/xml/xml.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/selection/active-line.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/search/searchcursor.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/search/search.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/dialog/dialog.js')
 			;
 
 		//if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -66,11 +65,11 @@ class Skin_Hostcms5 extends Core_Skin
 
 		$this
 			->addCss('/modules/skin/' . $this->_skinName . '/css/style.css')
-			->addCss('/admin/js/ui/themes/base/jquery.ui.all.css')
-			->addCss('/admin/js/ui/ui.css')
-			->addCss('/admin/js/ui/stars/ui.stars.css')
-			->addCss('/admin/js/codemirror/lib/codemirror.css')
-			->addCss('/admin/js/codemirror/addon/dialog/dialog.css')
+			->addCss('/modules/skin/default/js/ui/themes/base/jquery.ui.all.css')
+			->addCss('/modules/skin/default/js/ui/ui.css')
+			->addCss('/modules/skin/default/js/ui/stars/ui.stars.css')
+			->addCss('/modules/skin/bootstrap/js/codemirror/lib/codemirror.css')
+			->addCss('/modules/skin/default/js/codemirror/addon/dialog/dialog.css')
 			;
 	}
 
@@ -93,10 +92,10 @@ class Skin_Hostcms5 extends Core_Skin
 			<link rel="stylesheet" type="text/css" href="/modules/skin/<?php echo $this->_skinName?>/css/ie_hacks.css" />
 		<![endif]-->
 
-		<script type="text/javascript">if(!window.jQuery) {document.write('<scri'+'pt type="text/javascript" src="/admin/js/jquery/jquery.js"></scr'+'ipt>');}</script>
+		<script type="text/javascript">if(!window.jQuery) {document.write('<scri'+'pt type="text/javascript" src="/modules/skin/default/js/jquery/jquery.js"></scr'+'ipt>');}</script>
 
 		<?php
-		$this->addJs("/admin/js/lng/{$lng}/{$lng}.js");
+		$this->addJs("/modules/skin/bootstrap/js/lng/{$lng}/{$lng}.js");
 		foreach ($this->_js as $sPath)
 		{
 			Core::factory('Core_Html_Entity_Script')
@@ -104,9 +103,8 @@ class Skin_Hostcms5 extends Core_Skin
 				->src($sPath . '?' . $timestamp)
 				->execute();
 		}
-		?>
 
-		<script type="text/javascript">
+		?><script type="text/javascript">
 		$(function() {
 			$.datepicker.setDefaults({showAnim: 'slideDown', dateFormat: 'dd.mm.yy', showButtonPanel: true});
 			$.afterContentLoad($("#id_content"));
@@ -163,7 +161,9 @@ class Skin_Hostcms5 extends Core_Skin
 <title><?php echo $this->_title?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"></meta>
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></meta>
-<link rel="shortcut icon" href="/admin/favicon.ico"></link>
+<link rel="apple-touch-icon" href="/modules/skin/bootstrap/ico/icon-iphone-retina.png" />
+<link rel="shortcut icon" type="image/x-icon" href="/modules/skin/bootstrap/ico/favicon.ico" />
+<link rel="icon" type="image/png" href="/modules/skin/bootstrap/ico/favicon.png" />
 <?php $this->showHead()?>
 </head>
 <body class="body-<?php echo htmlspecialchars($this->_mode)?> hostcmsWindow backendBody">
@@ -348,9 +348,12 @@ if ($this->_mode != 'blank')
 					{
 						foreach ($oCore_Module->menu as $aMenu)
 						{
-							$aSkin_Config['adminMenu']
-								[$aMenu['block']]
-								['sub'][] = $aMenu + array('sorting' => 0, 'block' => 0);
+							if (isset($aMenu['href']))
+							{
+								$aSkin_Config['adminMenu']
+									[$aMenu['block']]
+									['sub'][] = $aMenu + array('sorting' => 0, 'block' => 0);
+							}
 						}
 					}
 				}
@@ -466,15 +469,13 @@ if ($this->_mode != 'blank')
 			<strong><?php echo Core::_('Core.info_cms')?> HostCMS v. 6</strong>
 			<br />
 			<br />
-			<?php echo Core::_('Core.info_cms_site')?> <a href="http://www.hostcms.ru" target="_blank">www.hostcms.ru</a>
+			<?php echo Core::_('Core.info_cms_site')?> <a href="http://<?php echo Core::_('Admin.company-website')?>" target="_blank"><?php echo Core::_('Admin.company-website')?></a>
 			<br />
-			<?php echo Core::_('Core.info_cms_support')?> <a href="mailto:support@hostcms.ru">support@hostcms.ru</a>
-			<br />
-			<?php echo Core::_('Core.info_cms_sales')?> <a href="mailto:sales@hostcms.ru">sales@hostcms.ru</a>
+			<?php echo Core::_('Core.info_cms_support')?> <a href="mailto:<?php echo Core::_('Admin.company-support')?>"><?php echo Core::_('Admin.company-support')?></a>
 		</div>
 
 		<div id="footer">
-			<div>Copyright &copy; 2005&ndash;2015 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright');" onmouseout="set_timeout_copyright();">ООО &laquo;Хостмэйк&raquo;</span></div>
+			<div>Copyright &copy; 2005&ndash;2015 <span onmousemove="ShowWindow('copyright'); copyright_position('copyright')" onmouseout="set_timeout_copyright()"><?php echo Core::_('Admin.company')?></span></div>
 		</div>
 
 		<!--[if lte IE 6]>
@@ -646,7 +647,7 @@ if ($this->_mode != 'blank')
 					$php_version = phpversion();
 					$mysql_version = Core_DataBase::instance()->getVersion();
 
-					$oHOSTCMS_UPDATE_NUMBER = Core_Entity::factory('Constant')->getByName('HOSTCMS_UPDATE_NUMBER');
+					$oHOSTCMS_UPDATE_NUMBER = Core_Entity::factory('Constant')->getBygetByName('HOSTCMS_UPDATE_NUMBER');
 					$update_id = is_null($oHOSTCMS_UPDATE_NUMBER) ? 0 : $oHOSTCMS_UPDATE_NUMBER->value;
 
 					$oSite_Alias = $oSite->getCurrentAlias();
@@ -902,9 +903,7 @@ if ($this->_mode != 'blank')
 					? Core::_('Admin.index_on')
 					: Core::_('Admin.index_off')?>
 				</span> <br />
-				<?php echo Core::_('Admin.index_tech_date_max_time', ini_get('max_execution_time')
-					? htmlspecialchars(ini_get('max_execution_time')) . " " . Core::_('Admin.seconds')
-					: Core::_('Admin.unknown'))?>
+				<?php echo Core::_('Admin.index_tech_date_max_time') . ' ' . htmlspecialchars(ini_get('max_execution_time')) . ' ' . Core::_('Admin.seconds')?>
 				</span>
 
 				</td>

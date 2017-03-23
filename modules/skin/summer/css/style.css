@@ -42,7 +42,7 @@ body.hostcms6 {
 	box-shadow: 0 0 3px #B8D4CF;
 	-moz-box-shadow: 0 0 3px #B8D4CF;
 	-webkit-box-shadow: 0 0 3px #B8D4CF;
-	behavior: url('/admin/js/pie/pie.htc');
+	behavior: url('/modules/skin/default/js/pie/pie.htc');
 }
 /* Context menu */
 .menuContainer {

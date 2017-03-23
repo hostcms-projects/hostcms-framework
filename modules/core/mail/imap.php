@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Imap extends Core_Servant_Properties
 {
@@ -227,8 +227,12 @@ class Core_Mail_Imap extends Core_Servant_Properties
 				$this->_aMessages[$i]['from'] = '';
 			}
 
-			$this->_aMessages[$i]['subject'] = isset($header_message->subject)
+			/*$this->_aMessages[$i]['subject'] = isset($header_message->subject)
 				? iconv_mime_decode($header_message->subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8')
+				: '';*/
+
+			$this->_aMessages[$i]['subject'] = isset($header_message->subject)
+				? mb_decode_mimeheader($header_message->subject)
 				: '';
 
 			$i++;
@@ -464,6 +468,21 @@ class Core_Mail_Imap extends Core_Servant_Properties
 					$this->_aMessages[$i]['attachments'][$n]['type'] = $partType;
 					$this->_aMessages[$i]['attachments'][$n]['body'] = $body;
 
+					if (isset($aStructurePart['parameters']['name']))
+					{
+						$this->_aMessages[$i]['attachments'][$n]['name'] = mb_decode_mimeheader(
+							$aStructurePart['parameters']['name']
+						);
+
+					}
+					elseif (isset($aStructurePart['dparameters']['filename']))
+					{
+						$this->_aMessages[$i]['attachments'][$n]['name'] = mb_decode_mimeheader(
+							$aStructurePart['dparameters']['filename']
+						);
+					}
+
+					/*
 					if (function_exists('imap_fetchmime'))
 					{
 						$mime = imap_fetchmime($this->_stream, $i + 1, $iStructurePartNumber + 1);
@@ -471,6 +490,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 
 						foreach ($aImapMimeHeaderDecode as $key => $oObject)
 						{
+							var_dump($oObject);
 							// Если у $oObject->text встретился name=, то следующий объект будет содержать имя файла
 							if (strpos($oObject->text, 'name=') !== FALSE && isset($aImapMimeHeaderDecode[$key + 1]))
 							{
@@ -613,7 +633,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 								}
 							}
 						}
-					}
+					}*/
 
 					$n++;
 				break;

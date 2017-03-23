@@ -8,9 +8,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_Type_Edit{	/**
+class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_Type_Edit
+{
+	/**
 	 * Operation name
 	 * @val string
 	 */
@@ -55,10 +57,15 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 						$this->title
 					);
 
-					ob_start();
-
 					$oXml = $Site_Controller_Template->loadTemplatesXml();
 
+					/*ob_start();
+					var_dump($oXml);
+					file_put_contents(CMS_FOLDER . "debug.txt", ob_get_clean());*/
+					
+					ob_start();
+
+					
 					?><div id="gallery"><?php
 					$aGroups = $oXml->children();
 
@@ -79,16 +86,13 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 									$small_height = 200 + 40;
 									// вывод информации о шаблоне
 									?>
-									<div class="site_template_block">
+									<div class="site_template_block col-lg-4 col-md-6 col-sm-6">
 									<div class="bord_img" style="width: <?php echo $small_width?>px; height:<?php echo $small_height?>px;">
-
 										<a href="<?php echo $Site_Controller_Template->server . trim((string)$oTemplate->template_full_preview)?>" target="_blank">
 										<img src="<?php echo $Site_Controller_Template->server . trim((string)$oTemplate->template_preview)?>" width="<?php echo $small_width?>" />
 										</a>
-
-										<div class="bottom">
+										<div class="bottom bottom_patch">
 											<input style="float: left" type="radio" <?php if ($iKeyTemplate == 0 && $iKeyGroup == 0) {echo 'checked="checked"';} ?> name="template_id" id="template_<?php echo (string)$oTemplate['id']?>" value="<?php echo (string)$oTemplate['id']?>" />
-
 											<label for="template_<?php echo (string)$oTemplate['id']?>" style="margin-left: 5px; float: left">
 												<b><?php echo (string)$oTemplate->template_name?></b>
 												<br />
@@ -129,6 +133,9 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 						->caption('Main')
 						->name('main');
 
+					$oMainTab
+						->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+						
 					$this->addTab($oMainTab);
 
 					$this->title(Core::_('Site.choose_color_scheme'));
@@ -179,11 +186,15 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 							</div>
 							<?php
 
-							$oMainTab->add(
+							/*$oMainTab->add(
 								Admin_Form_Entity::factory('Code')->html(
 									ob_get_clean()
 								)
-							);
+							);*/
+							
+							$oMainRow1->add(Admin_Form_Entity::factory('Code')->html(
+									ob_get_clean()
+								));
 
 							$return = $this->_showEditForm();
 							break;
@@ -199,6 +210,9 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 						->caption('Main')
 						->name('main');
 
+					$oMainTab
+						->add($oSettingsTableRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+						
 					$this->addTab($oMainTab);
 
 					$this->title(Core::_('Site.template_settings'));
@@ -275,8 +289,10 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 							if (count($aXmlFields))
 							{
-								?><p><?php echo Core::_('install.template_data_information')?></p>
-								<table border="0" cellspacing="2" cellpadding="2" class="admin_table">
+								?>
+								<div class="form-group col-lg-6 col-md-6">
+								<p><?php echo Core::_('install.template_data_information')?></p>
+								<table border="0" cellspacing="2" cellpadding="2" class="admin_table admin_table_patch table table-hover table-striped table-bordered">
 								<tr class="admin_table_title">
 									<td><?php echo Core::_('install.table_field_param')?></td>
 									<td><?php echo Core::_('install.table_field_value')?></td>
@@ -298,7 +314,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 									$iFieldType = intval($aFieldsValue['Type']);
 
 									// Название поля
-									?><tr class="row">
+									?><tr class="row row_patch">
 										<td><?php echo $sFieldName?></td>
 										<td><?php
 
@@ -306,12 +322,12 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 									{
 										case 0: // текст
 											?>
-											<input type="text" size="50" name="<?php echo $sFieldMacros?>" value="<?php echo $sFieldValue?>" />
+											<input class="form-control" type="text" size="50" name="<?php echo $sFieldMacros?>" value="<?php echo $sFieldValue?>" />
 											<?php
 											break;
 										case 1: // список
 											?>
-											<select name="<?php echo $sFieldMacros?>">
+											<select class="form-control" name="<?php echo $sFieldMacros?>">
 											<?php
 											if (count($sFieldListValue) > 0)
 											{
@@ -328,7 +344,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 											break;
 										case 2: // файл
 											?>
-											<input type="file" size="50" name="<?php echo $sFieldMacros?>" value="<?php echo $sFieldValue?>" />
+											<input class="form-control" type="file" size="50" name="<?php echo $sFieldMacros?>" value="<?php echo $sFieldValue?>" />
 											<?php
 											if (trim($sFieldExtension) != '')
 											{
@@ -345,7 +361,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 											break;
 										case 3: // большое текстовое поле
 											?>
-											<textarea name="<?php echo $sFieldMacros?>" rows="5" cols="47"><?php echo $sFieldValue?></textarea>
+											<textarea class="form-control" name="<?php echo $sFieldMacros?>" rows="5" cols="47"><?php echo $sFieldValue?></textarea>
 											<?php
 											break;
 									}
@@ -353,7 +369,9 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 									</tr>
 									<?php
 								}
-								?></table><?php
+								?></table>
+								</div>
+								<?php
 							}
 							else
 							{
@@ -366,11 +384,14 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 						}
 					}
 
-					$oMainTab->add(
+					/*$oMainTab->add(
 						Admin_Form_Entity::factory('Code')->html(
 							ob_get_clean()
 						)
-					);
+					);*/
+					$oSettingsTableRow1->add(Admin_Form_Entity::factory('Code')->html(
+							ob_get_clean()
+						));
 
 					$return = $this->_showEditForm();
 				break;
@@ -496,7 +517,7 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 		$oAdmin_Form_Entity_Button_Save = Admin_Form_Entity::factory('Button')
 			->name($this->_formOperation)
-			->class('applyButton btn btn-blue')
+			->class('applyButton btn btn-palegreen')
 			->value(Core::_('Install.next'))
 			->onclick(
 				$this->_Admin_Form_Controller->getAdminSendForm(NULL, $this->_formOperation)
@@ -510,8 +531,11 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 	/**
 	 * Processing of the form. Apply object fields.
-	 * @hostcms-event Site_Controller_addSiteWithTemplate.onAfterRedeclaredApplyObjectProperty
-	 */	protected function _applyObjectProperty()	{		//parent::_applyObjectProperty();
+	 */
+	protected function _applyObjectProperty()
+	{
+		//parent::_applyObjectProperty();
+
 		$oConstantLogin = Core_Entity::factory('Constant')->getByName('HOSTCMS_USER_LOGIN');
 		$oConstantNumber = Core_Entity::factory('Constant')->getByName('HOSTCMS_CONTRACT_NUMBER');
 		$oConstantPin = Core_Entity::factory('Constant')->getByName('HOSTCMS_PIN_CODE');
@@ -545,5 +569,5 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 
 		$oConstantPin->value = Core_Array::getPost('HOSTCMS_PIN_CODE');
 		$oConstantPin->save();
-
-		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));	}}
+	}
+}

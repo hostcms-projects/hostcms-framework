@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 {
@@ -89,10 +89,7 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 			}
 
 			ob_start();
-
 			$windowId = $this->_Admin_Form_Controller->getWindowId();
-
-			$oTable = Core::factory('Core_Html_Entity_Table');
 
 			$aLib_Properties = $oLib->Lib_Properties->findAll();
 
@@ -111,30 +108,36 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 					: '<acronym title="' . htmlspecialchars($oLib_Property->description) . '">'
 						. htmlspecialchars($oLib_Property->name) . '</acronym>';
 
-				$oTr = Core::factory('Core_Html_Entity_Tr')
+				$oDivCaption = Core::factory('Core_Html_Entity_Div')
+					->class('col-xs-6 col-sm-6 col-md-5 col-lg-4 no-padding-right')
 					->add(
-						Core::factory('Core_Html_Entity_Td')
+						Core::factory('Core_Html_Entity_Span')
+							->class('caption')
 							->value($acronym)
 					);
 
-				$oTable->add($oTr);
+				$oDivInputs = Core::factory('Core_Html_Entity_Div')
+					->class('col-xs-6 col-sm-6 col-md-7 col-lg-8');
+
+				$oDivRow = Core::factory('Core_Html_Entity_Div')
+					->class('row form-group')
+					->add($oDivCaption)
+					->add($oDivInputs);
 
 				switch ($oLib_Property->type)
 				{
 					case 0: /* Текстовое поле */
-						$oTr->add(
-							Core::factory('Core_Html_Entity_Td')
-								->add(
-									Core::factory('Core_Html_Entity_Input')
-										->size(50)
-										->name("lib_property_id_{$oLib_Property->id}")
-										->value($value)
-								)
+						$oDivInputs->add(
+							Core::factory('Core_Html_Entity_Input')
+								->class('form-control')
+								->name("lib_property_id_{$oLib_Property->id}")
+								->value($value)
 						);
 					break;
 					case 1: /* Флажок */
+						//$oCore_Html_Entity_Checkbox = Admin_Form_Entity::factory('Input')
 						$oCore_Html_Entity_Checkbox = Core::factory('Core_Html_Entity_Input')
-							->size(30)
+							//->controller($this->_Admin_Form_Controller)
 							->name("lib_property_id_{$oLib_Property->id}")
 							->type('checkbox')
 							->id("lib_property_id_{$oLib_Property->id}");
@@ -144,16 +147,21 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 							$oCore_Html_Entity_Checkbox->checked('checked');
 						}
 
-						$oTr->add(
+						$oDivInputs->add(
 							Core::factory('Core_Html_Entity_Td')
-							->add(
-								$oCore_Html_Entity_Checkbox
-							)
-							->add(
-								Core::factory('Core_Html_Entity_Label')
-									->for("lib_property_id_{$oLib_Property->id}")
-									->value('&nbsp;' . Core::_('Admin_Form.yes'))
-							)
+								->add(
+									Core::factory('Core_Html_Entity_Label')
+										->for("lib_property_id_{$oLib_Property->id}")
+										
+										->add(
+											$oCore_Html_Entity_Checkbox
+										)
+										->add(
+											Core::factory('Core_Html_Entity_Span')
+												->class('text')
+												->value('&nbsp;' . Core::_('Admin_Form.yes'))
+										)
+								)
 						);
 					break;
 					case 2: // XSL шаблон
@@ -172,44 +180,54 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 
 						$editXslId = "editXsl_{$this->_object->id}_{$xsl_id}";
 
-						$oTr->add(
-							Core::factory('Core_Html_Entity_Td')
-								->add(
-									Core::factory('Core_Html_Entity_Select')
-										->name("xsl_dir_id_{$oLib_Property->id}")
-										->id("xsl_dir_id_{$oLib_Property->id}")
-										->style('width: 220px')
-										->options(
-											array(' … ') + $aXslDirs
-										)
-										->value($xsl_dir_id)
-										// lib_property_id передается для исключения Abort в ajaxPrefilter
-										->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'lib_property_id_{$oLib_Property->id}', callBack: [$.loadSelectOptionsCallback, function(){\$('#{$windowId} #lib_property_id_{$oLib_Property->id}').val('{$xsl_id}')}], action: 'loadXslList',additionalParams: 'xsl_dir_id=' + this.value + '&lib_property_id={$oLib_Property->id}',windowId: '{$windowId}'}); return false")
-								)
-								->add(
-									Core::factory('Core_Html_Entity_Script')
-										->type("text/javascript")
-										->value("$('#{$windowId} #xsl_dir_id_{$oLib_Property->id}').change();")
-								)
-								->add(
-									Core::factory('Core_Html_Entity_Div')
-										->style('clear: both')
-								)
-								->add(
-									Core::factory('Core_Html_Entity_Select')
-										->name("lib_property_id_{$oLib_Property->id}")
-										->id("lib_property_id_{$oLib_Property->id}")
-										->style('width: 330px')
-										->value($xsl_dir_id)
-								)
-								->add(
-									Core::factory('Core_Html_Entity_Img')
-										->src('/admin/images/edit.gif')
-										->id($editXslId)
-										->class('pointer left5px')
-										->onclick("$.openWindow({path: '/admin/xsl/index.php', additionalParams: 'xsl_dir_id={$xsl_dir_id}&hostcms[checked][1][{$xsl_id}]=1&hostcms[action]=edit'})")
-								)
-						);
+						$oDivInputs->add(
+								Core::factory('Core_Html_Entity_Div')
+									->class('row')
+									->add(
+										Core::factory('Core_Html_Entity_Div')
+											->class('col-xs-12 col-sm-6 col-md-6 col-lg-6')
+											->add(
+												Core::factory('Core_Html_Entity_Select')
+													->name("xsl_dir_id_{$oLib_Property->id}")
+													->id("xsl_dir_id_{$oLib_Property->id}")
+													->class('form-control')
+													->options(
+														array(' … ') + $aXslDirs
+													)
+													->value($xsl_dir_id)
+													->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'lib_property_id_{$oLib_Property->id}', callBack: [$.loadSelectOptionsCallback, function(){var xsl_id = \$('#{$windowId} #lib_property_id_{$oLib_Property->id} [value=\'{$xsl_id}\']').get(0) ? {$xsl_id} : 0; \$('#{$windowId} #lib_property_id_{$oLib_Property->id}').val(xsl_id)}], action: 'loadXslList',additionalParams: 'xsl_dir_id=' + this.value + '&lib_property_id={$oLib_Property->id}',windowId: '{$windowId}'}); return false")
+											)
+									)
+									->add(
+										Core::factory('Core_Html_Entity_Script')
+											->type("text/javascript")
+											->value("$('#{$windowId} #xsl_dir_id_{$oLib_Property->id}').change();")
+									)
+									->add(
+										Core::factory('Core_Html_Entity_Div')
+											->class('col-xs-12 col-sm-6 col-md-6 col-lg-6')
+											->add(
+												Core::factory('Core_Html_Entity_Div')
+													->class('input-group')
+													->add(
+														Core::factory('Core_Html_Entity_Select')
+															->name("lib_property_id_{$oLib_Property->id}")
+															->id("lib_property_id_{$oLib_Property->id}")
+															->class('form-control')
+															->value($xsl_dir_id)
+													)
+													->add(
+														Core::factory('Core_Html_Entity_A')
+															->href("/admin/xsl/index.php?xsl_dir_id={$xsl_dir_id}&hostcms[checked][1][{$xsl_id}]=1&hostcms[action]=edit")
+															->target('_blank')
+															->class('input-group-addon bg-blue bordered-blue')
+															->value('<i class="fa fa-pencil"></i>')
+															//->onclick("return $.openWindow( { path: '/admin/xsl/index.php', additionalParams: 'xsl_dir_id={$xsl_dir_id}&hostcms[checked][1][{$xsl_id}]=1&hostcms[action]=edit' } );")
+													)
+											)
+									)
+							);
+
 					break;
 					case 3: // Список
 						$aLib_Property_List_Values = $oLib_Property->Lib_Property_List_Values->findAll();
@@ -219,18 +237,13 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 							$aOptions[$oLib_Property_List_Value->value] = $oLib_Property_List_Value->name;
 						}
 
-						$oTr->add(
-							Core::factory('Core_Html_Entity_Td')
-								->add(
-									Core::factory('Core_Html_Entity_Select')
-										->name("lib_property_id_{$oLib_Property->id}")
-										->id("lib_property_id_{$oLib_Property->id}")
-										->style('width: 220px')
-										->options(
-											$aOptions
-										)
-										->value($value)
-								)
+						$oDivInputs->add(
+							Core::factory('Core_Html_Entity_Select')
+								->name("lib_property_id_{$oLib_Property->id}")
+								->id("lib_property_id_{$oLib_Property->id}")
+								->class('form-control')
+								->options($aOptions)
+								->value($value)
 						);
 					break;
 					case 4: // SQL-запрос
@@ -265,40 +278,31 @@ class Structure_Controller_Libproperties extends Admin_Form_Action_Controller
 								Core_Message::show($e->getMessage(), 'error');
 							}
 
-							$oTr->add(
-								Core::factory('Core_Html_Entity_Td')
-									->add(
-										Core::factory('Core_Html_Entity_Select')
-											->name("lib_property_id_{$oLib_Property->id}")
-											->id("lib_property_id_{$oLib_Property->id}")
-											->style('width: 220px')
-											->options(
-												$aOptions
-											)
-											->value($value)
-									)
+							$oDivInputs->add(
+								Core::factory('Core_Html_Entity_Select')
+									->name("lib_property_id_{$oLib_Property->id}")
+									->id("lib_property_id_{$oLib_Property->id}")
+									->class('form-control')
+									->options($aOptions)
+									->value($value)
 							);
 						}
 					break;
 					case 5: // Текстовое поле
-						$oTr->add(
-							Core::factory('Core_Html_Entity_Td')
-								->add(
-									Core::factory('Core_Html_Entity_Textarea')
-										->name("lib_property_id_{$oLib_Property->id}")
-										->id("lib_property_id_{$oLib_Property->id}")
-										->cols(48)
-										->rows(5)
-										->value($value)
-								)
+						$oDivInputs->add(
+							Core::factory('Core_Html_Entity_Textarea')
+								->name("lib_property_id_{$oLib_Property->id}")
+								->id("lib_property_id_{$oLib_Property->id}")
+								->class('form-control')
+								->value($value)
 						);
 					break;
 				}
+
+				$oDivRow->execute();
 			}
-			$oTable->execute();
 		}
 
-		echo json_encode(ob_get_clean());
-		exit();
+		Core::showJson(ob_get_clean());
 	}
 }

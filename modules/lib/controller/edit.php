@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -23,23 +23,24 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		
-
 		$oMainTab = $this->getTab('main');
+		$oAdditionalTab = $this->getTab('additional');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		switch ($modelName)
 		{
 			case 'lib':
 				$title = $this->_object->id
 					? Core::_('Lib.lib_form_title_edit')
 					: Core::_('Lib.lib_form_title_add');
 
-				if (is_null($this->_object->id))
+				if (!$this->_object->id)
 				{
 					$this->_object->lib_dir_id = Core_Array::getGet('lib_dir_id');
 				}
-
-				$oAdditionalTab = $this->getTab('additional');
 
 				// Настройки типовой дин. страницы
 				$oAdmin_Form_Tab_Entity_Lib_Config = Admin_Form_Entity::factory('Tab')
@@ -64,7 +65,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
-				$oAdmin_Form_Tab_Entity_Lib_Config->add($oAdmin_Form_Entity_Textarea_Lib_Config);
+				$oAdmin_Form_Tab_Entity_Lib_Config->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainRow3->add($oAdmin_Form_Entity_Textarea_Lib_Config);
 
 				// Код типовой дин. страницы
 				$oAdmin_Form_Tab_Entity_Lib = Admin_Form_Entity::factory('Tab')
@@ -89,7 +92,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions);
 
-				$oAdmin_Form_Tab_Entity_Lib->add($oAdmin_Form_Entity_Textarea_Lib);
+				$oAdmin_Form_Tab_Entity_Lib->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainRow4->add($oAdmin_Form_Entity_Textarea_Lib);
 
 				// Селектор с группой
 				$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
@@ -102,15 +107,12 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->lib_dir_id)
 					->caption(Core::_('Lib.lib_dir_id'));
 
-				//->addAfter($oAdmin_Form_Entity_Textarea_Lib, $this->getField('lib_dir_id'));
-
 				$oAdditionalTab->delete(
 					 $this->getField('lib_dir_id') // Удаляем стандартный <input> lib_dir_id
 				);
 
-				$oMainTab->addBefore(
-					$oAdmin_Form_Entity_Select, $this->getField('description')
-				);
+				$oMainRow1->add($oAdmin_Form_Entity_Select);
+				$oMainTab->move($this->getField('description'), $oMainRow2);
 
 			break;
 			case 'lib_dir':
@@ -120,13 +122,12 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					: Core::_('Lib_Dir.lib_form_title_add_dir');
 
 				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
+				if (!$this->_object->id)
 				{
 					$this->_object->parent_id = Core_Array::getGet('lib_dir_id');
 				}
 
-				$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select');
-				$oAdmin_Form_Entity_Select
+				$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select')
 					->options(
 						array(' … ') + $this->fillLibDir(0, $this->_object->id)
 					)
@@ -134,14 +135,9 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->parent_id)
 					->caption(Core::_('Lib_Dir.parent_id'));
 
-				$oAdditionalTab = $this->getTab('additional');
-				$oAdditionalTab->delete(
-						 $this->getField('parent_id') // Удаляем стандартный <input> parent_id
-					);
+				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oMainTab->add(
-					$oAdmin_Form_Entity_Select
-				);
+				$oMainRow1->add($oAdmin_Form_Entity_Select);
 			break;
 		}
 
@@ -160,7 +156,7 @@ class Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'lib':
 				$this->_object->saveLibFile(Core_Array::getRequest('lib_php_code'));

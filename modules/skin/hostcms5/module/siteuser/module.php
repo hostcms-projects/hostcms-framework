@@ -8,9 +8,15 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Skin_Hostcms5_Module_Siteuser_Module extends Siteuser_Module{	public function adminPage($type = 0, $ajax = FALSE)
+class Skin_Hostcms5_Module_Siteuser_Module extends Siteuser_Module{
+	/**
+	 * Show admin widget
+	 * @param int $type
+	 * @param boolean $ajax
+	 * @return self
+	 */	public function adminPage($type = 0, $ajax = FALSE)
 	{
 		$oSiteusers = Core_Entity::factory('Siteuser');
 		$oSiteusers->queryBuilder()

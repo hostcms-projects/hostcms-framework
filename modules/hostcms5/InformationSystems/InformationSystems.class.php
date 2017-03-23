@@ -3357,32 +3357,32 @@ class InformationSystem
 	function GetAllInformationGroups($param)
 	{
 		$queryBuilder = Core_QueryBuilder::select(
-			array('id', 'information_groups_id'),
-			array('informationsystem_id', 'information_systems_id'),
-			array('siteuser_id', 'site_users_id'),
-			array('parent_id', 'information_groups_parent_id'),
-			array('top_parent_id', 'information_groups_top_parent_id'),
-			array('name', 'information_groups_name'),
-			array('description', 'information_groups_description'),
-			array('sorting', 'information_groups_order'),
-			array('path', 'information_groups_path'),
-			array('image_large', 'information_groups_image'),
-			array('image_small', 'information_groups_small_image'),
-			array('indexing', 'information_groups_allow_indexation'),
-			array('seo_title', 'information_groups_seo_title'),
-			array('seo_description', 'information_groups_seo_description'),
-			array('seo_keywords', 'information_groups_seo_keywords'),
-			array('siteuser_group_id', 'information_groups_access'),
-			array('active', 'information_groups_activity'),
-			array('user_id', 'users_id'),
+			array('informationsystem_groups.id', 'information_groups_id'),
+			array('informationsystem_groups.informationsystem_id', 'information_systems_id'),
+			array('informationsystem_groups.siteuser_id', 'site_users_id'),
+			array('informationsystem_groups.parent_id', 'information_groups_parent_id'),
+			array('informationsystem_groups.top_parent_id', 'information_groups_top_parent_id'),
+			array('informationsystem_groups.name', 'information_groups_name'),
+			array('informationsystem_groups.description', 'information_groups_description'),
+			array('informationsystem_groups.sorting', 'information_groups_order'),
+			array('informationsystem_groups.path', 'information_groups_path'),
+			array('informationsystem_groups.image_large', 'information_groups_image'),
+			array('informationsystem_groups.image_small', 'information_groups_small_image'),
+			array('informationsystem_groups.indexing', 'information_groups_allow_indexation'),
+			array('informationsystem_groups.seo_title', 'information_groups_seo_title'),
+			array('informationsystem_groups.seo_description', 'information_groups_seo_description'),
+			array('informationsystem_groups.seo_keywords', 'information_groups_seo_keywords'),
+			array('informationsystem_groups.siteuser_group_id', 'information_groups_access'),
+			array('informationsystem_groups.active', 'information_groups_activity'),
+			array('informationsystem_groups.user_id', 'users_id'),
 			'sns_type_id',
-			array('items_count', 'count_items'),
-			array('items_total_count', 'count_all_items'),
-			array('subgroups_count', 'count_groups'),
-			array('subgroups_total_count', 'count_all_groups')
+			array('informationsystem_groups.items_count', 'count_items'),
+			array('informationsystem_groups.items_total_count', 'count_all_items'),
+			array('informationsystem_groups.subgroups_count', 'count_groups'),
+			array('informationsystem_groups.subgroups_total_count', 'count_all_groups')
 		)
 		->from('informationsystem_groups')
-		->where('deleted', '=', 0);
+		->where('informationsystem_groups.deleted', '=', 0);
 
 		if (isset($param['select_fields']))
 		{
@@ -3395,27 +3395,27 @@ class InformationSystem
 
 		if (isset($param['groups_activity']) && $param['groups_activity'] == 1)
 		{
-			$queryBuilder->where('active', '=', 1);
+			$queryBuilder->where('informationsystem_groups.active', '=', 1);
 		}
 
 		if (isset($param['xml_show_group_id'])
 		&& is_array($param['xml_show_group_id'])
 		&& count($param['xml_show_group_id']) > 0)
 		{
-			$queryBuilder->where('id', 'IN', $param['xml_show_group_id']);
+			$queryBuilder->where('informationsystem_groups.id', 'IN', $param['xml_show_group_id']);
 		}
 
 		if (isset($param['groups_parent_id']) && $param['groups_parent_id'] !== FALSE)
 		{
 			$param['groups_parent_id'] = intval($param['groups_parent_id']);
-			$queryBuilder->where('parent_id', '=', $param['groups_parent_id']);
+			$queryBuilder->where('informationsystem_groups.parent_id', '=', $param['groups_parent_id']);
 		}
 
 		$information_system_id = Core_Type_Conversion::toInt($param['information_system_id']);
 
 		if ($information_system_id)
 		{
-			$queryBuilder->where('informationsystem_id', '=', $information_system_id);
+			$queryBuilder->where('informationsystem_groups.informationsystem_id', '=', $information_system_id);
 		}
 
 		$oInformationsystem = Core_Entity::factory('Informationsystem')->find($information_system_id);
@@ -3441,7 +3441,7 @@ class InformationSystem
 		}
 		else
 		{
-			$order_field = 'sorting';
+			$order_field = 'informationsystem_groups.sorting';
 		}
 
 		// Если явно не передано направление сортировки
@@ -3476,7 +3476,7 @@ class InformationSystem
 			$not_in_mass = explode(',', $param['NotInGroup']);
 
 			$not_in_mass = Core_Array::toInt($not_in_mass);
-			$queryBuilder->where('id', 'NOT IN', $not_in_mass);
+			$queryBuilder->where('informationsystem_groups.id', 'NOT IN', $not_in_mass);
 		}
 
 		if (isset($param['groups_on_page']) )
@@ -3484,12 +3484,81 @@ class InformationSystem
 			$queryBuilder->limit(Core_Type_Conversion::toInt($param['groups_begin']), Core_Type_Conversion::toInt($param['groups_on_page']));
 		}
 
+		// Формируем дополнительные условия для выборки
+		if (isset($param['select_groups'])
+			&& is_array($param['select_groups'])
+			&& count($param['select_groups']))
+		{
+			foreach ($param['select_groups'] as $key => $value)
+			{
+				if ($value['type'] == 0) // Основное свойство
+				{
+					$this->parseQueryBuilder($value['prefix'], $queryBuilder);
+
+					$value['value'] = Core_Type_Conversion::toStr($value['value']);
+
+					$value['name'] != '' && $value['if'] != ''
+						&& $queryBuilder->where($value['name'], $value['if'], $value['value']);
+
+					$this->parseQueryBuilder($value['sufix'], $queryBuilder);
+				}
+				else // Дополнительное свойство
+				{
+					if (Core_Type_Conversion::toInt($value['property_id']) != 0)
+					{
+						$this->parseQueryBuilder($value['prefix'], $queryBuilder);
+
+						$queryBuilder->where('informationsystem_group_properties.property_id', '=', $value['property_id']);
+
+						$aPropertyValueTable = $this->getPropertyValueTableName(Core_Entity::factory('Property', $value['property_id'])->type);
+
+						$queryBuilder->where(
+							$aPropertyValueTable['tableName'] . '.' . $aPropertyValueTable['fieldName'], $value['if'], $value['value']
+						);
+
+						$this->parseQueryBuilder($value['sufix'], $queryBuilder);
+					}
+				}
+			}
+
+			// JOIN WITH PROPERTIES
+			$queryBuilder
+				->leftJoin('informationsystem_group_properties', 'informationsystem_groups.informationsystem_id', '=', 'informationsystem_group_properties.informationsystem_id')
+				->leftJoin('property_value_ints', 'informationsystem_groups.id', '=', 'property_value_ints.entity_id',
+					array(
+						array('AND' => array('informationsystem_group_properties.property_id', '=', Core_QueryBuilder::expression('property_value_ints.property_id')))
+					)
+				)
+				->leftJoin('property_value_strings', 'informationsystem_groups.id', '=', 'property_value_strings.entity_id',
+					array(
+						array('AND' => array('informationsystem_group_properties.property_id', '=', Core_QueryBuilder::expression('property_value_strings.property_id')))
+					)
+				)
+				->leftJoin('property_value_texts', 'informationsystem_groups.id', '=', 'property_value_texts.entity_id',
+					array(
+						array('AND' => array('informationsystem_group_properties.property_id', '=', Core_QueryBuilder::expression('property_value_texts.property_id')))
+					)
+				)
+				->leftJoin('property_value_datetimes', 'informationsystem_groups.id', '=', 'property_value_datetimes.entity_id',
+					array(
+						array('AND' => array('informationsystem_group_properties.property_id', '=', Core_QueryBuilder::expression('property_value_datetimes.property_id')))
+					)
+				)
+				->leftJoin('property_value_files', 'informationsystem_groups.id', '=', 'property_value_files.entity_id',
+					array(
+						array('AND' => array('informationsystem_group_properties.property_id', '=', Core_QueryBuilder::expression('property_value_files.property_id')))
+					)
+				);
+		}
+		
 		$aGroups = $queryBuilder->execute()->asAssoc()->result();
 
 		$aReturn = array();
 		foreach($aGroups as $aRow)
 		{
-			$aReturn[isset($param['select_fields']) ? $aRow['id'] : $aRow['information_groups_id']] = $aRow;
+			$aReturn[isset($param['select_fields'])
+				? $aRow['id']
+				: $aRow['information_groups_id']] = $aRow;
 		}
 
 		return $aReturn;
@@ -8670,7 +8739,7 @@ class InformationSystem
 
 		$param['information_system_id'] = $InformationSystem_id;
 
-		$param['select_fields'] = array('id', 'parent_id');
+		$param['select_fields'] = array('informationsystem_groups.id', 'informationsystem_groups.parent_id');
 
 		$mas_groups = $this->GetAllInformationGroups($param);
 
@@ -10877,7 +10946,7 @@ class InformationSystem
 
 		$param['informationsystem_id'] = $information_system_id;
 
-		$param['select_fields'] = array('id', 'parent_id');
+		$param['select_fields'] = array('informationsystem_groups.id', 'informationsystem_groups.parent_id');
 
 		$mas_groups = $this->GetAllInformationGroups($param);
 

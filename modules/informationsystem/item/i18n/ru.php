@@ -5,7 +5,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Информационные элементы',
@@ -62,6 +62,7 @@ return array(
 	'seo_keywords' => '<acronym title="Значение мета-тега <keywords> для информационного элемента">Ключевые слова (Keywords)</acronym>',
 
 	'tags' => '<acronym title="Метки (теги) информационного элемента, разделяются запятой, например процессоры, AMD, Athlon64">Метки (теги)</acronym>',
+	'type_tag' => 'Введите тэг ...',
 
 	'error_information_group_URL_item' => 'В группе уже существует информационный элемент с таким названием в URL!',
 	'error_information_group_URL_item_URL' => 'В группе существует подгруппа с URL, совпадающим с названием элемента в URL!',

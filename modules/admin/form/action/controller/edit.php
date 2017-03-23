@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,7 +22,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		$this
 			->addSkipColumn('admin_word_id');
 
-		if (is_null($object->admin_form_id))
+		if (!$object->admin_form_id)
 		{
 			$object->admin_form_id = Core_Array::getGet('admin_form_id', 0);
 		}
@@ -37,6 +37,14 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 		$this
 			->addTabBefore($oNameTab, $oMainTab);
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		// Название и описание для всех языков
 		$aAdmin_Languages = Core_Entity::factory('Admin_Language')->findAll();
@@ -64,7 +72,7 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Action.action_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
-					->class('input-lg')
+					->class('form-control')
 					->format(
 						array(
 							'maxlen' => array('value' => 255),
@@ -79,32 +87,52 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->rows(2);
 
 				$oNameTab
-					->add($oAdmin_Form_Entity_Input_Name)
-					->add($oAdmin_Form_Entity_Textarea_Description);
+					->add(
+						Admin_Form_Entity::factory('Div')
+							->class('row')
+							->add($oAdmin_Form_Entity_Input_Name)
+					)
+					->add(
+						Admin_Form_Entity::factory('Div')
+							->class('row')
+							->add($oAdmin_Form_Entity_Textarea_Description)
+					);
 			}
 		}
 
+		$this->getField('name')->class('form-control');
+		$oMainTab->move($this->getField('name'), $oMainRow1);
+
 		$this->getField('picture')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 300px');
-			
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+
 		$this->getField('icon')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 250px');				
-			
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+
 		$this->getField('color')
-			->style('width: 250px');			
-			
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+
+		$oMainTab
+			->move($this->getField('picture'), $oMainRow2)
+			->move($this->getField('icon'), $oMainRow2)
+			->move($this->getField('color'), $oMainRow2);
+
+		$oMainTab->move($this->getField('single'), $oMainRow3);
+		$oMainTab->move($this->getField('group'), $oMainRow4);
+
 		$this->getField('sorting')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
 
 		$this->getField('dataset')
-			//->divAttr(array('style' => 'float: left'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
 
+		$oMainTab
+			->move($this->getField('sorting'), $oMainRow5)
+			->move($this->getField('dataset'), $oMainRow5);
 
-		//
+		$oMainTab
+			->move($this->getField('confirm'), $oMainRow6);
+
 		$oAdmin_Word_Value = $this->_object->Admin_Word->getWordByLanguage(CURRENT_LANGUAGE_ID);
 		$form_name = $oAdmin_Word_Value ? $oAdmin_Word_Value->name : '';
 

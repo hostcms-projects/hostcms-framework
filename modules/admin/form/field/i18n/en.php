@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Administration center form fields',
@@ -31,15 +31,9 @@ return array(
 	'allow_sorting' => '<acronym title="Enable alphabetical sorting">Enable sorting</acronym>',
 	'allow_filter' => '<acronym title="Enable field values filter">Enable filter</acronym>',
 	'editable' => '<acronym title="Allow edit field in place">Allow edit in place</acronym>',
-	'title_align' => '<acronym title="Title alignment">Title alignment</acronym>',
-
-	'left' => 'Left',
-	'center' => 'Center',
-	'right' => 'Right',
-
-	'align' => '<acronym title="Data alignment">Data alignment</acronym>',
 	'width' => '<acronym title="Field width in pixels, per cents etc. e.g. 45px/">Field width</acronym>',
-	'style' => '<acronym title="CSS style of field displaying">CSS style</acronym>',
+	'ico' => '<acronym title="Field\'s ico, e.g. &quot;fa fa-comment&quot;">Icon class</acronym>',
+	'class' => '<acronym title="CSS class">CSS class</acronym>',
 	'attributes' => '<acronym title="Field attributes list">Attributes</acronym>',
 	'image' => '<acronym title="Correspondence of pictures and field values that is set as <Field value>=<Path to picture>">Correspondence of pictures and field values</acronym>',
 	'link' => '<acronym title="Link with substitution">Link</acronym>',

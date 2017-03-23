@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Answer extends Core_Servant_Properties
 {
@@ -58,7 +58,7 @@ class Admin_Answer extends Core_Servant_Properties
 	protected function _showHeader()
 	{
 		$this->skin && Core_Skin::instance()
-			->setMode(Core_Array::getRequest('hostcmsMode'))
+			->setMode(Core_Array::getRequest('hostcmsMode', Core_Skin::instance()->getMode()))
 			->title($this->title)
 			->header();
 

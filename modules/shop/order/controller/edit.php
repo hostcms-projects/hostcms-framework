@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,32 +22,32 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this
 			->addSkipColumn('unloaded');
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_id = Core_Array::getGet('shop_id');
 		}
 
 		parent::setObject($object);
 
+		$objectId = intval($this->_object->id);
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
+
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparator = Admin_Form_Entity::factory('Separator');
 
 		$this
-			->addTabAfter
-				(
+			->addTabAfter(
 					$oDescriptionTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab3'))
 						->name('Description'), $oMainTab
 				)
-			->addTabAfter
-				(
+			->addTabAfter(
 					$oContactsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab2'))
 						->name('Contacts'), $oMainTab
 				)
-			->addTabAfter
-				(
+			->addTabAfter(
 					$oDocumentsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Order.tab4'))
 						->name('Documents'), $oContactsTab
@@ -57,64 +57,65 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$Shop_Delivery_Condition_Controller_Edit->controller($this->_Admin_Form_Controller);
 
-		// Удаляем страны
-		$oAdditionalTab->delete(
-			$this->getField('shop_country_id')
-		);
-
-		// Удаляем местоположения
-		$oAdditionalTab->delete(
-			$this->getField('shop_country_location_id')
-		);
-
-		// Удаляем города
-		$oAdditionalTab->delete(
-			$this->getField('shop_country_location_city_id')
-		);
-
-		// Удаляем районы
-		$oAdditionalTab->delete(
-			$this->getField('shop_country_location_city_area_id')
-		);
-
-		$lastField = $Shop_Delivery_Condition_Controller_Edit
-			->generateCountryFields($this,
-					$oContactsTab,
-					NULL
-				);
-
 		$oMainTab
-			->moveAfter($oPostcodeField = $this->getField('postcode'), $lastField, $oContactsTab)
-			->moveAfter($oAddressField = $this->getField('address'), $oPostcodeField, $oContactsTab)
-			->moveAfter($oSurnameField = $this->getField('surname'), $oAddressField, $oContactsTab)
-			->moveAfter($oNameField = $this->getField('name'), $oSurnameField, $oContactsTab)
-			->moveAfter($oPatronymicField = $this->getField('patronymic'), $oNameField, $oContactsTab)
-			->moveAfter($oCompanyField = $this->getField('company'), $oPatronymicField, $oContactsTab)
-			->moveAfter($oPhoneField = $this->getField('phone'), $oCompanyField, $oContactsTab)
-			->moveAfter($oFaxField = $this->getField('fax'), $oPhoneField, $oContactsTab)
-			->moveAfter($oEmailField = $this->getField('email'), $oFaxField, $oContactsTab);
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$oMainTab->move($this->getField('guid'), $oAdditionalTab);
+		$oContactsTab
+			->add($oContactsTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oContactsTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oContactsTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oContactsTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oContactsTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oContactsTabRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$oMainTab
-			->moveBefore($oInvoiceField = $this->getField('invoice'), $oIpField = $this->getField('ip'), $oMainTab)
-			->moveAfter($oDatetimeField = $this->getField('datetime'), $oInvoiceField, $oMainTab);
+		$oDocumentsTab
+			->add($oDocumentsTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oDocumentsTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oDocumentsTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oDocumentsTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
+		$oDescriptionTab
+			->add($oDescriptionTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oDescriptionTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oDescriptionTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
 		$oAdditionalTab
-			->moveAfter($oSiteuseridField = $this->getField('siteuser_id'), $oDatetimeField, $oMainTab);
+			->add($oAdditionalTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oAdditionalTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$oOrderSumTextBox = Admin_Form_Entity::factory('Input')
-			->name("sum")
-			->style("width: 150px");
+		$oMainTab->move($this->getField('postcode')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow3);
+		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-9 col-md-9 col-sm-9 col-xs-12')), $oContactsTabRow3);
 
-		$oMainTab
-			->addAfter($oOrderSumTextBox, $oSiteuseridField)
-			->moveAfter($oPaidField = $this->getField('paid'), $oOrderSumTextBox, $oMainTab)
-			->moveAfter($oCanceledField = $this->getField('canceled'), $oPaidField, $oMainTab)
-			->moveAfter($oPaymentdatetimeField = $this->getField('payment_datetime'), $oCanceledField, $oMainTab)
-			->moveAfter($oStatusdatetimeField = $this->getField('status_datetime'), $oPaymentdatetimeField, $oMainTab);
+		$oMainTab->move($this->getField('surname')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('name')->class('form-control')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('patronymic')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('company')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
 
-		$this->getField('status_datetime')->id('status_datetime');
+		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
+		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
+		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-12')), $oContactsTabRow5);
+
+		$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oContactsTabRow6);
+		$oMainTab->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oContactsTabRow6);
+
+		$oMainTab->move($this->getField('guid'), $oAdditionalTab);
+		$oAdditionalTab->move($this->getField('shop_id')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow1);
+		$oAdditionalTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow2);
+
+		$oMainTab->move($this->getField('invoice')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
+		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
+		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')), $oMainRow1);
 
 		if ($this->_object->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
@@ -122,71 +123,39 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oSiteuserLink = Admin_Form_Entity::factory('Link');
 			$oSiteuserLink
-				->divAttr(array('style' => 'float: left'))
+				->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
 				->a
+					->class('btn btn-labeled btn-sky')
 					->href($this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/siteuser/siteuser/index.php', 'edit', NULL, 0, $oSiteuser->id))
 					->onclick("$.openWindowAddTaskbar({path: '/admin/siteuser/siteuser/index.php', additionalParams: 'hostcms[checked][0][{$oSiteuser->id}]=1&hostcms[action]=edit', shortcutImg: '" . '/modules/skin/' . Core_Skin::instance()->getSkinName() . '/images/module/siteuser.png' . "', shortcutTitle: 'undefined', Minimize: true}); return false")
 					->value($oSiteuser->login)
 					->target('_blank');
 			$oSiteuserLink
-				->img
-					->src('/admin/images/new_window.gif');
+				->icon
+					->class('btn-label fa fa-user');
 
-			$oMainTab->addAfter($oSiteuserLink, $oSiteuseridField);
-
-			$oMainTab->addAfter($oSeparator, $oSiteuserLink);
-		}
-		else
-		{
-			$oMainTab->addAfter($oSeparator, $oSiteuseridField);
+			$oMainRow1->add($oSiteuserLink);
 		}
 
-		$oMainTab
-			->move($oDescriptionField = $this->getField('description'), $oDescriptionTab)
-			->moveAfter($oSysteminformationField = $this->getField('system_information'), $oDescriptionField, $oDescriptionTab)
-			->moveAfter($oDeliveryinformationField = $this->getField('delivery_information'), $oSysteminformationField, $oDescriptionTab);
-
-		$oInvoiceField
-			->class('input-lg')
-			->divAttr(array('style' => 'float: left'))
-			->style("width: 150px;");
-
-		$oDatetimeField
-			->class("calendar_field_large")
-			->divAttr(array('style' => 'float: left'));
-
-		$oSiteuseridField
-			->class("input-lg")
-			->divAttr(array('style' => 'float: left'))
-			->style("width: 150px;");
-
-		$oOrderSumTextBox
-			->divAttr(array('style' => 'float: left'))
-			->class("input-lg")
-			->style("width: 150px; ")
-			->value($this->_object->getAmount())
-			->readonly('readonly')
-			->caption(Core::_("Shop_Order.cond_of_delivery_add_form_price_order"));
-
-		$oAdditionalTab->delete(
-			$this->getField('shop_currency_id')
-		);
-
-		$oCurrencySelect = Admin_Form_Entity::factory('Select');
-		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
-
-		$oCurrencySelect
-			->caption(Core::_('Shop_Order.order_currency'))
-			->style("width: 150px")
-			->class('input-lg')
-			->divAttr(array('style' => 'float: left'))
-			->options(
-					$Shop_Controller_Edit->fillCurrencies()
-				)
-			->name('shop_currency_id')
-			->value($this->_object->shop_currency_id);
-
-		$oMainTab->addAfter($oCurrencySelect, $oOrderSumTextBox);
+		$oMainRow2
+			->add(
+				Admin_Form_Entity::factory('Input')
+					->name('sum')
+					->value($this->_object->getAmount())
+					->readonly('readonly')
+					->caption(Core::_("Shop_Order.cond_of_delivery_add_form_price_order"))
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+			)
+			->add(
+				Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Order.order_currency'))
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+					->options(
+						$Shop_Controller_Edit->fillCurrencies()
+					)
+					->name('shop_currency_id')
+					->value($this->_object->shop_currency_id)
+			);
 
 		$shop_group_id = Core_Array::getGet('shop_group_id', 0);
 		$shop_dir_id = Core_Array::getGet('shop_dir_id', 0);
@@ -198,8 +167,9 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oItemsLink = Admin_Form_Entity::factory('Link');
 		$oItemsLink
-			->divAttr(array('style' => 'float: left'))
+			->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
 			->a
+				->class('btn btn-labeled btn-success')
 				->href($this->_Admin_Form_Controller->getAdminLoadHref(
 						$sShopOrderItemsPath, NULL, NULL, $sAdditionalParams
 					)
@@ -209,56 +179,213 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					))
 				->value(Core::_('Shop_Order.order_items_link'));
 		$oItemsLink
-			->img
-				->src('/admin/images/page.gif');
+			->icon
+				->class('btn-label fa fa-list');
 
-		$oMainTab->addAfter($oItemsLink, $oCurrencySelect);
+		$oMainRow2->add($oItemsLink);
 
-		$oMainTab->addAfter($oSeparator, $oItemsLink);
+		$oMainTab->move($this->getField('paid')->divAttr(
+				array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')
+			), $oMainRow3);
+		$oMainTab->move($this->getField('canceled')->divAttr(
+				array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')
+			), $oMainRow3);
 
-		$oPaidField
-			->divAttr(array('style' => 'float: left'));
+		$oMainTab->move($this->getField('payment_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow4);
+
+		$oMainRow4->add(
+			Admin_Form_Entity::factory('Select')
+				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
+				->caption(Core::_('Shop_Order.system_of_pay'))
+				->options(
+					$this->_fillPaymentSystems(Core_Array::getGet('shop_id', 0))
+				)
+				->name('shop_payment_system_id')
+				->value($this->_object->shop_payment_system_id)
+		);
+
+		$oMainRow4->add(
+			Admin_Form_Entity::factory('Select')
+				->caption(Core::_('Shop_Order.show_order_status'))
+				->options(
+					$Shop_Controller_Edit->fillOrderStatuses(Core_Array::getGet('shop_id', 0))
+				)
+				->name('shop_order_status_id')
+				->value($this->_object->shop_order_status_id)
+				->onchange("$.changeOrderStatus('{$windowId}')")
+				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
+		);
+
+		$oMainTab->move($this->getField('status_datetime')
+			->id('status_datetime')
+			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow5);
+
+		$oMainTab->move($this->getField('ip')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow5);
+
+		$this->getField('status_datetime');
+
+		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow1);
+		$oMainTab->move($this->getField('system_information')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow2);
+		$oMainTab->move($this->getField('delivery_information')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow3);
+
+		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 
 		$oAdditionalTab->delete(
 			$this->getField('shop_payment_system_id')
 		);
 
-		$oShopPaymentSystemsSelect = Admin_Form_Entity::factory('Select');
+		// Удаляем страны
+		$oAdditionalTab->delete(
+			$this->getField('shop_country_id')
+		);
 
-		$oShopPaymentSystemsSelect
-			->caption(Core::_('Shop_Order.system_of_pay'))
-			->style("width: 300px")
-			->divAttr(array('style' => 'float: left'))
+		// Создаем поле стран как выпадающий список
+		$CountriesSelectField = Admin_Form_Entity::factory('Select')
+			->name('shop_country_id')
+			->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
 			->options(
-				$this->_fillPaymentSystems(Core_Array::getGet('shop_id', 0))
+				$Shop_Controller_Edit->fillCountries()
 			)
-			->name('shop_payment_system_id')
-			->value($this->_object->shop_payment_system_id);
+			->value($this->_object->shop_country_id)
+			->onchange("$('#{$windowId} #list4').clearSelect();$('#{$windowId} #list3').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list2', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList2',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+		$oContactsTabRow1->add($CountriesSelectField);
 
-		$oMainTab->addAfter(
-				$oShopPaymentSystemsSelect, $oPaymentdatetimeField
-			);
+		// Удаляем местоположения
+		$oAdditionalTab->delete(
+			$this->getField('shop_country_location_id')
+		);
 
-		$oPaymentdatetimeField
-			->divAttr(array('style' => 'float: left'));
+		// Создаем поле местоположений как выпадающий список
+		$CountryLocationsSelectField = Admin_Form_Entity::factory('Select')
+			->name('shop_country_location_id')
+			->id('list2')
+			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->options(
+					$Shop_Controller_Edit->fillCountryLocations($this->_object->shop_country_id)
+				)
+			->value($this->_object->shop_country_location_id)
+			->onchange("$('#{$windowId} #list4').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list3', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList3',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+		$oContactsTabRow1->add($CountryLocationsSelectField);
 
-		$oPrintLink = Admin_Form_Entity::factory('Link');
-		$oPrintLink->div->style("width: 100px");
-		$oPrintLink
+		// Удаляем города
+		$oAdditionalTab->delete(
+			$this->getField('shop_country_location_city_id')
+		);
+
+		// Создаем поле городов как выпадающий список
+		$CountryLocationCitiesSelectField = Admin_Form_Entity::factory('Select')
+			->name('shop_country_location_city_id')
+			->id('list3')
+			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->options(
+					$Shop_Controller_Edit->fillCountryLocationCities($this->_object->shop_country_location_id)
+				)
+			->value($this->_object->shop_country_location_city_id)
+			->onchange("$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list4', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList4',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+		$oContactsTabRow2->add($CountryLocationCitiesSelectField);
+
+		// Удаляем районы
+		$oAdditionalTab->delete(
+			$this->getField('shop_country_location_city_area_id')
+		);
+
+		// Создаем поле районов как выпадающий список
+		$oContactsTabRow2->add(
+			Admin_Form_Entity::factory('Select')
+				->name('shop_country_location_city_area_id')
+				->id('list4')
+				->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))
+				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+				->options(
+					$Shop_Controller_Edit->fillCountryLocationCityAreas($this->_object->shop_country_location_city_id)
+				)
+				->value($this->_object->shop_country_location_city_area_id)
+		);
+
+		$Shop_Delivery_Controller_Edit = new Shop_Delivery_Controller_Edit($this->_Admin_Form_Action);
+
+		$oShopDelivery = Core_Entity::factory('Shop_Delivery_Condition', $this->_object->shop_delivery_condition_id)->Shop_Delivery;
+
+		$oAdditionalTab->delete($this->getField('shop_delivery_id'));
+
+		$oShopDeliveryTypeSelect = Admin_Form_Entity::factory('Select')
+			->caption(Core::_('Shop_Order.type_of_delivery'))
+			->options(
+				$Shop_Delivery_Controller_Edit->fillDeliveries(Core_Array::getGet('shop_id', 0))
+			)
+			->name('shop_delivery_id')
+			->value($this->_object->shop_delivery_id)
+			->onchange("$.ajaxRequest({path: '/admin/shop/order/index.php',context: 'shop_delivery_condition_id', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadDeliveryConditionsList',additionalParams: 'delivery_id=' + this.value,windowId: '{$windowId}'}); return false")
+			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+
+		$oMainRow6->add($oShopDeliveryTypeSelect);
+
+		$oAdditionalTab->delete(
+			$this->getField('shop_delivery_condition_id')
+		);
+
+		$oMainRow6->add(
+			Admin_Form_Entity::factory('Select')
+				->caption(Core::_('Shop_Order.shop_delivery_condition_id'))
+				->id('shop_delivery_condition_id')
+				->options(
+					$oShopDelivery->Shop_Delivery_Conditions->getCount() <= 250
+						? $this->_fillDeliveryConditions($oShopDelivery->id)
+						: array($this->_object->shop_delivery_condition_id => $this->_object->Shop_Delivery_Condition->name)
+				)
+				->name('shop_delivery_condition_id')
+				->value($this->_object->shop_delivery_condition_id)
+				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+		);
+
+		$iOrderId = intval($this->_object->id);
+		$sOrderPath = '/admin/shop/order/index.php';
+
+		$oRecalcDeliveryPriceLink = Admin_Form_Entity::factory('Link');
+		$oRecalcDeliveryPriceLink
+			->divAttr(array('class' => 'large-link form-group col-lg-12 col-md-12 col-sm-12'))
 			->a
+				->class('btn btn-default')
+				->href($this->_Admin_Form_Controller->getAdminActionLoadHref(
+						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
+					)
+				)
+				->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax(
+						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
+					)
+				)
+				->value(Core::_('Shop_Order.recalc_order_delivery_sum'));
+		$oRecalcDeliveryPriceLink
+			->icon
+				->class('fa fa-truck');
+
+		$oMainRow7->add($oRecalcDeliveryPriceLink);
+
+		// Печать
+		$oPrintLink = Admin_Form_Entity::factory('Link');
+		$oPrintLink
+			->divAttr(array('class' => 'large-link form-group col-lg-12 col-md-12 col-sm-12'))
+			->a
+				->class('btn btn-labeled btn-danger')
 				->href($this->_Admin_Form_Controller->getAdminLoadHref(
 						"/admin/shop/order/print/index.php",
 						NULL, NULL, "shop_order_id=" . intval($this->_object->id
 					)))
 				->value(Core::_('Shop_Order.print'));
 		$oPrintLink
-			->img
-				->src('/admin/images/printer.gif');
-		$oDocumentsTab->add($oPrintLink);
+			->icon
+				->class('btn-label fa fa-print');
+		$oDocumentsTabRow1->add($oPrintLink);
 
+		// Карточка заказка
 		$oOrderCardLink = Admin_Form_Entity::factory('Link');
 		$oOrderCardLink
+			->divAttr(array('class' => 'large-link form-group col-lg-12 col-md-12 col-sm-12'))
 			->a
+				->class('btn btn-labeled btn-warning')
 				->href(
 					$this->_Admin_Form_Controller->getAdminLoadHref(
 						"/admin/shop/order/card/index.php",
@@ -267,195 +394,89 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->value(Core::_('Shop_Order.order_card'))
 				->target('_blank');
 		$oOrderCardLink
-			->img
-				->src('/admin/images/new_window.gif');
-		$oOrderCardLink->divAttr(array('style' => 'width: 200px'));
-		$oDocumentsTab->add($oOrderCardLink);
+			->icon
+				->class('btn-label fa fa-print');
 
-		$oActLink = Admin_Form_Entity::factory('Link');
-		$oActLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/acceptance/report/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_('Shop_Order.acceptance_report_form'))->target('_blank');
-		$oActLink->img->src('/admin/images/new_window.gif');
-		$oActLink->divAttr(array('style' => 'width: 80px; float: left'));
-		$oDocumentsTab->add($oActLink);
-
-		$oNaklLink = Admin_Form_Entity::factory('Link');
-		$oNaklLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/torg12/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_("Shop_Order.torg12_title"))->target('_blank');
-		$oNaklLink->img->src('/admin/images/new_window.gif');
-		$oNaklLink->divAttr(array('style' => 'width: 100px; float: left'));
-		$oDocumentsTab->add($oNaklLink);
+		$oDocumentsTabRow2->add($oOrderCardLink);
 
 		$oMainTab->delete($this->getField('acceptance_report'));
 		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 		$oAdmin_Form_Entity_Input
 			->name('acceptance_report')
-			->caption('&nbsp;')
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->caption(Core::_('Shop_Order.document_number'))
+			->class('form-control input-group-input')
 			->value($this->_object->acceptance_report)
-			->style("width: 100px; margin-left: 0");
-		$oDocumentsTab->add($oAdmin_Form_Entity_Input);
+			// Акт
+			->add(
+				Core::factory('Core_Html_Entity_A')
+					->class('btn btn-labeled btn-azure')
+					->href(
+						$this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/acceptance/report/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id))
+					)
+					->target('_blank')
+					->add(
+						Core::factory('Core_Html_Entity_I')
+							->class("btn-label fa fa-print")
+					)
+					->add(
+						Core::factory('Core_Html_Entity_Code')
+							->value(Core::_('Shop_Order.acceptance_report_form'))
+					)
+			)
+			// Торг-12
+			->add(
+				Core::factory('Core_Html_Entity_A')
+					->class('btn btn-labeled btn-palegreen')
+					->href(
+						$this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/torg12/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id))
+					)
+					->target('_blank')
+					->add(
+						Core::factory('Core_Html_Entity_I')
+							->class("btn-label fa fa-print")
+					)
+					->add(
+						Core::factory('Core_Html_Entity_Code')
+							->value(Core::_('Shop_Order.torg12_title'))
+					)
+			);
 
-		$oFactLink = Admin_Form_Entity::factory('Link');
-		$oFactLink->a->href($this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/vat/invoice/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id)))->value(Core::_('Shop_Order.acceptance_report_invoice'))->target('_blank');
-		$oFactLink->img->src('/admin/images/new_window.gif');
-		$oFactLink->divAttr(array('style' => 'width: 180px; float: left'));
-		$oDocumentsTab->add($oFactLink);
+		$oDocumentsTabRow3->add($oAdmin_Form_Entity_Input);
 
 		$oMainTab->delete($this->getField('vat_invoice'));
+
 		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 		$oAdmin_Form_Entity_Input
 			->name('vat_invoice')
-			->caption('&nbsp;')
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->caption(Core::_('Shop_Order.document_number'))
+			->class('form-control input-group-input')
 			->value($this->_object->vat_invoice)
-			->style("width: 100px; margin-left: 0");
-		$oDocumentsTab->add($oAdmin_Form_Entity_Input);
+			// Счет-фактура
+			->add(
+				Core::factory('Core_Html_Entity_A')
+					->class('btn btn-labeled btn-azure')
+					->href(
+						$this->_Admin_Form_Controller->getAdminLoadHref("/admin/shop/order/vat/invoice/index.php", NULL, NULL, "shop_order_id=" . intval($this->_object->id))
+					)
+					->target('_blank')
+					->add(
+						Core::factory('Core_Html_Entity_I')
+							->class("btn-label fa fa-print")
+					)
+					->add(
+						Core::factory('Core_Html_Entity_Code')
+							->value(Core::_('Shop_Order.acceptance_report_invoice'))
+					)
+			)
+			;
+
+		$oDocumentsTabRow4->add($oAdmin_Form_Entity_Input);
 
 		$oAdditionalTab->delete(
 			$this->getField('shop_order_status_id')
 		);
-
-		$oShopOrderStatusesSelect = Admin_Form_Entity::factory('Select');
-
-		$objectId = intval($this->_object->id);
-		$windowId = $this->_Admin_Form_Controller->getWindowId();
-
-		$oShopOrderStatusesSelect
-			->caption(Core::_('Shop_Order.show_order_status'))
-			->style("width: 100px")
-			->options(
-				$Shop_Controller_Edit->fillOrderStatuses(Core_Array::getGet('shop_id', 0))
-			)
-			->divAttr(array('style' => 'float: left'))
-			->name('shop_order_status_id')
-			->value($this->_object->shop_order_status_id)
-			->onchange("$.changeOrderStatus('{$windowId}')");
-
-		$oMainTab->addAfter(
-				$oShopOrderStatusesSelect, $oShopPaymentSystemsSelect
-			);
-
-		$oMainTab->addAfter($oSeparator, $oShopOrderStatusesSelect);
-
-		$oStatusdatetimeField
-			->divAttr(array('style' => 'float: left'));
-
-		$oIpField
-			->style("width: 100px");
-
-		$Shop_Delivery_Controller_Edit = new Shop_Delivery_Controller_Edit($this->_Admin_Form_Action);
-
-		$oShopDelivery = Core_Entity::factory('Shop_Delivery_Condition', $this->_object->shop_delivery_condition_id)->Shop_Delivery;
-
-		$oAdditionalTab->delete(
-			$this->getField('shop_delivery_id')
-		);
-		$oShopDeliveryTypeSelect = Admin_Form_Entity::factory('Select');
-
-		$oShopDeliveryTypeSelect
-			->caption(Core::_('Shop_Order.type_of_delivery'))
-			->style("width: 300px")
-			->options(
-				$Shop_Delivery_Controller_Edit->fillDeliveries(Core_Array::getGet('shop_id', 0))
-			)
-			->divAttr(array('style' => 'float: left'))
-			->name('shop_delivery_id')
-			->value($this->_object->shop_delivery_id)
-			->onchange("$.ajaxRequest({path: '/admin/shop/order/index.php',context: 'shop_delivery_condition_id', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadDeliveryConditionsList',additionalParams: 'delivery_id=' + this.value,windowId: '{$windowId}'}); return false");
-
-		$oMainTab->addAfter(
-				$oShopDeliveryTypeSelect, $oIpField
-			);
-
-		$oAdditionalTab->delete(
-			$this->getField('shop_delivery_condition_id')
-		);
-
-		$oShopDeliveryConditionsTypeSelect = Admin_Form_Entity::factory('Select');
-
-		$iShop_Delivery_Conditions = $oShopDelivery->Shop_Delivery_Conditions->getCount();
-
-		$oShopDeliveryConditionsTypeSelect
-			->caption(Core::_('Shop_Order.shop_delivery_condition_id'))
-			->id('shop_delivery_condition_id')
-			->style("width: 300px")
-			->options(
-				$iShop_Delivery_Conditions <= 250
-					? $this->_fillDeliveryConditions($oShopDelivery->id)
-					: array($this->_object->shop_delivery_condition_id => $this->_object->Shop_Delivery_Condition->name)
-			)
-			->name('shop_delivery_condition_id')
-			->value($this->_object->shop_delivery_condition_id);
-
-		$oMainTab->addAfter(
-				$oShopDeliveryConditionsTypeSelect, $oShopDeliveryTypeSelect
-			);
-
-		$oPostcodeField
-			->style("width: 100px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oAddressField
-			->style("width: 490px");
-
-		$oSurnameField
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oNameField
-			->class('')
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oPatronymicField
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oCompanyField
-			->style("width: 190px");
-
-		$oPhoneField
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oFaxField
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oEmailField
-			->style("width: 190px");
-
-		$iOrderId = intval($this->_object->id);
-		$sOrderPath = '/admin/shop/order/index.php';
-
-		$oRecalcDeliveryPriceLink = Admin_Form_Entity::factory('Link');
-		$oRecalcDeliveryPriceLink
-			->a
-				->href($this->_Admin_Form_Controller->getAdminActionLoadHref
-					(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
-					)
-				)
-				->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax
-					(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
-					)
-				)
-				->value(Core::_('Shop_Order.recalc_order_delivery_sum'));
-		$oRecalcDeliveryPriceLink
-			->img
-				->src('/admin/images/coins.gif');
-
-		$oRecalcDeliveryPriceLink->div->style("width: 350px");
-
-		$oMainTab->addAfter($oRecalcDeliveryPriceLink, $oShopDeliveryConditionsTypeSelect);
-
-		$oTinField = $this->getField('tin');
-		$oTinField
-			->style("width: 190px")
-			->divAttr(array('style' => 'float: left'));
-		$oKppField = $this->getField('kpp');
-		$oKppField->style("width: 190px");
-
-		$oMainTab->moveAfter($oTinField, $oEmailField, $oContactsTab);
-		$oMainTab->moveAfter($oKppField, $this->getField('tin'), $oContactsTab);
 
 		$oPropertyTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_("Shop_Order.tab_properties"))
@@ -463,9 +484,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->addTabBefore($oPropertyTab, $oAdditionalTab);
 
-		// ---- Дополнительные свойства
-		$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-		$oProperty_Controller_Tab
+		// Properties
+		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->setDatasetId($this->getDatasetId())
 			->linkedObject(Core_Entity::factory('Shop_Order_Property_List', $shop_id))
@@ -513,6 +533,11 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
+		// Payment datetime
+		Core_Array::get($this->_formValues, 'paid')
+			&& Core_Array::get($this->_formValues, 'payment_datetime') == ''
+			&& $this->_formValues['payment_datetime'] = Core_Date::timestamp2sql(time());
+
 		if ($this->_object->id)
 		{
 			$this->_object->paid != Core_Array::get($this->_formValues, 'paid') && $this->_object->paid == 0
@@ -520,16 +545,15 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				: $this->_object->cancelPaid();
 		}
 
+		$this->_formValues['unloaded'] = 0;
+
 		parent::_applyObjectProperty();
 
-		// ---- Дополнительные свойства
-		$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-		$oProperty_Controller_Tab
+		// Properties
+		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->linkedObject(Core_Entity::factory('Shop_Order_Property_List', $this->_object->Shop->id))
-			->applyObjectProperty()
-			;
-		// ----
+			->applyObjectProperty();
 
 		if ($this->_object->invoice == '')
 		{
@@ -599,16 +623,17 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oObject = Core_Entity::factory('Shop_Payment_System');
 		$oObject->queryBuilder()
-				->where("shop_id", "=", $iShopId)
-				->orderBy("sorting");
+			->where('shop_id', '=', $iShopId)
+			->orderBy('sorting');
 
 		$aReturn = array(" … ");
 		$aObjects = $oObject->findAll();
 		foreach ($aObjects as $oObject)
 		{
-			//$aReturn[$oObject->id] = $oObject->name;
 			$aReturn[$oObject->id] = array('value' => $oObject->name);
-			!$oObject->active && $aReturn[$oObject->id]['attr'] = array('style' => 'text-decoration: line-through');
+			!$oObject->active && $aReturn[$oObject->id]['attr'] = array(
+				'style' => 'text-decoration: line-through'
+			);
 		}
 
 		return $aReturn;

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 {
@@ -48,22 +48,21 @@ abstract class Admin_Form_Action_Controller extends Core_Servant_Properties
 	*/
 	static public function factory($className, Admin_Form_Action_Model $oAdmin_Form_Action)
 	{
-		//$skinClassName = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_Modules_' . ucfirst($className);
-		$skinClassName = ucfirst($className) . '_' . ucfirst(Core_Skin::instance()->getSkinName());
+		//$skinClassName = ucfirst($className) . '_' . ucfirst(Core_Skin::instance()->getSkinName());
 
-		return class_exists($skinClassName)
+		return /*class_exists($skinClassName)
 			? new $skinClassName($oAdmin_Form_Action)
-			: new $className($oAdmin_Form_Action);
+			: */new $className($oAdmin_Form_Action);
 	}
 
 	/**
 	 * Set Admin_Form_Controller
-	 * @param Admin_Form_Controller controller
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
 	 * @return self
 	 */
-	public function controller(Admin_Form_Controller $controller)
+	public function controller(Admin_Form_Controller $oAdmin_Form_Controller)
 	{
-		$this->_Admin_Form_Controller = $controller;
+		$this->_Admin_Form_Controller = $oAdmin_Form_Controller;
 		return $this;
 	}
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Siteuser_Transaction_Model extends Core_Entity
 {
@@ -105,11 +105,19 @@ class Shop_Siteuser_Transaction_Model extends Core_Entity
 	/**
 	 * Change transaction status
 	 * @return Shop_Siteuser_Transaction_Model
+	 * @hostcms-event shop_siteuser_transaction.onBeforeChangeActive
+	 * @hostcms-event shop_siteuser_transaction.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+		
 		$this->active = 1 - $this->active;
-		return $this->save();
+		$this->save();
+		
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+		
+		return $this;
 	}
 
 	/**

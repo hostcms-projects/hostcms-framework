@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_Action_Controller
 {
@@ -119,8 +119,7 @@ class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_A
 		// Add objects
 		$this->addValues();
 
-		echo json_encode($this->_values);
-		die();
+		Core::showJson($this->_values);
 	}
 
 	/**

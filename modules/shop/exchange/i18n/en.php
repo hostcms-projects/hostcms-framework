@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array( 
 	'!download' => '-- Not upload --',
@@ -43,9 +43,9 @@ return array(
 	'item_active' => 'Product activity',
 	'item_sorting' => 'Product sorting order',
 	'item_path' => 'Path to product',
-	'item_seo_title' => 'Product page title',
-	'item_seo_description' => 'Value of meta-tag description for product page',
-	'item_seo_keywords' => 'Value of meta-tag keywords for product page',
+	'item_seo_title' => 'Meta element title',
+	'item_seo_description' => 'Meta element description',
+	'item_seo_keywords' => 'Meta element keywords',
 	'item_indexing' => 'Index checkbox',
 	'item_yandex_market' => 'Checkbox "Export to Yandex.Market"',
 	'item_yandex_market_bid' => 'Yandex.Market base charge',

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ТОВ "Хостмейк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ТОВ "Хостмейк"(Hostmake LLC), http://www.hostcms.ru
  */
 return array( 	'model_name' => 'Структура сайту',
 	'menu' => 'Структура сайту',

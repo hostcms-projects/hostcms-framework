@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Delete_Value extends Admin_Form_Action_Controller
 {
@@ -34,7 +34,7 @@ class Property_Controller_Delete_Value extends Admin_Form_Action_Controller
 		}
 
 		preg_match('/(\w*)property_(\d*)_(\d*)/i', $operation, $matches);
-		
+
 		/*ob_start();
 		print_r($matches);
 		$this->addMessage($operation);
@@ -59,28 +59,28 @@ class Property_Controller_Delete_Value extends Admin_Form_Action_Controller
 						{
 							$oValue->setDir($this->linkedObject[$this->_datasetId]->getDirPath($this->_object));
 						}
-						
+
 						$windowId = $this->_Admin_Form_Controller->getWindowId();
-						
+
 						if ($matches[1] == 'small_')
 						{
 							$oValue->deleteSmallFile();
-							
+
 							ob_start();
 							Core::factory('Core_Html_Entity_Script')
 								->type("text/javascript")
-								->value("$(\"#{$windowId} #control_small_property_{$oProperty->id}_{$oValue->id}\").remove()")
+								->value("$(\"#{$windowId} #preview_small_property_{$oProperty->id}_{$oValue->id},#{$windowId} #delete_small_property_{$oProperty->id}_{$oValue->id}\").remove()")
 								->execute();
 							$this->addMessage(ob_get_clean());
 						}
 						elseif ($matches[1] == 'large_')
 						{
 							$oValue->deleteLargeFile();
-							
+
 							ob_start();
 							Core::factory('Core_Html_Entity_Script')
 								->type("text/javascript")
-								->value("$(\"#{$windowId} #control_large_property_{$oProperty->id}_{$oValue->id}\").remove()")
+								->value("$(\"#{$windowId} #preview_large_property_{$oProperty->id}_{$oValue->id}, #{$windowId} #delete_large_property_{$oProperty->id}_{$oValue->id}\").remove()")
 								->execute();
 							$this->addMessage(ob_get_clean());
 						}
@@ -88,7 +88,7 @@ class Property_Controller_Delete_Value extends Admin_Form_Action_Controller
 						{
 							$oValue->delete();
 						}
-						
+
 						$this->addMessage(Core_Message::get(Core::_('Property.deletePropertyValue_success')));
 					}
 					else

@@ -8,19 +8,19 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.2';
+	public $version = '6.5';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-04-02';
+	public $date = '2015-06-05';
 	/**
 	 * Module name
 	 * @var string
@@ -32,5 +32,5 @@ class Document_Module extends Core_Module{	/**
 	 */	public function __construct()	{
 		parent::__construct();
 		$this->menu = array(			array(				'sorting' => 20,				'block' => 0,
-				'ico' => 'fa-file-text-o',
+				'ico' => 'fa fa-file-text-o',
 				'name' => Core::_('Document.menu'),				'href' => "/admin/document/index.php",				'onclick' => "$.adminLoad({path: '/admin/document/index.php'}); return false"			)		);	}}

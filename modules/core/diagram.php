@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Diagram extends Core_Servant_Properties
 {
@@ -236,7 +236,7 @@ class Core_Diagram extends Core_Servant_Properties
 		$delta = $max_val - $min_val;
 		if ($delta < 5)
 		{
-			switch($delta)
+			switch ($delta)
 			{
 				case 0:
 					$scaleDivision = 2;
@@ -816,7 +816,7 @@ class Core_Diagram extends Core_Servant_Properties
 	 */
 	protected function colors($im, $color_id)
 	{
-		switch($color_id)
+		switch ($color_id)
 		{
 			// Основные цвета, используемые для рисования диаграммы
 			default:

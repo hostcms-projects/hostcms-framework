@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,25 +19,55 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function setObject($object)
 	{
-		parent::setObject($object);
+		$modelName = $object->getModelName();
+
+		switch ($modelName)
+		{
+			case 'document':
+				if (!$object->id)
+				{
+					$object->document_dir_id = Core_Array::getGet('document_dir_id');
+				}
+			break;
+			case 'document_dir':
+				if (!$object->id)
+				{
+					$object->parent_id = Core_Array::getGet('document_dir_id');
+				}
+			break;
+		}
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
 
 		$modelName = $this->_object->getModelName();
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
+
 		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		switch ($modelName)
 		{
 			case 'document':
 				$title = $this->_object->id
 					? Core::_('Document.edit')
 					: Core::_('Document.add');
 
-				if (is_null($this->_object->id))
-				{
-					$this->_object->document_dir_id = Core_Array::getGet('document_dir_id');
-				}
+				$oMainTab
+					->move($this->getField('name'), $oMainRow1);
 
 				$oDocument_Version_Current = $this->_object->Document_Versions->getCurrent(FALSE);
 
@@ -47,9 +77,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							? $oDocument_Version_Current->loadFile()
 							: ''
 					)
-					//->cols(140)
 					->rows(15)
-					->style('height: 500px; width: 100%')
 					->caption(Core::_('Document_Version.text'))
 					->name('text')
 					->wysiwyg(TRUE)
@@ -57,7 +85,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						? $oDocument_Version_Current->template_id
 						: 0);
 
-				$oMainTab->addAfter($oTextarea_Document, $this->getField('name'));
+				$oMainRow2->add($oTextarea_Document);
 
 				if (Core::moduleIsActive('typograph'))
 				{
@@ -65,34 +93,38 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						Typograph_Controller::instance()->eraseOpticalAlignment($oTextarea_Document->value)
 					);
 
-					$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
-					$oUseTypograph
+					$oUseTypograph = Admin_Form_Entity::factory('Checkbox')
 						->name("use_typograph")
 						->caption(Core::_('Document.use_typograph'))
 						->value(1)
-						->divAttr(array('style' => 'float: left;'));
+						->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
-					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
-					$oUseTrailingPunctuation
+					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox')
 						->name("use_trailing_punctuation")
 						->caption(Core::_('Document.use_trailing_punctuation'))
 						->value(1)
-						->divAttr(array('style' => 'float: left;'));
+						->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 					$oMainTab
-						->addAfter($oUseTypograph, $oTextarea_Document)
-						->addAfter($oUseTrailingPunctuation, $oUseTypograph)
-						->addAfter(Admin_Form_Entity::factory('Separator'), $oUseTrailingPunctuation);
+						->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+					$oMainRow3
+						->add($oUseTypograph)
+						->add($oUseTrailingPunctuation);
 				}
 
-				// Объект вкладки 'Атрибуты документа'
+				// Attr
 				$oAttrTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Document.tab_1'))
 					->name('tab_1');
 
 				$this->addTabAfter($oAttrTab, $oMainTab);
 
-				// Удаляем стандартный <input>
+				$oAttrTab
+					->add($oAttrRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oAttrRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oAttrRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oAdditionalTab->delete($this->getField('document_dir_id'));
 
 				$oSelect_Dirs
@@ -102,17 +134,13 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('document_dir_id')
 					->value($this->_object->document_dir_id)
 					->caption(Core::_('Document.document_dir_id'))
-					->divAttr(array('style' => 'float: left'))
-					->style('width: 320px');
-
-				$oAttrTab->add($oSelect_Dirs);
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				// Выбор макета
 				$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
 
 				$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
 
-				// Warning: TO DO: dynamic chain list template_dir -> template like Documents
 				$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 					->options(
 						count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
@@ -124,12 +152,11 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						: 0
 					)
 					->caption(Core::_('Document_Version.template_id'))
-					->divAttr(array('style' => 'float: left'))
-					->style('width: 320px');
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
-				$oAttrTab
-					->add($oSelect_Template_Id)
-					->add(Admin_Form_Entity::factory('Separator'));
+				$oAttrRow1
+					->add($oSelect_Dirs)
+					->add($oSelect_Template_Id);
 
 				// Статус документа
 				$oAdditionalTab
@@ -144,25 +171,22 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('document_status_id')
 					->value($this->_object->document_status_id)
 					->caption(Core::_('Document.document_status_id'))
-					->divAttr(array('style' => 'float: left'))
-					->style('width: 320px');
-
-				$oAttrTab->add($oSelect_Statuses);
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				// Текушая версия
 				$oInput_Current = Admin_Form_Entity::factory('Checkbox')
 					->name('current')
 					->value(1)
 					->caption(Core::_('Document_Version.current'))
-					;
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6 checkbox-margin-top'));
 
 				if (is_null($oDocument_Version_Current) || $oDocument_Version_Current->current)
 				{
 					$oInput_Current->checked('checked');
 				}
 
-				$oAttrTab
-					->add(Admin_Form_Entity::factory('Separator'))
+				$oAttrRow2
+					->add($oSelect_Statuses)
 					->add($oInput_Current);
 
 				$oTextarea_Description = Admin_Form_Entity::factory('Textarea')
@@ -171,12 +195,12 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							? $oDocument_Version_Current->description
 							: ''
 					)
-					//->cols(140)
 					->rows(15)
 					->caption(Core::_('Document_Version.description'))
-					->name('description');
+					->name('description')
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				$oAttrTab
+				$oAttrRow3
 					->add($oTextarea_Description);
 
 			break;
@@ -186,16 +210,8 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						? Core::_('Document_Dir.edit_title')
 						: Core::_('Document_Dir.add_title');
 
-				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
-				{
-					$this->_object->parent_id = Core_Array::getGet('document_dir_id');
-				}
-
 				// Удаляем стандартный <input>
-				$oAdditionalTab->delete(
-					 $this->getField('parent_id')
-				);
+				$oAdditionalTab->delete($this->getField('parent_id'));
 
 				$oSelect_Dirs
 					->options(
@@ -203,9 +219,15 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->caption(Core::_('Document_Dir.parent_id'));
+					->caption(Core::_('Document_Dir.parent_id'))
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				$oMainTab->addAfter($oSelect_Dirs,  $this->getField('name'));
+				$this->getField('name')
+					->divAttr(array('class' => 'form-group col-lg-12'));
+
+				$oMainTab->move($this->getField('name'), $oMainRow1);
+
+				$oMainRow1->add($oSelect_Dirs);
 			break;
 		}
 
@@ -224,7 +246,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'document':
 				$text = Core_Array::getPost('text');

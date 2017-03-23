@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Item_Model extends Core_Entity
 {
@@ -48,6 +48,15 @@ class Shop_Order_Item_Model extends Core_Entity
 		'shop_warehouse' => array()
 	);
 
+
+	/**
+	 * Default sorting for models
+	 * @var array
+	 */
+	protected $_sorting = array(
+		'shop_order_items.id' => 'ASC',
+	);
+	
 	/**
 	 * Forbidden tags. If list of tags is empty, all tags will show.
 	 * @var array
@@ -97,7 +106,7 @@ class Shop_Order_Item_Model extends Core_Entity
 			$sShopItemPath = '/admin/shop/item/index.php';
 			$iShopItemId = $this->Shop_Item->id;
 
-			return sprintf('<img src="/admin/images/new_window.gif" /> <a href="%s" target="_blank">%s</a>',
+			return sprintf('<a href="%s" target="_blank">%s <i class="fa fa-external-link"></i></a>',
 			$oAdmin_Form_Controller->getAdminActionLoadHref($sShopItemPath, 'edit', NULL, 1, $iShopItemId), $this->Shop_Item->name);
 		}
 	}

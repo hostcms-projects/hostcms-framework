@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -32,8 +32,8 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$modelName = $object->getModelName();
 
-		$bNewProperty = is_null($object->id);
-		
+		$bNewProperty = !$object->id;
+
 		if ($bNewProperty && $modelName == 'property')
 		{
 			$object->image_large_max_width = $this->linkedObject->getLargeImageMaxWidth();
@@ -42,23 +42,57 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$object->image_small_max_height = $this->linkedObject->getSmallImageMaxHeight();
 		}
 
-		parent::setObject($object);
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
+
+		$bNewProperty = !$this->_object->id;
+
+		$modelName = $this->_object->getModelName();
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			;
+
+		$this->getField('name')
+			->divAttr(array('class' => 'form-group col-lg-12'));
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1);
+
+		switch ($modelName)
 		{
 			case 'property':
+
+			$oMainTab
+				->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow11 = Admin_Form_Entity::factory('Div')->class('row'))
+				->add($oMainRow12 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$title = $this->_object->id
 					? Core::_('Property.edit_title')
 					: Core::_('Property.add_title');
 
-				if (is_null($this->_object->id))
-				{
-					$this->_object->property_dir_id = Core_Array::getGet('property_dir_id');
-				}
+				!$this->_object->id && $this->_object->property_dir_id = Core_Array::getGet('property_dir_id');
 
 				$oFormatTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Property.tab_format'))
@@ -66,12 +100,6 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$this
 					->addTabAfter($oFormatTab, $oMainTab);
-
-				$this->getField('description')
-					->wysiwyg(TRUE);
-
-				$oMainTab
-					->move($this->getField('guid'), $oAdditionalTab);
 
 				// Удаляем стандартный <input>
 				$oMainTab->delete($this->getField('type'));
@@ -117,12 +145,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->type)
 					->caption(Core::_('Property.type'))
 					->onchange("ShowPropertyRows('{$windowId}', this.options[this.selectedIndex].value)")
-					->style('width: 320px')
-					->divAttr(array('style' => 'float: left'));
-
-				$oMainTab->addAfter(
-					$oSelect_Type, $this->getField('name')
-				);
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete($this->getField('property_dir_id'));
@@ -135,11 +158,11 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('property_dir_id')
 					->value($this->_object->property_dir_id)
 					->caption(Core::_('Property_Dir.parent_id'))
-					->style('width: 320px');
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
-				$oMainTab->addAfter(
-					$oSelect_Dirs, $oSelect_Type
-				);
+				$oMainRow2
+					->add($oSelect_Type)
+					->add($oSelect_Dirs);
 
 				// Список
 				if (Core::moduleIsActive('list'))
@@ -155,12 +178,9 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('list_id')
 						->value($this->_object->list_id)
 						->caption(Core::_('Property.list_id'))
-						->style('width: 320px')
-						->divAttr(array('id' => 'list_id'))
-						;
+						->divAttr(array('id' => 'list_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
 
-					$oMainTab
-						->addAfter($oSelect_Lists, $oSelect_Dirs);
+					$oMainRow3->add($oSelect_Lists);
 				}
 
 				// Информационные системы
@@ -177,12 +197,10 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('informationsystem_id')
 						->value($this->_object->informationsystem_id)
 						->caption(Core::_('Property.informationsystem_id'))
-						->style('width: 320px')
-						->divAttr(array('id' => 'informationsystem_id'))
+						->divAttr(array('id' => 'informationsystem_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
 						;
 
-					$oMainTab
-						->addAfter($oSelect_Informationsystems, $oSelect_Dirs);
+					$oMainRow4->add($oSelect_Informationsystems);
 				}
 
 				// Магазин
@@ -199,18 +217,48 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('shop_id')
 						->value($this->_object->shop_id)
 						->caption(Core::_('Property.shop_id'))
-						->style('width: 320px')
-						->divAttr(array('id' => 'shop_id'))
-						;
+						->divAttr(array('id' => 'shop_id',  'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
 
-					$oMainTab
-						->addAfter($oSelect_Shops, $oSelect_Dirs);
+					$oMainRow5->add($oSelect_Shops);
 				}
 
-				// ---
+				$this->getField('description')
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+					->wysiwyg(TRUE);
+
+				$oMainTab->move($this->getField('description'), $oMainRow6);
+
+				$this->getField('default_value')
+					->divAttr(array('id' => 'default_value', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+
+				$oMainTab->move($this->getField('default_value'), $oMainRow7);
+
+				$oDefault_Value_Date = Admin_Form_Entity::factory('Date')
+					->value($this->_object->default_value)
+					->name('default_value_date')
+					->caption(Core::_('Property.default_value'))
+					->divAttr(array('id' => 'default_value_date', 'class' => 'form-group col-sm-6 col-md-4 col-lg-3'));
+
+				$oMainRow8->add($oDefault_Value_Date);
+
+				$oDefault_Value_DateTime = Admin_Form_Entity::factory('DateTime')
+					->value($this->_object->default_value)
+					->name('default_value_datetime')
+					->caption(Core::_('Property.default_value'))
+					->divAttr(array('id' => 'default_value_datetime', 'class' => 'form-group col-sm-6 col-md-4 col-lg-3'));
+
+				$oMainRow9->add($oDefault_Value_DateTime);
+
+				$oDefault_Value_Checkbox = Admin_Form_Entity::factory('Checkbox')
+					->value($this->_object->default_value)
+					->caption(Core::_('Property.default_value'))
+					->name('default_value_checked')
+					->divAttr(array('id' => 'default_value_checked', 'class' => 'form-group col-sm-6 col-md-4 col-lg-4'));
+
+				$oMainRow10->add($oDefault_Value_Checkbox);
+
 				$this->getField('tag_name')
-					->style('width: 220px')
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				// Для тегов проверка на длину только при редактировании.
 				!$bNewProperty && $this->getField('tag_name')->format(
@@ -219,69 +267,47 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							'minlen' => array('value' => 1)
 						)
 					);
-					
+
 				$this->getField('sorting')
-					->style('width: 220px');
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				$oMainTab
-					->addAfter(Admin_Form_Entity::factory('Separator'), $this->getField('sorting'));
+					->move($this->getField('tag_name'), $oMainRow11)
+					->move($this->getField('sorting'), $oMainRow11)
+					->move($this->getField('multiple'), $oMainRow12);
 
-				$this->getField('default_value')
-					->divAttr(array('id' => 'default_value'));
+				$oFormatTab
+					->add($oMainRow13 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow14 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow15 = Admin_Form_Entity::factory('Div')->class('row'));
 
-				$oDefault_Value_Date = Admin_Form_Entity::factory('Date')
-					->value($this->_object->default_value)
-					->name('default_value_date')
-					->caption(Core::_('Property.default_value'))
-					->divAttr(array('id' => 'default_value_date'));
-
-				$oMainTab
-					->addAfter($oDefault_Value_Date, $this->getField('default_value'));
-
-				$oDefault_Value_DateTime = Admin_Form_Entity::factory('DateTime')
-					->value($this->_object->default_value)
-					->name('default_value_datetime')
-					->caption(Core::_('Property.default_value'))
-					->divAttr(array('id' => 'default_value_datetime'));
-
-				$oMainTab
-					->addAfter($oDefault_Value_DateTime, $this->getField('default_value'));
-
-				$oDefault_Value_Checkbox = Admin_Form_Entity::factory('Checkbox')
-					->value($this->_object->default_value)
-					->caption(Core::_('Property.default_value'))
-					->name('default_value_checked')
-					->divAttr(array('id' => 'default_value_checked'));
-
-				$oMainTab
-					->addAfter($oDefault_Value_Checkbox, $this->getField('default_value'));
+				$oAdditionalTab
+					->add($oMainRow16 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow17 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				// Formats
 				$this->getField('image_large_max_width')
-					->style('width: 320px')
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				$this->getField('image_large_max_height')
-					->style('width: 320px')
-					//->divAttr(array('style' => 'float: left'))
-					;
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				$this->getField('image_small_max_width')
-					->style('width: 320px')
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				$this->getField('image_small_max_height')
-					->style('width: 320px')
-					//->divAttr(array('style' => 'float: left'))
-					;
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+
+				$this->getField('hide_small_image')
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 				$oMainTab
-					->move($this->getField('image_large_max_width'), $oFormatTab)
-					->move($this->getField('image_large_max_height'), $oFormatTab)
-					->move($this->getField('image_small_max_width'), $oFormatTab)
-					->move($this->getField('image_small_max_height'), $oFormatTab)
-					->move($this->getField('hide_small_image'), $oFormatTab)
-					;
+					->move($this->getField('image_large_max_width'), $oMainRow13)
+					->move($this->getField('image_large_max_height'), $oMainRow13)
+					->move($this->getField('image_small_max_width'), $oMainRow14)
+					->move($this->getField('image_small_max_height'), $oMainRow14)
+					->move($this->getField('hide_small_image'), $oMainRow15)
+					->move($this->getField('guid'), $oMainRow16);
 
 				$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 				$oAdmin_Form_Entity_Code->html(
@@ -289,25 +315,23 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 
 				$oMainTab->add($oAdmin_Form_Entity_Code);
-
-
 			break;
 			case 'property_dir':
 			default:
 				$title = $this->_object->id
-						? Core::_('Property_Dir.edit_title')
-						: Core::_('Property_Dir.add_title');
+					? Core::_('Property_Dir.edit_title')
+					: Core::_('Property_Dir.add_title');
 
 				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
-				{
-					$this->_object->parent_id = Core_Array::getGet('property_dir_id');
-				}
+				!$this->_object->id && $this->_object->parent_id = Core_Array::getGet('property_dir_id');
 
-				// Удаляем стандартный <input>
-				$oAdditionalTab->delete(
-					 $this->getField('parent_id')
-				);
+				$oAdditionalTab->delete($this->getField('parent_id'));
+
+				$this->getField('name')
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+
+				$oMainTab
+					->move($this->getField('name'), $oMainRow1);
 
 				$oSelect_Dirs
 					->options(
@@ -315,9 +339,15 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->caption(Core::_('Property_Dir.parent_id'));
+					->caption(Core::_('Property_Dir.parent_id'))
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
 
-				$oMainTab->addAfter($oSelect_Dirs, $this->getField('name'));
+				$oMainRow2->add($oSelect_Dirs);
+
+				$oMainTab
+					->move($this->getField('description'), $oMainRow3)
+					->move($this->getField('sorting'), $oMainRow4);
+
 			break;
 		}
 
@@ -366,7 +396,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'property':
 				if ($bNewProperty && trim($this->_object->tag_name) == '')
@@ -377,8 +407,8 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							: $this->_object->name
 						);
 				}
-				
-				switch($this->_object->type)
+
+				switch ($this->_object->type)
 				{
 					case 7: // Флажок
 						$this->_object->default_value = Core_Array::getPost('default_value_checked', 0);
@@ -389,8 +419,8 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							: '0000-00-00 00:00:00';
 					break;
 					case 9: // Дата-время
-						$this->_object->default_value = strlen(Core_Array::getPost('default_value_date'))
-							? Core_Date::datetime2sql(Core_Array::getPost('default_value_date'))
+						$this->_object->default_value = strlen(Core_Array::getPost('default_value_datetime'))
+							? Core_Date::datetime2sql(Core_Array::getPost('default_value_datetime'))
 							: '0000-00-00 00:00:00';
 					break;
 				}

@@ -14,13 +14,13 @@ class Structure_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.2';
+	public $version = '6.5';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-05-14';
+	public $date = '2015-06-05';
 	/**
 	 * Module name
 	 * @var string
@@ -32,7 +32,7 @@ class Structure_Module extends Core_Module{	/**
 	 */	public function __construct()	{
 		parent::__construct();
 		$this->menu = array(			array(				'sorting' => 10,				'block' => 0,
-				'ico' => 'fa-sitemap',				'name' => Core::_('Structure.menu'),				'href' => "/admin/structure/index.php",				'onclick' => "$.adminLoad({path: '/admin/structure/index.php'}); return false"			)		);	}
+				'ico' => 'fa fa-sitemap',				'name' => Core::_('Structure.menu'),				'href' => "/admin/structure/index.php",				'onclick' => "$.adminLoad({path: '/admin/structure/index.php'}); return false"			)		);	}
 
 	/**
 	 * Индексация структуры сайта

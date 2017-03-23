@@ -6,7 +6,7 @@
  * @package HostCMS 6\Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'changeLanguage' => 'Select your language:',
@@ -30,23 +30,22 @@ return array(
 	'megabytes' => 'M',
 
 	'step_0' => 'HostCMS installation',
-	'step_1' => 'Step 1: HostCMS information',
+	'step_1' => 'Step 1: Introduction',
 	'step_2' => 'Step 2: License agreement',
-	'step_3' => 'Step 3: Check server settings',
+	'step_3' => 'Step 3: Server settings',
 	'step_4' => 'Step 4: Settings',
-	'step_5' => 'Step 5: Preliminary configuration',
+	'step_5' => 'Step 5: Configuration',
 	'step_6' => 'Step 6: Choose template',
-	'step_7' => 'Step 7: Choose color scheme',
+	'step_7' => 'Step 7: Color scheme',
 	'step_8' => 'Step 8: Template settings',
 	'step_9' => 'Step 9: Installation complete',
 
 	'write_error' => 'Error while writing into file %s.',
-	'template_data_information' => 'Information for template.',
+	'template_data_information' => 'Template settings.',
 	'allowed_extension' => 'Allowed file extensions: %s',
 	'max_file_size' => 'Maximum file size: %s x %s',
 	'empty_settings' => 'Template hasn\'t settings',
 	'file_not_found' => 'File %s not found.',
-	'template_files_copy_success' => 'Template files copied successfully!',
 	'template_install_success' => 'Template installed successfully.',
 	'template_files_copy_error' => 'Error! Template files has not been copied!',
 	'file_copy_error' => 'Error! File has not been copied in %s!',
@@ -57,7 +56,7 @@ return array(
 	'license_agreement_error' => 'Please accept the License Agreement terms to continue the installation process!',
 	'license_agreement' => 'I accept the terms in the license agreement.',
 
-	'table_field_param' => 'Parameters',
+	'table_field_param' => 'Option',
 	'table_field_need' => 'Required',
 	'table_field_thereis' => 'Available',
 	'table_field_value' => 'Value',
@@ -101,6 +100,8 @@ return array(
 	'result' => 'Result',
 	'comment' => 'Comment',
 
+	'empty_color_scheme' => 'The template does not have a color scheme. Please press <strong>"Next"</strong>.',
+	
 	'store_database_params' => 'Database parameters record',
 	'not_enough_rights_error' => 'File write error <b>%s</b>. Please set the required directory access rights.',
 	'database_connection' => 'Database connection',
@@ -108,7 +109,7 @@ return array(
 	'database_creation' => 'Database creation',
 	'attention_message' => 'The database user to be connected through should have enough rights to create a database. The database users of most hosting do not possess such rights. If the case, it is recommended to create your database using the hosting control panel. Do not mark with a flag "Create database".',
 
-	'attention_message2' => '<p>If reinstalling, it is recommended to install in the new database otherwise all your database data shall be lost.</p><p>To reinstall HostCMS push the button <strong>"Next"</strong>, and the button <strong>"Start"</strong> to start your work.</p><p>if the installer cannot be removed delete manually the directory <b>/install/</b> from the website.</p>',
+	'attention_message2' => '<p>If reinstalling, it is recommended to install in the new database otherwise all your database data shall be lost.</p><p>To reinstall HostCMS press <strong>"Next"</strong>, and the button <strong>"Start"</strong> to start your work.</p><p>if the installer cannot be removed delete manually the directory <b>/install/</b> from the website.</p>',
 	'attention_message3' => '<p>To continue the installation process please connect to the FTP server and <strong>delete the file install.php</strong>, from the website roots.</p>',
 
 	'attention_message4' => '<p>The installer checks the server software compliance to the HostCMS system requirements, performs the installation together with the initial configuration of the HostCMS.</p>
@@ -126,5 +127,5 @@ return array(
 
 	'error_system_already_install' => 'The HostCMS has been installed!',
 	'delete_install_file' => 'Delete file install.php',
-	'attention_complete_install' => '<p>To finish the installation process, to go to the website home page as well as to delete the installation system please push the button <strong>"Start"</strong>.</p><p>To go to the administration section, please, enter <a href="/admin/" target="_blank">http://[your_site]/admin/</a> in the browser address line having changed [your_site] to the website address.</p><p>To enter the administration section use: <br />Login: <strong>admin</strong> <br />Password: <strong>admin</strong></p><p>Thank you for choosing HostCMS content management system!</p>',
+	'attention_complete_install' => '<p>To finish the installation and delete the installation system please push the button <strong>"Start"</strong>.</p><p>Back-end available on <a href="/admin/" target="_blank">http://[your_site]/admin/</a> in the browser address line change [your_site] to the website address.</p><p>To login into the back-end: <br />Login: <strong>admin</strong> <br />Password: <strong>admin</strong></p><p>Thank you for choosing HostCMS content management system!</p>',
 );

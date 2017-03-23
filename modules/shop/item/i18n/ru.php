@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Товары магазина',
@@ -82,6 +82,7 @@ return array(
 	'items_catalog_image' => "<acronym title=\"Изображение товара\">Изображение товара</acronym>",
 	'items_catalog_image_small' => "<acronym title=\"Малое изображение товара\">Малое изображение товара</acronym>",
 	'items_catalog_tags' => "<acronym title=\"Метки (теги) товара, разделяются запятой, например кухня, бытовая техника, холодильник, Indesit\">Метки (теги)</acronym>",
+	'type_tag' => 'Введите тэг ...',
 	'items_catalog_add_form_title' => "Добавление информации о товаре",
 	'items_catalog_edit_form_title' => "Редактирование информации о товаре",
 	'changeActive_success' => "Информация успешно изменена",
@@ -190,7 +191,7 @@ return array(
 	'form_sales_order_sallers' => '<acronym title="Ограничение заказаных товаров по продавцу">Продавец:</acronym>',
 	'form_sales_order_sop' => '<acronym title="Ограничение заказаных товаров по платежной системе">Платежная система:</acronym>',
 	'form_sales_order_status' => '<acronym title="Ограничение заказаных товаров по статусу заказа">Статус заказа:</acronym>',
-	'sales_report_title' => "Отчет о продажах магазина %s за период с&nbsp;%s&nbsp;по&nbsp;%s%s",
+	'sales_report_title' => "Отчет о продажах магазина %s за период %s - %s",
 	'form_sales_order_count_orders' => 'Заказов',
 	'form_sales_order_count_items' => 'Кол-во товара',
 	'form_sales_order_total_summ' => 'Сумма заказа',
@@ -267,4 +268,6 @@ return array(
 	'show_in_group'=>'Показывать свойство в группе',
 	'show_in_item'=>'Показывать свойство в товаре',
 	'add_value'=>'Добавить отсутствующие значения свойства по умолчанию у товаров',
+	'start_order_date'=>'Начальная дата',
+	'stop_order_date'=>'Конечная дата'
 );

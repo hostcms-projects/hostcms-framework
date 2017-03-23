@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Wysiwyg
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Wysiwyg_Filemanager_File extends Core_Entity
 {
@@ -150,8 +150,10 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 			ob_start();
 			$oCore_Html_Entity_Img = Core::factory('Core_Html_Entity_A')
 				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->src('/admin/images/disk.gif')
+					Core::factory('Core_Html_Entity_I')
+						->class('fa fa-download')
+					/*Core::factory('Core_Html_Entity_Img')
+						->src('/admin/images/disk.gif')*/
 				)
 				->href("/admin/filemanager/index.php?hostcms[action]=download&cdir=" . rawurlencode(Core_File::pathCorrection(Core_Array::getRequest('cdir'))) . "&dir=" . rawurlencode(Core_File::pathCorrection(Core_Array::getRequest('dir'))) ."&hostcms[checked][1][{$this->hash}]=1")
 				->target('_blank')
@@ -208,6 +210,12 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 */
 	public function image()
 	{
+		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
+			->class('fm_preview');
+
+		$oChild = Core::factory('Core_Html_Entity_I')
+			->class('fa fa-file-text-o');
+			
 		if ($this->type == 'file')
 		{
 			$aExt = array('JPG', 'JPEG', 'GIF', 'PNG');
@@ -215,7 +223,17 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 			// Ассоциированные иконки
 			$ext = Core_File::getExtension($this->name);
 
-			$icon_file = '/admin/images/icons/' . (isset(Core::$mainConfig['fileIcons'][$ext]) ? Core::$mainConfig['fileIcons'][$ext] : 'file.gif');
+			if (isset(Core::$mainConfig['fileIcons'][$ext]))
+			{
+				$oChild = Core::factory('Core_Html_Entity_Img')
+					->src('/admin/images/icons/' . Core::$mainConfig['fileIcons'][$ext]);
+			}
+			
+			/*$icon_file = '/admin/images/icons/' . (
+				isset(Core::$mainConfig['fileIcons'][$ext])
+					? Core::$mainConfig['fileIcons'][$ext]
+					: 'file.gif'
+			);*/
 
 			try
 			{
@@ -328,7 +346,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 							}
 							elseif ($iImagetype == IMAGETYPE_GIF)
 							{
-								$sourceResource = imagecreatefromgif($filePath);
+								$sourceResource = imagecreatefromgif ($filePath);
 
 								if ($sourceResource)
 								{
@@ -337,7 +355,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 									imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
 
 									ob_start();
-									imagegif($targetResourceStep1);
+									imagegif ($targetResourceStep1);
 									$sImgContent = ob_get_clean();
 
 									imagedestroy($sourceResource);
@@ -357,7 +375,13 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 							$sImgContent = Core_File::read($filePath);
 						}
 
-						$icon_file = "data:" . Core_Mime::getFileMime($filePath) . ";base64," . base64_encode($sImgContent);
+						$oChild = Core::factory('Core_Html_Entity_Img')
+							->src(
+								"data:" . Core_Mime::getFileMime($filePath) .
+								";base64," . base64_encode($sImgContent)
+							);
+						
+						//$icon_file = "data:" . Core_Mime::getFileMime($filePath) . ";base64," . base64_encode($sImgContent);
 					}
 				}
 			}
@@ -365,12 +389,18 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 		}
 		else
 		{
-			$icon_file = $this->name == '..'
-				? '/admin/images/top_point.gif'
-				: '/admin/images/folder.gif';
-		}
+			$oChild = Core::factory('Core_Html_Entity_I')
+					->class('fa fa-folder-open-o');
 
-		?><div class="fm_preview"><img src="<?php echo $icon_file?>" /></div><?php
+			/*$icon_file = $this->name == '..'
+				? '/admin/images/top_point.gif'
+				: '/admin/images/folder.gif';*/
+		}
+		
+		/*?><div class=""><img src="<?php echo $icon_file?>" /></div><?php*/
+		$oCore_Html_Entity_Div
+			->add($oChild)
+			->execute();
 	}
 
 	/**

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -23,12 +23,22 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->addSkipColumn('id')
 			->addSkipColumn('datetime');
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->document_id = intval(Core_Array::getGet('document_id'));
 		}
 
-		parent::setObject($object);
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
@@ -44,10 +54,9 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			? Core::_('Document_Version.edit')
 			: Core::_('Document_Version.add');
 
-		if (is_null($this->_object->id))
-		{
-			$this->_object->document_id = Core_Array::getGet('document_id');
-		}
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$oDocument_Name = Admin_Form_Entity::factory('Input')
 			->value(
@@ -55,26 +64,21 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 			)
 			->caption(Core::_('Document.name'))
 			->name('name')
-			->class('input-lg');
+			->class('form-control input-lg');
 
-		$oMainTab->add($oDocument_Name);
+		$oMainRow1->add($oDocument_Name);
 
 		$oTextarea_Document = Admin_Form_Entity::factory('Textarea')
 			->value(
-				!is_null($this->_object->id)
-					? $this->_object->loadFile()
-					: ''
+				!is_null($this->_object->id) ? $this->_object->loadFile() : ''
 			)
-			//->cols(140)
-			->rows(20)
+			->rows(15)
 			->caption(Core::_('Document_Version.text'))
 			->name('text')
 			->wysiwyg(TRUE)
 			->template_id($this->_object->template_id);
 
-		// Добавляем на основную вкладку большое текстовое поле с кодом XSL-шаблона
-		// после выпадающего списка разделов XSL
-		$oMainTab->addAfter($oTextarea_Document, $oDocument_Name);
+		$oMainRow2->add($oTextarea_Document);
 
 		if (Core::moduleIsActive('typograph'))
 		{
@@ -82,25 +86,30 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 				Typograph_Controller::instance()->eraseOpticalAlignment($oTextarea_Document->value)
 			);
 
-			$oUseTypograph = Admin_Form_Entity::factory('Checkbox');
-			$oUseTypograph
+			$oUseTypograph = Admin_Form_Entity::factory('Checkbox')
 				->name("use_typograph")
 				->caption(Core::_('Document.use_typograph'))
 				->value(1)
-				->divAttr(array('style' => 'float: left;'));
+				->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
-			$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
-			$oUseTrailingPunctuation
+			$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox')
 				->name("use_trailing_punctuation")
 				->caption(Core::_('Document.use_trailing_punctuation'))
 				->value(1)
-				->divAttr(array('style' => 'float: left;'));
+				->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
 
 			$oMainTab
-				->addAfter($oUseTypograph, $oTextarea_Document)
-				->addAfter($oUseTrailingPunctuation, $oUseTypograph)
-				->addAfter(Admin_Form_Entity::factory('Separator'), $oUseTrailingPunctuation);
+				->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+			$oMainRow3
+				->add($oUseTypograph)
+				->add($oUseTrailingPunctuation);
 		}
+
+		$oAttrTab
+			->add($oAttrRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oAttrRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oAttrRow3 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		// Выбор макета
 		$oAdditionalTab->delete($this->getField('template_id'));
@@ -108,7 +117,6 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 
 		$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->Document->site_id);
 
-		// Warning: TO DO: dynamic chain list template_dir -> template like Documents
 		$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
 			->options(
 				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
@@ -119,18 +127,13 @@ class Document_Version_Controller_Edit extends Admin_Form_Action_Controller_Type
 				? $this->_object->template_id
 				: 0
 			)
-			->caption(Core::_('Document_Version.template_id'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
+			->caption(Core::_('Document_Version.template_id'));
 
-		$oAttrTab
-			->add($oSelect_Template_Id)
-			->add(Admin_Form_Entity::factory('Separator'));
+		$oAttrRow1->add($oSelect_Template_Id);
 
 		$oMainTab
-			->move($this->getField('current'), $oAttrTab)
-			->move($this->getField('description'), $oAttrTab);
-
+			->move($this->getField('current'), $oAttrRow2)
+			->move($this->getField('description'), $oAttrRow3);
 
 		$this->title($title);
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -28,10 +28,10 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 	{
 		$modelName = $object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'shop_delivery_condition':
-				if (is_null($object->id))
+				if (!$object->id)
 				{
 					$object->shop_delivery_id = Core_Array::getGet('delivery_id');
 					$object->shop_delivery_condition_dir_id = Core_Array::getGet('shop_delivery_condition_dir_id');
@@ -40,19 +40,36 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				parent::setObject($object);
 
 				// Добавляем вкладку условий доставки
-				$this->addTabAfter
-				(
+				$this->addTabAfter(
 					$oConditionsTab = Admin_Form_Entity::factory('Tab')
 						->caption(Core::_('Shop_Delivery_Condition.cond_of_delivery_tab'))
 						->name('Conditions'),
 					$oMainTab = $this->getTab('main')
 				);
 
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
+
+				$oConditionsTab
+					->add($oConditionsTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oConditionsTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oConditionsTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oConditionsTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oConditionsTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oConditionsTabRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
+
 				$oShop = $object->shop_delivery->Shop;
 
 				$oAdditionalTab = $this->getTab('additional');
-
-				$oSeparator = Admin_Form_Entity::factory('Separator');
 
 				// Переносим поля на другую вкладку
 				$oMainTab
@@ -62,52 +79,17 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->moveAfter($oMaxPriceField = $this->getField('max_price'), $oMinPriceField, $oConditionsTab)
 					->moveAfter($oPriceField = $this->getField('price'), $oMaxPriceField, $oConditionsTab);
 
-				// Настраиваем внешний вид
-				$oPriceField
-					->style("width: 100px")
-					->divAttr(array('style' => 'float: left'));
-
 				$oMinWeightField->caption(
-						Core::_(
-							'Shop_Delivery_Condition.min_weight',
-							$measure_name = $oShop->Shop_Measure->name == ''
-								? Core::_('Shop_Delivery_Condition.shop_measure_not_checked')
-								: $oShop->Shop_Measure->name)
-					);
+					Core::_(
+						'Shop_Delivery_Condition.min_weight',
+						$measure_name = $oShop->Shop_Measure->name == ''
+							? Core::_('Shop_Delivery_Condition.shop_measure_not_checked')
+							: $oShop->Shop_Measure->name)
+				);
 				$oMaxWeightField->caption(Core::_('Shop_Delivery_Condition.max_weight', $measure_name));
 
-				// Удаляем валюты
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_currency_id')
-				);
-
-				$oCurrenciesSelect = Admin_Form_Entity::factory('Select');
-
-				// Создаем экземпляр контроллера магазина
-				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
-
-				$oCurrenciesSelect->caption(Core::_('Shop_Delivery_Condition.shop_currency_id'))
-					->options
-					(
-							$Shop_Controller_Edit->fillCurrencies()
-					)
-					->name('shop_currency_id')
-					->style("width: 100px")
-					->caption("&nbsp;")
-					->value($this->_object->shop_currency_id);
-
-				// Добавляем валюты как выпадающий список
-				$oConditionsTab->addAfter($oCurrenciesSelect, $oPriceField);
-
-				// Добавляем разделитель
-				$oConditionsTab->addAfter($oSeparator, $oCurrenciesSelect);
-
 				// Удаляем налоги
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_tax_id')
-				);
+				$oAdditionalTab->delete($this->getField('shop_tax_id'));
 
 				// Создаем поле налогов как выпадающий список
 				$oTaxSelect = Admin_Form_Entity::factory('Select');
@@ -117,59 +99,93 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 
 				$oTaxSelect
 					->caption(Core::_("Shop_Delivery_Condition.shop_tax_id"))
-					->style("width: 100px")
+					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2'))
 					->options(
 						$Shop_Item_Controller_Edit->fillTaxesList()
 					)
 					->name('shop_tax_id')
 					->value($this->_object->shop_tax_id);
 
-				// Добавляем налоги
-				$oConditionsTab->addAfter
-				(
-					$oTaxSelect, $oSeparator
-				);
+				$oConditionsTabRow6->add($oTaxSelect);
 
-				// Удаляем страны
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_country_id')
-				);
+				$oAdditionalTab
+					->delete($this->getField('shop_country_id'))
+					->delete($this->getField('shop_country_location_id'))
+					->delete($this->getField('shop_country_location_city_id'))
+					->delete($this->getField('shop_country_location_city_area_id'));
 
-				// Удаляем местоположения
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_country_location_id')
-				);
+				$oMainTab
+					->delete($this->getField('shop_country_id_inverted'))
+					->delete($this->getField('shop_country_location_id_inverted'))
+					->delete($this->getField('shop_country_location_city_id_inverted'))
+					->delete($this->getField('shop_country_location_city_area_id_inverted'));
 
-				// Удаляем города
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_country_location_city_id')
-				);
+				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
+				$objectId = intval($this->_object->id);
+				$windowId = $this->_Admin_Form_Controller->getWindowId();
 
-				// Удаляем районы
-				$oAdditionalTab->delete
-				(
-					$this->getField('shop_country_location_city_area_id')
-				);
+				// Создаем поле стран как выпадающий список
+				$CountriesSelectField = Admin_Form_Entity::factory('Select')
+					->name('shop_country_id')
+					->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+					->options($Shop_Controller_Edit->fillCountries())
+					->value($this->_object->shop_country_id)
+					->invertor(true)
+					->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_id_inverted'))
+					->inverted($this->_object->shop_country_id_inverted)
+					->onchange("$('#{$windowId} #list4').clearSelect();$('#{$windowId} #list3').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list2', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList2',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+				$oMainRow2->add($CountriesSelectField);
 
-				$oMainTab->delete(
-					$this->getField('shop_country_id_inverted')
-				);
-				$oMainTab->delete(
-					$this->getField('shop_country_location_id_inverted')
-				);
-				$oMainTab->delete(
-					$this->getField('shop_country_location_city_id_inverted')
-				);
-				$oMainTab->delete(
-					$this->getField('shop_country_location_city_area_id_inverted')
-				);
-				$lastField = $this->generateCountryFields($this,
-						$oMainTab,
-						$this->getField('name')
-					);
+				// Создаем поле местоположений как выпадающий список
+				$CountryLocationsSelectField = Admin_Form_Entity::factory('Select')
+					->name('shop_country_location_id')
+					->id('list2')
+					->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+					->options(
+							$Shop_Controller_Edit->fillCountryLocations($this->_object->shop_country_id)
+						)
+					->value($this->_object->shop_country_location_id)
+					->invertor(true)
+					->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_id_inverted'))
+					->inverted($this->_object->shop_country_location_id_inverted)
+					->onchange("$('#{$windowId} #list4').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list3', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList3',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+
+				$oMainRow2->add($CountryLocationsSelectField);
+
+				// Создаем поле городов как выпадающий список
+				$CountryLocationCitiesSelectField = Admin_Form_Entity::factory('Select')
+					->name('shop_country_location_city_id')
+					->id('list3')
+					->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+					->options(
+							$Shop_Controller_Edit->fillCountryLocationCities($this->_object->shop_country_location_id)
+						)
+					->value($this->_object->shop_country_location_city_id)
+					->invertor(true)
+					->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id_inverted'))
+					->inverted($this->_object->shop_country_location_city_id_inverted)
+					->onchange("$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list4', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList4',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
+
+				$oMainRow3->add($CountryLocationCitiesSelectField);
+
+				// Создаем поле районов как выпадающий список
+				$CountryLocationCityAreasSelectField = Admin_Form_Entity::factory('Select')
+					->name('shop_country_location_city_area_id')
+					->id('list4')
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+					->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))
+					->options(
+							$Shop_Controller_Edit->fillCountryLocationCityAreas($this->_object->shop_country_location_city_id)
+						)
+					->value($this->_object->shop_country_location_city_area_id)
+					->invertor(true)
+					->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id_inverted'))
+					->inverted($this->_object->shop_country_location_city_area_id_inverted);
+
+				$oMainRow3->add($CountryLocationCityAreasSelectField);
 
 				// Удаляем типы доставок
 				$oAdditionalTab->delete
@@ -184,14 +200,14 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				$DeliverySelectField = Admin_Form_Entity::factory('Select')
 					->name('shop_delivery_id')
 					->caption(Core::_('Shop_Delivery_Condition.shop_delivery_id'))
-					->style('width: 500px')
+					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
 					->options(
 							$Shop_Delivery_Controller_Edit->fillDeliveries($this->_object->Shop_Delivery->shop_id)
 					)
 					->value($this->_object->shop_delivery_id);
 
 				// Добавляем типы доставок
-				$oMainTab->addAfter($DeliverySelectField, $lastField);
+				$oMainRow4->add($DeliverySelectField);
 
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_delivery_condition_dir_id'));
@@ -201,13 +217,40 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_delivery_id))
 					->name('shop_delivery_condition_dir_id')
 					->value($this->_object->shop_delivery_condition_dir_id)
-					->style('width:300px; float:left')
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров
-				$oMainTab
-					->addAfter($oGroupSelect, $this->getField('name'))
-					->moveBefore($this->getField('delivery_time'), $oGroupSelect);
+				$oMainRow1->add($oGroupSelect);
+
+				$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow5);
+				$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow6);
+				$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow7);
+				$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow8);
+
+				$oConditionsTab->move($oMinWeightField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow1);
+				$oConditionsTab->move($oMaxWeightField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow2);
+				$oConditionsTab->move($oMinPriceField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow3);
+				$oConditionsTab->move($oMaxPriceField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow4);
+				$oConditionsTab->move($oPriceField->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-8')), $oConditionsTabRow5);
+
+				// Создаем экземпляр контроллера магазина
+				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
+
+				// Удаляем валюты
+				$oAdditionalTab->delete($this->getField('shop_currency_id'));
+
+				$oConditionsTabRow5->add(
+					Admin_Form_Entity::factory('Select')
+						->caption(Core::_('Shop_Delivery_Condition.shop_currency_id'))
+						->options(
+							$Shop_Controller_Edit->fillCurrencies()
+						)
+						->name('shop_currency_id')
+						->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-4'))
+						->caption("&nbsp;")
+						->value($this->_object->shop_currency_id)
+				);
 
 				// Заголовок формы
 				$title = $this->_object->id
@@ -217,7 +260,7 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 				$this->title($title);
 			break;
 			case 'shop_delivery_condition_dir':
-				if (is_null($object->id))
+				if (!$object->id)
 				{
 					$object->shop_delivery_id = Core_Array::getGet('delivery_id');
 					$object->parent_id = Core_Array::getGet('shop_delivery_condition_dir_id');
@@ -236,7 +279,6 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_delivery_id))
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->style('width:300px; float:left')
 					->filter(TRUE);
 
 				// Добавляем группу товаров
@@ -315,14 +357,15 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		$CountriesSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_id')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
-			->style('width: 300px')
 			->divAttr(array('style' => 'float: left'))
 			->options(
 					$Shop_Controller_Edit->fillCountries()
 				)
 			->value($object->_object->shop_country_id)
 			->onchange("$('#{$windowId} #list4').clearSelect();$('#{$windowId} #list3').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list2', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList2',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
-		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit)
+		{
 			$CountriesSelectField
 				->invertor(true)
 				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_id_inverted'))
@@ -330,27 +373,23 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 		}
 
 		// Добавляем страны
-		if (is_null($fieldAfter))
-		{
-			$tab->add($CountriesSelectField);
-		}
-		else
-		{
-			$tab->addAfter($CountriesSelectField, $fieldAfter);
-		}
+		is_null($fieldAfter)
+			? $tab->add($CountriesSelectField)
+			: $tab->addAfter($CountriesSelectField, $fieldAfter);
 
 		// Создаем поле местоположений как выпадающий список
 		$CountryLocationsSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_location_id')
 			->id('list2')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
-			->style('width: 300px')
 			->options(
 					$Shop_Controller_Edit->fillCountryLocations($object->_object->shop_country_id)
 				)
 			->value($object->_object->shop_country_location_id)
 			->onchange("$('#{$windowId} #list4').clearSelect();$.ajaxRequest({path: '". $this->_Admin_Form_Controller->getPath() ."',context: 'list3', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadList3',additionalParams: 'list_id=' + this.value,windowId: '{$windowId}'}); return false");
-		if ($object instanceof Shop_Delivery_Condition_Controller_Edit) {
+
+		if ($object instanceof Shop_Delivery_Condition_Controller_Edit)
+		{
 			$CountryLocationsSelectField
 				->invertor(true)
 				->invertorCaption(Core::_('Shop_Delivery_Condition.shop_country_location_id_inverted'))
@@ -365,7 +404,6 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 			->name('shop_country_location_city_id')
 			->id('list3')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
-			->style('width: 300px')
 			->divAttr(array('style' => 'float: left'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocationCities($object->_object->shop_country_location_id)
@@ -388,7 +426,6 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 			->name('shop_country_location_city_area_id')
 			->id('list4')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))
-			->style('width: 300px')
 			->options(
 					$Shop_Controller_Edit->fillCountryLocationCityAreas($object->_object->shop_country_location_city_id)
 				)

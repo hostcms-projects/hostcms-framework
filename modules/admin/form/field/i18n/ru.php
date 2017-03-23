@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Поля формы центра администрирования',
@@ -31,15 +31,9 @@ return array(
 	'allow_sorting' => '<acronym title="Разрешить сортировку по алфавиту">Разрешить сортировку</acronym>',
 	'allow_filter' => '<acronym title="Разрешить фильтр для значений поля">Разрешить фильтр</acronym>',
 	'editable' => '<acronym title="Разрешить редактирование поля без открытия формы">Редактировать на форме</acronym>',
-	'title_align' => '<acronym title="Выравнивание заголовка">Выравнивание заголовка</acronym>',
-
-	'left' => 'Слева',
-	'center' => 'По центру',
-	'right' => 'Справа',
-
-	'align' => '<acronym title="Выравнивание данных">Выравнивание данных</acronym>',
 	'width' => '<acronym title="Ширина поля в пикселах, процентах и т.д., например, 45px">Ширина поля</acronym>',
-	'style' => '<acronym title="CSS-стиль отображения поля">CSS-стиль</acronym>',
+	'ico' => '<acronym title="Изображение для поля, указывается классом для тега &lt;i&gt;, например &quot;fa fa-comment&quot;">Изображение для поля</acronym>',
+	'class' => '<acronym title="CSS-класс отображения поля">CSS-класс</acronym>',
 	'attributes' => '<acronym title="Список атрибутов поля">Атрибуты</acronym>',
 	'image' => '<acronym title="Соответствие изображений значениям поля. Задается в формате <Значение поля>=<Путь к изображению>">Соответствие изображений значениям поля</acronym>',
 	'link' => '<acronym title="Ссылка с подстановкой">Ссылка</acronym>',

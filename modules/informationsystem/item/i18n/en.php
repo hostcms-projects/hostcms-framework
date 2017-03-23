@@ -5,14 +5,14 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information items',
 	'show_information_groups_title' => 'Information system "%s"',
 	'information_system_top_menu_items' => 'Information item',
 	'show_information_groups_link2' => 'Add',
-	'show_information_groups_link3' => 'Additional properties',
+	'show_information_groups_link3' => 'Properties',
 	'show_all_comments_top_menu' => 'Comments',
 	'show_comments_link_show_all_comments' => 'All comments',
 
@@ -58,10 +58,11 @@ return array(
 	'tab_3' => 'Tags',
 	'tab_4' => 'Additional properties',
 
-	'seo_title' => '<acronym title="Value of meta-tag <title> for information item">Title</acronym>',
-	'seo_description' => '<acronym title="Value of meta-tag <description> for information item">Description</acronym>',
-	'seo_keywords' => '<acronym title="Value of meta-tag <keywords> for information item">Keywords</acronym>',
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 	'tags' => '<acronym title="Labels (tags) of information item divided by comma, e.g. processors, AMD, Athlon64">Labels (tags)</acronym>',
+	'type_tag' => 'Type tag ...',
 
 	'error_information_group_URL_item' => 'Group already contains information item with this name in URL!',
 	'error_information_group_URL_item_URL' => 'Group contains subgroup with URL coinciding with the item name in URL!',

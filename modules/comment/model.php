@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Model extends Core_Entity
 {
@@ -123,7 +123,7 @@ class Comment_Model extends Core_Entity
 		$this->_showXmlVotes = $showXmlVotes;
 		return $this;
 	}
-	
+
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
@@ -180,11 +180,19 @@ class Comment_Model extends Core_Entity
 	/**
 	 * Change comment status
 	 * @return Comment_Model
+	 * @hostcms-event comment.onBeforeChangeActive
+	 * @hostcms-event comment.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+
 		$this->active = 1 - $this->active;
-		return $this->save();
+		$this->save();
+
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+
+		return $this;
 	}
 
 	/**
@@ -253,14 +261,16 @@ class Comment_Model extends Core_Entity
 			ob_start();
 			$windowId = $oAdmin_Form_Controller->getWindowId();
 
-			Core::factory('Core_Html_Entity_Img')
-				->src('/admin/images/new_window.gif')
+			Core::factory('Core_Html_Entity_I')
+				->class('fa fa-user')
 				->execute();
+
 			Core::factory('Core_Html_Entity_A')
 				->href($oAdmin_Form_Controller->getAdminActionLoadHref('/admin/siteuser/siteuser/index.php', 'edit', NULL, 0, $this->Siteuser->id))
 				->onclick("$.openWindowAddTaskbar({path: '/admin/siteuser/siteuser/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][0][{$this->Siteuser->id}]=1&hostcms[action]=edit', shortcutImg: '" . '/modules/skin/' . Core_Skin::instance()->getSkinName() . '/images/module/siteuser.png' . "', shortcutTitle: 'undefined', Minimize: true}); return false")
 				->value(htmlspecialchars($this->Siteuser->login))
 				->execute();
+
 			return ob_get_clean();
 		}
 

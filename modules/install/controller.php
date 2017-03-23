@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Install_Controller
 {
@@ -508,10 +508,11 @@ class Install_Controller
 		$oProperty = Core_Entity::factory('Property')->find($shopItemPropertyId);
 
 		$oValue = $oProperty->createNewValue($shopItemId);
+		$oValue->save();
 
 		if (is_file($shop_item_property_image_from))
 		{
-			$shop_item_property_image_to = $item_dir . "shop_property_file_{$shopItemId}_{$shopItemPropertyId}.jpg";
+			$shop_item_property_image_to = $item_dir . "shop_property_file_{$shopItemId}_{$oValue->id}.jpg";
 			Core_File::copy($shop_item_property_image_from, $shop_item_property_image_to);
 
 			$oValue->file_name = $oValue->file = basename($shop_item_property_image_to);
@@ -531,7 +532,7 @@ class Install_Controller
 
 		if (is_file($shop_item_property_small_image_from))
 		{
-			$shop_item_property_small_image_to = $item_dir . "small_shop_property_file_{$shopItemId}_{$shopItemPropertyId}.jpg";
+			$shop_item_property_small_image_to = $item_dir . "small_shop_property_file_{$shopItemId}_{$oValue->id}.jpg";
 
 			Core_File::copy($shop_item_property_small_image_from, $shop_item_property_small_image_to);
 

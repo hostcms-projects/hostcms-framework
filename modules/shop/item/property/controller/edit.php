@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 {
@@ -35,9 +35,20 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 		$this
 			->addTabAfter($oShopItemTabExportImport, $oMainTab);
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'property':
+
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
+
+				$oShopItemTabExportImport
+					->add($oShopItemTabExportImportRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
 
 				// Создаем экземпляр контроллера магазина
 				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
@@ -50,34 +61,30 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 
 				$oShopMeasuresSelect
 					->caption(Core::_("Shop_Item.shop_measure_id"))
-					->style("width: 100px")
 					->options(
 						$Shop_Controller_Edit->fillMeasures()
 					)
 					->name('shop_measure_id')
 					->value($this->_object->Shop_Item_Property->shop_measure_id)
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					;
 
-				$oMainTab
-					->add($oShopMeasuresSelect);
+				$oMainRow1->add($oShopMeasuresSelect);
 
 				// Префикс
 				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
 				$oShopPrefixInput
 					->caption(Core::_('Shop_Item.property_prefix'))
-					->style('width: 100px')
 					->name('prefix')
 					->value($this->_object->Shop_Item_Property->prefix)
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
 
-				$oMainTab
-					->add($oShopPrefixInput);
+				$oMainRow1->add($oShopPrefixInput);
 
 				// Способ отображения в фильтре
 				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
 				$oShopFilterSelect
 					->caption(Core::_('Shop_Item.property_filter'))
-					->style('width: 250px')
 					->options(
 						array(0 => Core::_('Shop_Item.properties_show_kind_none'),
 						1 => Core::_('Shop_Item.properties_show_kind_text'),
@@ -89,11 +96,11 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 						7 => Core::_('Shop_Item.properties_show_kind_listbox'))
 					)
 					->name('filter')
-					->value($this->_object->Shop_Item_Property->filter);
-					//->divAttr(array('style' => 'float: left'));
+					->value($this->_object->Shop_Item_Property->filter)
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					;
 
-				$oMainTab
-					->add($oShopFilterSelect);
+				$oMainRow1->add($oShopFilterSelect);
 
 				$oShopShowInGroupCheckbox = Admin_Form_Entity::factory('Checkbox');
 				$oShopShowInGroupCheckbox
@@ -101,8 +108,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					->caption(Core::_("Shop_Item.show_in_group"))
 					->name("show_in_group");
 
-				$oMainTab
-					->add($oShopShowInGroupCheckbox);
+				$oMainRow2->add($oShopShowInGroupCheckbox);
 
 				$oShopShowInItemCheckbox = Admin_Form_Entity::factory('Checkbox');
 				$oShopShowInItemCheckbox
@@ -110,8 +116,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					->caption(Core::_("Shop_Item.show_in_item"))
 					->name("show_in_item");
 
-				$oMainTab
-					->add($oShopShowInItemCheckbox);
+				$oMainRow3->add($oShopShowInItemCheckbox);
 
 				$oAddValueCheckbox = Admin_Form_Entity::factory('Checkbox');
 				$oAddValueCheckbox
@@ -121,8 +126,9 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					->caption(Core::_("Shop_Item.add_value"))
 					->name("add_value");
 
-				$oMainTab
-					->add($oAddValueCheckbox);
+				$oMainRow4->add($oAddValueCheckbox);
+
+				$oShopItemTabExportImport->move($this->getField('guid'), $oShopItemTabExportImportRow1);
 
 			break;
 			case 'property_dir':
@@ -143,7 +149,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'property':
 				$Shop_Item_Property = $this->_object->Shop_Item_Property;
@@ -176,7 +182,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 						{
 							$oProperty_Value = $this->_object->createNewValue($oShop_Item->id);
 
-							switch($this->_object->type)
+							switch ($this->_object->type)
 							{
 								case 2: // Файл
 								break;

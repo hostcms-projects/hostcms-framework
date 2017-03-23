@@ -5,7 +5,7 @@
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Structure',
@@ -39,9 +39,9 @@ return array(
 	'active' => '<acronym title="Manages page activity and sections">Page activity</acronym>',
 	"indexing" =>'<acronym title="Manage page indexing">Indexing</acronym>',
 	'name' => '<acronym title="Page name in website menu">Page name in menu</acronym>',
-	'seo_title' => '<acronym title="Value of meta-tag <title> for page">Page title [Title]</acronym>',
-	'seo_description' => '<acronym title="Value of meta-tag <description> for page">Page description [Description]</acronym>',
-	'seo_keywords' => '<acronym title="Value of meta-tag <keywords> for page">Keywords [Keywords]</acronym>',
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 	'url' => '<acronym title="Website section can be an external link">Link to another file</acronym>',
 	'sorting' => '<acronym title="Field according to which page should be sorted">Sorting for the current level</acronym>',
 	'path' => '<acronym title="Element of path to this page from the parent section. E.g., «about_company»">Section name</acronym>',

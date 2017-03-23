@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Market_Module extends Core_Module
 {
@@ -16,13 +16,13 @@ class Market_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.2';
+	public $version = '6.5';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-04-02';
+	public $date = '2015-06-05';
 
 	/**
 	 * Module name
@@ -41,7 +41,7 @@ class Market_Module extends Core_Module
 			array(
 				'sorting' => 150,
 				'block' => 3,
-				'ico' => 'fa-cogs',
+				'ico' => 'fa fa-cogs',
 				'name' => Core::_('Market.menu'),
 				'href' => "/admin/market/index.php",
 				'onclick' => "$.adminLoad({path: '/admin/market/index.php'}); return false"

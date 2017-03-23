@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Date extends Admin_Form_Entity_Input
 {
@@ -36,7 +36,7 @@ class Skin_Default_Admin_Form_Entity_Date extends Admin_Form_Entity_Input
 
 		$aDefaultDivAttr = array('class' => 'item_div');
 		$this->divAttr = Core_Array::union($this->divAttr, $aDefaultDivAttr);
-		
+
 		$aDivAttr = array();
 
 		// Установим атрибуты div'a.
@@ -51,8 +51,14 @@ class Skin_Default_Admin_Form_Entity_Date extends Admin_Form_Entity_Input
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
 
 		?><span class="caption"><?php echo $this->caption?></span><?php
+
+		if (count($this->_children))
+		{
+			?><div class="input-group"><?php
+		}
+
 		?><input <?php echo implode(' ', $aAttr) ?>/>
-	
+
 		<script type="text/javascript">
 		(function($) {
 			$("#<?php echo $this->id?>")
@@ -62,10 +68,11 @@ class Skin_Default_Admin_Form_Entity_Date extends Admin_Form_Entity_Input
 
 		//$this->_showFormat();
 
-		//parent::execute();
-		foreach ($this->_children as $oCore_Html_Entity)
+		$this->executeChildren();
+
+		if (count($this->_children))
 		{
-			$oCore_Html_Entity->execute();
+			?></div><?php
 		}
 
 		?></div><?php

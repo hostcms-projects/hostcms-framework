@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Curl extends Core_Http
 {
@@ -21,6 +21,11 @@ class Core_Http_Curl extends Core_Http
 	 */
 	protected function _execute($host, $path, $query)
 	{
+		if (!function_exists('curl_init'))
+		{
+			throw new Core_Exception("cURL has been disabled, please contact your system administrator!");
+		}
+
 		$curl = @curl_init();
 
 		// Предотвращаем chunked-ответ

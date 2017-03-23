@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class User_Model extends Core_Entity
 {
@@ -308,9 +308,13 @@ class User_Model extends Core_Entity
 	/**
 	 * Change user status
 	 * @return self
+	 * @hostcms-event user.onBeforeChangeActive
+	 * @hostcms-event user.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+		
 		$oCurrentUser = Core_Entity::factory('User', 0)->getCurrent();
 
 		$oUsers = Core_Entity::factory('User');
@@ -329,6 +333,8 @@ class User_Model extends Core_Entity
 			$this->save();
 		}
 
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+		
 		return $this;
 	}
 }

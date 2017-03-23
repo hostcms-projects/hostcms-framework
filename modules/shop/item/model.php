@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Model extends Core_Entity
 {
@@ -387,6 +387,8 @@ class Shop_Item_Model extends Core_Entity
 	 * Backend callback method
 	 * @param object $value value
 	 * @return string
+	 * @hostcms-event shop_item.onBeforeAdminPrice
+	 * @hostcms-event shop_item.onAfterAdminPrice
 	 */
 	public function adminPrice($value = NULL)
 	{
@@ -406,8 +408,6 @@ class Shop_Item_Model extends Core_Entity
 
 			$this->price = $value;
 			//$this->save();
-			echo "CLEAR CACHE";
-			var_dump($value);
 			$this->clearCache();
 
 			Core_Event::notify($this->_modelName . '.onAfterAdminPrice', $this);
@@ -420,13 +420,26 @@ class Shop_Item_Model extends Core_Entity
 	 * Show item's currency
 	 * @return string
 	 */
-	public function suffixAdminPrice()
+	/*public function suffixAdminPrice()
 	{
 		$oShopItem = $this->shortcut_id
-			? Core_Entity::factory("Shop_Item", $this->shortcut_id)
+			? Core_Entity::factory('Shop_Item', $this->shortcut_id)
 			: $this;
 
 		echo ' ' . $oShopItem->Shop_Currency->name;
+	}*/
+
+	/**
+	 * Show item's currency
+	 * @return string
+	 */
+	public function adminCurrency()
+	{
+		$oShopItem = $this->shortcut_id
+			? Core_Entity::factory('Shop_Item', $this->shortcut_id)
+			: $this;
+
+		return $oShopItem->Shop_Currency->name;
 	}
 
 	/**
@@ -806,9 +819,13 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Change item status
 	 * @return self
+	 * @hostcms-event shop_item.onBeforeChangeActive
+	 * @hostcms-event shop_item.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+
 		$this->active = 1 - $this->active;
 		$this->save();
 
@@ -819,7 +836,20 @@ class Shop_Item_Model extends Core_Entity
 
 		$this->clearCache();
 
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+
 		return $this;
+	}
+
+	/**
+	 * Mark entity as deleted
+	 * @return Core_Entity
+	 */
+	public function markDeleted()
+	{
+		$this->clearCache();
+
+		return parent::markDeleted();
 	}
 
 	/**
@@ -944,7 +974,6 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function indexing()
 	{
-		//$oSearch_Page = Core_Entity::factory('Search_Page');
 		$oSearch_Page = new stdClass();
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
@@ -1041,16 +1070,6 @@ class Shop_Item_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
-		//$oSearch_Page->save();
-
-		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
-			->where('search_page_id', '=', $oSearch_Page->id)
-			->execute();
-
-		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
-		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
-
 		return $oSearch_Page;
 	}
 
@@ -1079,17 +1098,15 @@ class Shop_Item_Model extends Core_Entity
 
 		Core::factory('Core_Html_Entity_A')
 			->add(
-				Core::factory('Core_Html_Entity_Img')
-					->src('/admin/images/' . ($iCount ? 'check.gif' : 'not_check.gif'))
+				/*Core::factory('Core_Html_Entity_Img')
+					->src('/admin/images/' . ($iCount ? 'check.gif' : 'not_check.gif'))*/
+				Core::factory('Core_Html_Entity_I')
+					->class('fa fa-lightbulb-o ' . ($iCount ? 'fa-active' : 'fa-inactive'))
 			)
-			->href($oAdmin_Form_Controller->getAdminActionLoadHref
-				(
-					"/admin/shop/item/associated/index.php", 'adminChangeAssociated', NULL, 1, $this->id
-				))
-			->onclick($oAdmin_Form_Controller->getAdminActionLoadAjax
-				(
-					"/admin/shop/item/associated/index.php", 'adminChangeAssociated', NULL, 1, $this->id
-				))
+			->href($oAdmin_Form_Controller->getAdminActionLoadHref(
+				"/admin/shop/item/associated/index.php", 'adminChangeAssociated', NULL, 1, $this->id))
+			->onclick($oAdmin_Form_Controller->getAdminActionLoadAjax(
+				"/admin/shop/item/associated/index.php", 'adminChangeAssociated', NULL, 1, $this->id))
 			->execute();
 
 		return ob_get_clean();
@@ -1324,9 +1341,8 @@ class Shop_Item_Model extends Core_Entity
 						->href($href)
 						->target('_blank')
 						->add(
-							Core::factory('Core_Html_Entity_Img')
-							->src('/admin/images/new_window.gif')
-							->class('img_line')
+							Core::factory('Core_Html_Entity_I')
+							->class('fa fa-external-link')
 						)
 				);
 			}
@@ -1335,9 +1351,8 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$oCore_Html_Entity_Div
 				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->src('/admin/images/mesures.gif')
-						->class('img_line')
+					Core::factory('Core_Html_Entity_I')
+						->class('fa fa-clock-o black')
 				);
 		}
 

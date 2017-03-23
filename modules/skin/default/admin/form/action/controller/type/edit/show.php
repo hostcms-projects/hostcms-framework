@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_Form_Action_Controller_Type_Edit_Show
 {
@@ -30,7 +30,7 @@ class Skin_Default_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_For
 			);
 
 		// Форма
-		$oAdmin_Form_Entity_Form = new Admin_Form_Entity_Form(
+		$oAdmin_Form_Entity_Form = $this->form->controller(
 			$Admin_Form_Controller
 		);
 
@@ -68,7 +68,7 @@ class Skin_Default_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_For
 		}
 
 		// Кнопки
-		$oAdmin_Form_Entity_Form->add(
+		!is_null($this->buttons) && $oAdmin_Form_Entity_Form->add(
 			$this->_addButtons()
 		)
 		->execute();
@@ -82,7 +82,7 @@ class Skin_Default_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_For
 	 */
 	protected function _addButtons()
 	{
-		if (is_null($this->buttons))
+		if ($this->buttons === TRUE)
 		{
 			// Кнопки
 			$oAdmin_Form_Entity_Buttons = Admin_Form_Entity::factory('Buttons');

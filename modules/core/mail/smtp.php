@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Smtp extends Core_Mail
 {
@@ -24,7 +24,7 @@ class Core_Mail_Smtp extends Core_Mail
 	{
 		$sSingleSeparator = $this->_separator;
 
-		$header = "Date: " . date("D, d M Y H:i:s") . " UT{$sSingleSeparator}";
+		$header = "Date: " . date("D, d M Y H:i:s O") . $sSingleSeparator;
 		$header .= "Subject: {$subject}{$sSingleSeparator}";
 		$header .= "To: <{$to}>{$sSingleSeparator}";
 		$header .= $additional_headers . $sSingleSeparator . $sSingleSeparator;

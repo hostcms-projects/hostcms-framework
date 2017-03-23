@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Model extends Core_Entity
 {
@@ -17,13 +17,13 @@ class Admin_Form_Model extends Core_Entity
 	 * @var int
 	 */
 	public $actions = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var int
 	 */
 	public $fields = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var string
@@ -71,6 +71,7 @@ class Admin_Form_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			$this->_preloadValues['guid'] = Core_Guid::get();
 		}
 	}
 

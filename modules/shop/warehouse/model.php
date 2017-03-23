@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Warehouse_Model extends Core_Entity
 {
@@ -66,9 +66,9 @@ class Shop_Warehouse_Model extends Core_Entity
 	 */
 	public function changeStatus()
 	{
-		if($this->active)
+		if ($this->active)
 		{
-			if($this->default)
+			if ($this->default)
 			{
 				throw new Core_Exception(Core::_('Shop_Warehouse.default_change_active_error'),
 					array(), 0, $bShowDebugTrace = FALSE

@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Image_Imagick extends Core_Image
 {
@@ -49,7 +49,7 @@ class Core_Image_Imagick extends Core_Image
 		$sourceX = $picsize['width'];
 		$sourceY = $picsize['height'];
 
-		if($sourceX > $maxWidth || $sourceY > $maxHeight)
+		if ($sourceX > $maxWidth || $sourceY > $maxHeight)
 		{
 			if ($preserveAspectRatio)
 			{
@@ -175,7 +175,7 @@ class Core_Image_Imagick extends Core_Image
 			}
 			else
 			{
-				if($destX_step2 == 0 || $destY_step2 == 0)
+				if ($destX_step2 == 0 || $destY_step2 == 0)
 				{
 					return FALSE;
 				}

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Products groups',
@@ -19,9 +19,9 @@ return array(
 	'indexing' => "<acronym title=\"Enable indexation of groups by on-site search module\">Index group</acronym>",
 	'active' => "<acronym title=\"Activity status of online store group\">Active</acronym>",
 	'path' => "<acronym title=\"Path, e.g. group_30312\">Path</acronym>",
-	'seo_title' => "<acronym title=\"Value of meta-tag title for products group\">Title</acronym>",
-	'seo_description' => "<acronym title=\"Value of meta-tag description for products group\">Description</acronym>",
-	'seo_keywords' => "<acronym title=\"Value of meta-tag keywords for products group\">Keywords</acronym>",
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 	'guid' => '<acronym title="Product group identifier for CommerceML format, e.g. ID00006831">CommerceML product group identifier</acronym>',
 	'groups_add_form_title' => "Add products group information",
 	'groups_edit_form_title' => "Edit products group information",
@@ -37,7 +37,7 @@ return array(
 	'copy_success' => "Products group copied successfully!",
 	'markDeleted_success' => "Products group deleted successfully!",
 	'changeActive_success' => "Products group has been changed",
-	'shops_add_form_link_properties_for_group' => "Groups properties",
+	'properties' => "Properties",
 	'list_of_property_for_group' => "Properties list of product group",
 	'tab_properties' => "Additional properties",
 	'delete_success' => 'Item deleted successfully!',

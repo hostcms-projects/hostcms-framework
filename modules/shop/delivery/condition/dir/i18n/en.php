@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu_caption' => 'Group',
@@ -15,7 +15,8 @@ return array(
 	'undelete_success' => 'Item restored successfully!',
 	'name' => "<acronym title=\"Name of group\">Name of group</acronym>",
 	'sorting' => "<acronym title=\"Sorting order\">Sorting order</acronym>",
-	'shop_delivery_id' => "<acronym title=\"Delivery type that group belongs to\">Delivery type that group belongs to</acronym>",
+	'shop_delivery_id' => "<acronym title=\"Delivery condition belongs to\">Delivery condition belongs to</acronym>",
+	'parent_id' => '<acronym title="Parent group">Parent group</acronym>',
 	'id' => "Id",
 	'edit_success' => "Data successfully saved",
 	'markDeleted_success' => "Data successfully deleted!",

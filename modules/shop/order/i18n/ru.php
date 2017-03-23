@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Заказы магазина',
@@ -95,6 +95,8 @@ return array(
 	'apply_success' => "Информация успешно изменена.",
 	'confirm_admin_subject' => 'Подтверждение оплаты, заказ N %1$s от %3$s в магазине "%2$s"',
 	'confirm_user_subject' => 'Подтверждение оплаты, заказ N %1$s от %3$s',
+	'cancel_admin_subject' => 'Отмена заказа N %1$s от %3$s в магазине "%2$s"',
+	'cancel_user_subject' => 'Отмена заказа N %1$s от %3$s',
 	'acceptance_report_address' => 'Адрес: ',
 	'acceptance_report_phone' => 'тел.:',
 	'acceptance_report_customer' => 'Заказчик',
@@ -110,9 +112,10 @@ return array(
 	'acceptance_report_performer' => 'Исполнитель',
 	'acceptance_report_signature' => 'подпись',
 	'acceptance_report_akt' => 'Акт № %s от %s',
-	'acceptance_report_form' => 'Акт №',
-	'acceptance_report_invoice' => 'Счёт-фактура №',
+	'acceptance_report_form' => 'Акт',
+	'acceptance_report_invoice' => 'Счёт-фактура',
 	'acceptance_report_year' => ' г.',
+	'document_number' => 'Номер документа',
 	
 	'vat_invoice_title' => 'Счет-фактура %s от %s г.',
 	'vat_invoice_intro' => 'Приложение №1<br/>к Правилам ведения журналов учета полученных и выставленных счетов-фактур,<br/>книг покупок и книг продаж при расчетах по налогу на добавленную стоимость,<br/>утвержденным постановлением Правительства Российской Федерации от 2 декабря 2000 г. N 914<br/>(в редакции постановлений Правительства Российской Федерации от 15 марта 2001 г. N 189,<br/>от 27 июля 2002 г. N 575, от 16 февраля 2004 г. N 84, от 11 мая 2006 г. N 283)',

@@ -1,7 +1,7 @@
 <?php
 
 return array (
-	'skin' => 'summer',
+	'skin' => 'bootstrap',
 	'dateFormat' => 'd.m.Y',
 	'dateTimeFormat' => 'd.m.Y H:i:s',
 	'timezone' => 'Europe/Moscow',

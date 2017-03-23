@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Группы товаров',
@@ -37,7 +37,7 @@ return array(
 	'copy_success' => "Группа товаров успешно скопирована!",	
 	'markDeleted_success' => "Группа товаров успешно удалена!",
 	'changeActive_success' => "Информация успешно изменена",
-	'shops_add_form_link_properties_for_group' => "Свойства групп",
+	'properties' => "Свойства групп",
 	'list_of_property_for_group' => "Список свойств групп товаров",
 	'tab_properties' => "Дополнительные свойства",
 	'delete_success' => 'Элемент удален!',

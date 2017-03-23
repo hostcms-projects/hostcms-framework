@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Delete_File extends Admin_Form_Action_Controller
 {
@@ -51,16 +51,20 @@ class Admin_Form_Action_Controller_Type_Delete_File extends Admin_Form_Action_Co
 		$methodName = $this->methodName;
 		$this->_object->$methodName($operation);
 
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+		
+		!is_array($this->divId) && $this->divId = array($this->divId);
+		
 		ob_start();
-		// Удаляем дочерние узлы
-		Core::factory('Core_Html_Entity_Script')
-			->type("text/javascript")
-			->value("deleteChildNodes('{$this->divId}');")
-			->execute();
-
-		$this->addMessage(
-			ob_get_clean()
-		);
+		foreach ($this->divId as $sDivId)
+		{
+			// Удаляем дочерние узлы
+			Core::factory('Core_Html_Entity_Script')
+				->type("text/javascript")
+				->value("$('#{$windowId} #{$sDivId}').remove()")
+				->execute();
+		}
+		$this->addMessage(ob_get_clean());
 
 		return TRUE;
 	}

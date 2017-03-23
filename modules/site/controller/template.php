@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Controller_Template extends Core_Servant_Properties
 {
@@ -85,7 +85,7 @@ class Site_Controller_Template extends Core_Servant_Properties
 
 		if(is_file($template_content_filepath) && ($sTemplateContentXml = Core_File::read($template_content_filepath)))
 		{
-			if($aTemplateContentXml = Core_XML::xml2array($sTemplateContentXml))
+			if ($aTemplateContentXml = Core_XML::xml2array($sTemplateContentXml))
 			{
 				return $aTemplateContentXml;
 			}

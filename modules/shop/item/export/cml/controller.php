@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 {
@@ -106,7 +106,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 	 */
 	public function exportImport()
 	{
-		if($this->group === NULL)
+		if ($this->group === NULL)
 		{
 			throw new Core_Exception('Parent group does not specified!');
 		}
@@ -120,7 +120,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 		$this->getGroupsCML($this->group, $classifier);
 
 		// Свойства товаров
-		if($this->exportItemExternalProperties)
+		if ($this->exportItemExternalProperties)
 		{
 			$aItemProperties = Core_Entity::factory('Shop_Item_Property_List', $this->shop->id)->Properties->findAll();
 		}
@@ -201,11 +201,11 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 		$item->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
 			->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
 
-		if($oShopItem->modification_id && $oShopItem->Modification->Shop_Group->id)
+		if ($oShopItem->modification_id && $oShopItem->Modification->Shop_Group->id)
 		{
 			$item->addChild('Группы')->addChild('Ид', $oShopItem->Modification->Shop_Group->guid);
 		}
-		elseif($oShopItem->Shop_Group->id)
+		elseif ($oShopItem->Shop_Group->id)
 		{
 			$item->addChild('Группы')->addChild('Ид', $oShopItem->Shop_Group->guid);
 		}
@@ -238,7 +238,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 	 */
 	public function exportOffers()
 	{
-		if($this->group === NULL)
+		if ($this->group === NULL)
 		{
 			throw new Core_Exception("Parent group does not specified!");
 		}

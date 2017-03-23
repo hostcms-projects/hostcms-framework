@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Breadcrumbs extends Admin_Form_Entity
 {
@@ -36,7 +36,6 @@ class Skin_Default_Admin_Form_Entity_Breadcrumbs extends Admin_Form_Entity
 	public function execute()
 	{
 		?><p><?php
-
 		$count = count($this->_children);
 
 		foreach ($this->_children as $key => $oAdmin_Form_Entity)
@@ -48,7 +47,6 @@ class Skin_Default_Admin_Form_Entity_Breadcrumbs extends Admin_Form_Entity
 				echo $this->separator;
 			}
 		}
-
 		?></p><?php
 	}
 }

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 	 */
 	public function setObject($object)
 	{
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_id = Core_Array::getGet('shop_id');
 		}
@@ -28,18 +28,25 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparator = Admin_Form_Entity::factory('Separator');
 
-		$oValueField = $this->getField('value');
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$oValueField
-			->style("width: 170px;")
-			->divAttr(array('style' => 'float: left'));
+		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow1);
+		$oMainTab->move($this->getField('coupon')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow2);
+		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
 
-		$oMainTab->delete($this->getField('type'));
 		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 		$oMainTab->delete($this->getField('mode'));
 
+		$oMainTab->delete($this->getField('type'));
 		$oTypeSelectField = Admin_Form_Entity::factory('Select');
 
 		$oTypeSelectField
@@ -49,57 +56,49 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_percent'),
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_summ'))
 			)
-			->style("width: 100px;")
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
 			->value($this->_object->type);
 
-		$oMainTab->addAfter($oTypeSelectField, $oValueField);
-		$oMainTab->addAfter($oSeparator, $oTypeSelectField);
+		$oMainRow3->add($oTypeSelectField);
 
-		$this->getField('start_datetime')
-			->divAttr(array('style' => 'float: left; width: 170px; padding-right: 20px;'));
+		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);
+		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);
 
-		$this->getField('min_amount')
-			->divAttr(array('style' => 'float: left; width: 170px; padding-right: 20px;'));
-
-		$oMaxAmountField = $this->getField('max_amount');
-
-		$oMaxAmountField
-			->style("width: 170px;")
-			->divAttr(array('style' => 'float: left;'));
+		$oMainTab->move($this->getField('min_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
+		$oMainTab->move($this->getField('max_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
 
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
-		$oCurrencySelectField = Admin_Form_Entity::factory('Select');
+		$oMainRow5->add(
+			Admin_Form_Entity::factory('Select')
+				->name('shop_currency_id')
+				->caption(Core::_('Shop_Purchase_Discount.shop_currency_id'))
+				->options($Shop_Controller_Edit->fillCurrencies())
+				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+				->value($this->_object->shop_currency_id)
+		);
 
-		$oCurrencySelectField
-			->name('shop_currency_id')
-			->caption(Core::_('Shop_Purchase_Discount.shop_currency_id'))
-			->options($Shop_Controller_Edit->fillCurrencies())
-			->style("width: 100px;")
-			->value($this->_object->shop_currency_id);
+		$oMainRow6->add(
+			Admin_Form_Entity::factory('Radiogroup')
+				->name('mode')
+				->value($this->_object->mode)
+				->radio(array(
+					Core::_('Shop_Purchase_Discount.order_discount_case_and'),
+					Core::_('Shop_Purchase_Discount.order_discount_case_or'),
+					Core::_('Shop_Purchase_Discount.order_discount_case_accumulative')
+				))
+				->ico(
+					array(
+						'fa-chevron-up',
+						'fa-chevron-down',
+						'fa-shopping-cart',
+					)
+				)
+				->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+		);
 
-		$oMainTab->addAfter($oCurrencySelectField, $oMaxAmountField);
-
-		$oLogicSwitcherField = Admin_Form_Entity::factory('Radiogroup');
-
-		$oLogicSwitcherField
-			->name('mode')
-			->value($this->_object->mode)
-			->radio(array(
-				Core::_('Shop_Purchase_Discount.order_discount_case_and'),
-				Core::_('Shop_Purchase_Discount.order_discount_case_or'),
-				Core::_('Shop_Purchase_Discount.order_discount_case_accumulative')
-			))
-			->divAttr(array('style' => 'font-weight: bold;'));
-
-		$oMainTab->addAfter($oLogicSwitcherField, $oCurrencySelectField);
-		$oMainTab->addAfter($oSeparator, $oCurrencySelectField);
-
-		$this->getField('min_count')
-			->style("width: 170px;")
-			->divAttr(array('style' => 'float: left;'));
-
-		$this->getField('max_count')->style("width: 170px;");
+		$oMainTab->move($this->getField('min_count')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7);
+		$oMainTab->move($this->getField('max_count')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7);
 
 		$this->title($this->_object->id
 			? Core::_('Shop_Purchase_Discount.edit_order_discount_form_title')

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller extends Core_Servant_Properties
 {
@@ -93,6 +93,76 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		// Умножаем цену товара на курс валюты в базовой валюте
 		$this->_aPrice['price'] *= $fCurrencyCoefficient;
 
+		// Расчитываем цену по установленному $this->_aPrice['price']
+		$this->_calculatePrice($oShop_Item);
+
+		Core_Event::notify(get_class($this) . '.onAfterCalculatePrice', $this, array($oShop_Item));
+
+		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
+		if ($bRound)
+		{
+			$oShop_Controller = Shop_Controller::instance();
+			$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
+			$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
+			$this->_aPrice['discount'] = $oShop_Controller->round($this->_aPrice['discount']);
+			$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
+			$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
+		}
+
+		return $this->_aPrice;
+	}
+
+	/**
+	 * Calculate the cost with tax and discounts in Shop_Item currency
+	 * @param float $price price
+	 * @param Shop_Item_Model $oShop_Item item
+	 * @param boolean $bRound round prices
+	 * @return array
+	 * @hostcms-event Shop_Item_Controller.onBeforeCalculatePrice
+	 * @hostcms-event Shop_Item_Controller.onAfterCalculatePrice
+	 */
+	public function calculatePriceInItemCurrency($price, Shop_Item_Model $oShop_Item, $bRound = TRUE)
+	{
+		$oShop = $oShop_Item->Shop;
+
+		$this->_aPrice = array(
+			'tax' => 0,
+			'rate' => 0,
+			'price' => $price,
+			'price_discount' => $price,
+			'price_tax' => $price,
+			'discount' => 0,
+			'discounts' => array()
+		);
+
+		Core_Event::notify(get_class($this) . '.onBeforeCalculatePriceInItemCurrency', $this, array($oShop_Item));
+
+		// Расчитываем цену по установленному $this->_aPrice['price']
+		$this->_calculatePrice($oShop_Item);
+
+		Core_Event::notify(get_class($this) . '.onAfterCalculatePriceInItemCurrency', $this, array($oShop_Item));
+
+		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
+		if ($bRound)
+		{
+			$oShop_Controller = Shop_Controller::instance();
+			$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
+			$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
+			$this->_aPrice['discount'] = $oShop_Controller->round($this->_aPrice['discount']);
+			$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
+			$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
+		}
+
+		return $this->_aPrice;
+	}
+
+	/**
+	 * Calculate the cost with tax and discounts without currencies
+	 * @param Shop_Item_Model $oShop_Item item
+	 * @return array
+	 */
+	protected function _calculatePrice(Shop_Item_Model $oShop_Item)
+	{
 		if ($this->_aPrice['price'])
 		{
 			// Определены ли скидки на товар
@@ -164,20 +234,6 @@ class Shop_Item_Controller extends Core_Servant_Properties
 			{
 				$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
 			}
-		}
-
-		$oShop_Controller = Shop_Controller::instance();
-
-		Core_Event::notify(get_class($this) . '.onAfterCalculatePrice', $this, array($oShop_Item));
-
-		// Округляем значения, переводим с научной нотации 1Е+10 в десятичную
-		if ($bRound)
-		{
-			$this->_aPrice['tax'] = $oShop_Controller->round($this->_aPrice['tax']);
-			$this->_aPrice['price'] = $oShop_Controller->round($this->_aPrice['price']);
-			$this->_aPrice['discount'] = $oShop_Controller->round($this->_aPrice['discount']);
-			$this->_aPrice['price_discount'] = $oShop_Controller->round($this->_aPrice['price_discount']);
-			$this->_aPrice['price_tax'] = $oShop_Controller->round($this->_aPrice['price_tax']);
 		}
 
 		return $this->_aPrice;

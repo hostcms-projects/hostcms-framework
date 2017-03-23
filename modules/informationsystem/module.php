@@ -14,13 +14,13 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.2';
+	public $version = '6.5';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-05-14';
+	public $date = '2015-06-05';
 	/**
 	 * Module name
 	 * @var string
@@ -33,7 +33,7 @@ class Informationsystem_Module extends Core_Module{	/**
 		parent::__construct();
 		$this->menu = array(			array(
 				'sorting' => 30,				'block' => 0,
-				'ico' => 'fa-tasks',				'name' => Core::_('Informationsystem.menu'),				'href' => "/admin/informationsystem/index.php",				'onclick' => "$.adminLoad({path: '/admin/informationsystem/index.php'}); return false"			)		);	}
+				'ico' => 'fa fa-tasks',				'name' => Core::_('Informationsystem.menu'),				'href' => "/admin/informationsystem/index.php",				'onclick' => "$.adminLoad({path: '/admin/informationsystem/index.php'}); return false"			)		);	}
 
 	/**
 	 * Функция обратного вызова для поисковой индексации

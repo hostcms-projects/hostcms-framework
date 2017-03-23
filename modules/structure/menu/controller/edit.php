@@ -8,27 +8,36 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Menu_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
 	/**
-	 * Set object
-	 * @param object $object object
+	 * Prepare backend item's edit form
+	 *
 	 * @return self
 	 */
-	public function setObject($object)
+	protected function _prepareForm()
 	{
-		parent::setObject($object);
+		parent::_prepareForm();
 
-		$this->getField('sorting')
-			->style('width: 220px');
-		
 		$title = is_null($this->_object->id)
 			? Core::_('Structure_Menu.add_title')
 			: Core::_('Structure_Menu.edit_title');
 
 		$this->title($title);
+
+		$oMainTab = $this->getTab('main');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1);
+
+		$oMainTab
+			->move($this->getField('sorting'), $oMainRow2);
 
 		return $this;
 	}

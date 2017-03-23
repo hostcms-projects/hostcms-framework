@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online store orders',
@@ -16,8 +16,8 @@ return array(
 	'order_edit_form_title' => "Edit order information",
 	'tab2' => 'Contact details',
 	'tab3' => 'Order description',
-	'tab4' => 'Документы',
-	'invoice' => "<acronym title=\"Number of arranged order\">Order number</acronym>",
+	'tab4' => 'Print',
+	'invoice' => "<acronym title=\"Number of order\">Order number</acronym>",
 	'datetime' => "<acronym title=\"Date and time when the order was placed\">Order date</acronym>",
 	'siteuser_id' => "<acronym title=\"User (customer) code\">User code</acronym>",
 	'order_currency' => "<acronym title=\"Payment currency of the order\">Currency</acronym>",
@@ -94,8 +94,10 @@ return array(
 	'order_card_dt' => "Order card %s from %s",
 	'changeStatusCanceled_success' => 'Canceled status changed',
 	'apply_success' => "Information successfully changed",
-	'confirm_admin_subject' => 'Confirmation of payment, order No. %1$s of %3$s in shop "%2$s"',
-	'confirm_user_subject' => 'Confirmation of payment, order No. %1$s of %3$s',
+	'confirm_admin_subject' => 'Confirmation of payment, order #%1$s of %3$s in shop "%2$s"',
+	'confirm_user_subject' => 'Confirmation of payment, order #%1$s of %3$s',
+	'cancel_admin_subject' => 'Cancellation #%1$s of %3$s in shop "%2$s"',
+	'cancel_user_subject' => 'Cancellation #%1$s of %3$s',
 	'acceptance_report_address' => 'Address: ',
 	'acceptance_report_phone' => 'phone.:',
 	'acceptance_report_customer' => 'Customer',
@@ -111,8 +113,10 @@ return array(
 	'acceptance_report_performer' => 'Performer',
 	'acceptance_report_signature' => 'signature',
 	'acceptance_report_akt' => 'Acceptance report №%s from %s',
-	'acceptance_report_invoice' => 'Invoice №',
+	'acceptance_report_form' => 'Acceptance report',
+	'acceptance_report_invoice' => 'Invoice',
 	'acceptance_report_year' => ' year',
+	'document_number' => 'Document number',
 	
 	'vat_invoice_title' => 'Vat invoice %s from %s г.',
 	'vat_invoice_intro' => '',
@@ -206,7 +210,7 @@ return array(
 	'torg12_gruzopol_s' => 'грузополучатель',
 	'torg12_mp' => 'М.П.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;"&emsp;&emsp;"_______________________20&emsp;года',
 	
-	'property_menu' => 'Order properties',
+	'property_menu' => 'Properties',
 	'property_menu_add' => 'Add',
 	'property_title' => 'External properties',
 	'show_list_of_properties_title' => "Properties list of online store order \"%s\"",

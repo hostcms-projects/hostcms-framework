@@ -5,7 +5,7 @@
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */ 
 return array(
 	'model_name' => 'SEO characteristics',
@@ -27,6 +27,7 @@ return array(
 	'tab_indexed' => 'Indexed',
 	'tab_catalog' => 'Catalogues',
 	'tab_counter' => 'Counters',
+	'tab_search_system' => 'Search systems',
 
 	'add_title' => 'Add characteristics',
 	'edit_title' => 'Edit website characteristics',
@@ -82,4 +83,6 @@ return array(
 	'define_error' => 'Error! Characteristics have not been calculated!',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	
+	'reset' => 'Reset'
 );

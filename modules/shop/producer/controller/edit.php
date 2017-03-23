@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -27,10 +27,11 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 	{
 		$modelName = $object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'shop_producer':
-				if (is_null($object->id))
+
+				if (!$object->id)
 				{
 					$object->shop_id = Core_Array::getGet('shop_id');
 					$object->shop_producer_dir_id = Core_Array::getGet('producer_dir_id');
@@ -42,7 +43,9 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 				parent::setObject($object);
 
-				$this->getField('description')->rows(20);
+				$this->getField('description')
+					->rows(15)
+					->wysiwyg(TRUE);
 
 				$oMainTab = $this->getTab('main');
 
@@ -52,41 +55,63 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->caption(Core::_('Shop_Producer.tab2'))
 					->name('Contacts');
 
+				$oContactsTab
+					->add($oContactsTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oContactsTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oContactsTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oContactsTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oContactsTabRow5 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oBankContactsTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Producer.tab3'))
 					->name('Contacts');
 
+				$oBankContactsTab
+					->add($oBankContactsTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oBankContactsTabRow10 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oSEOTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Producer.tab4'))
 					->name('Contacts');
+
+				$oSEOTab
+					->add($oSEOTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSEOTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSEOTabRow3 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$this
 					->addTabAfter($oContactsTab, $oMainTab)
 					->addTabAfter($oBankContactsTab, $oContactsTab)
 					->addTabAfter($oSEOTab, $oBankContactsTab);
 
-				$oMainTab
-					->move($this->getField('address'), $oContactsTab)
-					->move($this->getField('phone'), $oContactsTab)
-					->move($this->getField('fax'), $oContactsTab)
-					->move($this->getField('site'), $oContactsTab)
-					->move($this->getField('email'), $oContactsTab)
-					->move($this->getField('tin'), $oBankContactsTab)
-					->move($this->getField('kpp'), $oBankContactsTab)
-					->move($this->getField('psrn'), $oBankContactsTab)
-					->move($this->getField('okpo'), $oBankContactsTab)
-					->move($this->getField('okved'), $oBankContactsTab)
-					->move($this->getField('bik'), $oBankContactsTab)
-					->move($this->getField('current_account'), $oBankContactsTab)
-					->move($this->getField('correspondent_account'), $oBankContactsTab)
-					->move($this->getField('bank_name'), $oBankContactsTab)
-					->move($this->getField('bank_address'), $oBankContactsTab)
-					->move($this->getField('seo_title'), $oSEOTab)
-					->move($this->getField('seo_description'), $oSEOTab)
-					->move($this->getField('seo_keywords'), $oSEOTab);
+				$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow1);
+				$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow2);
+				$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow3);
+				$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow4);
+				$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow5);
 
-				$oDescriptionField = $this->getField('description');
-				$oDescriptionField->wysiwyg = TRUE;
+				$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('psrn')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('okpo')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('okved')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bik')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('current_account')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('correspondent_account')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+
+				$oMainTab->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow1);
+				$oMainTab->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow2);
+				$oMainTab->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow3);
 
 				$oShop = $this->_object->Shop;
 
@@ -106,45 +131,42 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 				$oImageField
-					->style("width: 400px;")
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 					->name("image")
 					->id("image")
 					->largeImage(array(
-							'max_width' => $oShop->producer_image_large_max_width,
-							'max_height' => $oShop->producer_image_large_max_height,
-							'path' => $oLargeFilePath,
-							'show_params' => TRUE,
-							'watermark_position_x' => 0,
-							'watermark_position_y' => 0,
-							'place_watermark_checkbox_checked' => 0,
-							'delete_onclick' =>
-							"$.adminLoad({path: '{$sFormPath}', additionalParams:
-							'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1',
-							action: 'deleteLargeImage', windowId: '{$windowId}'}); return false",
-							'caption' => Core::_('Shop_Producer.image_large'),
-							'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio
-						)
-					)
-					->smallImage
-					(array(
-							'max_width' => $oShop->producer_image_small_max_width,
-							'max_height' => $oShop->producer_image_small_max_height,
-							'path' => $oSmallFilePath,
-							'create_small_image_from_large_checked' =>
-							$this->_object->image_small == '',
-							'place_watermark_checkbox_checked' =>
-							$oShop->watermark_default_use_small_image,
-							'delete_onclick' => "$.adminLoad({path: '{$sFormPath}',
-							additionalParams:
-							'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1',
-							action: 'deleteSmallImage', windowId: '{$windowId}'}); return false",
-							'caption' => Core::_('Shop_Producer.image_small'),
-							'show_params' => TRUE,
-							'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small
-						)
-					);
+						'max_width' => $oShop->producer_image_large_max_width,
+						'max_height' => $oShop->producer_image_large_max_height,
+						'path' => $oLargeFilePath,
+						'show_params' => TRUE,
+						'watermark_position_x' => 0,
+						'watermark_position_y' => 0,
+						'place_watermark_checkbox_checked' => 0,
+						'delete_onclick' =>
+						"$.adminLoad({path: '{$sFormPath}', additionalParams:
+						'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1',
+						action: 'deleteLargeImage', windowId: '{$windowId}'}); return false",
+						'caption' => Core::_('Shop_Producer.image_large'),
+						'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio
+					))
+					->smallImage(array(
+						'max_width' => $oShop->producer_image_small_max_width,
+						'max_height' => $oShop->producer_image_small_max_height,
+						'path' => $oSmallFilePath,
+						'create_small_image_from_large_checked' =>
+						$this->_object->image_small == '',
+						'place_watermark_checkbox_checked' =>
+						$oShop->watermark_default_use_small_image,
+						'delete_onclick' => "$.adminLoad({path: '{$sFormPath}',
+						additionalParams:
+						'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1',
+						action: 'deleteSmallImage', windowId: '{$windowId}'}); return false",
+						'caption' => Core::_('Shop_Producer.image_small'),
+						'show_params' => TRUE,
+						'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small
+					));
 
-				$oMainTab->addAfter($oImageField, $oDescriptionField);
+				$oMainTab->addAfter($oImageField, $this->getField('description'));
 
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_producer_dir_id'));
@@ -154,7 +176,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id))
 					->name('shop_producer_dir_id')
 					->value($this->_object->shop_producer_dir_id)
-					->style('width:300px; float:left')
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров
@@ -168,7 +190,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			break;
 			case 'shop_producer_dir':
 
-				if (is_null($object->id))
+				if (!$object->id)
 				{
 					$object->shop_id = Core_Array::getGet('shop_id');
 					$object->parent_id = Core_Array::getGet('producer_dir_id');
@@ -187,7 +209,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->style('width:300px; float:left')
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров
@@ -204,7 +226,6 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 		return $this;
 	}
-
 
 	/**
 	 * Create visual tree of the directories
@@ -282,7 +303,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			// и передан файл
 			&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
 			if (Core_File::isValidExtension($aFileData['name'],
@@ -441,7 +462,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			{
 				$this->_object->image_large = $large_image;
 
-				// WARNING !!! Закомментировано до особого указа о добавлении полей для хранения
+				// WARNING: Закомментировано до добавления полей для хранения
 				// размеров изображений производителя
 				//$this->_object->setLargeImageSizes();
 			}
@@ -449,7 +470,6 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			if ($result['small_image'])
 			{
 				$this->_object->image_small = $small_image;
-
 				//$this->_object->setSmallImageSizes();
 			}
 		}

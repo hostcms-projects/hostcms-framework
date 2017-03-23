@@ -5,14 +5,14 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Discounts',
 	'show_item_discount_title' => "Discounts for product \"%s\"",
-	'discount_add_form_link' => 'Reference "Discounts"',
-	'show_groups_discount' => "Discount",
-	'show_groups_discount_add' => "Add",
+	'discount_add_form_link' => 'Product discounts',
+	'show_groups_discount' => 'Discount',
+	'show_groups_discount_add' => 'Add',
 	'item_discount_add_form_title' => "Add product discount information",
 	'item_discount_edit_form_title' => "Edit product discount information",
 	'name' => '<acronym title="Name of discount from total order amount">Name</acronym>',

@@ -6,11 +6,13 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'save' => 'Сохранить',
 	'apply' => 'Применить',
+	'noSubject' => 'Без темы',
+	'actions' => 'Действия',
 
 	'yes' => 'Да',
 	'no' => 'Нет',
@@ -46,6 +48,7 @@ return array(
 	'default_order_field' => '<acronym title="Название поля по умолчанию для сортировки">Название поля сортировки</acronym>',
 	'default_order_direction' => '<acronym title="Направление сортировки">Направление сортировки</acronym>',
 	'id' => 'Идентификатор',
+	'guid' => 'GUID',
 
 	'apply_success' => 'Информация о форме изменена!',
 	'apply_error' => 'Ошибка! Информация о форме не изменена!',
@@ -103,5 +106,5 @@ return array(
 	'export_csv' => 'Экспорт в CSV',
 	'file_description' => 'Описание файла',
 	'delete_success' => 'Элемент удален!',
-	'undelete_success' => 'Элемент восстановлен!',
+	'undelete_success' => 'Элемент восстановлен!',	
 );

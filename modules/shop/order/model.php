@@ -386,9 +386,9 @@ class Shop_Order_Model extends Core_Entity
 
 			$iRowCount = count($aRows);
 
-			if($iRowCount)
+			if ($iRowCount)
 			{
-				if($iRowCount > 1)
+				if ($iRowCount > 1)
 				{
 					Core::$log
 					->clear()
@@ -398,7 +398,7 @@ class Shop_Order_Model extends Core_Entity
 				}
 
 
-				if($this->shop_delivery_condition_id == $aRows[0]->id)
+				if ($this->shop_delivery_condition_id == $aRows[0]->id)
 				{
 					// Нашли то же условие доставки
 				}
@@ -847,7 +847,7 @@ class Shop_Order_Model extends Core_Entity
 				$oShop_Order_Item->save();
 			}
 			// Пополнение лицевого счета
-			elseif($oShop_Order_Item->type == 2)
+			elseif ($oShop_Order_Item->type == 2)
 			{
 				// Проведение/стронирование транзакции
 				$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');

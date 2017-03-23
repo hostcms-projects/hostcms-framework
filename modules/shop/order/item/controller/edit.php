@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 	 */
 	public function setObject($object)
 	{
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_order_id = Core_Array::getGet('shop_order_id');
 		}
@@ -31,95 +31,64 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparatorField = Admin_Form_Entity::factory('Separator');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$oOrder = Core_Entity::factory('Shop_Order', intval(Core_Array::getGet('shop_order_id')));
 
-		$this->getField('quantity')
-			->style("width: 200px")
-			->divAttr(array('style' => 'float: left'))
-			->class('input-lg');
+		$oMainTab->move($this->getField('quantity')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
+		$oMainTab->move($this->getField('price')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-5')), $oMainRow1);
+		$oMainTab->move($this->getField('rate')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-5')), $oMainRow1);
+
+		$oMainRow1->add(Admin_Form_Entity::factory('Span')
+			->value('%')
+			->style("font-size: 200%")
+			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-2', 'style' => 'padding-top: 20px'))
+			);
 
 		$this->getField('name')->format(array('minlen' => array('value' => 0)));
 
-		$oPriceField = $this->getField('price');
+		$oMainTab->moveAfter($this->getField('rate'), $this->getField('price'));
 
-		$oPriceField
-			->style("width: 200px")
-			->class('input-lg')
-			->divAttr(array('style' => 'float: left'));
+		$oAdditionalTab->delete($this->getField('shop_warehouse_id'));
 
-		$oRateField = $this->getField('rate');
-		$oRateField->style("width: 100px")
-			->class('input-lg')
-			->divAttr(array('style' => 'float: left'));
-
-		$oMainTab->moveAfter($oRateField, $oPriceField);
-
-		$oSpanPercent = Admin_Form_Entity::factory('Span');
-		$oSpanPercent->value('%')
-			->style("font-size: 200%")
-			->divAttr(array('style' => 'padding-top: 20px'));
-
-		$oMainTab->addAfter(
-			$oSpanPercent, $oRateField
-		)->addAfter(
-			$oSeparatorField, $oSpanPercent
-		);
-
-		$oAdditionalTab->delete(
-			$this->getField('shop_warehouse_id')
-		);
-
-		$oWarehouseSelect = Admin_Form_Entity::factory('Select');
-
-		$oWarehouseSelect->caption(Core::_('Shop_Order_Item.shop_warehouse_id'))
-			->options(
-				$this->_fillWarehousesList(Core_Array::getGet('shop_id'))
-			)
-			->name('shop_warehouse_id')
-			->value($this->_object->shop_warehouse_id)
-			->style("width: 200px")
-			->divAttr(array('style' => 'float: left'));
-
-		$oMainTab->addAfter(
-			$oWarehouseSelect, $oSeparatorField
-		);
-
-		$oMainTab->delete(
-			$this->getField('type')
-		);
-
-		$oTypeSelect = Admin_Form_Entity::factory('Select');
-
-		$oTypeSelect->caption(Core::_('Shop_Order_Item.type'))
-			->options(
-				array(
-					Core::_('Shop_Order_Item.order_item_type_caption0'),
-					Core::_('Shop_Order_Item.order_item_type_caption1'),
-					Core::_('Shop_Order_Item.order_item_type_caption2')
+		$oMainRow2->add(
+			Admin_Form_Entity::factory('Select')
+				->caption(Core::_('Shop_Order_Item.shop_warehouse_id'))
+				->options(
+					$this->_fillWarehousesList(Core_Array::getGet('shop_id'))
 				)
-			)
-			->name('type')
-			->value($this->_object->type)
-			->style("width: 200px");
-
-		$oMainTab->addAfter(
-			$oTypeSelect, $oWarehouseSelect
+				->name('shop_warehouse_id')
+				->value($this->_object->shop_warehouse_id)
+				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'))
 		);
 
-		$oMarkingField = $this->getField('marking');
+		$oMainTab->delete($this->getField('type'));
 
-		$oMarkingField
-			->style("width: 200px")
-			->divAttr(array('style' => 'float: left'));
+		$oMainRow2->add(
+			Admin_Form_Entity::factory('Select')
+				->caption(Core::_('Shop_Order_Item.type'))
+				->options(
+					array(
+						Core::_('Shop_Order_Item.order_item_type_caption0'),
+						Core::_('Shop_Order_Item.order_item_type_caption1'),
+						Core::_('Shop_Order_Item.order_item_type_caption2')
+					)
+				)
+				->name('type')
+				->value($this->_object->type)
+				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'))
+		);
 
-		//$this->getField('rate')->divAttr(array('style' => 'display: none'));
-		//$this->getField('hash')->divAttr(array('style' => 'display: none'));
-		//$this->getField('shop_item_digital_id')->divAttr(array('style' => 'display: none'));
+		$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+		$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
 
-		$oAdditionalTab
-			->move($this->getField('shop_item_id')->style("width: 200px"), $oMainTab);
+		$oAdditionalTab->move($this->getField('shop_item_id')/*->style("width: 200px")*/, $oMainTab);
+
+		$oMainTab->move($this->getField('shop_item_id')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Order_Item.order_items_edit_form_title', $oOrder->invoice)
@@ -138,7 +107,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 	protected function _applyObjectProperty()
 	{
 		// New order item
-		if (is_null($this->_object->id))
+		if (!$this->_object->id)
 		{
 			$shop_item_id = Core_Array::get($this->_formValues, 'shop_item_id');
 
@@ -153,6 +122,11 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 		}
 
 		parent::_applyObjectProperty();
+
+		// Reset `unloaded`
+		$this->_object->Shop_Order
+			->unloaded(0)
+			->save();
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
@@ -169,10 +143,9 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 		$oObject = Core_Entity::factory('Shop_Warehouse');
 
 		$oObject->queryBuilder()
-				->where("shop_id", "=", $iShopId)
-				->orderBy("sorting")
-				->orderBy("id")
-			;
+			->where("shop_id", "=", $iShopId)
+			->orderBy("sorting")
+			->orderBy("id");
 
 		$aObjects = $oObject->findAll();
 

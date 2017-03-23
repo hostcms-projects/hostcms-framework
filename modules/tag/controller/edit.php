@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,35 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function setObject($object)
 	{
-		parent::setObject($object);
+		$modelName = $object->getModelName();
+
+		switch ($modelName)
+		{
+			case 'tag':
+				if (!$object->id)
+				{
+					$object->tag_dir_id = Core_Array::getGet('tag_dir_id');
+				}
+			break;
+			case 'tag_dir':
+				if (!$object->id)
+				{
+					$object->parent_id = Core_Array::getGet('tag_dir_id');
+				}
+			break;
+		}
+
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
 
 		$modelName = $this->_object->getModelName();
 
@@ -27,22 +55,15 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oAdditionalTab = $this->getTab('additional');
 		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'tag':
 				$title = $this->_object->id
 					? Core::_('Tag.form_edit_add_title_add')
 					: Core::_('Tag.form_edit_add_title_edit');
 
-				if (is_null($this->_object->id))
-				{
-					$this->_object->tag_dir_id = Core_Array::getGet('tag_dir_id');
-				}
-
 				// Удаляем стандартный <input>
-				$oAdditionalTab->delete(
-					 $this->getField('tag_dir_id')
-				);
+				$oAdditionalTab->delete($this->getField('tag_dir_id'));
 
 				// Селектор с группой
 				$oSelect_Dirs
@@ -57,9 +78,10 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oSelect_Dirs, $this->getField('path')
 				);
 
-				$this->getField('description')->wysiwyg(TRUE);
+				$this->getField('description')
+					->wysiwyg(TRUE);
 
-				if (is_null($this->_object->id))
+				if (!$this->_object->id)
 				{
 					// Удаляем стандартный <input>
 					$oMainTab->delete(
@@ -67,7 +89,6 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					);
 
 					$oTextarea_TagName = Admin_Form_Entity::factory('Textarea')
-						->cols(140)
 						->rows(5)
 						->caption(Core::_('Tag.add_tag_name'))
 						->name('name');
@@ -79,22 +100,22 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->addTabAfter($seoTab = Admin_Form_Entity::factory('Tab')
 					->caption('SEO')
 					->name('SEO'), $oMainTab);
+
+				$seoTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$oMainTab
-					->move($this->getField('seo_title')->rows(3), $seoTab)
-					->move($this->getField('seo_description')->rows(3), $seoTab)
-					->move($this->getField('seo_keywords')->rows(3), $seoTab);
+					->move($this->getField('seo_title')->rows(3), $oMainRow1)
+					->move($this->getField('seo_description')->rows(3), $oMainRow2)
+					->move($this->getField('seo_keywords')->rows(3), $oMainRow3);
 			break;
 			case 'tag_dir':
 			default:
 				$title = $this->_object->id
 					? Core::_('Tag_Dir.form_edit_add_tags_group_title_edit')
 					: Core::_('Tag_Dir.form_edit_add_tags_group_title_add');
-
-				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
-				{
-					$this->_object->parent_id = Core_Array::getGet('tag_dir_id');
-				}
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
@@ -129,9 +150,9 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		if (is_null($id))
+		if (!$id)
 		{
-			switch($modelName)
+			switch ($modelName)
 			{
 				case 'tag':
 					$sName = trim(Core_Array::getPost('name'));
@@ -149,10 +170,11 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		parent::_applyObjectProperty();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'tag':
-			if (is_null($id))
+
+			if (!$id)
 			{
 				foreach ($aTags as $tag_name)
 				{

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -29,7 +29,7 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 	public function setObject($object)
 	{
 		// При добавлении объекта
-		if(is_null($object->id))
+		if (!$object->id)
 		{
 			$object->lib_id = Core_Array::getGet('lib_id');
 		}
@@ -40,30 +40,21 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			? Core::_('Lib_Property.lib_property_form_title_edit')
 			: Core::_('Lib_Property.lib_property_form_title_add'));
 
-		// Создаем элемент <select>
-		$oHtmlFormSelect = Admin_Form_Entity::factory('Select');
-
-		$oHtmlFormSelect
-			->options
-			(
-				array
-				(
-					Core::_('Lib_Property.lib_property_type_0'),
-					Core::_('Lib_Property.lib_property_type_1'),
-					Core::_('Lib_Property.lib_property_type_2'),
-					Core::_('Lib_Property.lib_property_type_3'),
-					Core::_('Lib_Property.lib_property_type_4'),
-					Core::_('Lib_Property.lib_property_type_5')
-				)
-			);
-
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
-		$oHtmlFormSelect
-				->name('type')
-				->value($this->_object->type)
-				->caption(Core::_('Lib_Property.type'))
-				->onchange("ShowRowsLibProperty('{$windowId}', this.options[this.selectedIndex].value)");
+		$oHtmlFormSelect = Admin_Form_Entity::factory('Select')
+			->options(array(
+				Core::_('Lib_Property.lib_property_type_0'),
+				Core::_('Lib_Property.lib_property_type_1'),
+				Core::_('Lib_Property.lib_property_type_2'),
+				Core::_('Lib_Property.lib_property_type_3'),
+				Core::_('Lib_Property.lib_property_type_4'),
+				Core::_('Lib_Property.lib_property_type_5')
+			))
+			->name('type')
+			->value($this->_object->type)
+			->caption(Core::_('Lib_Property.type'))
+			->onchange("ShowRowsLibProperty('{$windowId}', this.options[this.selectedIndex].value)");
 
 		// Явно определяем ID <div>
 		$this->getField('sql_request')->divAttr(
@@ -79,10 +70,37 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 		// Получаем основную вкладку
 		$oMainTab = $this->getTab('main');
 
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+			;
+
+		$this->getField('sql_request')->divAttr(array('id' => 'sql_request', 'class' => 'form-group col-lg-12'));
+		$this->getField('sql_caption_field')->divAttr(array('id' => 'sql_caption_field', 'class' => 'form-group col-lg-12'));
+		$this->getField('sql_value_field')->divAttr(array('id' => 'sql_value_field', 'class' => 'form-group col-lg-12'));
+
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1)
+			->move($this->getField('description'), $oMainRow2)
+			->move($this->getField('varible_name'), $oMainRow3)
+			->move($this->getField('default_value'), $oMainRow5)
+			->move($this->getField('sorting'), $oMainRow6)
+			->move($this->getField('sql_request'), $oMainRow7)
+			->move($this->getField('sql_caption_field'), $oMainRow8)
+			->move($this->getField('sql_value_field'), $oMainRow9);
+
 		// Удаляем стандартный <input>
 		$oMainTab->delete($this->getField('type'));
 
-		$oMainTab->addAfter($oHtmlFormSelect, $this->getField('varible_name'));
+		//$oMainTab->addAfter($oHtmlFormSelect, $this->getField('varible_name'));
+		$oMainRow4->add($oHtmlFormSelect);
 
 		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 		$oAdmin_Form_Entity_Code->html(

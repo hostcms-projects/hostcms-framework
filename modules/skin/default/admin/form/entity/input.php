@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Input extends Admin_Form_Entity
 {
@@ -44,6 +44,10 @@ class Skin_Default_Admin_Form_Entity_Input extends Admin_Form_Entity
 
 		$this->id = $this->name = 'field_id_' . $iAdmin_Form_Count;
 		$this->type('text');
+
+		$this->class .= ' form-control';
+
+		$this->divAttr = array('class' => 'form-group col-lg-12');
 	}
 
 	/**
@@ -51,10 +55,7 @@ class Skin_Default_Admin_Form_Entity_Input extends Admin_Form_Entity
 	 */
 	public function execute()
 	{
-		if (is_null($this->size) && is_null($this->style))
-		{
-			$this->style('width: 100%');
-		}
+		is_null($this->size) && is_null($this->style) && $this->style('width: 100%');
 
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
@@ -80,12 +81,24 @@ class Skin_Default_Admin_Form_Entity_Input extends Admin_Form_Entity
 
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
 		?><span class="caption"><?php echo $this->caption?></span><?php
+
+		if (count($this->_children))
+		{
+			?><div class="input-group"><?php
+		}
+
 		?><input <?php echo implode(' ', $aAttr) ?>/><?php
 
 		// Могут быть дочерние элементы элементы
-		parent::execute();
+		$this->executeChildren();
 
 		$this->_showFormat();
+
+		if (count($this->_children))
+		{
+			?></div><?php
+		}
+
 		?></div><?php
 	}
 }

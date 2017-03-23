@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 {
@@ -26,7 +26,10 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		switch ($modelName)
 		{
 			case 'property':
 
@@ -34,19 +37,16 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
 				$oShopPrefixInput
 					->caption(Core::_('Shop_Order.prefix'))
-					->style('width: 100px')
 					->name('prefix')
 					->value($this->_object->Shop_Order_Property->prefix)
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2'));
 
-				$oMainTab
-					->add($oShopPrefixInput);
+				$oMainRow1->add($oShopPrefixInput);
 
 				// Способ отображения в фильтре
 				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
 				$oShopFilterSelect
 					->caption(Core::_('Shop_Order.display'))
-					->style('width: 250px')
 					->options(
 						array(0 => Core::_('Shop_Order.properties_show_kind_none'),
 						1 => Core::_('Shop_Order.properties_show_kind_text'),
@@ -60,10 +60,9 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 					)
 					->name('display')
 					->value($this->_object->Shop_Order_Property->display)
-					->divAttr(array('style' => 'float: left'));
+					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3'));
 
-				$oMainTab
-					->add($oShopFilterSelect);
+				$oMainRow1->add($oShopFilterSelect);
 
 			break;
 			case 'property_dir':
@@ -84,7 +83,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'property':
 				$Shop_Order_Property = $this->_object->Shop_Order_Property;

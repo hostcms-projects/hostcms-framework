@@ -10,4 +10,7 @@ return array (
 	'hostcms5' => array(
 		'cover' => 'cover.jpg',
 	),
+	'bootstrap' => array(
+		'cover' => 'cover.jpg',
+	),
 );

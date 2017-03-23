@@ -6,7 +6,7 @@
  * @package HostCMS 6\Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'changeLanguage' => 'Выберите язык:',
@@ -46,7 +46,6 @@ return array(
 	'max_file_size' => 'Максимальный размер файла: %s x %s',
 	'empty_settings' => 'Макет не имеет настроек.',
 	'file_not_found' => 'Файл %s не найден.',
-	'template_files_copy_success' => 'Файлы макета скопированы.',
 	'template_install_success' => 'Установка макета выполнена.',
 	'template_files_copy_error' => 'Ошибка копирования файлов макета!',
 	'file_copy_error' => 'Ошибка копирования файла в %s!',
@@ -100,6 +99,8 @@ return array(
 	'action' => 'Действие',
 	'result' => 'Результат',
 	'comment' => 'Комментарий',
+	
+	'empty_color_scheme' => 'Макет не имеет цветовых схем. Нажмите <strong>"Далее"</strong>.',
 
 	'store_database_params' => 'Запись параметров БД',
 	'not_enough_rights_error' => 'Ошибка записи файла <b>%s</b>. Установите необходимые права доступа для директории.',

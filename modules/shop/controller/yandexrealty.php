@@ -16,7 +16,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexRealty extends Core_Controller
 {
@@ -320,6 +320,8 @@ class Shop_Controller_YandexRealty extends Core_Controller
 			$aAreaProperties[$areaTagName] = $oShop_Item_Property_List->Properties->getByTag_name($areaTagName);
 		}
 
+		$oShop_Item_Controller = new Shop_Item_Controller();
+		
 		/* Описание параметров, входящих в элемент */
 		do {
 			$oShop_Items = $this->_Shop_Items;
@@ -400,8 +402,10 @@ class Shop_Controller_YandexRealty extends Core_Controller
 				echo '</sales-agent>'."\n";
 
 				/* Информация о сделке */
+				$aPrices = $oShop_Item_Controller->calculatePriceInItemCurrency($oShop_Item->price, $oShop_Item);
+				
 				echo '<price>'."\n";
-					echo '<value>' . $oShop_Item->price . '</value>'."\n";
+					echo '<value>' . $aPrices['price_discount'] . '</value>'."\n";
 					echo '<currency>' . $oShop_Item->Shop_Currency->code . '</currency>'."\n";
 				echo '</price>'."\n";
 

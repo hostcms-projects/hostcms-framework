@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default extends Core_Skin
 {
@@ -28,37 +28,45 @@ class Skin_Default extends Core_Skin
 		$lng = $this->getLng();
 
 		$this
-			->addJs('/admin/js/jquery/jquery.elastic.js')
-			->addJs('/admin/js/jquery/jquery.tools.js')
-			->addJs('/admin/js/jquery/jquery.form.js')
-			->addJs('/admin/js/main.js')
-			->addJs('/admin/js/hostcms6.js')
-			->addJs('/admin/js/ui/jquery-ui.js')
+			->addJs('/modules/skin/default/js/jquery/jquery.elastic.js')
+			->addJs('/modules/skin/default/js/jquery/jquery.tools.js')
+			->addJs('/modules/skin/bootstrap/js/jquery.form.js')
+			->addJs('/modules/skin/bootstrap/js/main.js')
+			->addJs('/modules/skin/default/js/ui/jquery-ui.js')
 			->addJs('/modules/skin/default/js/default-hostcms.js')
-			->addJs('/admin/js/ui/i18n/jquery.ui.datepicker-' . $lng . '.js')
-			->addJs('/admin/js/ui/jquery-HostCMSWindow.js')
-			->addJs('/admin/js/ui/timepicker/timepicker.js')
-			->addJs('/admin/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
-			->addJs('/admin/js/ui/stars/jquery.ui.stars.js')
-			->addJs('/admin/js/fusionchart/FusionCharts.js')
+			->addJs('/modules/skin/default/js/ui/i18n/jquery.ui.datepicker-' . $lng . '.js')
+			->addJs('/modules/skin/default/js/ui/jquery-HostCMSWindow.js')
+			->addJs('/modules/skin/default/js/ui/timepicker/timepicker.js')
+			->addJs('/modules/skin/default/js/ui/timepicker/i18n/jquery-ui-timepicker-' . $lng . '.js')
+			->addJs('/modules/skin/default/js/ui/stars/jquery.ui.stars.js')
+			->addJs('/modules/skin/default/js/fusionchart/FusionCharts.js')
 			// context menu
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/mbMenu.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.metadata.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/mb.menu/jquery.hoverIntent.js')
-			->addJs('/admin/js/typeahead-bs2.min.js')
-			->addJs('/admin/js/bootstrap-tag.js')
-			->addJs('/admin/js/ace.js')
-			->addJs('/admin/js/codemirror/lib/codemirror.js')
-			->addJs('/admin/js/codemirror/mode/css/css.js')
-			->addJs('/admin/js/codemirror/mode/htmlmixed/htmlmixed.js')
-			->addJs('/admin/js/codemirror/mode/javascript/javascript.js')
-			->addJs('/admin/js/codemirror/mode/clike/clike.js')
-			->addJs('/admin/js/codemirror/mode/php/php.js')
-			->addJs('/admin/js/codemirror/mode/xml/xml.js')
-			->addJs('/admin/js/codemirror/addon/selection/active-line.js')
-			->addJs('/admin/js/codemirror/addon/search/searchcursor.js')
-			->addJs('/admin/js/codemirror/addon/search/search.js')
-			->addJs('/admin/js/codemirror/addon/dialog/dialog.js')
+			->addJs('/modules/skin/bootstrap/js/typeahead-bs2.min.js')
+			->addJs('/modules/skin/bootstrap/js/bootstrap-tag.js')
+			->addJs('/modules/skin/bootstrap/js/ace.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/lib/codemirror.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/css/css.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/htmlmixed/htmlmixed.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/javascript/javascript.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/clike/clike.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/php/php.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/mode/xml/xml.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/selection/active-line.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/search/searchcursor.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/search/search.js')
+			->addJs('/modules/skin/bootstrap/js/codemirror/addon/dialog/dialog.js')
+
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.js')
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.time.js')
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.tooltip.js')
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.crosshair.js')
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.resize.js')
+			->addJs('/modules/skin/bootstrap/js/charts/flot/jquery.flot.selection.js')
+			->addJs('/modules/skin/bootstrap/js/jquery.slimscroll.min.js')
+
 			;
 
 		/*if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
@@ -71,11 +79,14 @@ class Skin_Default extends Core_Skin
 		$this
 			->addCss('/modules/skin/' . $this->_skinName . '/js/mb.menu/menu.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/style.css')
-			->addCss('/admin/js/ui/themes/base/jquery.ui.all.css')
-			->addCss('/admin/js/ui/stars/ui.stars.css')
-			->addCss('/admin/js/ui/ui.css')
-			->addCss('/admin/js/codemirror/lib/codemirror.css')
-			->addCss('/admin/js/codemirror/addon/dialog/dialog.css')
+			->addCss('/modules/skin/' . $this->_skinName . '/css/external.css')
+			->addCss('/modules/skin/default/js/ui/themes/base/jquery.ui.all.css')
+			->addCss('/modules/skin/default/js/ui/stars/ui.stars.css')
+			->addCss('/modules/skin/default/js/ui/ui.css')
+			->addCss('/modules/skin/bootstrap/js/codemirror/lib/codemirror.css')
+			->addCss('/modules/skin/default/js/codemirror/addon/dialog/dialog.css')
+
+			->addCss('/modules/skin/bootstrap/css/font-awesome.min.css')
 			;
 	}
 
@@ -93,13 +104,13 @@ class Skin_Default extends Core_Skin
 		$aCss = $this->getCss();
 		foreach ($aCss as $sPath)
 		{
-			?><link type="text/css" href="<?php echo $sPath . '?' . $timestamp?>" rel="stylesheet"></link><?php
+			?><link type="text/css" href="<?php echo $sPath . '?' . $timestamp?>" rel="stylesheet" /><?php
 			echo PHP_EOL;
 		}?>
-		<script type="text/javascript">if(!window.jQuery) {document.write('<scri'+'pt type="text/javascript" src="/admin/js/jquery/jquery.js"></scr'+'ipt>');}</script>
+		<script type="text/javascript">if(!window.jQuery) {document.write('<scri'+'pt type="text/javascript" src="/modules/skin/default/js/jquery/jquery.js"></scr'+'ipt>');}</script>
 
 		<?php
-		$this->addJs("/admin/js/lng/{$lng}/{$lng}.js");
+		$this->addJs("/modules/skin/bootstrap/js/lng/{$lng}/{$lng}.js");
 		$aJs = $this->getJs();
 		foreach ($aJs as $sPath)
 		{
@@ -161,10 +172,12 @@ class Skin_Default extends Core_Skin
 		?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title><?php echo $this->_title?></title>
-<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></meta>
-<link rel="shortcut icon" href="/admin/favicon.ico"></link>
-<?php $this->showHead()?>
+	<title><?php echo $this->_title?></title>
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></meta>
+	<link rel="apple-touch-icon" href="/modules/skin/bootstrap/ico/icon-iphone-retina.png" />
+	<link rel="shortcut icon" type="image/x-icon" href="/modules/skin/bootstrap/ico/favicon.ico" />
+	<link rel="icon" type="image/png" href="/modules/skin/bootstrap/ico/favicon.png" />
+	<?php $this->showHead()?>
 </head>
 <body class="body-<?php echo htmlspecialchars($this->_mode)?> hostcms6 backendBody">
 <?php
@@ -594,21 +607,24 @@ if ($this->_mode != 'blank')
 				{
 					foreach ($oCore_Module->menu as $aMenu)
 					{
-						$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId($oModule->id, 99, 0);
+						if (isset($aMenu['href']))
+						{
+							$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId($oModule->id, 99, 0);
 
-						$block = is_null($oUser_Setting) ? floor($iMenuCount % 3) : $oUser_Setting->position_x;
+							$block = is_null($oUser_Setting) ? floor($iMenuCount % 3) : $oUser_Setting->position_x;
 
-						$aMainMenu
-							[$block]
-							['sub'][] = array(
-									'position' => is_null($oUser_Setting) ? 999 : $oUser_Setting->position_y,
-									'block' => $block
-								) + $aMenu + array(
-								'sorting' => 0,
-								'moduleId' => $oModule->id,
-								'image' => $oModule->path . '.png'
-							);
-						$iMenuCount++;
+							$aMainMenu
+								[$block]
+								['sub'][] = array(
+										'position' => is_null($oUser_Setting) ? 999 : $oUser_Setting->position_y,
+										'block' => $block
+									) + $aMenu + array(
+									'sorting' => 0,
+									'moduleId' => $oModule->id,
+									'image' => $oModule->path . '.png'
+								);
+							$iMenuCount++;
+						}
 					}
 				}
 			}

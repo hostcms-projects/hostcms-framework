@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Checkbox extends Admin_Form_Entity_Input
 {
@@ -69,11 +69,7 @@ class Skin_Default_Admin_Form_Entity_Checkbox extends Admin_Form_Entity_Input
 		?><label><input <?php echo implode(' ', $aAttr) ?>/> <?php
 		?><span class="caption" style="display: inline"><?php echo $this->caption?></span></label><?php
 
-		//parent::execute();
-		foreach ($this->_children as $oCore_Html_Entity)
-		{
-			$oCore_Html_Entity->execute();
-		}
+		$this->executeChildren();
 		?></div><?php
 	}
 }

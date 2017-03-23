@@ -5,13 +5,14 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Discount coupon',
-	'list_of_coupons' => 'Discount coupon',
+	'list_of_coupons' => 'Discount coupons',
 	'coupon' => 'Discount coupon',
 	'coupon_add' => 'Add',
+	'not_enough_discounts' => 'Please add at least 1 purchase discount!',
 	'coupon_form_table_title_add' => 'Add discount coupon',
 	'coupon_form_table_title_edit' => 'Edit discount coupon',
 	'name' => '<acronym title="Name of discount coupon">Name</acronym>',

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,41 +22,44 @@ class Site_Controller_AccountInfo extends Admin_Form_Action_Controller_Type_Edit
 		parent::setObject($object);
 
 		$oMainTab = Admin_Form_Entity::factory('Tab')
-				->caption('Main')
-				->name('main');
+			->caption('Main')
+			->name('main');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$this->addTab($oMainTab);
 
 		$this->title(Core::_('Site.accountinfo_title'));
 
-		$oMainTab->add(
-			Admin_Form_Entity::factory('Input')
-				->caption(Core::_("Site.accountinfo_login"))
-				->style("width: 400px;")
-				->name("HOSTCMS_USER_LOGIN")
-				->value(defined('HOSTCMS_USER_LOGIN')
-					? HOSTCMS_USER_LOGIN
-					: ''
-				)
-		)->add(
-			Admin_Form_Entity::factory('Input')
-				->caption(Core::_("Site.accountinfo_contract_number"))
-				->style("width: 400px;")
-				->name("HOSTCMS_CONTRACT_NUMBER")
-				->value(defined('HOSTCMS_CONTRACT_NUMBER')
-					? HOSTCMS_CONTRACT_NUMBER
-					: ''
-				)
-		)->add(
-			Admin_Form_Entity::factory('Input')
-				->caption(Core::_("Site.accountinfo_pin_code"))
-				->style("width: 400px;")
-				->name("HOSTCMS_PIN_CODE")
-				->value(defined('HOSTCMS_PIN_CODE')
-					? HOSTCMS_PIN_CODE
-					: ''
-				)
-		);
+		$oMainRow1->add(Admin_Form_Entity::factory('Input')
+			->caption(Core::_("Site.accountinfo_login"))
+			->divAttr(array('class'=>'form-group col-lg-6 col-md-6'))
+			->name("HOSTCMS_USER_LOGIN")
+			->value(defined('HOSTCMS_USER_LOGIN')
+				? HOSTCMS_USER_LOGIN
+				: ''
+			));
+
+		$oMainRow2->add(Admin_Form_Entity::factory('Input')
+			->caption(Core::_("Site.accountinfo_contract_number"))
+			->divAttr(array('class'=>'form-group col-lg-6 col-md-6'))
+			->name("HOSTCMS_CONTRACT_NUMBER")
+			->value(defined('HOSTCMS_CONTRACT_NUMBER')
+				? HOSTCMS_CONTRACT_NUMBER
+				: ''
+			));
+
+		$oMainRow3->add(Admin_Form_Entity::factory('Input')
+			->caption(Core::_("Site.accountinfo_pin_code"))
+			->divAttr(array('class'=>'form-group col-lg-6 col-md-6'))
+			->name("HOSTCMS_PIN_CODE")
+			->value(defined('HOSTCMS_PIN_CODE')
+				? HOSTCMS_PIN_CODE
+				: ''
+			));
 
 		return $this;
 	}

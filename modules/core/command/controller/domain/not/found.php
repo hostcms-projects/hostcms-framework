@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Domain_Not_Found extends Core_Command_Controller
 {
@@ -37,16 +37,20 @@ class Core_Command_Controller_Domain_Not_Found extends Core_Command_Controller
 		ob_start();
 		$oSkin = Core_Skin::instance()
 			->title($title)
+			->setMode('authorization')
 			->header();
 
 		Core::factory('Core_Html_Entity_Div')
-			->id('indexMessage')
+			->class('indexMessage')
 			->add(Core::factory('Core_Html_Entity_H1')->value($title))
 			->add(Core::factory('Core_Html_Entity_P')->value(
 				'Домен <b>'. $domain.'</b> необходимо добавить в список поддерживаемых системой управления сайтом <b>HostCMS</b>!'
 			))
 			->add(Core::factory('Core_Html_Entity_P')->value(
-				'Для добавления домена перейдите в <b><a href="/admin/site/index.php" target="_blank">"Раздел администрирования" &#8594; "Сайты"</a></b>. Выберите пиктограмму <b>"Домены"</b> для требуемого сайта. На открывшейся странице нажмите на ссылку <b>"Домен"</b> &#8594; <b>"Добавить"</b>.'
+				'Для добавления домена перейдите в <b><a href="/admin/site/index.php" target="_blank">"Раздел администрирования" → "Система" → "Сайты"</a></b>.'
+			))
+			->add(Core::factory('Core_Html_Entity_P')->value(
+				'Выберите пиктограмму <b>"Домены"</b> для требуемого сайта. На открывшейся странице нажмите на ссылку <b>"Домен"</b> → <b>"Добавить"</b>.'
 			))
 			->execute();
 

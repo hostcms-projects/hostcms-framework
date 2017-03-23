@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Group_Model extends Core_Entity
 {
@@ -556,9 +556,13 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Change group status
 	 * @return Informationsystem_Group_Model
+	 * @hostcms-event informationsystem_group.onBeforeChangeActive
+	 * @hostcms-event informationsystem_group.onAfterChangeActive
 	 */
 	public function changeActive()
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
+		
 		$this->active = 1 - $this->active;
 		$this->save();
 
@@ -569,9 +573,22 @@ class Informationsystem_Group_Model extends Core_Entity
 
 		$this->clearCache();
 
+		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+		
 		return $this;
 	}
 
+	/**
+	 * Mark entity as deleted
+	 * @return Core_Entity
+	 */
+	public function markDeleted()
+	{
+		$this->clearCache();
+
+		return parent::markDeleted();
+	}
+	
 	/**
 	 * Switch indexation mode
 	 * @return self
@@ -748,9 +765,8 @@ class Informationsystem_Group_Model extends Core_Entity
 						->href($href)
 						->target('_blank')
 						->add(
-							Core::factory('Core_Html_Entity_Img')
-							->src('/admin/images/new_window.gif')
-							->class('img_line')
+							Core::factory('Core_Html_Entity_I')
+								->class('fa fa-external-link')
 						)
 				);
 			}

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Action_Controller_Type_Edit_Show extends Core_Servant_Properties
 {
@@ -18,12 +18,27 @@ abstract class Admin_Form_Action_Controller_Type_Edit_Show extends Core_Servant_
 	 */
 	protected $_allowedProperties = array(
 		'title',
+		'message',
 		'children',
 		'Admin_Form_Controller',
 		'formId',
 		'tabs',
 		'buttons',
+		'form',
 	);
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->tabs = array();
+		$this->children = array();
+
+		$this->form = Admin_Form_Entity::factory('Form');
+	}
 
 	/**
 	 * Create new form controller
@@ -37,12 +52,12 @@ abstract class Admin_Form_Action_Controller_Type_Edit_Show extends Core_Servant_
 		if (!class_exists($className))
 		{
 			throw new Core_Exception("Class '%className' does not exist",
-					array('%className' => $className));
+				array('%className' => $className));
 		}
 
 		return new $className();
 	}
-	
+
 	/**
 	 * Show edit form
 	 * @return boolean

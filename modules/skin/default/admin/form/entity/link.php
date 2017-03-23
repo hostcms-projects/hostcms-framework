@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 {
@@ -20,6 +20,7 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 		'divAttr', // array
 		'a',
 		'img',
+		'icon',
 		'div'
 	);
 
@@ -30,11 +31,10 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 	{
 		parent::__construct();
 
-		$this->a = Core::factory('Core_Html_Entity_A')
-			->target('_blank');
+		$this->a = Core::factory('Core_Html_Entity_A')->target('_blank');
 		$this->img = Core::factory('Core_Html_Entity_Img');
-		$this->div = Core::factory('Core_Html_Entity_Div')
-			->style("width: 250px");
+		$this->icon = Core::factory('Core_Html_Entity_I');
+		$this->div = Core::factory('Core_Html_Entity_Div');
 	}
 
 	/**
@@ -56,9 +56,30 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 			}
 		}
 
+		!is_null($this->img->src) && $this->div->add($this->img);
+
+		if (count($this->_children))
+		{
+			?><div class="input-group"><?php
+		}
+		
 		$this->div
-			->add($this->img)
-			->add($this->a)
+			->add($this->a
+				->add($this->icon)
+				->add(
+					Core::factory('Core_Html_Entity_Code')
+						->value(htmlspecialchars($this->a->value))
+				)
+				->value('')
+			)
 			->execute();
+			
+		// Могут быть дочерние элементы элементы
+		$this->executeChildren();
+
+		if (count($this->_children))
+		{
+			?></div><?php
+		}
 	}
 }

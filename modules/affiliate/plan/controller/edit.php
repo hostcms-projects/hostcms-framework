@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,7 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 	 */
 	public function setObject($object)
 	{
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->site_id = CURRENT_SITE;
 		}
@@ -27,27 +27,33 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 		parent::setObject($object);
 
 		$oMainTab = $this->getTab('main');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
 		$oAdditionalTab = $this->getTab('additional');
-		$oSeparatorField = Admin_Form_Entity::factory('Separator');
 
-		$oAdditionalTab->delete(
-			$this->getField('site_id')
-		);
+		$oAdditionalTab->delete($this->getField('site_id'));
 
-		$oAdditionalTab->delete(
-			$this->getField('siteuser_group_id')
-		);
+		$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
 		$Site_Controller_Edit = new Site_Controller_Edit($this->_Admin_Form_Action);
 
-		$oSiteField = Admin_Form_Entity::factory('Select');
-		$oSiteField
+		$oSiteField = Admin_Form_Entity::factory('Select')
 			->name('site_id')
 			->caption(Core::_('Affiliate_Plan.site_id'))
 			->options($Site_Controller_Edit->fillSites())
 			->value($this->_object->site_id);
 
-		$oMainTab->addAfter($oSiteField, $this->getField('description'));
+		$oMainTab->move($this->getField('description'), $oMainRow1);
+		$oMainRow2->add($oSiteField);
 
 		if (Core::moduleIsActive('siteuser'))
 		{
@@ -59,27 +65,23 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			$aSiteuser_Groups = array();
 		}
 
-		$oSiteUserGroupField = Admin_Form_Entity::factory('Select');
-		$oSiteUserGroupField
+		$oSiteUserGroupField = Admin_Form_Entity::factory('Select')
 			->name('siteuser_group_id')
 			->caption(Core::_('Affiliate_Plan.siteuser_group_id'))
 			->options($aSiteuser_Groups)
 			->value($this->_object->siteuser_group_id);
 
-		$oMainTab->addAfter($oSiteUserGroupField, $this->getField('active'));
-
-		$this->getField('min_count_of_items')
-			->divAttr(array('style' => 'float: left'))
-			->style("width: 300px");
-
-		$oMainTab->addAfter($oSeparatorField,
-			$this->getField('min_amount_of_items')
-				->style("width: 300px"));
+		$oMainTab->move($this->getField('active'), $oMainRow3);
+		$oMainRow4->add($oSiteUserGroupField);
+		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow5);
+		$oMainTab->move($this->getField('min_count_of_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow6);
+		$oMainTab->move($this->getField('min_amount_of_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow6);
+		$oMainTab->move($this->getField('include_delivery'), $oMainRow7);
 
 		// Заголовок формы
 		$title = $this->_object->id
-					? Core::_('Affiliate_Plan.affiliate_form_edit')
-					: Core::_('Affiliate_Plan.affiliate_form_add');
+			? Core::_('Affiliate_Plan.affiliate_form_edit')
+			: Core::_('Affiliate_Plan.affiliate_form_add');
 
 		$this->title($title);
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Str
 {
@@ -497,7 +497,7 @@ class Core_Str
 		{
 			$cLastAlpha = strtolower(substr($str, -1));
 			$size = intval($str);
-			switch($cLastAlpha)
+			switch ($cLastAlpha)
 			{
 				case 't':
 					$size *= 1024;

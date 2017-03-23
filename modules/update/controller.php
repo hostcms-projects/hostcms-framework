@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Controller extends Core_Servant_Properties
 {
@@ -118,6 +118,7 @@ class Update_Controller extends Core_Servant_Properties
 	public function getUpdateFile($path)
 	{
 		$url = 'http://' . $this->update_server . $path . "&domain=".rawurlencode($this->domain) .
+			'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
 			"&login=" . rawurlencode($this->login) .
 			"&contract=" . rawurlencode(md5($this->contract)) .
 			"&pin=" . rawurlencode(md5($this->pin)) .
@@ -144,6 +145,7 @@ class Update_Controller extends Core_Servant_Properties
 	public function getUpdate($update_key_id)
 	{
 		$url = 'http://' . $this->update_server . "/hostcmsupdate/?action=get_update&domain=".rawurlencode($this->domain) .
+			'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
 			"&login=" . rawurlencode($this->login) .
 			"&contract=" . rawurlencode(md5($this->contract)) .
 			"&pin=" . rawurlencode(md5($this->pin)) .
@@ -171,7 +173,11 @@ class Update_Controller extends Core_Servant_Properties
 
 		if (!file_exists($updateFilePath) || time() >= filemtime($updateFilePath) + 4 * 60 * 60)
 		{
-			if (!defined('HOSTCMS_USER_LOGIN') || !defined('HOSTCMS_CONTRACT_NUMBER') || !defined('HOSTCMS_PIN_CODE') || !defined('HOSTCMS_UPDATE_NUMBER'))
+			if (!defined('HOSTCMS_USER_LOGIN')
+				|| !defined('HOSTCMS_CONTRACT_NUMBER')
+				|| !defined('HOSTCMS_PIN_CODE')
+				|| !defined('HOSTCMS_UPDATE_NUMBER')
+			)
 			{
 				throw new Core_Exception(Core::_('Update.constant_check_error'), array(), 0, FALSE);
 			}
@@ -237,14 +243,16 @@ class Update_Controller extends Core_Servant_Properties
 	public function getUpdates()
 	{
 		// Формируем строку запроса
-		$url = 'http://' . $this->update_server . "/hostcmsupdate/?action=get_listupdate&domain=".rawurlencode($this->domain) .
-			"&login=" . rawurlencode($this->login) .
-			"&contract=" . rawurlencode(md5($this->contract)) .
-			"&pin=" . rawurlencode(md5($this->pin)) .
-			"&cms_folder=" . rawurlencode($this->cms_folder) .
-			"&php_version=" . rawurlencode($this->php_version) .
-			"&mysql_version=" . rawurlencode($this->mysql_version) .
-			"&update_id={$this->update_id}&install_beta_update=" . rawurlencode($this->install_beta);
+		$url = 'http://' . $this->update_server . '/hostcmsupdate/?action=get_listupdate&domain='.rawurlencode($this->domain) .
+			'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
+			'&login=' . rawurlencode($this->login) .
+			'&contract=' . rawurlencode(md5($this->contract)) .
+			'&pin=' . rawurlencode(md5($this->pin)) .
+			'&cms_folder=' . rawurlencode($this->cms_folder) .
+			'&php_version=' . rawurlencode($this->php_version) .
+			'&mysql_version=' . rawurlencode($this->mysql_version) .
+			'&update_id=' . $this->update_id .
+			'&install_beta_update=' . rawurlencode($this->install_beta);
 
 		if (is_array($this->keys))
 		{

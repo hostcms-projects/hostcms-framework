@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -27,14 +27,19 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oAdditionalTab = $this->getTab('additional');
 		$oSelect_Dirs = Admin_Form_Entity::factory('Select');
 
-		switch($modelName)
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		switch ($modelName)
 		{
 			case 'xsl':
 				$title = $this->_object->id
 					? Core::_('Xsl.edit_title')
 					: Core::_('Xsl.add_title');
 
-				if (is_null($this->_object->id))
+				if (!$this->_object->id)
 				{
 					$this->_object->xsl_dir_id = Core_Array::getGet('xsl_dir_id');
 				}
@@ -53,9 +58,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->xsl_dir_id)
 					->caption(Core::_('Xsl.xsl_dir_id'));
 
-				$oMainTab->addAfter(
-					$oSelect_Dirs, $this->getField('name')
-				);
+				$oMainRow1->add($oSelect_Dirs);
 
 				$oTextarea_Xsl = Admin_Form_Entity::factory('Textarea');
 
@@ -66,16 +69,26 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value(
 						$this->_object->loadXslFile()
 					)
-					->cols(140)
 					->rows(30)
 					->caption(Core::_('Xsl.value'))
 					->name('xsl_value')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
-					->syntaxHighlighterOptions($oTmpOptions);
+					->syntaxHighlighterOptions($oTmpOptions)
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				// Добавляем на основную вкладку большое текстовое поле с кодом XSL-шаблона
-				// после выпадающего списка разделов XSL
-				$oMainTab->addAfter($oTextarea_Xsl, $oSelect_Dirs);
+				$oMainRow2->add($oTextarea_Xsl);
+
+				$oMainTab
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$this->getField('sorting')
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
+				$this->getField('format')
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6 margin-top-21'));
+
+				$oMainTab->move($this->getField('sorting'), $oMainRow3);
+				$oMainTab->move($this->getField('format'), $oMainRow3);
 
 				// Объект вкладки 'Комментарий'
 				$oDescriptionTab = Admin_Form_Entity::factory('Tab')
@@ -84,18 +97,23 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$this->addTabAfter($oDescriptionTab, $oMainTab);
 
+				$oDescriptionTab
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12'));
+
 				// Перемещаем поле "Комментарий"
-				$oMainTab->move($this->getField('description'), $oDescriptionTab);
+				$oMainTab->move($this->getField('description'), $oMainRow6);
 			break;
 
 			case 'xsl_dir':
 			default:
 				$title = $this->_object->id
-						? Core::_('Xsl_Dir.edit_title')
-						: Core::_('Xsl_Dir.add_title');
+					? Core::_('Xsl_Dir.edit_title')
+					: Core::_('Xsl_Dir.add_title');
 
 				// Значения директории для добавляемого объекта
-				if (is_null($this->_object->id))
+				if (!$this->_object->id)
 				{
 					$this->_object->parent_id = Core_Array::getGet('xsl_dir_id');
 				}
@@ -111,9 +129,14 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->caption(Core::_('Xsl_Dir.parent_id'));
+					->caption(Core::_('Xsl_Dir.parent_id'))
+					->divAttr(array('class' => 'form-group col-lg-12'));
 
-				$oMainTab->addAfter($oSelect_Dirs,  $this->getField('name'));
+				$oMainRow1->add($oSelect_Dirs);
+
+				$this->getField('sorting')->divAttr(array('class' => 'form-group col-sm-6 col-md-5 col-lg-4'));
+				$oMainTab->move($this->getField('sorting'), $oMainRow2);
+
 			break;
 		}
 
@@ -166,7 +189,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$modelName = $this->_object->getModelName();
 
-		switch($modelName)
+		switch ($modelName)
 		{
 			case 'xsl':
 				$xsl_value = Core_Array::getPost('xsl_value');
@@ -190,11 +213,11 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function execute($operation = NULL)
 	{
-		if (!is_null($operation))
+		if (!is_null($operation) && $operation != '')
 		{
 			$modelName = $this->_object->getModelName();
 
-			switch($modelName)
+			switch ($modelName)
 			{
 				case 'xsl':
 					$name = Core_Array::getRequest('name');

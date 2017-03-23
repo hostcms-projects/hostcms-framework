@@ -5,11 +5,11 @@
  * @package HostCMS 6\Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'XSL templates',
-	'menu' => 'XSL templates',
+	'menu' => 'XSL',
 	'tab2' => 'Description',
 	'edit_success' => 'XSL template information modified successfully!',
 	'markDeleted_success' => 'XSL template deleted successfully!',
@@ -23,7 +23,7 @@ return array(
 	'sorting' => '<acronym title="Order number of XSL template in the list of section templates">Order number of XSL template</acronym>',
 	'value' => '<acronym title="Code of XSL template">Code of XSL template</acronym>',
 	'format' => '<acronym title="Format of XSL document">Format of XSL template</acronym>',
-	'description' => '<acronym title="Additional information on XSL template in free format">Description to XSL template</acronym>',
+	'description' => '<acronym title="Additional information on XSL template in free format">Description</acronym>',
 	'xsl_already_exists' => 'XSL template with this name already exists! Enter a unique name of XSL template',
 	'main_menu' => 'XSL template',
 	'add' => 'Add',

@@ -24,7 +24,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Servant_Properties
 {
@@ -39,6 +39,12 @@ class Core_Servant_Properties
 	 * @var array
 	 */
 	protected $_propertiesValues = array();
+
+	/**
+	 * Object has unlimited number of properties
+	 * @var boolean
+	 */
+	protected $_unlimitedProperties = FALSE;
 
 	/**
 	 * Constructor.
@@ -114,6 +120,10 @@ class Core_Servant_Properties
 		{
 			return $this->_propertiesValues[$property];
 		}
+		elseif ($this->_unlimitedProperties)
+		{
+			return NULL;
+		}
 
 		throw new Core_Exception("The property '%property' does not exist in '%class'.",
 			array('%property' => $property, '%class' => get_class($this)));
@@ -127,7 +137,13 @@ class Core_Servant_Properties
 	 */
 	public function __set($property, $value)
 	{
-		if (array_key_exists($property, $this->_propertiesValues))
+		// Add new property for 'unlimitedProperties' mode
+		if ($this->_unlimitedProperties && !isset($this->_allowedProperties[$property]))
+		{
+			$this->_allowedProperties[$property] = $property;
+		}
+
+		if (array_key_exists($property, $this->_propertiesValues) || $this->_unlimitedProperties)
 		{
 			$this->_propertiesValues[$property] = $value;
 			return $this;

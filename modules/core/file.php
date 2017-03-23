@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_File
 {
@@ -930,7 +930,7 @@ class Core_File
 					}
 				}
 				// Применить ватермарк к малому изображению и не применять его к большому
-				elseif($create_small_image_from_large && !empty($small_image_target) && !$large_image_watermark)
+				elseif ($create_small_image_from_large && !empty($small_image_target) && !$large_image_watermark)
 				{
 					// Создаем малое изображение из большого
 					$create_small_from_small = Core_Image::instance()->resizeImage($large_image_target, $large_image_max_width, $large_image_max_height, $small_image_target, NULL, $small_image_preserve_aspect_ratio);

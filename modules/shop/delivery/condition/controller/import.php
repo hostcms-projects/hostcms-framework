@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -99,13 +99,13 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 				continue;
 			}
 
-			if($current_csv_line_array)
+			if ($current_csv_line_array)
 			{
 				$oShopDeliveryCondition = Core_Entity::factory('Shop_Delivery_Condition');
 
 				foreach($current_csv_line_array as $code => $data)
 				{
-					switch($code)
+					switch ($code)
 					{
 						case 0:
 							$oShopDeliveryCondition->name = $data;
@@ -191,31 +191,31 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 
 		// Очищаем основную вкладку
 		$oMainTab = Admin_Form_Entity::factory('Tab')
-				->caption('Main')
-				->name('main');
+			->caption('Main')
+			->name('main');
+
+		$oMainTab->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$this->addTab($oMainTab);
 
 		// Очищаем дополнительную вкладку
 		$oAdditionalTab = Admin_Form_Entity::factory('Tab')
-				->caption('Additional')
-				->name('additional');
+			->caption('Additional')
+			->name('additional');
 
 		$this->addTab($oAdditionalTab);
 
 		// Добавляем поле типа "Файл"
 		$oCSVFileField = Admin_Form_Entity::factory('File')
 			->caption(Core::_("Shop_Delivery_Condition.import_price_list_file_type"))
-			->style("width: 400px;")
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 			->name("csvfile")
 			->largeImage(array(
 					'show_params' => FALSE
 				))
 			->smallImage(array('show' => FALSE));
 
-		$oMainTab->add(
-			$oCSVFileField
-		);
+		$oMainRow1->add($oCSVFileField);
 
 		return $this;
 	}

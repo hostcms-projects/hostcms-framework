@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Tab extends Admin_Form_Entity
 {
@@ -74,5 +74,36 @@ class Skin_Default_Admin_Form_Entity_Tab extends Admin_Form_Entity
 	public function getFields()
 	{
 		return $this->_children;
+	}
+
+	/**
+	 * Delete empty items from tab
+	 * @return self
+	 */
+	public function deleteEmptyItems()
+	{
+		// Удаляем пустые div - row из показа
+		$this->_children = array_filter($this->_children, array(__CLASS__, '_deleteEmptyItems'));
+
+		return $this;
+	}
+
+	/**
+	 * Check if $value is not instance of Skin_Default_Admin_Form_Entity_Div or $value has children
+	 * @return boolean
+	 */
+	static protected function _deleteEmptyItems($value)
+	{
+		return !($value instanceof Skin_Default_Admin_Form_Entity_Div)
+			|| $value->getCountChildren();
+	}
+
+	/**
+	 * Execute all children
+	 * @return self
+	 */
+	public function executeChildren()
+	{
+		return parent::executeChildren();
 	}
 }

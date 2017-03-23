@@ -5,30 +5,30 @@
  * @package HostCMS 6\Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
-	'model_name' => 'Sample dynamic pages',
-	'markDeleted_success' => 'Sample dynamic page deleted successfully!',
-	'copy_success' => 'Sample dynamic page copied successfully!',
-	'name' => '<acronym title="Name of sample dynamic page">Name of sample dynamic page</acronym>',
-	'lib_dir_id' => '<acronym title="Parent section for sample dynamic page">Parent section</acronym>',
-	'description' => '<acronym title="Description of sample dynamic page">Description of sample dynamic page</acronym>',
+	'model_name' => 'Lib',
+	'markDeleted_success' => 'Lib deleted successfully!',
+	'copy_success' => 'Lib copied successfully!',
+	'name' => '<acronym title="Name of Lib">Name</acronym>',
+	'lib_dir_id' => '<acronym title="Parent section for Lib">Parent section</acronym>',
+	'description' => '<acronym title="Description of Lib">Description</acronym>',
 	'id' => 'Id',
 	'user_id' => 'User id',
-	'lib_form_module' => '<acronym title="PHP code of sample dynamic page">PHP code of sample dynamic page</acronym>',
-	'lib_form_module_config' => '<acronym title="PHP code of settings of sample dynamic page">Settings of sample dynamic page</acronym>',
-	'menu' => "Sample dynamic pages",
-	'lib_page' => 'Page',
+	'lib_form_module' => '<acronym title="PHP code of Lib">PHP code</acronym>',
+	'lib_form_module_config' => '<acronym title="PHP code of settings">Settings</acronym>',
+	'menu' => 'Libs',
+	'lib_page' => 'Lib',
 	'lib_show_add_link' => 'Add',
-	'menu_list' => 'Sample dynamic pages',
+	'menu_list' => 'Libs',
 	'lib_php_code' => 'Page code',
 	'lib_php_code_config' => 'Page settings',
-	'lib_form_title_add' => 'Add sample dynamic page',
-	'lib_form_title_edit' => 'Edit sample dynamic page',
-	'edit_success' => 'Sample dynamic page information updated successfully.',
-	'edit_error' => 'Error while updating sample dynamic page information!',
+	'lib_form_title_add' => 'Add Lib',
+	'lib_form_title_edit' => 'Edit Lib',
+	'edit_success' => 'Lib information updated successfully.',
+	'edit_error' => 'Error while updating Lib information!',
 	'copy_from' => ' [Copy of %s]',
-	'delete_success' => 'Item deleted successfully!',
-	'undelete_success' => 'Item restored successfully!',
+	'delete_success' => 'Lib deleted successfully!',
+	'undelete_success' => 'Lib restored successfully!',
 );

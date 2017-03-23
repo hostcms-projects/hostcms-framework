@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Wysiwyg
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -24,14 +24,13 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 	}
 
 	/**
-	 * Set object
-	 * @param object $object object
+	 * Prepare backend item's edit form
+	 *
 	 * @return self
 	 */
-	public function setObject($object)
+	protected function _prepareForm()
 	{
-		//parent::setObject($object);
-		$this->_object = $object;
+		//parent::_prepareForm();
 
 		$oMainTab = Admin_Form_Entity::factory('Tab')
 			->caption('main')
@@ -39,7 +38,10 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 
 		$this->addTab($oMainTab);
 
-		$title = Core::_('Wysiwyg_Filemanager.edit_file', $object->name);
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$title = Core::_('Wysiwyg_Filemanager.edit_file', $this->_object->name);
 
 		$filePath = $this->_getFilePath();
 
@@ -56,7 +58,7 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 			->name('text')
 			->rows(20);
 
-		$oMainTab->add($oFile_Content);
+		$oMainRow1->add($oFile_Content);
 
 		$this->title($title);
 
@@ -78,7 +80,7 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 		}
 
 		//parent::_applyObjectProperty();
-		
+
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 }

@@ -105,7 +105,6 @@ class Core_Tar
 			{
 				$extname = 'zlib';
 			}
-
 		}
 	}
 
@@ -156,7 +155,7 @@ class Core_Tar
 	}
 
 	/**
-	 * Extract 
+	 * Extract
 	 * @param string $p_path path
 	 */
 	public function extract($p_path='')
@@ -512,7 +511,7 @@ class Core_Tar
 
 	/**
 	 * Open for read
-	 * @return boolean 
+	 * @return boolean
 	 */
 	protected function _openRead()
 	{
@@ -643,8 +642,8 @@ class Core_Tar
 	}
 
 	/**
-	 * Write block 
-	 * @param string $p_binary_data 
+	 * Write block
+	 * @param string $p_binary_data
 	 * @param int $p_len data length
 	 * @return boolean
 	 */
@@ -699,10 +698,10 @@ class Core_Tar
 	}
 
 	/**
-	 * Skip block 
+	 * Skip block
 	 * @param int $p_len block length
 	 * @return boolean
-	 */	
+	 */
 	protected function _jumpBlock($p_len=null)
 	{
 		if (is_resource($this->_file)) {
@@ -856,7 +855,7 @@ class Core_Tar
 
 	/**
 	 * Add file
-	 * @param string $p_filename 
+	 * @param string $p_filename
 	 * @param pointer $p_header
 	 * @param string $p_add_dir
 	 * @param string $p_remove_dir
@@ -964,7 +963,7 @@ class Core_Tar
 
 	/**
 	 * Write header
-	 * @param string $p_filename 
+	 * @param string $p_filename
 	 * @param string $p_stored_filename
 	 * @return boolean
 	 */
@@ -1051,8 +1050,8 @@ class Core_Tar
 	 * @param string $p_filename file name
 	 * @param int $p_size size
 	 * @param int $p_mtime
-	 * @param int $p_perms 
-	 * @param string $p_type 
+	 * @param int $p_perms
+	 * @param string $p_type
 	 * @param int $p_uid
 	 * @param int $p_gid
 	 * @return boolean
@@ -1131,7 +1130,7 @@ class Core_Tar
 
 	/**
 	 * Write long header
-	 * @param string $p_filename 
+	 * @param string $p_filename
 	 * @return boolean
 	 */
 	protected function _writeLongHeader($p_filename)
@@ -1199,7 +1198,7 @@ class Core_Tar
 	/**
 	 * Read header
 	 * @param string $v_binary_data
-	 * @param pointer $v_header 
+	 * @param pointer $v_header
 	 * @return boolean
 	 */
 	protected function _readHeader($v_binary_data, &$v_header)
@@ -1276,7 +1275,7 @@ class Core_Tar
 
 	/**
 	 * Read long header
-	 * @param pointer $v_header 
+	 * @param pointer $v_header
 	 * @return boolean
 	 */
 	protected function _readLongHeader(&$v_header)
@@ -1355,9 +1354,9 @@ class Core_Tar
 	/**
 	 * Extract list
 	 * @param string $p_path path
-	 * @param pointer $p_list_detail 
-	 * @param string $p_mode 
-	 * @param array $p_file_list 
+	 * @param pointer $p_list_detail
+	 * @param string $p_mode
+	 * @param array $p_file_list
 	 * @param string $p_remove_path
 	 */
 	protected function _extractList($p_path, &$p_list_detail, $p_mode,

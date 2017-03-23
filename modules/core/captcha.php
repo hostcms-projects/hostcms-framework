@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Kruglov Sergei
  * @author Hostmake LLC
  * @copyright © 2006, 2007, 2008, 2011 Kruglov Sergei, http://www.captcha.ru
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Captcha
 {
@@ -497,7 +497,7 @@ class Core_Captcha
 		if ($type == 'GIF')
 		{
 			header('Content-Type: image/gif');
-			imagegif($img3);
+			imagegif ($img3);
 		}
 		elseif ($type == 'PNG')
 		{

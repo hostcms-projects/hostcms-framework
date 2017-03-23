@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,12 +22,22 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this
 			->addSkipColumn('data_template_id');
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->parent_id = intval(Core_Array::getGet('parent_id'));
 		}
 
-		parent::setObject($object);
+		return parent::setObject($object);
+	}
+
+	/**
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
+	 */
+	protected function _prepareForm()
+	{
+		parent::_prepareForm();
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
@@ -49,15 +59,328 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->addTabAfter($oSitemapTab, $oSeoTab)
 			->addTabAfter($oPropertyTab, $oSitemapTab);
 
+		// ---------------------------------------------------------------------
 		$oMainTab
-			// SEO
-			->move($this->getField('seo_title')->rows(2), $oSeoTab)
-			->move($this->getField('seo_description')->rows(2), $oSeoTab)
-			->move($this->getField('seo_keywords')->rows(2), $oSeoTab)
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow13 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow11 = Admin_Form_Entity::factory('Div')->id('lib_properties'))
+			->add($oMainRow12 = Admin_Form_Entity::factory('Div')->class('row'))
+			;
 
-			->delete($this->getField('changefreq'))
-			->delete($this->getField('priority'));
+		// -!- Row --
+		$this->getField('name')
+			->divAttr(array('class' => 'form-group col-lg-12'));
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1);
 
+		// -!- Row --
+		// Выбор родительского раздела
+		$oSelect_Parent_Id = Admin_Form_Entity::factory('Select')
+			->options(
+				array(' … ') + $this->fillStructureList($this->_object->site_id, 0, $this->_object->id)
+			)
+			->name('parent_id')
+			->value($this->_object->parent_id)
+			->caption(Core::_('Structure.parent_id'))
+			->divAttr(array('style' => 'float: left'))
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+
+		// Выбор меню
+		$aMenu = $this->_fillMenuList($this->_object->site_id);
+
+		$oSelect_Menu_Id = Admin_Form_Entity::factory('Select')
+			->options(
+				count($aMenu) ? $aMenu : array(' … ')
+			)
+			->name('structure_menu_id')
+			->value($this->_object->structure_menu_id)
+			->caption(Core::_('Structure.structure_menu_id'))
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+
+		$this->getField('show')
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4 checkbox-margin-top'));
+
+		$oAdditionalTab
+			->delete($this->getField('parent_id'))
+			->delete($this->getField('structure_menu_id'));
+
+		$oMainRow2
+			->add($oSelect_Parent_Id)
+			->add($oSelect_Menu_Id);
+		$oMainTab->move($this->getField('show'), $oMainRow2);
+
+		// -!- Row --
+		// Группа доступа
+		$oAdditionalTab
+			->delete($this->getField('siteuser_group_id'));
+
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$oSiteuser_Controller_Edit = new Siteuser_Controller_Edit($this->_Admin_Form_Action);
+			$aSiteuser_Groups = $oSiteuser_Controller_Edit->fillSiteuserGroups($this->_object->site_id);
+		}
+		else
+		{
+			$aSiteuser_Groups = array();
+		}
+
+		$oSelect_SiteUserGroup = Admin_Form_Entity::factory('Select')
+			->name('siteuser_group_id')
+			->caption(Core::_('Structure.siteuser_group_id'))
+			->options(
+				array(
+					// Все
+					0 => Core::_('Structure.all'),
+					// Как у родителя
+					-1 => Core::_('Structure.like_parent')
+				) + $aSiteuser_Groups
+			)
+			->value($this->_object->siteuser_group_id)
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
+
+		$this->getField('sorting')
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
+
+		$oMainTab
+			->move($this->getField('path'), $oMainRow3)
+			->move($this->getField('sorting'), $oMainRow3);
+		$oMainRow3->add($oSelect_SiteUserGroup);
+
+		// -!- Row --
+
+		// Structure type
+		$oMainTab->delete($this->getField('type'));
+
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
+
+		$iLibId = 0;
+		$iLibDirId = 0;
+
+		$oRadio_Type = Admin_Form_Entity::factory('Radiogroup')
+			->name('type')
+			->id('structureType' . time())
+			->caption(Core::_('Structure.type'))
+			->value($this->_object->type)
+			->divAttr(array('id' => 'structure_types', 'class' => 'form-group col-lg-12'))
+			->radio(
+				array(
+					0 => Core::_('Structure.static_page'),
+					2 => Core::_('Structure.typical_dynamic_page'),
+					1 => Core::_('Structure.dynamic_page')
+				)
+			)
+			->buttonset(TRUE)
+			->ico(
+				array(
+					0 => 'fa-file-o',
+					2 => 'fa-list-ul',
+					1 => 'fa-file-text-o',
+				)
+			)
+			->onclick("SetViewStructure('{$windowId}', this.value, '{$this->_object->id}', '{$iLibDirId}', '{$iLibId}');");
+
+		// Статичный документ
+		$oAdditionalTab->delete($this->getField('document_id'));
+
+		$oMainTab
+			->delete($this->getField('url'))
+			->add($this->getField('url'));
+
+		$this->getField('url')
+			->divAttr(array('id' => 'url', 'class' => 'form-group col-lg-6'))
+			// clear standart url pattern
+			->format(array('lib' => array()));
+
+		// Checkboxes
+		$this->getField('active')
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+		$this->getField('indexing')
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+		$this->getField('https')
+			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+
+		$oMainTab
+			->move($this->getField('active'), $oMainRow4)
+			->move($this->getField('indexing'), $oMainRow4)
+			->move($this->getField('https'), $oMainRow4);
+
+		$oMainRow5->add($oRadio_Type);
+
+		$oDocument = Core_Entity::factory('Document', $this->_object->document_id);
+
+		// Контроллер редактирования документа
+		$Document_Controller_Edit = new Document_Controller_Edit($this->_Admin_Form_Action);
+
+		$Select_DocumentDir = Admin_Form_Entity::factory('Select')
+			->name('document_dir_id')
+			->id('document_dir_id')
+			->caption(Core::_('Structure.document_dir_id'))
+			->divAttr(array('id' => 'document_dir', 'class' => 'form-group col-lg-6'))
+			->options(
+				array(' … ') + $Document_Controller_Edit->fillDocumentDir($this->_object->site_id)
+			)
+			->value($oDocument->document_dir_id) //
+			->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'document_id', callBack: $.loadSelectOptionsCallback, action: 'loadDocumentList', additionalParams: 'document_dir_id=' + this.value,windowId: '{$windowId}'}); return false");
+
+		$oMainRow6->add($Select_DocumentDir);
+
+		$aDocumentForDir = array(' … ');
+		// intval() because $oDocument->document_dir_id may be NULL
+		$aDocuments = Core_Entity::factory('Document_Dir', intval($oDocument->document_dir_id))
+			->Documents->getBySiteId($this->_object->site_id);
+
+		foreach ($aDocuments as $oTmpDocument)
+		{
+			$aDocumentForDir[$oTmpDocument->id] = $oTmpDocument->name;
+		}
+
+		$Select_Document = Admin_Form_Entity::factory('Select')
+			->name('document_id')
+			->id('document_id')
+			->caption(Core::_('Structure.document_id'))
+			->divAttr(array('id' => 'document', 'class' => 'form-group col-lg-6'))
+			->options($aDocumentForDir)
+			->value($this->_object->document_id);
+
+		$Select_Document
+			->add(
+				Admin_Form_Entity::factory('A')
+					->href('/admin/document/index.php?document_dir_id=' . intval($oDocument->document_dir_id) . '&hostcms[checked][1][' . $this->_object->document_id  . ']=1&hostcms[action]=edit')
+					->class('input-group-addon bg-blue bordered-blue')
+					->value('<i class="fa fa-pencil"></i>')
+					->onclick("return !($.openWindow && $.openWindow({width: '80%', path: '/admin/document/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][1][' + $('#{$windowId} #document_id').val() + ']=1&hostcms[action]=edit', dialogClass: 'hostcms6'}));")
+			);
+
+		$oMainRow7->add($Select_Document);
+
+		// -!- Row --
+		// Выбор макета
+		$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
+
+		$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
+
+		$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
+			->options(
+				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
+			)
+			->name('template_id')
+			->value($this->_object->template_id)
+			->caption(Core::_('Structure.template_id'))
+			->divAttr(array('class' => 'form-group col-lg-6', 'id' => 'template_id'));
+
+		$oMainRow13->add($oSelect_Template_Id);
+
+		$oAdditionalTab->delete($this->getField('template_id'));
+
+		$this->getField('path')
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
+
+		// -!- Row --
+		$oMainTab
+			->move($this->getField('url'), $oMainRow8);
+
+		// Типовая динамическая страница
+		$oAdditionalTab->delete($this->getField('lib_id'));
+
+		$Lib_Controller_Edit = new Lib_Controller_Edit($this->_Admin_Form_Action);
+
+		$oLib = Core_Entity::factory('Lib', $this->_object->lib_id);
+
+		$Select_LibDir = Admin_Form_Entity::factory('Select')
+			->name('lib_dir_id')
+			->caption(Core::_('Structure.lib_dir_id'))
+			->divAttr(array('id' => 'lib_dir', 'class' => 'form-group col-lg-6'))
+			->options(
+				array(' … ') + $Lib_Controller_Edit->fillLibDir(0)
+			)
+			->value($oLib->lib_dir_id) //
+			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_id', callBack: $.loadSelectOptionsCallback, action: 'loadLibList',additionalParams: 'lib_dir_id=' + this.value,windowId: '{$windowId}'}); return false");
+
+		$aLibForDir = array(' … ');
+		$aLibs = Core_Entity::factory('Lib_Dir', intval($oLib->lib_dir_id)) // Может быть NULL
+			->Libs->findAll();
+
+		foreach ($aLibs as $oTmpLib)
+		{
+			$aLibForDir[$oTmpLib->id] = '[' . $oTmpLib->id . '] ' . $oTmpLib->name;
+		}
+		$objectId = intval($this->_object->id);
+		$Select_Lib = Admin_Form_Entity::factory('Select')
+			->name('lib_id')
+			->id('lib_id')
+			->caption(Core::_('Structure.lib_id'))
+			->divAttr(array('id' => 'lib', 'class' => 'form-group col-lg-6'))
+			->options($aLibForDir)
+			->value($this->_object->lib_id)
+			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")
+			;
+
+		$Div_Lib_Properies = Admin_Form_Entity::factory('Code');
+
+		ob_start();
+		// DIV для св-в типовой дин. страницы
+		// Для выбранного стандартно
+		$Core_Html_Entity_Div = Core::factory('Core_Html_Entity_Script')
+			->type("text/javascript")
+			->value("$('#{$windowId} #lib_id').change();")
+			->execute();
+
+		$Div_Lib_Properies
+			->html(ob_get_clean());
+
+		$oMainRow9->add($Select_LibDir);
+		$oMainRow10->add($Select_Lib);
+		$oMainRow11->add($Div_Lib_Properies);
+
+		// Динамическая страница
+		$oTextarea_Structure_Source = Admin_Form_Entity::factory('Textarea');
+
+		$oTmpOptions = $oTextarea_Structure_Source->syntaxHighlighterOptions;
+		$oTmpOptions['mode'] = 'application/x-httpd-php';
+
+		$oTextarea_Structure_Source
+			->name('structure_source')
+			->divAttr(array('id' => 'structure_source', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+			->caption(Core::_('Structure.structure_source'))
+			->value($this->_object->getStructureFile())
+			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
+			->syntaxHighlighterOptions($oTmpOptions)
+			->rows(30);
+
+		$oTextarea_StructureConfig_Source = Admin_Form_Entity::factory('Textarea')
+			->name('structure_config_source')
+			->divAttr(array('id' => 'structure_config_source', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+			->caption(Core::_('Structure.structure_config_source'))
+			->value($this->_object->getStructureConfigFile())
+			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
+			->syntaxHighlighterOptions($oTmpOptions)
+			->rows(30);
+
+		$oMainRow12
+			->add($oTextarea_Structure_Source)
+			->add($oTextarea_StructureConfig_Source);
+
+		// -- SEO
+		$oSeoTab
+			->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab
+			->move($this->getField('seo_title')->rows(2), $oSeoRow1)
+			->move($this->getField('seo_description')->rows(2), $oSeoRow2)
+			->move($this->getField('seo_keywords')->rows(2), $oSeoRow3);
+
+		// -- Sitemap
 		$oSelect_changefreq = Admin_Form_Entity::factory('Select')
 			->options(
 				array(
@@ -73,7 +396,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('changefreq')
 			->value($this->_object->changefreq)
 			->caption(Core::_('Structure.changefreq'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-xs-4 col-sm-4 col-md-4 col-lg-4'));
 
 		$oSelect_priority = Admin_Form_Entity::factory('Select')
 			->options(
@@ -94,318 +417,27 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('priority')
 			->value($this->_object->priority)
 			->caption(Core::_('Structure.priority'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-xs-4 col-sm-4 col-md-4 col-lg-4'));
 
 		$oSitemapTab
-			->add($oSelect_changefreq)
-			->add($oSelect_priority);
-
-		$oAdditionalTab
-			->delete($this->getField('parent_id'))
-			->delete($this->getField('structure_menu_id'))
-			;
-
-		// Выбор родительского раздела
-		$oSelect_Parent_Id = Admin_Form_Entity::factory('Select')
-			->options(
-				array(' … ') + $this->fillStructureList($this->_object->site_id, 0, $this->_object->id)
-			)
-			->name('parent_id')
-			->value($this->_object->parent_id)
-			->caption(Core::_('Structure.parent_id'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
-
-		// Выбор меню
-		$aMenu = $this->_fillMenuList($this->_object->site_id);
-
-		$oSelect_Menu_Id = Admin_Form_Entity::factory('Select')
-			->options(
-				count($aMenu) ? $aMenu : array(' … ')
-			)
-			->name('structure_menu_id')
-			->value($this->_object->structure_menu_id)
-			->caption(Core::_('Structure.structure_menu_id'))
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px');
-
-		$this->getField('show')
-			->divAttr(array('style' => 'margin-top: 25px'));
+			->add($oSitemapRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oSitemapRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$oMainTab
-			->addAfter($oSelect_Parent_Id, $this->getField('name'))
-			->addAfter($oSelect_Menu_Id, $oSelect_Parent_Id)
-			->addAfter(Admin_Form_Entity::factory('Separator'), $this->getField('show'));
+			->delete($this->getField('changefreq'))
+			->delete($this->getField('priority'));
 
-		// Выбор макета
-		$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
-
-		$aTemplateOptions = $Template_Controller_Edit->fillTemplateList($this->_object->site_id);
-
-		// Warning: TO DO: dynamic chain list template_dir -> template like Documents
-		$oSelect_Template_Id = Admin_Form_Entity::factory('Select')
-			->options(
-				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
-			)
-			->name('template_id')
-			->value($this->_object->template_id)
-			->caption(Core::_('Structure.template_id'))
-			->divAttr(array('style' => 'float: left', 'id' => 'template_id'))
-			->style('width: 320px');
-
-		$oAdditionalTab->delete($this->getField('template_id'));
-		$oMainTab
-			->addBefore($oSelect_Template_Id, $this->getField('path'))
-			->addAfter(Admin_Form_Entity::factory('Separator'), $oSelect_Template_Id);
-
-		$this->getField('path')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 320px; font-weight: bold;');
-
-		$this->getField('sorting')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 200px');
-
-		$oMainTab
-			->delete($this->getField('sorting'))
-			->addAfter($this->getField('sorting'), $this->getField('path'));
-
-		// Checkboxes
-		$oMainTab
-			->delete($this->getField('https'))
-			->addAfter($this->getField('https'), $this->getField('indexing'));
-
-		$this->getField('active')
-			->divAttr(array('style' => 'float: left'));
-
-		$this->getField('indexing')
-			->divAttr(array('style' => 'float: left'));
-
-		// Группа доступа
-		$oAdditionalTab
-			->delete($this->getField('siteuser_group_id'));
-
-		if (Core::moduleIsActive('siteuser'))
-		{
-			$oSiteuser_Controller_Edit = new Siteuser_Controller_Edit($this->_Admin_Form_Action);
-			$aSiteuser_Groups = $oSiteuser_Controller_Edit->fillSiteuserGroups($this->_object->site_id);
-		}
-		else
-		{
-			$aSiteuser_Groups = array();
-		}
-
-		$oSelect_SiteUserGroup = Admin_Form_Entity::factory('Select')
-			->name('siteuser_group_id')
-			->caption(Core::_('Structure.siteuser_group_id'))
-			->style('width: 110px')
-			->options(
-				array(
-					// Все
-					0 => Core::_('Structure.all'),
-					// Как у родителя
-					-1 => Core::_('Structure.like_parent')
-				) + $aSiteuser_Groups
-			)
-			->value($this->_object->siteuser_group_id);
-
-		$oMainTab
-			->addAfter($oSelect_SiteUserGroup, $this->getField('sorting'))
-			->addAfter(Admin_Form_Entity::factory('Separator'), $oSelect_SiteUserGroup);
-
-		// Structure type
-		$oMainTab->delete($this->getField('type'));
-
-		$windowId = $this->_Admin_Form_Controller->getWindowId();
-
-		$iLibId = 0;
-		$iLibDirId = 0;
-
-		$oRadio_Type = Admin_Form_Entity::factory('Radiogroup')
-			->name('type')
-			->id('structureType' . time())
-			->caption(Core::_('Structure.type'))
-			->value($this->_object->type)
-			//->labelAttr(array('style' => 'font-weight: bold'))
-			->divAttr(array('id' => 'structure_types'))
-			->radio(
-				array(
-					0 => Core::_('Structure.static_page'),
-					2 => Core::_('Structure.typical_dynamic_page'),
-					1 => Core::_('Structure.dynamic_page')
-				)
-			)
-			->onclick("SetViewStructure('{$windowId}', this.value, '{$this->_object->id}', '{$iLibDirId}', '{$iLibId}')");
-
-		$oMainTab
-			->add($oRadio_Type)
-			->add(Admin_Form_Entity::factory('Code')
-				->html("<script>$(function() {
-					$('#{$windowId} #structure_types').buttonset();
-				});</script>")
-			);
-
-		// Статичный документ
-		$oAdditionalTab->delete($this->getField('document_id'));
-
-		$oDocument = Core_Entity::factory('Document', $this->_object->document_id);
-
-		// Контроллер редактирования документа
-		$Document_Controller_Edit = new Document_Controller_Edit($this->_Admin_Form_Action);
-
-		$Select_DocumentDir = Admin_Form_Entity::factory('Select')
-			->name('document_dir_id')
-			->id('document_dir_id')
-			->caption(Core::_('Structure.document_dir_id'))
-			->style('width: 500px')
-			->divAttr(array('id' => 'document_dir'))
-			->options(
-				array(' … ') + $Document_Controller_Edit->fillDocumentDir($this->_object->site_id)
-			)
-			->value($oDocument->document_dir_id) //
-			->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: 'document_id', callBack: $.loadSelectOptionsCallback, action: 'loadDocumentList', additionalParams: 'document_dir_id=' + this.value,windowId: '{$windowId}'}); return false");
-
-		$aDocumentForDir = array(' … ');
-		// intval() because $oDocument->document_dir_id may be NULL
-		$aDocuments = Core_Entity::factory('Document_Dir', intval($oDocument->document_dir_id))
-			->Documents->getBySiteId($this->_object->site_id);
-
-		foreach ($aDocuments as $oTmpDocument)
-		{
-			$aDocumentForDir[$oTmpDocument->id] = $oTmpDocument->name;
-		}
-
-		ob_start();
-		Core::factory('Core_Html_Entity_Img')
-			->src('/admin/images/edit.gif')
-			->id('editDocument')
-			->class('pointer left5px')
-			->onclick("$.openWindow({path: '/admin/document/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][1][' + $('#{$windowId} #document_id').val() + ']=1&hostcms[action]=edit', dialogClass: 'hostcms6'})")
-			->execute();
-
-		$sDocumentEditImg = ob_get_clean();
-
-		$Select_Document = Admin_Form_Entity::factory('Select')
-			->name('document_id')
-			->id('document_id')
-			->caption(Core::_('Structure.document_id'))
-			->style('width: 500px')
-			->divAttr(array('id' => 'document'/*, 'style' => 'float: left'*/))
-			->options($aDocumentForDir)
-			->value($this->_object->document_id)
-			->add(
-				Admin_Form_Entity::factory('Code')->html($sDocumentEditImg)
-			);
-
-		$oMainTab
-			->addAfter($Select_DocumentDir, $oRadio_Type)
-			->addAfter($Select_Document, $Select_DocumentDir);
-
-		// Типовая динамическая страница
-		$oAdditionalTab->delete($this->getField('lib_id'));
-
-		$Lib_Controller_Edit = new Lib_Controller_Edit($this->_Admin_Form_Action);
-
-		$oLib = Core_Entity::factory('Lib', $this->_object->lib_id);
-
-		$Select_LibDir = Admin_Form_Entity::factory('Select')
-			->name('lib_dir_id')
-			->caption(Core::_('Structure.lib_dir_id'))
-			->style('width: 500px')
-			->divAttr(array('id' => 'lib_dir'))
-			->options(
-				array(' … ') + $Lib_Controller_Edit->fillLibDir(0)
-			)
-			->value($oLib->lib_dir_id) //
-			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_id', callBack: $.loadSelectOptionsCallback, action: 'loadLibList',additionalParams: 'lib_dir_id=' + this.value,windowId: '{$windowId}'}); return false");
-
-		$aLibForDir = array(' … ');
-		$aLibs = Core_Entity::factory('Lib_Dir', intval($oLib->lib_dir_id)) // Может быть NULL
-			->Libs->findAll();
-
-		foreach ($aLibs as $oTmpLib)
-		{
-			$aLibForDir[$oTmpLib->id] = $oTmpLib->name;
-		}
-		$objectId = intval($this->_object->id);
-		$Select_Lib = Admin_Form_Entity::factory('Select')
-			->name('lib_id')
-			->id('lib_id')
-			->caption(Core::_('Structure.lib_id'))
-			->style('width: 500px')
-			->divAttr(array('id' => 'lib'))
-			->options($aLibForDir)
-			->value($this->_object->lib_id)
-			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")
-			;
-
-		$Div_Lib_Properies = Admin_Form_Entity::factory('Code');
-
-		ob_start();
-		// DIV для св-в типовой дин. страницы
-		$Core_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
-			->id('lib_properties')
-			->execute();
-
-		// Для выбранного стандартно
-		$Core_Html_Entity_Div = Core::factory('Core_Html_Entity_Script')
-			->type("text/javascript")
-			->value("$('#{$windowId} #lib_id').change();")
-			->execute();
-
-		$Div_Lib_Properies
-			->html(ob_get_clean());
-
-		$oMainTab
-			->addAfter($Select_LibDir, $oRadio_Type)
-			->addAfter($Select_Lib, $Select_LibDir)
-			->addAfter($Div_Lib_Properies, $Select_Lib)
-			;
-
-		// Динамическая страница
-		$oTextarea_Structure_Source = Admin_Form_Entity::factory('Textarea')
-			->name('structure_source')
-			->divAttr(array('id' => 'structure_source'))
-			->caption(Core::_('Structure.structure_source'))
-			->value($this->_object->getStructureFile())
-			->rows(20)
-			->style('height: 400px; width: 100%')
-			->class('codepress php');
-
-		$oTextarea_StructureConfig_Source = Admin_Form_Entity::factory('Textarea')
-			->name('structure_config_source')
-			->divAttr(array('id' => 'structure_config_source'))
-			->caption(Core::_('Structure.structure_config_source'))
-			->value($this->_object->getStructureConfigFile())
-			->rows(20)
-			->style('height: 400px; width: 100%')
-			->class('codepress php');
-
-		$oMainTab
-			->addAfter($oTextarea_Structure_Source, $oRadio_Type)
-			->addAfter($oTextarea_StructureConfig_Source, $oTextarea_Structure_Source);
+		$oSitemapRow1->add($oSelect_changefreq);
+		$oSitemapRow2->add($oSelect_priority);
 
 		// ---- Дополнительные свойства
-		$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-		$oProperty_Controller_Tab
+		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->setDatasetId($this->getDatasetId())
 			->linkedObject(Core_Entity::factory('Structure_Property_List', CURRENT_SITE))
 			->setTab($oPropertyTab)
 			->template_id($this->_object->template_id)
-			->fillTab()
-			;
-		// ----
-
-		$oMainTab
-			->delete($this->getField('url'))
-			->add($this->getField('url'));
-
-		$this->getField('url')
-			->divAttr(array('id' => 'url'))
-			->style('width: 500px;')
-			// clear standart url pattern
-			->format(array('lib' => array()));
+			->fillTab();
 
 		$this->title($this->_object->id
 			? Core::_('Structure.edit_title')
@@ -494,12 +526,10 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		// ---- Дополнительные свойства
-		$oProperty_Controller_Tab = new Property_Controller_Tab($this->_Admin_Form_Controller);
-		$oProperty_Controller_Tab
+		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->linkedObject(Core_Entity::factory('Structure_Property_List', CURRENT_SITE))
-			->applyObjectProperty()
-			;
+			->applyObjectProperty();
 		// ----
 
 		if (Core::moduleIsActive('search'))
@@ -572,5 +602,4 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		return $aReturn;
 	}
-
 }

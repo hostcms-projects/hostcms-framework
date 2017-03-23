@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Status_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,8 +22,8 @@ class Shop_Order_Status_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		parent::setObject($object);
 
 		$title = $this->_object->id
-					? Core::_('Shop_Order_Status.order_status_edit_form_title')
-					: Core::_('Shop_Order_Status.order_status_add_form_title');
+			? Core::_('Shop_Order_Status.order_status_edit_form_title')
+			: Core::_('Shop_Order_Status.order_status_add_form_title');
 
 		$this->title($title);
 

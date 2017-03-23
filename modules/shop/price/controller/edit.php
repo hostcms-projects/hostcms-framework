@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function setObject($object)
 	{
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_id = Core_Array::getGet('shop_id');
 		}
@@ -33,25 +33,22 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Shop_Price.import_export_tab'))
 			->name('ImportExport');
 
+		$oImportExportTab
+			->add($oImportExportTabRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
 		$this->addTabAfter($oImportExportTab, $oMainTab);
 
-		$oMainTab->move($this->getField('guid'), $oImportExportTab);
+		$oMainTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oImportExportTabRow1);
 
 		// Удаляем группу доступа
-		$oAdditionalTab->delete
-		(
-			$this->getField('siteuser_group_id')
-		);
+		$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
 		if (Core::moduleIsActive('siteuser'))
 		{
-			$oSiteuser_Controller_Edit =
-								new Siteuser_Controller_Edit($this->_Admin_Form_Action);
-			$aSiteuser_Groups =
-				$oSiteuser_Controller_Edit->fillSiteuserGroups
-				(
-						$this->_object->Shop->site_id
-				);
+			$oSiteuser_Controller_Edit = new Siteuser_Controller_Edit($this->_Admin_Form_Action);
+			$aSiteuser_Groups = $oSiteuser_Controller_Edit->fillSiteuserGroups(
+				$this->_object->Shop->site_id
+			);
 		}
 		else
 		{
@@ -77,7 +74,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oApplyForAll = Admin_Form_Entity::factory('Checkbox');
 		$oApplyForAll->name('apply_for_all')->caption(Core::_("Shop_Item.prices_add_form_apply_for_all"));
-		$oApplyForAll->value(is_null($object->id) ? 1 : 0);
+		$oApplyForAll->value($object->id ? 0 : 1);
 		$oMainTab->addAfter($oApplyForAll, $this->getField('percent'));
 
 		if (!is_null($object->id))

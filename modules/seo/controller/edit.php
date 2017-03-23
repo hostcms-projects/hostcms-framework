@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -53,64 +53,65 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('counter');
 		$this->addTabAfter($oCounterTab, $oCatalogTab);
 
-		$this->getField('pr')
-			->style('width: 110px;')
-			->divAttr(array('style' => 'float: left;'));
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$this->getField('tcy')
-			->style('width: 110px;')
-			->divAttr(array('style' => 'float: left;'));
+		$oLinksTab
+			->add($oLinksTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oLinksTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
 
-		$this->getField('tcy_topic')
-			->style('width: 220px;')
-			->divAttr(array('style' => 'float: left;'));
+		$oIndexedTab
+			->add($oIndexedTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oIndexedTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
+		$oCatalogTab
+			->add($oCatalogTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCatalogTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
+		$oCounterTab
+			->add($oCounterTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oCounterTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+		;
+
+		$this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+
+		$oMainTab->move($this->getField('pr')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('tcy')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('tcy_topic')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
 
 		// Закладка обратных ссылок
-		$oMainTab->move($this->getField('yandex_links')
-				->style('width: 300px;')
-				->divAttr(array('style' => 'float: left;')),
-				$oLinksTab)
-			->move($this->getField('google_links')
-				->style('width: 300px;'),
-				$oLinksTab)
-			->move($this->getField('yahoo_links')
-				->style('width: 300px;')
-				->divAttr(array('style' => 'float: left;')),
-				$oLinksTab)
-			->move($this->getField('bing_links')
-				->style('width: 300px;'),
-				$oLinksTab);
+		$oMainTab->move($this->getField('yandex_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow1);
+		$oMainTab->move($this->getField('google_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow1);
+		$oMainTab->move($this->getField('yahoo_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow2);
+		$oMainTab->move($this->getField('bing_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow2);
 
 		// Закладка проиндексированных страниц
-		$oMainTab->move($this->getField('yandex_indexed')
-				->style('width: 300px;')
-				->divAttr(array('style' => 'float: left;')),
-				$oIndexedTab)
-			->move($this->getField('google_indexed')
-				->style('width: 300px;'),
-				$oIndexedTab)
-			->move($this->getField('yahoo_indexed')
-				->style('width: 300px;')
-				->divAttr(array('style' => 'float: left;')),
-				$oIndexedTab)
-			->move($this->getField('bing_indexed')
-				->style('width: 300px;'),
-				$oIndexedTab);
+		$oMainTab->move($this->getField('yandex_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow1);
+		$oMainTab->move($this->getField('google_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow1);
+		$oMainTab->move($this->getField('yahoo_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow2);
+		$oMainTab->move($this->getField('bing_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow2);
 
 		// Закладка каталогов
-		$oMainTab
-			->move($this->getField('yandex_catalog'), $oCatalogTab)
-			->move($this->getField('rambler_catalog'), $oCatalogTab)
-			->move($this->getField('dmoz_catalog'), $oCatalogTab)
-			->move($this->getField('mail_catalog'), $oCatalogTab);
+		$oMainTab->move($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow1);
+		$oMainTab->move($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow2);
+		$oMainTab->move($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow3);
+		$oMainTab->move($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow4);
 
 		// Закладка счетчиков
-		$oMainTab
-			->move($this->getField('rambler_counter'), $oCounterTab)
-			->move($this->getField('spylog_counter'), $oCounterTab)
-			->move($this->getField('hotlog_counter'), $oCounterTab)
-			->move($this->getField('liveinternet_counter'), $oCounterTab)
-			->move($this->getField('mail_counter'), $oCounterTab);
+		$oMainTab->move($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow1);
+		$oMainTab->move($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow2);
+		$oMainTab->move($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow3);
+		$oMainTab->move($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow4);
+		$oMainTab->move($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow5);
 
 		return $this;
 	}

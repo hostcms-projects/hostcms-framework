@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Form extends Admin_Form_Entity
 {
@@ -45,7 +45,9 @@ class Skin_Default_Admin_Form_Entity_Form extends Admin_Form_Entity
 		var fieldType = new Array(), fieldMessage = new Array(), fieldsStatus = new Array();
 		</script>
 		<form <?php echo implode(' ', $aAttr) ?>><?php
-		parent::execute();
+		
+		$this->executeChildren();
+		
 		?></form>
 		<script type="text/javascript">
 		$(function() {

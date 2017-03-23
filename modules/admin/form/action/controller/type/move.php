@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controller
 {
@@ -68,12 +68,11 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				->name('destinationId')
 				->id('destinationId')
 				->style('width: 280px; float: left')
-				//->divAttr(array('style' => 'float: left'))
 				->filter(TRUE)
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller($this->_Admin_Form_Controller);
+				->controller($this->_Admin_Form_Controller->window($newWindowId));
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
@@ -85,11 +84,11 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				foreach ($checkedItems as $key => $value)
 				{
 					$oCore_Html_Entity_Form->add(
-						 Admin_Form_Entity::factory('Input')
+						 Core::factory('Core_Html_Entity_Input')
 							->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
 							->value(1)
 							->type('hidden')
-							->controller($this->_Admin_Form_Controller)
+							//->controller($this->_Admin_Form_Controller)
 					);
 				}
 			}
@@ -97,7 +96,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 			$oAdmin_Form_Entity_Button = Admin_Form_Entity::factory('Button')
 				->name('apply')
 				->type('submit')
-				->class('applyButton')
+				->class('applyButton btn btn-blue')
 				->value($this->buttonName)
 				->onclick(
 					'$("#' . $newWindowId . '").remove(); '
@@ -107,7 +106,11 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 
 			$oCore_Html_Entity_Form
 				->add($oAdmin_Form_Entity_Select)
-				->add($oAdmin_Form_Entity_Button);
+				->add(
+					Admin_Form_Entity::factory('Div')
+						->class('form-group col-lg-12')
+						->add($oAdmin_Form_Entity_Button)
+				);
 
 			$oCore_Html_Entity_Div->execute();
 

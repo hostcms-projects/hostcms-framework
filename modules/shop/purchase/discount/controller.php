@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 {
@@ -102,7 +102,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 
 			$bCheckOrdersSum = FALSE;
 
-			if($oShop_Purchase_Discount->mode == 2 && $this->siteuserId)
+			if ($oShop_Purchase_Discount->mode == 2 && $this->siteuserId)
 			{
 				$oSiteuser = Core_Entity::factory('Siteuser')->find($this->siteuserId);
 				if(!is_null($oSiteuser))

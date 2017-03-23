@@ -6,7 +6,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information systems',
@@ -63,7 +63,6 @@ return array(
 	'typograph_default_items' => '<acronym title="Parameter that specifies the use of prepress service of information items by default">Use prepress service to items</acronym>',
 	'typograph_default_groups' => '<acronym title="Parameter that specifies the use of prepress service of information groups by default">Use prepress service to groups</acronym>',
 
-
 	'siteuser_group_id' => '<acronym title="User group having access rights to information system">Access group</acronym>',
 	'information_all' => 'All',
 
@@ -75,16 +74,15 @@ return array(
 	'watermark_default_use_small_image' => '<acronym title="Property to specify whether watermark should be used for small pictures by default">Use watermark for small pictures by default</acronym>',
 	'watermark_default_position_x' => '<acronym title="Property to specify the dafault watermark position in X-direction, e.g. 200 (in pixels) or 50% (in percentage)">Default position in X-direction</acronym>',
 	'watermark_default_position_y' => '<acronym title="Property to specify the default watermark position in Y-direction, e.g. 200 (in pixels) or 50% (in percentage)">Default position in Y-direction</acronym>',
-
 	'preserve_aspect_ratio' => '<acronym title="Preserve aspect ratio">Preserve aspect ratio</acronym>',
 	'preserve_aspect_ratio_small' => '<acronym title="Preserve aspect ratio for small images">Preserve aspect ratio</acronym>',
-	'preserve_aspect_ratio' => '<acronym title="Preserve aspect ratio for group">Preserve aspect ratio for group</acronym>',
-	'preserve_aspect_ratio_small' => '<acronym title="Preserve aspect ratio for small images of group">Preserve aspect ratio for group</acronym>',
+	'preserve_aspect_ratio_group' => '<acronym title="Preserve aspect ratio for group">Preserve aspect ratio for group</acronym>',
+	'preserve_aspect_ratio_group_small' => '<acronym title="Preserve aspect ratio for small images of group">Preserve aspect ratio for group</acronym>',
 	'items_on_page' => '<acronym title="Property to specify the number of items on a page">Number of items on page</acronym>',
 	'apply_tags_automatically' => '<acronym title="Automatic generation of labels (tags) of information item from its name, description and text">Apply labels (tags) automatically</acronym>',
 	'change_filename' => '<acronym title="Conversion of all uploaded files for all information system objects: items, groups, additional properties of items and groups">Edit names of uploaded files</acronym>',
 
-	'url_type' => '<acronym title="Type of generation of information items URL in case parameter has not been filled in\'Name of item in URL\' ">Type of generation of information items URL</acronym>',
+	'url_type' => '<acronym title="Type of generation of URL in case parameter has not been filled in\'Name of item in URL\' ">Type of generation of URL</acronym>',
 	'url_type_identificater' => 'ID',
 	'url_type_transliteration' => 'Transliteration',
 	'apply_keywords_automatically' => '<acronym title="Automatic generation of keywords of information item and category from their name, description and text">Generate keywords automatically</acronym>',

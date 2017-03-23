@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Purchase_Discount_Coupon_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -19,7 +19,6 @@ class Shop_Purchase_Discount_Coupon_Controller_Edit extends Admin_Form_Action_Co
 	 */
 	public function setObject($object)
 	{
-
 		parent::setObject($object);
 
 		$oMainTab = $this->getTab('main');
@@ -27,11 +26,15 @@ class Shop_Purchase_Discount_Coupon_Controller_Edit extends Admin_Form_Action_Co
 
 		$oAdditionalTab->delete($this->getField('shop_purchase_discount_id'));
 
-		$oCouponSelect = Admin_Form_Entity::factory('Select');
-
 		$aOptions = $this->_fillShopPurchaseDiscounts(Core_Array::getGet('shop_id', 0));
+
+		if (!count($aOptions))
+		{
+			throw new Core_Exception(Core::_('Shop_Purchase_Discount_Coupon.not_enough_discounts'), array(), 0, FALSE);
+		}
 		
-		$oCouponSelect->caption(Core::_('Shop_Purchase_Discount_Coupon.shop_purchase_discount_id'))
+		$oCouponSelect = Admin_Form_Entity::factory('Select')
+			->caption(Core::_('Shop_Purchase_Discount_Coupon.shop_purchase_discount_id'))
 			->options(
 				count($aOptions) ? $aOptions : array(' … ')
 			)
@@ -41,8 +44,8 @@ class Shop_Purchase_Discount_Coupon_Controller_Edit extends Admin_Form_Action_Co
 		$oMainTab->addAfter($oCouponSelect, $this->getField('name'));
 
 		$title = $this->_object->id
-					? Core::_('Shop_Purchase_Discount_Coupon.coupon_form_table_title_edit')
-					: Core::_('Shop_Purchase_Discount_Coupon.coupon_form_table_title_add');
+			? Core::_('Shop_Purchase_Discount_Coupon.coupon_form_table_title_edit')
+			: Core::_('Shop_Purchase_Discount_Coupon.coupon_form_table_title_add');
 
 		$this->title($title);
 

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Controller
 {
@@ -126,6 +126,16 @@ class Admin_Form_Controller
 	}
 
 	/**
+	 * Escape jQuery selectors
+	 * @param string $str string
+	 * @return string
+	 */
+	public function jQueryEscape($str)
+	{
+		return str_replace('%', '\\%', $str);
+	}
+
+	/**
 	 * Data set from _REQUEST
 	 * @var array
 	 */
@@ -195,6 +205,9 @@ class Admin_Form_Controller
 			{
 				$this->_sortingFieldId = $oAdmin_Form_Setting->order_field_id;
 			}
+
+			// Set sorting field
+			$this->_sortingFieldId && $this->_sortingAdmin_Form_Field = $this->_Admin_Form->Admin_Form_Fields->getById($this->_sortingFieldId);
 
 			if (!is_null($this->_sortingDirection))
 			{
@@ -321,6 +334,11 @@ class Admin_Form_Controller
 		return $this;
 	}
 
+	public function getChildren()
+	{
+		return $this->_children;
+	}
+
 	/**
 	 * List of external replaces
 	 * @var array
@@ -394,8 +412,8 @@ class Admin_Form_Controller
 				$this->_pageTitle = $formName->name;
 			}
 
+			// Default sorting field
 			$sortingFieldName = $this->_Admin_Form->default_order_field;
-
 			$this->_sortingAdmin_Form_Field = $this->_Admin_Form->Admin_Form_Fields->getByName($sortingFieldName);
 
 			if (is_null($this->_sortingAdmin_Form_Field))
@@ -749,27 +767,6 @@ class Admin_Form_Controller
 	protected $_onPage = array (10 => 10, 20 => 20, 30 => 30, /*40 => 40, */50 => 50, 100 => 100, 500 => 500, 1000 => 1000);
 
 	/**
-	 * Show items count selector
-	 */
-	protected function _onPageSelector()
-	{
-		$sCurrentValue = $this->_limit;
-		$windowId = Core_Str::escapeJavascriptVariable($this->getWindowId());
-		$additionalParams = Core_Str::escapeJavascriptVariable(
-			str_replace(array('"'), array('&quot;'), $this->_additionalParams)
-		);
- 		$path = Core_Str::escapeJavascriptVariable($this->getPath());
-
-		$oCore_Html_Entity_Select = Core::factory('Core_Html_Entity_Select')
-			->name('admin_forms_on_page')
-			->id('id_on_page')
-			->onchange("$.adminLoad({path: '{$path}', additionalParams: '{$additionalParams}', limit: this.options[this.selectedIndex].value, windowId : '{$windowId}'}); return false")
-			->options($this->_onPage)
-			->value($sCurrentValue)
-			->execute();
-	}
-
-	/**
 	 * Total founded items
 	 * @var int
 	 */
@@ -804,177 +801,6 @@ class Admin_Form_Controller
 	 * @var int
 	 */
 	protected $_pageNavigationDelta = 5;
-
-	/**
-	 * Показ строки ссылок
-	 * @return self
-	 */
-	protected function _pageNavigation()
-	{
-		$total_count = $this->getTotalCount();
-		$total_page = $total_count / $this->_limit;
-
-		// Округляем в большую сторону
-		if ($total_count % $this->_limit != 0)
-		{
-			$total_page = intval($total_page) + 1;
-		}
-
-		$this->_current > $total_page && $this->_current = $total_page;
-
-		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
-			->style('float: left; text-align: center; margin-top: 10px');
-
-		// Формируем скрытые ссылки навигации для перехода по Ctrl + стрелка
-		if ($this->_current < $total_page)
-		{
-			// Ссылка на следующую страницу
-			$page = $this->_current + 1 ? $this->_current + 1 : 1;
-			$oCore_Html_Entity_Div->add(
-				Core::factory('Core_Html_Entity_A')
-					->onclick($this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $page))
-					->id('id_next')
-			);
-		}
-
-		if ($this->_current > 1)
-		{
-			// Ссылка на предыдущую страницу
-			$page = $this->_current - 1 ? $this->_current - 1 : 1;
-			$oCore_Html_Entity_Div->add(
-				Core::factory('Core_Html_Entity_A')
-					->onclick($this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $page))
-					->id('id_prev')
-			);
-		}
-
-		// Отображаем строку ссылок, если общее число страниц больше 1.
-		if ($total_page > 1)
-		{
-			// Определяем номер ссылки, с которой начинается строка ссылок.
-			$link_num_begin = ($this->_current - $this->_pageNavigationDelta < 1)
-				? 1
-				: $this->_current - $this->_pageNavigationDelta;
-
-			// Определяем номер ссылки, которой заканчивается строка ссылок.
-			$link_num_end = $this->_current + $this->_pageNavigationDelta;
-			$link_num_end > $total_page && $link_num_end = $total_page;
-
-			// Определяем число ссылок выводимых на страницу.
-			$count_link = $link_num_end - $link_num_begin + 1;
-
-			if ($this->_current == 1)
-			{
-				$oCore_Html_Entity_Div->add(
-					Core::factory('Core_Html_Entity_Span')
-						->class('current')
-						->value($link_num_begin)
-				);
-			}
-			else
-			{
-				$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, 1);
-				$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, 1);
-
-				$oCore_Html_Entity_Div->add(
-					Core::factory('Core_Html_Entity_A')
-						->href($href)
-						->onclick($onclick)
-						->class('page_link')
-						->value(1)
-				);
-
-				// Выведем … со ссылкой на 2-ю страницу, если показываем с 3-й
-				if ($link_num_begin > 1)
-				{
-					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, 2);
-					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, 2);
-
-					$oCore_Html_Entity_Div->add(
-						Core::factory('Core_Html_Entity_A')
-							->href($href)
-							->onclick($onclick)
-							->class('page_link')
-							->value('…')
-					);
-				}
-			}
-
-			// Страница не является первой и не является последней.
-			for ($i = 1; $i < $count_link - 1; $i++)
-			{
-				$link_number = $link_num_begin + $i;
-
-				if ($link_number == $this->_current)
-				{
-					// Страница является текущей
-					$oCore_Html_Entity_Div->add(
-						Core::factory('Core_Html_Entity_Span')
-							->class('current')
-							->value($link_number)
-					);
-				}
-				else
-				{
-					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $link_number);
-					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $link_number);
-					$oCore_Html_Entity_Div->add(
-						Core::factory('Core_Html_Entity_A')
-							->href($href)
-							->onclick($onclick)
-							->class('page_link')
-							->value($link_number)
-					);
-				}
-			}
-
-			// Если последняя страница является текущей
-			if ($this->_current == $total_page)
-			{
-				$oCore_Html_Entity_Div->add(
-					Core::factory('Core_Html_Entity_Span')
-							->class('current')
-							->value($total_page)
-				);
-			}
-			else
-			{
-				// Выведем … со ссылкой на предпоследнюю страницу
-				if ($link_num_end < $total_page)
-				{
-					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
-					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
-
-					$oCore_Html_Entity_Div->add(
-						Core::factory('Core_Html_Entity_A')
-							->href($href)
-							->onclick($onclick)
-							->class('page_link')
-							->value('…')
-					);
-				}
-
-				$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $total_page);
-				$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $total_page);
-
-				// Последняя страница не является текущей
-				$oCore_Html_Entity_Div->add(
-					Core::factory('Core_Html_Entity_A')
-						->href($href)
-						->onclick($onclick)
-						->class('page_link')
-						->value($total_page)
-				);
-			}
-
-			$oCore_Html_Entity_Div->execute();
-			Core::factory('Core_Html_Entity_Div')
-				->style('clear: both')
-				->execute();
-		}
-
-		return $this;
-	}
 
 	/**
 	 * Content
@@ -1035,10 +861,7 @@ class Admin_Form_Controller
 	{
 		$oAdmin_Answer = Core_Skin::instance()->answer();
 
-		if (!is_null($this->_module))
-		{
-			$oAdmin_Answer->module($this->_module->getModuleName());
-		}
+		!is_null($this->_module) && $oAdmin_Answer->module($this->_module->getModuleName());
 
 		$oAdmin_Answer
 			->ajax($this->_ajax)
@@ -1187,7 +1010,6 @@ class Admin_Form_Controller
 				Core_Message::show($e->getMessage(), 'error');
 			}
 
-
 			// были успешные операции
 			foreach ($aReadyAction as $modelName => $actionChangedCount)
 			{
@@ -1202,25 +1024,10 @@ class Admin_Form_Controller
 	}
 
 	/**
-	 * Show children elements
-	 * @return self
-	 */
-	public function showChildren()
-	{
-		// Связанные с формой элементы (меню, строка навигации и т.д.)
-		foreach ($this->_children as $oAdmin_Form_Entity)
-		{
-			$oAdmin_Form_Entity->execute();
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Show form title in administration center
 	 * @return self
 	 */
-	protected function _showFormTitle()
+	/*protected function _showFormTitle()
 	{
 		// Заголовок формы
 		strlen($this->_pageTitle) && Admin_Form_Entity::factory('Title')
@@ -1228,7 +1035,7 @@ class Admin_Form_Controller
 			->execute();
 
 		return $this;
-	}
+	}*/
 
 	/**
 	 * Edit-in-Place in administration center
@@ -1261,8 +1068,6 @@ class Admin_Form_Controller
 			Core::factory('Core_Html_Entity_Script')
 				->type("text/javascript")
 				->value("(function($){
-					//console.log($('#{$windowId} table.admin_table .editable'));
-					//$('#{$windowId} table.admin_table .editable').editable({windowId: '{$windowId}', path: '{$path}'});
 					$('#{$windowId} table .editable').editable({windowId: '{$windowId}', path: '{$path}'});
 				})(jQuery);")
 				->execute();
@@ -1287,13 +1092,27 @@ class Admin_Form_Controller
 	{
 		ob_start();
 
+		$oAdmin_View = Admin_View::create();
+		$oAdmin_View
+			->children($this->_children)
+			->pageTitle($this->_pageTitle)
+			->module($this->_module);
+
+		ob_start();
+
 		$this
-			->_showFormTitle()
-			->showChildren()
 			->_showFormContent()
-			->_showBottomActions()
-			->_applyEditable()
+			->_bottomActions()
 			->_pageNavigation();
+
+		$content = ob_get_clean();
+
+		$oAdmin_View
+			->content($content)
+			->message($this->getMessage())
+			->show();
+
+		$this->_applyEditable();
 
 		return ob_get_clean();
 	}
@@ -1303,9 +1122,10 @@ class Admin_Form_Controller
 	 * @param array $aAdmin_Form_Fields Admin_Form_Fields
 	 * @param Core_Entity $oEntity entity
 	 * @param string $subject
+	 * @param string $mode link|onclick
 	 * @return string
 	 */
-	public function doReplaces($aAdmin_Form_Fields, $oEntity, $subject)
+	public function doReplaces($aAdmin_Form_Fields, $oEntity, $subject, $mode = 'link')
 	{
 		foreach ($this->_externalReplace as $replace_key => $replace_value)
 		{
@@ -1315,7 +1135,13 @@ class Admin_Form_Controller
 		$aColumns = $oEntity->getTableColums();
 		foreach ($aColumns as $columnName => $columnArray)
 		{
-			$subject = str_replace('{'.$columnName.'}', $oEntity->$columnName, $subject);
+			$subject = str_replace(
+				'{'.$columnName.'}', 
+				$mode == 'link'
+					? $oEntity->$columnName
+					: Core_Str::escapeJavascriptVariable($this->jQueryEscape($oEntity->$columnName)),
+				$subject
+			);
 		}
 
 		return $subject;
@@ -1407,8 +1233,8 @@ class Admin_Form_Controller
 		$limit = NULL, $current = NULL, $sortingFieldId = NULL, $sortingDirection = NULL)
 	{
 		$windowId = Core_Str::escapeJavascriptVariable($this->getWindowId());
-		$datasetKey = Core_Str::escapeJavascriptVariable($datasetKey);
-		$datasetValue = Core_Str::escapeJavascriptVariable($datasetValue);
+		$datasetKey = Core_Str::escapeJavascriptVariable($this->jQueryEscape($datasetKey));
+		$datasetValue = Core_Str::escapeJavascriptVariable($this->jQueryEscape($datasetValue));
 
 		return "$('#{$windowId} #row_{$datasetKey}_{$datasetValue}').toggleHighlight(); "
 			. "$.adminCheckObject({objectId: 'check_{$datasetKey}_{$datasetValue}', windowId: '{$windowId}'}); "
@@ -1930,7 +1756,7 @@ class Admin_Form_Controller
 
 				$this->current($current);
 			}
-			elseif($iTotalCount == $offset && $offset >= $this->_limit)
+			elseif ($iTotalCount == $offset && $offset >= $this->_limit)
 			{
 				$offset -= $this->_limit;
 				$bLoaded = FALSE;
@@ -1988,16 +1814,16 @@ class Admin_Form_Controller
 						}
 
 						$oAdmin_Form_Dataset
-						->limit($this->_limit - ($prevDatasetCount - $offset) - $begin)
-						->offset($begin)
-						->loaded($bLoaded);
+							->limit($this->_limit - ($prevDatasetCount - $offset) - $begin)
+							->offset($begin)
+							->loaded($bLoaded);
 					}
 					else
 					{
 						$oAdmin_Form_Dataset
-						->limit(0)
-						->offset(0)
-						->loaded($bLoaded);
+							->limit(0)
+							->offset(0)
+							->loaded($bLoaded);
 					}
 				}
 			}

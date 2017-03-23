@@ -62,7 +62,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_ORM
 {
@@ -245,6 +245,12 @@ class Core_ORM
 	 * @var array
 	 */
 	static protected $_columnCache = array();
+
+	/**
+	 * Columns cache for models default values
+	 * @var array
+	 */
+	static protected $_columnCacheDefaultValues = array();
 
 	/**
 	 * Core_DataBase object
@@ -978,6 +984,24 @@ class Core_ORM
 	}
 
 	/**
+	 * Clear self::$_columnCache
+	 * @return self
+	 */
+	public function clearColumnCache()
+	{
+		self::$_columnCache = array();
+		self::$_columnCacheDefaultValues = array();
+
+		if (Core::moduleIsActive('cache'))
+		{
+			$cacheName = 'Core_ORM_ColumnCache';
+			self::$columnCache->deleteAll($cacheName);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Load columns list for model
 	 * @return Core_ORM
 	 */
@@ -1006,6 +1030,14 @@ class Core_ORM
 					: $this->_dataBase->getColumns($this->_tableName);
 
 				$bCache && self::$columnCache->set($this->_modelName, $this->_tableColumns, $cacheName);
+
+				// Fill self::$_columnCacheDefaultValues
+				self::$_columnCacheDefaultValues[$this->_modelName] = array();
+				foreach (self::$_columnCache[$this->_modelName] as $key => $aColumn)
+				{
+					!is_null($aColumn['default'])
+						&& self::$_columnCacheDefaultValues[$this->_modelName][$key] = $aColumn['default'];
+				}
 			}
 
 			/*$this->_tableColumns = isset(self::$_columnCache[$this->_modelName])
@@ -1031,7 +1063,25 @@ class Core_ORM
 			if (!$this->loaded())
 			{
 				// Do not set values which have changed
-				$this->setValues(array_diff_key($this->_preloadValues, $this->_changedColumns), $changed = TRUE);
+				
+				// To delete
+				if (!is_array($this->_preloadValues))
+				{
+					Core_Log::instance()->clear()
+						->status(Core_Log::$ERROR)
+						->write("Ошибка, неверный тип _preloadValues, " . gettype($this->_preloadValues) . ", модель " . get_class($this));
+				}
+				if (!is_array(self::$_columnCacheDefaultValues[$this->_modelName]))
+				{
+					Core_Log::instance()->clear()
+						->status(Core_Log::$ERROR)
+						->write("Ошибка, неверный тип _columnCacheDefaultValues, " . gettype(self::$_columnCacheDefaultValues[$this->_modelName])  . ", модель " . get_class($this));
+				}
+				// ---------------
+				
+				$this->setValues(
+					array_diff_key($this->_preloadValues + self::$_columnCacheDefaultValues[$this->_modelName], $this->_changedColumns), $changed = TRUE
+				);
 
 				//$this->setValues($this->_preloadValues, $changed = TRUE);
 				//$this->_preloadValues = array();

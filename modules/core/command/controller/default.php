@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Default extends Core_Command_Controller
 {
@@ -175,13 +175,14 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			}
 		}
 
-		// Если доступ к узлу структуры только по HTTPS, а используется HTTP, то делаем редирект
+		// Если доступ к узлу структуры только по HTTPS, а используется HTTP,
+		// то делаем 301 редирект
 		if ($oStructure->https == 1 && !Core::httpsUses())
 		{
 			$url = str_replace(array("\r", "\n"), '', Core::$url['host'] . $this->_uri);
 
 			$oCore_Response
-				->status(302)
+				->status(301)
 				->header('Location', 'https://' . $url);
 
 			return $oCore_Response;
@@ -522,7 +523,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		$oCore_Response->body($sContent);
 
 		$oCore_Registry->set('Core_Statistics.totalTime', Core::getmicrotime() - $fBeginTime);
-		
+
 		// Top panel
 		if (Core::checkPanel())
 		{
@@ -533,6 +534,27 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$sContent = ob_get_clean();
 
 			!$bIsUtf8 && $sContent = $this->_iconv($oSite->coding, $sContent);
+
+			$oCore_Response->body($sContent);
+		}
+
+		// Benchmark
+		if (defined('START_BENCHMARK') && START_BENCHMARK && Core::moduleIsActive('benchmark'))
+		{
+			ob_start();
+			?><!-- HostCMS Benchmark --><script type="text/javascript">
+			window.addEventListener('load', function() {
+				var waiting = performance.timing.responseStart - performance.timing.requestStart, loadPage = performance.timing.loadEventStart - performance.timing.requestStart, dnsLookup = performance.timing.domainLookupEnd - performance.timing.domainLookupStart, connectServer = performance.timing.connectEnd - performance.timing.connectStart;
+
+				xmlhttprequest = new XMLHttpRequest();
+				xmlhttprequest.open('POST','/hostcms-benchmark.php',true);
+				xmlhttprequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+				xmlhttprequest.send('structure_id=<?php echo CURRENT_STRUCTURE_ID?>&waiting_time='+waiting+'&load_page_time='+loadPage+'&dns_lookup='+dnsLookup+'&connect_server='+connectServer);
+			});
+			</script>
+			<?php
+
+			$sContent = ob_get_clean();
 
 			$oCore_Response->body($sContent);
 		}

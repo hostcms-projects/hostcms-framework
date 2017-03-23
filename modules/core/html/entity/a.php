@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Html
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Html_Entity_A extends Core_Html_Entity
 {
@@ -38,6 +38,12 @@ class Core_Html_Entity_A extends Core_Html_Entity
 	protected $_skipProperies = array(
 		'value' // идет в значение <span>
 	);
+	
+	/**
+	 * Object has unlimited number of properties
+	 * @var boolean
+	 */
+	protected $_unlimitedProperties = TRUE;
 	
 	/**
 	 * Executes the business logic.

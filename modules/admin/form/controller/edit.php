@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -31,6 +31,15 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('Name');
 
 		$this->addTabBefore($oNameTab, $oMainTab);
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
+
 
 		// Название и описание для всех языков
 		$aAdmin_Languages = Core_Entity::factory('Admin_Language')->findAll();
@@ -58,10 +67,7 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('name_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form.form_forms_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($name)
-					->class('input-lg')
-					/*->format(
-						array('minlen' => array('value' => 1))
-					)*/;
+					->class('form-control input-lg');
 
 				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
@@ -70,18 +76,36 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->rows(2);
 
 				$oNameTab
-					->add($oAdmin_Form_Entity_Input_Name)
-					->add($oAdmin_Form_Entity_Textarea_Description);
+					->add(
+						Admin_Form_Entity::factory('Div')->class('row')
+							->add($oAdmin_Form_Entity_Input_Name)
+					)
+					->add(
+						Admin_Form_Entity::factory('Div')->class('row')
+							->add($oAdmin_Form_Entity_Textarea_Description)
+					);
 			}
 		}
 
 		$this->getField('on_page')
-			->class('');
+			->class('form-control')
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-6'));
+
+		$oMainTab->move($this->getField('on_page'), $oMainRow1);
+
+		$oMainTab->move($this->getField('key_field'), $oMainRow2);
+
+		$this->getField('show_operations')
+			->divAttr(array('class' => 'form-group col-lg-12'));
+		$oMainTab->move($this->getField('show_operations'), $oMainRow3);
+
+		$this->getField('show_group_operations')
+			->divAttr(array('class' => 'form-group col-lg-12'));
+		$oMainTab->move($this->getField('show_group_operations'), $oMainRow4);
 
 		// Поле сортировки по умолчанию
 		$this->getField('default_order_field')
-			->divAttr(array('style' => 'float: left'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
 		// Направление сортировки
 		$oMainTab->delete($this->getField('default_order_direction'));
@@ -96,11 +120,13 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('default_order_direction')
 			->value($this->_object->default_order_direction)
 			->caption(Core::_('Admin_Form.default_order_direction'))
-			->style('width: 220px');
+			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-		$oMainTab->add(
-			$oSelect_Order_Direction
-		);
+
+		$oMainTab->move($this->getField('default_order_field'), $oMainRow5);
+		$oMainRow5->add($oSelect_Order_Direction);
+		
+		$oMainTab->move($this->getField('guid'), $oMainRow6);		
 
 		if (!is_null($this->_object->id))
 		{

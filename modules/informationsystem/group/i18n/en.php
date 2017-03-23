@@ -5,13 +5,13 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information groups',
 	'information_system_top_menu_groups' => 'Information group',
 	'show_information_groups_link1' => 'Add',
-	'show_information_groups_link4' => 'Additional properties',
+	'show_information_groups_link4' => 'Properties',
 	'information_groups_add_form_title' => 'Add information group',
 	'information_groups_edit_form_title' => 'Edit information group',
 	'information_groups_form_tab_seo' => 'SEO',
@@ -35,9 +35,9 @@ return array(
 	'image_large' => '<acronym title="Picture of information group">Picture</acronym>',
 	'image_small' => '<acronym title="Small picture of information group">Small picture</acronym>',
 
-	'seo_title' => '<acronym title="Value of meta-tag title for information group">Title</acronym>',
-	'seo_description' => '<acronym title="Value of meta-tag description for information group">Description</acronym>',
-	'seo_keywords' => '<acronym title="Value of meta-tag keywords for information group">Keywords</acronym>',
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 
 	'edit_success' => 'Information system added successfully.',
 	//'edit_information_groups_success' => "Information system saved successfully!",

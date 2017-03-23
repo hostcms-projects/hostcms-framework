@@ -5,7 +5,7 @@
  * @package HostCMS 6\Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Tags',
@@ -33,7 +33,7 @@ return array(
 	'merge_success' => 'Tags have been merged.',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-	'seo_title' => 'Tag title',
-	'seo_description' => 'Value of meta-tag description for tag',
-	'seo_keywords' => 'Value of meta-tag keywords for tag',
+	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
+	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
+	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 );

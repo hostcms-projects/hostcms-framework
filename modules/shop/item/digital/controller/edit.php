@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Digital_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -21,7 +21,7 @@ class Shop_Item_Digital_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	{
 		$oShopItem = Core_Entity::factory('Shop', Core_Array::getGet('shop_item_id', 0));
 
-		if (is_null($object->id))
+		if (!$object->id)
 		{
 			$object->shop_item_id = $oShopItem->id;
 		}
@@ -34,9 +34,11 @@ class Shop_Item_Digital_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 		$oImageField = Admin_Form_Entity::factory('File');
 
-		$sFilePath = is_file($this->_object->getFullFilePath()) ? $this->_object->getFullFilePath() : '';
+		$sFilePath = is_file($this->_object->getFullFilePath())
+			? $this->_object->getFullFilePath()
+			: '';
 
-		if($sFilePath)
+		if ($sFilePath)
 		{
 			$sFilePath = "/admin/shop/item/digital/index.php?download_digital_file={$this->_object->id}";
 		}
@@ -87,7 +89,7 @@ class Shop_Item_Digital_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		// и передан файл
 		&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
 			if (Core_File::isValidExtension($aFileData['name'],

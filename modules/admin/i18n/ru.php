@@ -6,7 +6,7 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Центр администрирования',
@@ -43,7 +43,7 @@ return array(
 	'index_tech_date_simplexml' => 'SimpleXML:',
 	'index_tech_date_iconv' => 'Iconv:',
 	'index_tech_date_max_date_size' => 'Макс. размер POST: ',
-	'index_tech_date_max_time' => 'Макс. время исполнения: %d сек.',
+	'index_tech_date_max_time' => 'Макс. время исполнения: ',
 	'index_tech_date_session_save_path' => 'Путь сохранения сессий: ',
 	'index_tmp_dir' => 'Временная папка: ',
 	'index_tmp_not_dir' => 'Не определена',
@@ -83,5 +83,16 @@ return array(
 	'support_email' => 'Служба технической поддержки: ',
 	'viewSite' => 'Посмотреть сайт в новом окне',
 
+	'company' => 'ООО «Хостмэйк»',
+	'company-website' => 'www.hostcms.ru',
+	'company-support' => 'support@hostcms.ru',
 	'copy' => '%s [Копия от %s]',
+	'exit' => 'Выход',
+	'home' => 'Домой',
+	'dashboard' => 'Информационная панель',
+	'fixed' => 'Закрепить: ',
+	'fixed-navbar' => 'Заголовок',
+	'fixed-sideBar' => 'Меню',
+	'fixed-breadcrumbs' => 'Навигацию',
+	'fixed-header' => 'Всё',
 );

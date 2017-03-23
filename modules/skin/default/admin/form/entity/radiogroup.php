@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 {
@@ -21,12 +21,16 @@ class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 		$this->_allowedProperties[] = 'radio';
 		$this->_allowedProperties[] = 'labelAttr';
 		$this->_allowedProperties[] = 'separator';
+		$this->_allowedProperties[] = 'ico';
+		$this->_allowedProperties[] = 'buttonset';
 
 		$this->_skipProperies[] = 'id';
 		$this->_skipProperies[] = 'value';
 		$this->_skipProperies[] = 'radio';
 		$this->_skipProperies[] = 'labelAttr';
 		$this->_skipProperies[] = 'separator';
+		$this->_skipProperies[] = 'ico';
+		$this->_skipProperies[] = 'buttonset';
 
 		parent::__construct();
 
@@ -73,11 +77,19 @@ class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 		}
 
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
+		
+		if ($this->buttonset)
+		{
+			$sButtonsetId = 'buttonset_' . Core_Array::get($aDivAttr, 'id');
+			?><div id="<?php echo $sButtonsetId?>"><?php
+		}
+		
 		?><span class="caption"><?php echo $this->caption?></span><?php
 
 		foreach ($this->radio as $key => $value)
 		{
 			$tmpAttr = $aAttr;
+
 			if ($key == $this->value)
 			{
 				$tmpAttr[] = 'checked="checked"';
@@ -91,6 +103,14 @@ class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 			echo $this->separator;
 		}
 
+		if ($this->buttonset)
+		{
+			$windowId = $this->_Admin_Form_Controller->getWindowId();
+			?></div><script>$(function() {
+				$('#<?php echo $windowId?> #<?php echo $sButtonsetId?>').buttonset();
+			});</script><?php
+		}
+		
 		?></div><?php
 	}
 }

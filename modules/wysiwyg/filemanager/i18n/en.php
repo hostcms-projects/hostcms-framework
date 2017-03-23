@@ -29,9 +29,9 @@ return array(
 
 	'edit_file' => 'Edit file "%s"',
 	'edit_file_text' => '<acronym title="File text">File text</acronym>',
-
 	'fm_error_open_file' => 'Error! Unable to open file "%s".',
 	'fm_error_write_file' => 'Error! Unable to save to file "%s".',
 	'edit_success' => 'File modified successfully!',
 	'root' => 'Root',
+	'chmod' => 'Permissions',
 );

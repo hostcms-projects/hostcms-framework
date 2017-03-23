@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Shop_Payment_System_Handler
 {
@@ -1043,10 +1043,19 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Массив с режимами, при использовании которых должно происходить уведомление о покупке
+	 * - edit - редактирование заказа
+	 * - changeStatusPaid - изменение статуса оплаты из списка заказов
+	 * - cancelPaid - отмена заказа
+	 */
+	protected $_notificationModes = array('changeStatusPaid', 'edit');
+
+	/**
 	 * Уведомление об операциях с заказом
 	 * @param string $mode режим изменения:
 	 * - edit - редактирование заказа
 	 * - changeStatusPaid - изменение статуса оплаты из списка заказов
+	 * - cancelPaid - отмена заказа
 	 * @hostcms-event Shop_Payment_System_Handler.onBeforeChangedOrder
 	 * @hostcms-event Shop_Payment_System_Handler.onAfterChangedOrder
 	 */
@@ -1054,19 +1063,35 @@ abstract class Shop_Payment_System_Handler
 	{
 		Core_Event::notify('Shop_Payment_System_Handler.onBeforeChangedOrder', $this, array($mode));
 
-		if (in_array($mode, array('changeStatusPaid', 'edit')))
+		if (in_array($mode, $this->_notificationModes))
 		{
-			if ($this->_shopOrderBeforeAction->paid != $this->_shopOrder->paid)
+			if ($this->getShopOrderBeforeAction()->paid != $this->getShopOrder()->paid
+				|| $this->getShopOrderBeforeAction()->canceled != $this->getShopOrder()->canceled)
 			{
-				$date_str = Core_Date::sql2datetime($this->_shopOrder->datetime);
+				$date_str = Core_Date::sql2datetime($this->getShopOrder()->datetime);
 
-				$this->adminMailSubject(
-					Core::_('Shop_Order.confirm_admin_subject', $this->_shopOrder->invoice, $this->_shopOrder->Shop->name, $date_str)
-				);
+				// Изменение темы письма при оплате
+				if ($this->getShopOrder()->paid)
+				{
+					$this->adminMailSubject(
+						Core::_('Shop_Order.confirm_admin_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+					);
 
-				$this->siteuserMailSubject(
-					Core::_('Shop_Order.confirm_user_subject', $this->_shopOrder->invoice, $this->_shopOrder->Shop->name, $date_str)
-				);
+					$this->siteuserMailSubject(
+						Core::_('Shop_Order.confirm_user_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+					);
+				}
+				// Изменение темы письма при отмене заказа
+				elseif ($this->getShopOrder()->canceled)
+				{
+					$this->adminMailSubject(
+						Core::_('Shop_Order.cancel_admin_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+					);
+
+					$this->siteuserMailSubject(
+						Core::_('Shop_Order.cancel_user_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+					);
+				}
 
 				// Установка XSL-шаблонов в соответствии с настройками в узле структуры
 				$this->setXSLs();

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 {
@@ -27,10 +27,13 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 	/**
 	 * Constructor.
 	 * @param Core_Entity $oCore_Entity entity
+	 * @hostcms-event Admin_Form_Dataset_Entity.onAfterConstruct
 	 */
 	public function __construct(Core_Entity $oCore_Entity)
 	{
 		$this->_entity = $oCore_Entity;
+
+		Core_Event::notify(get_class($this) . '.onAfterConstruct', $this);
 	}
 
 	/**
@@ -153,10 +156,11 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			$this->_objects = $this->_entity->findAll(FALSE);
 
 			// Warning
-			/*if (Core_Array::getRequest('debug'))
-			{
-				echo '<p><b>Запрос на выборку</b>: <pre>', Core_DataBase::instance()->getLastQuery(), '</pre></p>';
-			}*/
+			//if (Core_Array::getRequest('debug'))
+			//{
+				//echo '<p><b>Запрос на выборку</b>: <pre>', Core_DataBase::instance()->getLastQuery(), '</pre></p>';
+			//}
+
 			$this->_loaded = TRUE;
 
 			// Расчет количества

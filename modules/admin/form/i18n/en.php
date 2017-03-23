@@ -6,11 +6,13 @@
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'save' => 'Save',
 	'apply' => 'Apply',
+	'noSubject' => 'No subject',
+	'actions' => 'Actions',
 
 	'yes' => 'Yes',
 	'no' => 'No',
@@ -46,6 +48,7 @@ return array(
 	'default_order_field' => '<acronym title="Default sorting field name">Sorting field name</acronym>',
 	'default_order_direction' => '<acronym title="Sorting direction">Sorting direction</acronym>',
 	'id' => 'Id',
+	'guid' => 'GUID',
 
 	'apply_success' => 'Form information modified successfully!',
 	'apply_error' => 'Error! Form information not modified!',

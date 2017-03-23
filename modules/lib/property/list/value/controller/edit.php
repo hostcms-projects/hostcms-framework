@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Property_List_Value_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -20,7 +20,7 @@ class Lib_Property_List_Value_Controller_Edit extends Admin_Form_Action_Controll
 	public function setObject($object)
 	{
 		// При добавлении объекта
-		if(is_null($object->id))
+		if (!$object->id)
 		{
 			$object->lib_property_id = Core_Array::getGet('property_id');
 		}

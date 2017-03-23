@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -26,22 +26,37 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oAdditionalTab->delete($this->getField('user_group_id'));
 
-		$oSelect_User_Groups = Admin_Form_Entity::factory('Select');
-
 		$user_group_id = is_null($this->_object->user_group_id)
 			? intval(Core_Array::getGet('user_group_id', 0))
 			: $this->_object->user_group_id;
+			
+			
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab->move($this->getField('login'), $oMainRow1);
+
 
 		// Селектор с группами пользователей
-		$oSelect_User_Groups
+		$oSelect_User_Groups = Admin_Form_Entity::factory('Select')
 			->options($this->_fillUserGroup())
 			->name('user_group_id')
 			->value($user_group_id)
 			->caption(Core::_('User.users_type_form'));
 
+		/*
 		$oMainTab->addAfter(
 			$oSelect_User_Groups, $this->getField('login')
 		);
+		*/
+		
+		$oMainRow2->add($oSelect_User_Groups);
 
 		$oMainTab->delete($this->getField('password'));
 
@@ -50,25 +65,22 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			'maxlen' => array('value' => 255)
 		);
 
-		$oPasswordFirst = Admin_Form_Entity::factory('Password');
-		$oPasswordFirst
+		$oPasswordFirst = Admin_Form_Entity::factory('Password')
 			->caption(Core::_('User.password'))
 			->id('password_first')
-			->name('password_first');
+			->name('password_first')
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
 
-		if (is_null($this->_object->id))
-		{
-			$oPasswordFirst->format(
-				$aPasswordFormat
-			);
-		}
+		!$this->_object->id && $oPasswordFirst->format($aPasswordFormat);
 
-		$oMainTab->addAfter($oPasswordFirst, $oSelect_User_Groups);
+		//$oMainTab->addAfter($oPasswordFirst, $oSelect_User_Groups);
+		
 
-		$oPasswordSecond = Admin_Form_Entity::factory('Password');
-		$oPasswordSecond
+		$oPasswordSecond = Admin_Form_Entity::factory('Password')
 			->caption(Core::_('User.password_second'))
-			->name('password_second');
+			->name('password_second')
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
+			
 
 		$aPasswordFormatSecond = array(
 			'fieldEquality' => array(
@@ -77,17 +89,24 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			)
 		);
 
-		if (is_null($this->_object->id))
-		{
-			$aPasswordFormatSecond += $aPasswordFormat;
-		}
+		!$this->_object->id && $aPasswordFormatSecond += $aPasswordFormat;
 
 		$oPasswordSecond->format($aPasswordFormatSecond);
 
-		$oMainTab->addAfter($oPasswordSecond, $oPasswordFirst);
-		$oMainTab->delete($this->getField('settings'));
+		//$oMainTab->addAfter($oPasswordSecond, $oPasswordFirst);
+		$oMainRow3
+			->add($oPasswordFirst)
+			->add($oPasswordSecond);
 		
-		$oMainTab->moveAfter($this->getField('active'), $oPasswordSecond);
+		$oMainTab->delete($this->getField('settings'));
+
+		//$oMainTab->moveAfter($this->getField('active'), $oPasswordSecond);
+		$oMainTab
+			->move($this->getField('active'), $oMainRow4)
+			->move($this->getField('superuser'), $oMainRow5)
+			->move($this->getField('only_access_my_own'), $oMainRow6)
+			->move($this->getField('read_only'), $oMainRow7);
+
 
 		$oPersonalDataTab = Admin_Form_Entity::factory('Tab')
 			->caption(Core::_('User.users_type_form_tab_2'))
@@ -95,13 +114,24 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->addTabAfter($oPersonalDataTab, $oMainTab);
 
-		$oMainTab->move($this->getField('surname'), $oPersonalDataTab)
-			->move($this->getField('name'), $oPersonalDataTab)
-			->move($this->getField('patronymic'), $oPersonalDataTab)
-			->move($this->getField('position'), $oPersonalDataTab)
-			->move($this->getField('email'), $oPersonalDataTab)
-			->move($this->getField('icq'), $oPersonalDataTab)
-			->move($this->getField('site'), $oPersonalDataTab);
+		$oPersonalDataTab
+			->add($oPersonalDataRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oPersonalDataRow7 = Admin_Form_Entity::factory('Div')->class('row'));
+		
+		$oMainTab
+			->move($this->getField('surname'), $oPersonalDataRow1)
+			->move($this->getField('name'), $oPersonalDataRow2)
+			->move($this->getField('patronymic'), $oPersonalDataRow3)
+			->move($this->getField('position'), $oPersonalDataRow4)
+			->move($this->getField('email'), $oPersonalDataRow5)
+			->move($this->getField('icq'), $oPersonalDataRow6)
+			->move($this->getField('site'), $oPersonalDataRow7);
+		
 
 		$title = $this->_object->id
 			? Core::_('User.ua_edit_user_form_title')
@@ -178,7 +208,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	public function execute($operation = NULL)
 	{
-		if (!is_null($operation))
+		if (!is_null($operation) && $operation != '')
 		{
 			$login = Core_Array::getRequest('login');
 			$id = Core_Array::getRequest('id');

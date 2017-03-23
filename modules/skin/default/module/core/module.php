@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Module_Core_Module extends Core_Module
 {
@@ -229,7 +229,7 @@ class Skin_Default_Module_Core_Module extends Core_Module
 							->class('characteristics ' . (!$maxExecutionTime || $maxExecutionTime >= 30 ? 'characteristicOk' : 'characteristicFail'))
 							->add(
 								Core::factory('Core_Html_Entity_Span')
-									->value(Core::_('Admin.index_tech_date_max_time', $maxExecutionTime))
+									->value(Core::_('Admin.index_tech_date_max_time') . ' ' . $maxExecutionTime)
 							)
 					)->add(
 						Core::factory('Core_Html_Entity_Div')

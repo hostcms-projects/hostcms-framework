@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Image_Gd extends Core_Image
 {
@@ -210,7 +210,7 @@ class Core_Image_Gd extends Core_Image
 			}
 			elseif ($iImagetype == IMAGETYPE_GIF)
 			{
-				$sourceResource = imagecreatefromgif($sourceFile);
+				$sourceResource = imagecreatefromgif ($sourceFile);
 
 				if ($sourceResource)
 				{
@@ -221,14 +221,14 @@ class Core_Image_Gd extends Core_Image
 
 					if ($preserveAspectRatio)
 					{
-						imagegif($targetResourceStep1, $targetFile);
+						imagegif ($targetResourceStep1, $targetFile);
 					}
 					else
 					{
 						//imagecopy($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2);
 						imagecopyresampled($targetResourceStep2, $targetResourceStep1, 0, 0, $src_x, $src_y, $destX_step2, $destY_step2, $destX_step2, $destY_step2);
 
-						imagegif($targetResourceStep2, $targetFile);
+						imagegif ($targetResourceStep2, $targetFile);
 						imagedestroy($targetResourceStep2);
 					}
 					@chmod($targetFile, CHMOD_FILE);
@@ -324,7 +324,7 @@ class Core_Image_Gd extends Core_Image
 			}
 			elseif ($ext == 'gif')
 			{
-				$sourceResource = imagecreatefromgif($source);
+				$sourceResource = imagecreatefromgif ($source);
 
 				if ($sourceResource)
 				{
@@ -338,7 +338,7 @@ class Core_Image_Gd extends Core_Image
 					imagecopyresampled($new_image, $sourceResource, 0, 0, 0, 0, $width, $height, $width, $height);
 
 					$new_image = self::_addWatermark($new_image, $watermarkResource, $watermarkX, $watermarkY);
-					$return = imagegif($new_image, $target);
+					$return = imagegif ($new_image, $target);
 					@chmod($target, CHMOD_FILE);
 
 					imagedestroy($new_image);

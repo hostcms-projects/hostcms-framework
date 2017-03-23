@@ -223,7 +223,7 @@ class Structure_Controller_Show extends Core_Controller
 				return $this;
 			}
 
-			$this->_aTags = array();
+			$this->_aTags = array('structure_' . intval($this->parentId));
 		}
 
 		$this->addEntity(
@@ -358,16 +358,19 @@ class Structure_Controller_Show extends Core_Controller
 			}
 		}
 
-		// Informationsystem
-		if (($this->showInformationsystemGroups || $this->showInformationsystemItems) && isset($this->_Informationsystems[$parent_id]))
+		if (is_null($this->level) || $level < $this->level)
 		{
-			$this->_addInformationsystemGroups($parentObject, $this->_Informationsystems[$parent_id]);
-		}
+			// Informationsystem
+			if (($this->showInformationsystemGroups || $this->showInformationsystemItems) && isset($this->_Informationsystems[$parent_id]))
+			{
+				$this->_addInformationsystemGroups($parentObject, $this->_Informationsystems[$parent_id], $level + 1);
+			}
 
-		// Shop
-		if (($this->showShopGroups || $this->showShopItems) && isset($this->_Shops[$parent_id]))
-		{
-			$this->_addShopGroups($parentObject, $this->_Shops[$parent_id]);
+			// Shop
+			if (($this->showShopGroups || $this->showShopItems) && isset($this->_Shops[$parent_id]))
+			{
+				$this->_addShopGroups($parentObject, $this->_Shops[$parent_id], $level + 1);
+			}
 		}
 
 		return $this;
@@ -417,7 +420,7 @@ class Structure_Controller_Show extends Core_Controller
 	 * @hostcms-event Structure_Controller_Show.onBeforeFindInformationsystemGroups
 	 * @hostcms-event Structure_Controller_Show.onBeforeFindInformationsystemItems
 	 */
-	protected function _addInformationsystemGroups($parentObject, $oInformationsystem)
+	protected function _addInformationsystemGroups($parentObject, $oInformationsystem, $level = 0)
 	{
 		$this->_aInformationsystem_Groups = array();
 
@@ -538,7 +541,7 @@ class Structure_Controller_Show extends Core_Controller
 	 * @param object $parentObject
 	 * @return self
 	 */
-	protected function _addInformationsystemGroupsByParentId($parent_id, $parentObject)
+	protected function _addInformationsystemGroupsByParentId($parent_id, $parentObject, $level = 0)
 	{
 		if (isset($this->_aInformationsystem_Groups[$parent_id]))
 		{
@@ -565,7 +568,10 @@ class Structure_Controller_Show extends Core_Controller
 
 				$parentObject->addEntity($oInformationsystem_Group);
 
-				$this->_addInformationsystemGroupsByParentId($oInformationsystem_Group->id, $oInformationsystem_Group);
+				if (is_null($this->level) || $level < $this->level)
+				{
+					$this->_addInformationsystemGroupsByParentId($oInformationsystem_Group->id, $oInformationsystem_Group, $level + 1);
+				}
 			}
 		}
 
@@ -622,7 +628,7 @@ class Structure_Controller_Show extends Core_Controller
 	 * @hostcms-event Structure_Controller_Show.onBeforeFindShopGroups
 	 * @hostcms-event Structure_Controller_Show.onBeforeFindShopItems
 	 */
-	protected function _addShopGroups($parentObject, $oShop)
+	protected function _addShopGroups($parentObject, $oShop, $level = 0)
 	{
 		$dateTime = Core_Date::timestamp2sql(time());
 
@@ -742,7 +748,7 @@ class Structure_Controller_Show extends Core_Controller
 	 * @param object $parentObject
 	 * @return self
 	 */
-	protected function _addShopGroupsByParentId($parent_id, $parentObject)
+	protected function _addShopGroupsByParentId($parent_id, $parentObject, $level = 0)
 	{
 		if (isset($this->_aShop_Groups[$parent_id]))
 		{
@@ -769,7 +775,10 @@ class Structure_Controller_Show extends Core_Controller
 
 				$parentObject->addEntity($oShop_Group);
 
-				$this->_addShopGroupsByParentId($oShop_Group->id, $oShop_Group);
+				if (is_null($this->level) || $level < $this->level)
+				{
+					$this->_addShopGroupsByParentId($oShop_Group->id, $oShop_Group, $level + 1);
+				}
 			}
 		}
 

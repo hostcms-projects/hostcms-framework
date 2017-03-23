@@ -8,13 +8,13 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\1PS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Oneps_Module extends Core_Module{	/**
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.1';
+	public $version = '6.5';
 
 	/**
 	 * Module date
@@ -22,7 +22,14 @@ class Oneps_Module extends Core_Module{	/**
 	 */
 	public $date = '2014-08-22';
 	/**
+	 * Module name
+	 * @var string
+	 */
+	protected $_moduleName = 'oneps';
+	
+	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 260,				'block' => 1,				'name' => Core::_('oneps.menu'),				'href' => "/admin/oneps/index.php",				'onclick' => "$.adminLoad({path: '/admin/oneps/index.php'}); return false"			)		);	}}
+		$this->menu = array(			array(				'sorting' => 260,				'block' => 1,
+				'ico' => 'fa fa-bell-o',				'name' => Core::_('oneps.menu'),				'href' => "/admin/oneps/index.php",				'onclick' => "$.adminLoad({path: '/admin/oneps/index.php'}); return false"			)		);	}}

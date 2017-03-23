@@ -425,7 +425,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					continue;
 				}
 
-				switch($this->csv_fields[$iKey])
+				switch ($this->csv_fields[$iKey])
 				{
 					//=================ЗАКАЗЫ=================//
 					case 'order_guid':
@@ -751,7 +751,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									->limit(1);
 								$oTmpObject = $oTmpObject->findAll(FALSE);
 
-								if (count($oTmpObject) > 0)
+								if (count($oTmpObject))
 								{
 									$this->_oCurrentGroup = $oTmpObject[0];
 								}
@@ -803,8 +803,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								->where('shop_id', '=', intval($this->_oCurrentShop->id))
 								->where('path', '=', $sData)
 							;
+
 							$oTmpObject = $oTmpObject->findAll(FALSE);
-							if (count($oTmpObject) >= 1)
+
+							if (count($oTmpObject))
 							{
 								// Группа найдена, делаем текущей
 								$this->_oCurrentGroup = $oTmpObject[0];
@@ -1109,10 +1111,19 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					case 'shop_groups_cml_id':
 						if ($sData != '')
 						{
-							$oTmpObject = $this->_oCurrentShop->Shop_Groups;
-							$oTmpObject->queryBuilder()
-								->where('guid', '=', $sData);
-							$oTmpObject = $oTmpObject->findAll(FALSE);
+							if ($sData == 'ID00000000')
+							{
+								$oTmpObject = array(Core_Entity::factory("Shop_Group", 0));
+							}
+							else
+							{
+								$oTmpObject = $this->_oCurrentShop->Shop_Groups;
+								$oTmpObject->queryBuilder()
+									->where('guid', '=', $sData)
+									->limit(1);
+
+								$oTmpObject = $oTmpObject->findAll(FALSE);
+							}
 
 							if (count($oTmpObject) > 0)
 							{
@@ -1141,7 +1152,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 							if (!is_null($oTmpObject))
 							{
-								if($oTmpObject->id != $this->_oCurrentGroup->id)
+								if ($oTmpObject->id != $this->_oCurrentGroup->id)
 								{
 									$this->_oCurrentGroup->parent_id = $oTmpObject->id;
 									$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
@@ -1299,15 +1310,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							Core_Event::notify('ImportShopItems.onBeforeFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
 
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()->where('marking', '=', $sData);
-							$oTmpObject = $oTmpObject->findAll(FALSE);
+							$oTmpObject->queryBuilder()
+								->where('marking', 'LIKE', trim($sData))
+								->limit(1);
+
+							$aTmpObject = $oTmpObject->findAll(FALSE);
 
 							$this->_oCurrentItem->marking = $sData;
-
-							if (count($oTmpObject) > 0)
-							{
-								$this->_oCurrentItem = $oTmpObject[0];
-							}
+							count($aTmpObject) && $this->_oCurrentItem = $aTmpObject[0];
 
 							Core_Event::notify('ImportShopItems.onAfterFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
 						}
@@ -1576,15 +1586,15 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						if ($sData != '')
 						{
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()->where('guid', '=', $sData);
+							$oTmpObject->queryBuilder()
+								->where('guid', '=', $sData)
+								->limit(1);
+
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
 							$this->_oCurrentItem->guid = $sData;
 
-							if (count($oTmpObject) > 0)
-							{
-								$this->_oCurrentItem = $oTmpObject[0];
-							}
+							count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
 						}
 					break;
 					default:
@@ -1639,7 +1649,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									? $aPropertyValues[0]
 									: $oProperty->createNewValue($this->_oCurrentGroup->id);
 
-								switch($oProperty->type)
+								switch ($oProperty->type)
 								{
 									// Файл
 									case 2:
@@ -1821,8 +1831,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				$this->_oCurrentShop->add($this->_oCurrentOrder);
 			}
 
-
-			if($this->_oCurrentItem->id && $this->importAction == 2)
+			if ($this->_oCurrentItem->id && $this->importAction == 2)
 			{
 				// если сказано - оставить без изменений, затираем все изменения
 				$this->_oCurrentItem = Core_Entity::factory('Shop_Item')->find($this->_oCurrentItem->id);
@@ -1857,13 +1866,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			{*/
 				if (Core::moduleIsActive('tag'))
 				{
-					$oTag = Core_Entity::factory('Tag');
-
 					// Вставка тэгов автоматически разрешена
 					if ($this->_sCurrentTags == '' && $this->_oCurrentShop->apply_tags_automatically)
 					{
 						$sTmpString = '';
-
 						$sTmpString .= $this->_oCurrentItem->name ? ' ' . $this->_oCurrentItem->name : '';
 						$sTmpString .= $this->_oCurrentItem->description ? ' ' . $this->_oCurrentItem->description : '';
 						$sTmpString .= $this->_oCurrentItem->text ? ' ' . $this->_oCurrentItem->text : '';
@@ -1874,18 +1880,16 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						$aText = array_unique($aText);
 
 						// Получаем список меток
-						$aTags = $oTag->findAll(FALSE);
+						$aTags = $this->_getTags();
 
-						// Есть хотя бы одна метка
-						if (count($aTags) > 0)
+						if (count($aTags))
 						{
 							// Удаляем уже существующие связи с метками
 							$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
 
-							foreach($aTags as $oTag)
+							foreach($aTags as $iTagId => $sTagName)
 							{
-								$aTmpTags =  Core_Str::getHashes($oTag->name, array ('hash_function' => 'crc32'));
-
+								$aTmpTags = Core_Str::getHashes($sTagName, array ('hash_function' => 'crc32'));
 								$aTmpTags = array_unique($aTmpTags);
 
 								if (count($aText) >= count($aTmpTags))
@@ -1893,26 +1897,23 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									// Расчитываем пересечение
 									$iIntersect = count(array_intersect($aText, $aTmpTags));
 
-									if (count($aTmpTags) != 0)
-									{
-										$iCoefficient = $iIntersect / count($aTmpTags);
-									}
-									else
-									{
-										$iCoefficient = 0;
-									}
+									$iCoefficient = count($aTmpTags) != 0
+										? $iIntersect / count($aTmpTags)
+										: 0;
 
 									// Найдено полное вхождение
 									if ($iCoefficient == 1)
 									{
 										// Если тэг еще не учтен
-										if (!in_array($oTag->name, $aTmpTags))
+										if (!in_array($sTagName, $aTmpTags))
 										{
 											// Добавляем в массив
-											$aTagsName[] = $oTag->name;
+											$aTagsName[] = $sTagName;
 
 											// Add relation
-											$this->_oCurrentItem->add($oTag);
+											$this->_oCurrentItem->add(
+												Core_Entity::factory('Tag', $iTagId)
+											);
 										}
 									}
 								}
@@ -1932,16 +1933,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				$this->_oCurrentItem->save();
 			}
 
-
-			if ($this->searchIndexation
-			&& $this->_oCurrentGroup->id)
+			if ($this->searchIndexation && $this->_oCurrentGroup->id)
 			{
 				Search_Controller::indexingSearchPages(array(Core_Entity::factory('Shop_Group', $this->_oCurrentGroup->id)->indexing()));
 			}
 
 			if ($this->_oCurrentItem->id)
-				{
-
+			{
 				if ($this->_sAssociatedItemMark)
 				{
 					$aShopItems = $this->_oCurrentShop->Shop_Items;
@@ -2179,7 +2177,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 					}
 				}
-				elseif($this->deleteImage)
+				elseif ($this->deleteImage)
 				{
 					// Удалить текущее большое изображение
 					if ($this->_oCurrentItem->image_large != '')
@@ -2289,7 +2287,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 					$this->_sSmallImageFile = '';
 				}
-				elseif($this->deleteImage)
+				elseif ($this->deleteImage)
 				{
 					if ($this->_oCurrentItem->image_small != '')
 					{
@@ -2341,7 +2339,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					}
 
 
-					if($oProperty->multiple)
+					if ($oProperty->multiple)
 					{
 						$oProperty_Value = $oProperty->createNewValue($this->_oCurrentItem->id);
 					}
@@ -2352,7 +2350,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							: $oProperty->createNewValue($this->_oCurrentItem->id);
 					}
 
-					switch($oProperty->type)
+					switch ($oProperty->type)
 					{
 						// Файл
 						case 2:
@@ -2492,7 +2490,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								;
 								$oListItem = $oListItem->findAll(FALSE);
 
-								if (count($oListItem) > 0)
+								if (count($oListItem))
 								{
 									$oProperty_Value->setValue($oListItem[0]->id);
 								}
@@ -2700,6 +2698,30 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		fclose($fInputFile);
 
 		return $iCurrentSeekPosition;
+	}
+
+	/**
+	 * Array of cached tags
+	 */
+	protected $_aTags = NULL;
+
+	/**
+	 * Get cached tags of array
+	 * @return array
+	 */
+	protected function _getTags()
+	{
+		if (is_null($this->_aTags))
+		{
+			$aTags = Core_Entity::factory('Tag')->findAll(FALSE);
+
+			foreach ($aTags as $oTag)
+			{
+				$this->_aTags[$oTag->id] = $oTag->name;
+			}
+		}
+
+		return $this->_aTags;
 	}
 
 	/**

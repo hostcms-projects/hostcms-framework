@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 {
@@ -62,7 +62,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 				$this->_exchangeRate[strval($Valute->CharCode)] = floatval((str_replace(',', '.', $Valute->Value))) / floatval(str_replace(',', '.', $Valute->Nominal));
 			}
 
-			if ($oDefaultCurrency->code != 'RUB' && !isset($this->_exchangeRate[$oDefaultCurrency->code]))
+			if ($oDefaultCurrency->code != 'RUR' && !isset($this->_exchangeRate[$oDefaultCurrency->code]))
 			{
 				throw new Exception('Валюта по умолчанию отсутствует во входящем XML');
 			}
@@ -76,11 +76,11 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 					И рубль присутсвует в списке валют
 				ставим рублю его котировку, относительно валюты по умолчанию
 			 */
-			if ($oDefaultCurrency->code != 'RUB')
+			if ($oDefaultCurrency->code != 'RUR')
 			{
 				$fRubRate = 1.0 / $this->_exchangeRate[$oDefaultCurrency->code];
 
-				!is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUB'))
+				!is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUR'))
 					&& $oRubCurrency
 						->exchange_rate($fRubRate)
 						->save();
@@ -96,7 +96,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 					continue;
 				}
 
-				if($oDefaultCurrency->code == 'RUB')
+				if ($oDefaultCurrency->code == 'RUR')
 				{
 					$oCurrentCurrency->exchange_rate = $rate;
 					$oCurrentCurrency->save();

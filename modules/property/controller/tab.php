@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Tab extends Core_Servant_Properties
 {
@@ -47,6 +47,24 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		parent::__construct();
 
 		$this->template_id = 0;
+	}
+
+	/**
+	 * Create and return an object of Property_Controller_Tab for current skin
+	 * @return object
+	 */
+	static public function factory(Admin_Form_Controller $Admin_Form_Controller)
+	{
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
+		//die($className);
+
+		if (!class_exists($className))
+		{
+			throw new Core_Exception("Class '%className' does not exist",
+				array('%className' => $className));
+		}
+
+		return new $className($Admin_Form_Controller);
 	}
 
 	/**
@@ -110,13 +128,22 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		return $this;
 	}
 
+	protected function _imgBox($oAdmin_Form_Entity, $oProperty, $addFunction = '$.cloneProperty', $deleteOnclick = '$.deleteNewProperty(this)')
+	{
+		$oAdmin_Form_Entity
+			->add($this->_getImgAdd($oProperty, $addFunction))
+			->add($this->_getImgDelete($deleteOnclick));
+
+		return $this;
+	}
+
 	/**
 	 * Show plus button
 	 * @param Property_Model $oProperty property
 	 * @param string $function function name
 	 * @return string
 	 */
-	protected function _getImgAdd($oProperty, $function = '$.cloneProperty')
+	protected function _getImgAdd($oProperty, $addFunction = '$.cloneProperty')
 	{
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
@@ -125,7 +152,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->src('/admin/images/action_add.gif')
 			->id('add')
 			->class('pointer left5px img_line')
-			->onclick("{$function}('{$windowId}', '{$oProperty->id}')")
+			->onclick("{$addFunction}('{$windowId}', '{$oProperty->id}')")
 			->execute();
 		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code')->html(ob_get_clean());
 
@@ -183,7 +210,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->caption($parent_id == 0
 				? Core::_('Property_Dir.main_section')
 				: Core_Entity::factory('Property_Dir', $parent_id)->name
-			);
+			)
+			->id('accordion_' . $parent_id);
 
 		foreach ($aProperties as $oProperty)
 		{
@@ -216,8 +244,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						case 10: // Hidden field
 						case 11: // Float
 						default:
-							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input')
-								->style('width: 340px');
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input');
 						break;
 
 						case 2: // File
@@ -277,16 +304,14 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								}
 
 								$oAdmin_Form_Entity = Admin_Form_Entity::factory('Select')
-									->options($aOptions)
-									->style('width: 340px');
+									->options($aOptions);
 
 								unset($aOptions);
 							}
 						break;
 
 						case 4: // Textarea
-							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Textarea')
-								->style('width: 340px');
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Textarea');
 						break;
 
 						case 6: // Wysiwyg
@@ -306,7 +331,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						break;
 
 						case 9: // Datetime
-							$oAdmin_Form_Entity = Core::factory('Admin_Form_Entity_Datetime');
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Datetime');
 						break;
 					}
 
@@ -318,17 +343,28 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								$this->_correctPrintValue($oProperty, $oProperty->default_value)
 							)
 							->divAttr(array(
-								'style' => "width: {$width}px",
-								'id' => "property_{$oProperty->id}"
+								'class' => ($oProperty->type != 2 ? 'form-group' : '') . (
+									($oProperty->type == 7 || $oProperty->type == 8 || $oProperty->type == 9)
+									? ' col-sm-7 col-md-6 col-lg-5'
+									: ' col-sm-12 col-md-12 col-lg-12')
 							));
 
-						$oProperty->multiple && $oAdmin_Form_Entity->add($this->_getImgAdd($oProperty));
+						//$oProperty->multiple && $oAdmin_Form_Entity->add($this->_getImgAdd($oProperty));
 
 						// Значений св-в нет для объекта
 						if (count($aProperty_Values) == 0)
 						{
-							$oProperty->multiple && $oAdmin_Form_Entity->add($this->_getImgDelete());
-							$oAdmin_Form_Entity_Section->add($oAdmin_Form_Entity);
+							$oAdmin_Form_Entity_Section->add(
+								Admin_Form_Entity::factory('Div')
+									->class('row')
+									->id("property_{$oProperty->id}")
+									/*->divAttr(array(
+										'id' => "property_{$oProperty->id}",
+									))*/
+									->add($oAdmin_Form_Entity)
+							);
+
+							$oProperty->multiple && $this->_imgBox($oAdmin_Form_Entity, $oProperty);
 
 							Core_Event::notify(get_class($this) . '.onBeforeAddFormEntity', $this, array($oAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
 						}
@@ -397,47 +433,47 @@ class Property_Controller_Tab extends Core_Servant_Properties
 									break;
 								}
 
-								$oProperty->multiple && $oNewAdmin_Form_Entity->add($this->_getImgDelete($this->_getImgDeletePath()));
-
 								$oNewAdmin_Form_Entity
 									->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 									->id("property_{$oProperty->id}_{$oProperty_Value->id}");
 
 								Core_Event::notify(get_class($this) . '.onBeforeAddFormEntity', $this, array($oNewAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
 
-								$oAdmin_Form_Entity_Section->add($oNewAdmin_Form_Entity);
+								$oAdmin_Form_Entity_Section->add(
+									Admin_Form_Entity::factory('Div')
+										->class('row')
+										->id("property_{$oProperty->id}")
+										/*->divAttr(array(
+											'id' => "property_{$oProperty->id}",
+										))*/
+										->add($oNewAdmin_Form_Entity)
+								);
+
+								// Визуальный редактор клонировать запрещено
+								$oProperty->multiple && $oProperty->type != 6 && $this->_imgBox($oNewAdmin_Form_Entity, $oProperty, '$.cloneProperty', $this->_getImgDeletePath());
 							}
 						}
 					}
 				break;
 
 				case 5: // ИС
-
 					// Директории
 					$oAdmin_Form_Entity_InfGroups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
-						->style('width: 340px')
 						->divAttr(array(
-							'style' => 'width: 410px',
-							'id' => "property_{$oProperty->id}"
+							'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'
 						));
 
 					// Элементы
 					$oAdmin_Form_Entity_InfItems = Admin_Form_Entity::factory('Select')
-						->style('width: 340px')
 						->name("property_{$oProperty->id}[]")
-						->value($oProperty->default_value)
-						->divAttr(array('class' => ''));
-
-					$oProperty->multiple && $oAdmin_Form_Entity_InfItems->add($this->_getImgAdd($oProperty, '$.clonePropertyInfSys'));
+						->value(NULL)
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
 					{
-						$oProperty->multiple && $oAdmin_Form_Entity_InfItems->add($this->_getImgDelete());
-
-						$this->_fillInformationSystem($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems);
-						$oAdmin_Form_Entity_Section->add($oAdmin_Form_Entity_InfGroups);
+						$this->_fillInformationSystem($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems);
 					}
 					else
 					{
@@ -452,11 +488,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								->id("property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
 								->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 								->value($value);
-							$oProperty->multiple && $oNewAdmin_Form_Entity_InfItems->add($this->_getImgDelete($this->_getImgDeletePath()));
 
-							$this->_fillInformationSystem($value, $oProperty, $oNewAdmin_Form_Entity_InfGroups, $oNewAdmin_Form_Entity_InfItems);
-
-							$oAdmin_Form_Entity_Section->add($oNewAdmin_Form_Entity_InfGroups);
+							$this->_fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_InfGroups, $oNewAdmin_Form_Entity_InfItems);
 						}
 					}
 
@@ -467,28 +500,20 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					// Директории
 					$oAdmin_Form_Entity_Shop_Groups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
-						->style('width: 340px')
 						->divAttr(array(
-							'style' => 'width: 410px',
-							'id' => "property_{$oProperty->id}"
+						'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'
 						));
 
 					// Элементы
 					$oAdmin_Form_Entity_Shop_Items = Admin_Form_Entity::factory('Select')
-						->style('width: 340px')
 						->name("property_{$oProperty->id}[]")
-						->value($oProperty->default_value)
-						->divAttr(array('class' => ''));
-
-					$oProperty->multiple && $oAdmin_Form_Entity_Shop_Items->add($this->_getImgAdd($oProperty, '$.clonePropertyInfSys'));
+						->value(NULL)
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
 					{
-						$oProperty->multiple && $oAdmin_Form_Entity_Shop_Items->add($this->_getImgDelete());
-
-						$this->_fillShop($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items);
-						$oAdmin_Form_Entity_Section->add($oAdmin_Form_Entity_Shop_Groups);
+						$this->_fillShop($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items);
 					}
 					else
 					{
@@ -503,14 +528,10 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								->id("property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
 								->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 								->value($value);
-							$oProperty->multiple && $oNewAdmin_Form_Entity_InfItems->add($this->_getImgDelete($this->_getImgDeletePath()));
 
-							$this->_fillShop($value, $oProperty, $oNewAdmin_Form_Entity_Shop_Groups, $oNewAdmin_Form_Entity_InfItems);
-
-							$oAdmin_Form_Entity_Section->add($oNewAdmin_Form_Entity_Shop_Groups);
+							$this->_fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_Shop_Groups, $oNewAdmin_Form_Entity_InfItems);
 						}
 					}
-
 				break;
 
 				default:
@@ -544,11 +565,14 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfGroups
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfItems
 	 */
-	protected function _fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems)
+	protected function _fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems)
 	{
 		$Informationsystem_Item = Core_Entity::factory('Informationsystem_Item', $value);
 
-		$gropup_id = $value == 0
+		$bIsNullValue = is_null($value);
+		$bIsNullValue && $value = $oProperty->default_value;
+
+		$group_id = $value == 0
 			? 0
 			: intval($Informationsystem_Item->informationsystem_group_id);
 
@@ -595,7 +619,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		}
 
 		// Items
-		$aInformationsystem_Items = $oInformationsystem_Items->getAllByinformationsystem_group_id($gropup_id);
+		$aInformationsystem_Items = $oInformationsystem_Items->getAllByinformationsystem_group_id($group_id);
 
 		$aOptions = array(' … ');
 		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
@@ -614,7 +638,29 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->onchange("$.ajaxRequest({path: '/admin/informationsystem/item/index.php', context: '{$oAdmin_Form_Entity_InfItems->id}', callBack: $.loadSelectOptionsCallback, action: 'loadInformationItemList',additionalParams: 'informationsystem_group_id=' + this.value + '&informationsystem_id={$oProperty->informationsystem_id}',windowId: '{$windowId}'}); return false")
 			;
 
-		$oAdmin_Form_Entity_InfGroups->add($oAdmin_Form_Entity_InfItems);
+		//$oAdmin_Form_Entity_InfGroups->add($oAdmin_Form_Entity_InfItems);
+
+		$oDiv_Group = Admin_Form_Entity::factory('Div')
+			->class('input-group')
+			->add($oAdmin_Form_Entity_InfGroups)
+			->add($oAdmin_Form_Entity_InfItems);
+
+		$oProperty->multiple && $this->_imgBox(
+			$oDiv_Group,
+			$oProperty,
+			'$.clonePropertyInfSys',
+			!$bIsNullValue
+				? $this->_getImgDeletePath()
+				: $this->_getImgDelete()
+		);
+
+		$oAdmin_Form_Entity_Section
+			->add(
+				Admin_Form_Entity::factory('Div')
+					->id("property_{$oProperty->id}")
+					->class('row')
+					->add($oDiv_Group)
+			);
 	}
 
 	/**
@@ -624,11 +670,14 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Groups
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Items
 	 */
-	protected function _fillShop($value, $oProperty, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items)
+	protected function _fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items)
 	{
 		$Shop_Item = Core_Entity::factory('Shop_Item', $value);
 
-		$gropup_id = $value == 0
+		$bIsNullValue = is_null($value);
+		$bIsNullValue && $value = $oProperty->default_value;
+
+		$group_id = $value == 0
 			? 0
 			: intval($Shop_Item->shop_group_id);
 
@@ -649,7 +698,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 		$oShop_Items
 			->queryBuilder()
-			->clearOrderBy();
+			->clearOrderBy()
+			->where('shop_items.modification_id', '=', 0);
 
 		// Определяем поле сортировки информационных элементов
 		switch ($oShop->items_sorting_field)
@@ -675,7 +725,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		}
 
 		// Items
-		$aShop_Items = $oShop_Items->getAllByshop_group_id($gropup_id);
+		$aShop_Items = $oShop_Items->getAllByShop_group_id($group_id);
 
 		$aOptions = array(' … ');
 		foreach ($aShop_Items as $oShop_Item)
@@ -694,7 +744,29 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->onchange("$.ajaxRequest({path: '/admin/shop/item/index.php', context: '{$oAdmin_Form_Entity_Shop_Items->id}', callBack: $.loadSelectOptionsCallback, action: 'loadShopItemList',additionalParams: 'shop_group_id=' + this.value + '&shop_id={$oProperty->shop_id}',windowId: '{$windowId}'}); return false")
 			;
 
-		$oAdmin_Form_Entity_Shop_Groups->add($oAdmin_Form_Entity_Shop_Items);
+		//$oAdmin_Form_Entity_Shop_Groups->add($oAdmin_Form_Entity_Shop_Items);
+
+		$oDiv_Group = Admin_Form_Entity::factory('Div')
+			->class('input-group')
+			->add($oAdmin_Form_Entity_Shop_Groups)
+			->add($oAdmin_Form_Entity_Shop_Items);
+
+		$oProperty->multiple && $this->_imgBox(
+			$oDiv_Group,
+			$oProperty,
+			'$.clonePropertyInfSys',
+			!$bIsNullValue
+				? $this->_getImgDeletePath()
+				: $this->_getImgDelete()
+		);
+
+		$oAdmin_Form_Entity_Section
+			->add(
+				Admin_Form_Entity::factory('Div')
+					->class('row')
+					->id("property_{$oProperty->id}")
+					->add($oDiv_Group)
+			);
 	}
 
 	/**
@@ -946,7 +1018,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			// и передан файл
 			&& intval($aFileData['size']) > 0;
 
-		if($bLargeImageIsCorrect)
+		if ($bLargeImageIsCorrect)
 		{
 			// Проверка на допустимый тип файла
 			if (Core_File::isValidExtension($aFileData['name'], $aCore_Config['availableExtension']))

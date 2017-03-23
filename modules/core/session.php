@@ -189,7 +189,7 @@ class Core_Session
 	protected function _error($content)
 	{
 		Core_Array::getRequest('_', FALSE)
-			? Core::showJson(array('error' => Core_Message::get($content), 'form_html' => NULL))
+			? Core::showJson(array('error' => Core_Message::get($content, 'error'), 'form_html' => NULL))
 			: exit($content);
 	}
 
