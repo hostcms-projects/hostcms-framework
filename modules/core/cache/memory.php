@@ -76,7 +76,7 @@ class Core_Cache_Memory extends Core_Cache
 	 * @hostcms-event Core_Cache.onBeforeSet
 	 * @hostcms-event Core_Cache.onAfterSet
 	 */
-	public function set($key, $value, $cacheName = 'default')
+	public function set($key, $value, $cacheName = 'default', array $tags = array())
 	{
 		Core_Event::notify('Core_Cache.onBeforeSet', $this, array($key, $value, $cacheName));
 

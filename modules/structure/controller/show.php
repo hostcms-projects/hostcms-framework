@@ -42,7 +42,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Show extends Core_Controller
 {
@@ -98,7 +98,12 @@ class Structure_Controller_Show extends Core_Controller
 	 * @var string
 	 */
 	protected $_cacheName = 'structure_show';
-	
+
+	/**
+	 * Tags for cache
+	 */
+	protected $_aTags = array();
+
 	/**
 	 * Constructor.
 	 * @param Site_Model $oSite site
@@ -109,22 +114,7 @@ class Structure_Controller_Show extends Core_Controller
 
 		$this->_Structure = $oSite->Structures;
 
-		$this->_aSiteuserGroups = array(0, -1);
-		if (Core::moduleIsActive('siteuser'))
-		{
-			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
-
-			if ($oSiteuser)
-			{
-				$this->addCacheSignature('siteuser_id=' . $oSiteuser->id);
-
-				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
-				foreach ($aSiteuser_Groups as $oSiteuser_Group)
-				{
-					$this->_aSiteuserGroups[] = $oSiteuser_Group->id;
-				}
-			}
-		}
+		$this->_aSiteuserGroups = $this->_getSiteuserGroups();
 
 		$this->_Structure
 			->queryBuilder()
@@ -140,6 +130,32 @@ class Structure_Controller_Show extends Core_Controller
 		$this->showPanel = $this->cache = TRUE;
 
 		$this->currentStructureId = Core_Page::instance()->structure->id;
+	}
+
+	/**
+	 * Get array of siteuser groups for current siteuser. Exists group 0 (all) and -1 (parent)
+	 * @return array
+	 */
+	protected function _getSiteuserGroups()
+	{
+		$aSiteuserGroups = array(0, -1);
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
+
+			if ($oSiteuser)
+			{
+				$this->addCacheSignature('siteuser_id=' . $oSiteuser->id);
+
+				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
+				foreach ($aSiteuser_Groups as $oSiteuser_Group)
+				{
+					$aSiteuserGroups[] = $oSiteuser_Group->id;
+				}
+			}
+		}
+
+		return $aSiteuserGroups;
 	}
 
 	/**
@@ -183,7 +199,7 @@ class Structure_Controller_Show extends Core_Controller
 
 		return FALSE;
 	}
-	
+
 	/**
 	 * Show built data
 	 * @return self
@@ -195,7 +211,8 @@ class Structure_Controller_Show extends Core_Controller
 
 		$this->showPanel && Core::checkPanel() && $this->_showPanel();
 
-		if ($this->cache && Core::moduleIsActive('cache'))
+		$bCache = $this->cache && Core::moduleIsActive('cache');
+		if ($bCache)
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
 			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
@@ -205,6 +222,8 @@ class Structure_Controller_Show extends Core_Controller
 				echo $inCache;
 				return $this;
 			}
+
+			$this->_aTags = array();
 		}
 
 		$this->addEntity(
@@ -256,30 +275,56 @@ class Structure_Controller_Show extends Core_Controller
 
 		if ($this->showInformationsystemGroups || $this->showInformationsystemItems)
 		{
-			$aInformationsystems = $oSite->Informationsystems->findAll();
-			foreach ($aInformationsystems as $oInformationsystem)
-			{
-				$oInformationsystem->structure_id && $this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
-			}
+			$this->_selectInformationsystems();
 		}
 
 		if ($this->showShopGroups || $this->showShopItems)
 		{
-			$aShops = $oSite->Shops->findAll();
-			foreach ($aShops as $oShop)
-			{
-				$oShop->structure_id && $this->_Shops[$oShop->structure_id] = $oShop;
-			}
+			$this->_selectShops();
 		}
 
 		$this->_addStructuresByParentId($this->parentId, $this);
 
+		echo $content = parent::get();
+		$bCache && $oCore_Cache->set($cacheKey, $content, $this->_cacheName, $this->_aTags);
+
 		// Clear
-		$this->_aStructures = $this->_aProperty_Dirs = $this->_aProperties
+		$this->_aTags = $this->_aStructures = $this->_aProperty_Dirs = $this->_aProperties
 			= $this->_Informationsystems = $this->_Shops = array();
 
-		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set($cacheKey, $content, $this->_cacheName);
+		return $this;
+	}
+
+	/**
+	 * Select informationsystems
+	 * @return self
+	 */
+	protected function _selectInformationsystems()
+	{
+		$oSite = $this->getEntity();
+
+		$aInformationsystems = $oSite->Informationsystems->findAll();
+		foreach ($aInformationsystems as $oInformationsystem)
+		{
+			$oInformationsystem->structure_id && $this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Select shops
+	 * @return self
+	 */
+	protected function _selectShops()
+	{
+		$oSite = $this->getEntity();
+
+		$aShops = $oSite->Shops->findAll();
+		foreach ($aShops as $oShop)
+		{
+			$oShop->structure_id && $this->_Shops[$oShop->structure_id] = $oShop;
+		}
 
 		return $this;
 	}
@@ -300,6 +345,8 @@ class Structure_Controller_Show extends Core_Controller
 				$this->applyForbiddenTags($oStructure);
 
 				$parentObject->addEntity($oStructure);
+
+				$this->_aTags[] = 'structure_' . $oStructure->id;
 
 				// Properties for structure entity
 				$oStructure->showXmlProperties($this->showProperties);
@@ -508,6 +555,8 @@ class Structure_Controller_Show extends Core_Controller
 							->value($oInformationsystem_Group->active)
 					);
 
+				$this->applyForbiddenTags($oInformationsystem_Group);
+
 				$parentObject->addEntity($oInformationsystem_Group);
 
 				$this->_addInformationsystemGroupsByParentId($oInformationsystem_Group->id, $oInformationsystem_Group);
@@ -538,6 +587,8 @@ class Structure_Controller_Show extends Core_Controller
 					);
 
 				$this->showInformationsystemItemProperties && $oInformationsystem_Item->showXmlProperties($this->showInformationsystemItemProperties);
+
+				$this->applyForbiddenTags($oInformationsystem_Item);
 
 				$parentObject->addEntity($oInformationsystem_Item);
 			}
@@ -704,6 +755,8 @@ class Structure_Controller_Show extends Core_Controller
 							->value($oShop_Group->active)
 					);
 
+				$this->applyForbiddenTags($oShop_Group);
+
 				$parentObject->addEntity($oShop_Group);
 
 				$this->_addShopGroupsByParentId($oShop_Group->id, $oShop_Group);
@@ -735,6 +788,8 @@ class Structure_Controller_Show extends Core_Controller
 					);
 
 				$this->showShopItemProperties && $oShop_Item->showXmlProperties($this->showShopItemProperties);
+
+				$this->applyForbiddenTags($oShop_Item);
 
 				$parentObject->addEntity($oShop_Item);
 			}

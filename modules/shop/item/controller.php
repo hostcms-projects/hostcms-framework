@@ -75,6 +75,8 @@ class Shop_Item_Controller extends Core_Servant_Properties
 			'tax' => 0,
 			'rate' => 0,
 			'price' => $price,
+			'price_discount' => $price,
+			'price_tax' => $price,
 			'discount' => 0,
 			'discounts' => array()
 		);
@@ -91,74 +93,77 @@ class Shop_Item_Controller extends Core_Servant_Properties
 		// Умножаем цену товара на курс валюты в базовой валюте
 		$this->_aPrice['price'] *= $fCurrencyCoefficient;
 
-		// Определены ли скидки на товар
-		$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll();
-		if (count($aShop_Item_Discounts))
+		if ($this->_aPrice['price'])
 		{
-			// Определяем количество скидок на товар
-			$discountPercent = $discountAmount = 0;
-
-			// Цикл по идентификаторам скидок для товара
-			foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
+			// Определены ли скидки на товар
+			$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll();
+			if (count($aShop_Item_Discounts))
 			{
-				$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
-				if ($oShop_Discount->isActive())
-				{
-					$this->_aPrice['discounts'][] = $oShop_Discount;
+				// Определяем количество скидок на товар
+				$discountPercent = $discountAmount = 0;
 
-					$oShop_Discount->type == 0
-						? $discountPercent += $oShop_Discount->value
-						: $discountAmount += $oShop_Discount->value;
+				// Цикл по идентификаторам скидок для товара
+				foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
+				{
+					$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
+					if ($oShop_Discount->isActive())
+					{
+						$this->_aPrice['discounts'][] = $oShop_Discount;
+
+						$oShop_Discount->type == 0
+							? $discountPercent += $oShop_Discount->value
+							: $discountAmount += $oShop_Discount->value;
+					}
 				}
+
+				// Определяем суммарную величину скидки в %
+				$this->_aPrice['discount'] = $this->_aPrice['price'] * $discountPercent / 100;
+
+				// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
+				($this->_aPrice['price'] - $this->_aPrice['discount']) > $discountAmount && $this->_aPrice['discount'] += $discountAmount;
+
+				// Вычисляем цену со скидкой как ее разность с величиной скидки в %
+				$this->_aPrice['price_discount'] = $this->_aPrice['price'] - $this->_aPrice['discount'];
+			}
+			else
+			{
+				// если скидок нет
+				$this->_aPrice['price_discount'] = $this->_aPrice['price'];
 			}
 
-			// Определяем суммарную величину скидки в %
-			$this->_aPrice['discount'] = $this->_aPrice['price'] * $discountPercent / 100;
-
-			// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
-			($this->_aPrice['price'] - $this->_aPrice['discount']) > $discountAmount && $this->_aPrice['discount'] += $discountAmount;
-
-			// Вычисляем цену со скидкой как ее разность с величиной скидки в %
-			$this->_aPrice['price_discount'] = $this->_aPrice['price'] - $this->_aPrice['discount'];
-		}
-		else
-		{
-			// если скидок нет
-			$this->_aPrice['price_discount'] = $this->_aPrice['price'];
-		}
-
-		// Выбираем информацию о налогах
-		if ($oShop_Item->shop_tax_id)
-		{
-			// Извлекаем информацию о налоге
-			$oShop_Tax = $oShop_Item->Shop_Tax;
-
-			if ($oShop_Tax->id)
+			// Выбираем информацию о налогах
+			if ($oShop_Item->shop_tax_id)
 			{
-				$this->_aPrice['rate'] = $oShop_Tax->rate;
+				// Извлекаем информацию о налоге
+				$oShop_Tax = $oShop_Item->Shop_Tax;
 
-				// Если он не входит в цену
-				if ($oShop_Tax->tax_is_included == 0)
+				if ($oShop_Tax->id)
 				{
-					// То считаем цену с налогом
-					$this->_aPrice['tax'] = $oShop_Tax->rate / 100 * $this->_aPrice['price_discount'];
-					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] = $this->_aPrice['price_discount'] + $this->_aPrice['tax'];
+					$this->_aPrice['rate'] = $oShop_Tax->rate;
+
+					// Если он не входит в цену
+					if ($oShop_Tax->tax_is_included == 0)
+					{
+						// То считаем цену с налогом
+						$this->_aPrice['tax'] = $oShop_Tax->rate / 100 * $this->_aPrice['price_discount'];
+						$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'] = $this->_aPrice['price_discount'] + $this->_aPrice['tax'];
+					}
+					else
+					{
+						$this->_aPrice['tax'] = $this->_aPrice['price_discount'] / (100 + $oShop_Tax->rate) * $oShop_Tax->rate;
+						$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
+						$this->_aPrice['price'] -= $this->_aPrice['tax'];
+					}
 				}
 				else
 				{
-					$this->_aPrice['tax'] = $this->_aPrice['price_discount'] / (100 + $oShop_Tax->rate) * $oShop_Tax->rate;
 					$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
-					$this->_aPrice['price'] -= $this->_aPrice['tax'];
 				}
 			}
 			else
 			{
 				$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
 			}
-		}
-		else
-		{
-			$this->_aPrice['price_tax'] = $this->_aPrice['price_discount'];
 		}
 
 		$oShop_Controller = Shop_Controller::instance();

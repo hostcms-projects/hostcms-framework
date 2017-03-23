@@ -168,6 +168,11 @@
 	});
 
 	jQuery.fn.extend({
+		setLanguage: function(){
+			jQuery("#languages img").removeClass('selected');
+			jQuery(this).addClass('selected');
+			jQuery("#language").val(jQuery(this).prop('alt'));
+		},
 		linkShortcut: function(settings)
 		{
 			settings = jQuery.extend({

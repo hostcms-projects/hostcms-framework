@@ -120,4 +120,11 @@ return array(
 	'size_measure_4' => 'футы',
 	'reserve' => '<acronym title="Резервировать заказанные товары">Резервировать заказанные товары</acronym>',
 	'reserve_hours' => '<acronym title="Время резервирования товаров (в часах)">Резервировать (в часах)</acronym>',
+	'sales_statistics' => 'Статистика продаж',
+	'ordered' => 'Заказано',
+	'paid_orders' => 'Оплачено заказов',
+	'orders_amount' => 'Сумма заказов',
+	'paid_orders_amount' => 'Сумма оплат',
+	'undefined_default_currency' => 'Валюта по умолчанию не установлена!',
+	'recent_orders' => 'Последние заказы',
 );

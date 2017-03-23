@@ -567,6 +567,8 @@ class Informationsystem_Group_Model extends Core_Entity
 			Search_Controller::indexingSearchPages(array($this->indexing()));
 		}
 
+		$this->clearCache();
+
 		return $this;
 	}
 
@@ -898,7 +900,7 @@ class Informationsystem_Group_Model extends Core_Entity
 
 		return parent::getXml();
 	}
-	
+
 	/**
 	 * Get IDs of child groups
 	 * @return array
@@ -929,5 +931,21 @@ class Informationsystem_Group_Model extends Core_Entity
 		}
 
 		return $aGroupIDs;
+	}
+
+	/**
+	 * Clear tagged cache
+	 * @return self
+	 */
+	public function clearCache()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			Core_Cache::instance(Core::$mainConfig['defaultCache'])
+				->deleteByTag('informationsystem_group_' . $this->id)
+				->deleteByTag('informationsystem_group_' . $this->parent_id);
+		}
+
+		return $this;
 	}
 }

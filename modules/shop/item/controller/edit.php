@@ -1248,6 +1248,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 		}
 
+		$this->_object->clearCache();
+
 		// Обработка картинок
 		$param = array();
 

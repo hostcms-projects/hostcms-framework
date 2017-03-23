@@ -509,6 +509,8 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			));
 		}
 
+		$this->_object->clearCache();
+
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}
 

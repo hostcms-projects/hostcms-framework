@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - group($id) идентификатор информационной группы, если FALSE, то вывод информационных элементов осуществляется из всех групп
  * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
- * - groupsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств групп информационных элементов, по умолчанию TRUE
+ * - groupsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств групп информационных элементов, по умолчанию TRUE
  * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп.
  * - groupsMode('tree') режим показа групп, может принимать следующие значения:
 	none - не показывать группы,
@@ -18,7 +18,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - groupsForbiddenTags(array('description')) массив тегов групп, запрещенных к передаче в генерируемый XML
  * - item(123) идентификатор показываемого информационного элемента
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
- * - itemsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств информационных элементов, по умолчанию TRUE
+ * - itemsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств информационных элементов, по умолчанию TRUE
  * - itemsForbiddenTags(array('description')) массив тегов информационных элементов, запрещенных к передаче в генерируемый XML
  * - comments(TRUE|FALSE) показывать комментарии для выбранных информационных элементов, по умолчанию FALSE
  * - votes(TRUE|FALSE) показывать рейтинг элемента, по умолчанию TRUE
@@ -58,7 +58,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Show extends Core_Controller
 {
@@ -160,32 +160,18 @@ class Informationsystem_Controller_Show extends Core_Controller
 	{
 		parent::__construct($oInformationsystem->clearEntities());
 
-		$siteuser_id = 0;
+		$this->_aSiteuserGroups = $this->_getSiteuserGroups();
 
-		$this->_aSiteuserGroups = array(0, -1);
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
-			if ($oSiteuser)
-			{
-				$siteuser_id = $oSiteuser->id;
-
-				$this->addCacheSignature('siteuser_id=' . $siteuser_id);
-
-				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
-				foreach ($aSiteuser_Groups as $oSiteuser_Group)
-				{
-					$this->_aSiteuserGroups[] = $oSiteuser_Group->id;
-				}
-			}
+			$oSiteuser && $this->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('siteuser_id')
+					->value($oSiteuser->id)
+			);
 		}
-
-		$this->addEntity(
-			Core::factory('Core_Xml_Entity')
-				->name('siteuser_id')
-				->value($siteuser_id)
-		);
 
 		$this->_setInformationsystemItems()->_setInformationsystemGroups();
 
@@ -208,6 +194,32 @@ class Informationsystem_Controller_Show extends Core_Controller
 			'part' => '\d+',
 			'page' => '\d+',
 		);
+	}
+
+	/**
+	 * Get array of siteuser groups for current siteuser. Exists group 0 (all) and -1 (parent)
+	 * @return array
+	 */
+	protected function _getSiteuserGroups()
+	{
+		$aSiteuserGroups = array(0, -1);
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
+
+			if ($oSiteuser)
+			{
+				$this->addCacheSignature('siteuser_id=' . $oSiteuser->id);
+
+				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
+				foreach ($aSiteuser_Groups as $oSiteuser_Group)
+				{
+					$aSiteuserGroups[] = $oSiteuser_Group->id;
+				}
+			}
+		}
+
+		return $aSiteuserGroups;
 	}
 
 	/**
@@ -388,7 +400,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 		$this->item && $this->_incShowed();
 
-		if ($this->cache && Core::moduleIsActive('cache'))
+		$bCache = $this->cache && Core::moduleIsActive('cache');
+		if ($bCache)
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
 			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
@@ -399,6 +412,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 				echo $inCache['content'];
 				return $this;
 			}
+
+			$aTags = array();
+			$aTags[] = 'informationsystem_group_' . intval($this->group);
 		}
 
 		$oInformationsystem = $this->getEntity();
@@ -465,17 +481,20 @@ class Informationsystem_Controller_Show extends Core_Controller
 		}
 
 		// Показывать дополнительные свойства групп
-		if ($this->groupsProperties)
+		if ($this->groupsProperties && $this->groupsPropertiesList)
 		{
 			$oInformationsystem_Group_Property_List = Core_Entity::factory('Informationsystem_Group_Property_List', $oInformationsystem->id);
 
-			$aProperties = $oInformationsystem_Group_Property_List->Properties->findAll();
+			$oProperties = $oInformationsystem_Group_Property_List->Properties;
+			if (is_array($this->groupsPropertiesList) && count($this->groupsPropertiesList))
+			{
+				$oProperties->queryBuilder()
+					->where('properties.id', 'IN', $this->groupsPropertiesList);
+			}
+			$aProperties = $oProperties->findAll();
 			foreach ($aProperties as $oProperty)
 			{
 				$this->_aGroup_Properties[$oProperty->property_dir_id][] = $oProperty;
-
-				// Load all values for property
-				//$oProperty->loadAllValues();
 			}
 
 			$aProperty_Dirs = $oInformationsystem_Group_Property_List->Property_Dirs->findAll();
@@ -485,16 +504,12 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$this->_aGroup_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
 			}
 
-			// Список свойств информационных элементов
-			if ($this->groupsPropertiesList)
-			{
-				$Informationsystem_Group_Properties = Core::factory('Core_Xml_Entity')
-					->name('informationsystem_group_properties');
+			$Informationsystem_Group_Properties = Core::factory('Core_Xml_Entity')
+				->name('informationsystem_group_properties');
 
-				$this->addEntity($Informationsystem_Group_Properties);
+			$this->addEntity($Informationsystem_Group_Properties);
 
-				$this->_addGroupsPropertiesList(0, $Informationsystem_Group_Properties);
-			}
+			$this->_addGroupsPropertiesList(0, $Informationsystem_Group_Properties);
 		}
 
 		is_array($this->groupsProperties) && $this->groupsProperties = array_combine($this->groupsProperties, $this->groupsProperties);
@@ -521,17 +536,20 @@ class Informationsystem_Controller_Show extends Core_Controller
 		}
 
 		// Показывать дополнительные свойства информационного элемента
-		if ($this->itemsProperties)
+		if ($this->itemsProperties && $this->itemsPropertiesList)
 		{
 			$oInformationsystem_Item_Property_List = Core_Entity::factory('Informationsystem_Item_Property_List', $oInformationsystem->id);
 
-			$aProperties = $oInformationsystem_Item_Property_List->Properties->findAll();
+			$oProperties = $oInformationsystem_Item_Property_List->Properties;
+			if (is_array($this->itemsPropertiesList) && count($this->itemsPropertiesList))
+			{
+				$oProperties->queryBuilder()
+					->where('properties.id', 'IN', $this->itemsPropertiesList);
+			}
+			$aProperties = $oProperties->findAll();
 			foreach ($aProperties as $oProperty)
 			{
 				$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
-
-				// Load all values for property
-				//$oProperty->loadAllValues();
 			}
 
 			$aProperty_Dirs = $oInformationsystem_Item_Property_List->Property_Dirs->findAll();
@@ -541,16 +559,12 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir->clearEntities();
 			}
 
-			// Список свойств информационных элементов
-			if ($this->itemsPropertiesList)
-			{
-				$Informationsystem_Item_Properties = Core::factory('Core_Xml_Entity')
-					->name('informationsystem_item_properties');
+			$Informationsystem_Item_Properties = Core::factory('Core_Xml_Entity')
+				->name('informationsystem_item_properties');
 
-				$this->addEntity($Informationsystem_Item_Properties);
+			$this->addEntity($Informationsystem_Item_Properties);
 
-				$this->_addItemsPropertiesList(0, $Informationsystem_Item_Properties);
-			}
+			$this->_addItemsPropertiesList(0, $Informationsystem_Item_Properties);
 		}
 
 		$this->_shownIDs = array();
@@ -560,6 +574,9 @@ class Informationsystem_Controller_Show extends Core_Controller
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 			{
 				$this->_shownIDs[] = $oInformationsystem_Item->id;
+
+				// Tagged cache
+				$bCache && $aTags[] = 'informationsystem_item_' . $oInformationsystem_Item->id;
 
 				// Shortcut
 				$iShortcut = $oInformationsystem_Item->shortcut_id;
@@ -625,10 +642,12 @@ class Informationsystem_Controller_Show extends Core_Controller
 			= $this->_aGroup_Properties = $this->_aGroup_Property_Dirs = array();
 
 		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set(
+
+		$bCache && $oCore_Cache->set(
 			$cacheKey,
 			array('content' => $content, 'shown' => $this->_shownIDs),
-			$this->_cacheName
+			$this->_cacheName,
+			$aTags
 		);
 
 		return $this;

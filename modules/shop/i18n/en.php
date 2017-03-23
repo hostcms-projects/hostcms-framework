@@ -120,4 +120,11 @@ return array(
 	'size_measure_4'=>'ft',
 	'reserve' => '<acronym title="Reserve ordered goods">Reserve ordered goods</acronym>',
 	'reserve_hours' => '<acronym title="Reserve ordered goods (in hours)">Reserve (in hours)</acronym>',
+	'sales_statistics' => 'Sales statistics',
+	'ordered' => 'Ordered',
+	'paid_orders' => 'Paid orders',
+	'orders_amount' => 'The amount of orders',
+	'paid_orders_amount' => 'The amount of paid orders',
+	'undefined_default_currency' => 'The default currency is undefined!',
+	'recent_orders' => 'Recent orders',
 );

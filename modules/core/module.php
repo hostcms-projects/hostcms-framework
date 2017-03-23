@@ -37,6 +37,12 @@ abstract class Core_Module
 	protected $_moduleName = NULL;
 
 	/**
+	 * Module
+	 * @var Core_Entity
+	 */
+	//protected $_module = NULL;
+
+	/**
 	 * Create module instance
 	 * @param string $moduleName module name
 	 * @return mixed
@@ -55,6 +61,16 @@ abstract class Core_Module
 
 		return NULL;
 	}
+
+	/**
+	 * Set module
+	 * @param Core_Entity Module
+	 */
+	/*public function setModule(Core_Entity $Module)
+	{
+		$this->_module = $Module;
+		return $this;
+	}*/
 
 	/**
 	 * Get module name

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Model extends Core_Entity
 {
@@ -1117,19 +1117,24 @@ class Shop_Order_Model extends Core_Entity
 		$oContractor = $oOrderXml->addChild('Контрагенты');
 		$oContractor = $oContractor->addChild('Контрагент');
 
-		$sContractorName = '';
-		$sContractorName .= $this->surname == '' ? $this->surname : $this->surname . ' ';
-		$sContractorName .= $this->name == '' ? $this->name : $this->name . ' ';
-		$sContractorName .= $this->patronymic;
-
-		$sContractorName == '' && $sContractorName = 'Контрагент #' . $this->siteuser_id;
+		if ($this->siteuser_id)
+		{
+			$aTmpArray = array();
+			$this->surname != '' && $aTmpArray[] = $this->surname;
+			$this->name != '' && $aTmpArray[] = $this->name;
+			$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
+			
+			!count($aTmpArray) && $aTmpArray[] = $this->email;
+			
+			$sContractorId = Core::crc32(implode(' ', $aTmpArray));
+		}
+		else
+		{
+			$sContractorId = $this->siteuser_id;
+		}
 
 		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
-		$oContractor->addChild('Ид', $this->siteuser_id
-			? $this->siteuser_id
-			: Core::crc32($sContractorName)
-		);
-
+		$oContractor->addChild('Ид', $sContractorId);
 		$oContractor->addChild('Наименование', $sContractorName);
 		$oContractor->addChild('Роль', 'Покупатель');
 		$oContractor->addChild('ПолноеНаименование', $sContractorName);
@@ -1156,7 +1161,7 @@ class Shop_Order_Model extends Core_Entity
 		$oAddressContacts = $oContractor->addChild('Контакты');
 		$oContact = $oAddressContacts->addChild('Контакт');
 		$oContact->addChild('Тип','Почта');
-		$oContact->addChild('Значение',$this->email);
+		$oContact->addChild('Значение', $this->email);
 		$oContact = $oAddressContacts->addChild('Контакт');
 		$oContact->addChild('Тип','Телефон');
 		$oContact->addChild('Значение',$this->phone);

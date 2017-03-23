@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 
 class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
@@ -352,6 +352,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		$this->_iCurrentShopId = $iCurrentShopId;
 		$this->_iCurrentGroupId = $iCurrentGroupId;
 
+		$this->time = 20;
+		$this->step = 100;
+
 		$this->init();
 
 		// Единожды в конструкторе, чтобы после __wakeup() не обнулялось
@@ -403,13 +406,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 		$timeout = Core::getmicrotime();
 
+		$aCsvLine = array();
+
 		while((Core::getmicrotime() - $timeout + 3 < $this->time)
 			&& $iCounter < $this->step
 			&& ($aCsvLine = $this->getCSVLine($fInputFile)))
 		{
 			if (count($aCsvLine) == 1
-			&& (is_null($aCsvLine[0])
-			|| $aCsvLine[0] == ""))
+			&& (is_null($aCsvLine[0]) || $aCsvLine[0] == ''))
 			{
 				continue;
 			}
@@ -719,11 +723,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							}
 						}
 					break;
-					// Название группы товаров WARNING
+					// Название группы товаров
 					case 'shop_groups_value':
 						if ($sData != '')
 						{
-							if(($sNeedKey = array_search("shop_shop_groups_parent_cml_id", $this->csv_fields)) !== false
+							if(($sNeedKey = array_search("shop_shop_groups_parent_cml_id", $this->csv_fields)) !== FALSE
 							&& ($sCMLID = Core_Array::get($aCsvLine, $sNeedKey, '')) != '')
 							{
 								if ($sCMLID == 'ID00000000')
@@ -815,33 +819,52 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					break;
 					// Порядок сортировки группы товаров
 					case 'shop_groups_order':
-						$this->_oCurrentGroup->sorting = intval($sData);
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->sorting = intval($sData);
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// Описание группы товаров
 					case 'shop_groups_description':
-						$this->_oCurrentGroup->description = $sData;
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						// Иначе будет обнуляться при указании пустого описания в списке товаров группы
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->description = $sData;
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// SEO Title группы товаров
 					case 'shop_groups_seo_title':
-						$this->_oCurrentGroup->seo_title = $sData;
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->seo_title = $sData;
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// SEO Description группы товаров
 					case 'shop_groups_seo_description':
-						$this->_oCurrentGroup->seo_description = $sData;
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->seo_description = $sData;
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// SEO Keywords группы товаров
 					case 'shop_groups_seo_keywords':
-						$this->_oCurrentGroup->seo_keywords = $sData;
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->seo_keywords = $sData;
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// Активность группы товаров
 					case 'shop_groups_activity':
-						$this->_oCurrentGroup->active = intval($sData) >= 1 ? 1 : 0;
-						$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						if ($sData != '')
+						{
+							$this->_oCurrentGroup->active = intval($sData) >= 1 ? 1 : 0;
+							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+						}
 					break;
 					// Картинка группы товаров
 					case 'shop_groups_image':
@@ -1271,7 +1294,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					break;
 					// Передан артикул товара
 					case 'shop_items_catalog_marking':
-
 						if ($sData != '')
 						{
 							Core_Event::notify('ImportShopItems.onBeforeFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
@@ -1808,7 +1830,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				$this->_sSmallImageFile = '';
 				$this->deleteImage = 0;
 			}
-			
+
 			// Обязательно после обработки тегов, т.к. иначе ORM сохранит товар косвенно.
 			$this->_oCurrentItem->shop_id = $this->_oCurrentShop->id;
 
@@ -1829,7 +1851,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				}
 				$this->_incInsertedItems($this->_oCurrentItem->id);
 			}
-			
+
 			$aTagsName = array();
 			/*if(!$this->_oCurrentItem->id)
 			{*/
@@ -1903,13 +1925,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					}
 				}
 			//}
-			
+
 			if ($this->_oCurrentItem->seo_keywords == '' && count($aTagsName) > 0)
 			{
 				$this->_oCurrentItem->seo_keywords = implode(", ", $aTagsName);
 				$this->_oCurrentItem->save();
 			}
-			
+
 
 			if ($this->searchIndexation
 			&& $this->_oCurrentGroup->id)
@@ -2722,7 +2744,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Clear object 
+	 * Clear object
 	 * @return self
 	 */
 	public function clear()

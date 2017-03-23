@@ -897,6 +897,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				// ----
 		}
 
+		$this->_object->clearCache();
+		
 		$param = array();
 
 		$large_image = '';

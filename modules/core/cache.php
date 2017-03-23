@@ -35,7 +35,8 @@ abstract class Core_Cache
 	static public $aCaches = array(
 		'expire' => 86400,
 		'size' => 262144,
-		'active' => TRUE
+		'active' => TRUE,
+		'tags' => TRUE
 	);
 
 	/**
@@ -54,7 +55,7 @@ abstract class Core_Cache
 	{
 		return NULL;
 	}
-	
+
 	/**
 	 * Get data from cache
 	 * @param string $key key name
@@ -71,7 +72,7 @@ abstract class Core_Cache
 	 * @param string $cacheName cache name
 	 * @return Core_Cache_Memory
 	 */
-	abstract public function set($key, $value, $cacheName = 'default');
+	abstract public function set($key, $value, $cacheName = 'default', array $tags = array());
 
 	/**
 	 * Delete key from cache
@@ -120,7 +121,7 @@ abstract class Core_Cache
 
 	/**
 	 * Register an existing instance as a singleton.
-	 * @param string $name 
+	 * @param string $name
 	 * @return object
 	 */
 	static public function instance($name = 'default')
@@ -219,5 +220,92 @@ abstract class Core_Cache
 			$key .= $varKey . '=' . $object->$varValue . ',';
 		}
 		return $key;
+	}
+
+	/**
+	 * Save array of tags into table
+	 * @param string cache cache name
+	 * @param string $actualKey cache key
+	 * @param array $tags array of tags
+	 * @return self
+	 */
+	protected function _saveTags($cacheName, $actualKey, array $tags)
+	{
+		if ($this->_config['caches'][$cacheName]['tags'])
+		{
+			$this->deleteTags($actualKey);
+
+			foreach ($tags as $tag)
+			{
+				$oCache_Tag = Core_Entity::factory('Cache_Tag');
+				$oCache_Tag->tag = Core::crc32($tag);
+				$oCache_Tag->hash = $actualKey;
+				$oCache_Tag->cache = Core::crc32($cacheName);
+				$oCache_Tag->save();
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete Cache_Tags
+	 * @param string $actualKey cache key
+	 * @return self
+	 */
+	public function deleteTags($actualKey)
+	{
+		Core_QueryBuilder::delete('cache_tags')
+			->where('hash', 'LIKE', $actualKey)
+			->execute();
+
+		return $this;
+	}
+
+	/**
+	 * Delete cache items by tag
+	 * @param string $tag
+	 * @return self
+	 */
+	public function deleteByTag($tag)
+	{
+		$aCache_Tags = Core_Entity::factory('Cache_Tag')->getAllByTag(
+			Core::crc32($tag)
+		);
+
+		foreach ($aCache_Tags as $oCache_Tag)
+		{
+			$this->_deleteByTag($oCache_Tag);
+			$oCache_Tag->delete();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete cache items by $oCache_Tag
+	 * @param Cache_Tag_Model $oCache_Tag
+	 * @return self
+	 */
+	protected function _deleteByTag(Cache_Tag_Model $oCache_Tag)
+	{
+		$this->_delete($oCache_Tag->hash);
+
+		return $this;
+	}
+
+	/**
+	 * Clear all tags for $cacheName
+	 * @param string $cacheName cache name
+	 * @return self
+	 */
+	public function clearTags($cacheName)
+	{
+		// Clear tagged cache for
+		Core_QueryBuilder::delete('cache_tags')
+			->where('cache', '=', Core::crc32($cacheName))
+			->execute();
+
+		return $this;
 	}
 }

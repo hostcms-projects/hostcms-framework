@@ -86,7 +86,6 @@ class Core_Session
 
 			if (!defined('DENY_INI_SET') || !DENY_INI_SET)
 			{
-				// Период хранения куки в секундах. Значение 0 означает "пока браузер не будет закрыт"
 				ini_set('session.cookie_lifetime', $expires);
 				//ini_set('session.gc_maxlifetime', $expires);
 			}

@@ -796,6 +796,8 @@ class Shop_Item_Model extends Core_Entity
 			Search_Controller::indexingSearchPages(array($this->indexing()));
 		}
 
+		$this->clearCache();
+
 		return $this;
 	}
 
@@ -1938,5 +1940,27 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Clear tagged cache
+	 * @return self
+	 */
+	public function clearCache()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			// Clear item's cache
+			Core_Cache::instance(Core::$mainConfig['defaultCache'])
+				->deleteByTag('shop_item_' . $this->id);
+
+			// Clear group's cache
+			$this->shop_group_id
+				? $this->Shop_Group->clearCache()
+				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
+					->deleteByTag('shop_group_0');
+		}
+
+		return $this;
 	}
 }

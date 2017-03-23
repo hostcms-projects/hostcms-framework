@@ -146,7 +146,8 @@ class Shop_Controller_Tag_Show extends Core_Controller
 			Core::factory('Core_Xml_Entity')
 				->name('group')
 				->value(intval($this->group)) // FALSE => 0
-		)->addEntity(
+		)
+		->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('limit')
 				->value(intval($this->limit))

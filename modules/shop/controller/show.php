@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - group($id) идентификатор группы магазина, если FALSE, то вывод товаров осуществляется из всех групп
  * - groupsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести
- * - groupsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств групп товаров, по умолчанию TRUE
+ * - groupsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств групп товаров, по умолчанию TRUE
  * - propertiesForGroups(array()) устанавливает дополнительное ограничение на вывод значений дополнительных свойств групп для массива идентификаторов групп (каким группам выводить доп. св-ва)
  * - groupsMode('tree') режим показа групп, может принимать следующие значения:
 	none - не показывать группы,
@@ -74,7 +74,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Show extends Core_Controller
 {
@@ -197,32 +197,18 @@ class Shop_Controller_Show extends Core_Controller
 	{
 		parent::__construct($oShop->clearEntities());
 
-		$siteuser_id = 0;
+		$this->_aSiteuserGroups = $this->_getSiteuserGroups();
 
-		$this->_aSiteuserGroups = array(0, -1);
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
-			if ($oSiteuser)
-			{
-				$siteuser_id = $oSiteuser->id;
-
-				$this->addCacheSignature('siteuser_id=' . $siteuser_id);
-
-				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
-				foreach ($aSiteuser_Groups as $oSiteuser_Group)
-				{
-					$this->_aSiteuserGroups[] = $oSiteuser_Group->id;
-				}
-			}
+			$oSiteuser && $this->addEntity(
+				Core::factory('Core_Xml_Entity')
+					->name('siteuser_id')
+					->value($oSiteuser->id)
+			);
 		}
-
-		$this->addEntity(
-			Core::factory('Core_Xml_Entity')
-				->name('siteuser_id')
-				->value($siteuser_id)
-		);
 
 		$this->_setShopItems()->_setShopGroups();
 
@@ -255,6 +241,32 @@ class Shop_Controller_Show extends Core_Controller
 			$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
 			count($hostcmsFavorite) && $this->addCacheSignature('hostcmsFavorite=' . implode(',', $hostcmsFavorite));
 		}
+	}
+
+	/**
+	 * Get array of siteuser groups for current siteuser. Exists group 0 (all) and -1 (parent)
+	 * @return array
+	 */
+	protected function _getSiteuserGroups()
+	{
+		$aSiteuserGroups = array(0, -1);
+		if (Core::moduleIsActive('siteuser'))
+		{
+			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
+
+			if ($oSiteuser)
+			{
+				$this->addCacheSignature('siteuser_id=' . $oSiteuser->id);
+
+				$aSiteuser_Groups = $oSiteuser->Siteuser_Groups->findAll();
+				foreach ($aSiteuser_Groups as $oSiteuser_Group)
+				{
+					$aSiteuserGroups[] = $oSiteuser_Group->id;
+				}
+			}
+		}
+
+		return $aSiteuserGroups;
 	}
 
 	/**
@@ -587,7 +599,8 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->item && $this->_incShowed();
 
-		if ($this->cache && Core::moduleIsActive('cache'))
+		$bCache = $this->cache && Core::moduleIsActive('cache');
+		if ($bCache)
 		{
 			$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
 			$inCache = $oCore_Cache->get($cacheKey = strval($this), $this->_cacheName);
@@ -598,6 +611,9 @@ class Shop_Controller_Show extends Core_Controller
 				echo $inCache['content'];
 				return $this;
 			}
+
+			$aTags = array();
+			$aTags[] = 'shop_group_' . intval($this->group);
 		}
 
 		$oShop = $this->getEntity();
@@ -703,17 +719,21 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		// Показывать дополнительные свойства групп
-		if ($this->groupsProperties)
+		if ($this->groupsProperties && $this->groupsPropertiesList)
 		{
 			$oShop_Group_Property_List = Core_Entity::factory('Shop_Group_Property_List', $oShop->id);
 
-			$aProperties = $oShop_Group_Property_List->Properties->findAll();
+			$oProperties = $oShop_Group_Property_List->Properties;
+			if (is_array($this->groupsPropertiesList) && count($this->groupsPropertiesList))
+			{
+				$oProperties->queryBuilder()
+					->where('properties.id', 'IN', $this->groupsPropertiesList);
+			}
+			$aProperties = $oProperties->findAll();
+
 			foreach ($aProperties as $oProperty)
 			{
 				$this->_aGroup_Properties[$oProperty->property_dir_id][] = $oProperty;
-
-				// Load all values for property
-				//$oProperty->loadAllValues();
 			}
 
 			$aProperty_Dirs = $oShop_Group_Property_List->Property_Dirs->findAll();
@@ -723,16 +743,12 @@ class Shop_Controller_Show extends Core_Controller
 				$this->_aGroup_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
 			}
 
-			// Список свойств групп товаров
-			if ($this->groupsPropertiesList)
-			{
-				$Shop_Group_Properties = Core::factory('Core_Xml_Entity')
-					->name('shop_group_properties');
+			$Shop_Group_Properties = Core::factory('Core_Xml_Entity')
+				->name('shop_group_properties');
 
-				$this->addEntity($Shop_Group_Properties);
+			$this->addEntity($Shop_Group_Properties);
 
-				$this->_addGroupsPropertiesList(0, $Shop_Group_Properties);
-			}
+			$this->_addGroupsPropertiesList(0, $Shop_Group_Properties);
 		}
 
 		is_array($this->groupsProperties) && $this->groupsProperties = array_combine($this->groupsProperties, $this->groupsProperties);
@@ -788,6 +804,9 @@ class Shop_Controller_Show extends Core_Controller
 			{
 				$this->_shownIDs[] = $oShop_Item->id;
 
+				// Tagged cache
+				$bCache && $aTags[] = 'shop_item_' . $oShop_Item->id;
+
 				// Shortcut
 				$iShortcut = $oShop_Item->shortcut_id;
 
@@ -823,19 +842,14 @@ class Shop_Controller_Show extends Core_Controller
 					$this->comments && $oShop_Item->showXmlComments(TRUE)->commentsActivity($this->commentsActivity);
 
 					$this->warehousesItems && $oShop_Item->showXmlWarehousesItems(TRUE);
-
 					$this->associatedItems && $oShop_Item->showXmlAssociatedItems(TRUE);
 					$this->modifications && $oShop_Item->showXmlModifications(TRUE);
 					$this->specialprices && $oShop_Item->showXmlSpecialprices(TRUE);
+					$this->tags && $oShop_Item->showXmlTags(TRUE);
+					$this->votes && $oShop_Item->showXmlVotes(TRUE);
 
 					// Properties for shop's item entity
 					$this->itemsProperties && $oShop_Item->showXmlProperties($mShowPropertyIDs);
-
-					// Tags
-					$this->tags && $oShop_Item->showXmlTags(TRUE);
-
-					// votes
-					$this->votes && $oShop_Item->showXmlVotes(TRUE);
 
 					// Siteuser
 					$this->siteuser && $oShop_Item->showXmlSiteuser(TRUE)
@@ -848,6 +862,11 @@ class Shop_Controller_Show extends Core_Controller
 						Core_Entity::factory('Shop_Item', $this->parentItem)
 							->showXmlProperties($this->itemsProperties)
 							->showXmlTags($this->tags)
+							->showXmlWarehousesItems($this->warehousesItems)
+							->showXmlAssociatedItems($this->associatedItems)
+							->showXmlModifications($this->modifications)
+							->showXmlSpecialprices($this->specialprices)
+							->showXmlVotes($this->votes)
 					);
 				}
 			}
@@ -858,10 +877,12 @@ class Shop_Controller_Show extends Core_Controller
 			= $this->_aGroup_Properties = $this->_aGroup_Property_Dirs = array();
 
 		echo $content = parent::get();
-		$this->cache && Core::moduleIsActive('cache') && $oCore_Cache->set(
+
+		$bCache && $oCore_Cache->set(
 			$cacheKey,
 			array('content' => $content, 'shown' => $this->_shownIDs),
-			$this->_cacheName
+			$this->_cacheName,
+			$aTags
 		);
 
 		return $this;
@@ -886,7 +907,8 @@ class Shop_Controller_Show extends Core_Controller
 		{
 			$oShop_Item_Property = $oProperty->Shop_Item_Property;
 
-			if ($oShop_Item_Property->show_in_item && $this->item || $oShop_Item_Property->show_in_group && !$this->item)
+			if ($oShop_Item_Property->show_in_item && $this->item
+				|| $oShop_Item_Property->show_in_group && !$this->item)
 			{
 				// Используется ниже для ограничение показа значений св-в товара в модели
 				$aShowPropertyIDs[] = $oProperty->id;
@@ -910,21 +932,18 @@ class Shop_Controller_Show extends Core_Controller
 			$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
 				$oShop_Item_Property->Shop_Measure
 			);
-
-			// Load all values for property
-			//$oProperty->loadAllValues();
-		}
-
-		$aProperty_Dirs = $oShop_Item_Property_List->Property_Dirs->findAll();
-		foreach ($aProperty_Dirs as $oProperty_Dir)
-		{
-			$oProperty_Dir->clearEntities();
-			$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
 		}
 
 		// Список свойств товаров
 		if ($this->itemsPropertiesList)
 		{
+			$aProperty_Dirs = $oShop_Item_Property_List->Property_Dirs->findAll();
+			foreach ($aProperty_Dirs as $oProperty_Dir)
+			{
+				$oProperty_Dir->clearEntities();
+				$this->_aItem_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir;
+			}
+
 			$Shop_Item_Properties = Core::factory('Core_Xml_Entity')
 				->name('shop_item_properties');
 
@@ -995,7 +1014,7 @@ class Shop_Controller_Show extends Core_Controller
 				->queryBuilder()
 				->where('shop_items.shop_producer_id', '=', $this->producer);
 
-			// В корне при фильтрации по меткам вывод идет из всех групп
+			// В корне при фильтрации по производителям вывод идет из всех групп
 			$this->group == 0 && $this->group = FALSE;
 		}
 

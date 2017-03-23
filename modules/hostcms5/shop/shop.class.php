@@ -20343,7 +20343,7 @@ class shop
 
 			$xmlData .= '<property_name>' . str_for_xml($property_row['shop_list_of_properties_name']) . "</property_name>\n";
 			$show_kind = Core_Type_Conversion::toInt($property_row['shop_list_of_properties_show_kind']);
-			
+
 			switch (Core_Type_Conversion::toInt($property_row['shop_list_of_properties_type']))
 			{
 				case 2: // Список, код откорректированный
@@ -27701,15 +27701,15 @@ class shop
 								// Указываем, какой именно электронный товар добавляем в заказ
 								$eitems_for_item_row = mysql_fetch_assoc($eitems_for_item);
 								$shop_eitem_id = $eitems_for_item_row['shop_eitem_id'];
+
+								$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item', $order_item_row['shop_order_items_id']);
+
+								// Обновляем Информацию о заказанном товаре
+								$oShop_Order_Item->hash = $shop_order_items_eitem_resource;
+								$oShop_Order_Item->shop_item_digital_id = $shop_eitem_id;
+								$oShop_Order_Item->save();
 							}
 						}
-
-						$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item', $order_item_row['shop_order_items_id']);
-
-						// Обновляем Информацию о заказанном товаре
-						$oShop_Order_Item->hash = $shop_order_items_eitem_resource;
-						$oShop_Order_Item->shop_item_digital_id = $shop_eitem_id;
-						$oShop_Order_Item->save();
 					}
 
 					// Если пополнение лицевого счета

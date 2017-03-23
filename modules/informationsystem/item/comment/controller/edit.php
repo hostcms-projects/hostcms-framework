@@ -18,4 +18,7 @@ class Informationsystem_Item_Comment_Controller_Edit extends Comment_Controller_
 				? Core_Entity::factory('Comment', $this->_object->parent_id)->Comment_Informationsystem_Item->informationsystem_item_id
 				: Core_Array::getGet('informationsystem_item_id'));			$Comment_Informationsystem_Item->save();		}
 
+		// Cached tags
+		$Comment_Informationsystem_Item->Informationsystem_Item->clearCache();
+		
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));	}}

@@ -29,10 +29,6 @@ class Core_Auth
 
 		if (!self::logged())
 		{
-			Core_Log::instance()->clear()
-				->status(Core_Log::$ERROR)
-				->write(Core::_('Core.error_log_attempt_to_access', $sModuleName));
-
 			if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])
 				&& Core_Type_Conversion::toBool($_SESSION['HOSTCMS_HTTP_AUTH_FLAG']) == TRUE)
 			{
@@ -57,6 +53,10 @@ class Core_Auth
 
 			if (!self::logged())
 			{
+				Core_Log::instance()->clear()
+					->status(Core_Log::$ERROR)
+					->write(Core::_('Core.error_log_attempt_to_access', $sModuleName));
+
 				header("Pragma: no-cashe");
 				header("WWW-authenticate: basic realm='HostCMS'");
 				header("HTTP/1.0 401 Unauthorized");

@@ -216,7 +216,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		$this->id = $primaryKey;
 
 		// Удаляем значения доп. свойств
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
 		{
 			$oPropertyValue->Property->type == 2 && $oPropertyValue->setDir($this->getItemPath());
@@ -313,7 +313,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			$newObject->saveSmallImageFile($this->getSmallFilePath(), $this->image_small);
 		}
 
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
 		{
 			$oNewPropertyValue = clone $oPropertyValue;
@@ -672,6 +672,8 @@ class Informationsystem_Item_Model extends Core_Entity
 			Search_Controller::indexingSearchPages(array($this->indexing()));
 		}
 
+		$this->clearCache();
+
 		return $this;
 	}
 
@@ -875,7 +877,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			}
 		}
 
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach ($aPropertyValues as $oPropertyValue)
 		{
 			// List
@@ -1326,5 +1328,27 @@ class Informationsystem_Item_Model extends Core_Entity
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Clear tagged cache
+	 * @return self
+	 */
+	public function clearCache()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			// Clear item's cache
+			Core_Cache::instance(Core::$mainConfig['defaultCache'])
+				->deleteByTag('informationsystem_item_' . $this->id);
+				
+			// Clear group's cache
+			$this->informationsystem_group_id
+				? $this->Informationsystem_Group->clearCache()
+				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
+					->deleteByTag('informationsystem_group_0');
+		}
+
+		return $this;
 	}
 }

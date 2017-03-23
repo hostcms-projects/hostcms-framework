@@ -501,11 +501,10 @@ class Core_ORM
 	public function deleteAll($bCache = TRUE)
 	{
 		$limit = 100;
-		$offset = 0;
 
 		$this->queryBuilder()
 			->limit($limit)
-			->offset($offset);
+			->offset(0);
 
 		do {
 			$aObjects = $this->findAll($bCache);
@@ -513,10 +512,6 @@ class Core_ORM
 			{
 				$oObject->delete();
 			}
-
-			$offset += $limit;
-
-			$this->queryBuilder()->offset($offset);
 		} while(count($aObjects) == $limit);
 
 		return $this;

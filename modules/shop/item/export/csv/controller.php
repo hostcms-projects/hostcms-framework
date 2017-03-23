@@ -133,9 +133,13 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		if(!$this->exportOrders)
 		{
 			// Заполняем склады
-			$this->_aShopWarehouses = Core_Entity::factory('Shop', $this->shopId)->Shop_Warehouses->findAll(FALSE);
+			$this->_aShopWarehouses = Core_Entity::factory('Shop', $this->shopId)
+				->Shop_Warehouses
+				->findAll(FALSE);
+
 			// Заполняем дополнительные свойства товара
 			$this->exportItemExternalProperties && $this->_aItem_Properties = Core_Entity::factory('Shop_Item_Property_List', $this->shopId)->Properties->findAll(FALSE);
+
 			// Заполняем дополнительные свойства групп товаров
 			$this->exportGroupExternalProperties && $this->_aGroup_Properties = Core_Entity::factory('Shop_Group_Property_List', $this->shopId)->Properties->findAll(FALSE);
 
@@ -415,7 +419,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				$oShopGroup = Core_Entity::factory('Shop_Group', $iShopGroupId);
 
 				$oShopItems = $oShopGroup->Shop_Items;
-				$oShopItems->queryBuilder()->where('modification_id', '=', 0)->where('shortcut_id', '=', 0);
+				$oShopItems->queryBuilder()
+					->where('modification_id', '=', 0)
+					->where('shortcut_id', '=', 0);
 
 				if($iShopGroupId != 0)
 				{
@@ -570,7 +576,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		}
 		else
 		{
-			$this->_aCurrentData[0] = array(
+			$this->_printRow(array(
 				'"GUID заказа"',
 				'"Номер заказа"',
 				'"Страна"',
@@ -605,91 +611,102 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Количество товара заказа"',
 				'"Цена товара заказа"',
 				'"Налог на товар заказа"',
-				'"Тип товара"');
+				'"Тип товара"'));
 
-			$aShop_Orders = Core_Entity::factory('Shop', $this->shopId)->Shop_Orders->findAll();
-			foreach($aShop_Orders as $oShop_Order)
-			{
-				$this->_aCurrentData[] = array(
-					sprintf('"%s"', $this->_prepareString($oShop_Order->guid)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->invoice)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City_Area->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->surname)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->patronymic)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->email)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->acceptance_report)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->vat_invoice)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->company)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->tin)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->kpp)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->phone)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->fax)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->address)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Order_Status->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Currency->name)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->shop_payment_system_id)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->datetime)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->paid)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->payment_datetime)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->description)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->system_information)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->canceled)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->status_datetime)),
-					sprintf('"%s"', $this->_prepareString($oShop_Order->delivery_information))
-				);
+			$offset = 0;
+			$limit = 100;
 
-				// Получаем все товары заказа
-				$aShop_Order_Items = $oShop_Order->Shop_Order_Items->findAll();
-				foreach($aShop_Order_Items as $oShop_Order_Item)
+			$oShop = Core_Entity::factory('Shop', $this->shopId);
+
+			do {
+				$oShop_Orders = $oShop->Shop_Orders;
+				$oShop_Orders
+					->queryBuilder()
+					->orderBy('id', 'ASC')
+					->offset($offset)->limit($limit);
+
+				$aShop_Orders = $oShop_Orders->findAll(FALSE);
+
+				foreach($aShop_Orders as $oShop_Order)
 				{
-					$this->_aCurrentData[] = array(
+					$this->_printRow(array(
 						sprintf('"%s"', $this->_prepareString($oShop_Order->guid)),
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						'""',
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->marking)),
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->name)),
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->quantity)),
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->price)),
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->rate)),
-						sprintf('"%s"', $this->_prepareString($oShop_Order_Item->type))
-					);
-				}
-			}
+						sprintf('"%s"', $this->_prepareString($oShop_Order->invoice)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Country_Location_City_Area->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->surname)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->patronymic)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->email)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->acceptance_report)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->vat_invoice)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->company)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->tin)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->kpp)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->phone)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->fax)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->address)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Order_Status->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->Shop_Currency->name)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->shop_payment_system_id)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->datetime)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->paid)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->payment_datetime)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->description)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->system_information)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->canceled)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->status_datetime)),
+						sprintf('"%s"', $this->_prepareString($oShop_Order->delivery_information))
+					));
 
-			foreach($this->_aCurrentData as $aCurrentLine)
-			{
-				$this->_printRow($aCurrentLine);
+					// Получаем все товары заказа
+					$aShop_Order_Items = $oShop_Order->Shop_Order_Items->findAll(FALSE);
+					foreach($aShop_Order_Items as $oShop_Order_Item)
+					{
+						$this->_printRow(array(
+							sprintf('"%s"', $this->_prepareString($oShop_Order->guid)),
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							'""',
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->marking)),
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->name)),
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->quantity)),
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->price)),
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->rate)),
+							sprintf('"%s"', $this->_prepareString($oShop_Order_Item->type))
+						));
+					}
+				}
+				$offset += $limit;
 			}
+			while (count($aShop_Orders));
 		}
 
 		exit();
@@ -704,7 +721,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	{
 		return str_replace('"', '""', trim($string));
 	}
-	
+
 	/**
 	 * Print array
 	 * @param array $aData

@@ -859,4 +859,19 @@ class Structure_Model extends Core_Entity
 
 		return $return;
 	}
+	
+	/**
+	 * Clear tagged cache
+	 * @return self
+	 */
+	public function clearCache()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			Core_Cache::instance(Core::$mainConfig['defaultCache'])
+				->deleteByTag('structure_' . $this->id);
+		}
+
+		return $this;
+	}
 }

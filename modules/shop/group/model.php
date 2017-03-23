@@ -429,6 +429,8 @@ class Shop_Group_Model extends Core_Entity
 			Search_Controller::indexingSearchPages(array($this->indexing()));
 		}
 
+		$this->clearCache();
+
 		return $this;
 	}
 
@@ -961,5 +963,21 @@ class Shop_Group_Model extends Core_Entity
 		}
 
 		return parent::getXml();
+	}
+
+	/**
+	 * Clear tagged cache
+	 * @return self
+	 */
+	public function clearCache()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			Core_Cache::instance(Core::$mainConfig['defaultCache'])
+				->deleteByTag('shop_group_' . $this->id)
+				->deleteByTag('shop_group_' . $this->parent_id);
+		}
+
+		return $this;
 	}
 }
