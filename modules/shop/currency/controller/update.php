@@ -48,6 +48,8 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 
 		if (is_object($oXml))
 		{
+			$fDate = Core_Date::date2sql($oXml->attributes()->Date);
+
 			$oDefaultCurrency = Core_Entity::factory('Shop_Currency')->getBydefault(1);
 
 			// валюты по умолчанию нет, нет смысла считать дальше
@@ -68,7 +70,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 			}
 
 			// любая валюта по умолчанию равна 1
-			$oDefaultCurrency->exchange_rate(1)->save();
+			$oDefaultCurrency->exchange_rate(1)->date($fDate)->save();
 
 			/* Рубль - не всегда валюта по умолчанию, но он всегда отсутствует во входящем XML.
 			 * Итак, если:
@@ -83,6 +85,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 				!is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUR'))
 					&& $oRubCurrency
 						->exchange_rate($fRubRate)
+						->date($fDate)
 						->save();
 			}
 
@@ -99,11 +102,13 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 				if ($oDefaultCurrency->code == 'RUR')
 				{
 					$oCurrentCurrency->exchange_rate = $rate;
+					$oCurrentCurrency->date($fDate);
 					$oCurrentCurrency->save();
 				}
 				elseif(isset($this->_exchangeRate[$oDefaultCurrency->code]))
 				{
 					$oCurrentCurrency->exchange_rate = $rate * $fRubRate;
+					$oCurrentCurrency->date($fDate);
 					$oCurrentCurrency->save();
 				}
 				else

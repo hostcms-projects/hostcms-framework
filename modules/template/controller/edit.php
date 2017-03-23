@@ -129,7 +129,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('template')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions)
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oTemplateTab
 					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -150,7 +150,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('css')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions)
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oCssTab
 					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -213,6 +213,12 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		if ($modelName == 'template')
 		{
+			if ($this->_object->template_id)
+			{
+				$this->_object->template_dir_id = 0;
+				$this->_object->save();
+			}
+
 			$this->_object->saveTemplateFile(Core_Array::getPost('template'));
 			$this->_object->saveTemplateCssFile(Core_Array::getPost('css'));
 

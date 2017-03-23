@@ -39,7 +39,7 @@ class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 		$oTabManagers->move($this->getField('legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
 		$oTabManagers->move($this->getField('accountant_legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
 
-		$oTabContacts->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12')),$oTabContactsRow1);
+		$oTabContacts->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabContactsRow1);
 
 		$oTabContacts->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow2);
 		$oTabContacts->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow2);
@@ -62,4 +62,4 @@ class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 		$oTabBankingDetails->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
 		$oTabBankingDetails->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
 
-		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12')),$oTabGUIDRow1);		$title = $this->_object->id			? Core::_('Shop_Company.company_form_edit_title')			: Core::_('Shop_Company.company_form_add_title');		$this->title($title);		return $this;	}}
+		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabGUIDRow1);		$title = $this->_object->id			? Core::_('Shop_Company.company_form_edit_title')			: Core::_('Shop_Company.company_form_add_title');		$this->title($title);		return $this;	}}

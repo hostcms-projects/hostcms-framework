@@ -20,16 +20,18 @@ class Trash_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-06-05';
+	public $date = '2015-08-07';
 	/**
 	 * Module name
 	 * @var string
 	 */
 	protected $_moduleName = 'trash';
-	
+
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 260,				'block' => 3,
-				'ico' => 'fa fa-trash-o',				'name' => Core::_('trash.menu'),				'href' => "/admin/trash/index.php",				'onclick' => "$.adminLoad({path: '/admin/trash/index.php'}); return false"			)		);	}}
+
+		$this->menu = array(			array(				'sorting' => 260,				'block' => 3,
+				'ico' => 'fa fa-trash-o',				'name' => Core::_('trash.menu'),				'href' => "/admin/trash/index.php",				'onclick' => "$.adminLoad({path: '/admin/trash/index.php'}); return false"			)		);	}
+}

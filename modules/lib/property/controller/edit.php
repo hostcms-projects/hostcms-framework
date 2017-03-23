@@ -82,9 +82,9 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
 			;
 
-		$this->getField('sql_request')->divAttr(array('id' => 'sql_request', 'class' => 'form-group col-lg-12'));
-		$this->getField('sql_caption_field')->divAttr(array('id' => 'sql_caption_field', 'class' => 'form-group col-lg-12'));
-		$this->getField('sql_value_field')->divAttr(array('id' => 'sql_value_field', 'class' => 'form-group col-lg-12'));
+		$this->getField('sql_request')->divAttr(array('id' => 'sql_request', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+		$this->getField('sql_caption_field')->divAttr(array('id' => 'sql_caption_field', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+		$this->getField('sql_value_field')->divAttr(array('id' => 'sql_value_field', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 		$oMainTab
 			->move($this->getField('name'), $oMainRow1)

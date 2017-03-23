@@ -20,7 +20,7 @@ class Site_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-07-10';
+	public $date = '2015-08-07';
 	/**
 	 * Module name
 	 * @var string

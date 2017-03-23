@@ -126,4 +126,19 @@ class Template_Dir_Model extends Core_Entity
 		}
 		return NULL;
 	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Templates->getCount();
+		$count > 0 && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-default badge-square')
+			->value($count)
+			->execute();
+	}
 }

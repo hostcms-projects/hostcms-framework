@@ -96,11 +96,11 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->move($this->getField('key_field'), $oMainRow2);
 
 		$this->getField('show_operations')
-			->divAttr(array('class' => 'form-group col-lg-12'));
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('show_operations'), $oMainRow3);
 
 		$this->getField('show_group_operations')
-			->divAttr(array('class' => 'form-group col-lg-12'));
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('show_group_operations'), $oMainRow4);
 
 		// Поле сортировки по умолчанию
@@ -125,8 +125,8 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainTab->move($this->getField('default_order_field'), $oMainRow5);
 		$oMainRow5->add($oSelect_Order_Direction);
-		
-		$oMainTab->move($this->getField('guid'), $oMainRow6);		
+
+		$oMainTab->move($this->getField('guid'), $oMainRow6);
 
 		if (!is_null($this->_object->id))
 		{

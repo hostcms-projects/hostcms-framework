@@ -120,7 +120,9 @@ class Shop_Item_Model extends Core_Entity
 	protected $_hasMany = array(
 		'shop_cart' => array(),
 		'comment' => array('through' => 'comment_shop_item'),
+		'shop_bonus' => array('through' => 'shop_item_bonus'),
 		'shop_discount' => array('through' => 'shop_item_discount'),
+		'shop_item_bonus' => array(),
 		'shop_item_discount' => array(),
 		'shop_item_digital' => array(),
 		'shop_item' => array('foreign_key' => 'shortcut_id'),
@@ -1222,6 +1224,9 @@ class Shop_Item_Model extends Core_Entity
 		// Удаляем комментарии
 		$this->Comments->deleteAll(FALSE);
 
+		// Удаляем связи с бонусами
+		$this->Shop_Item_Bonuses->deleteAll(FALSE);
+
 		// Удаляем связи со скидками
 		$this->Shop_Item_Discounts->deleteAll(FALSE);
 
@@ -1363,6 +1368,23 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
+	 * Show bonuses in XML
+	 * @var boolean
+	 */
+	protected $_showXmlBonuses = FALSE;
+
+	/**
+	 * Add bonuses XML to item
+	 * @param boolean $showXmlBonuses mode
+	 * @return self
+	 */
+	public function showXmlBonuses($showXmlBonuses = TRUE)
+	{
+		$this->_showXmlBonuses = $showXmlBonuses;
+		return $this;
+	}
+
+	/**
 	 * Show comments data in XML
 	 * @var boolean
 	 */
@@ -1371,7 +1393,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Add comments XML to item
 	 * @param boolean $showXmlComments mode
-	 * @return self;
+	 * @return self
 	 */
 	public function showXmlComments($showXmlComments = TRUE)
 	{
@@ -1405,7 +1427,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Add associated items XML to item
 	 * @param boolean $showXmlAssociatedItems mode
-	 * @return self;
+	 * @return self
 	 */
 	public function showXmlAssociatedItems($showXmlAssociatedItems = TRUE)
 	{
@@ -1422,7 +1444,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Add modifications XML to item
 	 * @param boolean $showXmlModifications mode
-	 * @return self;
+	 * @return self
 	 */
 	public function showXmlModifications($showXmlModifications = TRUE)
 	{
@@ -1439,7 +1461,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Add special prices XML to item
 	 * @param boolean $showXmlSpecialprices mode
-	 * @return self;
+	 * @return self
 	 */
 	public function showXmlSpecialprices($showXmlSpecialprices = TRUE)
 	{
@@ -1456,7 +1478,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Add tags XML to item
 	 * @param boolean $showXmlTags mode
-	 * @return self;
+	 * @return self
 	 */
 	public function showXmlTags($showXmlTags = TRUE)
 	{
@@ -1684,6 +1706,26 @@ class Shop_Item_Model extends Core_Entity
 
 		// Валюта от магазина
 		$this->shop_currency_id && $this->addXmlTag('currency', $this->Shop->Shop_Currency->name);
+
+		// Бонусы
+		if ($this->_showXmlBonuses && Core::moduleIsActive('siteuser'))
+		{
+			$aBonuses = $oShop_Item_Controller->getBonuses($this, $aPrices['price_discount']);
+
+			if ($aBonuses['total'])
+			{
+				$this->addEntity(
+					Core::factory('Core_Xml_Entity')
+						->name('shop_bonuses')
+						->addEntities($aBonuses['bonuses'])
+						->addEntity(
+							Core::factory('Core_Xml_Entity')
+								->name('total')
+								->value($aBonuses['total'])
+						)
+				);
+			}
+		}
 
 		$this->shop_seller_id && !isset($this->_forbiddenTags['shop_seller']) && $this->addEntity($this->Shop_Seller);
 		$this->shop_producer_id && !isset($this->_forbiddenTags['shop_producer']) && $this->addEntity($this->Shop_Producer);

@@ -134,14 +134,14 @@ abstract class Xsl_Processor
 			{
 				$driver = __CLASS__ . '_Xslt';
 			}
-			elseif (function_exists('domxml_xslt_stylesheet'))
+			/*elseif (function_exists('domxml_xslt_stylesheet'))
 			{
 				$driver = __CLASS__ . '_DomXml';
 			}
 			elseif (function_exists('xslt_create'))
 			{
 				$driver = __CLASS__ . '_Sablotron';
-			}
+			}*/
 			else
 			{
 				throw new Core_Exception('XSLT processor does not exist.');

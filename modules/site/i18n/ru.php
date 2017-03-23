@@ -71,7 +71,7 @@ return array(
 
 	'accountinfo_title' => 'Редактирование регистрационных данных',
 	'accountinfo_login' => '<acronym title="Логин пользователя в личном кабинете на сайте www.hostcms.ru">Логин пользователя в личном кабинете на сайте www.hostcms.ru</acronym>',
-	'accountinfo_contract_number' => '<acronym title="Номер договора">Номер договора</acronym>',
+	'accountinfo_contract_number' => '<acronym title="Номер договора">Номер лицензии (договора)</acronym>',
 	'accountinfo_pin_code' => '<acronym title="PIN-код">PIN-код</acronym>',
 	'accountInfo_success' => 'Регистрационные данные успешно изменены.',
 

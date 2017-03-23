@@ -189,6 +189,18 @@ class Core_DataBase_Pdo extends Core_DataBase
 				$max = 255;
 				break;
 
+			case 'smallint':
+				$type = 'int';
+				$min = -32768;
+				$max = 32767;
+				break;
+
+			case 'smallint unsigned':
+				$type = 'int';
+				$min = 0;
+				$max = 65535;
+				break;
+				
 			case 'mediumint':
 				$type = 'int';
 				$min = -8388608;

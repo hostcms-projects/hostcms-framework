@@ -137,7 +137,15 @@ class Site_Alias_Model extends Core_Entity
 			$update_id = HOSTCMS_UPDATE_NUMBER;
 
 			// Формируем строку запроса
-			$url = 'http://' . HOSTCMS_UPDATE_SERVER . "/hostcmsupdate/key/?domain=".rawurlencode($this->alias_name_without_mask)."&login=".rawurlencode($login)."&contract=".rawurlencode($contract)."&pin=".rawurlencode($pin)."&cms_folder=".rawurlencode($cms_folder)."&php_version=".rawurlencode($php_version)."&mysql_version=".rawurlencode($mysql_version)."&update_id=".rawurlencode($update_id);
+			$url = 'http://' . HOSTCMS_UPDATE_SERVER . "/hostcmsupdate/key/?domain=".rawurlencode($this->alias_name_without_mask) .
+				'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
+				"&login=" . rawurlencode($login) .
+				"&contract=" . rawurlencode($contract) .
+				"&pin=" . rawurlencode($pin) .
+				"&cms_folder=" . rawurlencode($cms_folder) .
+				"&php_version=" . rawurlencode($php_version) .
+				"&mysql_version=" . rawurlencode($mysql_version) .
+				"&update_id=" . rawurlencode($update_id);
 
 			$Core_Http = Core_Http::instance()
 				->url($url)

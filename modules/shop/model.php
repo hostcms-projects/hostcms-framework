@@ -45,6 +45,7 @@ class Shop_Model extends Core_Entity{
 		'shop_affiliate_plan' => array(),
 		'shop_cart' => array(),
 		'shop_delivery' => array(),
+		'shop_bonus' => array(),
 		'shop_discount' => array(),
 		'shop_group' => array(),
 		'shop_group_property' => array(),
@@ -73,9 +74,10 @@ class Shop_Model extends Core_Entity{
 		'groups_sorting_field' => 0,
 		'groups_sorting_direction' => 0,
 		'url_type' => 0,
-		'apply_tags_automatically' => 1,
+		'apply_tags_automatically' => 0,
 		'write_off_paid_items' => 0,
 		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,
+		'reserve' => 0,
 		'reserve_hours' => 24,		'watermark_file' => '',
 		'producer_image_small_max_width' => 100,
 		'producer_image_large_max_width' => 800,
@@ -155,6 +157,7 @@ class Shop_Model extends Core_Entity{
 		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Deliveries->deleteAll(FALSE);
+		$this->Shop_Bonuses->deleteAll(FALSE);
 		$this->Shop_Discounts->deleteAll(FALSE);
 		$this->Shop_Groups->deleteAll(FALSE);
 		$this->Shop_Items->deleteAll(FALSE);
@@ -386,6 +389,15 @@ class Shop_Model extends Core_Entity{
 			);
 		}
 
+		// Копирование бонусов
+		$aShop_Bonuses = $this->Shop_Bonuses->findAll();
+		foreach($aShop_Bonuses as $oShop_Bonus)
+		{
+			$newObject->add(
+				$oShop_Bonus->copy()
+			);
+		}
+		
 		// Копирование скидок на товары
 		$aShop_Discounts = $this->Shop_Discounts->findAll();
 		foreach($aShop_Discounts as $oShop_Discount)

@@ -32,6 +32,6 @@ return array(
 	'edit_success' => "Seller information added successfully!",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-	'markDeleted_success' => "Manufacturer information deleted successfully!",
+	'markDeleted_success' => "Seller information deleted successfully!",
 	'changeDefaultStatus_success' => "Information has been successfully changed",
 );

@@ -14,6 +14,8 @@ return array(
 	'noSubject' => 'No subject',
 	'actions' => 'Actions',
 
+	'add' => 'Add',
+	
 	'yes' => 'Yes',
 	'no' => 'No',
 

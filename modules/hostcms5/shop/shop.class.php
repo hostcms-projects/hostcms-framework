@@ -423,6 +423,10 @@ class shop
 					// осталось 3 аргумента для where при конструкции "AND property_value_ints.value >= 61"
 					elseif ($iCount - $key == 3)
 					{
+						if (strtoupper(trim($aStr[$key + 1])) == 'IN')
+						{
+							$aStr[$key + 2] = explode(',', trim($aStr[$key + 2], "() \t\n\r\0\x0B"));
+						}
 						$queryBuilder->where($sOriginalValue, $aStr[$key + 1], $aStr[$key + 2]);
 					}
 				break 2; // (!)
@@ -3090,7 +3094,7 @@ class shop
 		{
 			$oShop_Item->modification_id = $param['shop_items_catalog_modification_id'];
 
-			if($param['shop_items_catalog_modification_id'])
+			if ($param['shop_items_catalog_modification_id'])
 			{
 				// Если вставка модификации - группа в 0
 				$oShop_Item->shop_group_id = 0;
@@ -7374,7 +7378,7 @@ class shop
 			$oShop_Order->paid = Core_Type_Conversion::toInt($param['status_of_pay']);
 
 			// Товар оплачен
-			if($oShop_Order->paid)
+			if ($oShop_Order->paid)
 			{
 				if (is_null($oShop_Order->id))
 				{
@@ -8032,7 +8036,7 @@ class shop
 		$shop_shops_id = intval($shop_shops_id);
 		$oShop_Currency = Core_Entity::factory('Shop', $shop_shops_id)->Shop_Currency;
 
-		if($oShop_Currency->id)
+		if ($oShop_Currency->id)
 		{
 			return $this->getArrayShopCurrency($oShop_Currency);
 		}
@@ -8105,7 +8109,7 @@ class shop
 		}
 
 		$oCurrency = Core_Entity::factory('Shop', $shop_shops_id)->Shop_Currency;
-		if($oCurrency->id)
+		if ($oCurrency->id)
 		{
 			$this->g_shop_currency[$shop_shops_id] = $this->getArrayShopCurrency($oCurrency);
 
@@ -12020,7 +12024,7 @@ class shop
 					$param_group_access['shop_id'] = $shop_id;
 					$param_group_access['shop_group_info'] = $row;
 
-					if($this->IssetAccessForShopGroup($param_group_access))
+					if ($this->IssetAccessForShopGroup($param_group_access))
 					{
 						// Проверяем, является ли группа текущий выбранный узел родителем отображаемого узла
 						$group_id_is_parent = $param['current_group_id'];
@@ -14032,7 +14036,7 @@ class shop
 					$aItemResult = $queryBuilder->execute()->asAssoc()->current();
 
 				   // элемент массива param является товаром
-				   if($aItemResult)
+				   if ($aItemResult)
 				   {
 						if ($this->GetAccessShopItem($site_user_id, $aItemResult['shop_items_catalog_item_id'], $aItemResult))
 						{
@@ -14806,7 +14810,7 @@ class shop
 		// Дописываем информацию о количестве по каждому складу
 		$aWarehouses = $warehouse->GetAllWarehousesForShop($shop_row['shop_shops_id']);
 
-		if($aWarehouses)
+		if ($aWarehouses)
 		{
 			$xmlData .= '<warehouses>' . "\n";
 
@@ -18095,7 +18099,7 @@ class shop
 	{
 		$oShop_Payment_System = Core_Entity::factory('Shop_Payment_System');
 
-		if($shop_shops_id)
+		if ($shop_shops_id)
 		{
 			$shop_shops_id = intval($shop_shops_id);
 			$oShop_Payment_System->queryBuilder()->where('shop_id', '=', $shop_shops_id);
@@ -22550,7 +22554,7 @@ class shop
 				$shop_order_discount_logic_between_elements = Core_Type_Conversion::toInt($discount_row['shop_order_discount_logic_between_elements']);
 
 				// Если ИЛИ
-				if($shop_order_discount_logic_between_elements == 1)
+				if ($shop_order_discount_logic_between_elements == 1)
 				{
 					if (($sum >= $discount_from
 					&& ($sum < $discount_to || $discount_to == 0)
@@ -23917,7 +23921,7 @@ class shop
 		if(!$shop_groups_big_image_width)
 		{
 			// Данные не переданы, получаем настройки из магазина
-			if($shop_data_row && isset($param['shop_groups_image']))
+			if ($shop_data_row && isset($param['shop_groups_image']))
 			{
 				$shop_groups_big_image_width = Core_Type_Conversion::toInt($shop_data_row['shop_image_big_max_width_group']);
 				$oShop_Group->image_large_width = $shop_groups_big_image_width;
@@ -23928,7 +23932,7 @@ class shop
 		if(!$shop_groups_big_image_height)
 		{
 			// Данные не переданы, получаем настройки из магазина
-			if($shop_data_row && isset($param['shop_groups_image']))
+			if ($shop_data_row && isset($param['shop_groups_image']))
 			{
 				$shop_groups_big_image_height = Core_Type_Conversion::toInt($shop_data_row['shop_image_big_max_height_group']);
 				$oShop_Group->image_large_height = $shop_groups_big_image_height;
@@ -23940,7 +23944,7 @@ class shop
 		if(!$shop_groups_small_image_width)
 		{
 			// Данные не переданы, получаем настройки из магазина
-			if($shop_data_row && isset($param['groups_image_small']))
+			if ($shop_data_row && isset($param['groups_image_small']))
 			{
 				$shop_groups_small_image_width = Core_Type_Conversion::toInt($shop_data_row['shop_image_small_max_width_group']);
 				$oShop_Group->image_small_width = $shop_groups_small_image_width;
@@ -23952,7 +23956,7 @@ class shop
 		if(!$shop_groups_small_image_height)
 		{
 			// Данные не переданы, получаем настройки из магазина
-			if($shop_data_row && isset($param['groups_image_small']))
+			if ($shop_data_row && isset($param['groups_image_small']))
 			{
 				$shop_groups_small_image_height = Core_Type_Conversion::toInt($shop_data_row['shop_image_small_max_height_group']);
 				$oShop_Group->image_small_height = $shop_groups_small_image_height;
@@ -26908,7 +26912,7 @@ class shop
 	 * $array = $shop->GetSpecialPricesForItem($shop_items_catalog_item_id);
 	 *
 	 * // Распечатаем результат
-	 * if($array)
+	 * if ($array)
 	 * {
 	 * 	print_r($row);
 	 * }
@@ -28398,7 +28402,7 @@ class shop
 							$shop_row = $this->GetShop($shop_shops_id);
 
 							// Картинка для группы $tmp_cur_parent_id передана, необходимо обработать
-							if($big_image_group != '' && is_file(CMS_FOLDER . $big_image_group))
+							if ($big_image_group != '' && is_file(CMS_FOLDER . $big_image_group))
 							{
 								$big_image_source = CMS_FOLDER . $big_image_group;
 
@@ -28429,7 +28433,7 @@ class shop
 								// Необходимо проверить, существуют ли старые картинки для данной группы товаров
 								$group_row = $this->GetGroup($tmp_cur_parent_id);
 
-								if($group_row['shop_groups_image'] != '')
+								if ($group_row['shop_groups_image'] != '')
 								{
 									// старая большая картинка задана, удаляем ее из файловой системы
 									if(is_file($group_images_dir . $group_row['shop_groups_image']))
@@ -28438,7 +28442,7 @@ class shop
 									}
 								}
 
-								if($group_row['shop_groups_small_image'] != '')
+								if ($group_row['shop_groups_small_image'] != '')
 								{
 									// старая малая картинка задана, удаляем ее из файловой системы
 									if(is_file($group_images_dir . $group_row['shop_groups_small_image']))
@@ -28494,7 +28498,7 @@ class shop
 
 								$oShop_Group = Core_Entity::factory('Shop_Group', $tmp_cur_parent_id);
 
-								if($result['big_image'])
+								if ($result['big_image'])
 								{
 									// Если операция завершилась успешно необходимо получить сведения о размерах изображения
 									if(file_exists($big_image_file_target) && filesize($big_image_file_target))
@@ -28517,7 +28521,7 @@ class shop
 									$oShop_Group->save();
 								}
 
-								if($result['small_image'])
+								if ($result['small_image'])
 								{
 									// Если операция завершилась успешно необходимо получить сведения о размерах изображения
 									if(file_exists($small_image_file_target) && filesize($small_image_file_target))
@@ -28547,13 +28551,13 @@ class shop
 									{
 										$group_property_picture = strval($picture_array['Картинка']);
 
-										if($group_property_picture != '')
+										if ($group_property_picture != '')
 										{
 											//echo "Обнаружена дополнительная картинка: $group_property_picture для группы tmp_cur_parent_id<br/>";
 
 											$file_extension = Core_File::getExtension($group_property_picture);
 
-											if($file_extension != '')
+											if ($file_extension != '')
 											{
 												$file_extension = "." . $file_extension;
 											}
@@ -28609,7 +28613,7 @@ class shop
 													'shop_groups_id' => $tmp_cur_parent_id
 												));
 
-												if($property_value_row)
+												if ($property_value_row)
 												{
 													$big_image_old_path = CMS_FOLDER . $group_dir . $property_value_row['shop_properties_group_value_value'];
 
@@ -28680,7 +28684,7 @@ class shop
 
 												$result_download_files = $kernel->AdminLoadFiles($admin_load_files_array);
 
-												if($result_download_files['big_image'] && $result_download_files['small_image'])
+												if ($result_download_files['big_image'] && $result_download_files['small_image'])
 												{
 													// Файлы успешно загрузились, необходимо вставить информацию в БД
 													$oProperty_Value_File = Core_Entity::factory('Property_Value_File');
@@ -28827,7 +28831,7 @@ class shop
 			->where('parent_id', '=', $parent_id)
 			->orderBy('id');
 
-		if($parent_id)
+		if ($parent_id)
 		{
 			if(!($site_id = Core_Type_Conversion::toInt($param['site_id'])))
 			{

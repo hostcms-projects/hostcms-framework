@@ -12,11 +12,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  */
 class User_Note_Model extends Core_Entity{
 	/**
-	 * Disable markDeleted()
-	 * @var mixed
+	 * Column consist item's name
+	 * @var string
 	 */
-	protected $_marksDeleted = NULL;
-
+	protected $_nameColumn = 'id';	
+	
 	/**
 	 * One-to-one relations
 	 * @var array

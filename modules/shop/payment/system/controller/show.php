@@ -35,6 +35,17 @@ class Shop_Payment_System_Controller_Show extends Core_Controller
 			if ($oSiteuser)
 			{
 				$this->addEntity($oSiteuser->clearEntities());
+
+				$fAmount = $oSiteuser->getTransactionsAmount($oShop);
+
+				if ($fAmount)
+				{
+					$oSiteuser->addEntity(
+						Core::factory('Core_Xml_Entity')
+							->name('transaction_amount')
+							->value($fAmount)
+					);
+				}
 			}
 		}
 	}

@@ -531,7 +531,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this->title($title);
 
 		//Core_Event::notify(get_class($this) . '.onAfterRedeclaredSetObject', $this, array());
-		
+
 		return $this;
 	}
 
@@ -571,9 +571,19 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		if ($this->_object->id)
 		{
-			$this->_object->paid != Core_Array::get($this->_formValues, 'paid') && $this->_object->paid == 0
-				? $this->_object->paid()
-				: $this->_object->cancelPaid();
+			// Change paid status
+			if ($this->_object->paid != Core_Array::get($this->_formValues, 'paid', 0))
+			{
+				$this->_object->paid == 0
+					? $this->_object->paid()
+					: $this->_object->cancelPaid();
+			}
+
+			// Change canceled status
+			if ($this->_object->canceled != Core_Array::get($this->_formValues, 'canceled', 0))
+			{
+				$this->_object->deleteReservedItems();
+			}
 		}
 
 		$this->_formValues['unloaded'] = 0;

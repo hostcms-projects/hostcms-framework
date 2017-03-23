@@ -285,7 +285,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			->name;
 
 		// В конечном объекте класс _prepareForm() не был переопределен
-		$classNameWithPrepareForm != $className && $this->_prepareForm();
+		if ($classNameWithPrepareForm != $className)
+		{
+			$this->_prepareForm();
+
+			// Событие onAfterRedeclaredPrepareForm вызывается в двух местах
+			Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterRedeclaredPrepareForm', $this, array($this->_object, $this->_Admin_Form_Controller));
+		}
 
 		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterSetObject', $this, array($object, $this->_Admin_Form_Controller));
 
@@ -298,9 +304,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	 * Prepare backend item's edit form
 	 *
 	 * @return self
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit.onBeforePrepareForm
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit.onAfterPrepareForm
 	 */
 	protected function _prepareForm()
 	{
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforePrepareForm', $this, array($this->_object, $this->_Admin_Form_Controller));
+
 		$this->_prepeared = TRUE;
 
 		$this->_loadKeys();
@@ -481,6 +491,8 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			}
 		}
 
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterPrepareForm', $this, array($this->_object, $this->_Admin_Form_Controller));
+
 		return $this;
 	}
 
@@ -499,7 +511,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		{
 			case NULL: // Показ формы
 
-				!$this->_prepeared && $this->_prepareForm();
+				if (!$this->_prepeared)
+				{
+					$this->_prepareForm();
+
+					// Событие onAfterRedeclaredPrepareForm вызывается в двух местах
+					Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onAfterRedeclaredPrepareForm', $this, array($this->_object, $this->_Admin_Form_Controller));
+				}
 
 				$this->_Admin_Form_Controller
 					->title($this->title)

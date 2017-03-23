@@ -368,6 +368,7 @@ abstract class Shop_Payment_System_Handler
 					$oShop_Order_Item->price = $aPrices['price_discount'] - $aPrices['tax'];
 					$oShop_Order_Item->rate = $aPrices['rate'];
 					$oShop_Order_Item->name = $oShop_Item->name;
+					$oShop_Order_Item->type = 0;
 					$oShop_Order_Item->marking = strlen($oShop_Cart->marking)
 						? $oShop_Cart->marking
 						: $oShop_Item->marking;
@@ -411,6 +412,64 @@ abstract class Shop_Payment_System_Handler
 			->where('shop_items.shop_id', '=', $oShop->id)
 			->where('shop_item_reserved.datetime', '<', Core_Date::timestamp2sql(time() - $oShop->reserve_hours * 60 * 60))
 			->execute();
+
+		// Частичная оплата с лицевого счета
+		if (Core::moduleIsActive('siteuser')
+				&& isset($this->_orderParams['partial_payment_by_personal_account'])
+				&& $this->_orderParams['partial_payment_by_personal_account']
+				&& $this->_shopOrder->Siteuser->id
+		)
+		{
+			$fCurrencyCoefficient = $this->_shopOrder->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+				? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+					$this->_shopOrder->Shop_Currency,
+					$oShop->Shop_Currency
+				)
+				: 0;
+
+			// Остаток на счете пользователя в валюте магазина
+			$fSiteuserAmount = $this->_shopOrder->Siteuser->getTransactionsAmount($oShop);
+
+			// На счете есть средства
+			if ($fSiteuserAmount)
+			{
+				// Сумма заказа в валюте магазина
+				$fOrderAmount = $this->_shopOrder->getAmount() * $fCurrencyCoefficient;
+
+				// Сумма заказа меньше или равна средствам
+				$fBonusesAmount = $fSiteuserAmount > $fOrderAmount
+					? $fOrderAmount
+					: $fSiteuserAmount;
+
+				// Проведение транзакции по списанию предоплаты бонусами
+				$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');
+				$oShop_Siteuser_Transaction->shop_id = $oShop->id;
+				$oShop_Siteuser_Transaction->siteuser_id = $this->_shopOrder->Siteuser->id;
+				$oShop_Siteuser_Transaction->active = 1;
+
+				$oShop_Siteuser_Transaction->amount_base_currency =
+					$oShop_Siteuser_Transaction->amount = $fBonusesAmount * -1;
+
+				$oShop_Siteuser_Transaction->shop_currency_id = $this->_shopOrder->shop_currency_id;
+				$oShop_Siteuser_Transaction->shop_order_id = $this->_shopOrder->id;
+				$oShop_Siteuser_Transaction->type = 0;
+				$oShop_Siteuser_Transaction->description = Core::_('Shop_Bonus.paid_by_bonuses');
+				$oShop_Siteuser_Transaction->save();
+
+				// Списание оплаченной суммы из цены заказа
+				$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
+				$oShop_Order_Item->name = Core::_('Shop_Bonus.paid_by_bonuses');
+				$oShop_Order_Item->quantity = 1;
+				$oShop_Order_Item->rate = 0;
+				$oShop_Order_Item->price = $fBonusesAmount * -1;
+				$oShop_Order_Item->marking = '';
+				$oShop_Order_Item->type = 3; // 3 - Списание бонусов в счет оплаты счета
+				$this->_shopOrder->add($oShop_Order_Item);
+
+				// Опачена полная сумма
+				$fBonusesAmount == $fOrderAmount && $this->_shopOrder->paid();
+			}
+		}
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterProcessOrder', $this);
 
@@ -1105,6 +1164,12 @@ abstract class Shop_Payment_System_Handler
 				// Отправка писем клиенту и пользователю
 				$this->send();
 			}
+		}
+
+		// Отмена заказа, снимаем зарезервированные товары
+		if ($mode == 'cancelPaid')
+		{
+			$this->getShopOrder()->deleteReservedItems();
 		}
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterChangedOrder', $this, array($mode));

@@ -119,6 +119,7 @@ return array(
 	'show_discount_link' => 'Product discounts',
 	'order_discount_show_title' => 'Order discounts',
 	'coupon_group_link' => 'Coupons',
+	'bonus_link' => 'Bonuses',
 	'affiliate_menu_title' => 'Affiliate program',
 	'add_item_shortcut_shop_groups_id' => "<acronym title=\"Group to which the product shortcut belongs\">Parent group</acronym>",
 	'add_shop_item_shortcut_title' => "Shortcut for %s",
@@ -178,6 +179,8 @@ return array(
 	'select_price_form' => '<acronym title="Select change option">Change option: </acronym>',
 	'select_discount_type' => '<acronym title="Select a discount to be set for the selected products group">Set discount</acronym>',
 	'flag_delete_discount' => '<acronym title="If this checkbox is activated, the discount will be deleted in case it has been granted">Delete selected discount</acronym>',
+	'select_bonus_type' => '<acronym title="Select a bonus to be set for the selected products group">Set bonus</acronym>',
+	'flag_delete_bonus' => '<acronym title="If this checkbox is activated, the bonus will be deleted in case it has been granted">Delete selected bonus</acronym>',
 	'flag_include_modifications' => '<acronym title="If this checkbox is activated, the modifications also be included into itrem list">Include modifications</acronym>',
 	'select_parent_group' => '<acronym title="Select product group from which prices should start to be changed">Parent group</acronym>',
 	'form_sales_order_select_grouping' => '<acronym title="Specifies order grouping period in report">Group:</acronym>',
@@ -271,5 +274,5 @@ return array(
 	'start_order_date'=>'Start date',
 	'stop_order_date' => 'End date',
 	'empty_shop' => 'Are you sure you want to permanently delete all of the items in the store?',
-	
+
 );

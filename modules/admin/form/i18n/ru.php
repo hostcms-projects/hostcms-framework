@@ -14,6 +14,8 @@ return array(
 	'noSubject' => 'Без темы',
 	'actions' => 'Действия',
 
+	'add' => 'Добавить',
+	
 	'yes' => 'Да',
 	'no' => 'Нет',
 

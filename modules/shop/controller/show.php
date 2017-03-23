@@ -31,6 +31,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - tags(TRUE|FALSE) выводить метки
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным товаром, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
+ * - bonuses(TRUE|FALSE) выводить бонусы для товаров, по умолчанию TRUE
  * - comparing(TRUE|FALSE) выводить сравниваемые товары, по умолчанию TRUE
  * - comparingLimit(10) максимальное количество выводимых сравниваемых товаров, по умолчанию 10
  * - favorite(TRUE|FALSE) выводить избранные товары, по умолчанию TRUE
@@ -105,6 +106,7 @@ class Shop_Controller_Show extends Core_Controller
 		'tags',
 		'siteuser',
 		'siteuserProperties',
+		'bonuses',
 		'comparing',
 		'comparingLimit',
 		'favorite',
@@ -219,8 +221,11 @@ class Shop_Controller_Show extends Core_Controller
 		$this->group = 0;
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
-			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems = $this->taxes = $this->cart = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
+			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems
+			= $this->taxes = $this->cart = FALSE;
+
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
+			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
 
 		$this->viewedLimit = $this->comparingLimit = $this->favoriteLimit = 10;
 
@@ -513,7 +518,7 @@ class Shop_Controller_Show extends Core_Controller
 				if (!is_null($oShop_Item->id))
 				{
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-					$oFavouriteEntity->addEntity($oShop_Item->clearEntities());
+					$oFavouriteEntity->addEntity($oShop_Item->clearEntities()->showXmlBonuses($this->bonuses));
 				}
 			}
 		}
@@ -567,7 +572,7 @@ class Shop_Controller_Show extends Core_Controller
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 					$this->comments && $oShop_Item->showXmlComments($this->comments);
 
-					$oViewedEntity->addEntity($oShop_Item->clearEntities());
+					$oViewedEntity->addEntity($oShop_Item->clearEntities()->showXmlBonuses($this->bonuses));
 				}
 			}
 		}
@@ -845,6 +850,7 @@ class Shop_Controller_Show extends Core_Controller
 					// Comments
 					$this->comments && $oShop_Item->showXmlComments(TRUE)->commentsActivity($this->commentsActivity);
 
+					$this->bonuses && $oShop_Item->showXmlBonuses(TRUE);
 					$this->warehousesItems && $oShop_Item->showXmlWarehousesItems(TRUE);
 					$this->associatedItems && $oShop_Item->showXmlAssociatedItems(TRUE);
 					$this->modifications && $oShop_Item->showXmlModifications(TRUE);

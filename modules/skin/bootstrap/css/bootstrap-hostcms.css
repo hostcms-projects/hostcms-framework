@@ -110,7 +110,7 @@ a, a:hover, a:focus {
 }
 .admin-table select {width: 100%}
 div.form-group .caption{display:block;margin:0 0 3px;padding:0}
-div.form-group acronym { border-bottom: 1px dashed #D0D0D0; cursor: help}
+div.form-group acronym { text-decoration: none; border-bottom: 1px dashed #D0D0D0; cursor: help }
 
 .radio-inline, .checkbox-inline {padding-left: 2px}
 
@@ -186,9 +186,12 @@ form#formEdit .popover .form-horizontal .checkbox-inline{
 table.admin-table {
 	table-layout: fixed;
 }
-table.admin-table > tbody > tr > td {
+table.admin-table > tbody > tr > td:not(:last-child) {
   overflow: hidden;
   /*text-overflow: ellipsis;*/
+}
+table.sql-table {
+	table-layout: auto;
 }
 /* /Truncate */
 
@@ -1692,3 +1695,27 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 .popover.left> .arrow::after{
 	border-left-color: #eee;
 }
+
+/* --- Note --- */
+#overview .note textarea {
+    background: transparent none repeat scroll 0 0;
+    border: medium none;
+    box-shadow: none;
+    color: #999;
+    font-size: 95%;
+    height: 40px;
+    left: 10px;
+    line-height: 120%;
+    margin: 0;
+    outline: medium none;
+    overflow: hidden;
+    padding: 0;
+    resize: none;
+    right: 10px;
+    width: 100%;
+	padding-bottom: 10px;
+}
+
+#user_notes .databox-stat i { cursor: pointer; color: #fb6e52; }
+.row-title i { cursor: pointer; }
+/* --- /Note --- */

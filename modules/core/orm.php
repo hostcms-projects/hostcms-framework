@@ -989,13 +989,29 @@ class Core_ORM
 	 */
 	public function clearColumnCache()
 	{
-		self::$_columnCache = array();
-		self::$_columnCacheDefaultValues = array();
+		self::$_columnCache = self::$_columnCacheDefaultValues = array();
 
 		if (Core::moduleIsActive('cache'))
 		{
 			$cacheName = 'Core_ORM_ColumnCache';
 			self::$columnCache->deleteAll($cacheName);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Load self::$_columnCacheDefaultValues for current model
+	 * @return self
+	 */
+	protected function _loadColumnCacheDefaultValues()
+	{
+		// Fill self::$_columnCacheDefaultValues
+		self::$_columnCacheDefaultValues[$this->_modelName] = array();
+		foreach (self::$_columnCache[$this->_modelName] as $key => $aColumn)
+		{
+			!is_null($aColumn['default'])
+				&& self::$_columnCacheDefaultValues[$this->_modelName][$key] = $aColumn['default'];
 		}
 
 		return $this;
@@ -1031,13 +1047,7 @@ class Core_ORM
 
 				$bCache && self::$columnCache->set($this->_modelName, $this->_tableColumns, $cacheName);
 
-				// Fill self::$_columnCacheDefaultValues
-				self::$_columnCacheDefaultValues[$this->_modelName] = array();
-				foreach (self::$_columnCache[$this->_modelName] as $key => $aColumn)
-				{
-					!is_null($aColumn['default'])
-						&& self::$_columnCacheDefaultValues[$this->_modelName][$key] = $aColumn['default'];
-				}
+				$this->_loadColumnCacheDefaultValues();
 			}
 
 			/*$this->_tableColumns = isset(self::$_columnCache[$this->_modelName])
@@ -1062,23 +1072,12 @@ class Core_ORM
 		{
 			if (!$this->loaded())
 			{
+				// Значения по умолчанию могут быть не загружены в случае, когда кроме создания модели не было
+				// ни одной операции с ее атрибутами
+				//!isset(self::$_columnCacheDefaultValues[$this->_modelName]) && $this->_loadColumnCacheDefaultValues();
+				$this->_loadColumns();
+
 				// Do not set values which have changed
-
-				// To delete
-				if (!is_array($this->_preloadValues))
-				{
-					Core_Log::instance()->clear()
-						->status(Core_Log::$ERROR)
-						->write("Ошибка, неверный тип _preloadValues, " . gettype($this->_preloadValues) . ", модель " . get_class($this));
-				}
-				if (!is_array(self::$_columnCacheDefaultValues[$this->_modelName]))
-				{
-					Core_Log::instance()->clear()
-						->status(Core_Log::$ERROR)
-						->write("Ошибка, неверный тип _columnCacheDefaultValues, " . gettype(self::$_columnCacheDefaultValues[$this->_modelName])  . ", модель " . get_class($this));
-				}
-				// ---------------
-
 				$this->setValues(
 					array_diff_key($this->_preloadValues + self::$_columnCacheDefaultValues[$this->_modelName], $this->_changedColumns), $changed = TRUE
 				);
@@ -1117,11 +1116,7 @@ class Core_ORM
 			if (!isset($this->_skipColumns[$column]))
 			{
 				$this->_modelColumns[$column] = $value;
-
-				if ($changed)
-				{
-					$this->_changedColumns[$column] = $column;
-				}
+				$changed && $this->_changedColumns[$column] = $column;
 			}
 		}
 
@@ -1327,7 +1322,7 @@ class Core_ORM
 		{
 			return TRUE;
 		}
-		
+
         return FALSE;
     }
 
@@ -1429,73 +1424,78 @@ class Core_ORM
 	{
 		//$this->_load();
 
-		foreach ($this->_tableColumns as $property => $aField)
+		// При создании объекта с явным указанием ID нельзя проверять значения, т.к. будет попытка
+		// загрузить такой объект из базы, его данных не будут и PK будет сброшен в NULL
+		if ($this->loaded())
 		{
-			/*
-			// Проверка идет при получении св-ва модели, здесь не нужна
-			if (!array_key_exists($property, $this->_modelColumns))
+			foreach ($this->_tableColumns as $property => $aField)
 			{
-				throw new Core_Exception("The property '%property' does not exist for check in the model '%model'",
-					array('%property' => $property, '%model' => $this->getModelName()));
-			}*/
-
-			//$value = $this->_modelColumns[$property];
-			$value = $this->$property;
-
-			// Value is not NULL or value is NULL and default value does not exist
-			if (!is_null($value) || is_null($aField['default']) && $aField['null'] != 1 && $aField['extra'] != 'auto_increment')
-			{
-				switch ($aField['type'])
+				/*
+				// Проверка идет при получении св-ва модели, здесь не нужна
+				if (!array_key_exists($property, $this->_modelColumns))
 				{
-					case 'int':
-						if (!is_numeric($value))
-						{
-							$this->$property = $value = intval($value);
-						}
+					throw new Core_Exception("The property '%property' does not exist for check in the model '%model'",
+						array('%property' => $property, '%model' => $this->getModelName()));
+				}*/
 
-						if ($value < $aField['min'] || $value > $aField['max'])
-						{
-							if ($exception)
-							{
-								throw new Core_Exception("The property '%property' has illegal value in the model '%model'",
-									array('%property' => $property, '%model' => $this->getModelName()));
-							}
-							else
-							{
-								$this->$property = ($value < $aField['min']) ? $aField['min'] : $aField['max'];
-							}
-						}
-					break;
-					case 'float':
-						// Convert "," to "."
-						$value = str_replace(',', '.', $value);
+				//$value = $this->_modelColumns[$property];
+				$value = $this->$property;
 
-						// Remove everything except numbers and dot
-						$value = preg_replace('/[^0-9\.\-]/', '', $value);
-
-						$this->$property = floatval($value);
-					break;
-					case 'string':
-						$strlen = mb_strlen($value);
-
-						if (!is_null($aField['max_length'])
-							&& $aField['datatype'] != 'enum'
-							&& $strlen > $aField['max_length'])
-						{
-							if ($exception)
+				// Value is not NULL or value is NULL and default value does not exist
+				if (!is_null($value) || is_null($aField['default']) && $aField['null'] != 1 && $aField['extra'] != 'auto_increment')
+				{
+					switch ($aField['type'])
+					{
+						case 'int':
+							if (!is_numeric($value))
 							{
-								throw new Core_Exception("The property '%property' has illegal length in the model '%model'",
-									array('%property' => $property, '%model' => $this->getModelName()));
+								$this->$property = $value = intval($value);
 							}
-							else
+
+							if ($value < $aField['min'] || $value > $aField['max'])
 							{
-								$this->$property = mb_substr($value, 0, $aField['max_length']);
+								if ($exception)
+								{
+									throw new Core_Exception("The property '%property' has illegal value in the model '%model'",
+										array('%property' => $property, '%model' => $this->getModelName()));
+								}
+								else
+								{
+									$this->$property = ($value < $aField['min']) ? $aField['min'] : $aField['max'];
+								}
 							}
-						}
-					break;
-					default:
-						throw new Core_Exception("Unchecked property '%property' type '%type' in the model '%model'",
-							array('%property' => $property, '%type' => $aField['type'], '%model' => $this->getModelName()));
+						break;
+						case 'float':
+							// Convert "," to "."
+							$value = str_replace(',', '.', $value);
+
+							// Remove everything except numbers and dot
+							$value = preg_replace('/[^0-9\.\-]/', '', $value);
+
+							$this->$property = floatval($value);
+						break;
+						case 'string':
+							$strlen = mb_strlen($value);
+
+							if (!is_null($aField['max_length'])
+								&& $aField['datatype'] != 'enum'
+								&& $strlen > $aField['max_length'])
+							{
+								if ($exception)
+								{
+									throw new Core_Exception("The property '%property' has illegal length in the model '%model'",
+										array('%property' => $property, '%model' => $this->getModelName()));
+								}
+								else
+								{
+									$this->$property = mb_substr($value, 0, $aField['max_length']);
+								}
+							}
+						break;
+						default:
+							throw new Core_Exception("Unchecked property '%property' type '%type' in the model '%model'",
+								array('%property' => $property, '%type' => $aField['type'], '%model' => $this->getModelName()));
+					}
 				}
 			}
 		}
@@ -1523,6 +1523,7 @@ class Core_ORM
 			if (!array_key_exists($this->_primaryKey, $data))
 			{
 				$getPrimaryKeyValue = $this->getPrimaryKey();
+
 				!is_null($getPrimaryKeyValue) && $data[$this->_primaryKey] = $getPrimaryKeyValue;
 			}
 

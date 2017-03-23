@@ -144,6 +144,73 @@
 				jObject.find(".modal-title").html(data.title);
 			}
 		},
+		// Создание заметки
+		createNote: function(settings)
+		{
+			var jObj = jQuery(object), text = jObj.text();
+
+			// add ajax '_'
+			var data = jQuery.getData({});
+
+			jQuery.ajax({
+				context: jObj,
+				url: '/admin/index.php?ajaxCreateNote',
+				data: data,
+				dataType: 'json',
+				type: 'POST',
+				success: function(data) {
+					$.changeNote(data.form_html);
+					$("#user_notes").prepend('<div id=note_' + data.form_html + ' class="col-lg-3 col-sm-6 col-xs-12"><div class="databox databox-graded"><div class="databox padding-top-20 bg-whitesmoke"><div class="databox-stat orange radius-bordered margin-right-10"><a onclick="$.destroyNote(' + data.form_html + ')"><i class="stat-icon fa fa-remove" title="Удалить заметку"></i></a></div><div class="databox-text darkgray padding-left-10 note"><textarea></textarea></div></div></div></div>');
+				}
+			});
+		},
+		// Изменение заметки
+		changeNote: function(noteId)
+		{
+			object = $("#note_" + noteId);
+
+			object.on('change', function(){
+				var object = jQuery(this), timer = object.data('timer');
+
+				if (timer){
+					clearTimeout(timer);
+				}
+
+				jQuery(this).data('timer', setTimeout(function() {
+						textarea = object.find('textarea').addClass('ajax');
+
+						// add ajax '_'
+						var data = jQuery.getData({});
+						data['value'] = textarea.val();
+
+						jQuery.ajax({
+							context: textarea,
+							url: '/admin/index.php?' + 'ajaxNote&action=save'
+								+ '&entity_id=' + noteId,
+							type: 'POST',
+							data: data,
+							dataType: 'json',
+							success: function(){
+								this.removeClass('ajax');
+							}
+						});
+					}, 1000)
+				);
+			});
+		},
+		// Удаление заметки
+		destroyNote: function(noteId)
+		{
+			jQuery.ajax({
+				url: '/admin/index.php?' + 'ajaxNote&action=delete'
+					+ '&entity_id=' + noteId,
+				type: 'get',
+				dataType: 'json',
+				success: function(){}
+			});
+
+			$("#note_" + noteId).remove();
+		},
 		widgetRequest: function(settings){
 			$.loadingScreen('show');
 
@@ -222,67 +289,13 @@
 				jQuery(object).find("div[id ^= 'popover']").remove();
 			});
 
-			//jNewObject.find("span[id^='file_large_settings_']").data('container', jNewObject.find("span[id^='file_large_settings_']").data('container') + '_' + iRand);
-			//jNewObject.find("span[id^='file_small_settings_']").data('container', jNewObject.find("span[id^='file_small_settings_']").data('container') + '_' + iRand);
-
-			/*
-			var oPropertyField = jProperies.eq(0).find("input[id ^= 'property_" + index + "_'][type='file']");
-
-				//originalHtmlLargeFileSettings = jNewObject.find("div[id *='_watermark_property_']").html(),
-				//originalHtmlSmallFileSettings = jNewObject.find("div[id *='_watermark_small_property_']").html();
-
-			// Копирование доп. свойства у редактируемого элемента системы
-
-			if (oPropertyField.length)
-			{
-				var aInputId = oPropertyField.attr('id').split('property_'),
-					suffix = aInputId[1];
-
-					jNewObject.find("div[id *='_watermark_property_']")
-						.attr('id', jNewObject.find("div[id *='_watermark_property_']").attr('id').replace('_watermark_property_' + suffix, '_watermark_property_' + index + '_'+ iRand))
-						.html(originalHtmlLargeFileSettings.replace(new RegExp(suffix,'g'), index + '[]'));
-
-					//.replace('_watermark_property_' + suffix, '_watermark_property_' + index + '_'+ iRand).replace(new RegExp(suffix,'g'), index + '[]');
-
-				aInputId = jProperies.eq(0).find("input[id ^= 'small_property_" + index + "_']").attr('id').split('small_property_');
-				suffix = aInputId[1];
-
-
-				jNewObject.find("div[id *='_watermark_small_property_']")
-						.attr('id', jNewObject.find("div[id *='_watermark_small_property_']").attr('id').replace('_watermark_small_property_' + suffix, '_watermark_small_property_' + index + '_'+ iRand))
-						.html(originalHtmlSmallFileSettings.replace(new RegExp(suffix,'g'), index + '[]'));
-			}
-			else
-			{
-				jNewObject.find("div[id *='_watermark_property_']").html(originalHtmlLargeFileSettings);
-				jNewObject.find("div[id *='_watermark_small_property_']").html(originalHtmlSmallFileSettings);
-			}*/
-
 			jNewObject.find("div[id *='_watermark_property_']").html(jNewObject.find("div[id *='_watermark_property_']").html());
 			jNewObject.find("div[id *='_watermark_small_property_']").html(jNewObject.find("div[id *='_watermark_small_property_']").html());
-
-			// Для скопированного элемента создаем временные popover'ы для настроек большого и малого изображений
-			/*
-			jNewObject.find('[id ^= \'file_\'][id *= \'_settings_\']')
-				.popover({
-					placement: 'left',
-					html: true,
-					trigger: 'manual',
-					temporary: 1
-				})
-				.popover('show')
-				.each(function(){
-					$(this).data('bs.popover').$tip.hide()
-				});
-			*/
 
 			// Удаляем элементы просмотра и удаления загруженнного изображения
 			jNewObject.find("[id ^= 'preview_large_property_'], [id ^= 'delete_large_property_'], [id ^= 'preview_small_property_'], [id ^= 'delete_small_property_']").remove();
 			// Удаляем скрипт просмотра загуженного изображения
 			jNewObject.find("input[id ^= 'property_" + index + "_'][type='file'] ~ script").remove();
-
-
-			//
 
 			jNewObject.find("input[id^='field_id'],select,textarea").attr('name', 'property_' + index + '[]');
 			jNewObject.find("div[id^='file_small'] input[id^='small_field_id']").attr('name', 'small_property_' + index + '[]').val('');
@@ -301,8 +314,6 @@
 			jNewObject.find("input[type='text']#description_large").attr('name', 'description_property_' + index + '[]');
 			jNewObject.find("input[type='text']#description_small").attr('name', 'description_small_property_' + index + '[]');
 
-			//jNewObject.find("img#delete").attr('onclick', "jQuery.deleteNewProperty(this)");
-
 			var oDateTimePicker = jProperies.find('div[id ^= "div_property_' + index + '_"], div[id ^= "div_field_id_"]').data('DateTimePicker');
 
 			if(oDateTimePicker)
@@ -310,28 +321,6 @@
 				jNewObject.find('script').remove();
 				jNewObject.find('div[id ^= "div_property_' + index + '_"], div[id ^= "div_field_id_"]').datetimepicker({locale: 'ru', format: oDateTimePicker.format()});
 			}
-			//jNewObject.find('input.hasDatepicker').attr('id', 'date_id_' + iRand).datepicker();
-
-			// После внесения в DOM
-			/*
- 			jNewObject.find("a[onclick*='watermark_property_'],a[onclick*='watermark_small_property_']").each(function(index, object){
-				var jObject = $(object), tmp = $(object).attr('onclick');
-				jObject.attr('onclick', tmp.replace('_property_', '_property_' + iRand + '_'));
-			});
-
-
-			jNewObject.find("div[id*='watermark_property_'],div[id*='watermark_small_property_']").each(function(index, object){
-				var jObject = $(object), tmp = $(object).attr('id');
-				jObject.attr('id', tmp.replace('_property_', '_property_' + iRand + '_'));
-
-				jObject.HostCMSWindow({ autoOpen: false, destroyOnClose: false, AppendTo: '#' + jNewObject.prop('id'), width: 360, height: 230, addContentPadding: true, modal: false, Maximize: false, Minimize: false });
-			});
-
-			jNewObject.find("div[aria-labelledby*='watermark_property_'],div[aria-labelledby*='watermark_small_property_']").each(function(index, object){
-				var jObject = $(object), tmp = $(object).attr('aria-labelledby');
-				jObject.attr('aria-labelledby', tmp.replace('_property_', '_property_' + iRand + '_'));
-			});
-			*/
 		}
 	});
 
@@ -378,7 +367,6 @@
 
 })(jQuery);
 
-
 $(function(){
 	$('.page-content').on('click', '[id ^= \'file_\'][id *= \'_settings_\']', function() {
 		$(this)
@@ -399,44 +387,22 @@ $(function(){
 		{
 			$(this).after(popoverContent.hide());
 		}
+		$(this).find("i.fa").toggleClass("fa-times fa-cog");
+	})
+	.on('show.bs.popover', '[id ^= \'file_\'][id *= \'_settings_\']', function () {
+		$(this).find("i.fa").toggleClass("fa-times fa-cog");
 	});
 
 	$('.page-content').on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-		//console.log(e.target); // newly activated tab
 		$(e.target.getAttribute('href')).refreshEditor();
-		//console.log(e.target.getAttribute('href'));
 	});
 
 	$('.page-container')
-/*
-	.on('mouseenter', '.page-sidebar.menu-compact .sidebar-menu > li', function() {
-		$(this).addClass('compact_submenu');
-		//console.log('Показ наведением мыши', $(this).attr('class'));
-	})
-	.on('mouseleave', '.page-sidebar.menu-compact .sidebar-menu > li', function(e) {
-		//console.log('Скрытие уводом мыши',  $(this).attr('class'));
-		$(this).removeClass('compact_submenu');
-	})
-	.on('click', '.page-sidebar.menu-compact .sidebar-menu .submenu > li', function(e) {
-		$(this).parents('li.compact_submenu').removeClass('compact_submenu');
-		//console.log('Скрытие нажатием мыши', $(this).parents('li'));
-	})
-	*/
-	/*
-	.on('touchend', '.page-sidebar.menu-compact .sidebar-menu > li', function(e) {
-		$(this).addClass('compact_submenu');
-		console.log('Показ тачем', $(this).attr('class'));
-		//e.preventDefault();
-		//return false;
-	})	*/
 	.on('touchend', '.page-sidebar.menu-compact .sidebar-menu .submenu > li', function(e) {
-		//$(this).parents('li.compact_submenu').removeClass('compact_submenu');
-		//console.log('!!!!!Скрытие тачем', $(this).parents('li'));
 		$(this).find('a').click();
 	});
 
 });
-
 
 var methods = {
 	show: function() {

@@ -10,14 +10,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
- class Shop_Discount_Model extends Core_Entity
+ class Shop_Bonus_Model extends Core_Entity
 {
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
 	 */
 	protected $_hasMany = array(
-		'shop_item_discount' => array()
+		'shop_item_bonus' => array()
 	);
 
 	/**
@@ -43,7 +43,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	 * Backend property
 	 * @var int
 	 */
-	public $img = 0;
+	public $img = 1;
 	
 	/**
 	 * Constructor.
@@ -63,7 +63,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	}
 
 	/**
-	 * Check if discount active is
+	 * Check if bonus active is
 	 * @return boolean
 	 */
 	public function isActive()
@@ -74,7 +74,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	}
 
 	/**
-	 * Change discount status
+	 * Change bonus status
 	 * @return self
 	 */
 	public function changeStatus()
@@ -98,19 +98,19 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 		$this->id = $primaryKey;
 
-		$aShop_Item_Discounts = $this->Shop_Item_Discounts->findAll(FALSE);
-		foreach($aShop_Item_Discounts as $oShop_Item_Discount)
+		$aShop_Item_Bonuses = $this->Shop_Item_Bonuses->findAll(FALSE);
+		foreach($aShop_Item_Bonuses as $oShop_Item_Bonus)
 		{
-			$oShop_Item_Discount->delete();
+			$oShop_Item_Bonus->delete();
 		}
 
 		return parent::delete($primaryKey);
 	}
-	
+
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
-	 * @hostcms-event shop_discount.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_bonus.onBeforeRedeclaredGetXml
 	 */
 	public function getXml()
 	{
@@ -122,5 +122,5 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 			: $this->addXmlTag('amount', $this->value);
 
 		return parent::getXml();
-	}	
+	}
 }

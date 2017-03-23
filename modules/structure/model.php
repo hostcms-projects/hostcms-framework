@@ -348,7 +348,7 @@ class Structure_Model extends Core_Entity
 	 * @param Admin_Form_Controller $oAdmin_Form_Controller
 	 * @return string
 	 */
-	public function name($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	/*public function name($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		$link = $oAdmin_Form_Field->link;
 		$onclick = $oAdmin_Form_Field->onclick;
@@ -380,7 +380,22 @@ class Structure_Model extends Core_Entity
 			);
 
 		$oCore_Html_Entity_Div->execute();
-	}
+	}*/
+	
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Structures->getCount();
+		$count > 0 && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-default badge-square')
+			->value($count)
+			->execute();
+	}	
 
 	/**
 	 * Backend callback method

@@ -30,7 +30,7 @@ class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab
 			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
-		$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('active'), $oMainRow1);
 
 		$this->getField('active')->divAttr(array('class' => 'form-group col-lg-6 col-md-6'));

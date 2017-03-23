@@ -32,6 +32,6 @@ return array(
 	'edit_success' => "Данные о продавце успешно добавлены!",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
-	'markDeleted_success' => "Информация о производителе успешно удалена!",
+	'markDeleted_success' => "Информация о продавце успешно удалена!",
 	'changeDefaultStatus_success' => "Информация успешно изменена",
 );

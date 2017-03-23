@@ -37,11 +37,11 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 				<div class="col-lg-6 col-md-5 col-sm-5 col-xs-5"><?php
 		}
 
-		?><span class="caption"><?php echo $this->caption;
-
-		$this->invertor && $this->_invertor();
-		
-		?></span><?php
+		// Не показывать <span>, если пустой. Используется при сдвоенных селекторах
+		if (strlen($this->caption))
+		{
+			?><span class="caption"><?php echo $this->caption; $this->invertor && $this->_invertor();?></span><?php
+		}
 
 		if (count($this->_children))
 		{
@@ -134,7 +134,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 			->class('col-lg-3 col-md-3 col-sm-3 col-xs-4 no-padding-left')
 			->add(
 				Admin_Form_Entity::factory('Div')
-					->class('input-group margin-top-21')
+					->class('input-group' . (strlen($this->caption) ? ' margin-top-21' : ''))
 					->add(
 						Admin_Form_Entity::factory('Code')
 							->html('<span class="input-group-addon"><i class="fa fa-search"></i></span>
@@ -147,7 +147,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 			->execute();
 
 			Admin_Form_Entity::factory('Div')
-				->class('col-lg-3 col-md-4 col-sm-4 col-xs-3 no-padding-left margin-top-21')
+				->class('col-lg-3 col-md-4 col-sm-4 col-xs-3 no-padding-left' . (strlen($this->caption) ? ' margin-top-21' : ''))
 				->add(
 					Admin_Form_Entity::factory('Code')
 						->html('<label class="checkbox-inline">' .

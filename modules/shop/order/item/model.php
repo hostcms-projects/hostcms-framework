@@ -5,6 +5,12 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Online shop.
  *
+ * Типы твоаров:
+ * 0 - Товар
+ * 1 - Доставка
+ * 2 - Пополнение лицевого счета
+ * 3 - Списание бонусов в счет оплаты счета
+ *
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
@@ -186,7 +192,7 @@ class Shop_Order_Item_Model extends Core_Entity
 	/**
 	 * Show properties in XML
 	 * @param mixed $showXmlProperties array of allowed properties ID or boolean
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlProperties($showXmlProperties = TRUE)
 	{

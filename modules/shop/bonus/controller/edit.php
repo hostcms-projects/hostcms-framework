@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Shop_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
+class Shop_Bonus_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
 	/**
 	 * Set object
@@ -24,17 +24,7 @@ class Shop_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			$object->shop_id = Core_Array::getGet('shop_id');
 		}
 
-		return parent::setObject($object);
-	}
-
-	/**
-	 * Prepare backend item's edit form
-	 *
-	 * @return self
-	 */
-	protected function _prepareForm()
-	{
-		parent::_prepareForm();
+		parent::setObject($object);
 
 		$oMainTab = $this->getTab('main');
 		$oAdditionalTab = $this->getTab('additional');
@@ -60,10 +50,10 @@ class Shop_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$oTypeSelectField
 			->name('type')
 			->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-6 col-xs-6'))
-			->caption(Core::_('Shop_Discount.type'))
+			->caption(Core::_('Shop_Bonus.type'))
 			->options(array(
-				Core::_('Shop_Discount.form_edit_affiliate_values_type_percent'),
-				Core::_('Shop_Discount.form_edit_affiliate_values_type_summ'))
+				Core::_('Shop_Bonus.form_edit_affiliate_values_type_percent'),
+				Core::_('Shop_Bonus.form_edit_affiliate_values_type_summ'))
 			)
 			->value($this->_object->type);
 
@@ -72,8 +62,8 @@ class Shop_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 			->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-6 col-xs-6')), $oMainRow1);
 
 		$title = $this->_object->id
-			? Core::_('Shop_Discount.item_discount_edit_form_title')
-			: Core::_('Shop_Discount.item_discount_add_form_title');
+			? Core::_('Shop_Bonus.edit_title')
+			: Core::_('Shop_Bonus.add_title');
 
 		$this->title($title);
 

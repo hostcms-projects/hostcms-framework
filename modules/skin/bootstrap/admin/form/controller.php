@@ -48,6 +48,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						$oAdmin_Form_Field->allow_filter && $allow_filter = TRUE;
 
 						// Перекрытие параметров для данного поля
+						$oAdmin_Form_Field_Changed = $oAdmin_Form_Field;
 						foreach ($this->_datasets as $datasetKey => $oAdmin_Form_Dataset)
 						{
 							$oAdmin_Form_Field_Changed = $this->_changeField($oAdmin_Form_Dataset, $oAdmin_Form_Field);
@@ -673,6 +674,16 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 								catch (Exception $e)
 								{
 									Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
+								}
+								
+								// Badges
+								$badgesMethodName = $fieldName . 'Badge';
+								if (method_exists($oEntity, $badgesMethodName)
+									|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($badgesMethodName)
+								)
+								{
+									// Выполним функцию обратного вызова
+									$oEntity->$badgesMethodName($oAdmin_Form_Field, $this);
 								}
 								?></td><?php
 							}

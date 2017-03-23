@@ -817,6 +817,44 @@ class Skin_Bootstrap extends Core_Skin
 			exit();
 		}
 
+		// Ajax note creating
+		if (!is_null(Core_Array::getGet('ajaxCreateNote')))
+		{
+			$oUser_Note = Core_Entity::factory('User_Note')->save();
+
+			$oAdmin_Answer = Core_Skin::instance()->answer();
+			$oAdmin_Answer
+				->content($oUser_Note->id)
+				->ajax($bAjax)
+				->execute();
+			exit();
+		}
+
+		// Ajax note changing
+		if (!is_null(Core_Array::getGet('ajaxNote')))
+		{
+			$oUser_Note = Core_Entity::factory('User_Note')->find(intval(Core_Array::getGet('entity_id')));
+
+			if (!is_null($oUser_Note->id) && $oUser_Note->user_id == $oUser->id)
+			{
+				switch (Core_Array::getGet('action'))
+				{
+					case 'delete':
+						$oUser_Note->markDeleted();
+					break;
+					case 'save':
+						$oUser_Note->value(Core_Array::getPost('value', ''))->save();
+					break;
+				}
+			}
+
+			$oAdmin_Answer = Core_Skin::instance()->answer();
+			$oAdmin_Answer
+				->ajax($bAjax)
+				->execute();
+			exit();
+		}
+
 		$aModules = $this->_getAllowedModules();
 
 		$oAdmin_View = Admin_View::create();

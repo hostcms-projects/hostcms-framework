@@ -310,7 +310,7 @@ abstract class Core_DataBase
 			'host' => 'localhost',
 			'username' => '',
 			'password' => '',
-			'database' => '',
+			'database' => NULL,
 			'charset' => 'UTF8',
 			'newlink' => FALSE,
 			'attr' => array(),

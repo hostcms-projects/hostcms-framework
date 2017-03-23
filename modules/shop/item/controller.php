@@ -240,6 +240,49 @@ class Shop_Item_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Calculate total bonuses for oShop_Item
+	 * @param Shop_Item_Model $oShop_Item item
+	 * @return array array('total' => Total bonuses, 'bonuses' => array of bonuses)
+	 */
+	public function getBonuses(Shop_Item_Model $oShop_Item, $price)
+	{
+		$aBonuses = array(
+			'total' => 0,
+			'bonuses' => array()
+		);
+
+		// Определены ли скидки на товар
+		$aShop_Item_Bonuses = $oShop_Item->Shop_Item_Bonuses->findAll();
+
+		if (count($aShop_Item_Bonuses))
+		{
+			// Определяем количество скидок на товар
+			$bonusPercent = $bonusAmount = 0;
+
+			// Цикл по идентификаторам скидок для товара
+			foreach ($aShop_Item_Bonuses as $oShop_Item_Bonus)
+			{
+				$oShop_Bonus = $oShop_Item_Bonus->Shop_Bonus;
+				if ($oShop_Bonus->isActive())
+				{
+					$aBonuses['bonuses'][] = $oShop_Bonus;
+
+					$oShop_Bonus->type == 0
+						? $bonusPercent += $oShop_Bonus->value
+						: $bonusAmount += $oShop_Bonus->value;
+				}
+			}
+
+			// Определяем суммарную величину бонусов в %
+			$aBonuses['total'] += Shop_Controller::instance()->round(
+				$price * $bonusPercent / 100 + $bonusAmount
+			);
+		}
+
+		return $aBonuses;
+	}
+
+	/**
 	 * Get price for current user
 	 * @param Shop_Item_Model $oShop_Item item
 	 * @return float

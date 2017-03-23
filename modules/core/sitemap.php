@@ -104,14 +104,14 @@ class Core_Sitemap extends Core_Servant_Properties
 	}
 
 	/**
-	 * Add structure nodes by parent
+	 * Select Structure_Models by parent_id
 	 * @param int $structure_id structure ID
-	 * @return self
+	 * @return array
 	 */
-	protected function _structure($structure_id = 0)
+	protected function _selectStructuresByParentId($structure_id)
 	{
 		$oSite = $this->getSite();
-
+		
 		$oStructures = $oSite->Structures;
 		$oStructures
 			->queryBuilder()
@@ -123,6 +123,20 @@ class Core_Sitemap extends Core_Servant_Properties
 			->orderBy('name');
 
 		$aStructure = $oStructures->findAll(FALSE);
+		
+		return $aStructure;
+	}
+	
+	/**
+	 * Add structure nodes by parent
+	 * @param int $structure_id structure ID
+	 * @return self
+	 */
+	protected function _structure($structure_id = 0)
+	{
+		$oSite = $this->getSite();
+
+		$aStructure = $this->_selectStructuresByParentId($structure_id);
 
 		$dateTime = Core_Date::timestamp2sql(time());
 

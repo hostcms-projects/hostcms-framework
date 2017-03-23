@@ -30,4 +30,5 @@ return array(
 	'undelete_success' => 'Item restored successfully!',
 	'update_currency' => 'Update exchange rates',
 	'update_success'=>'Exchange rates was updated successfully',
+	'date'=>'Exchange rate date',
 );

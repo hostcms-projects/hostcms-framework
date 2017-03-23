@@ -203,20 +203,20 @@ class Shop_Order_Model extends Core_Entity
 	}
 
 	/**
-	 * Get sum of order
+	 * Get amount of order
 	 * @return float
 	 */
 	public function getAmount()
 	{
-		$sum = 0;
+		$fAmount = 0;
 
-		$aOrderItems = $this->Shop_Order_Items->findAll();
+		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
 		foreach($aOrderItems as $oOrderItem)
 		{
-			$sum += $oOrderItem->getAmount();
+			$fAmount += $oOrderItem->getAmount();
 		}
 
-		return $sum;
+		return $fAmount;
 	}
 
 	/**
@@ -749,7 +749,7 @@ class Shop_Order_Model extends Core_Entity
 			$this->_paidTransaction();
 
 			// Удалить зарезервированные товары
-			$this->Shop_Item_Reserveds->deleteAll();
+			$this->deleteReservedItems();
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterPaid', $this);
@@ -774,11 +774,25 @@ class Shop_Order_Model extends Core_Entity
 
 			// Вернуть списанные товары
 			$this->_paidTransaction();
+
+			// Удалить зарезервированные товары
+			$this->deleteReservedItems();
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterCancelPaid', $this);
 
 		return $this->save();
+	}
+
+	/**
+	 * Delete reserved items for order
+	 * @return self
+	 */
+	public function deleteReservedItems()
+	{
+		$this->Shop_Item_Reserveds->deleteAll(FALSE);
+
+		return $this;
 	}
 
 	/**
@@ -795,12 +809,14 @@ class Shop_Order_Model extends Core_Entity
 		$aShop_Order_Items = $this->Shop_Order_Items->findAll();
 		foreach ($aShop_Order_Items as $oShop_Order_Item)
 		{
+			$oShop_Item = $oShop_Order_Item->Shop_Item;
+
 			// электронный товар
-			if ($oShop_Order_Item->Shop_Item->type == 1
+			if ($oShop_Item->type == 1
 				&& $oShop_Order_Item->Shop_Order_Item_Digitals->getCount(FALSE) == 0)
 			{
 				// Получаем все файлы электронного товара
-				$aShop_Item_Digitals = $oShop_Order_Item->Shop_Item->Shop_Item_Digitals->getBySorting();
+				$aShop_Item_Digitals = $oShop_Item->Shop_Item_Digitals->getBySorting();
 
 				if (count($aShop_Item_Digitals))
 				{
@@ -852,14 +868,26 @@ class Shop_Order_Model extends Core_Entity
 				$oShop_Order_Item->save();
 			}
 			// Пополнение лицевого счета
-			elseif ($oShop_Order_Item->type == 2)
+			elseif ($oShop_Order_Item->type == 2 && Core::moduleIsActive('siteuser'))
 			{
 				// Проведение/стронирование транзакции
 				$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');
 				$oShop_Siteuser_Transaction->shop_id = $oShop->id;
 				$oShop_Siteuser_Transaction->siteuser_id = $this->siteuser_id;
 				$oShop_Siteuser_Transaction->active = 1;
-				$oShop_Siteuser_Transaction->amount_base_currency = $oShop_Siteuser_Transaction->amount = $oShop_Order_Item->price * $oShop_Order_Item->quantity * $mode;
+
+				// Определяем коэффициент пересчета
+				$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+					? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+						$this->Shop_Currency, $oShop->Shop_Currency
+					)
+					: 0;
+
+				$fAmount = $oShop_Order_Item->price * $oShop_Order_Item->quantity * $mode;
+
+				$oShop_Siteuser_Transaction->amount = $fAmount;
+				$oShop_Siteuser_Transaction->shop_currency_id = $this->shop_currency_id;
+				$oShop_Siteuser_Transaction->amount_base_currency = $fAmount * $fCurrencyCoefficient;
 				$oShop_Siteuser_Transaction->shop_order_id = $this->id;
 				$oShop_Siteuser_Transaction->type = 0;
 				$oShop_Siteuser_Transaction->description = $oShop_Order_Item->name;
@@ -873,7 +901,7 @@ class Shop_Order_Model extends Core_Entity
 					? $oShop_Order_Item->Shop_Warehouse
 					: $oShop->Shop_Warehouses->getDefault();
 
-				if (!is_null($oShop_Warehouse) && $oShop_Order_Item->Shop_Item->id)
+				if (!is_null($oShop_Warehouse) && $oShop_Item->id)
 				{
 					$oShop_Warehouse_Item = $oShop_Warehouse->Shop_Warehouse_Items->getByShopItemId($oShop_Order_Item->Shop_Item->id);
 
@@ -882,6 +910,39 @@ class Shop_Order_Model extends Core_Entity
 						$oShop_Warehouse_Item->count -= $oShop_Order_Item->quantity * $mode;
 						$oShop_Warehouse_Item->save();
 					}
+				}
+			}
+
+			// Начисление/списание бонусов
+			if ($oShop_Item->id && Core::moduleIsActive('siteuser'))
+			{
+				$oShop_Item_Controller = new Shop_Item_Controller();
+				$aBonuses = $oShop_Item_Controller->getBonuses($oShop_Item, $oShop_Order_Item->price);
+
+				if ($aBonuses['total'])
+				{
+					// Проведение/стронирование транзакции
+					$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');
+					$oShop_Siteuser_Transaction->shop_id = $oShop->id;
+					$oShop_Siteuser_Transaction->siteuser_id = $this->siteuser_id;
+					$oShop_Siteuser_Transaction->active = 1;
+
+					// Определяем коэффициент пересчета
+					$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+						? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+							$this->Shop_Currency, $oShop->Shop_Currency
+						)
+						: 0;
+
+					$fAmount = $aBonuses['total'] * $oShop_Order_Item->quantity * $mode;
+
+					$oShop_Siteuser_Transaction->amount = $fAmount;
+					$oShop_Siteuser_Transaction->shop_currency_id = $this->shop_currency_id;
+					$oShop_Siteuser_Transaction->amount_base_currency = $fAmount * $fCurrencyCoefficient;
+					$oShop_Siteuser_Transaction->shop_order_id = $this->id;
+					$oShop_Siteuser_Transaction->type = 0;
+					$oShop_Siteuser_Transaction->description = Core::_('Shop_Bonus.bonus_transaction_name', $this->invoice);
+					$oShop_Siteuser_Transaction->save();
 				}
 			}
 		}

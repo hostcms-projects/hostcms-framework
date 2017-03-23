@@ -711,8 +711,8 @@ class Shop_Group_Model extends Core_Entity
 		$this->items_total_count > 0 && $oCore_Html_Entity_Div
 			->add(
 				Core::factory('Core_Html_Entity_Span')
-					->class('count')
-					->value(htmlspecialchars($this->items_total_count))
+					->class('badge badge-default badge-square')
+					->value($this->items_total_count)
 			);
 
 		$oCore_Html_Entity_Div->execute();

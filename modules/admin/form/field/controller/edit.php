@@ -94,14 +94,14 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 							'maxlen' => array('value' => 255)
 						)
 					)
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Field.form_forms_field_lng_description') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($description)
 					->rows(2)
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oNameTab
 					->add(
@@ -171,19 +171,19 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$oMainTab->move($this->getField('editable'), $oMainRow5);
 
 		$this->getField('image')
-			->divAttr(array('id' => 'image', 'class' => 'form-group col-lg-12'))
+			->divAttr(array('id' => 'image', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 			->rows(3);
 
 		$this->getField('link')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 			->rows(2);
 
 		$this->getField('onclick')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 			->rows(2);
 
 		$this->getField('list')
-			->divAttr(array('id' => 'list', 'class' => 'form-group col-lg-12'))
+			->divAttr(array('id' => 'list', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 			->rows(3);
 
 		$oMainTab
