@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Model extends Core_Entity
 {
@@ -112,7 +112,7 @@ class Site_Model extends Core_Entity
 		'error' => 'E_ALL',
 		'error404' => 0,
 		'error403' => 0,
-		'robots' => "User-agent: *\nDisallow: /admin",
+		'robots' => "User-Agent: *\nDisallow: /admin\n",
 		'closed' => 0,
 		'safe_email' => 1,
 		'html_cache_use' => 0,

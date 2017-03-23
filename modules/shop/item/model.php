@@ -73,7 +73,7 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function __isset($property)
 	{
-		return in_array(strtolower($property), array('adminprice'))
+		return strtolower($property) == 'adminprice'
 			? TRUE
 			: parent::__isset($property);
 	}
@@ -86,7 +86,16 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function __set($property, $value)
 	{
-		$property == 'adminPrice' && $property = 'price';
+		if ($property == 'adminPrice')
+		{
+			$this->adminPrice($value);
+			return $this;
+		}
+
+		/*$tmpProperty = $property == 'adminPrice'
+			? 'price'
+			: $property;*/
+
 		return parent::__set($property, $value);
 	}
 
@@ -97,7 +106,7 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function __get($property)
 	{
-		return in_array(strtolower($property), array('adminprice'))
+		return strtolower($property) == 'adminprice'
 			? ($this->shortcut_id
 				? Core_Entity::factory('Shop_Item', $this->shortcut_id)->price
 				: $this->price)
@@ -385,14 +394,26 @@ class Shop_Item_Model extends Core_Entity
 		if (is_null($value) || is_object($value))
 		{
 			$oShopItem = $this->shortcut_id
-				? Core_Entity::factory("Shop_Item", $this->shortcut_id)
+				? Core_Entity::factory('Shop_Item', $this->shortcut_id)
 				: $this;
 
 			return $oShopItem->price;
 		}
 
-		$this->price = $value;
-		$this->save();
+		if ($this->price != $value)
+		{
+			Core_Event::notify($this->_modelName . '.onBeforeAdminPrice', $this);
+
+			$this->price = $value;
+			//$this->save();
+			echo "CLEAR CACHE";
+			var_dump($value);
+			$this->clearCache();
+
+			Core_Event::notify($this->_modelName . '.onAfterAdminPrice', $this);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -923,7 +944,8 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function indexing()
 	{
-		$oSearch_Page = Core_Entity::factory('Search_Page');
+		//$oSearch_Page = Core_Entity::factory('Search_Page');
+		$oSearch_Page = new stdClass();
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
@@ -999,6 +1021,10 @@ class Shop_Item_Model extends Core_Entity
 				. $this->Shop->Structure->getPath()
 				. $this->getPath();
 		}
+		else
+		{
+			return NULL;
+		}
 
 		$oSearch_Page->size = mb_strlen($oSearch_Page->text);
 		$oSearch_Page->site_id = $this->Shop->site_id;
@@ -1011,17 +1037,19 @@ class Shop_Item_Model extends Core_Entity
 		$oSearch_Page->module_value_type = 2; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
 
+		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
+
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->save();
+		//$oSearch_Page->save();
 
-		Core_QueryBuilder::delete('search_page_siteuser_groups')
+		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
 			->where('search_page_id', '=', $oSearch_Page->id)
 			->execute();
 
 		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
 		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);
+		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
 
 		return $oSearch_Page;
 	}

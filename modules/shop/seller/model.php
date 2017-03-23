@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Seller_Model extends Core_Entity
 {
@@ -79,7 +79,8 @@ class Shop_Seller_Model extends Core_Entity
 	 */
 	public function indexing()
 	{
-		$oSearch_Page = Core_Entity::factory('Search_Page');
+		//$oSearch_Page = Core_Entity::factory('Search_Page');
+		$oSearch_Page = new stdClass();
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
@@ -94,6 +95,10 @@ class Shop_Seller_Model extends Core_Entity
 				. $this->Shop->Structure->getPath()
 				. $this->getPath();
 		}
+		else
+		{
+			return NULL;
+		}
 
 		$oSearch_Page->size = mb_strlen($oSearch_Page->text);
 		$oSearch_Page->site_id = $this->Shop->site_id;
@@ -104,17 +109,19 @@ class Shop_Seller_Model extends Core_Entity
 		$oSearch_Page->module_value_type = 3; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
 
+		$oSearch_Page->siteuser_groups = array(intval($this->Shop->siteuser_group_id));
+		
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->save();
+		//$oSearch_Page->save();
 
-		Core_QueryBuilder::delete('search_page_siteuser_groups')
+		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
 			->where('search_page_id', '=', $oSearch_Page->id)
 			->execute();
 
 		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
 		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->Shop->siteuser_group_id;
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);
+		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
 
 		return $oSearch_Page;
 	}

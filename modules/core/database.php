@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_DataBase
 {
@@ -425,8 +425,19 @@ abstract class Core_DataBase
 			// Available since PHP 4.3.10 and PHP 5.0.3.
 			return sprintf("%F", $value);
 		}
+		elseif (is_array($value))
+		{
+			foreach ($value as $mKey => $mValue)
+			{
+				$value[$mKey] = $this->quote($mValue);
+			}
 
-		throw new Core_Exception('Wrong argument type (expected String) for quote()');
+			return '(' . implode(',', $value) . ')';
+		}
+
+		throw new Core_Exception("Wrong argument type '%type' (expected string) for quote()", array(
+				'%type' => gettype($value)
+			));
 	}
 
 	/**

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 {
@@ -290,7 +290,7 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 	 * @param string $value value
 	 * @return Core_QueryBuilder_Selection
 	 */
-	public function where($column, $expression, $value)
+	public function where($column, $expression = NULL, $value = NULL)
 	{
 		$this->_where[] = array(
 			$this->_operator => array($column, $expression, $value)

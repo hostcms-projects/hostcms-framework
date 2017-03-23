@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Model extends Core_Entity
 {
@@ -43,7 +43,8 @@ class Structure_Model extends Core_Entity
 		'template_id' => 0,
 		// Warning: Удалить после объединения
 		'data_template_id' => 0,
-		'show' => 1
+		'show' => 1,
+		'url' => ''
 	);
 
 	/**
@@ -699,15 +700,20 @@ class Structure_Model extends Core_Entity
 	 */
 	public function indexing()
 	{
-		$oSearch_Page = Core_Entity::factory('Search_Page');
+		$oSearch_Page = new stdClass();
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = htmlspecialchars($this->name) . ' ' . $this->id . ' ' . htmlspecialchars($this->seo_title) . ' ' . htmlspecialchars($this->seo_description) . ' ' . htmlspecialchars($this->seo_keywords) . ' ' . htmlspecialchars($this->path);
+		$oSearch_Page->text = htmlspecialchars($this->name) . ' ' .
+			$this->id . ' ' .
+			htmlspecialchars($this->seo_title) . ' ' .
+			htmlspecialchars($this->seo_description) . ' ' .
+			htmlspecialchars($this->seo_keywords) . ' ' .
+			htmlspecialchars($this->path) . ' ';
 
 		$oSearch_Page->title = strlen($this->seo_title) > 0
-				? $this->seo_title
-				: $this->name;
+			? $this->seo_title
+			: $this->name;
 
 		// Для динамических страниц дата ставится текущая
 		$date = date('Y-m-d H:i:s');
@@ -720,7 +726,7 @@ class Structure_Model extends Core_Entity
 			if ($oDocument_Version)
 			{
 				$date = $oDocument_Version->datetime;
-				$oSearch_Page->text .= $oDocument_Version->loadFile();
+				$oSearch_Page->text .= $oDocument_Version->loadFile() . ' ';
 			}
 		}
 
@@ -738,7 +744,8 @@ class Structure_Model extends Core_Entity
 			$oShop = Core_Entity::factory('Shop')->getByStructureId($this->id);
 			if ($oShop)
 			{
-				$oSearch_Page->text .= htmlspecialchars($oShop->name) . ' ' . $oShop->description . ' ';
+				$oSearch_Page->text .= htmlspecialchars($oShop->name) . ' ' .
+					$oShop->description . ' ';
 			}
 		}
 
@@ -751,7 +758,7 @@ class Structure_Model extends Core_Entity
 				if ($oPropertyValue->value != 0)
 				{
 					$oList_Item = $oPropertyValue->List_Item;
-					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value);
+					$oList_Item->id && $oSearch_Page->text .= htmlspecialchars($oList_Item->value) . ' ';
 				}
 			}
 			// Informationsystem
@@ -762,7 +769,7 @@ class Structure_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name);
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ';
 					}
 				}
 			}
@@ -778,27 +785,23 @@ class Structure_Model extends Core_Entity
 		{
 			$oSearch_Page->url = 'http://' . $oSiteAlias->name . $this->getPath();
 		}
+		else
+		{
+			return NULL;
+		}
 
 		$oSearch_Page->size = mb_strlen($oSearch_Page->text);
 		$oSearch_Page->site_id = $this->site_id;
 		$oSearch_Page->datetime = $date;
 		$oSearch_Page->module = 0;
-		$oSearch_Page->module_id = $this->id;
+		$oSearch_Page->module_id = $this->site_id;
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 0; // search_page_module_value_type
-		$oSearch_Page->module_value_id = 0; // search_page_module_value_id
+		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+
+		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
 
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
-
-		$oSearch_Page->save();
-
-		Core_QueryBuilder::delete('search_page_siteuser_groups')
-			->where('search_page_id', '=', $oSearch_Page->id)
-			->execute();
-
-		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
-		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);
 
 		return $oSearch_Page;
 	}
@@ -859,7 +862,7 @@ class Structure_Model extends Core_Entity
 
 		return $return;
 	}
-	
+
 	/**
 	 * Clear tagged cache
 	 * @return self

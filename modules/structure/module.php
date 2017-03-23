@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +20,7 @@ class Structure_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-04-02';
+	public $date = '2015-05-14';
 	/**
 	 * Module name
 	 * @var string
@@ -57,12 +57,13 @@ class Structure_Module extends Core_Module{	/**
 			->where('structures.path', '!=', '')
 			->where('structures.url', '=', '')
 			->where('sites.deleted', '=', 0)
-			->orderBy('structures.id')
+			->where('sites.active', '=', 1)
+			->orderBy('structures.id', 'DESC')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexing', $this, array($oStructure));
 
-		$aStructures = $oStructure->findAll();
+		$aStructures = $oStructure->findAll(FALSE);
 
 		$result = array();
 		foreach ($aStructures as $oStructure)

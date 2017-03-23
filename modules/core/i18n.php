@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_I18n
 {
@@ -90,6 +90,47 @@ class Core_I18n
 	}
 
 	/**
+	 * Expand LNG
+	 * @param string $className class name
+	 * @param array $value
+	 * @param mixed $lng language
+	 * @return self
+	 */
+	public function expandLng($className, array $value, $lng = NULL)
+	{
+		is_null($lng) && $lng = $this->getLng();
+		$lng = basename($lng);
+		$className = basename(strtolower($className));
+
+		if ($className == '')
+		{
+			throw new Core_Exception('Classname is empty.');
+		}
+
+		$this->loadLng($lng, $className);
+
+		$this->_cache[$lng][$className] = $value + $this->_cache[$lng][$className];
+
+		return $this;
+	}
+
+	/**
+	 * Load LNG into cache
+	 * @param mixed $lng language
+	 * @param string $className class name
+	 * @return self
+	 */
+	public function loadLng($lng, $className)
+	{
+		if (!isset($this->_cache[$lng][$className]))
+		{
+			$this->_cache[$lng][$className] = $this->getLngFile($className, $lng);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Get text for key
 	 *
 	 * <code>
@@ -113,17 +154,14 @@ class Core_I18n
 	{
 		$aKey = explode('.', $key, 2);
 
-		if (is_null($lng))
-		{
-			$lng = $this->getLng();
-		}
-
 		if (count($aKey) == 2)
 		{
 			list($className, $textName) = $aKey;
 
-			$className = strtolower($className);
-			$className = basename($className);
+			is_null($lng) && $lng = $this->getLng();
+			$lng = basename($lng);
+
+			$className = basename(strtolower($className));
 
 			if ($className == '')
 			{
@@ -132,12 +170,8 @@ class Core_I18n
 			}
 
 			$textName = basename($textName);
-			$lng = basename($lng);
 
-			if (!isset($this->_cache[$lng][$className]))
-			{
-				$this->_cache[$lng][$className] = $this->getLngFile($className, $lng);
-			}
+			$this->loadLng($lng, $className);
 
 			if (isset($this->_cache[$lng][$className][$textName]))
 			{

@@ -7,9 +7,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
- * - itemsProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
+ * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
+ * - onStep(100) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 100
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -22,7 +23,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexMarket extends Core_Controller
 {
@@ -33,7 +34,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected $_allowedProperties = array(
 		'itemsProperties',
 		'modifications',
-		'type'
+		'type',
+		'onStep'
 	);
 
 	/**
@@ -277,7 +279,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->where('shop_items.yandex_market', '=', 1)
-			->where('shop_items.price', '>', 0);
+			->where('shop_items.price', '>', 0)
+			->where('shop_items.modification_id', '=', 0);
 
 		$this->_Shop_Groups = $oShop->Shop_Groups;
 		$this->_Shop_Groups
@@ -289,6 +292,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->itemsProperties = $this->modifications = TRUE;
 
 		$this->type = 'offer';
+		$this->onStep = 100;
 	}
 
 	/**
@@ -333,8 +337,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			if (trim($oShop_Currency->code) != ''
 			&& in_array($oShop_Currency->code, $aCurrenciesCodes))
 			{
-					echo '<currency id="' . Core_Str::xml($oShop_Currency->code) .
-							'" rate="' . Core_Str::xml($oShop_Currency->exchange_rate) .'"'. "/>\n";
+				echo '<currency id="' . Core_Str::xml($oShop_Currency->code) .
+					'" rate="' . Core_Str::xml($oShop_Currency->exchange_rate) .'"'. "/>\n";
 			}
 		}
 		echo '</currencies>'. "\n";
@@ -378,23 +382,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected function _offers()
 	{
-		$oShop = $this->getEntity();
-
-		if (!$this->modifications)
-		{
-			$this->_Shop_Items
-				->queryBuilder()
-				->where('shop_items.modification_id', '=', 0);
-		}
-
-		$sType = $this->type != 'offer'
-			? ' type="' . Core_Str::xml($this->type) . '"'
-			: '';
-
 		echo "<offers>\n";
 
 		$offset = 0;
-		$limit = 100;
+		$limit = $this->onStep;
 
 		do {
 			$oShop_Items = $this->_Shop_Items;
@@ -406,142 +397,19 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			foreach ($aShop_Items as $oShop_Item)
 			{
-				/* Устанавливаем атрибуты тега <offer>*/
-				$tag_bid = $oShop_Item->yandex_market_bid
-					? ' bid="' . Core_Str::xml($oShop_Item->yandex_market_bid) . '"'
-					: '';
-
-				$tag_cbid = $oShop_Item->yandex_market_cid
-					? ' cbid="' . Core_Str::xml($oShop_Item->yandex_market_cid) . '"'
-					: '';
-
-				$oShop_Warehouse_Item = $oShop_Item->Shop_Warehouse_Items->getByShopItemId($oShop_Item->id, FALSE);
-				$available = !is_null($oShop_Warehouse_Item) && $oShop_Warehouse_Item->count > 0 ? 'true' : 'false';
-
-				echo '<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cbid . $sType . " available=\"{$available}\">\n";
-
-				Core_Event::notify(get_class($this) . '.onBeforeOffer', $this, array($oShop_Item));
-
-				/* URL */
-				echo '<url>' . Core_Str::xml($this->_shopPath . $oShop_Item->getPath()) . '</url>'. "\n";
-
-				// Определяем цену со скидкой.
-				$price = array();
-				$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll(FALSE);
-				if (count($aShop_Item_Discounts))
+				$this->_showOffer($oShop_Item);
+				
+				if ($this->modifications)
 				{
-					// определяем количество скидок на товар
-					$discountPercent = $discountAmount = 0;
-
-					// Цикл по идентификаторам скидок для товара
-					foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
+					$aModifications = $oShop_Item->Modifications->findAll(FALSE);
+					
+					foreach ($aModifications as $oModification)
 					{
-						$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
-						if ($oShop_Discount->isActive())
-						{
-							$price['discounts'][] = $oShop_Discount;
-							$oShop_Discount->type == 0
-								? $discountPercent += $oShop_Discount->value
-								: $discountAmount += $oShop_Discount->value;
-						}
-					}
-
-					// Определяем суммарную величину скидки в %
-					$price['discount'] = $oShop_Item->price * $discountPercent / 100;
-
-					// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
-					($price['discount'] - $price['discount']) > $discountAmount && $price['discount'] += $discountAmount;
-
-					// Вычисляем цену со скидкой как ее разность с величиной скидки в %
-					$price['price_discount'] = $oShop_Item->price - $price['discount'];
-				}
-				else
-				{
-					// если скидок нет, то price_discount положим равным price
-					$price['price_discount'] = $oShop_Item->price;
-					$price['discount'] = 0;
-				}
-
-				/* Цена */
-				echo '<price>' . $price['price_discount'] . '</price>'. "\n";
-
-				/* CURRENCY */
-				// Обязательно поле в модели:
-				// (url?,buyurl?,price,wprice?,currencyId,xCategory?,categoryId+ ...
-				echo '<currencyId>'. Core_Str::xml($oShop_Item->Shop_Currency->code) . '</currencyId>'. "\n";
-
-				/* Идентификатор категории */
-				// Основной товар
-				if ($oShop_Item->modification_id == 0)
-				{
-					$categoryId = $oShop_Item->shop_group_id;
-				}
-				else // Модификация, берем ID родительской группы
-				{
-					$categoryId = $oShop_Item->Modification->Shop_Group->id
-						? $oShop_Item->Modification->Shop_Group->id
-						: 0;
-				}
-				echo '<categoryId>' . $categoryId . '</categoryId>'. "\n";
-
-				/* PICTURE */
-				if ($oShop_Item->image_large != '')
-				{
-					echo '<picture>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
-				}
-
-				// (name, vendor?, vendorCode?)
-				if (mb_strlen($oShop_Item->name) > 0)
-				{
-					/* NAME */
-					echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
-
-					if ($oShop_Item->Shop_Producer->id)
-					{
-						echo '<vendor>' . Core_Str::xml($oShop_Item->Shop_Producer->name) . '</vendor>'. "\n";
-					}
-
-					if ($oShop_Item->vendorcode != '')
-					{
-						echo '<vendorCode>' . Core_Str::xml($oShop_Item->vendorcode) . '</vendorCode>'. "\n";
+						$this->_showOffer($oModification);
 					}
 				}
-
-				/* DESCRIPTION */
-				if (!empty($oShop_Item->description))
-				{
-					echo '<description>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->description), ENT_COMPAT, 'UTF-8')) . '</description>'. "\n";
-				}
-
-				/* sales_notes */
-				$sales_notes = mb_strlen($oShop_Item->yandex_market_sales_notes) > 0
-					? $oShop_Item->yandex_market_sales_notes
-					: $oShop->yandex_market_sales_notes_default;
-
-				echo '<sales_notes>' . Core_Str::xml(html_entity_decode(strip_tags($sales_notes), ENT_COMPAT, 'UTF-8')) . '</sales_notes>'. "\n";
-
-				if ($oShop_Item->manufacturer_warranty)
-				{
-					echo '<manufacturer_warranty>true</manufacturer_warranty>'. "\n";
-				}
-
-				if (trim($oShop_Item->country_of_origin) != '')
-				{
-					echo '<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n";
-				}
-
-				// Элемент предназначен для обозначения товара, который можно скачать. Если указано значение параметра true, товарное предложение показывается во всех регионах независимо от регионов доставки, указанных магазином на странице Параметры размещения.
-				if ($oShop_Item->type == 1)
-				{
-					echo '<downloadable>true</downloadable>'. "\n";
-				}
-
-				$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
-
-				Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));
-
-				echo '</offer>'. "\n";
 			}
+			
 			Core_File::flush();
 			$offset += $limit;
 		}
@@ -550,6 +418,151 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		echo '</offers>'. "\n";
 
 		return $this;
+	}
+
+	protected function _showOffer($oShop_Item)
+	{
+		$oShop = $this->getEntity();
+
+		/* Устанавливаем атрибуты тега <offer>*/
+		$tag_bid = $oShop_Item->yandex_market_bid
+			? ' bid="' . Core_Str::xml($oShop_Item->yandex_market_bid) . '"'
+			: '';
+
+		$tag_cbid = $oShop_Item->yandex_market_cid
+			? ' cbid="' . Core_Str::xml($oShop_Item->yandex_market_cid) . '"'
+			: '';
+
+		$oShop_Warehouse_Item = $oShop_Item->Shop_Warehouse_Items->getByShopItemId($oShop_Item->id, FALSE);
+		$available = !is_null($oShop_Warehouse_Item) && $oShop_Warehouse_Item->count > 0 ? 'true' : 'false';
+
+		$sType = $this->type != 'offer'
+			? ' type="' . Core_Str::xml($this->type) . '"'
+			: '';
+
+		echo '<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cbid . $sType . " available=\"{$available}\">\n";
+
+		Core_Event::notify(get_class($this) . '.onBeforeOffer', $this, array($oShop_Item));
+
+		/* URL */
+		echo '<url>' . Core_Str::xml($this->_shopPath . $oShop_Item->getPath()) . '</url>'. "\n";
+
+		// Определяем цену со скидкой.
+		$price = array();
+		$aShop_Item_Discounts = $oShop_Item->Shop_Item_Discounts->findAll(FALSE);
+		if (count($aShop_Item_Discounts))
+		{
+			// определяем количество скидок на товар
+			$discountPercent = $discountAmount = 0;
+
+			// Цикл по идентификаторам скидок для товара
+			foreach ($aShop_Item_Discounts as $oShop_Item_Discount)
+			{
+				$oShop_Discount = $oShop_Item_Discount->Shop_Discount;
+				if ($oShop_Discount->isActive())
+				{
+					$price['discounts'][] = $oShop_Discount;
+					$oShop_Discount->type == 0
+						? $discountPercent += $oShop_Discount->value
+						: $discountAmount += $oShop_Discount->value;
+				}
+			}
+
+			// Определяем суммарную величину скидки в %
+			$price['discount'] = $oShop_Item->price * $discountPercent / 100;
+
+			// Если оставшаяся цена > скидки в фиксированном размере, то применяем скидку в фиксированном размере
+			($price['discount'] - $price['discount']) > $discountAmount && $price['discount'] += $discountAmount;
+
+			// Вычисляем цену со скидкой как ее разность с величиной скидки в %
+			$price['price_discount'] = $oShop_Item->price - $price['discount'];
+		}
+		else
+		{
+			// если скидок нет, то price_discount положим равным price
+			$price['price_discount'] = $oShop_Item->price;
+			$price['discount'] = 0;
+		}
+
+		/* Цена */
+		echo '<price>' . $price['price_discount'] . '</price>'. "\n";
+
+		/* CURRENCY */
+		// Обязательно поле в модели:
+		// (url?,buyurl?,price,wprice?,currencyId,xCategory?,categoryId+ ...
+		echo '<currencyId>'. Core_Str::xml($oShop_Item->Shop_Currency->code) . '</currencyId>'. "\n";
+
+		/* Идентификатор категории */
+		// Основной товар
+		if ($oShop_Item->modification_id == 0)
+		{
+			$categoryId = $oShop_Item->shop_group_id;
+		}
+		else // Модификация, берем ID родительской группы
+		{
+			$categoryId = $oShop_Item->Modification->Shop_Group->id
+				? $oShop_Item->Modification->Shop_Group->id
+				: 0;
+		}
+		echo '<categoryId>' . $categoryId . '</categoryId>'. "\n";
+
+		/* PICTURE */
+		if ($oShop_Item->image_large != '')
+		{
+			echo '<picture>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
+		}
+
+		// (name, vendor?, vendorCode?)
+		if (mb_strlen($oShop_Item->name) > 0)
+		{
+			/* NAME */
+			echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
+
+			if ($oShop_Item->Shop_Producer->id)
+			{
+				echo '<vendor>' . Core_Str::xml($oShop_Item->Shop_Producer->name) . '</vendor>'. "\n";
+			}
+
+			if ($oShop_Item->vendorcode != '')
+			{
+				echo '<vendorCode>' . Core_Str::xml($oShop_Item->vendorcode) . '</vendorCode>'. "\n";
+			}
+		}
+
+		/* DESCRIPTION */
+		if (!empty($oShop_Item->description))
+		{
+			echo '<description>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->description), ENT_COMPAT, 'UTF-8')) . '</description>'. "\n";
+		}
+
+		/* sales_notes */
+		$sales_notes = mb_strlen($oShop_Item->yandex_market_sales_notes) > 0
+			? $oShop_Item->yandex_market_sales_notes
+			: $oShop->yandex_market_sales_notes_default;
+
+		echo '<sales_notes>' . Core_Str::xml(html_entity_decode(strip_tags($sales_notes), ENT_COMPAT, 'UTF-8')) . '</sales_notes>'. "\n";
+
+		if ($oShop_Item->manufacturer_warranty)
+		{
+			echo '<manufacturer_warranty>true</manufacturer_warranty>'. "\n";
+		}
+
+		if (trim($oShop_Item->country_of_origin) != '')
+		{
+			echo '<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n";
+		}
+
+		// Элемент предназначен для обозначения товара, который можно скачать. Если указано значение параметра true, товарное предложение показывается во всех регионах независимо от регионов доставки, указанных магазином на странице Параметры размещения.
+		if ($oShop_Item->type == 1)
+		{
+			echo '<downloadable>true</downloadable>'. "\n";
+		}
+
+		$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
+
+		Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));
+
+		echo '</offer>'. "\n";
 	}
 
 	/**
@@ -561,7 +574,16 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	{
 		// Доп. св-ва выводятся в <param>
 		// <param name="Максимальный формат">А4</param>
-		$aProperty_Values = $oShop_Item->getPropertyValues(FALSE);
+		//$aProperty_Values = $oShop_Item->getPropertyValues(FALSE);
+
+		if (is_array($this->itemsProperties))
+		{
+			$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id);
+		}
+		else
+		{
+			$aProperty_Values = $oShop_Item->getPropertyValues(FALSE);
+		}
 
 		foreach ($aProperty_Values as $oProperty_Value)
 		{

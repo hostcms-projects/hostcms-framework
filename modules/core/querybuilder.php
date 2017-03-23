@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_QueryBuilder
 {
@@ -59,6 +59,19 @@ abstract class Core_QueryBuilder
 	{
 		$args = func_get_args();
 		return Core_QueryBuilder::factory('Insert', $args);
+	}
+
+	/**
+	 * Create and return a REPLACE Database Abstraction Layer
+	 * <code>
+	 * $oCore_QueryBuilder_Replace = Core_QueryBuilder::replace();
+	 * </code>
+	 * @return Core_QueryBuilder_Replace
+	 */
+	static public function replace()
+	{
+		$args = func_get_args();
+		return Core_QueryBuilder::factory('Replace', $args);
 	}
 
 	/**

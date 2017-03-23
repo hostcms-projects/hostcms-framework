@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +20,7 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-04-02';
+	public $date = '2015-05-14';
 	/**
 	 * Module name
 	 * @var string
@@ -147,6 +147,7 @@ class Shop_Module extends Core_Module{	/**
 		$oShopGroup = Core_Entity::factory('Shop_Group');
 		$oShopGroup
 			->queryBuilder()
+			->straightJoin()
 			->join('shops', 'shop_groups.shop_id', '=', 'shops.id')
 			->join('structures', 'shops.structure_id', '=', 'structures.id')
 			->where('structures.active', '=', 1)
@@ -156,7 +157,7 @@ class Shop_Module extends Core_Module{	/**
 			->where('shop_groups.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
-			->orderBy('shop_groups.id')
+			->orderBy('shop_groups.id', 'DESC')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingShopGroups', $this, array($oShopGroup));
@@ -189,6 +190,7 @@ class Shop_Module extends Core_Module{	/**
 
 		$oShopItem
 			->queryBuilder()
+			->straightJoin()
 			->join('shops', 'shop_items.shop_id', '=', 'shops.id')
 			->join('structures', 'shops.structure_id', '=', 'structures.id')
 			->leftJoin('shop_groups', 'shop_items.shop_group_id', '=', 'shop_groups.id')
@@ -206,7 +208,7 @@ class Shop_Module extends Core_Module{	/**
 			->close()
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
-			->orderBy('shop_items.id')
+			->orderBy('shop_items.id', 'DESC')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingShopItems', $this, array($oShopItem));

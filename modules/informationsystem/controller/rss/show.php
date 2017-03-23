@@ -9,6 +9,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - group($id) идентификатор информационной группы, если FALSE, то вывод инофрмационных элементов
  * осуществляется из всех групп
+ * - yandex(TRUE|FALSE) экспорт в Яндекс.Новости, по умолчанию FALSE
+ * - tag($path) путь тега, с использованием которого ведется отбор информационных элементов
  * - offset($offset) смещение, с которого выводить информационные элементы. По умолчанию 0
  * - limit($limit) количество выводимых элементов
  *
@@ -25,7 +27,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Rss_Show extends Core_Controller
 {
@@ -39,6 +41,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		'link',
 		'image',
 		'group',
+		'tag',
 		'offset',
 		'limit',
 		'yandex',
@@ -174,14 +177,41 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 	}
 
 	/**
+	 * Current <item>
+	 * @var array
+	 */
+	protected $_currentItem = array();
+
+	/**
+	 * Set $this->_currentItem
+	 * @param array $aItem
+	 * @return self
+	 */
+	public function setCurrentItem(array $aItem)
+	{
+		$this->_currentItem = $aItem;
+		return $this;
+	}
+
+	/**
+	 * Get $this->_currentItem
+	 * @return array
+	 */
+	public function getCurrentItem()
+	{
+		return $this->_currentItem;
+	}
+
+	/**
 	 * Show RSS
 	 * @return self
 	 * @hostcms-event Informationsystem_Controller_Rss_Show.onBeforeRedeclaredShow
+	 * @hostcms-event Informationsystem_Controller_Rss_Show.onBeforeAddItem
 	 */
 	public function show()
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
-	
+
 		$oInformationsystem = $this->getEntity();
 
 		$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();
@@ -193,8 +223,8 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		$this->_Core_Rss
 			->add('title', !is_null($this->title) ? $this->title : $oInformationsystem->name)
 			->add('description', !is_null($this->description) ? $this->description : ($this->stripTags
-					? strip_tags($oInformationsystem->description)
-					: $oInformationsystem->description));
+				? strip_tags($oInformationsystem->description)
+				: $oInformationsystem->description));
 
 		$this->_Core_Rss->add('link', !is_null($this->link)
 			? $this->link
@@ -218,9 +248,22 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			}
 		}
 
-		if ($this->yandex)
+		$this->yandex && $this->_Core_Rss->xmlns('yandex', 'http://news.yandex.ru');
+
+		if (!is_null($this->tag) && Core::moduleIsActive('tag'))
 		{
-			$this->_Core_Rss->xmlns('yandex', 'http://news.yandex.ru');
+			$oTag = Core_Entity::factory('Tag')->getByPath($this->tag);
+
+			if ($oTag)
+			{
+				$this->_Informationsystem_Items
+					->queryBuilder()
+					->leftJoin('tag_informationsystem_items', 'informationsystem_items.id', '=', 'tag_informationsystem_items.informationsystem_item_id')
+					->where('tag_informationsystem_items.tag_id', '=', $oTag->id);
+
+				// В корне при фильтрации по меткам вывод идет из всех групп ИС
+				$this->group == 0 && $this->group = FALSE;
+			}
 		}
 
 		if ($this->group !== FALSE)
@@ -253,16 +296,16 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 		{
-			$aItem = array();
-			$aItem['pubDate'] = date('r', Core_Date::sql2timestamp($oInformationsystem_Item->datetime));
-			$aItem['title'] = Core_Str::str2ncr(
+			$this->_currentItem = array();
+			$this->_currentItem['pubDate'] = date('r', Core_Date::sql2timestamp($oInformationsystem_Item->datetime));
+			$this->_currentItem['title'] = Core_Str::str2ncr(
 				Core_Str::xml($this->stripTags
 					? strip_tags($oInformationsystem_Item->name)
 					: $oInformationsystem_Item->name
 				)
 			);
 
-			$aItem['description'] = Core_Str::str2ncr(
+			$this->_currentItem['description'] = Core_Str::str2ncr(
 				Core_Str::xml($this->stripTags
 					? strip_tags($oInformationsystem_Item->description)
 					: $oInformationsystem_Item->description)
@@ -270,7 +313,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 			if ($this->yandex)
 			{
-				$aItem['yandex:full-text'] = Core_Str::str2ncr(
+				$this->_currentItem['yandex:full-text'] = Core_Str::str2ncr(
 					Core_Str::xml($this->stripTags
 						? strip_tags($oInformationsystem_Item->text)
 						: $oInformationsystem_Item->text)
@@ -278,26 +321,28 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 				if ($oInformationsystem_Item->Informationsystem_Group->id)
 				{
-					$aItem['category'] = Core_Str::str2ncr(Core_Str::xml($oInformationsystem_Item->Informationsystem_Group->name));
+					$this->_currentItem['category'] = Core_Str::str2ncr(Core_Str::xml($oInformationsystem_Item->Informationsystem_Group->name));
 				}
 			}
 
-			$aItem['link'] = $aItem['guid'] = Core_Str::str2ncr(Core_Str::xml($this->_path . $oInformationsystem_Item->getPath()));
+			$this->_currentItem['link'] = $this->_currentItem['guid'] = Core_Str::str2ncr(Core_Str::xml($this->_path . $oInformationsystem_Item->getPath()));
 
 			if ($oInformationsystem_Item->image_large)
 			{
 				$file_enclosure = $oInformationsystem_Item->getLargeFilePath();
 
-				$aItem['enclosure'][0]['url'] = $sitePath . $oInformationsystem_Item->getLargeFileHref();
-				$aItem['enclosure'][0]['type'] = Core_Mime::getFileMime($aItem['enclosure'][0]['url']);
+				$this->_currentItem['enclosure'][0]['url'] = $sitePath . $oInformationsystem_Item->getLargeFileHref();
+				$this->_currentItem['enclosure'][0]['type'] = Core_Mime::getFileMime($this->_currentItem['enclosure'][0]['url']);
 
 				if (is_file($file_enclosure))
 				{
-					$aItem['enclosure'][0]['length'] = filesize($file_enclosure);
+					$this->_currentItem['enclosure'][0]['length'] = filesize($file_enclosure);
 				}
 			}
 
-			$this->_Core_Rss->add('item', $aItem);
+			Core_Event::notify(get_class($this) . '.onBeforeAddItem', $this, array($oInformationsystem_Item, $this->_currentItem));
+
+			$this->_Core_Rss->add('item', $this->_currentItem);
 		}
 
 		$content = $this->_Core_Rss->get();

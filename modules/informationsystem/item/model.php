@@ -853,7 +853,8 @@ class Informationsystem_Item_Model extends Core_Entity
 	 */
 	public function indexing()
 	{
-		$oSearch_Page = Core_Entity::factory('Search_Page');
+		//$oSearch_Page = Core_Entity::factory('Search_Page');
+		$oSearch_Page = new stdClass();
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
@@ -915,6 +916,10 @@ class Informationsystem_Item_Model extends Core_Entity
 				. $this->Informationsystem->Structure->getPath()
 				. $this->getPath();
 		}
+		else
+		{
+			return NULL;
+		}
 
 		$oSearch_Page->size = mb_strlen($oSearch_Page->text);
 		$oSearch_Page->site_id = $this->Informationsystem->site_id;
@@ -929,15 +934,17 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->save();
+		//$oSearch_Page->save();
 
-		Core_QueryBuilder::delete('search_page_siteuser_groups')
+		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
 			->where('search_page_id', '=', $oSearch_Page->id)
 			->execute();
 
 		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
 		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);
+		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
+
+		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
 
 		return $oSearch_Page;
 	}

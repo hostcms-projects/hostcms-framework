@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Session
 {
@@ -189,7 +189,7 @@ class Core_Session
 	protected function _error($content)
 	{
 		Core_Array::getRequest('_', FALSE)
-			? Core::showJson($content)
+			? Core::showJson(array('error' => Core_Message::get($content), 'form_html' => NULL))
 			: exit($content);
 	}
 

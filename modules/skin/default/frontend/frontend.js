@@ -1,8 +1,8 @@
-(function($){
+//(function($){
 	// Функции для коллекции элементов
-	$.fn.extend({
+	hQuery.fn.extend({
 		hostcmsEditable: function(settings){
-			settings = $.extend({
+			settings = hQuery.extend({
 				save: function(item, settings){
 					var data = {
 						'id': item.attr('hostcms:id'),
@@ -12,9 +12,9 @@
 					};
 					data['_'] = Math.round(new Date().getTime());
 
-					$.ajax({
+					hQuery.ajax({
 						// ajax loader
-						context: $('<img>').addClass('img_line').prop('src', '/modules/skin/default/frontend/images/ajax-loader.gif').appendTo(item),
+						context: hQuery('<img>').addClass('img_line').prop('src', '/modules/skin/default/frontend/images/ajax-loader.gif').appendTo(item),
 						url: settings.path,
 						type: 'POST',
 						data: data,
@@ -31,14 +31,14 @@
 			}, settings);
 
 			return this.each(function(index, object){
-				$(object).on('click', function(){
-					var obj = $(this), href = obj.attr('href');
+				hQuery(object).on('click', function(){
+					var obj = hQuery(this), href = obj.attr('href');
 					if (href != undefined && !obj.data('timer')) {
 					   obj.data('timer', setTimeout(function(){window.location = href;}, 500));
 					}
 					return false;
 				}).on('dblclick', function(){
-					var item = $(this), type = item.attr('hostcms:type'), jEditInPlace;
+					var item = hQuery(this), type = item.attr('hostcms:type'), jEditInPlace;
 
 					clearTimeout(item.data('timer'));
 					item.data('timer', null);
@@ -47,11 +47,11 @@
 					{
 						case 'textarea':
 						case 'wysiwyg':
-							jEditInPlace = $('<textarea>');
+							jEditInPlace = hQuery('<textarea>');
 						break;
 						case 'input':
 						default:
-							jEditInPlace = $('<input>').prop('type', 'text');
+							jEditInPlace = hQuery('<input>').prop('type', 'text');
 					}
 
 					if (type != 'wysiwyg')
@@ -66,12 +66,12 @@
 						}
 						if (e.keyCode == 27) { // ESC
 							e.preventDefault();
-							var input = $(this), item = input.prev();
+							var input = hQuery(this), item = input.prev();
 							item.css('display', '');
 							input.remove();
 						}
 					})/*.width('90%')*/.prop('name', item.parent().prop('id'))
-					.css($(this).getStyleObject())
+					.css(hQuery(this).getStyleObject())
 					.insertAfter(item).focus().val(item.html());
 
 					if (type == 'wysiwyg')
@@ -105,7 +105,7 @@
 			var returns = {};
 			if (window.getComputedStyle){
 				var camelize = function(a,b){
-								return b.toUpperCase();
+					return b.toUpperCase();
 				};
 				style = window.getComputedStyle(dom, null);
 				for(var i = 0, l = style.length; i < l; i++){
@@ -134,26 +134,26 @@
 		}
 	});
 
-	$.extend({
+	hQuery.extend({
 		createWindow: function(settings) {
-			settings = $.extend({
+			settings = hQuery.extend({
 				open: function( event, ui ) {
-					var uiDialog = $(this).parent('.ui-dialog');
+					var uiDialog = hQuery(this).parent('.ui-dialog');
 					uiDialog.width(uiDialog.width()).height(uiDialog.height());
 				},
 				close: function( event, ui ) {
-					$(this).dialog('destroy').remove();
+					hQuery(this).dialog('destroy').remove();
 				}
 			}, settings);
 
-			var windowCounter = $('body').data('windowCounter');
+			var windowCounter = hQuery('body').data('windowCounter');
 			if (windowCounter == undefined) { windowCounter = 0 }
-			$('body').data('windowCounter', windowCounter + 1);
+			hQuery('body').data('windowCounter', windowCounter + 1);
 
-			return $('<div>')
+			return hQuery('<div>')
 				.addClass("hostcmsWindow")
 				.attr("id", "Window" + windowCounter)
-				.appendTo($(document.body))
+				.appendTo(hQuery(document.body))
 				.dialog(settings);
 		},
 		showWindow: function(windowId, content, settings) {
@@ -165,7 +165,7 @@
 
 			if (!jWin.length)
 			{
-				jWin = $.createWindow(settings)
+				jWin = hQuery.createWindow(settings)
 					.attr('id', windowId)
 					.html(content);
 			}
@@ -175,14 +175,14 @@
 			return jWin;
 		},
 		openWindow: function(settings) {
-			settings = $.extend({
-				width: /*'70%',*/$(window).width() * 0.7,
-				height: /*500,*/$(window).height() * 0.7,
+			settings = hQuery.extend({
+				width: /*'70%',*/hQuery(window).width() * 0.7,
+				height: /*500,*/hQuery(window).height() * 0.7,
 				path: '',
 				additionalParams: ''
 			}, settings);
 
-			var jDivWin = $.createWindow(settings), cmsrequest = settings.path;
+			var jDivWin = hQuery.createWindow(settings), cmsrequest = settings.path;
 			if (settings.additionalParams != ' ' && settings.additionalParams != '')
 			{
 				cmsrequest += '?' + settings.additionalParams;
@@ -193,4 +193,4 @@
 			return jDivWin;
 		}
 	});
-})(hQuery);
+//})(hQuery);

@@ -406,7 +406,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			throw new Core_Exception(Core::_('Shop_Item.error_parent_directory'));
 		}
 
-		if ($this->importAction == 0)
+		/*
+		 Удаляем товары/группы только при получении import.xml
+		*/
+		if ($this->importAction == 0 
+			&& count((array)$this->_oSimpleXMLElement->Классификатор) 
+			&& count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0)
 		{
 			Core_QueryBuilder::update('shop_groups')
 				->set('deleted', 1)
@@ -1129,33 +1134,38 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						}
 					}
 
+					$iItemCount = 0;
+					
 					foreach ($this->xpath($oProposal, 'Количество') as $oCount)
 					{
-						// Ищем главный склад
-						$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
-
-						if (is_null($oWarehouse))
-						{
-							// Склад не обнаружен
-							$oWarehouse = Core_Entity::factory('Shop_Warehouse');
-							$oWarehouse->name = Core::_("Shop_Warehouse.warehouse_default_name");
-							$oWarehouse->active = 1;
-							$oWarehouse->default = 1;
-							$oWarehouse->shop_id = $this->iShopId;
-							$oWarehouse->save();
-						}
-
-						$oShop_Warehouse_Item = $oWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
-
-						if (is_null($oShop_Warehouse_Item))
-						{
-							$oShop_Warehouse_Item = Core_Entity::factory('Shop_Warehouse_Item')
-								->shop_warehouse_id($oWarehouse->id)
-								->shop_item_id($oShopItem->id);
-						}
-
-						$oShop_Warehouse_Item->count(floatval($oCount))->save();
+						$iItemCount = $oCount;
 					}
+					
+					// если нет тега "Количество", ставим количество товара на главном складе равным нулю
+					// Ищем главный склад
+					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
+
+					if (is_null($oWarehouse))
+					{
+						// Склад не обнаружен
+						$oWarehouse = Core_Entity::factory('Shop_Warehouse');
+						$oWarehouse->name = Core::_("Shop_Warehouse.warehouse_default_name");
+						$oWarehouse->active = 1;
+						$oWarehouse->default = 1;
+						$oWarehouse->shop_id = $this->iShopId;
+						$oWarehouse->save();
+					}
+
+					$oShop_Warehouse_Item = $oWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
+
+					if (is_null($oShop_Warehouse_Item))
+					{
+						$oShop_Warehouse_Item = Core_Entity::factory('Shop_Warehouse_Item')
+							->shop_warehouse_id($oWarehouse->id)
+							->shop_item_id($oShopItem->id);
+					}
+
+					$oShop_Warehouse_Item->count(floatval($iItemCount))->save();
 
 					// склады
 					foreach ($this->xpath($oProposal, 'Склад') as $oWarehouseCount)

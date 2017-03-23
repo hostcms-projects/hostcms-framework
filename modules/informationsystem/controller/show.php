@@ -162,16 +162,18 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 		$this->_aSiteuserGroups = $this->_getSiteuserGroups();
 
+		$siteuser_id = 0;
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
-
-			$oSiteuser && $this->addEntity(
-				Core::factory('Core_Xml_Entity')
-					->name('siteuser_id')
-					->value($oSiteuser->id)
-			);
+			$oSiteuser && $siteuser_id = $oSiteuser->id;
 		}
+
+		$this->addEntity(
+			Core::factory('Core_Xml_Entity')
+				->name('siteuser_id')
+				->value($siteuser_id)
+		);
 
 		$this->_setInformationsystemItems()->_setInformationsystemGroups();
 
@@ -774,7 +776,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$oInformationsystem_Groups = $oInformationsystem->Informationsystem_Groups;
 
 				$this->groupsActivity = strtolower($this->groupsActivity);
-				if($this->groupsActivity != 'all')
+				if ($this->groupsActivity != 'all')
 				{
 					$oInformationsystem_Groups
 						->queryBuilder()
@@ -800,7 +802,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 					$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
 
 					$this->itemsActivity = strtolower($this->itemsActivity);
-					if($this->itemsActivity != 'all')
+					if ($this->itemsActivity != 'all')
 					{
 						$oInformationsystem_Items
 							->queryBuilder()
@@ -1271,7 +1273,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 	protected function _setItemsActivity()
 	{
 		$this->itemsActivity = strtolower($this->itemsActivity);
-		if($this->itemsActivity != 'all')
+		if ($this->itemsActivity != 'all')
 		{
 			$this->_Informationsystem_Items
 				->queryBuilder()
@@ -1288,7 +1290,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 	protected function _setGroupsActivity()
 	{
 		$this->groupsActivity = strtolower($this->groupsActivity);
-		if($this->groupsActivity != 'all')
+		if ($this->groupsActivity != 'all')
 		{
 			$this->_Informationsystem_Groups
 				->queryBuilder()

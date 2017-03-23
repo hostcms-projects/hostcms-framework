@@ -8,11 +8,17 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2012 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2013 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Skin_Hostcms5_Module_Search_Module extends Search_Module{	public function adminPage($type = 0, $ajax = FALSE)
+class Skin_Hostcms5_Module_Search_Module extends Search_Module{
+	/**
+	 * Show admin widget
+	 * @param int $type
+	 * @param boolean $ajax
+	 * @return self
+	 */	public function adminPage($type = 0, $ajax = FALSE)
 	{
-		$count = Search_Controller::getPageCount(CURRENT_SITE);
+		$count = Search_Controller::instance()->getPageCount(CURRENT_SITE);
 
 		?><td valign="top" class="index_table_td">
 		<div class="main_div"><span class="div_title"><?php echo Core::_('Search.index_search')?></span>
@@ -25,15 +31,11 @@ class Skin_Hostcms5_Module_Search_Module extends Search_Module{	public functio
 				<td valign="bottom"><?php echo Core::_('Search.index_blocks_size')?>
 				<select name="step">
 					<option value="10">10</option>
-					<option value="20">20</option>
 					<option value="30">30</option>
-					<option value="40">40</option>
 					<option value="50">50</option>
-					<option value="60">60</option>
-					<option value="70">70</option>
-					<option value="80">80</option>
-					<option value="90">90</option>
 					<option value="100" selected="selected">100</option>
+					<option value="500">500</option>
+					<option value="1000">1000</option>
 				</select></td>
 				<td valign="bottom"><?php echo Core::_('Search.index_search_delay')?>
 				<input type="text" size="3" name="timeout" value="0" />&nbsp;<?php echo Core::_('Search.index_search_delay_unit')?></td>

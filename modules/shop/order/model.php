@@ -1117,21 +1117,18 @@ class Shop_Order_Model extends Core_Entity
 		$oContractor = $oOrderXml->addChild('Контрагенты');
 		$oContractor = $oContractor->addChild('Контрагент');
 
-		if ($this->siteuser_id)
-		{
-			$aTmpArray = array();
-			$this->surname != '' && $aTmpArray[] = $this->surname;
-			$this->name != '' && $aTmpArray[] = $this->name;
-			$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
-			
-			!count($aTmpArray) && $aTmpArray[] = $this->email;
-			
-			$sContractorId = Core::crc32(implode(' ', $aTmpArray));
-		}
-		else
-		{
-			$sContractorId = $this->siteuser_id;
-		}
+		$aTmpArray = array();
+		$this->surname != '' && $aTmpArray[] = $this->surname;
+		$this->name != '' && $aTmpArray[] = $this->name;
+		$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
+
+		!count($aTmpArray) && $aTmpArray[] = $this->email;
+
+		$sContractorName = implode(' ', $aTmpArray);
+
+		$sContractorId = $this->siteuser_id
+			? $this->siteuser_id
+			: Core::crc32($sContractorName);
 
 		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
 		$oContractor->addChild('Ид', $sContractorId);

@@ -414,6 +414,8 @@ class Structure_Controller_Show extends Core_Controller
 	 * Add all groups of information system to XML
 	 * @param object $parentObject
 	 * @param Informationsystem_Model $oInformationsystem
+	 * @hostcms-event Structure_Controller_Show.onBeforeFindInformationsystemGroups
+	 * @hostcms-event Structure_Controller_Show.onBeforeFindInformationsystemItems
 	 */
 	protected function _addInformationsystemGroups($parentObject, $oInformationsystem)
 	{
@@ -454,6 +456,8 @@ class Structure_Controller_Show extends Core_Controller
 		}
 
 		$this->_aInformationsystem_Groups = array();
+
+		Core_Event::notify(get_class($this) . '.onBeforeFindInformationsystemGroups', $this, array($oInformationsystem_Groups, $parentObject, $oInformationsystem));
 
 		$aInformationsystem_Groups = $oInformationsystem_Groups->findAll();
 		foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
@@ -515,6 +519,8 @@ class Structure_Controller_Show extends Core_Controller
 			}
 
 			$this->_aInformationsystem_Items = array();
+
+			Core_Event::notify(get_class($this) . '.onBeforeFindInformationsystemItems', $this, array($oInformationsystem_Items, $parentObject, $oInformationsystem));
 
 			$aInformationsystem_Items = $oInformationsystem_Items->findAll();
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
@@ -613,11 +619,11 @@ class Structure_Controller_Show extends Core_Controller
 	 * Add all groups of shop to XML
 	 * @param object $parentObject
 	 * @param Shop_Model $oShop shop
+	 * @hostcms-event Structure_Controller_Show.onBeforeFindShopGroups
+	 * @hostcms-event Structure_Controller_Show.onBeforeFindShopItems
 	 */
 	protected function _addShopGroups($parentObject, $oShop)
 	{
-		//$this->_aShop_Groups = array();
-
 		$dateTime = Core_Date::timestamp2sql(time());
 
 		$oShop_Groups = $oShop->Shop_Groups;
@@ -653,6 +659,8 @@ class Structure_Controller_Show extends Core_Controller
 		}
 
 		$this->_aShop_Groups = array();
+
+		Core_Event::notify(get_class($this) . '.onBeforeFindShopGroups', $this, array($oShop_Groups, $parentObject, $oShop));
 
 		$aShop_Groups = $oShop_Groups->findAll();
 		foreach ($aShop_Groups as $oShop_Group)
@@ -715,6 +723,8 @@ class Structure_Controller_Show extends Core_Controller
 			}
 
 			$this->_aShop_Items = array();
+
+			Core_Event::notify(get_class($this) . '.onBeforeFindShopItems', $this, array($oShop_Items, $parentObject, $oShop));
 
 			$aShop_Items = $oShop_Items->findAll();
 			foreach ($aShop_Items as $oShop_Item)

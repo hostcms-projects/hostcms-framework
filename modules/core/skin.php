@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Skin
 {
@@ -311,17 +311,15 @@ abstract class Core_Skin
 	{
 		$iTimestamp = abs(Core::crc32(defined('CURRENT_VERSION') ? CURRENT_VERSION : '6.0'));
 
-		$oStructure = Core_Entity::factory('Structure', CURRENT_STRUCTURE_ID);
 		?><link rel="stylesheet" type="text/css" href="/modules/skin/default/frontend/frontend.css?<?php echo $iTimestamp?>" /><?php
 		?><script src="/modules/skin/default/frontend/jquery.min.js"></script><?php
-		?><script type="text/javascript">var hQuery = $.noConflict();</script><?php
 		?><script src="/modules/skin/default/frontend/jquery-ui.min.js" type="text/javascript"></script><?php
-		?><script src="/modules/skin/default/frontend/frontend.js" type="text/javascript"></script><?php
 		?><script src="/admin/wysiwyg/jquery.tinymce.js" type="text/javascript"></script><?php
+		?><script type="text/javascript">var hQuery = $.noConflict(true);</script><?php
+		?><script src="/modules/skin/default/frontend/frontend.js" type="text/javascript"></script><?php
 
 		$oHostcmsTopPanel = Core::factory('Core_Html_Entity_Div')
-			->class('hostcmsPanel hostcmsTopPanel')
-			;
+			->class('hostcmsPanel hostcmsTopPanel');
 
 		$oHostcmsSubPanel = Core::factory('Core_Html_Entity_Div')
 			->class('hostcmsSubPanel hostcmsWindow')
@@ -333,134 +331,138 @@ abstract class Core_Skin
 
 		$oHostcmsTopPanel->add($oHostcmsSubPanel);
 
-		//if ($bIsUtf8)
-		//{
-		// Structure
-		$sPath = '/admin/structure/index.php';
-		$sAdditional = "hostcms[action]=edit&parent_id={$oStructure->parent_id}&hostcms[checked][0][{$oStructure->id}]=1";
-
-		$oHostcmsSubPanel->add(
-			Core::factory('Core_Html_Entity_A')
-				->href("{$sPath}?{$sAdditional}")
-				->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Structure.edit_title')) . "'}); return false")
-				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->width(16)->height(16)
-						->src('/hostcmsfiles/images/structure_edit.gif')
-						->id('hostcmsEditStructure')
-						->alt(Core::_('Structure.edit_title'))
-						->title(Core::_('Structure.edit_title'))
-				)
-		);
-
-		// Template
-		if ($oStructure->type == 0)
+		if (defined('CURRENT_STRUCTURE_ID'))
 		{
-			$oDocument_Version = $oStructure->Document->Document_Versions->getCurrent();
-			$oTemplate = is_null($oDocument_Version)
-				? NULL
-				: $oDocument_Version->Template;
-		}
-		else
-		{
-			$oTemplate = $oStructure->Template;
-		}
-
-		if ($oTemplate && $oTemplate->id)
-		{
-			$sPath = '/admin/template/index.php';
-			$sAdditional = "hostcms[action]=edit&hostcms[checked][1][{$oTemplate->id}]=1";
-
-			$oHostcmsSubPanel->add(
-				Core::factory('Core_Html_Entity_A')
-				->href("{$sPath}?{$sAdditional}")
-				->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Template.title_edit', $oTemplate->name)) . "'}); return false")
-				->add(
-					Core::factory('Core_Html_Entity_Img')
-						->width(16)->height(16)
-						->src('/hostcmsfiles/images/template_edit.gif')
-						->id('hostcmsEditTemplate')
-						->alt(Core::_('Template.title_edit', $oTemplate->name))
-						->title(Core::_('Template.title_edit', $oTemplate->name))
-				)
-			);
-		}
-
-		// Document
-		if ($oStructure->type == 0 && $oStructure->document_id)
-		{
-			$sPath = '/admin/document/index.php';
-			$sAdditional = "hostcms[action]=edit&document_dir_id={$oStructure->Document->document_dir_id}&hostcms[checked][1][{$oStructure->Document->id}]=1";
+			//if ($bIsUtf8)
+			//{
+			// Structure
+			$oStructure = Core_Entity::factory('Structure', CURRENT_STRUCTURE_ID);
+			$sPath = '/admin/structure/index.php';
+			$sAdditional = "hostcms[action]=edit&parent_id={$oStructure->parent_id}&hostcms[checked][0][{$oStructure->id}]=1";
 
 			$oHostcmsSubPanel->add(
 				Core::factory('Core_Html_Entity_A')
 					->href("{$sPath}?{$sAdditional}")
-					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Document.edit')) . "'}); return false")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Structure.edit_title')) . "'}); return false")
 					->add(
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
-							->src('/hostcmsfiles/images/page_edit.gif')
-							->id('hostcmsEditDocument')
-							->alt(Core::_('Document.edit'))
-							->title(Core::_('Document.edit'))
+							->src('/hostcmsfiles/images/structure_edit.gif')
+							->id('hostcmsEditStructure')
+							->alt(Core::_('Structure.edit_title'))
+							->title(Core::_('Structure.edit_title'))
 					)
 			);
-		}
 
-		// Informationsystem
-		if (Core::moduleIsActive('informationsystem'))
-		{
-			$oInformationsystem = Core_Entity::factory('Informationsystem')
-				->getByStructureId($oStructure->id);
-
-			if ($oInformationsystem)
+			// Template
+			if ($oStructure->type == 0)
 			{
-				$sPath = '/admin/informationsystem/index.php';
-				$sAdditional = "hostcms[action]=edit&informationsystem_dir_id={$oInformationsystem->informationsystem_dir_id}&hostcms[checked][1][{$oInformationsystem->id}]=1";
+				$oDocument_Version = $oStructure->Document->Document_Versions->getCurrent();
+				$oTemplate = is_null($oDocument_Version)
+					? NULL
+					: $oDocument_Version->Template;
+			}
+			else
+			{
+				$oTemplate = $oStructure->Template;
+			}
+
+			if ($oTemplate && $oTemplate->id)
+			{
+				$sPath = '/admin/template/index.php';
+				$sAdditional = "hostcms[action]=edit&hostcms[checked][1][{$oTemplate->id}]=1";
+
+				$oHostcmsSubPanel->add(
+					Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Template.title_edit', $oTemplate->name)) . "'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/hostcmsfiles/images/template_edit.gif')
+							->id('hostcmsEditTemplate')
+							->alt(Core::_('Template.title_edit', $oTemplate->name))
+							->title(Core::_('Template.title_edit', $oTemplate->name))
+					)
+				);
+			}
+
+			// Document
+			if ($oStructure->type == 0 && $oStructure->document_id)
+			{
+				$sPath = '/admin/document/index.php';
+				$sAdditional = "hostcms[action]=edit&document_dir_id={$oStructure->Document->document_dir_id}&hostcms[checked][1][{$oStructure->Document->id}]=1";
 
 				$oHostcmsSubPanel->add(
 					Core::factory('Core_Html_Entity_A')
 						->href("{$sPath}?{$sAdditional}")
-						->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Informationsystem.edit_title')) . "'}); return false")
+						->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Document.edit')) . "'}); return false")
 						->add(
 							Core::factory('Core_Html_Entity_Img')
 								->width(16)->height(16)
-								->src('/hostcmsfiles/images/folder_page_edit.gif')
-								->id('hostcmsEditInformationsystem')
-								->alt(Core::_('Informationsystem.edit_title'))
-								->title(Core::_('Informationsystem.edit_title'))
+								->src('/hostcmsfiles/images/page_edit.gif')
+								->id('hostcmsEditDocument')
+								->alt(Core::_('Document.edit'))
+								->title(Core::_('Document.edit'))
 						)
 				);
 			}
-		}
 
-		// Shop
-		if (Core::moduleIsActive('shop'))
-		{
-			$oShop = Core_Entity::factory('Shop')
-				->getByStructureId($oStructure->id);
-
-			if ($oShop)
+			// Informationsystem
+			if (Core::moduleIsActive('informationsystem'))
 			{
-				$sPath = '/admin/shop/index.php';
-				$sAdditional = "hostcms[action]=edit&shop_dir_id={$oShop->shop_dir_id}&hostcms[checked][1][{$oShop->id}]=1";
+				$oInformationsystem = Core_Entity::factory('Informationsystem')
+					->getByStructureId($oStructure->id);
 
-				$oHostcmsSubPanel->add(
-					Core::factory('Core_Html_Entity_A')
-						->href("{$sPath}?{$sAdditional}")
-						->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Shop.edit_title')) . "'}); return false")
-						->add(
-							Core::factory('Core_Html_Entity_Img')
-								->width(16)->height(16)
-								->src('/hostcmsfiles/images/shop_edit.gif')
-								->id('hostcmsEditShop')
-								->alt(Core::_('Shop.edit_title'))
-								->title(Core::_('Shop.edit_title'))
-						)
-				);
+				if ($oInformationsystem)
+				{
+					$sPath = '/admin/informationsystem/index.php';
+					$sAdditional = "hostcms[action]=edit&informationsystem_dir_id={$oInformationsystem->informationsystem_dir_id}&hostcms[checked][1][{$oInformationsystem->id}]=1";
+
+					$oHostcmsSubPanel->add(
+						Core::factory('Core_Html_Entity_A')
+							->href("{$sPath}?{$sAdditional}")
+							->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Informationsystem.edit_title')) . "'}); return false")
+							->add(
+								Core::factory('Core_Html_Entity_Img')
+									->width(16)->height(16)
+									->src('/hostcmsfiles/images/folder_page_edit.gif')
+									->id('hostcmsEditInformationsystem')
+									->alt(Core::_('Informationsystem.edit_title'))
+									->title(Core::_('Informationsystem.edit_title'))
+							)
+					);
+				}
 			}
+
+			// Shop
+			if (Core::moduleIsActive('shop'))
+			{
+				$oShop = Core_Entity::factory('Shop')
+					->getByStructureId($oStructure->id);
+
+				if ($oShop)
+				{
+					$sPath = '/admin/shop/index.php';
+					$sAdditional = "hostcms[action]=edit&shop_dir_id={$oShop->shop_dir_id}&hostcms[checked][1][{$oShop->id}]=1";
+
+					$oHostcmsSubPanel->add(
+						Core::factory('Core_Html_Entity_A')
+							->href("{$sPath}?{$sAdditional}")
+							->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6', title: '" . Core_Str::escapeJavascriptVariable(Core::_('Shop.edit_title')) . "'}); return false")
+							->add(
+								Core::factory('Core_Html_Entity_Img')
+									->width(16)->height(16)
+									->src('/hostcmsfiles/images/shop_edit.gif')
+									->id('hostcmsEditShop')
+									->alt(Core::_('Shop.edit_title'))
+									->title(Core::_('Shop.edit_title'))
+							)
+					);
+				}
+			}
+			//}
 		}
-		//}
 
 		// Separator
 		$oHostcmsSubPanel->add(

@@ -199,16 +199,18 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->_aSiteuserGroups = $this->_getSiteuserGroups();
 
+		$siteuser_id = 0;
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
-
-			$oSiteuser && $this->addEntity(
-				Core::factory('Core_Xml_Entity')
-					->name('siteuser_id')
-					->value($oSiteuser->id)
-			);
+			$oSiteuser && $siteuser_id = $oSiteuser->id;
 		}
+
+		$this->addEntity(
+			Core::factory('Core_Xml_Entity')
+				->name('siteuser_id')
+				->value($siteuser_id)
+		);
 
 		$this->_setShopItems()->_setShopGroups();
 
@@ -349,22 +351,22 @@ class Shop_Controller_Show extends Core_Controller
 	 * @param Core_QueryBuilder_Select $oCore_QueryBuilder_Select
 	 * @return self
 	 */
-	protected function _applyItemConditionsQueryBuilder(Core_QueryBuilder_Select $oCore_QueryBuilder_Select)
+	protected function _applyItemConditionsQueryBuilder(Core_QueryBuilder_Select $oCore_QueryBuilder_Select, $tableName = 'shop_items')
 	{
 		$dateTime = Core_Date::timestamp2sql(time());
 		$oCore_QueryBuilder_Select
 			->open()
-			->where('shop_items.start_datetime', '<', $dateTime)
+			->where($tableName . '.start_datetime', '<', $dateTime)
 			->setOr()
-			->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+			->where($tableName . '.start_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->setAnd()
 			->open()
-			->where('shop_items.end_datetime', '>', $dateTime)
+			->where($tableName . '.end_datetime', '>', $dateTime)
 			->setOr()
-			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+			->where($tableName . '.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-			->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups);
+			->where($tableName . '.siteuser_group_id', 'IN', $this->_aSiteuserGroups);
 
 		return $this;
 	}
@@ -1052,6 +1054,7 @@ class Shop_Controller_Show extends Core_Controller
 			$oCore_QueryBuilder_Select_Modifications = Core_QueryBuilder::select('shop_items.id')
 				->from('shop_items')
 				->where('shop_items.shop_group_id', '=', $shop_group_id);
+
 			// Стандартные ограничения для товаров
 			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
 
@@ -1140,7 +1143,7 @@ class Shop_Controller_Show extends Core_Controller
 				$oShop_Groups = $oShop->Shop_Groups;
 
 				$this->groupsActivity = strtolower($this->groupsActivity);
-				if($this->groupsActivity != 'all')
+				if ($this->groupsActivity != 'all')
 				{
 					$oShop_Groups
 						->queryBuilder()
@@ -1166,7 +1169,7 @@ class Shop_Controller_Show extends Core_Controller
 					$oShop_Items = $oShop->Shop_Items;
 
 					$this->itemsActivity = strtolower($this->itemsActivity);
-					if($this->itemsActivity != 'all')
+					if ($this->itemsActivity != 'all')
 					{
 						$oShop_Items
 							->queryBuilder()
@@ -1688,7 +1691,7 @@ class Shop_Controller_Show extends Core_Controller
 	protected function _setItemsActivity()
 	{
 		$this->itemsActivity = strtolower($this->itemsActivity);
-		if($this->itemsActivity != 'all')
+		if ($this->itemsActivity != 'all')
 		{
 			$this->_Shop_Items
 				->queryBuilder()
@@ -1705,7 +1708,7 @@ class Shop_Controller_Show extends Core_Controller
 	protected function _setGroupsActivity()
 	{
 		$this->groupsActivity = strtolower($this->groupsActivity);
-		if($this->groupsActivity != 'all')
+		if ($this->groupsActivity != 'all')
 		{
 			$this->_Shop_Groups
 				->queryBuilder()
@@ -1743,6 +1746,7 @@ class Shop_Controller_Show extends Core_Controller
 		$oSubMinMaxQueryBuilder = Core_QueryBuilder::select(array(Core_QueryBuilder::expression($query_currency_switch), 'absolute_price'))
 			->from('shop_items')
 			->where('shop_items.shop_id', '=', $oShop->id)
+			->where('shop_items.active', '=', 1)
 			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
 			->leftJoin('shop_item_discounts', 'shop_items.id', '=', 'shop_item_discounts.shop_item_id')
 			->leftJoin('shop_discounts', 'shop_item_discounts.shop_discount_id', '=', 'shop_discounts.id', array(
@@ -1776,6 +1780,30 @@ class Shop_Controller_Show extends Core_Controller
 					round($rows['max'])
 				)
 		);
+
+		return $this;
+	}
+
+	/**
+	 * Add shortcut conditions
+	 *
+	 * @return self
+	 */
+	public function addShortcutConditions()
+	{
+		$this->_Shop_Items
+			->queryBuilder()
+			->leftJoin(array('shop_items', 'shortcut_items'), 'shortcut_items.id', '=', 'shop_items.shortcut_id')
+			->open()
+			->where('shortcut_items.id', 'IS', NULL)
+			->setOr()
+			->where('shortcut_items.active', '=', 1);
+
+		$this->_applyItemConditionsQueryBuilder($this->_Shop_Items->queryBuilder(), 'shortcut_items');
+		
+		$this->_Shop_Items
+			->queryBuilder()
+			->close();
 
 		return $this;
 	}

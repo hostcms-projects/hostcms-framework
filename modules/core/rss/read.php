@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Rss
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Rss_Read
 {
@@ -197,9 +197,9 @@ class Core_Rss_Read
 			} elseif ($this->_tag == $this->_rss . $this->_rssChannel . '^ITEM^DESCRIPTION') {
 				$this->_items[$this->_itemCount]['description'] .= $data;
 			} elseif ($this->_tag == $this->_rss . $this->_rssChannel . '^ITEM^CATEGORY') {
-				$this->_items[$this->_itemCount]['category'] .= $data;
+				$this->_items[$this->_itemCount]['category'][] = $data;
 			} elseif ($this->_tag == $this->_rss . $this->_rssChannel . '^ITEM^DC:SUBJECT') {
-				$this->_items[$this->_itemCount]['category'] .= $data;
+				$this->_items[$this->_itemCount]['category'][] = $data;
 			} elseif ($this->_tag == $this->_rss . $this->_rssChannel . '^ITEM^PUBDATE') {
 				$this->_items[$this->_itemCount]['pubdate'] .= $data;
 			} elseif ($this->_tag == $this->_rss . $this->_rssChannel . '^IMAGE^TITLE') {

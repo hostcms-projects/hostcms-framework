@@ -33,7 +33,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 {
@@ -429,6 +429,22 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	}
 
 	/**
+	 * Offset compatibility with PostgreSQL, default TRUE
+	 * @var boolean
+	 */
+	protected $_offsetPostgreSQLSyntax = TRUE; 
+
+	/**
+	 * Offset compatibility with PostgreSQL, default TRUE
+	 * $param boolean $compatible
+	 */
+	public function offsetPostgreSQLSyntax($compatible)
+	{
+		$this->_offsetPostgreSQLSyntax = $compatible;
+		return $this;
+	}
+
+	/**
 	 * Build the SQL query
 	 *
 	 * @return string The SQL query
@@ -498,10 +514,12 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 
 		if (!is_null($this->_limit))
 		{
-			$query[] = 'LIMIT ' . $this->_limit;
+			$sLImit = 'LIMIT ';
+			!$this->_offsetPostgreSQLSyntax && !is_null($this->_offset) && $sLImit .= $this->_offset . ', ';
+			$query[] = $sLImit . $this->_limit;
 		}
 
-		if (!is_null($this->_offset))
+		if ($this->_offsetPostgreSQLSyntax && !is_null($this->_offset))
 		{
 			$query[] = 'OFFSET ' . $this->_offset;
 		}

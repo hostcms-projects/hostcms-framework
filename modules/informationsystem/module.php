@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2014 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Module extends Core_Module{	/**
 	 * Module version
@@ -20,13 +20,13 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-04-02';
+	public $date = '2015-05-14';
 	/**
 	 * Module name
 	 * @var string
 	 */
 	protected $_moduleName = 'informationsystem';
-	
+
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -124,6 +124,7 @@ class Informationsystem_Module extends Core_Module{	/**
 		$oInformationsystemGroup = Core_Entity::factory('Informationsystem_Group');
 		$oInformationsystemGroup
 			->queryBuilder()
+			->straightJoin()
 			->join('informationsystems', 'informationsystem_groups.informationsystem_id', '=', 'informationsystems.id')
 			->join('structures', 'informationsystems.structure_id', '=', 'structures.id')
 			->where('structures.active', '=', 1)
@@ -133,7 +134,7 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('informationsystem_groups.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
-			->orderBy('informationsystem_groups.id')
+			->orderBy('informationsystem_groups.id', 'DESC')
 			->limit($offset, $limit);
 
 		Core_Event::notify(get_class($this) . '.indexingInformationsystemGroups', $this, array($oInformationsystemGroup));
@@ -166,6 +167,7 @@ class Informationsystem_Module extends Core_Module{	/**
 
 		$oInformationsystemItem
 			->queryBuilder()
+			->straightJoin()
 			->join('informationsystems', 'informationsystem_items.informationsystem_id', '=', 'informationsystems.id')
 			->join('structures', 'informationsystems.structure_id', '=', 'structures.id')
 			->leftJoin('informationsystem_groups', 'informationsystem_items.informationsystem_group_id', '=', 'informationsystem_groups.id')
@@ -180,13 +182,11 @@ class Informationsystem_Module extends Core_Module{	/**
 			->setOr()
 			->where('informationsystem_groups.active', '=', 1)
 			->where('informationsystem_groups.indexing', '=', 1)
-			->close()			
+			->close()
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
-			->orderBy('informationsystem_items.id')
+			->orderBy('informationsystem_items.id', 'DESC')
 			->limit($offset, $limit);
-
-			//->orderBy('informationsystem_items.id');
 
 		Core_Event::notify(get_class($this) . '.indexingInformationsystemItems', $this, array($oInformationsystemItem));
 
