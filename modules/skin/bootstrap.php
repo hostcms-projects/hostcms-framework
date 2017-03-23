@@ -65,8 +65,8 @@ class Skin_Bootstrap extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/mode/php/php.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/mode/xml/xml.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/selection/active-line.js')
-			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/search/searchcursor.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/search/search.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/search/searchcursor.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/dialog/dialog.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/star-rating.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/typeahead-bs2.min.js')
@@ -83,6 +83,7 @@ class Skin_Bootstrap extends Core_Skin
 			->addCss('/modules/skin/' . $this->_skinName . '/css/dataTables.bootstrap.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/bootstrap-datetimepicker.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/js/codemirror/lib/codemirror.css')
+			->addCss('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/dialog/dialog.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/star-rating.min.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/bootstrap-hostcms.css')
 			;
@@ -127,8 +128,10 @@ class Skin_Bootstrap extends Core_Skin
 			$oUser = Core_Entity::factory('User')->getCurrent();
 			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo Core_Str::escapeJavascriptVariable($oUser ? $oUser->User_Group->root_dir : '')?>');
 
-			$(window).on('beforeunload', function () {return false;});
-		<?php
+			<?php if (!defined('CONFIRM_CLOSE_BROWSER') || CONFIRM_CLOSE_BROWSER)
+			{
+				?>$(window).on('beforeunload', function () {return ' ';});<?php
+			}
 		}
 		?>
 		</script>
@@ -425,9 +428,11 @@ class Skin_Bootstrap extends Core_Skin
 				</li>
 				<?php
 				// Список основных меню скина
-				$aSkin_Config = Core_Config::instance()->get('skin_bootstrap_config');
+				$this->_config = Core_Config::instance()->get('skin_bootstrap_config');
 
-				if (isset($aSkin_Config['adminMenu']))
+				Core_Event::notify(get_class($this) . '.onLoadSkinConfig', $this);
+
+				if (isset($this->_config['adminMenu']))
 				{
 					$aModules = $this->_getAllowedModules();
 
@@ -438,7 +443,7 @@ class Skin_Bootstrap extends Core_Skin
 					}
 					unset($aModules);
 
-					foreach ($aSkin_Config['adminMenu'] as $key => $aAdminMenu)
+					foreach ($this->_config['adminMenu'] as $key => $aAdminMenu)
 					{
 						$aAdminMenu += array('ico' => 'fa-file-o',
 							'modules' => array()
@@ -786,13 +791,12 @@ class Skin_Bootstrap extends Core_Skin
 					? 'core'
 					: Core_Entity::factory('Module', $moduleId)->path;
 
-				$sSkinModuleName = $this->getSkinModuleName($modulePath);
-
 				Core_Session::close();
 
-				if (class_exists($sSkinModuleName))
+				$Core_Module = $this->getSkinModule($modulePath);
+
+				if (!is_null($Core_Module))
 				{
-					$Core_Module = new $sSkinModuleName();
 					$Core_Module->adminPage($type, $bAjax && is_null(Core_Array::getGet('widgetAjax')));
 				}
 				else
@@ -845,11 +849,9 @@ class Skin_Bootstrap extends Core_Skin
 				$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 				foreach ($aModules as $oModule)
 				{
-					$sSkinModuleName = $this->getSkinModuleName($oModule->path);
+					$Core_Module = $this->getSkinModule($oModule->path);
 
-					$Core_Module = class_exists($sSkinModuleName)
-						? new $sSkinModuleName()
-						: $oModule->Core_Module;
+					is_null($Core_Module) && $Core_Module = $oModule->Core_Module;
 
 					if ($oModule->active
 						&& !is_null($Core_Module)
@@ -876,11 +878,9 @@ class Skin_Bootstrap extends Core_Skin
 				$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 				foreach ($aModules as $oModule)
 				{
-					$sSkinModuleName = $this->getSkinModuleName($oModule->path);
+					$Core_Module = $this->getSkinModule($oModule->path);
 
-					$Core_Module = class_exists($sSkinModuleName)
-						? new $sSkinModuleName()
-						: $oModule->Core_Module;
+					is_null($Core_Module) && $Core_Module = $oModule->Core_Module;
 
 					if ($oModule->active
 						&& !is_null($Core_Module)
@@ -909,10 +909,11 @@ class Skin_Bootstrap extends Core_Skin
 				}
 
 				// Core
-				$sSkinModuleName = $this->getSkinModuleName('core');
-				if (class_exists($sSkinModuleName))
+				$Core_Module = $this->getSkinModule('core');
+
+				if (!is_null($Core_Module))
 				{
-					$Core_Module = new $sSkinModuleName();
+					//$Core_Module = new $sSkinModuleName();
 					$aTypes = $Core_Module->getAdminPages();
 
 					foreach ($aTypes as $type => $title)
@@ -977,7 +978,7 @@ class Skin_Bootstrap extends Core_Skin
 				->caption(Core::_('Install.changeLanguage'))
 				->options($aLng)
 				->value(isset($_SESSION['LNG_INSTALL']) ? $_SESSION['LNG_INSTALL'] : DEFAULT_LNG)
-				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3'))
+				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-12 col-xs-12'))
 				->execute();
 			?>
 			</div>

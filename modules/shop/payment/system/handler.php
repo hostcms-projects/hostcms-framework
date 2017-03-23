@@ -196,7 +196,7 @@ abstract class Shop_Payment_System_Handler
 
 		$shop_delivery_id = intval(Core_Array::get($this->_orderParams, 'shop_delivery_id', 0));
 		!$shop_delivery_id && $shop_delivery_condition_id && $shop_delivery_id = Core_Entity::factory('Shop_Delivery_Condition', $shop_delivery_condition_id)->shop_delivery_id;
-		$this->_shopOrder->shop_delivery_id = $shop_delivery_id;
+		$this->_shopOrder->shop_delivery_id = intval($shop_delivery_id);
 
 		$this->_shopOrder->shop_payment_system_id = intval(Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0));
 		$this->_shopOrder->shop_currency_id = intval($oShop->shop_currency_id);
@@ -210,6 +210,10 @@ abstract class Shop_Payment_System_Handler
 			$oSiteuser && $this->_shopOrder->siteuser_id = $oSiteuser->id;
 		}
 
+		// UTM, Openstat or From
+		$oSource_Controller = new Source_Controller();
+		$this->_shopOrder->source_id = $oSource_Controller->getId();
+
 		// Номер заказа
 		$bInvoice = strlen($this->_orderParams['invoice']) > 0;
 		$bInvoice && $this->_shopOrder->invoice = Core_Array::get($this->_orderParams, 'invoice');
@@ -221,9 +225,11 @@ abstract class Shop_Payment_System_Handler
 		$oShop->add($this->_shopOrder);
 
 		// Additional order properties
-		if (isset($_SESSION['hostcmsOrder']['properties']) && is_array($_SESSION['hostcmsOrder']['properties']))
+		$aOrderParamProperties = Core_Array::get($this->_orderParams, 'properties');
+
+		if (is_array($aOrderParamProperties))
 		{
-			foreach ($_SESSION['hostcmsOrder']['properties'] as $aTmp)
+			foreach ($aOrderParamProperties as $aTmp)
 			{
 				if (count($aTmp) == 2)
 				{
@@ -272,7 +278,7 @@ abstract class Shop_Payment_System_Handler
 			}
 		}
 
-		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
+		/*$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
 
 		$aProperties = $oShop_Order_Property_List->Properties->findAll();
 		foreach ($aProperties as $oProperty)
@@ -288,7 +294,7 @@ abstract class Shop_Payment_System_Handler
 					$_SESSION['hostcmsOrder']['properties'][] = array($oProperty->id, strval($sPropertyValue));
 				}
 			}
-		}
+		}*/
 
 		$this->shopOrder($this->_shopOrder);
 

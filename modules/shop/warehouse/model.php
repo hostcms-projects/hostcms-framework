@@ -89,27 +89,28 @@ class Shop_Warehouse_Model extends Core_Entity
 
 	/**
 	 * Switch default status
+	 * @return self
 	 */
 	public function changeDefaultStatus()
 	{
 		$this->save();
 
-		$aWarehouses = $this->Shop->Shop_Warehouses;
-		$aWarehouses
+		$oShop_Warehouses = $this->Shop->Shop_Warehouses;
+		$oShop_Warehouses
 			->queryBuilder()
-			->where('default', '=', 1);
+			->where('shop_warehouses.default', '=', 1);
 
-		$aWarehouses = $aWarehouses->findAll();
+		$aShop_Warehouses = $oShop_Warehouses->findAll();
 
-		foreach($aWarehouses as $oWarehouse)
+		foreach($aShop_Warehouses as $oShop_Warehouse)
 		{
-			$oWarehouse->default = 0;
-			$oWarehouse->update();
+			$oShop_Warehouse->default = 0;
+			$oShop_Warehouse->update();
 		}
 
 		$this->default = 1;
 		$this->active = 1;
-		$this->save();
+		return $this->save();
 	}
 
 	/**
@@ -121,7 +122,7 @@ class Shop_Warehouse_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			//->clear()
-			->where('default', '=', 1)
+			->where('shop_warehouses.default', '=', 1)
 			->limit(1);
 
 		$aShop_Warehouses = $this->findAll($bCache);

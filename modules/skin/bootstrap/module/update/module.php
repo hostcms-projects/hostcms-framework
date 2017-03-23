@@ -32,7 +32,7 @@ class Skin_Bootstrap_Module_Update_Module extends Update_Module{
 			$error = $aUpdates['error'];
 
 			?><!-- Update -->
-			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+			<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 				<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 					<div class="databox-left bg-themethirdcolor">
 						<div class="databox-piechart">

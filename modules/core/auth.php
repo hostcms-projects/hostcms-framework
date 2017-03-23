@@ -134,36 +134,8 @@ class Core_Auth
 				exit();
 			}
 
-			// Имя формы
-			$sFormName = Core::_('Core.default_form_name');
-
-			// Имя действия
-			$sEventName = Core::_('Core.default_event_name');
-
 			$aHostCMS = Core_Array::getRequest('hostcms', array());
 
-			if (isset($aHostCMS['action']))
-			{
-				$oAdmin_Form_Action = Core_Entity::factory('Admin_Form_Action')->getByName($aHostCMS['action']);
-
-				if ($oAdmin_Form_Action)
-				{
-					$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Word->getWordByLanguage();
-
-					if ($oAdmin_Word_Value)
-					{
-						$sEventName = $oAdmin_Word_Value->name;
-					}
-
-					// Название формы для действия
-					$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Form->Admin_Word->getWordByLanguage();
-
-					if ($oAdmin_Word_Value)
-					{
-						$sFormName = $oAdmin_Word_Value->name;
-					}
-				}
-			}
 		}
 		catch (Exception $e)
 		{
@@ -181,7 +153,7 @@ class Core_Auth
 
 		Core_Log::instance()->clear()
 			->status(Core_Log::$SUCCESS)
-			->write(Core::_('Core.error_log_access_allowed', $moduleName, $sFormName, $sEventName));
+			->write(Core::_('Core.error_log_module_access_allowed', $moduleName));
 
 		Core_Session::close();
 	}

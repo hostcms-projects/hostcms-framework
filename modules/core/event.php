@@ -64,6 +64,26 @@ class Core_Event
 	}
 
 	/**
+	 * Last returned value
+	 * @var misex
+	 */
+	static protected $_lastReturn = NULL;
+	
+	/**
+	 * Get the last returned value 
+	 *
+	 * <code>
+	 * $value = Core_Event::getLastReturn();
+	 * </code>
+	 *
+	 * @return mixed
+	 */
+	static public function getLastReturn()
+	{
+		return self::$_lastReturn;
+	}
+	
+	/**
 	 * Notify all observers. If observer return FALSE, the cycle will stop.
 	 *
 	 * <code>
@@ -81,7 +101,8 @@ class Core_Event
 		{
 			foreach (self::$_attached[$eventName] as $observer)
 			{
-				if (call_user_func($observer, $object, $args) === FALSE)
+				self::$_lastReturn = call_user_func($observer, $object, $args);
+				if (self::$_lastReturn === FALSE)
 				{
 					break;
 				}

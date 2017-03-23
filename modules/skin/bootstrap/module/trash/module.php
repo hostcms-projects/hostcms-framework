@@ -26,7 +26,7 @@ class Skin_Bootstrap_Module_Trash_Module extends Trash_Module{
 	public function widget()
 	{
 		?><!-- Trash -->
-		<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 			<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 				<div class="databox-left bg-themesecondary">
 					<div class="databox-piechart">

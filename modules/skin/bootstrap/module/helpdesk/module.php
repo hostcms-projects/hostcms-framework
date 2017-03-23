@@ -26,7 +26,7 @@ class Skin_Bootstrap_Module_Helpdesk_Module extends Helpdesk_Module{
 	public function widget()
 	{
 		?><!-- Helpdesk -->
-		<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 			<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 				<div class="databox-left bg-azure">
 					<div class="databox-piechart">
@@ -45,7 +45,7 @@ class Skin_Bootstrap_Module_Helpdesk_Module extends Helpdesk_Module{
 				$row = $oCore_QueryBuilder_Select->execute()->asAssoc()->result();
 				?>
 				<div class="databox-right">
-					<span class="databox-number azure"><?php echo $row[0]['count'] ?></span>
+					<span class="databox-number azure"><?php echo intval($row[0]['count']) ?></span>
 					<div class="databox-text"><?php echo Core::_('Helpdesk_Ticket.new_incidents')?></div>
 					<div class="databox-stat azure radius-bordered">
 						<i class="stat-icon icon-lg fa fa-life-ring"></i>

@@ -55,7 +55,7 @@ class Core_Exception extends Exception
 
 		$aDebugTrace = array();
 
-		foreach ($debug_backtrace AS $history)
+		foreach ($debug_backtrace as $history)
 		{
 			if (isset($history['file']) && isset($history['line']))
 			{

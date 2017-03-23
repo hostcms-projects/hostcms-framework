@@ -74,7 +74,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('xsl_value')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions)
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oMainRow2->add($oTextarea_Xsl);
 
@@ -100,7 +100,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oDescriptionTab
 					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
 
-				$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12'));
+				$this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				// Перемещаем поле "Комментарий"
 				$oMainTab->move($this->getField('description'), $oMainRow6);
@@ -130,7 +130,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('parent_id')
 					->value($this->_object->parent_id)
 					->caption(Core::_('Xsl_Dir.parent_id'))
-					->divAttr(array('class' => 'form-group col-lg-12'));
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 
 				$oMainRow1->add($oSelect_Dirs);
 

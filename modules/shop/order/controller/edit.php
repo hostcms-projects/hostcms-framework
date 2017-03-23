@@ -53,6 +53,35 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('Documents'), $oContactsTab
 				);
 
+		// Order tags
+		if ($this->_object->source_id)
+		{
+			$this->addTabAfter(
+				$oTagTab = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Shop_Order.tab5'))
+					->name('Tags'), $oContactsTab
+			);
+
+			$oSource = $this->_object->Source;
+
+			$oTagTab
+				->add($oTagRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+			$aSourceFields = array('service', 'campaign', 'ad', 'source', 'medium', 'content', 'term');
+
+			foreach ($aSourceFields as $sFieldName)
+			{
+				$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input')
+					->name('source_' . $sFieldName)
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-4'))
+					->caption(Core::_('Source.' . $sFieldName))
+					->class('form-control input-group-input')
+					->value($oSource->$sFieldName);
+
+				$oTagRow1->add($oAdmin_Form_Entity_Input);
+			}
+		}
+
 		$Shop_Delivery_Condition_Controller_Edit = new Shop_Delivery_Condition_Controller_Edit($this->_Admin_Form_Action);
 
 		$Shop_Delivery_Condition_Controller_Edit->controller($this->_Admin_Form_Controller);
@@ -501,6 +530,8 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->title($title);
 
+		//Core_Event::notify(get_class($this) . '.onAfterRedeclaredSetObject', $this, array());
+		
 		return $this;
 	}
 

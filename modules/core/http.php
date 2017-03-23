@@ -195,7 +195,7 @@ abstract class Core_Http
 	{
 		return $this->_url;
 	}
-	
+
 	/**
 	 * Request referer
 	 * @var string
@@ -360,7 +360,13 @@ abstract class Core_Http
 	{
 		$aUrl = @parse_url(trim($this->_url));
 
-		$path = isset($aUrl['host']) && isset ($aUrl['path'])
+		$scheme = strtolower(Core_Array::get($aUrl, 'scheme', 'http'));
+
+		// Change https port
+		$scheme == 'https' && $this->_port == 80
+			&& $this->_port = 443;
+
+		$path = isset($aUrl['host']) && isset($aUrl['path'])
 			? $aUrl['path']
 			: '/';
 
@@ -371,7 +377,7 @@ abstract class Core_Http
 			: '';
 
 		$this->_referer = is_null($this->_referer)
-			? "http://{$host}"
+			? "{$scheme}://{$host}"
 			: $this->_referer;
 
 		return $this->_execute($host, $path, $query);
@@ -413,10 +419,6 @@ abstract class Core_Http
 		{
 			if (preg_match('/([^:]+): (.+)/m', $field, $match))
 			{
-				/*$match[1] = preg_replace('/(?<=^|[\x09\x20\x2D])./e', 'strtoupper("\0")', strtolower(
-					trim($match[1]))
-				);*/
-
 				$match[1] = preg_replace_callback(
 					'/(?<=^|[\x09\x20\x2D])./',
 					create_function ('$matches', 'return strtoupper($matches[0]);'), strtolower(trim($match[1]))

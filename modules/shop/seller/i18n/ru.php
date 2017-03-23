@@ -26,10 +26,12 @@ return array(
 	'email' => "<acronym title=\"E-Mail продавца\">E-Mail</acronym>",
 	'tin' => "<acronym title=\"ИНН продавца\">ИНН</acronym>",
 	'id' => "Идентификатор",
+	'default' => "<acronym title=\"Флаг, определяющий продавца по умолчанию\">Продавец \"по умолчанию\"</acronym>",
 	'siteuser_id' => '<acronym title="Идентификатор пользователя сайта">Идентификатор пользователя сайта</acronym>',
 	'shop_id' => '<acronym title="Родительский магазин элемента">Магазин</acronym>',
 	'edit_success' => "Данные о продавце успешно добавлены!",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
 	'markDeleted_success' => "Информация о производителе успешно удалена!",
+	'changeDefaultStatus_success' => "Информация успешно изменена",
 );

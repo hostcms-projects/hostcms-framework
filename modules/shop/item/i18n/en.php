@@ -269,5 +269,7 @@ return array(
 	'show_in_item'=>'Show property in item',
 	'add_value'=>'Add the default property values ​​for the items with unset values',
 	'start_order_date'=>'Start date',
-	'stop_order_date'=>'End date'
+	'stop_order_date' => 'End date',
+	'empty_shop' => 'Are you sure you want to permanently delete all of the items in the store?',
+	
 );

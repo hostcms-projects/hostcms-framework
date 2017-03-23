@@ -159,24 +159,36 @@ class Core_Str
 	 */
 	static public function translate($string)
 	{
-		$url = 'http://translate.yandex.net/api/v1/tr.json/translate?lang=ru-en&text=' . urlencode($string);
-
-		$Core_Http = Core_Http::instance()
-			->url($url)
-			->timeout(3)
-			->execute();
-
-		$data = trim($Core_Http->getBody());
-
-		if (strlen($data))
+		if (defined('YANDEX_TRANSLATE_KEY') && strlen(YANDEX_TRANSLATE_KEY))
 		{
-			$oData = json_decode($data);
+			$url = 'https://translate.yandex.net/api/v1.5/tr.json/translate?' .
+				'key=' . urlencode(YANDEX_TRANSLATE_KEY) .
+				'&text=' . urlencode($string) .
+				'&lang=en&format=plain';
 
-			if (is_object($oData) && $oData->code == 200 && isset($oData->text[0]))
+			$Core_Http = Core_Http::instance()
+				->url($url)
+				->timeout(3)
+				->execute();
+
+			$data = trim($Core_Http->getBody());
+
+			if (strlen($data))
 			{
-				return $oData->text[0];
+				$oData = json_decode($data);
+
+				if (is_object($oData) && $oData->code == 200 && isset($oData->text[0]))
+				{
+					return $oData->text[0];
+				}
 			}
 		}
+		/*else
+		{
+			Core_Log::instance()->clear()
+				->status(Core_Log::$MESSAGE)
+				->write('Can not translate. Constant YANDEX_TRANSLATE_KEY is undefined.');
+		}*/
 
 		return NULL;
 	}
@@ -456,7 +468,6 @@ class Core_Str
 		}
 		else
 		{
-			//$result = preg_replace('/<(.*?)>/ieu', "'<' . preg_replace(array('/javascript:[^\"\']*/iu', '/(" . implode('|', $aDisabledAttributes) . ")[ \\t\\n]*=[ \\t\\n]*[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes('\\1')) . '>'", strip_tags($sSource, $aAllowedTags));
 			$result = preg_replace_callback('/<(.*?)>/iu', create_function('$matches', "return '<' . preg_replace(array('/javascript:[^\"\']*/iu', '/(" . implode('|', $aDisabledAttributes) . ")[ \\t\\n]*=[ \\t\\n]*[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes(" . '$matches[1]' . ")) . '>';"), strip_tags($sSource, $aAllowedTags));
 		}
 

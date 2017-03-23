@@ -70,7 +70,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				}
 				else
 				{
-					?><div class="col-lg-8" id="eventsAdminPage">
+					?><div class="col-xs-12 col-sm-8 col-md-8 col-lg-8" id="eventsAdminPage">
 						<script type="text/javascript">
 						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#eventsAdminPage') });
 						</script>
@@ -85,7 +85,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				}
 				else
 				{
-					?><div class="systems-characteristics col-lg-4" id="characteristicsAdminPage">
+					?><div class="systems-characteristics col-xs-12 col-sm-4 col-md-4 col-lg-4" id="characteristicsAdminPage">
 						<script type="text/javascript">
 						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#characteristicsAdminPage') });
 						</script>
@@ -231,7 +231,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 		<?php
 		return $this;
 	}
-	
+
 	protected function _characteristicsContent()
 	{
 		$dbVersion = Core_DataBase::instance()->getVersion();
@@ -245,7 +245,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 		?><div class="widget">
 			<div class="widget-header bordered-bottom bordered-blue">
 				<i class="widget-icon fa fa-gears blue"></i>
-				<span class="widget-caption blue"><?php echo Core::_('Admin.index_systems_characteristics');?></span>
+				<span class="widget-caption blue"><?php echo Core::_('Admin.index_systems_characteristics')?></span>
 				<div class="widget-buttons">
 					<a data-toggle="maximize">
 						<i class="fa fa-expand gray"></i>
@@ -262,8 +262,19 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 							<li class="ticket-item">
 								<div class="row">
 									<div class="ticket-user">
-										<span class="user-name"><?php echo Core::_('Admin.index_tech_date_hostcms') ?></span>
+										<span class="user-name"><?php echo Core::_('Admin.index_tech_date_hostcms')?></span>
 										<span class="user-company"><?php echo CURRENT_VERSION ?></span>
+									</div>
+									<div class="ticket-state bg-palegreen">
+										<i class="fa fa-check"></i>
+									</div>
+								</div>
+							</li>
+							<li class="ticket-item">
+								<div class="row">
+									<div class="ticket-user">
+										<span class="user-name"><?php echo Core::_('Admin.index_tech_date_editorial')?></span>
+										<span class="user-company"><?php echo Core::_('Core.redaction' . Core_Array::get(Core::$config->get('core_hostcms'), 'integration', 0))?></span>
 									</div>
 									<div class="ticket-state bg-palegreen">
 										<i class="fa fa-check"></i>

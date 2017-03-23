@@ -131,6 +131,7 @@ class Market_Controller extends Core_Servant_Properties
 		$md5_pin = md5($this->pin);
 
 		$url = 'http://' . $this->update_server . "/hostcmsupdate/market/?action=load_market&domain=" . rawurlencode($this->domain) .
+			'&protocol=' . (Core::httpsUses() ? 'https' : 'http') .
 			"&login=" . rawurlencode($this->login) .
 			"&contract=" . rawurlencode($md5_contract) .
 			"&pin=" . rawurlencode($md5_pin) .

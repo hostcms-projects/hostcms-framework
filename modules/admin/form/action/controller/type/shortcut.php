@@ -66,12 +66,11 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 			$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select')
 				->name('destinationId')
 				->id('destinationId')
-				//->style('width: 280px; float: left')
 				->filter(TRUE)
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller($this->_Admin_Form_Controller->window($newWindowId));
+				->controller($this->_Admin_Form_Controller/*->window($newWindowId)*/);
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
@@ -106,9 +105,9 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 			$oCore_Html_Entity_Form
 				->add($oAdmin_Form_Entity_Select)
 				->add(
-						Admin_Form_Entity::factory('Div')
-							->class('form-group col-lg-12')
-							->add($oAdmin_Form_Entity_Button)
+					Admin_Form_Entity::factory('Div')
+						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+						->add($oAdmin_Form_Entity_Button)
 				);
 
 			$oCore_Html_Entity_Div->execute();

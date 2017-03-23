@@ -39,7 +39,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 					// Ячейку над групповыми чекбоксами показываем только при наличии действий
 					if ($this->_Admin_Form->show_operations && $this->_showOperations)
 					{
-						?><th>&nbsp;</th><?php
+						?><th width="40">&nbsp;</th><?php
 					}
 
 					foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)

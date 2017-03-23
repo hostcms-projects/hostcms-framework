@@ -23,6 +23,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - parentItem(123) идентификатор родительского товара для отображаемой модификации
  * - modifications(TRUE|FALSE) показывать модификации для выбранных товаров, по умолчанию FALSE
  * - modificationsList(TRUE|FALSE) показывать модификации товаров текущей группы на уровне товаров группы, по умолчанию FALSE
+ * - filterShortcuts(TRUE|FALSE) выбирать ярлыки товаров текущей группы на уровне товаров группы, по умолчанию FALSE. Используется для фильтрации по дополнительным свойствам.
  * - specialprices(TRUE|FALSE) показывать специальные цены для выбранных товаров, по умолчанию FALSE
  * - associatedItems(TRUE|FALSE) показывать сопутствующие товары для выбранных товаров, по умолчанию FALSE
  * - comments(TRUE|FALSE) показывать комментарии для выбранных товаров, по умолчанию FALSE
@@ -96,6 +97,7 @@ class Shop_Controller_Show extends Core_Controller
 		'parentItem',
 		'modifications',
 		'modificationsList',
+		'filterShortcuts',
 		'specialprices',
 		'associatedItems',
 		'comments',
@@ -777,7 +779,7 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		// Показывать дополнительные свойства товара
-		if ($this->itemsProperties)
+		if ($this->itemsProperties || $this->itemsPropertiesList)
 		{
 			$aShowPropertyIDs = $this->_itemsProperties();
 		}
@@ -819,7 +821,7 @@ class Shop_Controller_Show extends Core_Controller
 					? 1
 					: (strtolower($this->itemsActivity) == 'all' ? $oShop_Item->active : 0);
 
-				//Ярлык может ссылаться на товар с истекшим или не наступившим сроком публикации
+				// Ярлык может ссылаться на товар с истекшим или не наступившим сроком публикации
 				$iCurrentTimestamp = time();
 
 				$oShop_Item->clearEntities();
@@ -895,46 +897,49 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	protected function _itemsProperties()
 	{
+		$aShowPropertyIDs = array();
+
 		$oShop = $this->getEntity();
 
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
 
-		$aProperties = $this->group === FALSE
-			? $oShop_Item_Property_List->Properties->findAll()
-			: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
+		//if ($this->itemsProperties)
+		//{
+			$aProperties = $this->group === FALSE
+				? $oShop_Item_Property_List->Properties->findAll()
+				: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
 
-		$aShowPropertyIDs = array();
-
-		foreach ($aProperties as $oProperty)
-		{
-			$oShop_Item_Property = $oProperty->Shop_Item_Property;
-
-			if ($oShop_Item_Property->show_in_item && $this->item
-				|| $oShop_Item_Property->show_in_group && !$this->item)
+			foreach ($aProperties as $oProperty)
 			{
-				// Используется ниже для ограничение показа значений св-в товара в модели
-				$aShowPropertyIDs[] = $oProperty->id;
+				$oShop_Item_Property = $oProperty->Shop_Item_Property;
+
+				if ($oShop_Item_Property->show_in_item && $this->item
+					|| $oShop_Item_Property->show_in_group && !$this->item)
+				{
+					// Используется ниже для ограничение показа значений св-в товара в модели
+					$aShowPropertyIDs[] = $oProperty->id;
+				}
+
+				$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
+
+				$oProperty->addEntity(
+					Core::factory('Core_Xml_Entity')->name('prefix')->value($oShop_Item_Property->prefix)
+				)
+				->addEntity(
+					Core::factory('Core_Xml_Entity')->name('filter')->value($oShop_Item_Property->filter)
+				)
+				->addEntity(
+					Core::factory('Core_Xml_Entity')->name('show_in_group')->value($oShop_Item_Property->show_in_group)
+				)
+				->addEntity(
+					Core::factory('Core_Xml_Entity')->name('show_in_item')->value($oShop_Item_Property->show_in_item)
+				);
+
+				$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
+					$oShop_Item_Property->Shop_Measure
+				);
 			}
-
-			$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
-
-			$oProperty->addEntity(
-				Core::factory('Core_Xml_Entity')->name('prefix')->value($oShop_Item_Property->prefix)
-			)
-			->addEntity(
-				Core::factory('Core_Xml_Entity')->name('filter')->value($oShop_Item_Property->filter)
-			)
-			->addEntity(
-				Core::factory('Core_Xml_Entity')->name('show_in_group')->value($oShop_Item_Property->show_in_group)
-			)
-			->addEntity(
-				Core::factory('Core_Xml_Entity')->name('show_in_item')->value($oShop_Item_Property->show_in_item)
-			);
-
-			$oShop_Item_Property->shop_measure_id && $oProperty->addEntity(
-				$oShop_Item_Property->Shop_Measure
-			);
-		}
+		//}
 
 		// Список свойств товаров
 		if ($this->itemsPropertiesList)
@@ -1038,8 +1043,12 @@ class Shop_Controller_Show extends Core_Controller
 		$this->_Shop_Items
 			->queryBuilder()
 			->open()
-			// Для модификаций ограничение по группе 0
 			->where('shop_items.shop_group_id', '=', $shop_group_id);
+
+		// Отключаем выбор ярлыков из текущей группы
+		$this->filterShortcuts && $this->_Shop_Items
+			->queryBuilder()
+			->where('shop_items.shortcut_id', '=', 0);
 
 		if (!$this->_selectModifications)
 		{
@@ -1063,6 +1072,22 @@ class Shop_Controller_Show extends Core_Controller
 				->setOr()
 				->where('shop_items.shop_group_id', '=', 0)
 				->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Modifications);
+		}
+
+		if ($this->filterShortcuts)
+		{
+			$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')
+				->from('shop_items')
+				->where('shop_items.shop_group_id', '=', $shop_group_id)
+				->where('shop_items.shortcut_id', '>', 0);
+
+			// Стандартные ограничения для товаров
+			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Shortcuts);
+
+			$this->_Shop_Items
+				->queryBuilder()
+				->setOr()
+				->where('shop_items.id', 'IN', $oCore_QueryBuilder_Select_Shortcuts);
 		}
 
 		$this->_Shop_Items
@@ -1747,7 +1772,29 @@ class Shop_Controller_Show extends Core_Controller
 			->from('shop_items')
 			->where('shop_items.shop_id', '=', $oShop->id)
 			->where('shop_items.active', '=', 1)
-			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
+			->open()
+			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup);
+
+		$this->filterShortcuts && $oSubMinMaxQueryBuilder
+			->where('shop_items.shortcut_id', '=', 0);
+
+		if ($this->filterShortcuts)
+		{
+			$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')
+				->from('shop_items')
+				->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
+				->where('shop_items.shortcut_id', '>', 0);
+
+			// Стандартные ограничения для товаров
+			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Shortcuts);
+
+			$oSubMinMaxQueryBuilder
+				->setOr()
+				->where('shop_items.id', 'IN', $oCore_QueryBuilder_Select_Shortcuts);
+		}
+
+		$oSubMinMaxQueryBuilder
+			->close()
 			->leftJoin('shop_item_discounts', 'shop_items.id', '=', 'shop_item_discounts.shop_item_id')
 			->leftJoin('shop_discounts', 'shop_item_discounts.shop_discount_id', '=', 'shop_discounts.id', array(
 				array('AND (' => array('shop_discounts.end_datetime', '>=', $current_date)),
@@ -1800,7 +1847,7 @@ class Shop_Controller_Show extends Core_Controller
 			->where('shortcut_items.active', '=', 1);
 
 		$this->_applyItemConditionsQueryBuilder($this->_Shop_Items->queryBuilder(), 'shortcut_items');
-		
+
 		$this->_Shop_Items
 			->queryBuilder()
 			->close();

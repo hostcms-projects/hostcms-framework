@@ -1,3 +1,7 @@
+function isEmpty(str) {
+    return (!str || 0 === str.length);
+}
+
 (function($) {
 	// http://james.padolsey.com/javascript/regex-selector-for-jquery/
 	jQuery.expr[':'].regex = function(elem, index, match) {
@@ -217,7 +221,7 @@
 				data: data,
 				dataType: 'json',
 				abortOnRetry: 1,
-				success: [jQuery.ajaxCallback, jQuery.ajaxCallbackSkin, function()
+				success: [jQuery.ajaxCallback, jQuery.ajaxCallbackSkin, function(returnedData)
 				{
 					var pjax = window.history && window.history.pushState && window.history.replaceState /*&& !navigator.userAgent.match(/(WebApps\/.+CFNetwork)/)*/;
 
@@ -385,7 +389,8 @@
 
 			jMessage.empty().html(data.error);
 
-			if (typeof data.title != 'undefined' && data.title != '' && jObject.attr('id') == 'id_content')
+			if (typeof data.title != 'undefined' && !isEmpty(data.title) && jObject.attr('id') == 'id_content'
+			)
 			{
 				document.title = data.title;
 			}
@@ -472,7 +477,11 @@
 		},
 		deleteProperty: function(object, settings)
 		{
-			var jObject = jQuery(object).siblings('input,select:not([onchange]),textarea');
+			//var jObject = jQuery(object).siblings('input,select:not([onchange]),textarea');
+			var jObject = jQuery(object)
+				.parents('div.input-group');
+
+			jObject = jObject.find('input,select:not([onchange]),textarea');
 
 			// For files
 			if (jObject.length === 0)
@@ -786,7 +795,6 @@
 		currentRequests[options.url] = jqXHR;
 	  }
 	});
-
 })(jQuery);
 
 

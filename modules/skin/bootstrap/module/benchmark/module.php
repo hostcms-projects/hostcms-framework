@@ -46,7 +46,7 @@ class Skin_Bootstrap_Module_Benchmark_Module extends Benchmark_Module{
 			$sColor = $aColors[ceil($iBenchmark / 25)];
 
 			?><!-- Benchmark -->
-			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+			<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 				<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 					<div class="databox-left bg-<?php echo $sColor?>">
 						<div class="databox-piechart">

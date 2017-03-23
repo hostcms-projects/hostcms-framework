@@ -622,13 +622,13 @@ class Core_Entity extends Core_ORM
 	{
 		$newObject = clone $this;
 
-		Core_Event::notify($this->_modelName . '.onBeforeCopy', $newObject);
+		Core_Event::notify($this->_modelName . '.onBeforeCopy', $newObject, array($this));
 
 		$nameColumn = $this->_nameColumn;
 		$nameColumn != 'id' && $newObject->$nameColumn = $this->_getCopiedName();
 		$newObject->save();
 
-		Core_Event::notify($this->_modelName . '.onAfterCopy', $newObject);
+		Core_Event::notify($this->_modelName . '.onAfterCopy', $newObject, array($this));
 
 		return $newObject;
 	}

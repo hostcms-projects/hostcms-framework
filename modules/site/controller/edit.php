@@ -101,7 +101,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oSiteTabCacheRow4 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		/* $oMainRow1 */
-		$this->getField('active')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('active'), $oMainRow1);
 
 		/* $oMainRow2 */
@@ -291,21 +291,21 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSiteTabErrorsRow2->add($oSelect_503);
 
 		/* $oSiteTabRobotsRow1 */
-		$this->getField('robots')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('robots')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('robots'), $oSiteTabRobotsRow1);
 
 		/* $oSiteTabLicenseRow1 */
-		$this->getField('key')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('key')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('key'), $oSiteTabLicenseRow1);
 
 		/* $oSiteTabCache */
 		$this->getField('html_cache_use')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
 		$oMainTab->move($this->getField('html_cache_use'), $oSiteTabCacheRow1);
 
-		$this->getField('html_cache_with')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('html_cache_with')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('html_cache_with'), $oSiteTabCacheRow2);
 
-		$this->getField('html_cache_without')->divAttr(array('class' => 'form-group col-lg-12'));
+		$this->getField('html_cache_without')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('html_cache_without'), $oSiteTabCacheRow3);
 
 		$this->getField('html_cache_clear_probability')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-sm-6 col-md-6 col-lg-6'));

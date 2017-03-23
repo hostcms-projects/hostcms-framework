@@ -183,20 +183,20 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				;
 
 				$oShopItemTabExportImport
-					->move($this->getField('yandex_market')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow1)
-					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow2)
-					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow3)
-					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow4)
-					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow5)
-					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow6)
-					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow7)
-					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabExportImportRow8)
+					->move($this->getField('yandex_market')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow1)
+					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow2)
+					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow3)
+					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow4)
+					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow5)
+					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow6)
+					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow7)
+					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow8)
 				;
 
 				$oShopItemTabSEO
-					->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabSEORow1)
-					->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabSEORow2)
-					->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-lg-12')), $oShopItemTabSEORow3)
+					->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow1)
+					->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow2)
+					->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow3)
 				;
 
 				$oDescriptionField
@@ -325,11 +325,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oShopGroupSelect = Admin_Form_Entity::factory('Select');
 					$oShopGroupSelect->caption(Core::_('Shop_Item.shop_group_id'))
-					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
-					->name('shop_group_id')
-					->value($this->_object->shop_group_id)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
-					->filter(TRUE);
+						->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
+						->name('shop_group_id')
+						->value($this->_object->shop_group_id)
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+						->filter(TRUE);
 
 					// Добавляем группу товаров
 					$oMainRow1->add($oShopGroupSelect);
@@ -360,8 +360,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$sFormPath = $this->_Admin_Form_Controller->getPath();
 
 				$oImageField
-					//->style("width: 400px;")
-					->divAttr(array('class' => 'form-group col-lg-12'))
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 					->name("image")
 					->id("image")
 					->largeImage(array('max_width' => $oShop->image_large_max_width, 'max_height' => $oShop->image_large_max_height, 'path' => $oLargeFilePath, 'show_params' => TRUE, 'watermark_position_x' => $oShop->watermark_default_position_x, 'watermark_position_y' => $oShop->watermark_default_position_y, 'place_watermark_checkbox_checked' => $oShop->watermark_default_use_large_image, 'delete_onclick' =>
@@ -398,28 +397,25 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Получаем список складов магазина
 				$aWarehouses = $oShop->Shop_Warehouses->findAll();
 
-				foreach($aWarehouses as $oWarehouse)
+				foreach ($aWarehouses as $oWarehouse)
 				{
 					$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
-
-					$oWarehouseTextBox = Admin_Form_Entity::factory('Input');
 
 					// Получаем количество товара на текущем складе
 					$oWarehouseItem =
 						$this->_object->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id);
 
 					$value = is_null($oWarehouseItem)
-						? 0
+						? (defined('DEFAULT_REST') ? DEFAULT_REST : 0)
 						: $oWarehouseItem->count;
 
-					$oWarehouseTextBox
-						->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
-						->value($value)
-						->name("warehouse_{$oWarehouse->id}")
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
-						;
-
-					$oWarehouseCurrentRow->add($oWarehouseTextBox);
+					$oWarehouseCurrentRow->add(
+						Admin_Form_Entity::factory('Input')
+							->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
+							->value($value)
+							->name("warehouse_{$oWarehouse->id}")
+							->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					);
 				}
 
 				$oMainTab
@@ -446,8 +442,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Создаем поле групп пользователей сайта как выпадающий список
-				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select');
-				$oSiteUserGroupSelect
+				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_("Shop_Item.siteuser_group_id"))
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
 					->options(array(-1 => Core::_('Shop_Item.shop_users_group_parrent')) + $aSiteuser_Groups)
@@ -460,14 +455,17 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем продавцов
 				$oAdditionalTab->delete($this->getField('shop_seller_id'));
 
-				// Создаем поле продавцов как выпадающий список
-				$oShopSellerSelect = Admin_Form_Entity::factory('Select');
+				$oDefault_Shop_Seller = $this->_object->Shop->Shop_Sellers->getDefault();
 
-				$oShopSellerSelect->caption(Core::_('Shop_Item.shop_seller_id'))
+				$oShopSellerSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Item.shop_seller_id'))
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
 					->options($this->_fillSellersList())
 					->name('shop_seller_id')
-					->value($this->_object->shop_seller_id);
+					->value($this->_object->id
+						? $this->_object->shop_seller_id
+						: (!is_null($oDefault_Shop_Seller) ? $oDefault_Shop_Seller->id : 0)
+					);
 
 				// Добавляем продавцов
 				$oMainRow9->add($oShopSellerSelect);
@@ -475,14 +473,17 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем производителей
 				$oAdditionalTab->delete($this->getField('shop_producer_id'));
 
-				// Создаем поле производителей как выпадающий список
-				$oShopProducerSelect = Admin_Form_Entity::factory('Select');
+				$oDefault_Shop_Producer = $this->_object->Shop->Shop_Producers->getDefault();
 
-				$oShopProducerSelect->caption(Core::_('Shop_Item.shop_producer_id'))
+				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Item.shop_producer_id'))
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
 					->options($this->fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
 					->name('shop_producer_id')
-					->value($this->_object->shop_producer_id);
+						->value($this->_object->id
+						? $this->_object->shop_producer_id
+						: (!is_null($oDefault_Shop_Producer) ? $oDefault_Shop_Producer->id : 0)
+					);
 
 				// Добавляем продавцов
 				$oMainRow9->add($oShopProducerSelect);
@@ -498,9 +499,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdditionalTab->delete($this->getField('shop_currency_id'));
 
 				// Создаем поле валюты как выпадающий список
-				$oShopCurrencySelect = Admin_Form_Entity::factory('Select');
-
-				$oShopCurrencySelect
+				$oShopCurrencySelect = Admin_Form_Entity::factory('Select')
 					->caption("&nbsp;")
 					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-6'))
 					->options($Shop_Controller_Edit->fillCurrencies())
@@ -513,7 +512,6 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем налоги
 				$oAdditionalTab->delete($this->getField('shop_tax_id'));
 
-				// Создаем поле налогов как выпадающий список
 				$oShopTaxSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_("Shop_Item.shop_tax_id"))
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
@@ -746,13 +744,14 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdditionalTab = $this->getTab('additional');
 
 				// Добавляем новые вкладки
-				$this->addTabAfter($oShopGroupDescriptionTab =
-					Admin_Form_Entity::factory('Tab')
+				$this->addTabAfter($oShopGroupDescriptionTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Group.tab_group_description'))
 					->name('Description'), $oMainTab);
+
 				$this->addTabAfter($oShopGroupSeoTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Group.tab_group_seo'))
 					->name('SEO'), $oShopGroupDescriptionTab);
+
 				$this->addTabAfter($oShopGroupImportExportTab =
 					Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Group.tab_yandex_market'))
@@ -779,8 +778,6 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
 
 				$oShopGroupDescriptionTab
@@ -813,12 +810,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем поле parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oShopGroupParentSelect = Admin_Form_Entity::factory('Select');
-
-				$oShopGroupParentSelect->caption(Core::_('Shop_Group.parent_id'))
+				$oShopGroupParentSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Group.parent_id'))
 					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
-					->value($this->_object->parent_id);
+					->value($this->_object->parent_id)
+					->filter(TRUE);
 
 				// Добавляем поле parent_id
 				$oMainRow1->add($oShopGroupParentSelect);
@@ -853,10 +850,19 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Добавляем поле картинки группы товаров
 				$oMainRow2->add($oImageField);
 
+				$this->getField("sorting")
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
+
+				$this->getField("indexing")
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
+
+				$this->getField("active")
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
+
 				$oMainTab
-					->move($this->getField("sorting"), $oMainRow3)
 					->move($this->getField("indexing"), $oMainRow4)
-					->move($this->getField("active"), $oMainRow5);
+					->move($this->getField("active"), $oMainRow4)
+					->move($this->getField("sorting"), $oMainRow5);
 
 				// Удаляем поле siteuser_group_id
 				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
@@ -872,17 +878,17 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Создаем поле групп пользователей сайта как выпадающий список
-				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select');
-				$oSiteUserGroupSelect
-				->caption(Core::_("Shop_Item.siteuser_group_id"))
-				->options(array(-1 => Core::_('Shop_Item.shop_users_group_parrent')) + $aSiteuser_Groups)
-				->name('siteuser_group_id')
-				->value($this->_object->siteuser_group_id);
+				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_("Shop_Item.siteuser_group_id"))
+					->options(array(-1 => Core::_('Shop_Item.shop_users_group_parrent')) + $aSiteuser_Groups)
+					->name('siteuser_group_id')
+					->value($this->_object->siteuser_group_id)
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6 col-lg-6'));
 
 				// Добавляем группы пользователей сайта
-				$oMainRow6->add($oSiteUserGroupSelect);
+				$oMainRow5->add($oSiteUserGroupSelect);
 
-				$oMainTab->move($this->getField("path"), $oMainRow7);
+				$oMainTab->move($this->getField("path"), $oMainRow3);
 
 				$oDescriptionField = $this->getField("description")
 					->wysiwyg(TRUE)
@@ -1497,7 +1503,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			{
 				$this->_object->name = Core_Array::getPost('name');
 				$this->_object->path = Core_Array::getPost('path');
-				$this->_object->makePath();
+				// id еще не определен, поэтому makePath() не может работать корректно
+				//$this->_object->makePath();
+
 				$path = $this->_object->path;
 
 				$this->addSkipColumn('path');
@@ -1531,7 +1539,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				case 'shop_group':
 					$parent_id = Core_Array::getPost('parent_id');
 
-					$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)->Shop_Groups->getByParentIdAndPath($parent_id, $path);
+					$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)
+						->Shop_Groups
+						->getByParentIdAndPath($parent_id, $path);
 
 					if (!is_null($oSameShopGroup) && $oSameShopGroup->id != Core_Array::getPost('id'))
 					{

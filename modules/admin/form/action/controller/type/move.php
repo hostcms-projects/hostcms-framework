@@ -72,7 +72,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller($this->_Admin_Form_Controller->window($newWindowId));
+				->controller($this->_Admin_Form_Controller/*->window($newWindowId)*/);
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
@@ -108,7 +108,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				->add($oAdmin_Form_Entity_Select)
 				->add(
 					Admin_Form_Entity::factory('Div')
-						->class('form-group col-lg-12')
+						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 						->add($oAdmin_Form_Entity_Button)
 				);
 

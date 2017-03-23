@@ -110,7 +110,7 @@ class Shop_Seller_Model extends Core_Entity
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
 
 		$oSearch_Page->siteuser_groups = array(intval($this->Shop->siteuser_group_id));
-		
+
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
 		//$oSearch_Page->save();
@@ -327,6 +327,50 @@ class Shop_Seller_Model extends Core_Entity
 		catch (Exception $e) {}
 
 		return $newObject;
+	}
+
+	/**
+	 * Switch default status
+	 * @return self
+	 */
+	public function changeDefaultStatus()
+	{
+		$this->save();
+
+		$oShop_Sellers = $this->Shop->Shop_Sellers;
+		$oShop_Sellers
+			->queryBuilder()
+			->where('shop_sellers.default', '=', 1);
+
+		$aShop_Sellers = $oShop_Sellers->findAll();
+
+		foreach($aShop_Sellers as $oShop_Seller)
+		{
+			$oShop_Seller->default = 0;
+			$oShop_Seller->update();
+		}
+
+		$this->default = 1;
+		return $this->save();
+	}
+
+	/**
+	 * Get default seller
+	 * @param boolean $bCache cache mode
+	 * @return Shop_Seller_Model|NULL
+	 */
+	public function getDefault($bCache = TRUE)
+	{
+		$this->queryBuilder()
+			//->clear()
+			->where('shop_sellers.default', '=', 1)
+			->limit(1);
+
+		$aShop_Sellers = $this->findAll($bCache);
+
+		return isset($aShop_Sellers[0])
+			? $aShop_Sellers[0]
+			: NULL;
 	}
 
 	/**

@@ -73,7 +73,8 @@ class Shop_Order_Model extends Core_Entity
 		'siteuser' => array(),
 		'shop_currency' => array(),
 		'shop_order_status' => array(),
-		'shop_payment_system' => array()
+		'shop_payment_system' => array(),
+		'source' => array(),
 	);
 
 	/**
@@ -565,7 +566,7 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Show order's status in XML
 	 * @param boolean $showXmlOrderStatus
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlOrderStatus($showXmlOrderStatus = TRUE)
 	{
@@ -582,7 +583,7 @@ class Shop_Order_Model extends Core_Entity
 	/**
 	 * Show properties in XML
 	 * @param mixed $showXmlProperties array of allowed properties ID or boolean
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlProperties($showXmlProperties = TRUE)
 	{
@@ -619,6 +620,10 @@ class Shop_Order_Model extends Core_Entity
 				: strftime($this->Shop->Site->date_time_format, Core_Date::sql2timestamp($this->datetime)));
 
 		$this->_showXmlCurrency && $this->shop_currency_id && $this->addEntity($this->Shop_Currency);
+
+		$this->source_id && $this->addEntity(
+			$this->Source->clearEntities()
+		);
 
 		if ($this->_showXmlProperties)
 		{

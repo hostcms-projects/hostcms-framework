@@ -34,6 +34,7 @@ return array(
 	// Технические данные
 	'index_title2' => 'Технические данные',
 	'index_tech_date_hostcms' => 'Версия HostCMS: ',
+	'index_tech_date_editorial' => 'Редакция: ',
 	'index_tech_date_php' => 'Версия PHP: ',
 	'index_tech_date_sql' => 'Версия MySQL: ',
 	'index_tech_date_gd' => 'Версия GD: ',

@@ -43,18 +43,30 @@ abstract class Core_Module
 	//protected $_module = NULL;
 
 	/**
+	 * The singleton instances.
+	 * @var mixed
+	 */
+	static public $instance = NULL;
+
+	/**
 	 * Create module instance
 	 * @param string $moduleName module name
 	 * @return mixed
 	 */
 	static public function factory($moduleName)
 	{
+		if (isset(self::$instance[$moduleName]))
+		{
+			return self::$instance[$moduleName];
+		}
+
 		$modelName = ucfirst($moduleName) . '_Module';
+
 		if (class_exists($modelName))
 		{
 			$oReflectionClass = new ReflectionClass($modelName);
 
-			return !$oReflectionClass->isAbstract()
+			return self::$instance[$moduleName] = !$oReflectionClass->isAbstract()
 				? new $modelName()
 				: NULL;
 		}

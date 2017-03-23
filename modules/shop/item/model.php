@@ -625,11 +625,14 @@ class Shop_Item_Model extends Core_Entity
 		if ($this->Shop->url_type == 1)
 		{
 			try {
-				$this->path = Core_Str::transliteration(
-					Core::$mainConfig['translate']
-						? Core_Str::translate($this->name)
-						: $this->name
-				);
+				Core::$mainConfig['translate'] && $sTranslated = Core_Str::translate($this->name);
+
+				$this->path = Core::$mainConfig['translate'] && strlen($sTranslated)
+					? $sTranslated
+					: $this->name;
+
+				$this->path = Core_Str::transliteration($this->path);
+
 			} catch (Exception $e) {
 				$this->path = Core_Str::transliteration($this->name);
 			}
@@ -1538,7 +1541,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Show properties in XML
 	 * @param mixed $showXmlProperties array of allowed properties ID or boolean
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlProperties($showXmlProperties = TRUE)
 	{

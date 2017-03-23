@@ -1188,9 +1188,10 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			{
 				$this->_object->name = Core_Array::getPost('name');
 				$this->_object->path = Core_Array::getPost('path');
-				$this->_object->makePath();
+				// id еще не определен, поэтому makePath() не может работать корректно
+				//$this->_object->makePath();
 				$path = $this->_object->path;
-				
+
 				$this->addSkipColumn('path');
 			}
 

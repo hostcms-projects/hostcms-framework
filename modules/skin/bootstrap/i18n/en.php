@@ -8,15 +8,16 @@
  * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
-	'admin_menu_0' => 'Content',
-	'admin_menu_1' => 'Structure',
-	'admin_menu_2' => 'Services',
-	'admin_menu_3' => 'Tools',
-	'admin_menu_4' => 'SEO',
-	'admin_menu_5' => 'Users',
-	'admin_menu_6' => 'Clouds',
-	'admin_menu_7' => 'System',
-	'admin_menu_8' => 'Cache',
-	'admin_menu_9' => 'Administration',
-	'admin_menu_10' => 'Trash',
+	'admin_menu_content' => 'Content',
+	'admin_menu_structure' => 'Structure',
+	'admin_menu_services' => 'Services',
+	'admin_menu_tools' => 'Tools',
+	'admin_menu_seo' => 'SEO',
+	'admin_menu_users' => 'Users',
+	'admin_menu_clouds' => 'Clouds',
+	'admin_menu_market' => 'Hostmarket',
+	'admin_menu_system' => 'System',
+	'admin_menu_cache' => 'Cache',
+	'admin_menu_administration' => 'Administration',
+	'admin_menu_trash' => 'Trash',
 );

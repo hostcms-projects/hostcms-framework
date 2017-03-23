@@ -274,7 +274,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->datetime));
 						$aOrdered[$sDate]++;
 
-						$fCurrencyCoefficient = $oShop_Order->shop_currency_id > 0
+						$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
 							? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 								$oShop_Order->Shop_Currency, $oDefault_Currency
 							)
@@ -300,7 +300,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->payment_datetime));
 						$aPaid[$sDate]++;
 
-						$fCurrencyCoefficient = $oShop_Order->shop_currency_id > 0
+						$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
 							? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 								$oShop_Order->Shop_Currency, $oDefault_Currency
 							)

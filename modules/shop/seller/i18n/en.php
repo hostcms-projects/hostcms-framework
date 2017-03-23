@@ -26,10 +26,12 @@ return array(
 	'email' => "<acronym title=\"Seller's e-mail\">E-Mail</acronym>",
 	'tin' => "<acronym title=\"Taxpayer ID\">Taxpayer ID</acronym>",
 	'id' => "Id",
+	'default' => "Default seller",
 	'siteuser_id' => '<acronym title="Site user id">Site user id</acronym>',
 	'shop_id' => '<acronym title="Parent store of item">Store</acronym>',
 	'edit_success' => "Seller information added successfully!",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-'markDeleted_success' => "Manufacturer information deleted successfully!",
+	'markDeleted_success' => "Manufacturer information deleted successfully!",
+	'changeDefaultStatus_success' => "Information has been successfully changed",
 );

@@ -31,6 +31,7 @@ return array(
 	'okpo' => '<acronym title="ОКПО производителя">ОКПО</acronym>',
 	'okved' => '<acronym title="ОКВЭД производителя">ОКВЭД</acronym>',
 	'bik' => '<acronym title="БИК производителя">БИК</acronym>',
+	'default' => "<acronym title=\"Флаг, определяющий производителя по умолчанию\">Производитель \"по умолчанию\"</acronym>",
 	'current_account' => '<acronym title="Номер счета производителя">Номер счета</acronym>',
 	'correspondent_account' => '<acronym title="Номер корр. счета производителя">Номер корр. счета</acronym>',
 	'bank_name' => '<acronym title="Название банка">Название банка</acronym>',
@@ -50,4 +51,5 @@ return array(
 	'undelete_success' => 'Элемент восстановлен!',
 	'active' => "<acronym title=\"Активность производителя\">Активность</acronym>",
 	'changeStatus_success' => "Информация успешно изменена",
+	'changeDefaultStatus_success' => "Информация успешно изменена",	
 );

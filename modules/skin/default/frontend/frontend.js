@@ -157,11 +157,11 @@
 				.dialog(settings);
 		},
 		showWindow: function(windowId, content, settings) {
-			settings = jQuery.extend({
+			settings = hQuery.extend({
 				autoOpen: false, resizable: true, draggable: true, Minimize: false, Closable: true
 			}, settings);
 
-			var jWin = jQuery('#' + windowId);
+			var jWin = hQuery('#' + windowId);
 
 			if (!jWin.length)
 			{

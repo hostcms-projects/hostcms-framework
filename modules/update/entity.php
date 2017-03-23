@@ -291,6 +291,13 @@ class Update_Entity extends Core_Entity
 						is_file($update_file) && Core_File::delete($update_file);
 					}
 
+					// Clear Core_ORM_ColumnCache
+					if (Core::moduleIsActive('cache'))
+					{
+						$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
+						$oCore_Cache->deleteAll('Core_ORM_ColumnCache');
+					}
+
 					// Если не было ошибок
 					if (!$error_update)
 					{

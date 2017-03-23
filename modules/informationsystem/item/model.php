@@ -522,11 +522,14 @@ class Informationsystem_Item_Model extends Core_Entity
 		if ($this->InformationSystem->url_type == 1)
 		{
 			try {
-				$this->path = Core_Str::transliteration(
-					Core::$mainConfig['translate']
-						? Core_Str::translate($this->name)
-						: $this->name
-				);
+				Core::$mainConfig['translate'] && $sTranslated = Core_Str::translate($this->name);
+
+				$this->path = Core::$mainConfig['translate'] && strlen($sTranslated)
+					? $sTranslated
+					: $this->name;
+
+				$this->path = Core_Str::transliteration($this->path);
+
 			} catch (Exception $e) {
 				$this->path = Core_Str::transliteration($this->name);
 			}
@@ -1076,7 +1079,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	/**
 	 * Show properties in XML
 	 * @param mixed $showXmlProperties array of allowed properties ID or boolean
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlProperties($showXmlProperties = TRUE)
 	{
@@ -1096,7 +1099,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	/**
 	 * Show part of text in XML
 	 * @param int $showXmlPart
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlPart($showXmlPart = 1)
 	{

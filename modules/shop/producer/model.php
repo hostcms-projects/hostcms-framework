@@ -201,11 +201,14 @@ class Shop_Producer_Model extends Core_Entity
 		if ($this->Shop->url_type == 1)
 		{
 			try {
-				$this->path = Core_Str::transliteration(
-					Core::$mainConfig['translate']
-						? Core_Str::translate($this->name)
-						: $this->name
-				);
+				Core::$mainConfig['translate'] && $sTranslated = Core_Str::translate($this->name);
+
+				$this->path = Core::$mainConfig['translate'] && strlen($sTranslated)
+					? $sTranslated
+					: $this->name;
+
+				$this->path = Core_Str::transliteration($this->path);
+
 			} catch (Exception $e) {
 				$this->path = Core_Str::transliteration($this->name);
 			}
@@ -321,6 +324,51 @@ class Shop_Producer_Model extends Core_Entity
 		} catch (Exception $e) {}
 
 		return $newObject;
+	}
+
+	/**
+	 * Switch default status
+	 * @return self
+	 */
+	public function changeDefaultStatus()
+	{
+		$this->save();
+
+		$oShop_Producers = $this->Shop->Shop_Producers;
+		$oShop_Producers
+			->queryBuilder()
+			->where('shop_producers.default', '=', 1);
+
+		$aShop_Producers = $oShop_Producers->findAll();
+
+		foreach($aShop_Producers as $oShop_Producer)
+		{
+			$oShop_Producer->default = 0;
+			$oShop_Producer->update();
+		}
+
+		$this->default = 1;
+		$this->active = 1;
+		return $this->save();
+	}
+
+	/**
+	 * Get default producer
+	 * @param boolean $bCache cache mode
+	 * @return Shop_Producer_Model|NULL
+	 */
+	public function getDefault($bCache = TRUE)
+	{
+		$this->queryBuilder()
+			//->clear()
+			->where('shop_producers.default', '=', 1)
+			->limit(1);
+
+		$aShop_Producers = $this->findAll($bCache);
+
+		return isset($aShop_Producers[0])
+			? $aShop_Producers[0]
+			: NULL;
 	}
 
 	/**

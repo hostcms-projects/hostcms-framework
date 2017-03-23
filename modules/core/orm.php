@@ -1063,7 +1063,7 @@ class Core_ORM
 			if (!$this->loaded())
 			{
 				// Do not set values which have changed
-				
+
 				// To delete
 				if (!is_array($this->_preloadValues))
 				{
@@ -1078,7 +1078,7 @@ class Core_ORM
 						->write("Ошибка, неверный тип _columnCacheDefaultValues, " . gettype(self::$_columnCacheDefaultValues[$this->_modelName])  . ", модель " . get_class($this));
 				}
 				// ---------------
-				
+
 				$this->setValues(
 					array_diff_key($this->_preloadValues + self::$_columnCacheDefaultValues[$this->_modelName], $this->_changedColumns), $changed = TRUE
 				);
@@ -1143,25 +1143,25 @@ class Core_ORM
 	 */
 	public function __get($property)
 	{
-		$property = strtolower($property);
+		$lowerProperty = strtolower($property);
 
-		if (isset($this->_relationCache[$property]))
+		if (isset($this->_relationCache[$lowerProperty]))
 		{
-			return $this->_relationCache[$property];
+			return $this->_relationCache[$lowerProperty];
 		}
 
-		if (isset($this->_relations[$property]))
+		if (isset($this->_relations[$lowerProperty]))
 		{
-			switch ($this->_relations[$property]['type'])
+			switch ($this->_relations[$lowerProperty]['type'])
 			{
 				case 'one':
-					$object = self::factory($this->_relations[$property]['model'])
+					$object = self::factory($this->_relations[$lowerProperty]['model'])
 						->clear();
 
-					if (isset($this->_relations[$property]['through']))
+					if (isset($this->_relations[$lowerProperty]['through']))
 					{
-						//$tableName = Core_Inflection::getPlural($this->_relations[$property]['through']);
-						$tableName = $this->_relations[$property]['through_table_name'];
+						//$tableName = Core_Inflection::getPlural($this->_relations[$lowerProperty]['through']);
+						$tableName = $this->_relations[$lowerProperty]['through_table_name'];
 
 						$object->queryBuilder()
 							// change id on id from joined table
@@ -1169,7 +1169,7 @@ class Core_ORM
 							->join($tableName,
 							$object->getTableName() . '.' . $object->getPrimaryKeyName(),
 							'=',
-							$tableName . '.' . $this->_relations[$property]['dependent_key']);
+							$tableName . '.' . $this->_relations[$lowerProperty]['dependent_key']);
 					}
 					else
 					{
@@ -1179,7 +1179,7 @@ class Core_ORM
 					$object
 						->queryBuilder()
 						->where(
-							$tableName . '.' . $this->_relations[$property]['foreign_key'],
+							$tableName . '.' . $this->_relations[$lowerProperty]['foreign_key'],
 							'=',
 							$this->getPrimaryKey()
 						)
@@ -1188,25 +1188,25 @@ class Core_ORM
 					// Load values
 					$object->find();
 
-					if (is_null($object->getPrimaryKey()) && !isset($this->_relations[$property]['through']))
+					if (is_null($object->getPrimaryKey()) && !isset($this->_relations[$lowerProperty]['through']))
 					{
-						$foreignKey = $this->_relations[$property]['foreign_key'];
+						$foreignKey = $this->_relations[$lowerProperty]['foreign_key'];
 
 						// Add relation
 						$object->$foreignKey = $this->getPrimaryKey();
 					}
 
 					// Insert into cache
-					$this->_relationCache[$property] = $object;
+					$this->_relationCache[$lowerProperty] = $object;
 				break;
 				case 'belong':
 
-					$object = self::factory($this->_relations[$property]['model']);
+					$object = self::factory($this->_relations[$lowerProperty]['model']);
 
 					$_belongsByPrimary =
-						$this->_relations[$property]['primary_key'] == $object->getPrimaryKeyName();
+						$this->_relations[$lowerProperty]['primary_key'] == $object->getPrimaryKeyName();
 
-					$foreignKey = $this->_relations[$property]['foreign_key'];
+					$foreignKey = $this->_relations[$lowerProperty]['foreign_key'];
 					$foreignKeyValue = $this->$foreignKey;
 
 					if ($_belongsByPrimary)
@@ -1222,7 +1222,7 @@ class Core_ORM
 								->clear()
 								->queryBuilder()
 								->where(
-								$object->getTableName() . '.' . $this->_relations[$property]['primary_key'],
+								$object->getTableName() . '.' . $this->_relations[$lowerProperty]['primary_key'],
 								'=',
 								$foreignKeyValue)
 								->limit(1);
@@ -1233,25 +1233,25 @@ class Core_ORM
 					}
 
 					// Add into cache
-					$this->_relationCache[$property] = $object;
+					$this->_relationCache[$lowerProperty] = $object;
 				break;
 				case 'many':
-					$object = self::factory($this->_relations[$property]['model']);
+					$object = self::factory($this->_relations[$lowerProperty]['model']);
 
 					$object->queryBuilder()
 						->clear();
 
-					if (isset($this->_relations[$property]['through']))
+					if (isset($this->_relations[$lowerProperty]['through']))
 					{
-						//$tableName = Core_Inflection::getPlural($this->_relations[$property]['through']);
-						$tableName = $this->_relations[$property]['through_table_name'];
+						//$tableName = Core_Inflection::getPlural($this->_relations[$lowerProperty]['through']);
+						$tableName = $this->_relations[$lowerProperty]['through_table_name'];
 
 						$object->queryBuilder()
 							->select($object->getTableName() . '.*')
 							->join($tableName,
 							$object->getTableName() . '.' . $object->getPrimaryKeyName(),
 							'=',
-							$tableName . '.' . $this->_relations[$property]['dependent_key']);
+							$tableName . '.' . $this->_relations[$lowerProperty]['dependent_key']);
 					}
 					else
 					{
@@ -1260,7 +1260,7 @@ class Core_ORM
 
 					$object->queryBuilder()
 						->where(
-						$tableName . '.' . $this->_relations[$property]['foreign_key'],
+						$tableName . '.' . $this->_relations[$lowerProperty]['foreign_key'],
 						'=',
 						$this->getPrimaryKey());
 					break;
@@ -1270,18 +1270,23 @@ class Core_ORM
 		}
 
 		// Property does not exist
-		if (!array_key_exists($property, $this->_modelColumns))
+		if (!array_key_exists($lowerProperty, $this->_modelColumns))
 		{
 			$this->_load();
 		}
 
-		if (array_key_exists($property, $this->_modelColumns))
+		if (array_key_exists($lowerProperty, $this->_modelColumns))
 		{
-			return $this->_modelColumns[$property];
+			return $this->_modelColumns[$lowerProperty];
 		}
 
-		throw new Core_Exception("The property '%property' does not exist in the model '%model'",
-			array('%property' => $property, '%model' => $this->getModelName()));
+		if (!Core_Event::notify($this->_modelName . '.onCall' . $property, $this))
+		{
+			throw new Core_Exception("The property '%property' does not exist in the model '%model'",
+				array('%property' => $property, '%model' => $this->getModelName()));
+		}
+
+		return Core_Event::getLastReturn();
 	}
 
 	/**
@@ -1300,24 +1305,29 @@ class Core_ORM
 	 */
 	public function __isset($property)
     {
-		$property = strtolower($property);
+		$lowerProperty = strtolower($property);
 
-		if (isset($this->_relationCache[$property]) || isset($this->_relations[$property]))
+		if (isset($this->_relationCache[$lowerProperty]) || isset($this->_relations[$lowerProperty]))
 		{
 			return TRUE;
 		}
 
 		// Property does not exist
-		if (!array_key_exists($property, $this->_modelColumns))
+		if (!array_key_exists($lowerProperty, $this->_modelColumns))
 		{
 			$this->_load();
 		}
 
-		if (array_key_exists($property, $this->_modelColumns))
+		if (array_key_exists($lowerProperty, $this->_modelColumns))
 		{
 			return TRUE;
 		}
 
+		if (Core_Event::getCount($this->_modelName . '.onCall' . $property))
+		{
+			return TRUE;
+		}
+		
         return FALSE;
     }
 
@@ -1355,8 +1365,13 @@ class Core_ORM
 			return $this;
 		}
 
-		throw new Core_Exception("The property '%property' does not exist in the model '%model'",
-			array('%property' => $property, '%model' => $this->getModelName()));
+		if (!Core_Event::notify($this->_modelName . '.onCall' . $property, $this, array($value)))
+		{
+			throw new Core_Exception("The property '%property' does not exist in the model '%model'",
+				array('%property' => $property, '%model' => $this->getModelName()));
+		}
+
+		return $this;
 	}
 
 	/**
@@ -1380,6 +1395,8 @@ class Core_ORM
 			throw new Core_Exception("The method '%methodName' does not exist in the model '%modelName'",
 				array('%methodName' => $name, '%modelName' => $this->getModelName()));
 		}
+
+		return Core_Event::getLastReturn();
 	}
 
 	/**
@@ -1450,6 +1467,13 @@ class Core_ORM
 						}
 					break;
 					case 'float':
+						// Convert "," to "."
+						$value = str_replace(',', '.', $value);
+
+						// Remove everything except numbers and dot
+						$value = preg_replace('/[^0-9\.\-]/', '', $value);
+
+						$this->$property = floatval($value);
 					break;
 					case 'string':
 						$strlen = mb_strlen($value);

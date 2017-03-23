@@ -107,58 +107,6 @@
 
 			return jDivWin;
 		},
-		openWindow777: function(settings)
-		{
-			settings = jQuery.windowSettings(
-				jQuery.requestSettings(settings)
-			);
-
-			var cmsrequest = settings.path;
-			if (settings.additionalParams != ' ' && settings.additionalParams != '')
-			{
-				cmsrequest += '?' + settings.additionalParams;
-			}
-
-			var windowCounter = $('body').data('windowCounter');
-			if (windowCounter == undefined) { windowCounter = 0 }
-			$('body').data('windowCounter', windowCounter + 1);
-
-			var dialog = bootbox.dialog({
-				message: ' ',
-				title: ' '/*,
-				className: 'modal-darkorange'*/
-			});
-
-			var data = jQuery.getData(settings),
-				modalBody = dialog.find('.modal-body');
-
-			// Calculate window ID
-			modalBody.attr('id', "Window" + windowCounter);
-
-			// Change window id
-			data['hostcms[window]'] = modalBody.attr('id');
-
-			if (typeof settings.width != 'undefined')
-			{
-				dialog.find('.modal-dialog').width(settings.width);
-			}
-
-			if (typeof settings.height != 'undefined')
-			{
-				modalBody.height(settings.height);
-			}
-
-			jQuery.ajax({
-				context: dialog,
-				url: cmsrequest,
-				data: data,
-				dataType: 'json',
-				type: 'POST',
-				success: $.ajaxCallbackModal
-			});
-
-			return dialog;
-		},
 		openWindowAddTaskbar: function(settings)
 		{
 			return jQuery.adminLoad(settings);
@@ -218,7 +166,20 @@
 						data: data,
 						dataType: 'json',
 						type: 'POST',
-						success: jQuery.ajaxCallback
+						//success: jQuery.ajaxCallback
+						success: [jQuery.ajaxCallback, function(returnedData)
+						{
+							if (returnedData == null || returnedData.form_html == null)
+							{
+								return;
+							}
+
+							// Clear widget place
+							if (returnedData.form_html == '')
+							{
+								$(this).empty();
+							}
+						}]
 					});
 				}
 			});
@@ -274,11 +235,8 @@
 
 			if (oPropertyField.length)
 			{
-
 				var aInputId = oPropertyField.attr('id').split('property_'),
 					suffix = aInputId[1];
-
-
 
 					jNewObject.find("div[id *='_watermark_property_']")
 						.attr('id', jNewObject.find("div[id *='_watermark_property_']").attr('id').replace('_watermark_property_' + suffix, '_watermark_property_' + index + '_'+ iRand))
@@ -293,9 +251,6 @@
 				jNewObject.find("div[id *='_watermark_small_property_']")
 						.attr('id', jNewObject.find("div[id *='_watermark_small_property_']").attr('id').replace('_watermark_small_property_' + suffix, '_watermark_small_property_' + index + '_'+ iRand))
 						.html(originalHtmlSmallFileSettings.replace(new RegExp(suffix,'g'), index + '[]'));
-
-
-
 			}
 			else
 			{
@@ -303,11 +258,8 @@
 				jNewObject.find("div[id *='_watermark_small_property_']").html(originalHtmlSmallFileSettings);
 			}*/
 
-
 			jNewObject.find("div[id *='_watermark_property_']").html(jNewObject.find("div[id *='_watermark_property_']").html());
 			jNewObject.find("div[id *='_watermark_small_property_']").html(jNewObject.find("div[id *='_watermark_small_property_']").html());
-
-
 
 			// Для скопированного элемента создаем временные popover'ы для настроек большого и малого изображений
 			/*

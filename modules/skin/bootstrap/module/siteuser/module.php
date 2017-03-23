@@ -54,7 +54,7 @@ class Skin_Bootstrap_Module_Siteuser_Module extends Siteuser_Module{
 
 		$iSiteusers = Core_Entity::factory('Site', CURRENT_SITE)->Siteusers->getCount();
 		?><!-- Siteuser -->
-		<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 			<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 				<div class="databox-left bg-white">
 					<div class="databox-sparkline">

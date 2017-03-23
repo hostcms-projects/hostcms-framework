@@ -38,6 +38,7 @@ return array(
 	'seo_title' => '<acronym title="Meta element title">Title</acronym>',
 	'seo_description' => '<acronym title="Meta element description">Description</acronym>',
 	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
+	'default' => "Default producer",
 	'id' => 'Id',
 	'shop_id' => 'Shop id',
 	'tab2' => 'Contact details',
@@ -50,4 +51,5 @@ return array(
 	'undelete_success' => 'Item restored successfully!',
 	'active' => "<acronym title=\"Activity of manufacturer\">Active</acronym>",
 	'changeStatus_success' => "Information has been successfully changed",
+	'changeDefaultStatus_success' => "Information has been successfully changed",
 );

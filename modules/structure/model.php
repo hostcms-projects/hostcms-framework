@@ -646,7 +646,7 @@ class Structure_Model extends Core_Entity
 	/**
 	 * Show properties in XML
 	 * @param boolean $showXmlProperties
-	 * @return Comment_Model
+	 * @return self
 	 */
 	public function showXmlProperties($showXmlProperties = TRUE)
 	{

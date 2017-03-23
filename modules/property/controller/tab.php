@@ -462,13 +462,15 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						->caption($oProperty->name)
 						->divAttr(array(
 							'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'
-						));
+						))
+						->filter(TRUE);
 
 					// Элементы
 					$oAdmin_Form_Entity_InfItems = Admin_Form_Entity::factory('Select')
 						->name("property_{$oProperty->id}[]")
 						->value(NULL)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->filter(TRUE);
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
@@ -500,15 +502,15 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					// Директории
 					$oAdmin_Form_Entity_Shop_Groups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
-						->divAttr(array(
-						'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'
-						));
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->filter(TRUE);
 
 					// Элементы
 					$oAdmin_Form_Entity_Shop_Items = Admin_Form_Entity::factory('Select')
 						->name("property_{$oProperty->id}[]")
 						->value(NULL)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->filter(TRUE);
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
@@ -812,6 +814,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					foreach ($aProperty_Values as $oProperty_Value)
 					{
 						$value = Core_Array::getPost("property_{$oProperty->id}_{$oProperty_Value->id}");
+
 						$value = $this->_correctValue($oProperty, $value);
 
 						$oProperty_Value
@@ -1239,7 +1242,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			break;
 			case 11: // Float
 				$value = floatval(
-					str_replace(array(',', '-'), '.', $value)
+					str_replace(',', '.', $value)
 				);
 			break;
 			case 8: // Date

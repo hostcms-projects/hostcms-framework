@@ -26,7 +26,7 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 	public function widget()
 	{
 		?><!-- Search -->
-		<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 			<div class="databox radius-bordered databox-shadowed hostcms-widget-databox">
 				<div class="databox-left bg-palegreen">
 					<div class="databox-piechart">
@@ -34,12 +34,14 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 						$iSearchPagesOnCurrentSite = Search_Controller::instance()->getPageCount(CURRENT_SITE);
 						
 						// Общее количество проиндексированных страниц
-						$iSearchPagesTotal = Search_Controller::instance()->getPageCount(NULL);
+						//$iSearchPagesTotal = Search_Controller::instance()->getPageCount(NULL);
 
-						$iPercent = $iSearchPagesTotal > 0
+						/*$iPercent = $iSearchPagesTotal > 0
 							? floor($iSearchPagesOnCurrentSite * 100 / $iSearchPagesTotal)
 							: 0;
-						?><div id="searchWidget" class="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="<?php echo $iPercent?>" data-animate="500" data-linewidth="3" data-size="47" data-trackcolor="rgba(255,255,255,0.1)"><span class="white font-90"><?php echo $iPercent?>%</span></div>
+						?><div id="searchWidget" class="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="<?php echo $iPercent?>" data-animate="500" data-linewidth="3" data-size="47" data-trackcolor="rgba(255,255,255,0.1)"><span class="white font-90"><?php echo $iPercent?>%</span></div>*/
+						?>
+						<a href="/admin/search/index.php" onclick="$.adminLoad({path: '/admin/search/index.php'}); return false"><i class="fa fa-search fa-3x"></i></a>
 					</div>
 				</div>
 				<div class="databox-right">

@@ -198,6 +198,33 @@ abstract class Core_Skin
 	}
 
 	/**
+	 * Skin config
+	 * @var mixed
+	 */
+	protected $_config = array();
+	
+	/**
+	 * Get skin config
+	 * @return mixed
+	 */
+	public function getConfig()
+	{
+		return $this->_config;
+	}
+	
+	/**
+	 * Set skin config
+	 * @param mixed $config
+	 * @return self
+	 */
+	public function setConfig($config)
+	{
+		$this->_config = $config;
+		
+		return $this;
+	}
+	
+	/**
 	 * Set answer
 	 * @return string
 	 */
@@ -216,6 +243,34 @@ abstract class Core_Skin
 		return abs(Core::crc32($currentVersion . $currentVersion));
 	}
 
+	/**
+	 * SkinModule singleton instances.
+	 * @var array
+	 */
+	static public $skinModuleInstance = array();
+	
+	/**
+	 * Get skin's module
+	 * @param string $modulePath module path
+	 * @return Core_Module|NULL
+	 */
+	public function getSkinModule($modulePath)
+	{
+		if (isset(self::$skinModuleInstance[$modulePath]))
+		{
+			return self::$skinModuleInstance[$modulePath];
+		}
+		
+		$sSkinModuleName = $this->getSkinModuleName($modulePath);
+
+		if (class_exists($sSkinModuleName))
+		{
+			return self::$skinModuleInstance[$modulePath] = new $sSkinModuleName();
+		}
+		
+		return NULL;
+	}
+	
 	/**
 	 * Get skin's module name
 	 * @param string $modulePath module path

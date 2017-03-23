@@ -5,10 +5,16 @@ body {padding-right: 0 !important; /*Fix bug with bootbox modal window */}
 	.hidden-xxs{display:none!important}
 }
 
+@media (max-width:767px){
+	th.filter-action-0, th.filter-action-1, th.filter-action-2,
+	th.filter-action-3, th.filter-action-4, th.filter-action-5,
+	th.filter-action-6, th.filter-action-7 {
+		width: 70px
+	}
+}
+
 @media (min-width:767px){
-	th.filter-action-0{width: 10px}
-	th.filter-action-1{width: 40px}
-	th.filter-action-2{width: 70px}
+	th.filter-action-0, th.filter-action-1, th.filter-action-2{width: 70px}
 	th.filter-action-3{width: 100px}
 	th.filter-action-4{width: 130px}
 	th.filter-action-5{width: 160px}
@@ -22,6 +28,10 @@ body {padding-right: 0 !important; /*Fix bug with bootbox modal window */}
 
 .nav>li.active>a {
 	padding-bottom: 8px;
+}
+
+.databox .databox-text {
+	margin-right: 15px
 }
 
 /* Bootbox */
@@ -172,6 +182,15 @@ form#formEdit .popover .form-horizontal .checkbox-inline{
     margin-right: 8px;
 }
 
+/* Truncate long text inside rows of a table */
+table.admin-table {
+	table-layout: fixed;
+}
+table.admin-table > tbody > tr > td {
+  overflow: hidden;
+  /*text-overflow: ellipsis;*/
+}
+/* /Truncate */
 
 body.body-authorization {
 	/* background-color: #F7F7F7; */

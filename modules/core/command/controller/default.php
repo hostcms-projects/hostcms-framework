@@ -175,6 +175,41 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			}
 		}
 
+		// Openstat, UTM and From
+		if (Core_Array::getGet('_openstat'))
+		{
+			$aOpenstat = explode(';', base64_decode(Core_Array::getGet('_openstat')));
+
+			$oSource_Controller = new Source_Controller();
+			$oSource_Controller
+				->type(0)
+				->service(Core_Array::get($aOpenstat, 0))
+				->campaign(Core_Array::get($aOpenstat, 1))
+				->ad(Core_Array::get($aOpenstat, 2))
+				->source(Core_Array::get($aOpenstat, 3))
+				->apply();
+		}
+		elseif (Core_Array::getGet('utm_source'))
+		{
+			$oSource_Controller = new Source_Controller();
+			$oSource_Controller
+				->type(1)
+				->service(Core_Array::getGet('utm_source'))
+				->medium(Core_Array::getGet('utm_medium'))
+				->campaign(Core_Array::getGet('utm_campaign'))
+				->content(Core_Array::getGet('utm_content'))
+				->term(Core_Array::getGet('utm_term'))
+				->apply();
+		}
+		elseif (Core_Array::getGet('from'))
+		{
+			$oSource_Controller = new Source_Controller();
+			$oSource_Controller
+				->type(2)
+				->service(Core_Array::getGet('from'))
+				->apply();
+		}
+
 		// Если доступ к узлу структуры только по HTTPS, а используется HTTP,
 		// то делаем 301 редирект
 		if ($oStructure->https == 1 && !Core::httpsUses())

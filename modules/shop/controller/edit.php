@@ -425,9 +425,9 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopTabFormats->move($this->getField('typograph_default_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oShopTabFormatsRow8);
 				$oShopTabFormats->move($this->getField('typograph_default_groups')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oShopTabFormatsRow8);
 
-				$oShopTabExport->move($this->getField('yandex_market_name')->divAttr(array('class' => 'form-group col-lg-12')),$oShopTabExportRow1);
-				$oShopTabExport->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12')),$oShopTabExportRow2);
-				$oShopTabExport->move($this->getField('yandex_market_sales_notes_default')->divAttr(array('class' => 'form-group col-lg-12')),$oShopTabExportRow3);
+				$oShopTabExport->move($this->getField('yandex_market_name')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow1);
+				$oShopTabExport->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow2);
+				$oShopTabExport->move($this->getField('yandex_market_sales_notes_default')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow3);
 
 				$watermarkPath =
 					is_file($this->_object->getWatermarkFilePath())
@@ -440,7 +440,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopTabWatermarkRow1->add(Admin_Form_Entity::factory('File')
 					->type("file")
 					->caption(Core::_('Shop.watermark_file'))
-					->divAttr(array('class' => 'form-group col-lg-12'))
+					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 					->name("watermark_file")
 					->id("watermark_file")
 					->largeImage(

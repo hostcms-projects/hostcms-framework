@@ -997,11 +997,27 @@ class Admin_Form_Controller
 							}
 						}
 					}
+					
+					// Log
+					$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Word->getWordByLanguage();
+					$sEventName = $oAdmin_Word_Value
+						? $oAdmin_Word_Value->name
+						: Core::_('Core.default_event_name');
+
+					// Название формы для действия
+					$oAdmin_Word_Value = $oAdmin_Form_Action->Admin_Form->Admin_Word->getWordByLanguage();
+					$sFormName = $oAdmin_Word_Value
+						? $oAdmin_Word_Value->name
+						: Core::_('Core.default_form_name');
+					
+					Core_Log::instance()->clear()
+						->status(Core_Log::$SUCCESS)
+						->write(Core::_('Core.error_log_action_access_allowed', $sEventName, $sFormName));
 				}
 				else
 				{
 					throw new Core_Exception(
-						Core::_('Admin_Form.msg_error_access'), array(), 0, FALSE
+						Core::_('Admin_Form.msg_error_access'), array()/*, 0, FALSE*/
 					);
 				}
 			}

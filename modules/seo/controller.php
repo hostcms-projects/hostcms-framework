@@ -51,7 +51,10 @@ class Seo_Controller
 	 */
 	protected function _allowYandexXml()
 	{
-		return defined('YANDEX_XML_USER') && defined('YANDEX_XML_KEY');
+		return defined('YANDEX_XML_USER')
+			&& defined('YANDEX_XML_KEY')
+			&& strlen(YANDEX_XML_USER)
+			&& strlen(YANDEX_XML_KEY);
 	}
 
 	/**
@@ -78,30 +81,21 @@ class Seo_Controller
 	 */
 	protected function _yandexXmlRequest($query, $page = 0)
 	{
-		$esc = htmlspecialchars($query);
-
-$doc = <<<DOC
-<?xml version='1.0' encoding='utf-8'?>
-<request>
-    <query>$esc</query>
-    <page>$page</page>
-    <sortby order="descending" priority="yes">rlv</sortby>
-	<groupings>
-	<groupby attr="d" mode="deep" groups-on-page="10" docs-in-group="1" />
-	</groupings>
-</request>
-DOC;
 		$lr = $this->_getLr();
 
-		$url = 'http://xmlsearch.yandex.ru/xmlsearch?user='.urlencode(YANDEX_XML_USER).'&key='.urlencode(YANDEX_XML_KEY).'&lr='.$lr;
+		$url = 'https://yandex.ru/search/xml?user=' . urlencode(YANDEX_XML_USER) .
+		'&key=' . urlencode(YANDEX_XML_KEY) .
+		'&query=' . urlencode($query) .
+		'&lr=' . urlencode($lr) .
+		'&l10n=ru&sortby=rlv&filter=none&groupby=attr%3Dd.mode%3Ddeep.groups-on-page%3D10.docs-in-group%3D1' .
+		'&page=' . $page;
 
 		try
 		{
 			$Core_Http = Core_Http::instance()
 				->url($url)
-				->method('POST')
-				->contentType('application/xml')
-				->data('text', $doc)
+				->port(80)
+				->timeout(5)
 				->execute();
 
 			$response = $Core_Http->getBody();
@@ -272,6 +266,7 @@ DOC;
 			{
 				//About 1,540 results<
 				//9 results<
+				//>About 700 results<
 				preg_match_all("#(About)?([^<]*)results<#s", $content, $matches);
 
 				if (isset($matches[2][0]))

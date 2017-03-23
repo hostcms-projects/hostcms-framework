@@ -78,7 +78,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		// -!- Row --
 		$this->getField('name')
-			->divAttr(array('class' => 'form-group col-lg-12'));
+			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab
 			->move($this->getField('name'), $oMainRow1);
 
@@ -170,7 +170,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->id('structureType' . time())
 			->caption(Core::_('Structure.type'))
 			->value($this->_object->type)
-			->divAttr(array('id' => 'structure_types', 'class' => 'form-group col-lg-12'))
+			->divAttr(array('id' => 'structure_types', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
 			->radio(
 				array(
 					0 => Core::_('Structure.static_page'),

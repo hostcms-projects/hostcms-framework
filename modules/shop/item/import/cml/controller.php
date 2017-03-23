@@ -791,6 +791,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Импортируем группы товаров
 			foreach ($this->xpath($classifier, 'Группы') as $Groups)
 			{
+				Core_File::flush();
+
 				$this->_importGroups($Groups, $this->iShopGroupId);
 			}
 			//is_object($classifier->Группы) && $this->_importGroups($classifier->Группы, $this->iShopGroupId);
@@ -798,6 +800,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Импортируем дополнительные свойства товаров
 			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
 			{
+				Core_File::flush();
+
 				$sPropertyName = strval($oItemProperty->Наименование);
 
 				foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
@@ -818,6 +822,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oItem)
 			{
+				Core_File::flush();
+
 				$sGUID = strval($oItem->Ид);
 				$sGUIDmod = FALSE;
 
@@ -850,8 +856,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Если передан GUID модификации и товар, для которого загружается модификация, уже существует
 				if (strlen($sGUIDmod) && $oShopItem->id)
 				{
-					/**/
-
 					$oModificationItem = $oShopItem->Modifications->getByGuid($sGUIDmod, FALSE);
 
 					// Модификация у товара не найдена, создаем ее
@@ -913,9 +917,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 				}
 
-				if (($oShopItem->id
-				&& $this->importAction == 1
-				&& !is_null($oShopItem->name)))
+				if ($oShopItem->id && $this->importAction == 1 && !is_null($oShopItem->name))
 				{
 					$oShopItem->save();
 				}

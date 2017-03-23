@@ -299,7 +299,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				$oLargeWatermark_Div
 					->add(
 						Core::factory('Core_Html_Entity_Div')
-					    ->class('form-group col-lg-12')
+					    ->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
 								->class('checkbox-inline')
@@ -335,7 +335,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				$oLargeWatermark_Div
 					->add(
 						Core::factory('Core_Html_Entity_Div')
-					    ->class('form-group col-lg-12')
+					    ->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
 								->class('checkbox-inline')
@@ -433,22 +433,25 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 					->add($oLargeWatermark_Div);
 			}
 		}
-		
+
 		// Быстрый просмотр большого изображения
 		if ($this->largeImage['path'] != '')
 		{
-			$oLarge_Input_Group_Div->add(Core::factory('Core_Html_Entity_Script')
-				->type("text/javascript")
-				->value('$(function(){
-						$("#preview_large_' . $this->largeImage['id'] . '").popover({
-							content: \'<img src="' . htmlspecialchars($this->largeImage['path']) . '?rnd=' . rand() .'" style="max-width:200px" />\',
-							html: true,
-							placement: \'top\',
-							container: $(\'#file_large_' . $iAdmin_Form_Count . '\'),
-							trigger: "hover"							
-						});
-					});'
-				));
+			if (Core_File::isValidExtension($this->largeImage['path'], array('jpg', 'jpeg', 'gif', 'png')))
+			{
+				$oLarge_Input_Group_Div->add(Core::factory('Core_Html_Entity_Script')
+					->type("text/javascript")
+					->value('$(function(){
+							$("#preview_large_' . $this->largeImage['id'] . '").popover({
+								content: \'<img src="' . htmlspecialchars($this->largeImage['path']) . '?rnd=' . rand() .'" style="max-width:200px" />\',
+								html: true,
+								placement: \'top\',
+								container: $(\'#file_large_' . $iAdmin_Form_Count . '\'),
+								trigger: "hover"
+							});
+						});'
+					));
+			}
 		}
 
 		if ($this->largeImage['show_description'])
@@ -506,7 +509,6 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				// Картинка с контролем малого изображения
 				if ($this->smallImage['path'] != '')
 				{
-
 					//$oSmallControl_Div->add(
 					$oSmall_Input_Group_Div->add(
 						Core::factory('Core_Html_Entity_A')
@@ -599,7 +601,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12')
+								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -635,7 +637,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12')
+								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -671,7 +673,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12')
+								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -728,18 +730,21 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				// Быстрый просмотр малого изображения
 				if ($this->smallImage['path'] != '')
 				{
-					$oSmall_Input_Group_Div->add(Core::factory('Core_Html_Entity_Script')
-						->type("text/javascript")
-						->value('$(function(){
-							$("#preview_' . $this->smallImage['id'] . '").popover({
-								content: \'<img src="' . $this->smallImage['path'] . '?rnd=' . rand() . '" style="max-width:200px" />\',
-								html: true,
-								placement: \'top\',
-								container: $(\'#file_small_' . $iAdmin_Form_Count . '\'),
-								trigger: "hover"								
-							});
-						});'
-					));
+					if (Core_File::isValidExtension($this->smallImage['path'], array('jpg', 'jpeg', 'gif', 'png')))
+					{
+						$oSmall_Input_Group_Div->add(Core::factory('Core_Html_Entity_Script')
+							->type("text/javascript")
+							->value('$(function(){
+								$("#preview_' . $this->smallImage['id'] . '").popover({
+									content: \'<img src="' . $this->smallImage['path'] . '?rnd=' . rand() . '" style="max-width:200px" />\',
+									html: true,
+									placement: \'top\',
+									container: $(\'#file_small_' . $iAdmin_Form_Count . '\'),
+									trigger: "hover"
+								});
+							});'
+						));
+					}
 				}
 			}
 		}
