@@ -314,7 +314,7 @@ class User_Model extends Core_Entity
 	public function changeActive()
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
-		
+
 		$oCurrentUser = Core_Entity::factory('User', 0)->getCurrent();
 
 		$oUsers = Core_Entity::factory('User');
@@ -334,7 +334,35 @@ class User_Model extends Core_Entity
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
-		
+
 		return $this;
+	}
+
+	/**
+	 * Update last activity
+	 * @return self
+	 */
+	public function updateLastActivity()
+	{
+		$this->last_activity = Core_Date::timestamp2sql(time());
+		return $this->save();
+	}
+
+	/**
+	 * Return number of seconds since last activity
+	 * @return int
+	 */
+	public function getLastActivity()
+	{
+		return time() - Core_Date::sql2timestamp($this->last_activity);
+	}
+
+	/**
+	 * Is user online
+	 * @return boolean
+	 */
+	public function isOnline()
+	{
+		return $this->getLastActivity() < 300;
 	}
 }

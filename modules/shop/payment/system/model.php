@@ -89,9 +89,9 @@ class Shop_Payment_System_Model extends Core_Entity
 	{
 		$this->save();
 
-		$sLibFilePath = $this->getPaymentSystemFilePath();
-		Core_File::mkdir(dirname($sLibFilePath), CHMOD, TRUE);
-		Core_File::write($sLibFilePath, trim($content));
+		$sPaymentSystemFilePath = $this->getPaymentSystemFilePath();
+		Core_File::mkdir(dirname($sPaymentSystemFilePath), CHMOD, TRUE);
+		Core_File::write($sPaymentSystemFilePath, trim($content));
 
 		return $this;
 	}

@@ -22,7 +22,7 @@ class Seo_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-09-03';
+	public $date = '2015-10-29';
 
 	/**
 	 * Module name

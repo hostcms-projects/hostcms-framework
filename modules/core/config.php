@@ -38,45 +38,105 @@ class Core_Config
 	}
 
 	/**
-	 * Get config, e.g. 'Core_DataBase' requires modules/core/config/database.php
-	 * @param string $key
+	 * Get config path
+	 * @param string $name
+	 * @return string
+	 */
+	protected function _getPath($name)
+	{
+		$aConfig = explode('_', $name);
+		$sFileName = array_pop($aConfig);
+
+		$path = Core::$modulesPath;
+		$path .= implode(DIRECTORY_SEPARATOR, $aConfig) . DIRECTORY_SEPARATOR;
+		$path .= 'config' . DIRECTORY_SEPARATOR . $sFileName . '.php';
+		$path = Core_File::pathCorrection($path);
+
+		return $path;
+	}
+
+	/**
+	 * Correct config name
+	 * @param string $name
+	 * @return string
+	 */
+	protected function _correctName($name)
+	{
+		$name = strtolower($name);
+		$name = basename($name);
+
+		return $name;
+	}
+
+	/**
+	 * Get config, e.g. 'Core_Myconfig' requires modules/core/config/myconfig.php
+	 * @param string $name, e.g. 'Core_Myconfig'
 	 * @param mixed $defaultValue
 	 * @return mixed Config or NULL
 	 */
-	public function get($key, $defaultValue = NULL)
+	public function get($name, $defaultValue = NULL)
 	{
-		$key = strtolower($key);
-		$key = basename($key);
+		$name = $this->_correctName($name);
 
-		if (!isset($this->_values[$key]))
+		if (!isset($this->_values[$name]))
 		{
-			$aConfig = explode('_', $key);
+			$path = $this->_getPath($name);
 
-			$sFileName = array_pop($aConfig);
-
-			$path = Core::$modulesPath;
-			$path .= implode(DIRECTORY_SEPARATOR, $aConfig) . DIRECTORY_SEPARATOR;
-			$path .= 'config' . DIRECTORY_SEPARATOR . $sFileName . '.php';
-
-			$path = Core_File::pathCorrection($path);
-
-			$this->_values[$key] = is_file($path)
+			$this->_values[$name] = is_file($path)
 				? require_once($path)
 				: $defaultValue;
 		}
 
-		return $this->_values[$key];
+		return $this->_values[$name];
+	}
+
+	/**
+	 * Convert value to string
+	 * @param mixed $value Value
+	 * @param $level Level of tabs, default 1
+	 * @return string
+	 */
+	protected function _toString($value, $level = 1)
+	{
+		if (is_array($value))
+		{
+			$sTabs = str_repeat("\t", $level);
+
+			$aTmp = array();
+			foreach ($value as $tmpKey => $tmpValue)
+			{
+				$aTmp[] = $sTabs . "'" . str_replace("'", "\'", $tmpKey) . "' => " . $this->_toString($tmpValue, $level + 1);
+			}
+
+			return "array(\n" . implode(",\n", $aTmp) . "\n" . str_repeat("\t", $level - 1) . ")";
+		}
+		else
+		{
+			return is_numeric($value)
+				? $value
+				: "'" . str_replace("'", "\'", $value) . "'";
+		}
 	}
 
 	/**
 	 * Set config value
-	 * @param string $key Config key
-	 * @param string $value Config value
+	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
+	 * @param array $value Config value, e.g. array('key' => 'value')
 	 * @return Core_Config
 	 */
-	/*public function set($key, $value)
+	public function set($name, $value)
 	{
-		$this->_values[$key] = $value;
+		$this->_values[$name] = $value;
+
+		$path = $this->_getPath($name);
+
+		// Create destination dir
+		Core_File::mkdir(dirname($path), CHMOD, TRUE);
+
+		$content = "<?php\n\nreturn " . $this->_toString($value) . ";";
+
+		Core_File::write($path, $content);
+
 		return $this;
-	}*/
+	}
 }

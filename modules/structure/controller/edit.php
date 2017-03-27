@@ -254,10 +254,16 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$Select_Document
 			->add(
 				Admin_Form_Entity::factory('A')
-					->href('/admin/document/index.php?document_dir_id=' . intval($oDocument->document_dir_id) . '&hostcms[checked][1][' . $this->_object->document_id  . ']=1&hostcms[action]=edit')
+					->target('_blank')
+					->href(
+						$this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/document/index.php', 'edit', NULL, 1, $this->_object->document_id, 'document_dir_id=' . intval($oDocument->document_dir_id))
+					)
 					->class('input-group-addon bg-blue bordered-blue')
 					->value('<i class="fa fa-pencil"></i>')
-					->onclick("return !($.openWindow && $.openWindow({width: '80%', path: '/admin/document/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][1][' + $('#{$windowId} #document_id').val() + ']=1&hostcms[action]=edit', dialogClass: 'hostcms6'}));")
+					//->onclick("return !($.openWindow && $.openWindow({width: '80%', path: '/admin/document/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][1][' + $('#{$windowId} #document_id').val() + ']=1&hostcms[action]=edit', dialogClass: 'hostcms6'}));")
+					/*->onclick(
+						$this->_Admin_Form_Controller->getAdminActionLoadAjax('/admin/document/index.php', 'edit', NULL, 1, $this->_object->document_id, 'document_dir_id=' . intval($oDocument->document_dir_id))
+					)*/
 			);
 
 		$oMainRow7->add($Select_Document);
@@ -431,12 +437,22 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSitemapRow2->add($oSelect_priority);
 
 		// ---- Дополнительные свойства
+		if ($this->_object->type == 0)
+		{
+			$oDocument_Version = $oDocument->Document_Versions->getCurrent(FALSE);
+			$template_id = !is_null($oDocument_Version) ? $oDocument_Version->template_id : 0;
+		}
+		else
+		{
+			$template_id = $this->_object->template_id;
+		}
+		
 		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->setDatasetId($this->getDatasetId())
 			->linkedObject(Core_Entity::factory('Structure_Property_List', CURRENT_SITE))
 			->setTab($oPropertyTab)
-			->template_id($this->_object->template_id)
+			->template_id($template_id)
 			->fillTab();
 
 		$this->title($this->_object->id

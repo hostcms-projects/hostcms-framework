@@ -239,8 +239,9 @@ abstract class Core_Cache
 			{
 				$oCache_Tag = Core_Entity::factory('Cache_Tag');
 				$oCache_Tag->tag = Core::crc32($tag);
-				$oCache_Tag->hash = $actualKey;
 				$oCache_Tag->cache = Core::crc32($cacheName);
+				$oCache_Tag->hashcrc32 = Core::crc32($actualKey);
+				$oCache_Tag->hash = $actualKey;
 				$oCache_Tag->save();
 			}
 		}
@@ -256,7 +257,7 @@ abstract class Core_Cache
 	public function deleteTags($actualKey)
 	{
 		Core_QueryBuilder::delete('cache_tags')
-			->where('hash', 'LIKE', $actualKey)
+			->where('hashcrc32', '=', Core::crc32($actualKey))
 			->execute();
 
 		return $this;
@@ -301,7 +302,7 @@ abstract class Core_Cache
 	 */
 	public function clearTags($cacheName)
 	{
-		// Clear tagged cache for
+		// Clear tagged cache
 		Core_QueryBuilder::delete('cache_tags')
 			->where('cache', '=', Core::crc32($cacheName))
 			->execute();

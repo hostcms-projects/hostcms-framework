@@ -16,7 +16,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show form content in administration center
 	 * @return self
 	 */
-	protected function _showFormContent()
+	public function showContent()
 	{
 		$aAdmin_Form_Fields = $this->_Admin_Form->Admin_Form_Fields->findAll();
 
@@ -703,7 +703,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show action panel in administration center
 	 * @return self
 	 */
-	protected function _bottomActions()
+	public function bottomActions()
 	{
 		// Строка с действиями
 		if ($this->_showBottomActions)

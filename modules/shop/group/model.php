@@ -457,7 +457,7 @@ class Shop_Group_Model extends Core_Entity
 	 */
 	public function getPath()
 	{
-		$sPath = $this->path . '/';
+		$sPath = rawurlencode($this->path) . '/';
 
 		if (!is_null($oParentGroup = $this->getParent()))
 		{
@@ -546,7 +546,7 @@ class Shop_Group_Model extends Core_Entity
 		$this->subgroups_total_count += $int;
 		$this->save();
 
-		if ($this->parent_id != 0)
+		if ($this->parent_id != 0 && !is_null($this->Shop_Group->id))
 		{
 			$this->Shop_Group->modifyCountGroups($int);
 		}

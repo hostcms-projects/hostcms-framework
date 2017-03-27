@@ -191,7 +191,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 * @var Shop_Item_Controller
 	 */
 	protected $_Shop_Item_Controller = NULL;
-	
+
 	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
@@ -221,7 +221,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			}
 		}
 
-		switch ($oShop->items_sorting_direction)
+		/*switch ($oShop->items_sorting_direction)
 		{
 			case 1:
 				$items_sorting_direction = 'DESC';
@@ -250,7 +250,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				$this->_Shop_Items
 					->queryBuilder()
 					->orderBy('shop_items.datetime', $items_sorting_direction);
-		}
+		}*/
+
+		$this->_Shop_Items
+			->queryBuilder()
+			->clearOrderBy()
+			->orderBy('shop_items.id', 'ASC');
 
 		$dateTime = Core_Date::timestamp2sql(time());
 		$this->_Shop_Items
@@ -262,7 +267,6 @@ class Shop_Controller_YandexMarket extends Core_Controller
 						array('OR' => array('shop_items.shop_group_id', '=', 0))
 					)*/
 			)
-
 			// Активность группы или группа корневая
 			->open()
 			->where('shop_groups.active', '=', 1)
@@ -299,7 +303,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->type = 'offer';
 		$this->onStep = 100;
-		
+
 		$this->_Shop_Item_Controller = new Shop_Item_Controller();
 	}
 
@@ -387,7 +391,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 * @var mixed
 	 */
 	protected $_MarketCategory = NULL;
-	
+
 	/**
 	 * Show offers
 	 * @return self
@@ -399,18 +403,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		echo "<offers>\n";
 
 		$offset = 0;
-		$limit = $this->onStep;
 
 		$oShop = $this->getEntity();
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
-		
+
 		$this->_MarketCategory = $oShop_Item_Property_List->Properties->getByTag_name('market_category');
-		
+
 		do {
 			$oShop_Items = $this->_Shop_Items;
 			$oShop_Items->queryBuilder()
 				->offset($offset)
-				->limit($limit);
+				->limit($this->onStep);
 
 			$aShop_Items = $oShop_Items->findAll(FALSE);
 
@@ -420,7 +423,11 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 				if ($this->modifications)
 				{
-					$aModifications = $oShop_Item->Modifications->findAll(FALSE);
+					$oModifications = $oShop_Item->Modifications;
+					$oModifications->queryBuilder()
+						->where('shop_items.yandex_market', '=', 1);
+
+					$aModifications = $oModifications->findAll(FALSE);
 
 					foreach ($aModifications as $oModification)
 					{
@@ -430,7 +437,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			}
 
 			Core_File::flush();
-			$offset += $limit;
+			$offset += $this->onStep;
 		}
 		while (count($aShop_Items));
 
@@ -468,10 +475,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		/* Определяем цену со скидкой */
 		$aPrices = $this->_Shop_Item_Controller->calculatePriceInItemCurrency($oShop_Item->price, $oShop_Item);
-		
+
 		/* Цена */
-		echo '<price>' . $aPrices['price_discount'] . '</price>'. "\n";		
-		
+		echo '<price>' . $aPrices['price_discount'] . '</price>'. "\n";
+
 		if ($aPrices['price'] > $aPrices['price_discount'])
 		{
 			/* Старая цена */
@@ -507,7 +514,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				'</market_category>'. "\n";
 			}
 		}
-		
+
 		/* PICTURE */
 		if ($oShop_Item->image_large != '')
 		{
@@ -520,7 +527,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			/* NAME */
 			echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
 
-			if ($oShop_Item->Shop_Producer->id)
+			if ($oShop_Item->shop_producer_id)
 			{
 				echo '<vendor>' . Core_Str::xml($oShop_Item->Shop_Producer->name) . '</vendor>'. "\n";
 			}
@@ -578,14 +585,9 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		// <param name="Максимальный формат">А4</param>
 		//$aProperty_Values = $oShop_Item->getPropertyValues(FALSE);
 
-		if (is_array($this->itemsProperties))
-		{
-			$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id, FALSE);
-		}
-		else
-		{
-			$aProperty_Values = $oShop_Item->getPropertyValues(FALSE);
-		}
+		$aProperty_Values = is_array($this->itemsProperties)
+			? Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id, FALSE)
+			: $oShop_Item->getPropertyValues(FALSE);
 
 		foreach ($aProperty_Values as $oProperty_Value)
 		{
@@ -606,7 +608,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 					$value = NULL;
 
 					$oList_Item = $oProperty->List->List_Items->getById(
-						$oProperty_Value->value, FALSE
+						$oProperty_Value->value/*, FALSE*/
 					);
 
 					!is_null($oList_Item) && $value = $oList_Item->value;
@@ -628,7 +630,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			{
 				$sTagName = 'param';
 
-				$unit = $oProperty->type == 0 && $oProperty->Shop_Item_Property->Shop_Measure->id
+				$unit = $oProperty->type == 0 && $oProperty->Shop_Item_Property->shop_measure_id
 					? ' unit="' . Core_Str::xml($oProperty->Shop_Item_Property->Shop_Measure->name) . '"'
 					: '';
 

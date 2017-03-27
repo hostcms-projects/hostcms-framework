@@ -578,6 +578,25 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 	}
 
 	/**
+	 * Get ORDER BY
+	 * @return array
+	 */
+	public function getOrderBy()
+	{
+		return $this->_orderBy;
+	}
+
+	/**
+	 * Clear ORDER BY
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function clearOrderBy()
+	{
+		$this->_orderBy = array();
+		return $this;
+	}
+
+	/**
 	 * Clear
 	 *
 	 * @return Core_QueryBuilder_Selection

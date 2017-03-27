@@ -52,6 +52,18 @@ class Shop_Country_Location_City_Model extends Core_Entity
 	);
 
 	/**
+	 * Forbidden tags. If list of tags is empty, all tags will be shown.
+	 * @var array
+	 */
+	protected $_forbiddenTags = array(
+		'name_en', 'name_ru', 'name_de',
+		'name_fr', 'name_it', 'name_es',
+		'name_pt', 'name_ua', 'name_be',
+		'name_pl', 'name_lt', 'name_lv',
+		'name_cz', 'name_ja', 'name'
+	);
+	
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -66,6 +78,42 @@ class Shop_Country_Location_City_Model extends Core_Entity
 		}
 	}
 
+	/**
+	 * Get name depending on SITE_LNG
+	 * @return string
+	 */
+	public function getName()
+	{
+		if (defined('SITE_LNG'))
+		{
+			$lngName = 'name_' . SITE_LNG;
+			$name = isset($this->$lngName) && $this->$lngName != ''
+				? $this->$lngName
+				: $this->name;
+		}
+		else
+		{
+			$name = $this->name;
+		}
+		
+		return $name;
+	}
+	
+	/**
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_country_location_city.onBeforeRedeclaredGetXml
+	 */
+	public function getXml()
+	{
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
+		
+		$this->clearXmlTags()
+			->addXmlTag('name', $this->getName());
+			
+		return parent::getXml();
+	}
+	
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object

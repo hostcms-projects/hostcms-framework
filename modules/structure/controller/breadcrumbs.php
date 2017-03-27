@@ -88,9 +88,42 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 	protected $_Informationsystems = array();
 
 	/**
+	 * List of breadcrumbs items
+	 * @var array
+	 */
+	protected $_breadcrumbs = array();
+
+	/**
+	 * Add breadcrumb
+	 * @param Core_Entity $oObject
+	 * @return self
+	 */
+	public function addBreadcrumb(Core_Entity $oObject)
+	{
+		$this->_breadcrumbs[] = $oObject;
+		return $this;
+	}
+
+	/**
+	 * Add breadcrumbs
+	 * @param array $aObjects
+	 * @return self
+	 */
+	public function addBreadcrumbs(array $aObjects)
+	{
+		$this->_breadcrumbs = array_merge($this->_breadcrumbs, $aObjects);
+		return $this;
+	}
+
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Structure_Controller_Breadcrumbs.onBeforeRedeclaredShow
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onAfterAddInformationsystemItem
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onAfterAddInformationsystemGroups
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onAfterAddShopItem
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onAfterAddShopGroups
+	 * @hostcms-event Structure_Controller_Breadcrumbs.onAfterAddStructure
 	 */
 	public function show()
 	{
@@ -143,7 +176,7 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 				->value($this->current)
 		);
 
-		$aStructures = array();
+		$this->_breadcrumbs = array();
 
 		if (is_object(Core_Page::instance()->object))
 		{
@@ -152,6 +185,8 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 				if ($this->informationsystem_item_id)
 				{
 					$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item', $this->informationsystem_item_id);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddInformationsystemItem', $this, array($oInformationsystem_Item));
 
 					$oInformationsystem_Item
 						->clearEntities()
@@ -168,14 +203,18 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 								->value($oInformationsystem_Item->active)
 						);
 
-					$aStructures[] = $oInformationsystem_Item;
+					$this->addBreadcrumb($oInformationsystem_Item);
+
+					Core_Event::notify(get_class($this) . '.onAfterAddInformationsystemItem', $this, array($oInformationsystem_Item));
 				}
 
 				if ($this->informationsystem_group_id)
 				{
 					$groupId = $this->informationsystem_group_id;
 
-					$aGroups = array();
+					Core_Event::notify(get_class($this) . '.onBeforeAddInformationsystemGroups', $this, array($groupId));
+
+					$aInformationsystem_Groups = array();
 
 					while ($groupId)
 					{
@@ -197,10 +236,12 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 							);
 
 						$groupId = $oInformationsystem_Group->parent_id;
-						$aGroups[] = $oInformationsystem_Group;
+						$aInformationsystem_Groups[] = $oInformationsystem_Group;
 					}
 
-					$aStructures = array_merge($aStructures, $aGroups);
+					$this->addBreadcrumbs($aInformationsystem_Groups);
+
+					Core_Event::notify(get_class($this) . '.onAfterAddInformationsystemGroups', $this, array($aInformationsystem_Groups));
 				}
 			}
 
@@ -209,6 +250,8 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 				if ($this->shop_item_id)
 				{
 					$oShop_Item = Core_Entity::factory('Shop_Item', $this->shop_item_id);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddShopItem', $this, array($oShop_Item));
 
 					$oShop_Item
 						->clearEntities()
@@ -233,14 +276,18 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 							->addEntity($oShop_Item);
 					}
 
-					$aStructures[] = $oShop_Item;
+					$this->addBreadcrumb($oShop_Item);
+
+					Core_Event::notify(get_class($this) . '.onAfterAddShopItem', $this, array($oShop_Item));
 				}
 
 				if ($this->shop_group_id)
 				{
 					$groupId = $this->shop_group_id;
 
-					$aGroups = array();
+					Core_Event::notify(get_class($this) . '.onBeforeAddShopGroups', $this, array($groupId));
+
+					$aShop_Groups = array();
 
 					while ($groupId)
 					{
@@ -262,10 +309,12 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 							);
 
 						$groupId = $oShop_Group->parent_id;
-						$aGroups[] = $oShop_Group;
+						$aShop_Groups[] = $oShop_Group;
 					}
 
-					$aStructures = array_merge($aStructures, $aGroups);
+					$this->addBreadcrumbs($aShop_Groups);
+
+					Core_Event::notify(get_class($this) . '.onAfterAddShopGroups', $this, array($aShop_Groups));
 				}
 			}
 		}
@@ -274,13 +323,17 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 			->clearEntities();
 
 		do {
-			$aStructures[] = $oStructure->clearEntities();
+			Core_Event::notify(get_class($this) . '.onBeforeAddStructure', $this, array($oStructure));
+
+			$this->addBreadcrumb($oStructure->clearEntities());
+
+			Core_Event::notify(get_class($this) . '.onAfterAddStructure', $this, array($oStructure));
 		} while($oStructure = $oStructure->getParent());
 
-		$aStructures = array_reverse($aStructures);
+		$this->_breadcrumbs = array_reverse($this->_breadcrumbs);
 
 		$object = $this;
-		foreach ($aStructures as $oStructure)
+		foreach ($this->_breadcrumbs as $oStructure)
 		{
 			$this->applyForbiddenTags($oStructure);
 			$object->addEntity($oStructure);

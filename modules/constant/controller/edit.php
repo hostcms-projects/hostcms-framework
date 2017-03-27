@@ -150,4 +150,17 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		return parent::execute($operation);
 	}
+	
+	/**
+	 * Processing of the form. Apply object fields.
+	 * @return self
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit.onBeforeApplyObjectProperty
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit.onAfterApplyObjectProperty
+	 */
+	protected function _applyObjectProperty()
+	{
+		$this->_formValues['name'] = trim(Core_Array::get($this->_formValues, 'name'));
+		
+		return parent::_applyObjectProperty();
+	}
 }

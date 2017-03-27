@@ -622,34 +622,44 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		$parent_id = 0;
 		foreach ($aPath as $sPath)
 		{
-			$oStructure = $oSite->Structures
-				->getByPathAndParentId($sPath, $parent_id);
+			$oStructure = $oSite->Structures->getByPathAndParentId($sPath, $parent_id);
 
+			// Found
 			if (!is_null($oStructure) && $oStructure->active == 1)
 			{
 				$parent_id = $oStructure->id;
 			}
+			// Not found
 			else
 			{
-				$oStructure = Core_Entity::factory('Structure')->find($parent_id);
+				// Parent node
+				$oStructure = $parent_id
+					? Core_Entity::factory('Structure')->find($parent_id)
+					: ($bINDEX_PAGE_IS_DEFAULT
+						// Получаем главную страницу
+						? $oSite->Structures->getByPath('/')
+						: NULL
+					);
 
-				if (!$bINDEX_PAGE_IS_DEFAULT &&
-					(is_null($oStructure->id) || $oStructure->type == 0))
+				// Обработчик и константа необходима на случай размещения инфосистемы на главной страницы
+				/*if ($bINDEX_PAGE_IS_DEFAULT && $parent_id == 0)
 				{
-					// Узел структуры не найден
+					// Получаем главную страницы
+					$oStructure = $oSite->Structures->getByPath('/');
+				}*/
+				
+				// Parent node is static page
+				if (is_null($oStructure)
+						|| !is_null($oStructure->id) && $oStructure->type == 0
+				)
+				{
+					// structure node not found
 					return NULL;
 				}
 
 				// Прерываем, если у страницы нет таких дочерних
 				break;
 			}
-		}
-
-		// Обработчик и константа необходима на случай размещения инфосистемы на главной страницы
-		if ($bINDEX_PAGE_IS_DEFAULT && $parent_id == 0)
-		{
-			// Получаем ID главной страницы
-			$oStructure = $oSite->Structures->getByPath('/');
 		}
 
 		return $oStructure;

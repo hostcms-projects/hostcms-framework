@@ -362,7 +362,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		'sShopDefaultPriceGUID',
 		'sPicturesPath',
 		'importAction',
-		'namespace'
+		'namespace',
+		'debug'
 	);
 
 	/**
@@ -547,9 +548,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 		$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE);
-		
+
 		$oShop = Core_Entity::factory('Shop', $this->iShopId);
-		
+
 		if (is_null($oProperty))
 		{
 			$oProperty = Core_Entity::factory('Property');
@@ -588,6 +589,268 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		}*/
 
 		$this->_setPropertyValue($oProperty_Value, $sPropertyValue);
+	}
+
+	/**
+	 * Import images
+	 * @param Shop_Item_Model $oShopItem item
+	 * @param array $oImages
+	 */
+	protected function _importImages(Shop_Item_Model $oShopItem, $oImages)
+	{
+		$bFirstPicture = TRUE;
+		$sGUID = 'ADDITIONAL-IMAGES';
+
+		$oShop = $oShopItem->Shop;
+
+		clearstatcache();
+
+		$this->debug && Core_Log::instance()->clear()
+			->status(Core_Log::$MESSAGE)
+			->write(sprintf('1С, импорт %d изображений товара ID=%d', count($oImages), $oShopItem->id));
+
+		// Обрабатываем изображения для товара
+		foreach ($oImages as $PictureData)
+		{
+			if (Core_File::isValidExtension($PictureData, Core::$mainConfig['availableExtension']))
+			{
+				// Папка назначения
+				$sDestinationFolder = $oShopItem->getItemPath();
+
+				if (!$bFirstPicture)
+				{
+					$sFileName = basename($PictureData);
+					$sFileDescription = strval($PictureData->attributes()->Описание);
+
+					$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
+
+					/*$sTmp = explode('_', basename($PictureData));
+					$sTmp[1] = basename($sTmp[1], '.'.Core_File::getExtension($sTmp[1]));
+
+					$sPictureData = strval($PictureData);
+					$oNewPropertyGUID = $this->xpath($oItem, "ЗначенияРеквизитов/ЗначениеРеквизита[starts-with(Значение, '{$sPictureData}')]/Значение");
+
+					$sPropertyDescription = '';
+					if ($oNewPropertyGUID !== FALSE && count($oNewPropertyGUID) > 0)
+					{
+						$oNewPropertyGUID = strval($oNewPropertyGUID[0]);
+
+						$oNewPropertyGUID = explode('#', $oNewPropertyGUID);
+						if (count($oNewPropertyGUID) == 2)
+						{
+							//$sTmp[1] = $oNewPropertyGUID[1];
+							$sTmp[1] = md5($oNewPropertyGUID[0]);
+							$sPropertyDescription = $oNewPropertyGUID[1];
+						}
+					}
+
+					$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sTmp[1], FALSE);*/
+
+					$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sGUID, FALSE);
+
+					if (is_null($oProperty))
+					{
+						/*$oProperty = Core_Entity::factory('Property');
+						$oProperty->name = $sTmp[1];
+						$oProperty->type = 2;
+						$oProperty->description = $sPropertyDescription;
+						$oProperty->tag_name = $sTmp[1];
+						$oProperty->guid = $sTmp[1];*/
+
+						$oProperty = Core_Entity::factory('Property');
+						$oProperty->name = 'Images';
+						$oProperty->type = 2;
+						$oProperty->description = '';
+						$oProperty->tag_name = 'images';
+						$oProperty->guid = $sGUID;
+
+						// Для вновь создаваемого допсвойства размеры берем из магазина
+						$oProperty->image_large_max_width = $oShop->image_large_max_width;
+						$oProperty->image_large_max_height = $oShop->image_large_max_height;
+						$oProperty->image_small_max_width = $oShop->image_small_max_width;
+						$oProperty->image_small_max_height = $oShop->image_small_max_height;
+
+						$oShop_Item_Property_List->add($oProperty);
+					}
+
+					$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
+						? intval($oShopItem->Shop_Group->id)
+						: intval($oShopItem->Modification->Shop_Group->id)
+					));
+
+					$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
+
+					$oProperty_Value = NULL;
+					foreach ($aPropertyValues as $oTmpPropertyValue)
+					{
+						// Ранее загруженное значение ищим по имени файла
+						if ($oTmpPropertyValue->file_name == $sFileName)
+						{
+							$oProperty_Value = $oTmpPropertyValue;
+							break;
+						}
+					}
+
+					is_null($oProperty_Value) && $oProperty_Value = $oProperty->createNewValue($oShopItem->id);
+
+					$oProperty_Value->save();
+
+					/*$oProperty_Value = isset($aPropertyValues[0])
+						? $aPropertyValues[0]
+						: $oProperty->createNewValue($oShopItem->id);*/
+
+					if ($oProperty_Value->file != '')
+					{
+						try
+						{
+							Core_File::delete($sDestinationFolder . $oProperty_Value->file);
+						} catch (Exception $e) {}
+					}
+
+					// Удаляем старое малое изображение
+					if ($oProperty_Value->file_small != '')
+					{
+						try
+						{
+							Core_File::delete($sDestinationFolder . $oProperty_Value->file_small);
+						} catch (Exception $e) {}
+					}
+				}
+				else
+				{
+					if ($oShopItem->image_large != '' && is_file($sDestinationFolder . $oShopItem->image_large))
+					{
+						try
+						{
+							Core_File::delete($sDestinationFolder . $oShopItem->image_large);
+						} catch (Exception $e) {}
+					}
+
+					// Удаляем старое малое изображение
+					if ($oShopItem->image_small != '' && is_file($sDestinationFolder . $oShopItem->image_small))
+					{
+						try
+						{
+							Core_File::delete($sDestinationFolder . $oShopItem->image_small);
+						} catch (Exception $e) {}
+					}
+				}
+
+				clearstatcache();
+				
+				// Удаляем папку назначения вместе со всеми старыми файлами
+				//Core_File::deleteDir($sDestinationFolder);
+
+				// Создаем папку назначения
+				$oShopItem->createDir();
+
+				// Файл-источник
+				$sSourceFile = CMS_FOLDER . $this->sPicturesPath . ltrim($PictureData, '/\\');
+
+				$sSourceFileBaseName = basename($PictureData);
+
+				if (!$oShop->change_filename)
+				{
+					$sTargetFileName = $sSourceFileBaseName;
+				}
+				else
+				{
+					$sTargetFileExtension = Core_File::getExtension($PictureData);
+
+					if ($sTargetFileExtension != '')
+					{
+						$sTargetFileExtension = ".{$sTargetFileExtension}";
+					}
+
+					if (!$bFirstPicture)
+					{
+						$sTargetFileName = "shop_property_file_{$oShopItem->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
+					}
+					else
+					{
+						$sTargetFileName = "shop_items_catalog_image{$oShopItem->id}{$sTargetFileExtension}";
+					}
+				}
+
+				$aPicturesParam = array();
+				$aPicturesParam['large_image_isset'] = TRUE;
+				$aPicturesParam['large_image_source'] = $sSourceFile;
+				$aPicturesParam['large_image_name'] = $sSourceFileBaseName;
+				$aPicturesParam['large_image_target'] = $sDestinationFolder . $sTargetFileName;
+				$aPicturesParam['watermark_file_path'] = $oShop->getWatermarkFilePath();
+				$aPicturesParam['watermark_position_x'] = $oShop->watermark_default_position_x;
+				$aPicturesParam['watermark_position_y'] = $oShop->watermark_default_position_y;
+				$aPicturesParam['large_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio;
+				$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
+				$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
+				$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
+				$aPicturesParam['create_small_image_from_large'] = TRUE;
+
+				if (!$bFirstPicture)
+				{
+					$aPicturesParam['large_image_max_width'] = $oProperty->image_large_max_width;
+					$aPicturesParam['large_image_max_height'] = $oProperty->image_large_max_height;
+					$aPicturesParam['small_image_max_width'] = $oProperty->image_small_max_width;
+					$aPicturesParam['small_image_max_height'] = $oProperty->image_small_max_height;
+				}
+				else
+				{
+					$aPicturesParam['large_image_max_width'] = $oShop->image_large_max_width;
+					$aPicturesParam['large_image_max_height'] = $oShop->image_large_max_height;
+					$aPicturesParam['small_image_max_width'] = $oShop->image_small_max_width;
+					$aPicturesParam['small_image_max_height'] = $oShop->image_small_max_height;
+				}
+
+				$aPicturesParam['small_image_watermark'] = $oShop->watermark_default_use_small_image;
+				$aPicturesParam['small_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio_small;
+
+				$aPicturesParam['large_image_watermark'] = $oShop->watermark_default_use_large_image;
+
+				try
+				{
+					$result = Core_File::adminUpload($aPicturesParam);
+				}
+				catch (Exception $exc)
+				{
+					$result = array('large_image' => FALSE, 'small_image' => FALSE);
+				}
+
+				if ($result['large_image'])
+				{
+					if (!$bFirstPicture)
+					{
+						$oProperty_Value->file = $sTargetFileName;
+						$oProperty_Value->file_name = $sFileName;
+						$oProperty_Value->file_description = $sFileDescription;
+						$oProperty_Value->save();
+					}
+					else
+					{
+						$oShopItem->image_large = $sTargetFileName;
+						$oShopItem->setLargeImageSizes();
+					}
+				}
+
+				if ($result['small_image'])
+				{
+					if (!$bFirstPicture)
+					{
+						$oProperty_Value->file_small = "small_{$sTargetFileName}";
+						$oProperty_Value->file_small_name = '';
+						$oProperty_Value->save();
+					}
+					else
+					{
+						$oShopItem->image_small = "small_{$sTargetFileName}";
+						$oShopItem->setSmallImageSizes();
+					}
+				}
+
+				$oShopItem->save() && $bFirstPicture = FALSE;
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -794,8 +1057,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Импортируем группы товаров
 			foreach ($this->xpath($classifier, 'Группы') as $Groups)
 			{
-				Core_File::flush();
-
 				$this->_importGroups($Groups, $this->iShopGroupId);
 			}
 			//is_object($classifier->Группы) && $this->_importGroups($classifier->Группы, $this->iShopGroupId);
@@ -803,8 +1064,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Импортируем дополнительные свойства товаров
 			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
 			{
-				Core_File::flush();
-
 				$sPropertyName = strval($oItemProperty->Наименование);
 
 				foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
@@ -825,8 +1084,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oItem)
 			{
-				Core_File::flush();
-
 				$sGUID = strval($oItem->Ид);
 				$sGUIDmod = FALSE;
 
@@ -878,6 +1135,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				$oShopItem->marking = strval($oItem->Артикул);
+					/*? strval($oItem->Артикул)
+					: (strlen(strval($oItem->Штрихкод))
+						? strval($oItem->Штрихкод)
+						: ''
+					);*/
+				
 				$oShopItem->name = $sItemName;
 
 				if (is_array($aTmp = $this->xpath($oItem, 'Группы'))
@@ -956,219 +1219,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopItem->save();
 				}
 
-				$bFirstPicture = TRUE;
-
-				// Обрабатываем изображения для товара
-				foreach ($this->xpath($oItem, 'Картинка') as $PictureData)
-				{
-					if (Core_File::isValidExtension(
-					$PictureData,
-					Core::$mainConfig['availableExtension']))
-					{
-						// Папка назначения
-						$sDestinationFolder = $oShopItem->getItemPath();
-
-						if (!$bFirstPicture)
-						{
-							$sTmp = explode('_', basename($PictureData));
-							$sTmp[1] = basename($sTmp[1], '.'.Core_File::getExtension($sTmp[1]));
-
-							$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
-
-							$sPictureData = strval($PictureData);
-							$oNewPropertyGUID = $this->xpath($oItem, "ЗначенияРеквизитов/ЗначениеРеквизита[starts-with(Значение, '{$sPictureData}')]/Значение");
-							$sPropertyDescription = '';
-							if ($oNewPropertyGUID !== FALSE && count($oNewPropertyGUID) > 0)
-							{
-								$oNewPropertyGUID = strval($oNewPropertyGUID[0]);
-
-								$oNewPropertyGUID = explode('#', $oNewPropertyGUID);
-								if (count($oNewPropertyGUID) == 2)
-								{
-									//$sTmp[1] = $oNewPropertyGUID[1];
-									$sTmp[1] = md5($oNewPropertyGUID[0]);
-									$sPropertyDescription = $oNewPropertyGUID[1];
-								}
-							}
-
-							$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sTmp[1], FALSE);
-
-							if (is_null($oProperty))
-							{
-								$oProperty = Core_Entity::factory('Property');
-								$oProperty->name = $sTmp[1];
-								$oProperty->type = 2;
-								$oProperty->description = $sPropertyDescription;
-								$oProperty->tag_name = $sTmp[1];
-								$oProperty->guid = $sTmp[1];
-
-								// Для вновь создаваемого допсвойства размеры берем из магазина
-								$oProperty->image_large_max_width = $oShop->image_large_max_width;
-								$oProperty->image_large_max_height = $oShop->image_large_max_height;
-								$oProperty->image_small_max_width = $oShop->image_small_max_width;
-								$oProperty->image_small_max_height = $oShop->image_small_max_height;
-
-								$oShop_Item_Property_List->add($oProperty);
-							}
-
-							$oShop->Shop_Item_Property_For_Groups->allowAccess($oProperty->Shop_Item_Property->id, ($oShopItem->modification_id == 0
-								? intval($oShopItem->Shop_Group->id)
-								: intval($oShopItem->Modification->Shop_Group->id)
-							));
-
-							$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
-
-							$oProperty_Value = isset($aPropertyValues[0])
-								? $aPropertyValues[0]
-								: $oProperty->createNewValue($oShopItem->id);
-
-							if ($oProperty_Value->file != '')
-							{
-								try
-								{
-									Core_File::delete($sDestinationFolder . $oProperty_Value->file);
-								} catch (Exception $e) {}
-							}
-
-							// Удаляем старое малое изображение
-							if ($oProperty_Value->file_small != '')
-							{
-								try
-								{
-									Core_File::delete($sDestinationFolder . $oProperty_Value->file_small);
-								} catch (Exception $e) {}
-							}
-						}
-						else
-						{
-							if ($oShopItem->image_large != '')
-							{
-								try
-								{
-									Core_File::delete($sDestinationFolder . $oShopItem->image_large);
-								} catch (Exception $e) {}
-							}
-
-							// Удаляем старое малое изображение
-							if ($oShopItem->image_small != '')
-							{
-								try
-								{
-									Core_File::delete($sDestinationFolder . $oShopItem->image_small);
-								} catch (Exception $e) {}
-							}
-						}
-
-						// Удаляем папку назначения вместе со всеми старыми файлами
-						//Core_File::deleteDir($sDestinationFolder);
-
-						// Создаем папку назначения
-						$oShopItem->createDir();
-
-						// Файл-источник
-						$sSourceFile = CMS_FOLDER . $this->sPicturesPath . ltrim($PictureData, '/\\');
-
-						$sSourceFileBaseName = basename($PictureData);
-
-						if (!$oShop->change_filename)
-						{
-							$sTargetFileName = $sSourceFileBaseName;
-						}
-						else
-						{
-							$sTargetFileExtension = Core_File::getExtension($PictureData);
-
-							if ($sTargetFileExtension != '')
-							{
-								$sTargetFileExtension = ".{$sTargetFileExtension}";
-							}
-
-							if (!$bFirstPicture)
-							{
-								$sTargetFileName = "shop_property_file_{$oShopItem->id}_{$oProperty->id}{$sTargetFileExtension}";
-							}
-							else
-							{
-								$sTargetFileName = "shop_items_catalog_image{$oShopItem->id}{$sTargetFileExtension}";
-							}
-						}
-
-						$aPicturesParam = array();
-						$aPicturesParam['large_image_isset'] = TRUE;
-						$aPicturesParam['large_image_source'] = $sSourceFile;
-						$aPicturesParam['large_image_name'] = $sSourceFileBaseName;
-						$aPicturesParam['large_image_target'] = $sDestinationFolder . $sTargetFileName;
-						$aPicturesParam['watermark_file_path'] = $oShop->getWatermarkFilePath();
-						$aPicturesParam['watermark_position_x'] = $oShop->watermark_default_position_x;
-						$aPicturesParam['watermark_position_y'] = $oShop->watermark_default_position_y;
-						$aPicturesParam['large_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio;
-						$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
-						$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
-						$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
-						$aPicturesParam['create_small_image_from_large'] = TRUE;
-
-						if (!$bFirstPicture)
-						{
-							$aPicturesParam['large_image_max_width'] = $oProperty->image_large_max_width;
-							$aPicturesParam['large_image_max_height'] = $oProperty->image_large_max_height;
-							$aPicturesParam['small_image_max_width'] = $oProperty->image_small_max_width;
-							$aPicturesParam['small_image_max_height'] = $oProperty->image_small_max_height;
-						}
-						else
-						{
-							$aPicturesParam['large_image_max_width'] = $oShop->image_large_max_width;
-							$aPicturesParam['large_image_max_height'] = $oShop->image_large_max_height;
-							$aPicturesParam['small_image_max_width'] = $oShop->image_small_max_width;
-							$aPicturesParam['small_image_max_height'] = $oShop->image_small_max_height;
-						}
-
-						$aPicturesParam['small_image_watermark'] = $oShop->watermark_default_use_small_image;
-						$aPicturesParam['small_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio_small;
-
-						$aPicturesParam['large_image_watermark'] = $oShop->watermark_default_use_large_image;
-
-						try
-						{
-							$result = Core_File::adminUpload($aPicturesParam);
-						}
-						catch (Exception $exc)
-						{
-							$result = array('large_image' => FALSE, 'small_image' => FALSE);
-						}
-
-						if ($result['large_image'])
-						{
-							if (!$bFirstPicture)
-							{
-								$oProperty_Value->file = $sTargetFileName;
-								$oProperty_Value->file_name = '';
-								$oProperty_Value->save();
-							}
-							else
-							{
-								$oShopItem->image_large = $sTargetFileName;
-								$oShopItem->setLargeImageSizes();
-							}
-						}
-
-						if ($result['small_image'])
-						{
-							if (!$bFirstPicture)
-							{
-								$oProperty_Value->file_small = "small_{$sTargetFileName}";
-								$oProperty_Value->file_small_name = '';
-								$oProperty_Value->save();
-							}
-							else
-							{
-								$oShopItem->image_small = "small_{$sTargetFileName}";
-								$oShopItem->setSmallImageSizes();
-							}
-						}
-
-						$oShopItem->save() && $bFirstPicture = FALSE;
-					}
-				}
+				// Картинки основного товара
+				$this->_importImages($oShopItem, $this->xpath($oItem, 'Картинка'));
 
 				// До обработки свойств из 1С нужно записать значения "по умолчанию" для всех свойств, заданных данной группе товара
 				$aProperties = Core_Entity::factory('Shop_Item_Property_List', $oShop->id)->Properties;
@@ -1228,7 +1280,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Обрабатываем свойства/значения свойств для конкретно данного товара
 				/*foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара or ЗначенияРеквизитов/ЗначениеРеквизита')
 						  as $oItemProperty)
-				{echo "111<br/>";
+				{
 					if (mb_strtoupper(strval($oItemProperty->Наименование)) == 'ВЕС')
 					{
 						$oShopItem->weight = Shop_Controller::instance()->convertPrice(strval($oItemProperty->Значение));
@@ -1388,6 +1440,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 						$oShopItem->shop_measure_id = $oShopMeasure->id;
 					}
+
+					// Картинки предложений (модификаций)
+					$this->_importImages($oShopItem, $this->xpath($oProposal, 'Картинка'));
 
 					// Добавляем значения для общих свойств всех товаров
 					foreach ($this->xpath($oProposal, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)

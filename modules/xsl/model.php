@@ -103,7 +103,7 @@ class Xsl_Model extends Core_Entity
 		$content = trim($content);
 		Core_File::write($this->getLngDtdPath($lng), $content);
 	}
-	
+
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object

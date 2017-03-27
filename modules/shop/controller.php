@@ -50,6 +50,72 @@ class Shop_Controller
 	}
 
 	/**
+	 * Use Banker's Rounding. Default TRUE
+	 * @var boolean
+	 */
+	protected $_bankersRounding = TRUE;
+
+	/**
+	 * Use Banker's Rounding
+	 * @param boolean $bankersRounding
+	 * @return self
+	 */
+	public function bankersRounding($bankersRounding = TRUE)
+	{
+		$this->_bankersRounding = $bankersRounding;
+		return $this;
+	}
+
+	/**
+	 * Banker's Round half to even
+	 * TRUE - Round half to even. 23.5 => 24, 24.5 => 24
+	 * FALSE - Round half to odd. 23.5 => 23, 24.5 => 25
+	 * @var boolean
+	 */
+	protected $_bankersRoundHalfToEven = TRUE;
+
+	/**
+	 * Banker's Round half to even
+	 * TRUE - Round half to even. 23.5 => 24, 24.5 => 24
+	 * FALSE - Round half to odd. 23.5 => 23, 24.5 => 25
+	 * @param boolean $bankersRoundHalfToEven
+	 * @return self
+	 */
+	public function bankersRoundHalfToEven($bankersRoundHalfToEven = TRUE)
+	{
+		$this->_bankersRoundHalfToEven = $bankersRoundHalfToEven;
+		return $this;
+	}
+
+	/**
+	 * Banker's Round
+	 * depends on $this->_bankersRoundHalfToEven
+	 *
+	 * @param float $value The value to round
+	 * @param int $precision The optional number of decimal digits to round to
+	 * @return float The rounded value
+	 */
+	public function bRound($value, $precision = 0)
+	{
+		$m = pow(10, $precision);
+		$n = $precision ? $value * $m : $value;
+		$i = floor($n);
+		$f = $n - $i;
+		$e = 0.00001;
+
+		$r = ($f > 0.5 - $e && $f < 0.5 + $e)
+			? ($this->_bankersRoundHalfToEven
+				? (($i % 2 == 0) ? $i : $i + 1)
+				: (($i % 2 == 0) ? $i + 1 : $i)
+			)
+			: round($n);
+
+		return $precision
+			? $r / $m
+			: $r;
+	}
+
+	/**
 	 * Округление цен к формату, приведенного в $this->_floatFormat
 	 *
 	 * @param float $value цена
@@ -57,7 +123,10 @@ class Shop_Controller
 	 */
 	public function round($value)
 	{
-		return sprintf($this->_floatFormat, round($value, 2));
+		return sprintf($this->_floatFormat, $this->_bankersRounding
+			? $this->bRound($value, 2)
+			: round($value, 2)
+		);
 	}
 
 	/**

@@ -31,6 +31,41 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Call ->checkPaymentBeforeContent() on each shop's Shop_Payment_System_Handlers
+	 * @param Shop_Model $oShop
+	 */
+	static public function checkBeforeContent(Shop_Model $oShop)
+	{
+		self::_check($oShop, 'checkPaymentBeforeContent');
+	}
+
+	/**
+	 * Call ->checkPaymentAfterContent() on each shop's Shop_Payment_System_Handlers
+	 * @param Shop_Model $oShop
+	 */
+	static public function checkAfterContent(Shop_Model $oShop)
+	{
+		return self::_check($oShop, 'checkPaymentAfterContent');
+	}
+
+	/**
+	 * Protected method to call $methodName on each shop's Shop_Payment_System_Handlers
+	 */
+	static protected function _check(Shop_Model $oShop, $methodName)
+	{
+		$aShop_Payment_Systems = $oShop->Shop_Payment_Systems->findAll();
+
+		foreach ($aShop_Payment_Systems as $oShop_Payment_System)
+		{
+			$oHandler = self::factory($oShop_Payment_System);
+			if (method_exists($oHandler, $methodName))
+			{
+				$oHandler->$methodName();
+			}
+		}
+	}
+
+	/**
 	 * List of properties
 	 * @var array
 	 */
@@ -420,7 +455,7 @@ abstract class Shop_Payment_System_Handler
 				&& $this->_shopOrder->Siteuser->id
 		)
 		{
-			$fCurrencyCoefficient = $this->_shopOrder->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+			$fCurrencyCoefficient = $this->_shopOrder->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
 				? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 					$this->_shopOrder->Shop_Currency,
 					$oShop->Shop_Currency
@@ -467,7 +502,25 @@ abstract class Shop_Payment_System_Handler
 				$this->_shopOrder->add($oShop_Order_Item);
 
 				// Опачена полная сумма
-				$fBonusesAmount == $fOrderAmount && $this->_shopOrder->paid();
+				if ($fBonusesAmount == $fOrderAmount)
+				{
+					$oBefore = clone $this->_shopOrder;
+
+					$this->_shopOrder->paid();
+
+					// Установка XSL-шаблонов в соответствии с настройками в узле структуры
+					$this->setXSLs();
+
+					// Отправка писем клиенту и пользователю
+					$this->send();
+
+					ob_start();
+
+					$this
+						->shopOrderBeforeAction($oBefore)
+						->changedOrder('changeStatusPaid');
+					ob_get_clean();
+				}
 			}
 		}
 
@@ -1109,6 +1162,7 @@ abstract class Shop_Payment_System_Handler
 
 	/**
 	 * Массив с режимами, при использовании которых должно происходить уведомление о покупке
+	 * - apply - применение изменений заказа из списка заказа, включая изменение статуса
 	 * - edit - редактирование заказа
 	 * - changeStatusPaid - изменение статуса оплаты из списка заказов
 	 * - cancelPaid - отмена заказа
@@ -1118,6 +1172,7 @@ abstract class Shop_Payment_System_Handler
 	/**
 	 * Уведомление об операциях с заказом
 	 * @param string $mode режим изменения:
+	 * - apply - применение изменений заказа из списка заказа, включая изменение статуса
 	 * - edit - редактирование заказа
 	 * - changeStatusPaid - изменение статуса оплаты из списка заказов
 	 * - cancelPaid - отмена заказа
@@ -1127,7 +1182,6 @@ abstract class Shop_Payment_System_Handler
 	public function changedOrder($mode)
 	{
 		Core_Event::notify('Shop_Payment_System_Handler.onBeforeChangedOrder', $this, array($mode));
-
 		if (in_array($mode, $this->_notificationModes))
 		{
 			if ($this->getShopOrderBeforeAction()->paid != $this->getShopOrder()->paid

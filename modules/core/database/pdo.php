@@ -48,7 +48,8 @@ class Core_DataBase_Pdo extends Core_DataBase
 			'driverName' => 'mysql',
 			'attr' => array(
 				PDO::ATTR_PERSISTENT => FALSE,
-				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+				// Moved to ->setAttribute() after connectiom
+				//PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 
 				// Setting the connection character set to UTF-8 prior to PHP 5.3.6
 				//PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $this->quote($this->_config['charset'])
@@ -64,6 +65,8 @@ class Core_DataBase_Pdo extends Core_DataBase
 				$this->_config['password'],
 				$this->_config['attr']
 			);
+			
+			$this->_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 		catch (PDOException $e)
 		{
@@ -123,13 +126,12 @@ class Core_DataBase_Pdo extends Core_DataBase
 	 */
 	public function escape($unescapedString)
 	{
-		$unescapedString = strval($unescapedString);
-
 		$this->connect();
 
-		$escapedString = $this->_connection->quote($unescapedString);
+		$unescapedString = strval($unescapedString);
+		$unescapedString = addcslashes($unescapedString, "\000\032");
 
-		return $escapedString;
+		return $this->_connection->quote($unescapedString);
 	}
 
 	/**
@@ -200,7 +202,7 @@ class Core_DataBase_Pdo extends Core_DataBase
 				$min = 0;
 				$max = 65535;
 				break;
-				
+
 			case 'mediumint':
 				$type = 'int';
 				$min = -8388608;

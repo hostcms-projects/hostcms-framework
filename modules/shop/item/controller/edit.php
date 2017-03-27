@@ -394,13 +394,13 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value($this->_object->shop_measure_id)
 				);
 
+				$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+
 				// Получаем список складов магазина
 				$aWarehouses = $oShop->Shop_Warehouses->findAll();
 
 				foreach ($aWarehouses as $oWarehouse)
 				{
-					$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
-
 					// Получаем количество товара на текущем складе
 					$oWarehouseItem =
 						$this->_object->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id);
@@ -1023,39 +1023,50 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						Core_Array::getPost('text', ''), array('hash_function' => 'crc32'));
 						$array_text = array_unique($array_text);
 
-						$oTag = Core_Entity::factory('Tag');
-
-						// Получаем список меток
-						$aTags = $oTag->findAll();
-
 						$coeff_intersect = array ();
 
-						foreach($aTags as $oTag)
-						{
-							// Получаем хэш тэга
-							$array_tags = Core_Str::getHashes($oTag->name, 	array('hash_function' => 'crc32'));
+						$offset = 0;
+						$limit = 100;
 
-							// Получаем коэффициент схожести текста элемента с тэгом
-							$array_tags = array_unique($array_tags);
+						do {
+							$oTags = Core_Entity::factory('Tag');
 
-							// Текст метки меньше текста инфоэлемента, т.к. должна
-							// входить метка в текст инфоэлемента, а не наоборот
-							if (count($array_text) >= count($array_tags))
+							$oTags->queryBuilder()
+								->offset($offset)
+								->limit($limit);
+
+							// Получаем список меток
+							$aTags = $oTags->findAll(FALSE);
+
+							foreach($aTags as $oTag)
 							{
-								// Расчитываем пересечение
-								$intersect = count(array_intersect($array_text, $array_tags));
+								// Получаем хэш тэга
+								$array_tags = Core_Str::getHashes($oTag->name, 	array('hash_function' => 'crc32'));
 
-								$coefficient = count($array_tags) != 0
-									? $intersect / count($array_tags)
-									: 0;
+								// Получаем коэффициент схожести текста элемента с тэгом
+								$array_tags = array_unique($array_tags);
 
-								// Найдено полное вхождение
-								if ($coefficient == 1 && !in_array($oTag->id, $coeff_intersect))
+								// Текст метки меньше текста инфоэлемента, т.к. должна
+								// входить метка в текст инфоэлемента, а не наоборот
+								if (count($array_text) >= count($array_tags))
 								{
-									$coeff_intersect[] = $oTag->id;
+									// Расчитываем пересечение
+									$intersect = count(array_intersect($array_text, $array_tags));
+
+									$coefficient = count($array_tags) != 0
+										? $intersect / count($array_tags)
+										: 0;
+
+									// Найдено полное вхождение
+									if ($coefficient == 1 && !in_array($oTag->id, $coeff_intersect))
+									{
+										$coeff_intersect[] = $oTag->id;
+									}
 								}
 							}
+							$offset += $limit;
 						}
+						while (count($aTags));
 					}
 
 					// Автоматическое применение ключевых слов
@@ -1130,7 +1141,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							->max_quantity(intval(Core_Array::getPost("specMaxQuantity_{$oShop_Specialprice->id}", 0)))
 							->price(Shop_Controller::instance()->convertPrice(Core_Array::getPost("specPrice_{$oShop_Specialprice->id}", 0)))
 							->percent(Shop_Controller::instance()->convertPrice(Core_Array::getPost("specPercent_{$oShop_Specialprice->id}", 0)));
-							
+
 						$oShop_Specialprice->price || $oShop_Specialprice->percent
 							? $oShop_Specialprice->save()
 							: $oShop_Specialprice->delete();

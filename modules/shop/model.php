@@ -397,7 +397,7 @@ class Shop_Model extends Core_Entity{
 				$oShop_Bonus->copy()
 			);
 		}
-		
+
 		// Копирование скидок на товары
 		$aShop_Discounts = $this->Shop_Discounts->findAll();
 		foreach($aShop_Discounts as $oShop_Discount)
@@ -651,12 +651,14 @@ class Shop_Model extends Core_Entity{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags()
+			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))
 			->addXmlTag('url', $this->Structure->getPath())
 			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0)
 			;
 
-		$this->shop_currency_id && $this->addEntity($this->Shop_Currency);
-		$this->shop_measure_id && $this->addEntity($this->Shop_Measure);
+		$this->shop_currency_id && $this->addEntity($this->Shop_Currency->clearEntities());
+		$this->shop_measure_id && $this->addEntity($this->Shop_Measure->clearEntities());
+		$this->shop_company_id && $this->addEntity($this->Shop_Company->clearEntities());
 
 		$this->addEntity(
 			Core::factory('Core_Xml_Entity')
@@ -701,5 +703,19 @@ class Shop_Model extends Core_Entity{
 			->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
 
 		return parent::getXml();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		!$this->structure_id && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-darkorange badge-square')
+			->add(Core::factory('Core_Html_Entity_I')->class('fa fa-exclamation'))
+			->execute();
 	}
 }

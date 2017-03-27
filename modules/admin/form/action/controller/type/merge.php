@@ -12,7 +12,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
- class Admin_Form_Action_Controller_Type_Merge extends Admin_Form_Action_Controller
+class Admin_Form_Action_Controller_Type_Merge extends Admin_Form_Action_Controller
 {
 	/**
 	 * Global properties support

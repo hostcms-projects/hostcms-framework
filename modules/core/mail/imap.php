@@ -197,7 +197,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			$fetchheader = array();
 			foreach ($aImap_fetchheader as $key => $value)
 			{
-				$aValue = explode(":", $value);
+				$aValue = explode(':', $value);
 				isset($aValue[1]) && $fetchheader[strtolower(trim(strval($aValue[0])))] = strtolower(trim(strval($aValue[1])));
 			}
 			$this->_aMessages[$i]['fetchheader'] = $fetchheader;
@@ -212,6 +212,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 				isset($header_message->date) ? $header_message->date : $header_message->MailDate
 			));
 
+			// From
 			if (isset($header_message->from))
 			{
 				// Узнаем отправителя
@@ -225,6 +226,18 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			else
 			{
 				$this->_aMessages[$i]['from'] = '';
+			}
+			
+			// Reply To заменяет From если передан
+			if (isset($header_message->reply_to))
+			{
+				// Узнаем отправителя
+				$reply_to = $header_message->reply_to;
+				foreach ($reply_to as $key => $value)
+				{
+					// Почтовый ящик отправителя
+					$this->_aMessages[$i]['from'] = $value->mailbox . "@" . $value->host;
+				}
 			}
 
 			/*$this->_aMessages[$i]['subject'] = isset($header_message->subject)

@@ -474,15 +474,15 @@ class Core_Entity extends Core_ORM
 
 		Core_Event::notify($this->_modelName . '.onBeforeGetXml', $this);
 
-		$object_values = $this->_modelColumns;
+		//$object_values = $this->_modelColumns;
 
 		$xml = "<" . $this->_tagName;
 
 		// Primary key as tag property
-		if (array_key_exists($this->_primaryKey, $object_values))
+		if (array_key_exists($this->_primaryKey, $this->_modelColumns))
 		{
-			$xml .= " {$this->_primaryKey}=\"" . Core_Str::xml($object_values[$this->_primaryKey]) . "\"";
-			unset($object_values[$this->_primaryKey]);
+			$xml .= " {$this->_primaryKey}=\"" . Core_Str::xml($this->_modelColumns[$this->_primaryKey]) . "\"";
+			//unset($object_values[$this->_primaryKey]);
 		}
 
 		$xml .= ">\n";
@@ -490,10 +490,12 @@ class Core_Entity extends Core_ORM
 		$bAllowedTagsIsEmty = count($this->_allowedTags) == 0;
 		$bForbiddenTagsIsEmty = count($this->_forbiddenTags) == 0;
 
-		foreach ($object_values as $field_name => $field_value)
+		foreach ($this->_modelColumns as $field_name => $field_value)
 		{
 			// Разрешенные теги
-			if ($bAllowedTagsIsEmty || isset($this->_allowedTags[$field_name]))
+			if ($field_name != $this->_primaryKey
+				&& ($bAllowedTagsIsEmty || isset($this->_allowedTags[$field_name]))
+			)
 			{
 				// Запрещенные теги
 				if ($bForbiddenTagsIsEmty || !isset($this->_forbiddenTags[$field_name]))

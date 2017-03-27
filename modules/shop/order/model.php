@@ -877,7 +877,7 @@ class Shop_Order_Model extends Core_Entity
 				$oShop_Siteuser_Transaction->active = 1;
 
 				// Определяем коэффициент пересчета
-				$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+				$fCurrencyCoefficient = $this->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
 					? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 						$this->Shop_Currency, $oShop->Shop_Currency
 					)
@@ -928,7 +928,7 @@ class Shop_Order_Model extends Core_Entity
 					$oShop_Siteuser_Transaction->active = 1;
 
 					// Определяем коэффициент пересчета
-					$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+					$fCurrencyCoefficient = $this->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
 						? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 							$this->Shop_Currency, $oShop->Shop_Currency
 						)
@@ -1026,7 +1026,7 @@ class Shop_Order_Model extends Core_Entity
 								if ($oAffiliate_Plan_Level->type == 0)
 								{
 									// Определяем коэффициент пересчета
-									$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+									$fCurrencyCoefficient = $this->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
 										? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 											$this->Shop_Currency, $oShop->Shop_Currency
 										)
@@ -1169,7 +1169,7 @@ class Shop_Order_Model extends Core_Entity
 	{
 		$oOrderXml = $oXml->addChild('Документ');
 		$oOrderXml->addChild('Ид', $this->id);
-		$oOrderXml->addChild('Номер', $this->id);
+		$oOrderXml->addChild('Номер', $this->invoice);
 		$datetime = explode(' ', $this->datetime);
 		$date = $datetime[0];
 		$time = $datetime[1];
@@ -1177,7 +1177,10 @@ class Shop_Order_Model extends Core_Entity
 		$oOrderXml->addChild('ХозОперация', 'Заказ товара');
 		$oOrderXml->addChild('Роль', 'Продавец');
 		$oOrderXml->addChild('Валюта', $this->Shop_Currency->code);
-		$oOrderXml->addChild('Курс', $this->shop_currency_id > 0 && $this->Shop->shop_currency_id > 0 ? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency($this->Shop_Currency, $this->Shop->Shop_Currency) : 0);
+		$oOrderXml->addChild('Курс', $this->Shop_Currency->id > 0 && $this->Shop->Shop_Currency->id > 0
+			? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency($this->Shop_Currency, $this->Shop->Shop_Currency)
+			: 0
+		);
 		$oOrderXml->addChild('Сумма', $this->getAmount());
 
 		$oContractor = $oOrderXml->addChild('Контрагенты');
@@ -1187,15 +1190,17 @@ class Shop_Order_Model extends Core_Entity
 		$this->surname != '' && $aTmpArray[] = $this->surname;
 		$this->name != '' && $aTmpArray[] = $this->name;
 		$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
-
 		!count($aTmpArray) && $aTmpArray[] = $this->email;
-
+		
 		$sContractorName = implode(' ', $aTmpArray);
-
+		
 		$sContractorId = $this->siteuser_id
 			? $this->siteuser_id
-			: Core::crc32($sContractorName);
+			: abs(Core::crc32($sContractorName));
 
+		!strlen($sContractorName)
+			&& $sContractorName = 'Контрагент ' . $sContractorId;
+			
 		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
 		$oContractor->addChild('Ид', $sContractorId);
 		$oContractor->addChild('Наименование', $sContractorName);
@@ -1244,7 +1249,6 @@ class Shop_Order_Model extends Core_Entity
 		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
 		$oOrderProperty->addChild('Наименование', 'Метод оплаты');
 		$oOrderProperty->addChild('Значение', $this->shop_payment_system->name);
-		////////////////////
 
 		$oOrderXml->addChild('Время', $time);
 		$oOrderXml->addChild('Комментарий', $this->description);

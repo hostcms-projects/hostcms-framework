@@ -348,54 +348,14 @@ class Structure_Model extends Core_Entity
 	 * @param Admin_Form_Controller $oAdmin_Form_Controller
 	 * @return string
 	 */
-	/*public function name($oAdmin_Form_Field, $oAdmin_Form_Controller)
-	{
-		$link = $oAdmin_Form_Field->link;
-		$onclick = $oAdmin_Form_Field->onclick;
-
-		$link = $oAdmin_Form_Controller->doReplaces($oAdmin_Form_Field, $this, $link);
-		$onclick = $oAdmin_Form_Controller->doReplaces($oAdmin_Form_Field, $this, $onclick);
-
-		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div');
-
-		if ($this->active == 0)
-		{
-			$oCore_Html_Entity_Div->style("text-decoration: line-through");
-		}
-
-		$oCore_Html_Entity_Div
-			->add(
-				Core::factory('Core_Html_Entity_A')
-					->href($link)
-					->onclick($onclick)
-					->value(htmlspecialchars($this->name))
-			);
-
-		$count = $this->Structures->getCount();
-		$count > 0 && $oCore_Html_Entity_Div
-			->add(
-				Core::factory('Core_Html_Entity_Span')
-					->class('count')
-					->value(htmlspecialchars($count))
-			);
-
-		$oCore_Html_Entity_Div->execute();
-	}*/
-	
-	/**
-	 * Backend callback method
-	 * @param Admin_Form_Field $oAdmin_Form_Field
-	 * @param Admin_Form_Controller $oAdmin_Form_Controller
-	 * @return string
-	 */
 	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		$count = $this->Structures->getCount();
-		$count > 0 && Core::factory('Core_Html_Entity_Span')
+		$count && Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
 			->value($count)
 			->execute();
-	}	
+	}
 
 	/**
 	 * Backend callback method
@@ -507,14 +467,9 @@ class Structure_Model extends Core_Entity
 
 		$path = rawurlencode($this->path) . '/';
 
-		if ($this->parent_id == 0)
-		{
-			$path = '/' . $path;
-		}
-		else
-		{
-			$path = $this->Structure->getPath() . $path;
-		}
+		$path = $this->parent_id == 0
+			? '/' . $path
+			: $this->Structure->getPath() . $path;
 
 		return $path;
 	}

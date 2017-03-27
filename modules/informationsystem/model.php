@@ -132,12 +132,9 @@ class Informationsystem_Model extends Core_Entity
 
 		$aInformationsystems = $this->findAll();
 
-		if (isset($aInformationsystems[0]))
-		{
-			return $aInformationsystems[0];
-		}
-
-		return NULL;
+		return isset($aInformationsystems[0])
+			? $aInformationsystems[0]
+			: NULL;
 	}
 
 	/**
@@ -580,6 +577,7 @@ class Informationsystem_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags()
+			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))		
 			->addXmlTag('url', $this->Structure->getPath())
 			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0)
 			;
@@ -612,5 +610,19 @@ class Informationsystem_Model extends Core_Entity
 			->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
 
 		return parent::getXml();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		!$this->structure_id && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-darkorange badge-square')
+			->add(Core::factory('Core_Html_Entity_I')->class('fa fa-exclamation'))
+			->execute();
 	}
 }

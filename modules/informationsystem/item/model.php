@@ -722,6 +722,7 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		$oInformationsystem_ItemShortcut->informationsystem_id = $object->informationsystem_id;
 		$oInformationsystem_ItemShortcut->shortcut_id = $object->id;
+		$oInformationsystem_ItemShortcut->datetime = $object->datetime;
 		$oInformationsystem_ItemShortcut->name = ''/*$object->name*/;
 		$oInformationsystem_ItemShortcut->path = '';
 		$oInformationsystem_ItemShortcut->indexing = 0;
@@ -743,7 +744,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	{
 		$sPath = ($this->path == ''
 			? $this->id
-			: $this->path) . '/';
+			: rawurlencode($this->path)) . '/';
 
 		if ($this->informationsystem_group_id)
 		{
@@ -1157,11 +1158,14 @@ class Informationsystem_Item_Model extends Core_Entity
 			$aParts = explode('<!-- pagebreak -->', $this->text);
 			$iPartsCount = count($aParts);
 
-			$this->_showXmlPart > $iPartsCount && $this->_showXmlPart = $iPartsCount;
+			if ($iPartsCount > 1)
+			{
+				$this->_showXmlPart > $iPartsCount && $this->_showXmlPart = $iPartsCount;
 
-			$this->addForbiddenTag('text')
-				->addXmlTag('parts_count', $iPartsCount)
-				->addXmlTag('text', $aParts[$this->_showXmlPart - 1]);
+				$this->addForbiddenTag('text')
+					->addXmlTag('parts_count', $iPartsCount)
+					->addXmlTag('text', $aParts[$this->_showXmlPart - 1]);
+			}
 
 			unset($aParts);
 		}

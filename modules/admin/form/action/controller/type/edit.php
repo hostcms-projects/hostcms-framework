@@ -631,12 +631,12 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 						$value = $value != ''
 							? Core_Date::datetime2sql($value)
 							: '0000-00-00 00:00:00';
-						break;
+					break;
 					case 'date':
 						$value = $value != ''
 							? Core_Date::date2sql($value)
 							: '0000-00-00';
-						break;
+					break;
 					case 'tinytext':
 					case 'text':
 					case 'mediumtext':
@@ -646,7 +646,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					case 'mediumblob':
 					case 'longblob':
 						// Nothing to do
-						break;
+					break;
 					case 'tinyint':
 					case 'tinyint unsigned':
 						// Только при длине 1 символ

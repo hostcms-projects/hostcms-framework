@@ -32,8 +32,8 @@ class Skin_Bootstrap_Admin_Form_Entity_Tabs extends Skin_Default_Admin_Form_Enti
 					{
 						echo '<li' . ($tab_id == 0 ? ' class="active"' : '') . '>'.
 						'<a href="#' . $windowId . '-tab-' . $tab_id . '" data-toggle="tab">' . htmlspecialchars($oAdmin_Form_Tab_Entity->caption) . '</a></li>';
-						$tab_id++;
 					}
+					$tab_id++;
 				}
 			?></ul><?php
 		}
@@ -48,7 +48,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Tabs extends Skin_Default_Admin_Form_Enti
 			<?php
 			$oAdmin_Form_Tab_Entity->execute();
 			?></div><?php
-			$oAdmin_Form_Tab_Entity->active && $tab_id++;
+			$tab_id++;
 		}
 		?></div><?php
 	}

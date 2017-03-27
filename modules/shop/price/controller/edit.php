@@ -103,31 +103,59 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		parent::_applyObjectProperty();
 
-		if(!is_null(Core_Array::getPost('apply_for_all')))
+		if (!is_null(Core_Array::getPost('apply_for_all')))
 		{
-			$aShop_Items = $this->_object->Shop->Shop_Items->findAll(FALSE);
-			foreach ($aShop_Items as $oShop_Item)
-			{
-				$oShop_Item_Price = $oShop_Item->Shop_Item_Prices->getByShop_price_id($this->_object->id, FALSE);
+			$offset = 0;
+			$limit = 100;
 
-				if (is_null($oShop_Item_Price))
+			do {
+				$oShop_Items = $this->_object->Shop->Shop_Items;
+
+				$oShop_Items->queryBuilder()
+					->offset($offset)
+					->limit($limit);
+
+				$aShop_Items = $oShop_Items->findAll(FALSE);
+
+				foreach ($aShop_Items as $oShop_Item)
 				{
-					$oShop_Item_Price = Core_Entity::factory('Shop_Item_Price');
-					$oShop_Item_Price->value = $oShop_Item->price / 100 * $this->_object->percent;
-					$oShop_Item_Price->shop_price_id = $this->_object->id;
-					$oShop_Item->add($oShop_Item_Price);
+					$oShop_Item_Price = $oShop_Item->Shop_Item_Prices->getByShop_price_id($this->_object->id, FALSE);
+
+					if (is_null($oShop_Item_Price))
+					{
+						$oShop_Item_Price = Core_Entity::factory('Shop_Item_Price');
+						$oShop_Item_Price->value = $oShop_Item->price / 100 * $this->_object->percent;
+						$oShop_Item_Price->shop_price_id = $this->_object->id;
+						$oShop_Item->add($oShop_Item_Price);
+					}
 				}
+				$offset += $limit;
 			}
+			while (count($aShop_Items));
 		}
 
 		if (!is_null(Core_Array::getPost('recalculate_price')))
 		{
-			$aShop_Item_Prices = $this->_object->Shop_Item_Prices->findAll(FALSE);
-			foreach ($aShop_Item_Prices as $oShop_Item_Price)
-			{
-				$oShop_Item_Price->value = $oShop_Item_Price->Shop_Item->price / 100 * $this->_object->percent;
-				$oShop_Item_Price->save();
+			$offset = 0;
+			$limit = 100;
+
+			do {
+				$oShop_Item_Prices = $this->_object->Shop_Item_Prices;
+
+				$oShop_Item_Prices->queryBuilder()
+					->offset($offset)
+					->limit($limit);
+
+				$aShop_Item_Prices = $oShop_Item_Prices->findAll(FALSE);
+
+				foreach ($aShop_Item_Prices as $oShop_Item_Price)
+				{
+					$oShop_Item_Price->value = $oShop_Item_Price->Shop_Item->price / 100 * $this->_object->percent;
+					$oShop_Item_Price->save();
+				}
+				$offset += $limit;
 			}
+			while (count($aShop_Item_Prices));
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));

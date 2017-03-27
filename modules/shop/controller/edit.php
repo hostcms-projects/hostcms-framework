@@ -84,7 +84,6 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			break;
 
 			case 'shop':
-
 				$title = $object->id
 					? Core::_('Shop.edit_title')
 					: Core::_('Shop.add_title');
@@ -622,7 +621,8 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->orderBy('sorting')
 			->orderBy('name');
 
-		$aCurrencyArray = array(' … ');
+		//$aCurrencyArray = array(' … ');
+		$aCurrencyArray = array();
 
 		$aCurrencies = $oCurrency->findAll();
 		foreach($aCurrencies as $oCurrency)

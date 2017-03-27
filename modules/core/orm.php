@@ -337,8 +337,8 @@ class Core_ORM
 	 * </code>
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeDelete
-	 * @hostcms-event Core_ORM.onAfterDelete
+	 * @hostcms-event modelname.onBeforeDelete
+	 * @hostcms-event modelname.onAfterDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -453,8 +453,8 @@ class Core_ORM
 	 * }
 	 * </code>
 	 * @return array
-	 * @hostcms-event Core_ORM.onBeforeFindAll
-	 * @hostcms-event Core_ORM.onAfterFindAll
+	 * @hostcms-event modelname.onBeforeFindAll
+	 * @hostcms-event modelname.onAfterFindAll
 	 */
 	public function findAll($bCache = TRUE)
 	{
@@ -465,7 +465,7 @@ class Core_ORM
 			->asObject(get_class($this));
 
 		// Sets ORDER BY
-		if (!empty($this->_sorting))
+		if (!empty($this->_sorting) && !count($oSelect->getOrderBy()))
 		{
 			foreach ($this->_sorting as $column => $direction)
 			{
@@ -553,8 +553,8 @@ class Core_ORM
 	 * @param Core_ORM $model
 	 * @param string $relation
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeAdd
-	 * @hostcms-event Core_ORM.onAfterAdd
+	 * @hostcms-event modelname.onBeforeAdd
+	 * @hostcms-event modelname.onAfterAdd
 	 *
 	 * <code>
 	 * $object = Core_ORM::factory('Main', 1);
@@ -641,8 +641,8 @@ class Core_ORM
 	 * @param Core_ORM $model
 	 * @param string $relation
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeRemove
-	 * @hostcms-event Core_ORM.onAfterRemove
+	 * @hostcms-event modelname.onBeforeRemove
+	 * @hostcms-event modelname.onAfterRemove
 	 */
 	public function remove(Core_ORM $model, $relation = NULL)
 	{
@@ -768,6 +768,7 @@ class Core_ORM
 	/**
 	 * Calculate model's relation if data does not exist in self::$_relationModelCache.
 	 * @return self
+	 * @hostcms-event modelname.onAfterRelations
 	 */
 	protected function _relations()
 	{
@@ -838,6 +839,8 @@ class Core_ORM
 
 		// Clear belongs to
 		$this->_belongsTo = array();
+
+		Core_Event::notify($this->_modelName . '.onAfterRelations', $this);
 
 		// Add into cache
 		self::$_relationModelCache[$this->_modelName] = $this->_relations;
@@ -1378,7 +1381,7 @@ class Core_ORM
 	 * @param string $name method name
 	 * @param array $arguments arguments
 	 * @return mixed
-	 * @hostcms-event Core_ORM.onCall
+	 * @hostcms-event modelname.onCall
 	 */
 	public function __call($name, $arguments)
 	{
@@ -1405,6 +1408,7 @@ class Core_ORM
 	protected function _getChangedData()
 	{
 		$data = array();
+
 		foreach ($this->_changedColumns as $column)
 		{
 			$data[$column] = $this->_modelColumns[$column];
@@ -1558,8 +1562,8 @@ class Core_ORM
 	/**
 	 * Insert new object data into database
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeCreate
-	 * @hostcms-event Core_ORM.onAfterCreate
+	 * @hostcms-event modelname.onBeforeCreate
+	 * @hostcms-event modelname.onAfterCreate
 	 */
 	public function create()
 	{
@@ -1603,8 +1607,8 @@ class Core_ORM
 	/**
 	 * Update object data into database
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeUpdate
-	 * @hostcms-event Core_ORM.onAfterUpdate
+	 * @hostcms-event modelname.onBeforeUpdate
+	 * @hostcms-event modelname.onAfterUpdate
 	 */
 	public function update()
 	{
@@ -1639,8 +1643,8 @@ class Core_ORM
 	 * Save object. Use self::update() or self::create()
 	 *
 	 * @return Core_ORM
-	 * @hostcms-event Core_ORM.onBeforeSave
-	 * @hostcms-event Core_ORM.onAfterSave
+	 * @hostcms-event modelname.onBeforeSave
+	 * @hostcms-event modelname.onAfterSave
 	 */
 	public function save()
 	{
@@ -1655,6 +1659,26 @@ class Core_ORM
 
 		Core_Event::notify($this->_modelName . '.onAfterSave', $this);
 
+		return $this;
+	}
+
+	/**
+	 * Get $this->_relations
+	 * @return array
+	 */
+	public function getRelations()
+	{
+		return $this->_relations;
+	}
+
+	/**
+	 * Set $this->_relations
+	 * @param array $relations Array with new relations
+	 * @return self
+	 */
+	public function setRelations(array $relations)
+	{
+		$this->_relations = $relations;
 		return $this;
 	}
 

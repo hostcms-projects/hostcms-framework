@@ -33,7 +33,12 @@ class Market_Controller extends Core_Servant_Properties
 		'total',
 		'page',
 		'limit',
-		'error'
+		'error',
+		'controller',
+		'admin_view',
+		'options',
+		'tmpDir',
+		'order'
 	);
 
 	/**
@@ -67,6 +72,7 @@ class Market_Controller extends Core_Servant_Properties
 		$this->page = 1;
 		$this->limit = 9;
 		$this->error = 0;
+		$this->options = array();
 	}
 
 	/**
@@ -113,9 +119,7 @@ class Market_Controller extends Core_Servant_Properties
 			->update_id($update_id)
 			->domain($domain)
 			->update_server(HOSTCMS_UPDATE_SERVER)
-			->keys($aSite_Alias_Names)
-			->category_id(intval(Core_Array::getRequest('category_id')))
-			->page(intval(Core_Array::getRequest('current', 1)));
+			->keys($aSite_Alias_Names);
 
 		return $this;
 	}
@@ -143,6 +147,8 @@ class Market_Controller extends Core_Servant_Properties
 			"&current=" . intval($this->page) .
 			"&limit=" . intval($this->limit);
 
+		!is_null($this->order) && $url .= "&order=" . rawurlencode($this->order);
+			
 		try
 		{
 			$Core_Http = Core_Http::instance()
@@ -229,7 +235,9 @@ class Market_Controller extends Core_Servant_Properties
 		}
 		catch (Exception $e)
 		{
-			Core_Message::show(Core::_('Market.server_error_respond_0'), 'error');
+			$this->admin_view->addMessage(
+				Core_Message::get(Core::_('Market.server_error_respond_0'), 'error')
+			);
 		}
 
 		return $this;
@@ -274,8 +282,6 @@ class Market_Controller extends Core_Servant_Properties
 
 			$oXml = @simplexml_load_string($data);
 
-			//echo nl2br(htmlspecialchars($data));
-
 			if (is_object($oXml))
 			{
 				$error = intval($oXml->error);
@@ -284,8 +290,9 @@ class Market_Controller extends Core_Servant_Properties
 				{
 					if (isset($oXml->module) && count($oXml->module))
 					{
-						//echo $oXml->module;
+						(!defined('DENY_INI_SET') || !DENY_INI_SET) && function_exists('set_time_limit') && ini_get('safe_mode') != 1 && @set_time_limit(3600);
 
+						// Объект с данными о модуле
 						$oModule = new StdClass();
 
 						if (intval($oXml->module->attributes()->id))
@@ -299,94 +306,434 @@ class Market_Controller extends Core_Servant_Properties
 							$oModule->php = strval($oXml->module->php);
 							$oModule->sql = strval($oXml->module->sql);
 							$oModule->file = strval($oXml->module->file);
+							$oModule->author_email = strval($oXml->module->author_email);
 						}
 
 						if ($oModule->id)
 						{
-							$oAdminModule = Core_Entity::factory('Module')->getByPath($oModule->path, FALSE);
+							// Загружаем и распаковываем версию модуля
+							/**
+							 * Структура архива
+							 * files
+							 * -- admin
+							 * -- modules
+							 * module.xml
+							 * module.php
+							 * module.sql
+							 */
 
-							if (!$oAdminModule)
+							// Временная директория для распаковки модуля
+							// CMS_FOLDER . 'hostcmsfiles/tmp/install/{id}/'
+							$this->tmpDir = $this->getPath() . '/' . $oModule->shop_item_id;
+
+							// Удаляем директорию с данными предыдущей установки
+							is_dir($this->tmpDir) && Core_File::deleteDir($this->tmpDir);
+
+							// Создаем директорию снова
+							Core_File::mkdir($this->tmpDir, CHMOD, TRUE);
+
+							// по умолчанию ошибок обновления нет
+							$bErrorInstall = FALSE;
+
+							if ($oModule->file != '')
 							{
-								$sInstallDir = $this->getPath() . '/' . $oModule->shop_item_id;
-								!is_dir($sInstallDir) && Core_File::mkdir($sInstallDir, CHMOD, TRUE);
-
-								// по умолчанию ошибок обновления нет
-								$error_install = FALSE;
-
 								$Core_Http = $this->getModuleFile($oModule->file);
-
-								$sHeaders = $Core_Http->getHeaders();
 
 								$original_filename = 'tmpfile.tar.gz';
 
-								$aParseHeaders = $Core_Http->parseHeaders();
-								if (isset($aParseHeaders['Content-Disposition']))
+								// Сохраняем tar.gz
+								$source_file = $this->tmpDir . DIRECTORY_SEPARATOR . $original_filename;
+								Core_File::write($source_file, $Core_Http->getBody());
+
+								// Распаковываем файлы
+								$Core_Tar = new Core_Tar($source_file);
+								if (!$Core_Tar->extractModify($this->tmpDir, $this->tmpDir))
 								{
-									if (preg_match('/.*?filename\s*=\s*"?(.+?)"?;/i', $aParseHeaders['Content-Disposition'], $aTmp))
+									$bErrorInstall = TRUE;
+
+									// Возникла ошибка распаковки
+									$this->admin_view->addMessage(
+										Core_Message::get(Core::_('Update.update_files_error'), 'error')
+									);
+								}
+							}
+
+							// Создавать запись о модуле в таблице модулей
+							$bCreateModule = FALSE;
+
+							// Устанавливать сейчас
+							$bInstall = FALSE;
+
+							// Читаем modules.xml
+							$sModuleXmlPath = $this->tmpDir . DIRECTORY_SEPARATOR . 'module.xml';
+							if (is_file($sModuleXmlPath))
+							{
+								$sModuleXml = Core_File::read($sModuleXmlPath);
+								$oModuleXml = simplexml_load_string($sModuleXml);
+
+								$create_module = strval($oModuleXml->options->create_module);
+								$bCreateModule = $create_module == 1 || $create_module == 'true';
+
+								$aXmlFields = $oModuleXml->xpath("fields/field");
+
+								if (count($aXmlFields))
+								{
+									$aFields = $this->getFields($aXmlFields);
+
+									// Вывод списка опций
+									if ($this->controller->getAction() != 'sendOptions')
 									{
-										$original_filename = $aTmp[1];
+										ob_start();
+
+										$sTitle = sprintf('Параметры установки "%s"', $oModule->name);
+										$this->admin_view
+											->pageTitle($sTitle);
+
+										$this->controller->title($sTitle);
+
+										$oMainTab = Admin_Form_Entity::factory('Tab')->name('main');
+
+										foreach ($aFields as $aFieldsValue)
+										{
+											$sFieldCaption = htmlspecialchars($aFieldsValue['Caption']);
+											$sFieldName = htmlspecialchars($aFieldsValue['Name']);
+											$sFieldValue = htmlspecialchars($aFieldsValue['Value']);
+
+											$sFieldType = strval($aFieldsValue['Type']);
+
+											switch ($sFieldType)
+											{
+												case 'input':
+													$oMainTab->add(
+														Admin_Form_Entity::factory('Div')->class('row')
+															->add(
+																Admin_Form_Entity::factory('Input')
+																	->caption($sFieldCaption)
+																	->name($sFieldName)
+																	->value($sFieldValue)
+																	->divAttr(array('class' => 'form-group col-lg-6 col-md-12 col-sm-6 col-xs-6'))
+																	->controller($this->controller)
+															)
+													);
+
+												break;
+												case 'select':
+													$sFieldListValue = $aFieldsValue['ListValue'];
+
+													$oMainTab->add(
+														Admin_Form_Entity::factory('Div')->class('row')
+															->add(
+																Admin_Form_Entity::factory('Select')
+																	->caption($sFieldCaption)
+																	->name($sFieldName)
+																	->options($sFieldListValue)
+																	->divAttr(array('class' => 'form-group col-lg-6 col-md-12 col-sm-6 col-xs-6'))
+																	->controller($this->controller)
+															)
+													);
+												break;
+												case 'siteList':
+												case 'shopList':
+												case 'informationsystemList':
+
+													$aTmpOptions = array();
+													if ($sFieldType == 'siteList')
+													{
+														$oUser = Core_Entity::factory('User')->getCurrent();
+														$aObjects = $oUser->getSites();
+													}
+													elseif ($sFieldType == 'shopList')
+													{
+														$aObjects = Core_Entity::factory('Site', CURRENT_SITE)
+															->Shops
+															->findAll();
+													}
+													elseif ($sFieldType == 'informationsystemList')
+													{
+														$aObjects = Core_Entity::factory('Site', CURRENT_SITE)
+															->Informationsystems
+															->findAll();
+													}
+
+													foreach ($aObjects as $oObject)
+													{
+														$aTmpOptions[$oObject->id] = $oObject->name;
+													}
+
+													$oMainTab->add(
+														Admin_Form_Entity::factory('Div')->class('row')
+															->add(
+																Admin_Form_Entity::factory('Select')
+																	->caption($sFieldCaption)
+																	->name($sFieldName)
+																	->options($aTmpOptions)
+																	->divAttr(array('class' => 'form-group col-lg-6 col-md-12 col-sm-6 col-xs-6'))
+																	->controller($this->controller)
+															)
+													);
+												break;
+												case 'file':
+													$sFieldExtension = htmlspecialchars($aFieldsValue['Extension']);
+													$sFieldMaxWidth = intval($aFieldsValue['MaxWidth']);
+													$sFieldMaxHeight = intval($aFieldsValue['MaxHeight']);
+
+													$oMainTab->add(
+														Admin_Form_Entity::factory('Div')->class('row')
+															->add(
+																Admin_Form_Entity::factory('File')
+																	->caption($sFieldCaption)
+																	->name($sFieldName)
+																	->value($sFieldValue)
+																	->largeImage(
+																		array('show_params' => FALSE)
+																	)->smallImage(
+																		array('show' => FALSE)
+																	)
+																	->divAttr(array('class' => 'form-group col-lg-6 col-md-12 col-sm-6 col-xs-6'))
+																	->controller($this->controller)
+															)
+															->add(
+																Admin_Form_Entity::factory('Div')
+																	->class('col-lg-6 col-md-12 col-sm-6 col-xs-6 margin-top-21')
+																	->value(
+																		(trim($sFieldExtension) != ''
+																			? Core::_('market.allowed_extension', $sFieldExtension)
+																			: ''
+																		)
+																)
+															)
+															->add(
+																Admin_Form_Entity::factory('Div')
+																	->class('col-lg-6 col-md-12 col-sm-6 col-xs-6')
+																	->value(
+																		$sFieldMaxWidth > 0 && $sFieldMaxHeight > 0
+																			? "\n" . Core::_('market.max_file_size', $sFieldMaxWidth, $sFieldMaxHeight)
+																			: ''
+																		)
+															)
+													);
+
+												break;
+												case 'textarea':
+													$oMainTab->add(
+														Admin_Form_Entity::factory('Div')->class('row')
+															->add(
+																Admin_Form_Entity::factory('Textarea')
+																	->caption($sFieldCaption)
+																	->name($sFieldName)
+																	->value($sFieldValue)
+																	->divAttr(array('class' => 'form-group col-lg-6 col-md-12 col-sm-6 col-xs-6'))
+																	->controller($this->controller)
+															)
+													);
+												break;
+											}
+										}
+										Admin_Form_Entity::factory('Form')
+											->controller($this->controller)
+											->action($this->controller->getPath())
+											->add($oMainTab)
+											->add(
+												Admin_Form_Entity::factory('Input')
+													->name('install')
+													->value($module_id)
+													->class('hidden')
+											)
+											->add(Admin_Form_Entity::factory('Button')
+												->name('applyOptions')
+												->type('submit')
+												->value(Core::_('market.install'))
+												->class('applyButton btn btn-blue')
+												->onclick(
+													$this->controller->getAdminSendForm('sendOptions')
+												)
+											)
+											->execute();
+
+										$this->admin_view
+											->content(ob_get_clean())
+											->show();
+									}
+									// Применение списка преданных опций
+									else
+									{
+										$aOptions = array();
+										foreach ($aFields as $aFieldsValue)
+										{
+											$sFieldCaption = $aFieldsValue['Caption'];
+											$sFieldName = $aFieldsValue['Name'];
+											$sFieldType = $aFieldsValue['Type'];
+
+											// Файл
+											if ($sFieldType == 'file')
+											{
+												if (isset($_FILES[$sFieldName]['tmp_name'])
+												&& is_file($_FILES[$sFieldName]['tmp_name'])
+												&& $_FILES[$sFieldName]['size'] > 0)
+												{
+													$sFieldPath = $aFieldsValue['Path'];
+													$sFieldExtension = $aFieldsValue['Extension'];
+
+													$sExt = Core_File::getExtension($_FILES[$sFieldName]['name']);
+													$aAllowedExt = explode(',', $sFieldExtension);
+
+													if (strlen(trim($sFieldExtension)) == 0 || in_array($sExt, $aAllowedExt))
+													{
+														if (!move_uploaded_file($_FILES[$sFieldName]['tmp_name'], CMS_FOLDER . $sFieldPath))
+														{
+															$this->admin_view->addMessage(
+																Core_Message::get(Core::_('install.file_copy_error', $sFieldPath), 'error')
+															);
+														}
+													}
+													else
+													{
+														$this->admin_view->addMessage(
+															Core_Message::get(Core::_('install.file_disabled_extension', $sFieldCaption), 'error')
+														);
+													}
+												}
+											}
+											// Остальные типы полей
+											else
+											{
+												$aOptions[$sFieldName] = Core_Array::getPost($sFieldName);
+											}
+										}
+
+										$this->options = $aOptions;
+
+										$bInstall = TRUE;
 									}
 								}
-
-								if (!empty($original_filename))
+								else
 								{
-									$source_file = $sInstallDir . '/' . $original_filename;
-
-									Core_File::write($source_file, $Core_Http->getBody());
-
-									$Core_Tar = new Core_Tar($source_file);
-
-									// Распаковываем файлы
-									if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
-									{
-										$error_install = TRUE;
-
-										// Возникла ошибка распаковки
-										Core_Message::show(Core::_('Update.update_files_error'), 'error');
-									}
-								}
-
-								// Размещаем файлы обновления в директорию
-								if (!$error_install)
-								{
-									//SQL
-									$sSql = strval($oModule->sql);
-									$sSqlFilename = $sInstallDir . '/' . $oModule->id . '.sql';
-									Core_File::write($sSqlFilename, html_entity_decode($sSql, ENT_COMPAT, 'UTF-8'));
-									$sSqlCode = html_entity_decode($sSql, ENT_COMPAT, 'UTF-8');
-									Sql_Controller::instance()->execute($sSqlCode);
-
-									//PHP
-									$sPhp = strval($oModule->php);
-									$sPhpFilename = $sInstallDir . '/' . $oModule->id . '.php';
-									Core_File::write($sPhpFilename, html_entity_decode($sPhp, ENT_COMPAT, 'UTF-8'));
-									include($sPhpFilename);
-
-									$oAdminModule = Core_Entity::factory('Module');
-									$oAdminModule
-										->name($oModule->name)
-										->description($oModule->description)
-										->active(1)
-										->indexing(1)
-										->path($oModule->path)
-										->save();
-
-									// install() для модуля, если есть
-									$oAdminModule->setupModule();
-								}
-
-								// Удаляем папку с файлами в случае с успешной установкой
-								is_dir($sInstallDir) && Core_File::deleteDir($sInstallDir);
-
-								// Если не было ошибок
-								if (!$error_install)
-								{
-									Core_Message::show(Core::_('Market.install_success', $oModule->name));
+									// Устанавливаем сразу без опций модуля
+									$bInstall = TRUE;
 								}
 							}
 							else
 							{
-								Core_Message::show(Core::_('Market.installed', $oModule->name));
+								$bInstall = TRUE;
+							}
+
+							if ($bInstall)
+							{
+								// Копируем файлы из ./files/ в папку системы
+								$sFilesDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'files';
+								if (is_dir($sFilesDir))
+								{
+									try
+									{
+										Core_File::copyDir($sFilesDir, CMS_FOLDER);
+									}
+									catch (Exception $e)
+									{
+										$this->admin_view->addMessage(
+											Core_Message::get($e->getMessage(), 'error')
+										);
+									}
+								}
+
+								if (!$bErrorInstall)
+								{
+									try
+									{
+										// Размещаем SQL из описания обновления
+										$sSql = strval($oModule->sql);
+										$sSqlFilename = $this->tmpDir . '/' . $oModule->id . '.sql';
+										Core_File::write($sSqlFilename, html_entity_decode($sSql, ENT_COMPAT, 'UTF-8'));
+										$sSqlCode = html_entity_decode($sSql, ENT_COMPAT, 'UTF-8');
+										Sql_Controller::instance()->execute($sSqlCode);
+
+										// Размещаем PHP из описания обновления
+										$sPhp = strval($oModule->php);
+										$sPhpFilename = $this->tmpDir . '/' . $oModule->id . '.php';
+										Core_File::write($sPhpFilename, html_entity_decode($sPhp, ENT_COMPAT, 'UTF-8'));
+										include($sPhpFilename);
+
+										// Стандартный файл module.sql из поставки модуля
+										$sSqlModuleFilename = $this->tmpDir . DIRECTORY_SEPARATOR . 'module.sql';
+										if (is_file($sSqlModuleFilename))
+										{
+											$sSqlCode = Core_File::read($sSqlModuleFilename);
+											Sql_Controller::instance()->execute($sSqlCode);
+										}
+
+										// Стандартный файл module.php из поставки модуля
+										$sPhpModuleFilename = $this->tmpDir . DIRECTORY_SEPARATOR . 'module.php';
+										if (is_file($sPhpModuleFilename))
+										{
+											include($sPhpModuleFilename);
+										}
+
+										// Создаем модуль только при явном указании на это
+										if ($bCreateModule)
+										{
+											$oAdminModule = Core_Entity::factory('Module');
+											$oAdminModule
+												->name($oModule->name)
+												->description($oModule->description)
+												->active(1)
+												->indexing(1)
+												->path($oModule->path)
+												->save();
+
+											// install() для модуля, если есть
+											$oAdminModule->setupModule();
+										}
+									}
+									catch (Exception $e)
+									{
+										$this->admin_view->addMessage(
+											Core_Message::get($e->getMessage(), 'error')
+										);
+									}
+								}
+
+								$oAdminModule = Core_Entity::factory('Module')->getByPath($oModule->path, FALSE);
+								if (!$oAdminModule)
+								{
+									// Удаляем папку с файлами в случае с успешной установкой
+									is_dir($this->tmpDir) && Core_File::deleteDir($this->tmpDir);
+
+									// Если не было ошибок
+									if (!$bErrorInstall)
+									{
+										try
+										{
+											$this->admin_view->addMessage(
+												Core_Message::get(Core::_('Market.install_success', $oModule->name))
+											);
+
+											// Отправка отдельного письма автору модуля
+											/*Core_Mail::instance()
+												->to($oModule->author_email)
+												//->to('1@1.ru')
+												->from('no-reply@hostcms.ru')
+												->subject(Core::_('Market.mail_subject', $oModule->name))
+												->message(Core::_('Market.mail_message', $this->login, $oModule->name) . "\n" .
+													Core::_('Market.mail_message_license') . $this->contract . "\n" .
+													Core::_('Market.mail_message_date') . date("d.m.Y H:i:s")
+												)
+												->contentType('text/plain')
+												->header('X-HostCMS-Reason', 'MarketInstall')
+												->header('Precedence', 'bulk')
+												->send();*/
+										} catch (Exception $e) {}
+									}
+								}
+								else
+								{
+									$this->admin_view->addMessage(
+										Core_Message::get(Core::_('Market.installed', $oModule->name))
+									);
+								}
+
+								// Вывод списка
+								$this
+									->getMarket()
+									->showItemsList();
 							}
 						}
 					}
@@ -396,16 +743,63 @@ class Market_Controller extends Core_Servant_Properties
 				{
 					$sModuleName = $error < 10 ? 'Update' : 'Market';
 
-					Core_Message::show(Core::_($sModuleName . '.server_error_respond_' . $error), 'error');
+					$this->admin_view->addMessage(
+						Core_Message::get(Core::_($sModuleName . '.server_error_respond_' . $error), 'error')
+					);
 				}
 			}
+
+
 		}
 		catch (Exception $e)
 		{
-			Core_Message::show(Core::_('Market.server_error_respond_0'), 'error');
+			$this->admin_view->addMessage(
+				Core_Message::get(Core::_('Market.server_error_respond_0'), 'error')
+			);
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Get fields
+	 * @param array $array
+	 * @return array
+	 */
+	public function getFields(array $array)
+	{
+		$return = array();
+
+		// цикл по дереву 'fields'
+		foreach ($array as $aFieldsValue)
+		{
+			$tmp = array(
+				'Caption' => strval($aFieldsValue->caption),
+				'Type' => strval($aFieldsValue->attributes()->type),
+				'Value' => strval($aFieldsValue->value),
+				'Name' => strval($aFieldsValue->name),
+				'Path' => strval($aFieldsValue->path),
+				'Extension' => strval($aFieldsValue->extension),
+				'MaxWidth' => strval($aFieldsValue->max_width),
+				'MaxHeight' => strval($aFieldsValue->max_height),
+				'ListValue' => array()
+			);
+
+			$aXmlValues = $aFieldsValue->xpath("value/list");
+
+			// Значения для списка
+			if (count($aXmlValues))
+			{
+				foreach ($aXmlValues as $oXmlValue)
+				{
+					$tmp['ListValue'][strval($oXmlValue->attributes()->value)] = strval($oXmlValue);
+				}
+			}
+
+			$return[] = $tmp;
+		}
+
+		return $return;
 	}
 
 	/**
@@ -433,5 +827,191 @@ class Market_Controller extends Core_Servant_Properties
 			->execute();
 
 		return $Core_Http;
+	}
+
+	public function showItemsList()
+	{
+		$this->admin_view
+			->pageTitle(Core::_('Market.title'));
+
+		$oMainTab = Admin_Form_Entity::factory('Tab')->name('main');
+
+		ob_start();
+
+		if ($this->error == 0)
+		{
+			$aCategories = array();
+			$aCategories = $this->categories;
+
+			$aTmp = array(Core::_('Market.select_section'));
+
+			foreach($aCategories as $object)
+			{
+				$aTmp[$object->id] = $object->name;
+			}
+
+			$oMainTab->add(
+				Admin_Form_Entity::factory('Div')->class('row')->add(
+					Admin_Form_Entity::factory('Select')
+						->name('category_id')
+						->value($this->category_id)
+						->onchange('changeCategory(this)')
+						->options($aTmp)
+						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+				)
+			);
+
+			$sHtml = $this->getMarketItemsHtml();
+
+			$count_pages = ceil($this->total / $this->limit);
+
+			$oMainTab->add(
+				Admin_Form_Entity::factory('Div')->class('row')
+					->add(
+						Admin_Form_Entity::factory('Code')->html($sHtml)
+					)
+			);
+
+			if ($this->category_id && $count_pages > 1)
+			{
+				ob_start();
+
+				$this->controller
+					->limit($this->limit)
+					->setTotalCount($this->total)
+					//->showBottomActions(FALSE)
+					->pageNavigation();
+
+				$sFooter = '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' . ob_get_clean() . '</div>';
+
+				$oMainTab->add(
+					Admin_Form_Entity::factory('Div')->class('row')
+						->add(
+							Admin_Form_Entity::factory('Code')->html($sFooter)
+						)
+				);
+			}
+		}
+		else
+		{
+			// Показ ошибок
+			$this->admin_view
+				->addMessage(
+					Core_Message::get(Core::_('Update.server_error_respond_' . $this->error), 'error')
+				);
+		}
+
+		$sWindowId = $this->controller->getWindowId();
+		
+		$oAdmin_Form_Entity_Form = Admin_Form_Entity::factory('Form')
+			->controller($this->controller)
+			->action($this->controller->getPath())
+			->add($oMainTab)
+			->add(Admin_Form_Entity::factory('Code')
+				->html('<script type="text/javascript">
+				function changeCategory(object)
+				{
+					if (object && object.tagName == "SELECT")
+					{
+						category_id = parseInt(object.options[object.selectedIndex].value);
+						$.adminLoad({path: "/admin/market/index.php", windowId:"' . $sWindowId . '", additionalParams: "category_id=" + category_id});
+					}
+					return false;
+				}</script>')
+			)
+			->execute();
+
+		$this->admin_view
+			->content(ob_get_clean())
+			->show();
+	}
+
+	public function getMarketItemsHtml()
+	{
+		$sHtml = '<div class="market col-lg-12 col-md-12 col-sm-12 col-xs-12">';
+		foreach ($this->items as $object)
+		{
+			$sHtml .= $this->_getMarketItemHtml($object);
+		}
+		$sHtml .= '</div>';
+		
+		return $sHtml;
+	}
+	
+	protected function _getMarketItemHtml($object)
+	{
+		$sWindowId = $this->controller
+			? $this->controller->getWindowId()
+			: 'id_content';
+		
+		$sHtml = '<div class="col-lg-4 col-sm-6 col-xs-12 market-item">
+			<div class="databox databox-xlg databox-halved radius-bordered databox-shadowed databox-vertical">
+				<div class="databox-top bg-white padding-10">
+					<div class="col-lg-4 col-sm-4 col-xs-4">
+						<a target="_blank" href="' .  $object->url . '">
+							<img src="' . $object->image_small . '" style="width:75px; height:75px;" class="image-circular bordered-3 bordered-white" />
+						</a>
+					</div>
+					<div class="col-lg-8 col-sm-8 col-xs-8 text-align-left padding-10">
+						<span class="databox-header carbon no-margin"><a target="_blank" href="' .  $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
+						<span class="databox-text lightcarbon no-margin"> ' . htmlspecialchars($object->category_name) . ' </span>
+					</div>
+				</div>
+				<div class="databox-bottom bg-white no-padding">
+					<div class="databox-row row-4">
+						<div class="databox-cell cell-12 text-align-left">
+							<div class="databox-text darkgray"> ' . $object->description . '</div>
+						</div>
+					</div>
+					<div class="databox-row row-6">
+		';
+
+		if ($object->installed)
+		{
+			$sHtml .= '<div class="databox-row row-6 padding-10">
+					<span class="btn btn-labeled btn-default pull-right">
+						<i class="btn-label fa fa-check"></i>
+						' . Core::_('Market.installed') . '
+					</span>
+				</div>';
+		}
+		else
+		{
+			$sHtml .= '<div class="databox-row row-6 padding-10">
+
+				<div class="databox-cell cell-6 no-padding">
+					<div class="databox-text black"> ' . (floatval($object->price)
+						? round($object->price) . ' ' . $object->currency
+						: Core::_('Market.free')
+					) . ' </div>
+				</div>
+
+				<div class="databox-cell cell-6 no-padding">
+				';
+
+			if ($object->paid && !$object->installed || $object->price == 0)
+			{
+				$sHtml .= '
+					<a class="btn btn-labeled btn-darkorange pull-right" onclick="res =confirm(\'' . Core::_('Market.install_warning') . '\'); if (res){ $.adminLoad({path:\'/admin/market/index.php\',action:\'\',operation:\'\',additionalParams:\'install=' . $object->id . '&category_id=' . $this->category_id . '&current=' .  $this->page . '\',windowId:\'' . $sWindowId . '\'}); } return false"  href="/admin/market/index.php?hostcms[window]=' . $sWindowId . '&install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '">
+						<i class="btn-label fa fa-download"></i>
+						' . Core::_('Market.install') . '
+					</a>
+				';
+			}
+			else
+			{
+				$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' .  $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+			}
+
+			$sHtml .= '</div>
+			</div>';
+		}
+
+		$sHtml .= '</div>
+				</div>
+			</div>
+		</div>';
+
+		return $sHtml;
 	}
 }

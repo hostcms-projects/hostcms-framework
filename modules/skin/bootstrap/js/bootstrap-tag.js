@@ -118,6 +118,7 @@
 				$('#'+ windowId).data('that', that);
 
 				$.ajaxRequest({
+					loadingScreen: false,
 					path: '/admin/tag/index.php',
 					context: 'form-field-tags',
 					callBack: $.loadTagsListCallback,

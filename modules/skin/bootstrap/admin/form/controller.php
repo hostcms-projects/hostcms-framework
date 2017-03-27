@@ -16,7 +16,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show form content in administration center
 	 * @return self
 	 */
-	protected function _showFormContent()
+	public function showContent()
 	{
 		$aAdmin_Form_Fields = $this->_Admin_Form->Admin_Form_Fields->findAll();
 
@@ -66,7 +66,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						// Change to Font Awesome
 						if (strlen($oAdmin_Form_Field_Changed->ico))
 						{
-							$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field_Changed->ico) . '" title="' . $fieldName .  '" />';
+							$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field_Changed->ico) . '" title="' . $fieldName .  '"></i>';
 						}
 
 						$oAdmin_Form_Field_Changed->allow_sorting
@@ -313,7 +313,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 				$quotedDatasetKey = htmlspecialchars($datasetKey);
 				$escapedDatasetKey = Core_Str::escapeJavascriptVariable($this->jQueryEscape($datasetKey));
-				
+
 				$aDataFromDataset = $oAdmin_Form_Dataset->load();
 
 				if (!empty($aDataFromDataset))
@@ -328,7 +328,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 							// Экранируем ' в имени индексного поля, т.к. дальше это значение пойдет в JS
 							$quotedEntityKey = htmlspecialchars($entityKey);
 							$escapedEntityKey = Core_Str::escapeJavascriptVariable($this->jQueryEscape($entityKey));
-							
+
 							/*$entityKey = str_replace(
 								array("'", '%'),
 								array("\'", '\\%'),
@@ -394,20 +394,13 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 									$element_name = "apply_check_{$quotedDatasetKey}_{$quotedEntityKey}_fv_{$oAdmin_Form_Field_Changed->id}";
 
 									$sCheckSelector = "check_{$escapedDatasetKey}_{$escapedEntityKey}";
-									
+
 									// Отображения элементов полей, в зависимости от их типа.
 									switch ($oAdmin_Form_Field_Changed->type)
 									{
 										case 1: // Текст.
-											//trim($value) == '' && $value = '&nbsp;';
-
-											$class = 'dl';
-
-											$oAdmin_Form_Field_Changed->editable && $class .= ' editable';
-
-											?><div id="<?php echo $element_name?>"><div <?php echo !empty($width_value) ? 'style="width: ' . $width_value . '"' : '' ?> class="<?php echo $class?>"><?php
-											echo $this->applyFormat(nl2br($value), $oAdmin_Form_Field_Changed->format);
-											?></div></div><?php
+											?><span id="<?php echo $element_name?>"<?php echo 	$oAdmin_Form_Field_Changed->editable ? ' class="editable"' : ''?>><?php
+											echo $this->applyFormat(nl2br($value), $oAdmin_Form_Field_Changed->format)?></span><?php
 										break;
 										case 2: // Поле ввода.
 											?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>" onchange="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" class="form-control input-xs" /><?php
@@ -498,7 +491,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 												$this->_Admin_Language->id
 											);
 
-											$fieldName = $Admin_Word_Value
+											$fieldCaption = $Admin_Word_Value
 												? htmlspecialchars($Admin_Word_Value->name)
 												: "&mdash;";
 
@@ -521,7 +514,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											}
 											elseif (!isset($alt_array[$value]))
 											{
-												$alt_array[$value] = $fieldName;
+												$alt_array[$value] = $fieldCaption;
 											}
 
 											// Warning: 01-06-11 Создать отдельное поле в таблице в БД и в нем хранить title-ы
@@ -543,7 +536,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											}
 											elseif (!isset($title_array[$value]))
 											{
-												$title_array[$value] = $fieldName;
+												$title_array[$value] = $fieldCaption;
 											}
 
 											if (isset($value_array[$value]))
@@ -581,7 +574,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											// Отображаем картинку без ссылки
 											if (!is_null($ico))
 											{
-												?><i class="<?php echo htmlspecialchars($ico)?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>" /><?php
+												?><i class="<?php echo htmlspecialchars($ico)?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>"></i><?php
 											}
 											elseif (!is_null($src))
 											{
@@ -675,7 +668,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 								{
 									Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
 								}
-								
+
 								// Badges
 								$badgesMethodName = $fieldName . 'Badge';
 								if (method_exists($oEntity, $badgesMethodName)
@@ -813,7 +806,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show action panel in administration center
 	 * @return self
 	 */
-	protected function _bottomActions()
+	public function bottomActions()
 	{
 		// Строка с действиями
 		if ($this->_showBottomActions)
@@ -937,23 +930,11 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 		// При показе формы могут быть добавлены сообщения в message, поэтому message показывается уже после отработки формы
 		ob_start();
-		$this->_showFormContent();
-		?>
-		<div class="DTTTFooter">
-			<div class="row">
-				<div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-					<?php $this->_bottomActions()?>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-					<?php $this->_pageNavigation()?>
-				</div>
-			</div>
-		</div>
-		<?php
+		$this->showContent();
+		$this->showFooter();
 		$content = ob_get_clean();
 
 		ob_start();
-
 		$oAdmin_View
 			->content($content)
 			->message($this->getMessage())
@@ -964,13 +945,33 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		return ob_get_clean();
 	}
 
+	/**
+	 * Show form footer
+	 */
+	public function showFooter()
+	{
+		?>
+		<div class="DTTTFooter">
+			<div class="row">
+				<div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+					<?php $this->bottomActions()?>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+					<?php $this->pageNavigation()?>
+				</div>
+			</div>
+		</div>
+		<?php
+		return $this;
+	}
+
 	protected $_pageNavigationDelta = 2;
 
 	/**
 	 * Показ строки ссылок
 	 * @return self
 	 */
-	protected function _pageNavigation()
+	public function pageNavigation()
 	{
 		$total_count = $this->getTotalCount();
 		$total_page = $total_count / $this->_limit;

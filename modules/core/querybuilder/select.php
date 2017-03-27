@@ -194,11 +194,12 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	 * <code>
 	 * $oCore_QueryBuilder_Select = Core_QueryBuilder::select()->sqlCalcFoundRows();
 	 * </code>
+	 * @param boolean $value
 	 * @return Core_QueryBuilder_Select
 	 */
-	public function sqlCalcFoundRows()
+	public function sqlCalcFoundRows($value = TRUE)
 	{
-		$this->_sqlCalcFoundRows = TRUE;
+		$this->_sqlCalcFoundRows = $value ? TRUE : NULL;
 		return $this;
 	}
 
@@ -432,7 +433,7 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	 * Offset compatibility with PostgreSQL, default TRUE
 	 * @var boolean
 	 */
-	protected $_offsetPostgreSQLSyntax = TRUE; 
+	protected $_offsetPostgreSQLSyntax = TRUE;
 
 	/**
 	 * Offset compatibility with PostgreSQL, default TRUE
@@ -574,16 +575,6 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	public function clearFrom()
 	{
 		$this->_from = array();
-		return $this;
-	}
-
-	/**
-	 * Clear ORDER BY
-	 * @return Core_QueryBuilder_Select
-	 */
-	public function clearOrderBy()
-	{
-		$this->_orderBy = array();
 		return $this;
 	}
 

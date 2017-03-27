@@ -85,6 +85,15 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get object
+	 * @return Core_Entity
+	 */
+	public function getObject()
+	{
+		return $this->_object;
+	}
+
+	/**
 	 * Dataset ID
 	 * @var int
 	 */
@@ -194,6 +203,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param int $parent_id ID of parent directory of properties
 	 * @param object $parentObject
 	 * @hostcms-event Property_Controller_Tab.onBeforeAddFormEntity
+	 * @hostcms-event Property_Controller_Tab.onAfterCreatePropertyListValues
 	 */
 	protected function _setPropertyDirs($parent_id = 0, $parentObject)
 	{
@@ -306,6 +316,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								$oAdmin_Form_Entity = Admin_Form_Entity::factory('Select')
 									->options($aOptions);
 
+								Core_Event::notify('Property_Controller_Tab.onAfterCreatePropertyListValues', $this, array($oProperty, $oAdmin_Form_Entity));
+
 								unset($aOptions);
 							}
 						break;
@@ -366,7 +378,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 							$oProperty->multiple && $this->_imgBox($oAdmin_Form_Entity, $oProperty);
 
-							Core_Event::notify(get_class($this) . '.onBeforeAddFormEntity', $this, array($oAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
+							Core_Event::notify('Property_Controller_Tab.onBeforeAddFormEntity', $this, array($oAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
 						}
 						else
 						{
@@ -437,7 +449,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 									->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 									->id("property_{$oProperty->id}_{$oProperty_Value->id}");
 
-								Core_Event::notify(get_class($this) . '.onBeforeAddFormEntity', $this, array($oNewAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
+								Core_Event::notify('Property_Controller_Tab.onBeforeAddFormEntity', $this, array($oNewAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
 
 								$oAdmin_Form_Entity_Section->add(
 									Admin_Form_Entity::factory('Div')

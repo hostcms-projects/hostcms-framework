@@ -20,7 +20,7 @@ class Core_Password
 	 * @param int $fuzzy cмазанность (0-10), по умолчанию 3
 	 * @return string
 	 */
-	static public function get($len = 8, $prefix = '', $fuzzy = 3)
+	static public function get($len = 10, $prefix = '', $fuzzy = 3)
 	{
 		$len %= 50;
 		$fuzzy %= 11;
@@ -48,13 +48,17 @@ class Core_Password
 
 		$aRange = range('a', 'z');
 
-		$return = mb_strtolower(preg_replace('/[^a-zA-Z0-9]/', '', mb_substr($prefix, 0, $len - 1))) || $return=$aRange[rand(0, count($aRange) - 1)];
-
-		while(mb_strlen($return) < $len)
+		$return = strlen($prefix)
+			? strtolower(preg_replace('/[^a-zA-Z0-9]/', '', substr($prefix, 0, $len - 1)))
+			: $aRange[rand(0, count($aRange) - 1)];
+		
+		while(strlen($return) < $len)
 		{
 			$tmpFuzzy = $fuzzy;
-			while(mb_substr_count($return, mb_substr($return, mb_strlen($return) - 1,1) .
-			($k = mb_substr($aRangeAlphabet[mb_substr($return, mb_strlen($return) - 1,1)], rand(0, $tmpFuzzy % 11), 1))))
+			while(
+				substr_count($return, substr($return, strlen($return) - 1, 1) .
+				($k = substr($aRangeAlphabet[substr($return, strlen($return) - 1, 1)], rand(0, $tmpFuzzy % 11), 1)))
+			)
 
 			if (++$tmpFuzzy > 10)
 			{

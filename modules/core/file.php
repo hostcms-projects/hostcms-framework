@@ -813,7 +813,7 @@ class Core_File
 			: TRUE;
 
 		// Проверка на доступность разрешения для уменьшения
-		if (!self::isValidExtension($large_image_name, self::$resizeExtensions)
+		if (!self::isValidExtension($large_image_target, self::$resizeExtensions)
 			|| $small_image_source != '')
 		{
 			$create_small_image_from_large = FALSE;
@@ -875,7 +875,7 @@ class Core_File
 		// Задан файл-источник большого изображения
 		if ($large_image_source != '')
 		{
-			if (self::isValidExtension($large_image_name, $aCore_Config['availableExtension']))
+			if (self::isValidExtension($large_image_target, $aCore_Config['availableExtension']))
 			{
 				$large_image_created = TRUE;
 				$small_image_created = TRUE;
@@ -999,7 +999,7 @@ class Core_File
 			// Не создаем большое изображение из малого
 			$create_large_image = FALSE;
 
-			if (self::isValidExtension($small_image_name, $aCore_Config['availableExtension']))
+			if (self::isValidExtension($small_image_target, $aCore_Config['availableExtension']))
 			{
 				self::upload($small_image_source, $small_image_target);
 

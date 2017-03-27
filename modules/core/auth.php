@@ -57,10 +57,6 @@ class Core_Auth
 					->status(Core_Log::$ERROR)
 					->write(Core::_('Core.error_log_attempt_to_access', $sModuleName));
 
-				header("Pragma: no-cashe");
-				header("WWW-authenticate: basic realm='HostCMS'");
-				header("HTTP/1.0 401 Unauthorized");
-
 				// Нужен старт сессии, чтобы записать в нее HOSTCMS_HTTP_AUTH_FLAG
 				if (@session_id() == '')
 				{
@@ -70,20 +66,40 @@ class Core_Auth
 				// Флаг начала HTTP-авторизации
 				$_SESSION['HOSTCMS_HTTP_AUTH_FLAG'] = TRUE;
 
-				ob_start();
-				?><h1><?php echo Core::_('Core.error_log_access_was_denied', $sModuleName)?></h1><?php
-				$content = ob_get_clean();
+				$oCore_Response = new Core_Response();
+
+				$oCore_Response
+					->status(401)
+					->header('Pragma', "no-cashe")
+					->header('WWW-authenticate', "basic realm='HostCMS'")
+					->header('Content-Type', "text/html; charset=UTF-8")
+					->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . ' GMT')
+					->header('X-Powered-By', 'HostCMS');
 
 				// Выводим страницу, которая отобразится, если пользователь нажмет "Отмена"
 				$title = Core::_('Core.error_log_access_was_denied', $sModuleName);
 
-				$oAdmin_Answer = Core_Skin::instance()->answer();
-				$oAdmin_Answer
-					->ajax(Core_Array::getRequest('_', FALSE))
-					->content($content)
-					->message($message)
+				ob_start();
+				$oSkin = Core_Skin::instance()
 					->title($title)
+					->setMode('authorization')
+					->header();
+
+				Core::factory('Core_Html_Entity_Div')
+					->class('indexMessage')
+					->add(Core::factory('Core_Html_Entity_H1')->value($title))
+					/*->add(Core::factory('Core_Html_Entity_P')->value(
+						Core::_('Core.getting_key')
+					))*/
 					->execute();
+
+				$oSkin->footer();
+
+				$oCore_Response->body(ob_get_clean());
+
+				$oCore_Response
+					->sendHeaders()
+					->showBody();
 
 				exit();
 			}
@@ -134,6 +150,8 @@ class Core_Auth
 				exit();
 			}
 
+			$oUser->updateLastActivity();
+			
 			$aHostCMS = Core_Array::getRequest('hostcms', array());
 
 		}
@@ -403,14 +421,14 @@ class Core_Auth
 			}
 
 			// Записываем ID пользователя
-			$_SESSION["current_users_id"] = $oUser->id;
-			$_SESSION["valid_user"] = $oUser->login;
-			$_SESSION["date_user"] = date("d.m.Y H:i:s");
-			$_SESSION["is_superuser"] = $oUser->superuser;
+			$_SESSION['current_users_id'] = $oUser->id;
+			$_SESSION['valid_user'] = $oUser->login;
+			$_SESSION['date_user'] = date('d.m.Y H:i:s');
+			$_SESSION['is_superuser'] = $oUser->superuser;
 
 			if ($assignSessionToIp)
 			{
-				$_SESSION["current_user_ip"] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
+				$_SESSION['current_user_ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
 			}
 
 			Core_Log::instance()->clear()
@@ -427,7 +445,7 @@ class Core_Auth
 				->setOr()
 				->where('ip', '=', Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1'));
 
-			$aUser_Accessdenieds = $oUser_Accessdenied->findAll();
+			$aUser_Accessdenieds = $oUser_Accessdenied->findAll(FALSE);
 			foreach ($aUser_Accessdenieds as $oUser_Accessdenied)
 			{
 				$oUser_Accessdenied->delete();

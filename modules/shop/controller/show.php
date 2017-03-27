@@ -222,7 +222,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems
-			= $this->taxes = $this->cart = FALSE;
+			= $this->taxes = $this->cart = $this->modifications = $this->modificationsList = $this->filterShortcuts = FALSE;
 
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
 			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
@@ -517,8 +517,12 @@ class Shop_Controller_Show extends Core_Controller
 				$oShop_Item = Core_Entity::factory('Shop_Item')->find($shop_item_id);
 				if (!is_null($oShop_Item->id))
 				{
+					$this->applyItemsForbiddenTags($oShop_Item);
+
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-					$oFavouriteEntity->addEntity($oShop_Item->clearEntities()->showXmlBonuses($this->bonuses));
+					$this->bonuses && $oShop_Item->showXmlBonuses($this->bonuses);
+
+					$oFavouriteEntity->addEntity($oShop_Item);
 				}
 			}
 		}
@@ -569,10 +573,13 @@ class Shop_Controller_Show extends Core_Controller
 
 				if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item && $oShop_Item->active)
 				{
+					$this->applyItemsForbiddenTags($oShop_Item);
+
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 					$this->comments && $oShop_Item->showXmlComments($this->comments);
+					$this->bonuses && $oShop_Item->showXmlBonuses($this->bonuses);
 
-					$oViewedEntity->addEntity($oShop_Item->clearEntities()->showXmlBonuses($this->bonuses));
+					$oViewedEntity->addEntity($oShop_Item);
 				}
 			}
 		}
@@ -593,6 +600,27 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		return FALSE;
+	}
+
+	/**
+	 * Set offset and limit
+	 * @return self
+	 */
+	protected function _setLimits()
+	{
+		// Load model columns BEFORE FOUND_ROWS()
+		Core_Entity::factory('Shop_Item')->getTableColums();
+
+		// Load user BEFORE FOUND_ROWS()
+		Core_Entity::factory('User', 0)->getCurrent();
+
+		$this->_Shop_Items
+			->queryBuilder()
+			->sqlCalcFoundRows()
+			->offset(intval($this->offset))
+			->limit(intval($this->limit));
+
+		return $this;
 	}
 
 	/**
@@ -694,17 +722,7 @@ class Shop_Controller_Show extends Core_Controller
 
 			if (!$this->item)
 			{
-				// Load model columns BEFORE FOUND_ROWS()
-				Core_Entity::factory('Shop_Item')->getTableColums();
-
-				// Load user BEFORE FOUND_ROWS()
-				$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
-
-				$this->_Shop_Items
-					->queryBuilder()
-					->sqlCalcFoundRows()
-					->offset(intval($this->offset))
-					->limit(intval($this->limit));
+				$this->_setLimits();
 			}
 
 			$aShop_Items = $this->_Shop_Items->findAll();
@@ -819,7 +837,11 @@ class Shop_Controller_Show extends Core_Controller
 				// Shortcut
 				$iShortcut = $oShop_Item->shortcut_id;
 
-				$iShortcut && $oShop_Item = $oShop_Item->Shop_Item;
+				if ($iShortcut)
+				{
+					$oShortcut_Item = $oShop_Item;
+					$oShop_Item = $oShop_Item->Shop_Item;
+				}
 
 				// Ярлык может ссылаться на отключенный товар
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
@@ -841,9 +863,22 @@ class Shop_Controller_Show extends Core_Controller
 				)
 				{
 					// ID оригинального ярлыка
-					$iShortcut && $oShop_Item->addEntity(
-						Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
-					);
+					if ($iShortcut)
+					{
+						$oShop_Item
+							->addForbiddenTag('shortcut_id')
+							->addForbiddenTag('shop_group_id')
+							->addEntity(
+								Core::factory('Core_Xml_Entity')
+									->name('shortcut_id')
+									->value($oShortcut_Item->id)
+							)
+							->addEntity(
+								Core::factory('Core_Xml_Entity')
+									->name('shop_group_id')
+									->value($oShortcut_Item->shop_group_id)
+							);
+					}
 
 					$this->applyItemsForbiddenTags($oShop_Item);
 
@@ -1037,6 +1072,33 @@ class Shop_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Disable shortcuts
+	 * @return self
+	 */
+	protected function forbidSelectShortcuts()
+	{
+		// Отключаем выбор ярлыков из текущей группы
+		$this->_Shop_Items
+			->queryBuilder()
+			->where('shop_items.shortcut_id', '=', 0);
+
+		return $this;
+	}
+
+	/**
+	 * External forbids to select modifications. Do not execute with ->modificationsList(TRUE)
+	 * @return self
+	 */
+	public function forbidSelectModifications()
+	{
+		$this->_Shop_Items
+			->queryBuilder()
+			->where('shop_items.modification_id', '=', 0);
+
+		return $this;
+	}
+
+	/**
 	 * Set item's condition by shop_group_id
 	 * @return self
 	 */
@@ -1051,17 +1113,11 @@ class Shop_Controller_Show extends Core_Controller
 			->open()
 			->where('shop_items.shop_group_id', '=', $shop_group_id);
 
-		// Отключаем выбор ярлыков из текущей группы
-		$this->filterShortcuts && $this->_Shop_Items
-			->queryBuilder()
-			->where('shop_items.shortcut_id', '=', 0);
+		// Отключаем выбор ярлыков
+		$this->filterShortcuts && $this->forbidSelectShortcuts();
 
-		if (!$this->_selectModifications)
-		{
-			$this->_Shop_Items
-				->queryBuilder()
-				->where('shop_items.modification_id', '=', 0);
-		}
+		// Отключаем выбор модификаций
+		!$this->_selectModifications && $this->forbidSelectModifications();
 
 		// Вывод модификаций на одном уровне в списке товаров
 		if (!$this->item && $this->modificationsList)
@@ -1209,6 +1265,7 @@ class Shop_Controller_Show extends Core_Controller
 
 					$this->_applyItemConditions($oShop_Items);
 
+					//$this->forbidSelectModifications();
 					$oShop_Items->queryBuilder()->where('shop_items.modification_id', '=', 0);
 
 					$oShop_Item = $oShop_Items->getByGroupIdAndPath($this->group, $sPath);
@@ -1269,18 +1326,7 @@ class Shop_Controller_Show extends Core_Controller
 		return $this;
 	}
 
-	/**
-	 * External forbids to select modifications. Do not execute with ->modificationsList(TRUE)
-	 * @return self
-	 */
-	public function forbidSelectModifications()
-	{
-		$this->_Shop_Items
-			->queryBuilder()
-			->where('shop_items.modification_id', '=', 0);
 
-		return $this;
-	}
 
 	/**
 	 * Define handler for 404 error
@@ -1319,7 +1365,23 @@ class Shop_Controller_Show extends Core_Controller
 				$oCore_Page->template($oStructure->Template);
 			}
 
-			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
+			if ($oStructure->type == 2)
+			{
+				$oCore_Page->libParams
+					= $oStructure->Lib->getDat($oStructure->id);
+
+				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
+
+				if (is_file($LibConfig) && is_readable($LibConfig))
+				{
+					include $LibConfig;
+				}
+			}
+
+			$oCore_Page
+				->structure($oStructure)
+				->addChild($oStructure->getRelatedObjectByType());
+
 			$oStructure->setCorePageSeo($oCore_Page);
 
 			// Если уже идет генерация страницы, то добавленный потомок не будет вызван

@@ -271,8 +271,8 @@ body.body-authorization footer a {
 
 body.body-authorization .indexMessage, .installContent {
 	position: absolute;
-	width: 60%;
-	left: 50%;
+	width: 80%;
+	left: 40%;
 	top: 10%;
 	margin: 0 0 0 -30%;
 	padding: 30px;
@@ -464,8 +464,7 @@ h1.row-title .fa, h2.row-title .fa, h3.row-title .fa, h4.row-title .fa, h5.row-t
 
 /* Картинка Фон 1 */
 body.hostcms-bootstrap1:before {
-	background: url("/modules/skin/bootstrap/img/bg.jpg") repeat top center #EEE6CF;
-	/*background-position: top center;*/
+	background: #eee6cf url("/modules/skin/bootstrap/img/bg.jpg") repeat scroll center top / cover;
 }
 /*.hostcms-bootstrap1 .page-sidebar,*/
 .hostcms-bootstrap1 .page-breadcrumbs,
@@ -1300,18 +1299,6 @@ div.inactive, .line-through {text-decoration: line-through}
 
 .pagination{clear:both;padding-top:15px}
 
-/* Market */
-.market a.price:visited,.market a.price:link,.market a.price:hover,.market a.install:visited,.market a.install:link,.market a.install:hover,.market-item-installed{text-decoration:none;padding:5px 10px;display:block;background-color:#B0AEAE;float:left;color:#FFF;font-weight:bold}
-.market a.install:visited,.market a.install:link,.market a.install:hover{background-color:#6DBE45}
-.market-item {height:145px;overflow: hidden;padding: 20px }
-.market-item .market-item-title {padding:0 0 5px 0;display:block;font-size:14pt;font-weight:300;margin-top:5px}
-.market-item .market-item-title a {color: #333}
-.market-item .market-item-category {padding:0 0 5px 0;display:block;font-size:8pt;color:#898686}
-.market-item-image {min-width: 130px; float: left }
-.market-item-image img { border-radius: 50px; border: 1px solid #eee; background-color: #FFF }
-.market-item-installed {cursor:default;background-color:#F3AE00}
-/* /Market */
-
 /* oneps */
 .oneps_patch p{text-align: justify;margin: 5px 15px 5px 0px;}
 .oneps_patch img{margin: 0px 5px 0px 0px;}
@@ -1759,3 +1746,23 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 	cursor: pointer;
 }
 /* --- /Notes --- */
+
+/* --- Market --- */
+.market-item  .databox .databox-header {
+	font-size: 15px;
+	font-weight: 800;
+}
+
+/* --- Badge --- */
+td.td-badge	{ background-clip: padding-box; position: relative; padding-top: 12px !important; padding-left: 8px !important; }
+.badge-ico {
+    border-radius: 10px !important;
+    font-size: 9px !important;
+    height: auto;
+    left: 1px;
+    opacity: 0.6;
+    padding: 3px;
+    position: absolute;
+    top: 4px;
+    width: 16px;
+}

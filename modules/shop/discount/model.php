@@ -44,7 +44,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	 * @var int
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
@@ -106,7 +106,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 		return parent::delete($primaryKey);
 	}
-	
+
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
@@ -122,5 +122,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 			: $this->addXmlTag('amount', $this->value);
 
 		return parent::getXml();
-	}	
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function valueBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		echo $this->type == 0
+			? '%'
+			: ' ' . $this->Shop->Shop_Currency->name;
+	}
 }

@@ -257,57 +257,78 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 					// Arrays with default values
 					$aPaidAmount = $aPaid = $aOrderedAmount = $aOrdered;
 
+					$limit = 100;
+					$offset = 0;
+
 					// Ordered
-					$oShop_Orders = Core_Entity::factory('Shop_Order');
-					$oShop_Orders
-						->queryBuilder()
-						->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
-						->where('shops.site_id', '=', CURRENT_SITE)
-						->where('shop_orders.datetime', '>=', date('Y-m-d 00:00:00', $iBeginTimestamp))
-						->where('shop_orders.datetime', '<=', $sEndTimestamp)
-						->clearOrderBy()
-						->orderBy('datetime', 'ASC');
+					do {
+						$oShop_Orders = Core_Entity::factory('Shop_Order');
+						$oShop_Orders
+							->queryBuilder()
+							->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
+							->where('shops.site_id', '=', CURRENT_SITE)
+							->where('shop_orders.datetime', '>=', date('Y-m-d 00:00:00', $iBeginTimestamp))
+							->where('shop_orders.datetime', '<=', $sEndTimestamp)
+							->offset($offset)
+							->limit($limit)
+							->clearOrderBy()
+							->orderBy('datetime', 'ASC');
 
-					$aShop_Orders = $oShop_Orders->findAll(FALSE);
-					foreach ($aShop_Orders as $oShop_Order)
-					{
-						$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->datetime));
-						$aOrdered[$sDate]++;
+						$aShop_Orders = $oShop_Orders->findAll(FALSE);
 
-						$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
-							? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
-								$oShop_Order->Shop_Currency, $oDefault_Currency
-							)
-							: 0;
+						foreach ($aShop_Orders as $oShop_Order)
+						{
+							$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->datetime));
+							$aOrdered[$sDate]++;
 
-						$aOrderedAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+							$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
+								? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+									$oShop_Order->Shop_Currency, $oDefault_Currency
+								)
+								: 0;
+
+							$aOrderedAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+						}
+
+						$offset += $limit;
 					}
+					while (count($aShop_Orders));
 
+					$offset = 0;
+					
 					// Paid
-					$oShop_Orders = Core_Entity::factory('Shop_Order');
-					$oShop_Orders
-						->queryBuilder()
-						->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
-						->where('shops.site_id', '=', CURRENT_SITE)
-						->where('shop_orders.payment_datetime', '>=', date('Y-m-d 00:00:00', $iBeginTimestamp))
-						->where('shop_orders.paid', '=', 1)
-						->clearOrderBy()
-						->orderBy('payment_datetime', 'ASC');
+					do {
+						$oShop_Orders = Core_Entity::factory('Shop_Order');
+						$oShop_Orders
+							->queryBuilder()
+							->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
+							->where('shops.site_id', '=', CURRENT_SITE)
+							->where('shop_orders.payment_datetime', '>=', date('Y-m-d 00:00:00', $iBeginTimestamp))
+							->where('shop_orders.paid', '=', 1)
+							->offset($offset)
+							->limit($limit)
+							->clearOrderBy()
+							->orderBy('payment_datetime', 'ASC');
 
-					$aShop_Orders = $oShop_Orders->findAll(FALSE);
-					foreach ($aShop_Orders as $oShop_Order)
-					{
-						$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->payment_datetime));
-						$aPaid[$sDate]++;
+						$aShop_Orders = $oShop_Orders->findAll(FALSE);
 
-						$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
-							? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
-								$oShop_Order->Shop_Currency, $oDefault_Currency
-							)
-							: 0;
+						foreach ($aShop_Orders as $oShop_Order)
+						{
+							$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->payment_datetime));
+							$aPaid[$sDate]++;
 
-						$aPaidAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+							$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
+								? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+									$oShop_Order->Shop_Currency, $oDefault_Currency
+								)
+								: 0;
+
+							$aPaidAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+						}
+
+						$offset += $limit;
 					}
+					while (count($aShop_Orders));
 
 					?><div class="dashboard-box">
 						<div class="box-header">

@@ -135,4 +135,44 @@ class Core_Date
 	{
 		return date(Core::$mainConfig['dateTimeFormat'], $timestamp);
 	}
+
+	/**
+	 * Convert seconds to string (seconds, minutes, hours, days or years). If NULL return empty string
+	 * @param int $time
+	 * @return string
+	 */
+	static public function time2string($time)
+	{
+		if (is_null($time))
+		{
+			$sLastMessageTime = '';
+		}
+		// Секунды
+		elseif ($time >= 0 && $time < 60)
+		{
+			$sLastMessageTime = $time . ' с.';
+		}
+		// Минуты
+		elseif ($time >= 60 && $time < 60 * 60)
+		{
+			$sLastMessageTime = floor($time / 60) . ' м.';
+		}
+		// Часы
+		elseif ($time >= 60 * 60 && $time < 60 * 60 * 24)
+		{
+			$sLastMessageTime = floor($time / 60 / 60) . ' ч.';
+		}
+		// Дни
+		elseif ($time >= 60 * 60 * 24 && $time < 60 * 60 * 24 * 365)
+		{
+			$sLastMessageTime = floor($time / 60 / 60/ 24) . ' д.';
+		}
+		// Годы
+		else
+		{
+			$sLastMessageTime = floor($time / 60 / 60 / 24 / 365) . ' г.';
+		}
+
+		return $sLastMessageTime;
+	}
 }

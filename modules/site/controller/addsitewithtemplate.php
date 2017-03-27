@@ -405,12 +405,12 @@ class Site_Controller_addSiteWithTemplate extends Admin_Form_Action_Controller_T
 						try
 						{
 							Core_File::copyDir($Site_Controller_Template->templatePath . 'template', CMS_FOLDER);
-							Core_Message::show(Core::_('install.template_files_copy_success'));
+							Core_Message::show(Core::_('site.template_files_copy_success'));
 						}
 						catch (Exception $e)
 						{
 							Core_Message::show($e->getMessage(), 'error');
-							Core_Message::show(Core::_('install.template_files_copy_error'), 'error');
+							Core_Message::show(Core::_('site.template_files_copy_error'), 'error');
 						}
 					}
 

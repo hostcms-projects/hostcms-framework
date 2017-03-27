@@ -390,6 +390,27 @@ class Informationsystem_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Set offset and limit
+	 * @return self
+	 */
+	protected function _setLimits()
+	{
+		// Load model columns BEFORE FOUND_ROWS()
+		Core_Entity::factory('Informationsystem_Item')->getTableColums();
+
+		// Load user BEFORE FOUND_ROWS()
+		Core_Entity::factory('User', 0)->getCurrent();
+
+		$this->_Informationsystem_Items
+			->queryBuilder()
+			->sqlCalcFoundRows()
+			->offset(intval($this->offset))
+			->limit(intval($this->limit));
+			
+		return $this;
+	}
+	
+	/**
 	 * Show built data
 	 * @return self
 	 * @hostcms-event Informationsystem_Controller_Show.onBeforeRedeclaredShow
@@ -449,17 +470,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 			if (!$this->item)
 			{
-				// Load model columns BEFORE FOUND_ROWS()
-				Core_Entity::factory('Informationsystem_Item')->getTableColums();
-
-				// Load user BEFORE FOUND_ROWS()
-				Core_Entity::factory('User', 0)->getCurrent();
-
-				$this->_Informationsystem_Items
-					->queryBuilder()
-					->sqlCalcFoundRows()
-					->offset(intval($this->offset))
-					->limit(intval($this->limit));
+				$this->_setLimits();
 			}
 
 			$aInformationsystem_Items = $this->_Informationsystem_Items->findAll();
@@ -583,7 +594,11 @@ class Informationsystem_Controller_Show extends Core_Controller
 				// Shortcut
 				$iShortcut = $oInformationsystem_Item->shortcut_id;
 
-				$iShortcut && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
+				if ($iShortcut)
+				{
+					$oShortcut_Item = $oInformationsystem_Item;
+					$oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
+				}
 
 				// Ярлык может ссылаться на отключенный элемент
 				$desiredActivity = strtolower($this->itemsActivity) == 'active'
@@ -596,9 +611,22 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$oInformationsystem_Item->clearEntities();
 
 				// ID оригинального ярлыка
-				$iShortcut && $oInformationsystem_Item->addEntity(
-					Core::factory('Core_Xml_Entity')->name('shortcut_id')->value($iShortcut)
-				);
+				if ($iShortcut)
+				{
+					$oInformationsystem_Item
+						->addForbiddenTag('shortcut_id')
+						->addForbiddenTag('informationsystem_group_id')
+						->addEntity(
+							Core::factory('Core_Xml_Entity')
+								->name('shortcut_id')
+								->value($oShortcut_Item->id)
+						)
+						->addEntity(
+							Core::factory('Core_Xml_Entity')
+								->name('informationsystem_group_id')
+								->value($oShortcut_Item->informationsystem_group_id)
+						);
+				}
 
 				if ($oInformationsystem_Item->active == $desiredActivity
 					&& (!$iShortcut
@@ -876,7 +904,23 @@ class Informationsystem_Controller_Show extends Core_Controller
 				$oCore_Page->template($oStructure->Template);
 			}
 
-			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
+			if ($oStructure->type == 2)
+			{
+				$oCore_Page->libParams
+					= $oStructure->Lib->getDat($oStructure->id);
+
+				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
+
+				if (is_file($LibConfig) && is_readable($LibConfig))
+				{
+					include $LibConfig;
+				}
+			}
+
+			$oCore_Page
+				->structure($oStructure)
+				->addChild($oStructure->getRelatedObjectByType());
+
 			$oStructure->setCorePageSeo($oCore_Page);
 
 			// Если уже идет генерация страницы, то добавленный потомок не будет вызван

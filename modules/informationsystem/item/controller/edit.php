@@ -784,36 +784,49 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$array_text = Core_Str::getHashes(Core_Array::getPost('name') . Core_Array::getPost('description') . ' ' . Core_Array::getPost('text', ''), array('hash_function' => 'crc32'));
 				$array_text = array_unique($array_text);
 
-				// Получаем список меток
-				$aTags = Core_Entity::factory('Tag')->findAll();
-
 				$coeff_intersect = array ();
 
-				foreach($aTags as $oTag)
-				{
-					// Получаем хэш тэга
-					$array_tags = Core_Str::getHashes($oTag->name, array('hash_function' => 'crc32'));
+				$offset = 0;
+				$limit = 100;
 
-					// Получаем коэффициент схожести текста элемента с тэгом
-					$array_tags = array_unique($array_tags);
+				do {
+					$oTags = Core_Entity::factory('Tag');
 
-					// Текст метки меньше текста инфоэлемента, т.к. должна входить метка в текст инфоэлемента, а не наоборот
-					if (count($array_text) >= count($array_tags))
+					$oTags->queryBuilder()
+						->offset($offset)
+						->limit($limit);
+ 
+					// Получаем список меток
+					$aTags = $oTags->findAll(FALSE);
+
+					foreach($aTags as $oTag)
 					{
-						// Расчитываем пересечение
-						$intersect = count(array_intersect($array_text, $array_tags));
+						// Получаем хэш тэга
+						$array_tags = Core_Str::getHashes($oTag->name, array('hash_function' => 'crc32'));
 
-						$coefficient = count($array_tags) != 0
-							? $intersect / count($array_tags)
-							: 0;
+						// Получаем коэффициент схожести текста элемента с тэгом
+						$array_tags = array_unique($array_tags);
 
-						// Найдено полное вхождение
-						if ($coefficient == 1 && !in_array($oTag->id, $coeff_intersect))
+						// Текст метки меньше текста инфоэлемента, т.к. должна входить метка в текст инфоэлемента, а не наоборот
+						if (count($array_text) >= count($array_tags))
 						{
-							$coeff_intersect[] = $oTag->id;
+							// Расчитываем пересечение
+							$intersect = count(array_intersect($array_text, $array_tags));
+
+							$coefficient = count($array_tags) != 0
+								? $intersect / count($array_tags)
+								: 0;
+
+							// Найдено полное вхождение
+							if ($coefficient == 1 && !in_array($oTag->id, $coeff_intersect))
+							{
+								$coeff_intersect[] = $oTag->id;
+							}
 						}
 					}
+					$offset += $limit;
 				}
+				while (count($aTags));
 			}
 
 			// Автоматическое применение ключевых слов

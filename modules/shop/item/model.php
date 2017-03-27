@@ -872,6 +872,7 @@ class Shop_Item_Model extends Core_Entity
 
 		$oShop_ItemShortcut->shop_id = $object->shop_id;
 		$oShop_ItemShortcut->shortcut_id = $object->id;
+		$oShop_ItemShortcut->datetime = $object->datetime;
 		$oShop_ItemShortcut->name = ''/*$object->name*/;
 		$oShop_ItemShortcut->type = $object->type;
 		$oShop_ItemShortcut->path = '';
@@ -893,7 +894,7 @@ class Shop_Item_Model extends Core_Entity
 	{
 		$sPath = ($this->path == ''
 			? $this->id
-			: $this->path) . '/';
+			: rawurlencode($this->path)) . '/';
 
 		if ($this->modification_id == 0)
 		{
@@ -2050,5 +2051,73 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function relatedBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Shop_Item_Associateds->getCount();
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-azure white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function modificationsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Modifications->getCount();
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-darkorange white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function discountsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$countDiscount = $this->Shop_Item_Discounts->getCount();
+		$countBonuses = $this->Shop_Item_Bonuses->getCount();
+
+		$count = $countDiscount + $countBonuses;
+
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-palegreen white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function reviewsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Comments->getCount();
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
 	}
 }

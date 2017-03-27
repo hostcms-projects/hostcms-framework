@@ -80,7 +80,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 		foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)
 		{
 			// Определяем коэффициент пересчета
-			$fCoefficient = $oShop_Purchase_Discount->shop_currency_id > 0 && $this->_shop->shop_currency_id > 0
+			$fCoefficient = $oShop_Purchase_Discount->Shop_Currency->id > 0 && $this->_shop->Shop_Currency->id > 0
 				? $oShop_Controller->getCurrencyCoefficientInShopCurrency(
 					$oShop_Purchase_Discount->Shop_Currency, $this->_shop->Shop_Currency
 				)

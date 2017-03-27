@@ -83,6 +83,17 @@ class Admin_Form_Controller
 		$this->_additionalParams .= '&' . htmlspecialchars($key) . '=' . rawurlencode($value);
 		return $this;
 	}
+	
+	/**
+	 * Set additional param
+	 * @param string $key param name
+	 * @return self
+	 */
+	public function setAdditionalParam($value)
+	{
+		$this->_additionalParams = $value;
+		return $this;
+	}
 
 	/**
 	 * Form setup
@@ -322,6 +333,7 @@ class Admin_Form_Controller
 	 * Add entity
 	 * @param Admin_Form_Entity $oAdmin_Form_Entity
 	 * @return self
+	 * @hostcms-event Admin_Form_Controller.onBeforeAddEntity
 	 */
 	public function addEntity(Admin_Form_Entity $oAdmin_Form_Entity)
 	{
@@ -618,12 +630,18 @@ class Admin_Form_Controller
 	public function current($current)
 	{
 		$current = intval($current);
+		$current > 0 && $this->_current = intval($current);
 
-		if ($current > 0)
-		{
-			$this->_current = intval($current);
-		}
 		return $this;
+	}
+	
+	/**
+	 * Get current page
+	 * @return int
+	 */
+	public function getCurrent()
+	{
+		return $this->_current;
 	}
 
 	/**
@@ -712,10 +730,15 @@ class Admin_Form_Controller
 	 * Add dataset
 	 * @param Admin_Form_Dataset $oAdmin_Form_Dataset dataset
 	 * @return self
+	 * @hostcms-event Admin_Form_Controller.onBeforeAddDataset
 	 */
 	public function addDataset(Admin_Form_Dataset $oAdmin_Form_Dataset)
 	{
-		$this->_datasets[] = $oAdmin_Form_Dataset->controller($this);
+		$oAdmin_Form_Dataset->controller($this);
+		
+		Core_Event::notify('Admin_Form_Controller.onBeforeAddDataset', $this, array($oAdmin_Form_Dataset));
+		
+		$this->_datasets[] = $oAdmin_Form_Dataset;
 		return $this;
 	}
 
@@ -791,6 +814,17 @@ class Admin_Form_Controller
 		}
 
 		return $this->_totalCount;
+	}
+
+	/**
+	 * Set count of total founded items
+	 * @param int $count Total countt
+	 * @return self
+	 */
+	public function setTotalCount($count)
+	{
+		$this->_totalCount = $count;
+		return $this;
 	}
 
 	/**
@@ -1114,9 +1148,8 @@ class Admin_Form_Controller
 		ob_start();
 
 		$this
-			->_showFormContent()
-			->_bottomActions()
-			->_pageNavigation();
+			->showContent()
+			->showFooter();
 
 		$content = ob_get_clean();
 
@@ -1128,6 +1161,18 @@ class Admin_Form_Controller
 		$this->_applyEditable();
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Show form footer
+	 */
+	public function showFooter()
+	{
+		$this
+			->bottomActions()
+			->pageNavigation();
+
+		return $this;
 	}
 
 	/**

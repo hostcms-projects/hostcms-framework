@@ -111,7 +111,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	protected function _selectStructuresByParentId($structure_id)
 	{
 		$oSite = $this->getSite();
-		
+
 		$oStructures = $oSite->Structures;
 		$oStructures
 			->queryBuilder()
@@ -123,10 +123,10 @@ class Core_Sitemap extends Core_Servant_Properties
 			->orderBy('name');
 
 		$aStructure = $oStructures->findAll(FALSE);
-		
+
 		return $aStructure;
 	}
-	
+
 	/**
 	 * Add structure nodes by parent
 	 * @param int $structure_id structure ID
@@ -516,9 +516,13 @@ class Core_Sitemap extends Core_Servant_Properties
 
 	/**
 	 * Executes the business logic.
+	 * @return self
+	 * @hostcms-event Core_Sitemap.onBeforeExecute
 	 */
 	public function execute()
 	{
+		Core_Event::notify('Core_Sitemap.onBeforeExecute', $this);
+
 		$this->_close();
 
 		$sIndexFilePath = $this->_getIndexFilePath();

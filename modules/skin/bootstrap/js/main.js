@@ -131,7 +131,8 @@ function isEmpty(str) {
 				current: '',
 				sortingFieldId: '',
 				sortingDirection: '',
-				post: {}
+				post: {},
+				loadingScreen: true
 				//callBack: ''
 			}, settings);
 
@@ -411,7 +412,7 @@ function isEmpty(str) {
 				path += '?' + settings.additionalParams;
 			}
 
-			$.loadingScreen('show');
+			if (settings.loadingScreen) { $.loadingScreen('show'); }
 
 			var data = jQuery.getData(settings);
 			data['hostcms[checked][' + settings.datasetId + '][' + settings.objectId + ']'] = 1;
@@ -668,7 +669,7 @@ function isEmpty(str) {
 				save: function(item, settings){
 
 					var data = jQuery.getData(settings), reg = /apply_check_(\d+)_(\S+)_fv_(\d+)/,
-					itemId = item.parent().prop('id'), arr = reg.exec(itemId);
+					itemId = item.prop('id'), arr = reg.exec(itemId);
 
 					data['hostcms[checked]['+arr[1]+']['+arr[2]+']'] = 1;
 					data[itemId] = item.text();
@@ -691,7 +692,7 @@ function isEmpty(str) {
 					var item = jQuery(this).css('display', 'none'),
 					jInput = jQuery('<input>').prop('type', 'text').on('blur', function() {
 						var input = jQuery(this), item = input.prev();
-						item.html(input.val()).css('display', 'block');
+						item.html(input.val()).css('display', '');
 						input.remove();
 						settings.save(item, settings);
 					}).on('keydown', function(e){
@@ -702,7 +703,7 @@ function isEmpty(str) {
 						if (e.keyCode == 27) { // ESC
 							e.preventDefault();
 							var input = jQuery(this), item = input.prev();
-							item.css('display', 'block');
+							item.css('display', '');
 							input.remove();
 						}
 					}).width('90%').prop('name', item.parent().prop('id'))
