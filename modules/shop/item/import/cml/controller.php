@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 {
@@ -312,6 +312,15 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @var SimpleXMLElement
 	 */
 	protected $_oSimpleXMLElement = NULL;
+
+	/**
+	 * Get $this->_oSimpleXMLElement
+	 * @return SimpleXMLElement
+	 */
+	public function getSimpleXMLElement()
+	{
+		return $this->_oSimpleXMLElement;
+	}
 
 	/**
 	 * List of predefined base properties
@@ -1260,8 +1269,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->_importProperties($oShopItem, $ItemPropertyValue);
 				}
 
-				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара')
-						  as $oItemProperty)
+				foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара') as $oItemProperty)
 				{
 					$this->_addCharacteristic($oShopItem, $oItemProperty);
 				}
@@ -1302,6 +1310,27 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				{
 					$oShopTax = $this->_addTax($oTax);
 					$oShopItem->shop_tax_id = $oShopTax->id;
+					$oShopItem->save();
+				}
+				
+				// Производитель
+				if (isset($oItem->Производитель->ТорговаяМарка))
+				{
+					$sProducerName = strval($oItem->Производитель->ТорговаяМарка);
+					
+					$oProducer = Core_Entity::factory('Shop', $this->iShopId)
+						->Shop_Producers
+						->getByName($sProducerName, FALSE);
+						
+					if (is_null($oProducer))
+					{
+						$oProducer = Core_Entity::factory('Shop_Producer')
+							->shop_id($this->iShopId)
+							->name($sProducerName)
+							->save();
+					}
+
+					$oShopItem->shop_producer_id = $oProducer->id;
 					$oShopItem->save();
 				}
 			}
@@ -1465,7 +1494,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 						if (!is_null($oShopPrice) && $this->sShopDefaultPriceGUID != strval($oPrice->ИдТипаЦены))
 						{
-							$oShop_Item_Price = Core_Entity::factory('Shop_Item', $oShopItem->id)->Shop_Item_Prices->getByPriceId($oShopPrice->id, FALSE);
+							$oShop_Item_Price = Core_Entity::factory('Shop_Item', $oShopItem->id)
+								->Shop_Item_Prices
+								->getByPriceId($oShopPrice->id, FALSE);
 
 							if (is_null($oShop_Item_Price))
 							{
@@ -1558,13 +1589,18 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					// Явно переданы остатки по каждому складу
 					if (count($aWarehouses))
 					{
-						// склады
+						/* <Склад ИдСклада="xxx" КоличествоНаСкладе="10"></Склад>
+						<Склад ИдСклада="yyy" КоличествоНаСкладе="15"></Склад> */
+
 						foreach ($aWarehouses as $oWarehouseCount)
 						{
 							$sWarehouseGuid = strval($oWarehouseCount['ИдСклада']);
 							$sWarehouseCount = strval($oWarehouseCount['КоличествоНаСкладе']);
 
-							$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByGuid($sWarehouseGuid, FALSE);
+							$oShopWarehouse = Core_Entity::factory('Shop', $this->iShopId)
+								->Shop_Warehouses
+								->getByGuid($sWarehouseGuid, FALSE);
+
 							if (!is_null($oShopWarehouse))
 							{
 								$oShop_Warehouse_Item = $oShopWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);

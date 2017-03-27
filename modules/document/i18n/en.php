@@ -5,7 +5,7 @@
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Pages',
@@ -15,10 +15,9 @@ return array(
 	'edit_error' => 'Error! Page information has not been added!',
 	'markDeleted_success' => 'Page deleted successfully!',
 	'markDeleted_error' => 'Error! Page has not been deleted!',
-	'deleteOldpageVersions_success' => 'All non-current page versions of this division have been deleted successfully!',
+	'deleteOldDocumentVersions_success' => 'All non-current page versions of this division have been deleted successfully!',
 	'deleteAllDirOldVersion' => 'Delete non-current page versions of this division',
 	'documents' => 'Page',
-	'add' => 'Add',
 	'tab_1' => 'Page attributes',
 	'write_error' => 'Error while writing file',
 	'edit' => 'Edit page',

@@ -6,7 +6,7 @@
  * @package HostCMS 6\Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Константы',
@@ -23,7 +23,6 @@ return array(
 	'value' => "<acronym title = \"Значение константы\">Значение константы</acronym>",
 	'description' => "<acronym title = \"Описание константы\">Описание константы</acronym>",
 	'active' => "<acronym title = \"Параметр, определяющий используется константа или нет\">Активность константы</acronym>",
-	'add' => 'Добавить',
 	'id' => 'Идентификатор',
 	'changeStatus_success' => 'Активность изменена',
 	'changeStatus_error' => 'Ошибка изменения активности',

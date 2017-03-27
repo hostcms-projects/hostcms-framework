@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -145,7 +145,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->options(
 						array(' … ') + self::fillInformationsystemGroup($object->informationsystem_id, 0)
 					)
-					->value($this->_object->informationsystem_group_id)
+					->value($this->_object->informationsystem_group_id)					
 					->filter(TRUE);
 
 				$oMainRow2->add($oSelect_Group);
@@ -795,7 +795,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$oTags->queryBuilder()
 						->offset($offset)
 						->limit($limit);
- 
+
 					// Получаем список меток
 					$aTags = $oTags->findAll(FALSE);
 
@@ -1160,7 +1160,49 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$this->_object->save();
 
+		// Index item
 		$this->_object->index();
+
+		if ($modelName == 'informationsystem_item')
+		{
+			// Index item by schedule
+			if (Core::moduleIsActive('schedule')
+				&& $this->_object->start_datetime != '0000-00-00 00:00:00'
+				&& Core_Date::sql2timestamp($this->_object->start_datetime) > time())
+			{
+				$oModule = Core_Entity::factory('Module')->getByPath('informationsystem');
+
+				if (!is_null($oModule->id))
+				{
+					$oSchedule = Core_Entity::factory('Schedule');
+					$oSchedule->module_id = $oModule->id;
+					$oSchedule->site_id = CURRENT_SITE;
+					$oSchedule->entity_id = $this->_object->id;
+					$oSchedule->action = 0;
+					$oSchedule->start_datetime = $this->_object->start_datetime;
+					$oSchedule->save();
+				}
+			}
+
+			// Unindex item by schedule
+			if (Core::moduleIsActive('schedule')
+				&& $this->_object->end_datetime != '0000-00-00 00:00:00'
+				&& Core_Date::sql2timestamp($this->_object->end_datetime) > time())
+			{
+				$oModule = Core_Entity::factory('Module')->getByPath('informationsystem');
+
+				if (!is_null($oModule->id))
+				{
+					$oSchedule = Core_Entity::factory('Schedule');
+					$oSchedule->module_id = $oModule->id;
+					$oSchedule->site_id = CURRENT_SITE;
+					$oSchedule->entity_id = $this->_object->id;
+					$oSchedule->action = 2;
+					$oSchedule->start_datetime = $this->_object->end_datetime;
+					$oSchedule->save();
+				}
+			}
+		}
 
 		if (Core::moduleIsActive('maillist') && Core_Array::getPost('maillist_id'))
 		{

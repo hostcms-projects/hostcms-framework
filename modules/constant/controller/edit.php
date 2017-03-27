@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,6 +22,7 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		parent::setObject($object);
 
 		$oMainTab = $this->getTab('main');
+		$oAdditionalTab = $this->getTab('additional');
 
 		switch ($this->_object->getModelName())
 		{
@@ -33,7 +34,7 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Удаляем группу товаров
-				$oMainTab->delete($this->getField('constant_dir_id'));
+				$oAdditionalTab->delete($this->getField('constant_dir_id'));
 
 				$oGroupSelect = Admin_Form_Entity::factory('Select');
 				$oGroupSelect->caption(Core::_('Constant_Dir.parent_id'))
@@ -64,8 +65,6 @@ class Constant_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$this->_object->parent_id = Core_Array::getGet('constant_dir_id');
 				}
-
-				$oAdditionalTab = $this->getTab('additional');
 
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('parent_id'));

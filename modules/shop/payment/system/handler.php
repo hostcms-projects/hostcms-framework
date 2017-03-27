@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Shop_Payment_System_Handler
 {
@@ -97,10 +97,29 @@ abstract class Shop_Payment_System_Handler
 		$this->_orderParams = $orderParams + array(
 			'invoice' => NULL,
 			'acceptance_report' => NULL,
+			'vat_invoice' => NULL,
 			'coupon_text' => NULL,
 		);
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterOrderParams', $this, array($orderParams));
+
+		return $this;
+	}
+
+	/**
+	 * Round prices
+	 * @var boolean
+	 */
+	protected $_round = TRUE;
+
+	/**
+	 * Round prices
+	 * @param boolean $round
+	 * @return self
+	 */
+	public function round($round)
+	{
+		$this->_round = $round;
 
 		return $this;
 	}
@@ -257,6 +276,10 @@ abstract class Shop_Payment_System_Handler
 		$bAcceptance_report = strlen($this->_orderParams['acceptance_report']) > 0;
 		$bAcceptance_report && $this->_shopOrder->acceptance_report = Core_Array::get($this->_orderParams, 'acceptance_report');
 
+		// Номер с/ф
+		$bVat_invoice = strlen($this->_orderParams['vat_invoice']) > 0;
+		$bVat_invoice && $this->_shopOrder->vat_invoice = Core_Array::get($this->_orderParams, 'vat_invoice');
+
 		$oShop->add($this->_shopOrder);
 
 		// Additional order properties
@@ -313,24 +336,6 @@ abstract class Shop_Payment_System_Handler
 			}
 		}
 
-		/*$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
-
-		$aProperties = $oShop_Order_Property_List->Properties->findAll();
-		foreach ($aProperties as $oProperty)
-		{
-			// Св-во может иметь несколько значений
-			$aPropertiesValue = Core_Array::getPost('property_' . $oProperty->id);
-
-			if (!is_null($aPropertiesValue))
-			{
-				!is_array($aPropertiesValue) && $aPropertiesValue = array($aPropertiesValue);
-				foreach ($aPropertiesValue as $sPropertyValue)
-				{
-					$_SESSION['hostcmsOrder']['properties'][] = array($oProperty->id, strval($sPropertyValue));
-				}
-			}
-		}*/
-
 		$this->shopOrder($this->_shopOrder);
 
 		// Если не установлен модуль пользователей сайта - записываем в сессию
@@ -342,10 +347,15 @@ abstract class Shop_Payment_System_Handler
 		}
 
 		// Номер заказа
-		!$bInvoice && $this->_shopOrder->invoice($this->_shopOrder->id)->save();
+		!$bInvoice && $this->_shopOrder->invoice($this->_shopOrder->id);
 
 		// Номер акта
-		!$bAcceptance_report && $this->_shopOrder->acceptance_report($this->_shopOrder->id)->save();
+		!$bAcceptance_report && $this->_shopOrder->acceptance_report($this->_shopOrder->id);
+
+		// Номер с/ф
+		!$bVat_invoice && $this->_shopOrder->vat_invoice($this->_shopOrder->id);
+
+		$this->_shopOrder->save();
 
 		return $this;
 	}
@@ -369,8 +379,7 @@ abstract class Shop_Payment_System_Handler
 		// Create new order
 		$this->createOrder();
 
-		$quantity = 0;
-		$amount = 0;
+		$quantityPurchaseDiscount = $amountPurchaseDiscount = $quantity = $amount = 0;
 
 		$Shop_Cart_Controller = Shop_Cart_Controller::instance();
 
@@ -383,7 +392,13 @@ abstract class Shop_Payment_System_Handler
 			{
 				if ($oShop_Cart->postpone == 0)
 				{
+					$oShop_Item = $oShop_Cart->Shop_Item;
+
 					$quantity += $oShop_Cart->quantity;
+
+					// Количество для скидок от суммы заказа рассчитывается отдельно
+					$oShop_Item->apply_purchase_discount
+						&& $quantityPurchaseDiscount += $oShop_Cart->quantity;
 
 					$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
 					$oShop_Order_Item->quantity = $oShop_Cart->quantity;
@@ -392,14 +407,20 @@ abstract class Shop_Payment_System_Handler
 
 					// Prices
 					$oShop_Item_Controller = new Shop_Item_Controller();
-					Core::moduleIsActive('siteuser') && $oSiteuser && $oShop_Item_Controller->siteuser($oSiteuser);
+
+					Core::moduleIsActive('siteuser') && $oSiteuser
+						&& $oShop_Item_Controller->siteuser($oSiteuser);
 
 					$oShop_Item_Controller->count($oShop_Cart->quantity);
 
-					$oShop_Item = $oShop_Cart->Shop_Item;
+					$aPrices = $oShop_Item_Controller->getPrices($oShop_Item, $this->_round);
 
-					$aPrices = $oShop_Item_Controller->getPrices($oShop_Item, FALSE);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
+
+					// Сумма для скидок от суммы заказа рассчитывается отдельно
+					$oShop_Item->apply_purchase_discount
+						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
+
 					$oShop_Order_Item->price = $aPrices['price_discount'] - $aPrices['tax'];
 					$oShop_Order_Item->rate = $aPrices['rate'];
 					$oShop_Order_Item->name = $oShop_Item->name;
@@ -436,7 +457,7 @@ abstract class Shop_Payment_System_Handler
 		if ($amount > 0)
 		{
 			// Add a discount to the purchase
-			$this->_addPurchaseDiscount($amount, $quantity);
+			$this->_addPurchaseDiscount($amountPurchaseDiscount, $quantityPurchaseDiscount);
 		}
 
 		$this->_addDelivery();

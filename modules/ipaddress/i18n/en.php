@@ -20,7 +20,7 @@ return array(
 	'add_title' => 'Add IP address information',
 	'edit_title' => 'Edit IP address information',
 	'main_menu' => 'IP address',
-	'ip' => '<acronym title="IP address">IP address</acronym>',
+	'ip' => '<acronym title="IP addres e.g. 192.168.0.1 or CIDR notation e.g. 192.168.0.0/24">IP address or CIDR </acronym>',
 	'id' => 'ID',
 	'ip_apply' => 'Apply',
 	'ip_save' => 'Save',

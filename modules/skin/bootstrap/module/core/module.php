@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Core_Module extends Core_Module
 {
@@ -96,6 +96,10 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 						</script>
 					</div><?php
 				}
+			break;
+			// Список сайтов
+			case 10:
+				$this->_siteContent();
 			break;
 			// Системные характеристики
 			default:
@@ -605,5 +609,83 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 		}
 
 		return $this;
+	}
+
+	protected function _siteContent()
+	{
+		$oUser = Core_Entity::factory('User')->getCurrent();
+		$aSites = $oUser->getSites();
+
+		$aJson = array(
+			'count' => count($aSites)
+		);
+
+		ob_start();
+		?><div class="scroll-sites">
+			<ul>
+			<?php
+			$aSiteColors = array(
+				'bg-themeprimary',
+				'bg-darkorange',
+				'bg-warning',
+				'bg-success'
+			);
+			$iCountColor = 0;
+			$sListSitesContent = '';
+
+			foreach ($aSites as $oSite)
+			{
+				$oSite_Alias = $oSite->Site_Aliases->getByCurrent(1);
+
+				if ($oSite->id != CURRENT_SITE)
+				{
+					$sListSitesContent .= '<li>
+						<a href="/admin/index.php?changeSiteId=' . $oSite->id . '"' . '>
+							<div class="clearfix">
+								<div class="notification-icon">
+									<i class="fa '. $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
+								</div>
+								<div class="notification-body">
+									<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
+									<span class="description">' .
+
+									 (!is_null($oSite_Alias)
+										? htmlspecialchars($oSite_Alias->name)
+										: 'undefined' ) . '
+									</span>
+								</div>
+							</div>
+						</a></li>';
+				}
+				else
+				{
+					$sListSitesContent = '<li>
+						<a>
+							<div class="clearfix">
+								<div class="notification-icon">
+									<i class="fa ' . $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
+								</div>
+								<div class="notification-body">
+									<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
+									<span class="description">' .
+									 (!is_null($oSite_Alias)
+										? htmlspecialchars($oSite_Alias->name)
+										: 'undefined' ) . '
+									</span>
+								</div><div class="notification-extra"><i class="fa fa-check-circle-o green"></i></div>
+							</div>
+						</a></li>' . $sListSitesContent;
+				}
+			}
+
+			echo $sListSitesContent;
+			?>
+			</ul>
+		</div>
+
+		<?php
+		$aJson['content'] = ob_get_clean();
+
+		Core::showJson($aJson);
 	}
 }

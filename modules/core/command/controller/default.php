@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Core command controller.
  *
- * @package HostCMS 6\Core\Command
+ * @package HostCMS
+ * @subpackage Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Default extends Core_Command_Controller
 {
@@ -43,35 +44,12 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		$this->_uri == '' && $this->_uri = '/';
 
-		// Отдача статичного кэша в случае, если правила mod_rewrite не сработали
-		// из-за %{HTTP_COOKIE} !^.*PHPSESSID=.*$
-		$bCheckCache = Core::moduleIsActive('cache') && $oSite->html_cache_use == 1;
-		if ($bCheckCache)
-		{
-			$Core_Cache = Core_Cache::instance('static');
-
-			if ($this->_checkCache())
-			{
-				$result = $Core_Cache->get($this->_uri);
-
-				if ($result !== FALSE)
-				{
-					$oCore_Response
-						->header('Content-Type', 'text/html; charset=' . $oSite->coding)
-						->body($result);
-
-					return $oCore_Response;
-				}
-			}
-
-		}
-
 		// Путь заканчивается на слэш
 		if (substr($this->_uri, -1) == '/'
 		// или передаются данные методом GET
 		// || isset(Core::$url['query']) // style.css?1341303578 doesn't work
 		// или запрет на 302 редирект к последнему слэшу
-		|| defined('DENY_LOCATION_302_LAST_SLASH'))
+		|| defined('DENY_LOCATION_302_LAST_SLASH') && DENY_LOCATION_302_LAST_SLASH)
 		{
 			// Получаем ID текущей страницы для указанного сайта по массиву
 			$oStructure = $this->getStructure($this->_uri, CURRENT_SITE);
@@ -117,6 +95,28 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			}
 
 			return $oCore_Response;
+		}
+
+		// Отдача статичного кэша в случае, если правила mod_rewrite не сработали
+		// из-за %{HTTP_COOKIE} !^.*PHPSESSID=.*$
+		$bCheckCache = Core::moduleIsActive('cache') && $oSite->html_cache_use == 1;
+		if ($bCheckCache)
+		{
+			$Core_Cache = Core_Cache::instance('static');
+
+			if ($this->_checkCache())
+			{
+				$result = $Core_Cache->get($this->_uri);
+
+				if ($result !== FALSE)
+				{
+					$oCore_Response
+						->header('Content-Type', 'text/html; charset=' . $oSite->coding)
+						->body($result);
+
+					return $oCore_Response;
+				}
+			}
 		}
 
 		if (((~Core::convert64b32(Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms'))) & 1176341605))
@@ -377,6 +377,13 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		$fBeginTime = Core::getmicrotime();
 
+		// Проверка на передачу GET-параметров для статичного документа
+		if (defined('ERROR_404_GET_REQUESTS') && ERROR_404_GET_REQUESTS
+			&& $oStructure->type == 0 && count($_GET))
+		{
+			$oCore_Page->error404();
+		}
+		
 		// Динамическая страница
 		if ($oStructure->type == 1)
 		{
@@ -647,7 +654,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 					// Получаем главную страницы
 					$oStructure = $oSite->Structures->getByPath('/');
 				}*/
-				
+
 				// Parent node is static page
 				if (is_null($oStructure)
 						|| !is_null($oStructure->id) && $oStructure->type == 0

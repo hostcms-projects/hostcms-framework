@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Model extends Core_Entity
 {
@@ -621,8 +621,8 @@ class Informationsystem_Model extends Core_Entity
 	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		!$this->structure_id && Core::factory('Core_Html_Entity_Span')
-			->class('badge badge-darkorange badge-square')
-			->add(Core::factory('Core_Html_Entity_I')->class('fa fa-exclamation'))
+			->class('badge badge-darkorange badge-ico white')
+			->add(Core::factory('Core_Html_Entity_I')->class('fa fa-chain-broken'))
 			->execute();
 	}
 }

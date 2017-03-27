@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Module
 {
@@ -135,5 +135,31 @@ abstract class Core_Module
 		Core_Event::notify(get_class($this) . '.onBeforeUninstall', $this);
 
 		return $this;
+	}
+	
+	/**
+	 * List of Schedule Actions
+	 * @var array
+	 */
+	protected $_scheduleActions = array();
+	
+	/**
+	 * Get List of Schedule Actions
+	 * @return array
+	 */
+	public function getScheduleActions()
+	{
+		return $this->_scheduleActions;
+	}
+	
+	/**
+	 * Notify module on the action on schedule
+	 * @param int $action action number
+	 * @param int $entityId entity ID
+	 * @return array
+	 */
+	public function callSchedule($action, $entityId)
+	{
+		// do smth
 	}
 }

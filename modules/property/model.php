@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Model extends Core_Entity
 {
@@ -362,12 +362,22 @@ class Property_Model extends Core_Entity
 		// List
 		if ($bIsList)
 		{
-			$this
-				->addEntity($this->List->clearEntities());
-
-			$this->_config['add_list_items'] && $this->List->addEntities(
-				$this->List->List_Items->getAllByActive(1)
+			$this->addEntity(
+				$this->List->clearEntities()
 			);
+
+			if ($this->_config['add_list_items'])
+			{
+				$oList_Items = $this->List->List_Items;
+				$oList_Items->queryBuilder()
+					->where('list_items.active', '=', 1);
+				
+				Core_Event::notify($this->_modelName . '.onBeforeGetXmlAddListItems', $this, array($oList_Items));
+				
+				$this->List->addEntities(
+					$oList_Items->findAll()
+				);
+			}
 		}
 
 		return parent::getXml();

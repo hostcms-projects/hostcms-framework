@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Http
 {
@@ -91,7 +91,7 @@ abstract class Core_Http
 	 * @param string $query query
 	 * @return mixed
 	 */
-	abstract protected function _execute($host, $path, $query);
+	abstract protected function _execute($host, $path, $query, $scheme = 'http');
 
 	/**
 	 * Constructor.
@@ -380,7 +380,7 @@ abstract class Core_Http
 			? "{$scheme}://{$host}"
 			: $this->_referer;
 
-		return $this->_execute($host, $path, $query);
+		return $this->_execute($host, $path, $query, $scheme);
 	}
 
 	/**

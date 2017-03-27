@@ -6,7 +6,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information systems',
@@ -113,4 +113,8 @@ return array(
 	'deleteEmptyDirs_success' => 'Empty dirs have been deleted!',
 
 	'structureIsExist' => 'Informationsystem linked with the same structure "%s" has already exist!',
+
+	'schedule-searchIndexItem' => 'Index informationsystem item',
+	'schedule-searchIndexGroup' => 'Index informationsystem group',
+	'schedule-searchUnindexItem' => 'Unindex informationsystem item',
 );

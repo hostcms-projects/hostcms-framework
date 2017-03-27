@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_List_Model extends Shop_Model
 {
@@ -17,7 +17,7 @@ class Shop_Item_Property_List_Model extends Shop_Model
 	 * @var string
 	 */
 	protected $_tableName = 'shops';
-	
+
 	/**
 	 * Name of the model
 	 * @var string
@@ -29,7 +29,7 @@ class Shop_Item_Property_List_Model extends Shop_Model
 	 * @var boolean
 	 */
 	public $changeFilename = TRUE;
-	
+
 	/**
 	 * Callback property_id
 	 * @var string
@@ -159,9 +159,10 @@ class Shop_Item_Property_List_Model extends Shop_Model
 	/**
 	 * Получение свойств товара, доступных группе $shop_group_id
 	 * @param int $shop_group_id идентификатор группы
+	 * @param array $property_ids массив идентификаторов дополнительных свойств, доступных для выборки
 	 * @return array
 	 */
-	public function getPropertiesForGroup($shop_group_id)
+	public function getPropertiesForGroup($shop_group_id, $property_ids = NULL)
 	{
 		$oProperties = $this->Properties;
 		if ($shop_group_id !== FALSE)
@@ -171,6 +172,13 @@ class Shop_Item_Property_List_Model extends Shop_Model
 				->join('shop_item_property_for_groups', 'shop_item_property_for_groups.shop_item_property_id', '=', 'shop_item_properties.id')
 				->where('shop_item_property_for_groups.shop_id', '=', $this->id)
 				->where('shop_item_property_for_groups.shop_group_id', '=', $shop_group_id);
+		}
+
+		if (is_array($property_ids) && count($property_ids))
+		{
+			$oProperties
+				->queryBuilder()
+				->where('properties.id', 'IN', $property_ids);
 		}
 
 		return $oProperties->findAll();

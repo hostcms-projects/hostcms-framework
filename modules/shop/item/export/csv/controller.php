@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 {
@@ -177,6 +177,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Описание раздела"',
 				'"Путь для раздела"',
 				'"Порядок сортировки раздела"',
+				'"CML ID идентификатор товара"',
 				'"Артикул товара"',
 				'"Артикул родительского товара"',
 				'"Название товара"',
@@ -210,7 +211,6 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Количество товара до"',
 				'"Значение цены"',
 				'"Процент от цены"',
-				'"CML ID идентификатор товара"',
 				'"Идентификатор пользователя сайта"'
 			);
 
@@ -352,6 +352,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		}
 
 		return array_merge($aTmpArray, array(
+		sprintf('"%s"', $this->_prepareString($oShopItem->guid)),
 		sprintf('"%s"', $this->_prepareString($oShopItem->marking)),
 		sprintf('"%s"', $this->_prepareString($oShopItem->Modification->marking)),
 		sprintf('"%s"', $this->_prepareString($oShopItem->name)),
@@ -381,8 +382,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		sprintf('"%s"', $oShopItem->end_datetime == '0000-00-00 00:00:00' ? '0000-00-00 00:00:00' :  Core_Date::sql2datetime($oShopItem->end_datetime)),
 		sprintf('"%s"', ($oShopItem->image_large == '') ? '' : $oShopItem->getLargeFileHref()),
 		sprintf('"%s"', ($oShopItem->image_small == '') ? '' : $oShopItem->getSmallFileHref())), $this->_aSpecialPriceBase_Properties,
-		array(sprintf('"%s"', $this->_prepareString($oShopItem->guid)),
-		sprintf('"%s"', $oShopItem->siteuser_id)), $aItemProperties, $aGroupProperties, $aWarehouses, $aShopPrices);
+		array(sprintf('"%s"', $oShopItem->siteuser_id)), $aItemProperties, $aGroupProperties, $aWarehouses, $aShopPrices);
 	}
 
 	/**

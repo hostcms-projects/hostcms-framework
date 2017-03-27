@@ -20,12 +20,22 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-12-09';
+	public $date = '2016-02-03';
 	/**
 	 * Module name
 	 * @var string
 	 */
 	protected $_moduleName = 'shop';
+
+	/**
+	 * List of Schedule Actions
+	 * @var array
+	 */
+	protected $_scheduleActions = array(
+		0 => 'searchIndexItem',
+		1 => 'searchIndexGroup',
+		2 => 'searchUnindexItem',
+	);
 
 	/**
 	 * Constructor.
@@ -320,5 +330,30 @@ class Shop_Module extends Core_Module{	/**
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Notify module on the action on schedule
+	 * @param int $action action number
+	 * @param int $entityId entity ID
+	 * @return array
+	 */
+	public function callSchedule($action, $entityId)
+	{
+		switch ($action)
+		{
+			// Index item
+			case 0:
+				$entityId && Core_Entity::factory('Shop_Item', $entityId)->index();
+			break;
+			// Index group
+			case 1:
+				$entityId && Core_Entity::factory('Shop_Group', $entityId)->index();
+			break;
+			// Unindex item
+			case 2:
+				$entityId && Core_Entity::factory('Shop_Item', $entityId)->unindex();
+			break;
+		}
 	}
 }

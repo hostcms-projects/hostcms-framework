@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Интернет-магазины',
@@ -127,4 +127,8 @@ return array(
 	'paid_orders_amount' => 'Сумма оплат',
 	'undefined_default_currency' => 'Валюта по умолчанию не установлена!',
 	'recent_orders' => 'Последние заказы',
+
+	'schedule-searchIndexItem' => 'Индексировать товар',
+	'schedule-searchIndexGroup' => 'Индексировать группу товаров',
+	'schedule-searchUnindexItem' => 'Снять товар с индексации',
 );

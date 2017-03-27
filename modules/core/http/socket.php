@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Socket extends Core_Http
 {
@@ -19,10 +19,10 @@ class Core_Http_Socket extends Core_Http
 	 * @param string $query query
 	 * @return self
 	 */
-	protected function _execute($host, $path, $query)
+	protected function _execute($host, $path, $query, $scheme = 'http')
 	{
 		// для 443 порта в fsockopen перед хостом нужно добавлять ssl://
-		$socketHost = $this->_port == 443
+		$socketHost = $scheme == 'https'
 			? 'ssl://' . $host
 			: $host;
 

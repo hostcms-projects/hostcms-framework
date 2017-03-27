@@ -17,7 +17,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Xsl_Processor
 {
@@ -149,10 +149,14 @@ abstract class Xsl_Processor
 
 			self::$instance = new $driver();
 
-			$bExist = in_array('lang', stream_get_wrappers());
-			if (!$bExist)
+			if (!in_array('lang', stream_get_wrappers()))
 			{
 				stream_wrapper_register('lang', 'Xsl_Stream_Lang');
+			}
+			
+			if (!in_array('import', stream_get_wrappers()))
+			{
+				stream_wrapper_register('import', 'Xsl_Stream_Import');
 			}
 		}
 

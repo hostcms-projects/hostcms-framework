@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online stores',
@@ -129,4 +129,8 @@ return array(
 	'paid_orders_amount' => 'The amount of paid orders',
 	'undefined_default_currency' => 'The default currency is undefined!',
 	'recent_orders' => 'Recent orders',
+
+	'schedule-searchIndexItem' => 'Index shop item',
+	'schedule-searchIndexGroup' => 'Index shop group',
+	'schedule-searchUnindexItem' => 'Unindex shop item',
 );

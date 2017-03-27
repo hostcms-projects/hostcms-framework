@@ -58,7 +58,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Show extends Core_Controller
 {
@@ -406,10 +406,10 @@ class Informationsystem_Controller_Show extends Core_Controller
 			->sqlCalcFoundRows()
 			->offset(intval($this->offset))
 			->limit(intval($this->limit));
-			
+
 		return $this;
 	}
-	
+
 	/**
 	 * Show built data
 	 * @return self
@@ -560,6 +560,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 					->where('properties.id', 'IN', $this->itemsPropertiesList);
 			}
 			$aProperties = $oProperties->findAll();
+
 			foreach ($aProperties as $oProperty)
 			{
 				$this->_aItem_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
@@ -613,7 +614,11 @@ class Informationsystem_Controller_Show extends Core_Controller
 				// ID оригинального ярлыка
 				if ($iShortcut)
 				{
+					$oOriginal_Informationsystem_Item = $oInformationsystem_Item;
+
+					$oInformationsystem_Item = clone $oInformationsystem_Item;
 					$oInformationsystem_Item
+						->id($oOriginal_Informationsystem_Item->id)
 						->addForbiddenTag('shortcut_id')
 						->addForbiddenTag('informationsystem_group_id')
 						->addEntity(
@@ -873,67 +878,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 	 */
 	public function error404()
 	{
-		$oCore_Response = Core_Page::instance()->deleteChild()->response->status(404);
+		Core_Page::instance()->error404();
 
-		// Если определена константа с ID страницы для 404 ошибки и она не равна нулю
-		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
-		if ($oSite->error404)
-		{
-			$oStructure = Core_Entity::factory('Structure')->find($oSite->error404);
-
-			$oCore_Page = Core_Page::instance();
-
-			// страница с 404 ошибкой не найдена
-			if (is_null($oStructure->id))
-			{
-				throw new Core_Exception('Group not found');
-			}
-
-			if ($oStructure->type == 0)
-			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$oCore_Page->template($oDocument_Versions->Template);
-				}
-			}
-			// Если динамическая страница или типовая дин. страница
-			elseif ($oStructure->type == 1 || $oStructure->type == 2)
-			{
-				$oCore_Page->template($oStructure->Template);
-			}
-
-			if ($oStructure->type == 2)
-			{
-				$oCore_Page->libParams
-					= $oStructure->Lib->getDat($oStructure->id);
-
-				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
-
-				if (is_file($LibConfig) && is_readable($LibConfig))
-				{
-					include $LibConfig;
-				}
-			}
-
-			$oCore_Page
-				->structure($oStructure)
-				->addChild($oStructure->getRelatedObjectByType());
-
-			$oStructure->setCorePageSeo($oCore_Page);
-
-			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
-			$oCore_Page->buildingPage && $oCore_Page->execute();
-		}
-		else
-		{
-			if (Core::$url['path'] != '/')
-			{
-				// Редирект на главную страницу
-				$oCore_Response->header('Location', '/');
-			}
-		}
 		return $this;
 	}
 
@@ -943,48 +889,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 	 */
 	public function error403()
 	{
-		$oCore_Response = Core_Page::instance()->deleteChild()->response->status(403);
+		Core_Page::instance()->error403();
 
-		// Если определена константа с ID страницы для 403 ошибки и она не равна нулю
-		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
-		if ($oSite->error403)
-		{
-			$oStructure = Core_Entity::factory('Structure')->find($oSite->error403);
-
-			$oCore_Page = Core_Page::instance();
-
-			// страница с 403 ошибкой не найдена
-			if (is_null($oStructure->id))
-			{
-				throw new Core_Exception('Group not found');
-			}
-
-			if ($oStructure->type == 0)
-			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$oCore_Page->template($oDocument_Versions->Template);
-				}
-			}
-			// Если динамическая страница или типовая дин. страница
-			elseif ($oStructure->type == 1 || $oStructure->type == 2)
-			{
-				$oCore_Page->template($oStructure->Template);
-			}
-
-			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
-			$oStructure->setCorePageSeo($oCore_Page);
-		}
-		else
-		{
-			if (Core::$url['path'] != '/')
-			{
-				// Редирект на главную страницу
-				$oCore_Response->header('Location', '/');
-			}
-		}
 		return $this;
 	}
 

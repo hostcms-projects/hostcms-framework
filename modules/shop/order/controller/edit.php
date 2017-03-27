@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -429,13 +429,23 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oDocumentsTabRow2->add($oOrderCardLink);
 
 		$oMainTab->delete($this->getField('acceptance_report'));
-		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
-		$oAdmin_Form_Entity_Input
+		$oMainTab->delete($this->getField('acceptance_report_datetime'));
+
+		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input')
 			->name('acceptance_report')
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-6 col-xs-6'))
 			->caption(Core::_('Shop_Order.document_number'))
-			->class('form-control input-group-input')
-			->value($this->_object->acceptance_report)
+			//->class('form-control input-group-input')
+			->value($this->_object->acceptance_report);
+
+		$oAdmin_Form_Entity_Datetime = Admin_Form_Entity::factory('Datetime')
+			->name('acceptance_report_datetime')
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-6'))
+			->caption(Core::_('Shop_Order.document_datetime'))
+			->value($this->_object->acceptance_report_datetime);
+
+		$oAdmin_Form_Entity_Div_Acceptance_Report = Admin_Form_Entity::factory('Div')
+			->class('form-group col-lg-6 col-md-4 col-sm-12 col-xs-12 margin-top-21')
 			// Акт
 			->add(
 				Core::factory('Core_Html_Entity_A')
@@ -471,17 +481,30 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 			);
 
-		$oDocumentsTabRow3->add($oAdmin_Form_Entity_Input);
+		$oDocumentsTabRow3
+			->add($oAdmin_Form_Entity_Input)
+			->add($oAdmin_Form_Entity_Datetime)
+			->add($oAdmin_Form_Entity_Div_Acceptance_Report);
 
 		$oMainTab->delete($this->getField('vat_invoice'));
+		$oMainTab->delete($this->getField('vat_invoice_datetime'));
 
 		$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input');
 		$oAdmin_Form_Entity_Input
 			->name('vat_invoice')
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-6 col-xs-6'))
 			->caption(Core::_('Shop_Order.document_number'))
-			->class('form-control input-group-input')
-			->value($this->_object->vat_invoice)
+			//->class('form-control input-group-input')
+			->value($this->_object->vat_invoice);
+
+		$oAdmin_Form_Entity_Vat_Datetime = Admin_Form_Entity::factory('Datetime')
+			->name('vat_invoice_datetime')
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-6'))
+			->caption(Core::_('Shop_Order.document_datetime'))
+			->value($this->_object->vat_invoice_datetime);
+
+		$oAdmin_Form_Entity_Div_Vat = Admin_Form_Entity::factory('Div')
+			->class('form-group col-lg-6 col-md-4 col-sm-12 col-xs-12 margin-top-21')
 			// Счет-фактура
 			->add(
 				Core::factory('Core_Html_Entity_A')
@@ -498,10 +521,12 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						Core::factory('Core_Html_Entity_Code')
 							->value(Core::_('Shop_Order.acceptance_report_invoice'))
 					)
-			)
-			;
+			);
 
-		$oDocumentsTabRow4->add($oAdmin_Form_Entity_Input);
+		$oDocumentsTabRow4
+			->add($oAdmin_Form_Entity_Input)
+			->add($oAdmin_Form_Entity_Vat_Datetime)
+			->add($oAdmin_Form_Entity_Div_Vat);
 
 		$oAdditionalTab->delete(
 			$this->getField('shop_order_status_id')

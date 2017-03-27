@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Model extends Core_Entity
 {
@@ -183,12 +183,10 @@ class Structure_Model extends Core_Entity
 	public function getStructureFile()
 	{
 		$path = $this->getStructureFilePath();
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
 
-		return NULL;
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**
@@ -217,12 +215,10 @@ class Structure_Model extends Core_Entity
 	public function getStructureConfigFile()
 	{
 		$path = $this->getStructureConfigFilePath();
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
 
-		return NULL;
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**
@@ -350,13 +346,30 @@ class Structure_Model extends Core_Entity
 	 */
 	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
-		$count = $this->Structures->getCount();
+		$count = $this->getChildCount();
 		$count && Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
 			->value($count)
 			->execute();
 	}
 
+	/**
+	 * Get count of substructures all levels
+	 * @return int
+	 */
+	public function getChildCount()
+	{
+		$count = 0;
+		$aStructures = $this->Structures->findAll(FALSE);
+		foreach ($aStructures as $oStructure)
+		{
+			$count++;
+			$count += $oStructure->getChildCount();
+		}
+		
+		return $count;
+	}
+	
 	/**
 	 * Backend callback method
 	 * @return string

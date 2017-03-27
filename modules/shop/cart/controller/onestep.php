@@ -32,7 +32,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Controller_Onestep extends Core_Controller
 {
@@ -109,7 +109,7 @@ class Shop_Cart_Controller_Onestep extends Core_Controller
 
 		$this->itemsPropertiesList = $this->itemsProperties = $this->taxes = FALSE;
 		$this->countries = $this->orderProperties = $this->paymentSystems = TRUE;
-		
+
 		$this->quantity = 1;
 	}
 
@@ -171,6 +171,7 @@ class Shop_Cart_Controller_Onestep extends Core_Controller
 			$this->_addItemsPropertiesList(0, $Shop_Item_Properties);
 		}
 
+		$totalDiscount = 0;
 		$oShop_Item = Core_Entity::factory('Shop_Item')->find($this->shop_item_id);
 
 		if (!is_null($oShop_Item->id))
@@ -182,19 +183,21 @@ class Shop_Cart_Controller_Onestep extends Core_Controller
 			$aTotal = $this->calculatePrice($oShop_Item);
 
 			// Скидки от суммы заказа
-			$oShop_Purchase_Discount_Controller = new Shop_Purchase_Discount_Controller($oShop);
-			$oShop_Purchase_Discount_Controller
-				->amount($aTotal['amount'])
-				->quantity($this->quantity)
-				->couponText($this->couponText)
-				->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0);
-
-			$totalDiscount = 0;
-			$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
-			foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)
+			if ($oShop_Item->apply_purchase_discount)
 			{
-				$this->addEntity($oShop_Purchase_Discount->clearEntities());
-				$totalDiscount += $oShop_Purchase_Discount->getDiscountAmount();
+				$oShop_Purchase_Discount_Controller = new Shop_Purchase_Discount_Controller($oShop);
+				$oShop_Purchase_Discount_Controller
+					->amount($aTotal['amount'])
+					->quantity($this->quantity)
+					->couponText($this->couponText)
+					->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0);
+
+				$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
+				foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)
+				{
+					$this->addEntity($oShop_Purchase_Discount->clearEntities());
+					$totalDiscount += $oShop_Purchase_Discount->getDiscountAmount();
+				}
 			}
 		}
 

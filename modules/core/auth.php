@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Auth
 {
@@ -287,7 +287,7 @@ class Core_Auth
 			if (!isset($_SESSION['current_site_id']))
 			{
 				$domain = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST'));
-				$oSiteAlias = Core_Entity::factory('Site_Alias')->getByName($domain);
+				$oSiteAlias = Core_Entity::factory('Site_Alias')->findAlias($domain);
 
 				if (!is_null($oSiteAlias))
 				{

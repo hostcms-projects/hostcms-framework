@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Model extends Core_Entity
 {
@@ -109,10 +109,15 @@ class Shop_Order_Model extends Core_Entity
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
-			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
-			$this->_preloadValues['status_datetime'] = Core_Date::timestamp2sql(time());
 
-			$this->_preloadValues['siteuser_id'] = Core::moduleIsActive('siteuser') && isset($_SESSION['siteuser_id']) ? intval($_SESSION['siteuser_id']) : 0;
+			$this->_preloadValues['datetime'] =
+				$this->_preloadValues['acceptance_report_datetime'] =
+				$this->_preloadValues['vat_invoice_datetime'] =
+				$this->_preloadValues['status_datetime'] = Core_Date::timestamp2sql(time());
+
+			$this->_preloadValues['siteuser_id'] = Core::moduleIsActive('siteuser') && isset($_SESSION['siteuser_id'])
+				? intval($_SESSION['siteuser_id'])
+				: 0;
 		}
 	}
 
@@ -1191,16 +1196,16 @@ class Shop_Order_Model extends Core_Entity
 		$this->name != '' && $aTmpArray[] = $this->name;
 		$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
 		!count($aTmpArray) && $aTmpArray[] = $this->email;
-		
+
 		$sContractorName = implode(' ', $aTmpArray);
-		
+
 		$sContractorId = $this->siteuser_id
 			? $this->siteuser_id
 			: abs(Core::crc32($sContractorName));
 
 		!strlen($sContractorName)
 			&& $sContractorName = 'Контрагент ' . $sContractorId;
-			
+
 		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
 		$oContractor->addChild('Ид', $sContractorId);
 		$oContractor->addChild('Наименование', $sContractorName);

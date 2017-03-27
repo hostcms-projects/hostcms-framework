@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Skin.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap extends Core_Skin
 {
@@ -202,87 +203,22 @@ class Skin_Bootstrap extends Core_Skin
 									<span class="account-area-site-name hidden-xs">
 										<?php echo htmlspecialchars($oCurrentSite->name)?>
 									</span>
-									<?php
-									$aSites = $oUser->getSites();
-									?>
-									<a class="dropdown-toggle" data-toggle="dropdown" title="Выберите сайт" href="#">
+
+									<a class="dropdown-toggle" id="sitesListIcon" data-toggle="dropdown" title="Выберите сайт" href="#">
 										<i class="icon fa fa-globe"></i>
-										<span class="badge"><?php echo count($aSites)?></span>
+										<span class="badge"></span>
 									</a>
 									<!--Tasks Dropdown-->
-									<div id="sitesListBox" class="pull-right dropdown-menu dropdown-arrow dropdown-notifications">
-										<div class="scroll-sites">
-											<ul>
-											<?php
-											$aSiteColors = array(
-												'bg-themeprimary',
-												'bg-darkorange',
-												'bg-warning',
-												'bg-success'
-											);
-											$iCountColor = 0;
-											$sListSitesContent = '';
-
-											foreach ($aSites as $oSite)
-											{
-												$oSite_Alias = $oSite->Site_Aliases->getByCurrent(1);
-
-												if ($oSite->id != CURRENT_SITE)
-												{
-													$sListSitesContent .= '<li>
-														<a href="/admin/index.php?changeSiteId=' . $oSite->id . '"' . '>
-															<div class="clearfix">
-																<div class="notification-icon">
-																	<i class="fa '. $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
-																</div>
-																<div class="notification-body">
-																	<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
-																	<span class="description">' .
-
-																	 (!is_null($oSite_Alias)
-																		? htmlspecialchars($oSite_Alias->name)
-																		: 'undefined' ) . '
-																	</span>
-																</div>
-															</div>
-														</a></li>';
-												}
-												else
-												{
-													$sListSitesContent = '<li>
-														<a>
-															<div class="clearfix">
-																<div class="notification-icon">
-																	<i class="fa ' . $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
-																</div>
-																<div class="notification-body">
-																	<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
-																	<span class="description">' .
-																	 (!is_null($oSite_Alias)
-																		? htmlspecialchars($oSite_Alias->name)
-																		: 'undefined' ) . '
-																	</span>
-																</div><div class="notification-extra"><i class="fa fa-check-circle-o green"></i></div>
-															</div>
-														</a></li>' . $sListSitesContent;
-												}
-											}
-											echo $sListSitesContent;
-											?>
-											</ul>
-										</div>
-									</div>
+									<div id="sitesListBox" class="pull-right dropdown-menu dropdown-arrow dropdown-notifications"></div>
 
 									<script type="text/javascript">
 										var sitesListBox = document.getElementById('sitesListBox');
 										sitesListBox.onclick = function(event){
 											event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
 										};
-										$('.scroll-sites').slimscroll({
-										 // height: '215px',
-										  height: 'auto',
-										  color: 'rgba(0,0,0,0.3)',
-										  size: '5px'
+
+										$(document).ready(function() {
+											$.loadSiteList();
 										});
 									</script>
 									<!--/Tasks Dropdown-->
@@ -339,9 +275,9 @@ class Skin_Bootstrap extends Core_Skin
 										};
 										$('.scroll-languages').slimscroll({
 										 // height: '215px',
-										  height: 'auto',
-										  color: 'rgba(0, 0, 0, 0.3)',
-										  size: '5px'
+										 height: 'auto',
+										 color: 'rgba(0, 0, 0, 0.3)',
+										 size: '5px'
 										});
 									</script>
 								</li>
@@ -422,9 +358,9 @@ class Skin_Bootstrap extends Core_Skin
 
 												$('.send-message textarea').on('keyup', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=79' }, $.chatSendMessage);
 
-												$(document).ready(
-													$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'})
-												);
+												$(document).ready(function() {
+													$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'});
+												});
 										});
 									</script>
 								</li>
@@ -535,7 +471,7 @@ class Skin_Bootstrap extends Core_Skin
 					is_null($aCore_Module[$oModule->path]) && $aCore_Module[$oModule->path] = Core_Module::factory($oModule->path);
 				}
 				unset($aModules);
-				
+
 				Core_Event::notify(get_class($this) . '.onLoadSkinConfig', $this);
 
 				if (isset($this->_config['adminMenu']))
@@ -639,7 +575,7 @@ class Skin_Bootstrap extends Core_Skin
 		<div class="loading-container">
 			<div class="loader"></div>
 		</div>
-		<!--  /Loading Container --><?php
+		<!-- /Loading Container --><?php
 
 		return $this;
 	}
@@ -787,7 +723,7 @@ class Skin_Bootstrap extends Core_Skin
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
-			<p class="copy pull-left copyright">Copyright © 2005–2015 <?php echo Core::_('Admin.company')?></p>
+			<p class="copy pull-left copyright">Copyright © 2005–2016 <?php echo Core::_('Admin.company')?></p>
 			<p class="copy text-right contacts">
 				<?php echo Core::_('Admin.website')?> <a href="http://<?php echo Core::_('Admin.company-website')?>" target="_blank"><?php echo Core::_('Admin.company-website')?></a>
 				<br/>

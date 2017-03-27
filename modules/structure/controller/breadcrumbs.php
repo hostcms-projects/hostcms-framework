@@ -26,7 +26,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Breadcrumbs extends Core_Controller
 {
@@ -336,7 +336,9 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 		foreach ($this->_breadcrumbs as $oStructure)
 		{
 			$this->applyForbiddenTags($oStructure);
-			$object->addEntity($oStructure);
+			$object->addEntity(
+				$oStructure->showXmlProperties($this->showProperties)
+			);
 			$object = $oStructure;
 		}
 

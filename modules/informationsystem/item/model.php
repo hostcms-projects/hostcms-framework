@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Model extends Core_Entity
 {
@@ -674,7 +674,9 @@ class Informationsystem_Item_Model extends Core_Entity
 			$oItemShortcut->save();
 		}
 
-		$this->index();
+		$this->active
+			? $this->index()
+			: $this->unindex();
 
 		$this->clearCache();
 
@@ -690,14 +692,30 @@ class Informationsystem_Item_Model extends Core_Entity
 	public function index()
 	{
 		if (Core::moduleIsActive('search')
-			&& $this->indexing && $this->active
-			&& ($this->start_datetime == '0000-00-00 00:00:00'
-				|| Core_Date::sql2timestamp($this->start_datetime) <= time())
-			&& ($this->end_datetime == '0000-00-00 00:00:00'
-				|| Core_Date::sql2timestamp($this->end_datetime) > time())
-		)
+			&& $this->indexing && $this->active)
 		{
-			Search_Controller::indexingSearchPages(array($this->indexing()));
+			$bStartDT = $this->start_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->start_datetime) <= time();
+
+			$bEndDT = $this->end_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->end_datetime) > time();
+
+			$bStartDT && $bEndDT
+				&& Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Remove item from search index
+	 * @return self
+	 */
+	public function unindex()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::deleteSearchPage(1, 2, $this->id);
 		}
 
 		return $this;
@@ -721,6 +739,11 @@ class Informationsystem_Item_Model extends Core_Entity
 	public function changeIndexation()
 	{
 		$this->indexing = 1 - $this->indexing;
+
+		$this->active && $this->indexing
+			? $this->index()
+			: $this->unindex();
+
 		return $this->save();
 	}
 

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Products',
@@ -20,7 +20,8 @@ return array(
 	'image_large' => "<acronym title=\"Product image\">Product image</acronym>",
 	'image_small' => "<acronym title=\"Small product image\">Small product image</acronym>",
 	'weight' => "<acronym title=\"Product weight\">Weight</acronym>",
-	'price' => "<acronym title=\"Product price in order in order currency\">Price</acronym>",
+	'price_header' => "Prices",
+	'price' => "<acronym title=\"Main product price\">Main</acronym>",
 	'active' => "<acronym title=\"Active product is available to order and published in catalogue\">Active product</acronym>",
 	'siteuser_group_id' => '<acronym title="Group having access rights to product">Access group</acronym>',
 	'sorting' => "<acronym title=\"Product sorting order\">Sorting order</acronym>",
@@ -66,7 +67,9 @@ return array(
 	'properties_show_kind_from_to' => 'From.. to..',
 	'properties_show_kind_listbox' => 'List by list of multiple choice',
 
-	'warehouse_item_count' => "Quantity of products in stock \"%s\"",
+	'warehouse_header' => "Quantity of products in stocks",
+	'property_header' => "Shop properties",
+	//'warehouse_item_count' => "Quantity of products in stock \"%s\"",
 	'siteuser_group_id' => '<acronym title="Group having access rights to product">Access group</acronym>',
 	'shop_users_group_parrent' => 'Like parent',
 	'siteuser_id' => '<acronym title="Website user ID that added product">Sietuser ID</acronym>',
@@ -268,6 +271,7 @@ return array(
 	'item_length'=>'Length',
 	'item_width'=>'Width',
 	'item_height'=>'Height',
+	'apply_purchase_discount' => 'Take into account when calculating the purchase discount',
 	'show_in_group'=>'Show property in group',
 	'show_in_item'=>'Show property in item',
 	'add_value'=>'Add the default property values ​​for the items with unset values',

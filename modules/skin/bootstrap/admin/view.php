@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_View extends Admin_View
 {
@@ -102,7 +102,7 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 			if (strlen($this->pageTitle))
 			{
 				$ico = !is_null($this->module) && isset($this->module->menu[0])
-					? Core_Array::get($this->module->menu[0], 'ico')
+					? Core_Array::get($this->module->menu[0], 'ico', 'fa-barcode')
 					: 'fa-barcode';
 
 				?><h5 class="row-title before-pink"><i class="fa <?php echo htmlspecialchars($ico)?>"></i><?php echo htmlspecialchars($this->pageTitle)?></h5><?php

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online store orders',
@@ -119,7 +119,7 @@ return array(
 	'acceptance_report_invoice' => 'Invoice',
 	'acceptance_report_year' => ' year',
 	'document_number' => 'Document number',
-	
+	'document_datetime' => 'Document date',
 	'vat_invoice_title' => 'Vat invoice %s from %s г.',
 	'vat_invoice_intro' => '',
 	'vat_invoice_seller' => 'Seller: ',
@@ -127,7 +127,7 @@ return array(
 	'vat_invoice_tin' => 'TIN/TRRC of the seller ',
 	'vat_invoice_shipper' => 'Shipper and its address: ----',
 	'vat_invoice_consignee' => 'Consignee and its address: ----',
-	'vat_invoice_payment_doc' => 'For paymnet doc № _________ от ____________',
+	'vat_invoice_payment_doc' => 'For paymnet doc № ____________ of ____________',
 	'vat_invoice_buyer' => 'Buyer ',
 	'vat_invoice_buyer_address' => 'Address: ',
 	'vat_invoice_buyer_tin' => 'TIN/TRRC of the buyer ',
@@ -141,10 +141,10 @@ return array(
 	'vat_invoice_fio' => '(full name)',
 	'vat_invoice_details' => '',
 	'vat_invoice_note' => '',
-	
+
 	'tin' => '<acronym title="TIN">TIN</acronym>',
 	'kpp' => '<acronym title="Tax registration reason code">TRRC</acronym>',
-	
+
 	'torg12_title' => 'ТОРГ-12',
 	'torg12_intro' => 'Унифицированная форма № ТОРГ-12<br/>Утверждена постановлением Госкомстата России от 25.12.98 № 132',
 	'torg12_codes' => 'Коды',
@@ -211,7 +211,7 @@ return array(
 	'torg12_gr_poluch' => 'Груз получил',
 	'torg12_gruzopol_s' => 'грузополучатель',
 	'torg12_mp' => 'М.П.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;"&emsp;&emsp;"_______________________20&emsp;года',
-	
+
 	'property_menu' => 'Properties',
 	'property_menu_add' => 'Add',
 	'property_title' => 'External properties',
@@ -219,7 +219,7 @@ return array(
 	'tab_properties' => "Additional properties",
 	'prefix' => '<acronym title="Prefix of product property">Prefix</acronym>',
 	'display' => '<acronym title="Display mode of property">Display mode of property</acronym>',
-	
+
 	'properties_show_kind_none' => 'Not display',
 	'properties_show_kind_text' => 'Input field',
 	'properties_show_kind_list' => 'List by lists',
@@ -229,7 +229,7 @@ return array(
 	'properties_show_kind_from_to' => 'From.. to..',
 	'properties_show_kind_listbox' => 'List by list of multiple choice',
 	'properties_show_kind_textarea' => 'Textarea',
-	
+
 	'copy_success' => "Order copied successfully!",
 	'guid' => "GUID",
 );

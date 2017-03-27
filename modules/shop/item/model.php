@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Model extends Core_Entity
 {
@@ -165,6 +165,7 @@ class Shop_Item_Model extends Core_Entity
 		'length' => 0,
 		'width' => 0,
 		'height' => 0,
+		'apply_purchase_discount' => 1,
 		'showed' => 0
 	);
 
@@ -834,7 +835,9 @@ class Shop_Item_Model extends Core_Entity
 		$this->active = 1 - $this->active;
 		$this->save();
 
-		$this->index();
+		$this->active
+			? $this->index()
+			: $this->unindex();
 
 		$this->clearCache();
 
@@ -862,7 +865,21 @@ class Shop_Item_Model extends Core_Entity
 
 		return $this;
 	}
-	
+
+	/**
+	 * Remove item from search index
+	 * @return self
+	 */
+	public function unindex()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::deleteSearchPage(3, 2, $this->id);
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Mark entity as deleted
 	 * @return Core_Entity
@@ -1095,6 +1112,8 @@ class Shop_Item_Model extends Core_Entity
 
 		return $oSearch_Page;
 	}
+
+
 
 	/**
 	 * Backend callback method

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Dataset
 {
@@ -57,6 +57,11 @@ abstract class Admin_Form_Dataset
 	 */
 	protected $_conditions = array();
 
+	/**
+	 * Array of orders
+	 */
+	protected $_orders = array();
+	
 	/**
 	 * Get count of finded objects
 	 * @return int
@@ -127,6 +132,19 @@ abstract class Admin_Form_Dataset
 	public function addCondition($condition)
 	{
 		$this->_conditions[] = $condition;
+		return $this;
+	}
+	
+	/**
+	 * Add orderBy
+	 * @param string $column column
+	 * @param string $direction sorting direction
+	 * @param boolean $binary binary option
+	 * @return self
+	 */
+	public function orderBy($column, $direction = 'ASC', $binary = FALSE)
+	{
+		$this->_orders[] = array($column, $direction, $binary);
 		return $this;
 	}
 

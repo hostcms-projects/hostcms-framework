@@ -6,7 +6,7 @@
  * @package HostCMS 6\Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'changeLanguage' => 'Выберите язык:',
@@ -29,6 +29,17 @@ return array(
 	'seconds' => 'сек.',
 	'megabytes' => 'M',
 
+	'menu_0' => 'Выбор языка',
+	'menu_1' => '1. Информация о системе',
+	'menu_2' => '2. Лицензионное соглашение',
+	'menu_3' => '3. Проверка параметром',
+	'menu_4' => '4. Опции установки',
+	'menu_5' => '5. Результат конфигурирования',
+	'menu_6' => '6. Лицензионные данные',
+	'menu_7' => '7. Выбор макета сайта',
+	'menu_8' => '8. Настройки макета',
+	'menu_9' => '9. Завершение установки HostCMS',
+	
 	'step_0' => 'Установка HostCMS',
 	'step_1' => 'Шаг 1: Информация о системе управления сайтом HostCMS',
 	'step_2' => 'Шаг 2: Лицензионный договор',

@@ -749,6 +749,32 @@
 			});
 		},
 		/* -- /CHAT -- */
+		loadSiteList: function() {
+			// add ajax '_'
+			var data = $.getData({});
+
+			$.ajax({
+				url: '/admin/index.php?ajaxWidgetLoad&moduleId=0&type=10',
+				type: "POST",
+				data: data,
+				dataType: 'json',
+				error: function(){},
+				success: function (data) {
+					//update count site badge
+					$('#sitesListIcon span.badge').text(data['count']);
+
+					// update site list
+					$('#sitesListBox').html(data['content']);
+
+					$('.scroll-sites').slimscroll({
+					 // height: '215px',
+					  height: 'auto',
+					  color: 'rgba(0,0,0,0.3)',
+					  size: '5px'
+					});
+				},
+			});
+		},
 		widgetRequest: function(settings){
 			$.loadingScreen('show');
 
@@ -875,7 +901,7 @@
 			});
 		},
 		/* --- /CHAT --- */
-		
+
 		refreshEditor: function()
 		{
 			return this.each(function(){

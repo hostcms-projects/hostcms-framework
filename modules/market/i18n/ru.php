@@ -5,7 +5,7 @@
  * @package HostCMS 6\Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Магазин приложений',
@@ -20,10 +20,6 @@ return array(
 	'free' => 'Бесплатно',
 	'buy' => 'Купить',
 	'install_warning' => 'Вы уверены, что хотите установить?',
-	'mail_subject' => 'Установка модуля %s',
-	'mail_message' => 'Пользователь %s установил модуль "%s"!',
-	'mail_message_license' => 'Лицензия: ',
-	'mail_message_date' => 'Дата: ',
 	'options-title' => 'Заполните опции модуля',
 	'option-caption' => 'Параметр',
 	'option-value' => 'Значение',

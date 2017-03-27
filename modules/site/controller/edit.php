@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -23,7 +23,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$object->lng = Core::_('Site.lng_default');
 		}
-		
+
 		parent::setObject($object);
 
 		$oSiteTabAccessRights = Admin_Form_Entity::factory('Tab')
@@ -363,6 +363,8 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 			}
 		}
+
+		$this->addMessage('<script type="text/javascript">$.loadSiteList()</script>');
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}

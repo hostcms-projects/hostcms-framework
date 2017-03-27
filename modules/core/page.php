@@ -74,7 +74,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Page extends Core_Servant_Properties
 {
@@ -437,6 +437,125 @@ class Core_Page extends Core_Servant_Properties
 		} while($oTemplate = $oTemplate->getParent());
 
 		$this->css = array_merge($this->css, array_reverse($aCss));
+
+		return $this;
+	}
+
+	/**
+	 * Show 403 error
+	 * @return self
+	 */
+	public function error403()
+	{
+		$oCore_Response = $this->deleteChild()->response->status(403);
+
+		// Если определена константа с ID страницы для 403 ошибки и она не равна нулю
+		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
+		if ($oSite->error403)
+		{
+			$oStructure = Core_Entity::factory('Structure')->find($oSite->error403);
+
+			// страница с 403 ошибкой не найдена
+			if (is_null($oStructure->id))
+			{
+				throw new Core_Exception('Group not found');
+			}
+
+			if ($oStructure->type == 0)
+			{
+				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
+
+				if (!is_null($oDocument_Versions))
+				{
+					$this->template($oDocument_Versions->Template);
+				}
+			}
+			// Если динамическая страница или типовая дин. страница
+			elseif ($oStructure->type == 1 || $oStructure->type == 2)
+			{
+				$this->template($oStructure->Template);
+			}
+
+			$this->addChild($oStructure->getRelatedObjectByType());
+			$oStructure->setCorePageSeo($this);
+		}
+		else
+		{
+			if (Core::$url['path'] != '/')
+			{
+				// Редирект на главную страницу
+				$oCore_Response->header('Location', '/');
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Show 404 error
+	 * @return self
+	 */
+	public function error404()
+	{
+		$oCore_Response = $this->deleteChild()->response->status(404);
+
+		// Если определена константа с ID страницы для 404 ошибки и она не равна нулю
+		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
+		if ($oSite->error404)
+		{
+			$oStructure = Core_Entity::factory('Structure')->find($oSite->error404);
+
+			// страница с 404 ошибкой не найдена
+			if (is_null($oStructure->id))
+			{
+				throw new Core_Exception('Structure not found');
+			}
+
+			if ($oStructure->type == 0)
+			{
+				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
+
+				if (!is_null($oDocument_Versions))
+				{
+					$this->template($oDocument_Versions->Template);
+				}
+			}
+			// Если динамическая страница или типовая дин. страница
+			elseif ($oStructure->type == 1 || $oStructure->type == 2)
+			{
+				$this->template($oStructure->Template);
+			}
+
+			if ($oStructure->type == 2)
+			{
+				$this->libParams
+					= $oStructure->Lib->getDat($oStructure->id);
+
+				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
+
+				if (is_file($LibConfig) && is_readable($LibConfig))
+				{
+					include $LibConfig;
+				}
+			}
+
+			$this
+				->structure($oStructure)
+				->addChild($oStructure->getRelatedObjectByType());
+
+			$oStructure->setCorePageSeo($this);
+
+			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
+			$this->buildingPage && $this->execute();
+		}
+		else
+		{
+			if (Core::$url['path'] != '/')
+			{
+				// Редирект на главную страницу
+				$oCore_Response->header('Location', '/');
+			}
+		}
 
 		return $this;
 	}

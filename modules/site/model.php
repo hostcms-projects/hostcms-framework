@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Model extends Core_Entity
 {
@@ -1567,5 +1567,40 @@ class Site_Model extends Core_Entity
 		}
 
 		return parent::getXml();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$aSite_Aliases = $this->Site_Aliases->findAll();
+		
+		if (count($aSite_Aliases))
+		{
+			$aTmpSite_Aliases = array_slice($aSite_Aliases, 0, 5);
+
+			$oDiv = Core::factory('Core_Html_Entity_Div');
+			foreach ($aTmpSite_Aliases as $oSite_Aliases)
+			{
+				$oDiv->add(
+					Core::factory('Core_Html_Entity_Span')
+						->class('label label-default')
+						->value(htmlspecialchars(Core_Str::cut($oSite_Aliases->name, 25)))
+					);
+
+			}
+
+			count($aTmpSite_Aliases) < count($aSite_Aliases) && $oDiv->add(
+				Core::factory('Core_Html_Entity_Span')
+					->class('label label-default')
+					->value('…')
+				);
+
+			$oDiv->execute();
+		}
 	}
 }

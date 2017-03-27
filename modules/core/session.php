@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Session
 {
@@ -44,13 +44,19 @@ class Core_Session
 	protected $_dataBase = NULL;
 
 	/**
+	 * Session has been read
+	 * @var boolean
+	 */
+	protected $_read = FALSE;
+	
+	/**
 	 * Constructor.
 	 */
 	public function __construct()
 	{
 		$this->_dataBase = Core_DataBase::instance();
 
-		if ($this->_lockPrefix === NULL)
+		if (is_null($this->_lockPrefix))
 		{
 			$aDataBaseConfig = $this->_dataBase->getConfig();
 			$this->_lockPrefix = $aDataBaseConfig['database'] . '_' . 'sessions';
@@ -90,7 +96,8 @@ class Core_Session
 				//ini_set('session.gc_maxlifetime', $expires);
 			}
 
-			$domain = strtolower(Core_Array::get($_SERVER, 'HTTP_HOST'));
+			list($domain) = explode(':', strtolower(Core_Array::get($_SERVER, 'HTTP_HOST')));
+
 			if (!empty($domain) && !headers_sent())
 			{
 				// Обрезаем www у домена
@@ -202,7 +209,7 @@ class Core_Session
 	{
 		$iStartTime = time();
 
-		while (TRUE)
+		while (!connection_aborted())
 		{
 			$oDataBase = $this->_dataBase->setQueryType(0)
 				->query('SELECT GET_LOCK("' . $this->_dataBase->quote($this->_lockPrefix . '_' . $id) . '",'
@@ -218,7 +225,7 @@ class Core_Session
 			if (isset($row['lock']) && $row['lock'] == 1)
 			{
 				// Блокировка удалась
-				break;
+				return TRUE;
 			}
 
 			// Время, прошедшее с начала попытки блокировки
@@ -232,7 +239,7 @@ class Core_Session
 			usleep($this->_nextStepDelay);
 		}
 
-		return TRUE;
+		return FALSE;
 	}
 
 	/**
@@ -262,26 +269,28 @@ class Core_Session
 	 */
 	public function sessionRead($id)
 	{
-		$this->_lock($id);
-
-		$queryBuilder = Core_QueryBuilder::select('value')
-			->from('sessions')
-			->where('id', '=', $id)
-			->limit(1);
-
-		$row = $queryBuilder->execute()->asAssoc()->current();
-
-		if ($row)
+		if ($this->_lock($id))
 		{
-			// Update last change time
-			Core_QueryBuilder::update('sessions')
-				//->columns(array('time' => 'UNIX_TIMESTAMP(NOW())'))
-				->columns(array('time' => time()))
+			$queryBuilder = Core_QueryBuilder::select('value')
+				->from('sessions')
 				->where('id', '=', $id)
-				->execute()
-				;
+				->limit(1);
 
-			return $row['value'];
+			$row = $queryBuilder->execute()->asAssoc()->current();
+
+			$this->_read = TRUE;
+			
+			if ($row)
+			{
+				// Update last change time
+				Core_QueryBuilder::update('sessions')
+					//->columns(array('time' => 'UNIX_TIMESTAMP(NOW())'))
+					->columns(array('time' => time()))
+					->where('id', '=', $id)
+					->execute();
+
+				return base64_decode($row['value']);
+			}
 		}
 
 		return FALSE;
@@ -343,27 +352,30 @@ class Core_Session
 	 */
 	public function sessionWrite($id, $value)
 	{
-		$this->_lock($id);
-
-		$oDataBase = Core_QueryBuilder::update('sessions')
+		if ($this->_read && $this->_lock($id))
+		{
+			$oDataBase = Core_QueryBuilder::update('sessions')
 				//->columns(array('time' => 'UNIX_TIMESTAMP(NOW())'))
-				->set('value', $value)
+				->set('value', base64_encode($value))
 				->set('time', time())
 				->where('id', '=', $id)
 				->execute();
 
-		if ($oDataBase->getAffectedRows() == 0)
-		{
-			$maxlifetime = self::getMaxLifeTime();
+			// Returns the number of rows affected by the last SQL statement
+			// If nothing's really was changed affected rowCount will return 0.
+			if ($oDataBase->getAffectedRows() == 0)
+			{
+				$maxlifetime = self::getMaxLifeTime();
 
-			Core_QueryBuilder::insert('sessions')
-				->ignore()
-				->columns('id', 'value', 'time', 'maxlifetime')
-				->values($id, $value, time(), $maxlifetime)
-				->execute();
+				Core_QueryBuilder::insert('sessions')
+					->ignore()
+					->columns('id', 'value', 'time', 'maxlifetime')
+					->values($id, base64_encode($value), time(), $maxlifetime)
+					->execute();
+			}
+
+			$this->_unlock($id);
 		}
-
-		$this->_unlock($id);
 
 		return TRUE;
 	}
@@ -375,16 +387,19 @@ class Core_Session
 	 */
 	public function sessionDestroyer($id)
 	{
-		$this->_lock($id);
+		if ($this->_lock($id))
+		{
+			Core_QueryBuilder::delete('sessions')
+				->where('id', '=', $id)
+				->execute();
 
-		Core_QueryBuilder::delete('sessions')
-			->where('id', '=', $id)
-			->execute();
+			// для предотвращения автоматической повторной регистрации сеанса
+			$_SESSION = array();
 
-		// для предотвращения автоматической повторной регистрации сеанса
-		$_SESSION = array();
+			return TRUE;
+		}
 
-		return TRUE;
+		return FALSE;
 	}
 
 	/**

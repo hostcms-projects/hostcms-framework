@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_DataBase
 {
@@ -451,18 +451,22 @@ abstract class Core_DataBase
 		$sQuoted = $this->quote($tableName);
 		$sColumnName = $this->quoteColumnName($tableName);
 
-		$stdOut->write("\r\n\r\n");
-		$stdOut->write("-- \r\n");
-		$stdOut->write("-- Structure for table " . $sQuoted . " \r\n");
-		$stdOut->write("-- \r\n\r\n");
-		$stdOut->write("DROP TABLE IF EXISTS " . $sColumnName . ";\r\n");
-
+		$stdOut->write(
+			"\r\n\r\n" .
+			"-- \r\n" .
+			"-- Structure for table " . $sQuoted . " \r\n" .
+			"-- \r\n\r\n" .
+			"DROP TABLE IF EXISTS " . $sColumnName . ";\r\n"
+		);
+		
 		$aCreate = $this->query("SHOW CREATE TABLE {$sColumnName}")->asAssoc()->current();
-		$stdOut->write("{$aCreate['Create Table']};\r\n\r\n");
-
-		$stdOut->write("-- \r\n");
-		$stdOut->write("-- Data for table {$sQuoted} \r\n");
-		$stdOut->write("-- \r\n\r\n");
+		
+		$stdOut->write(
+			"{$aCreate['Create Table']};\r\n\r\n" .
+			"-- \r\n" .
+			"-- Data for table {$sQuoted} \r\n" .
+			"-- \r\n\r\n"
+		);
 
 		$oCore_QueryBuilderSelect = Core_QueryBuilder::select()
 			->from($tableName)
@@ -474,18 +478,19 @@ abstract class Core_DataBase
 		$replace = array("''", "\\\\", '\0', '\n', '\r', '\Z');
 
 		$i = 0;
-		while($row = $oCore_QueryBuilderSelect->current())
+		$content = '';
+		while ($row = $oCore_QueryBuilderSelect->current())
 		{
 			if ($i == 0)
 			{
-				$stdOut->write("LOCK TABLES {$sColumnName} WRITE; \r\n");
-				$stdOut->write($sInsertInto);
+				$content .= "LOCK TABLES {$sColumnName} WRITE; \r\n" .
+					$sInsertInto;
 			}
 			else
 			{
 				$i % 100 == 0
-					? $stdOut->write(";\r\n" . $sInsertInto)
-					: $stdOut->write(",\r\n");
+					? $content .= ";\r\n" . $sInsertInto
+					: $content .= ",\r\n";
 			}
 
 			$values = array();
@@ -506,14 +511,20 @@ abstract class Core_DataBase
 				}
 			}
 
-			$stdOut->write('(' . implode(',', $values) . ")");
+			$content .= '(' . implode(',', $values) . ")";
 
+			if ($i % 100)
+			{
+				$stdOut->write($content);
+				$content = '';
+			}
+			
 			$i++;
 		}
-
+		
 		if ($i > 0)
 		{
-			$stdOut->write(";\r\n");
+			$stdOut->write($content . ";\r\n");
 			$stdOut->write("UNLOCK TABLES;");
 		}
 

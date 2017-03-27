@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Benchmark.
  *
- * @package HostCMS 6\Benchmark
+ * @package HostCMS
+ * @subpackage Benchmark
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
  */
 class Benchmark_Controller
 {
@@ -285,5 +286,21 @@ class Benchmark_Controller
 		@mail($oSite->admin_email, 'Performance test', self::$aConfig['sample_text']);
 
 		return abs(round(Core::getmicrotime() - $startTime, 4));
+	}
+
+	/*
+	 * Delete old urls
+	 * @return self
+	 */
+	public function deleteOldUrlBenchmarks()
+	{
+		// Получаем дату, начиная с которой необходимо хранить урлы
+		$date_storage = Core_Date::timestamp2sql(strtotime("-1 month"));
+
+		// Удаляем старые данные из таблицы статистики
+		Core_DataBase::instance()->setQueryType(3)
+			->query("DELETE LOW_PRIORITY QUICK FROM `benchmark_urls` WHERE `datetime` < '{$date_storage}' LIMIT 5000");
+			
+		return $this;
 	}
 }

@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Core benchmark controller.
  *
- * @package HostCMS 6\Core\Command
+ * @package HostCMS
+ * @subpackage Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Benchmark extends Core_Command_Controller
 {
@@ -36,6 +37,12 @@ class Core_Command_Controller_Benchmark extends Core_Command_Controller
 				->save();
 
 			$result = 'OK';
+
+			// Clear old data
+			if (rand(0, 999) == 0)
+			{
+				Benchmark_Controller::instance()->deleteOldUrlBenchmarks();
+			}
 		}
 
 		$oCore_Response

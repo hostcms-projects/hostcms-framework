@@ -7,6 +7,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
+ * - dirsList(TRUE|FALSE) показывать группы производителей, по умолчанию FALSE
  * - producer($id) идентификатор производителя
  * - offset($offset) смещение, по умолчанию 0
  * - limit($limit) количество
@@ -27,7 +28,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Producer_Controller_Show extends Core_Controller
 {
@@ -43,6 +44,7 @@ class Shop_Producer_Controller_Show extends Core_Controller
 		'total',
 		'pattern',
 		'patternParams',
+		'dirsList',
 	);
 
 	/**
@@ -52,6 +54,18 @@ class Shop_Producer_Controller_Show extends Core_Controller
 	protected $_Shop_Producers = array();
 
 	/**
+	 * List of dirs of producers
+	 * @var array
+	 */
+	protected $_aShop_Producer_Dirs = array();
+
+	/**
+	 * Shop producer dirs object
+	 * @var Shop_Group_Model
+	 */
+	protected $_Shop_Producer_Dirs = NULL;
+
+	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
 	 */
@@ -59,11 +73,15 @@ class Shop_Producer_Controller_Show extends Core_Controller
 	{
 		parent::__construct($oShop->clearEntities());
 
+		$this->_setShopProducerDirs();
+
 		$this->_Shop_Producers = $oShop->Shop_Producers;
 
 		$this->_Shop_Producers
 			->queryBuilder()
 			->select('shop_producers.*');
+
+		$this->dirsList = FALSE;
 
 		$this->producer = NULL;
 		$this->offset = 0;
@@ -73,12 +91,39 @@ class Shop_Producer_Controller_Show extends Core_Controller
 	}
 
 	/**
+	 * Set dirs's conditions
+	 * @return self
+	 */
+	protected function _setShopProducerDirs()
+	{
+		$oShop = $this->getEntity();
+
+		$this->_Shop_Producer_Dirs = $oShop->Shop_Producer_Dirs;
+		$this->_Shop_Producer_Dirs
+			->queryBuilder()
+			->clearOrderBy()
+			->orderBy('shop_producer_dirs.sorting', 'ASC')
+			->orderBy('shop_producer_dirs.name', 'ASC');
+
+		return $this;
+	}
+
+	/**
 	 * Get producers
 	 * @return array
 	 */
 	public function shopProducers()
 	{
 		return $this->_Shop_Producers;
+	}
+
+	/**
+	 * Get producer dirs
+	 * @return array
+	 */
+	public function shopProducerDirs()
+	{
+		return $this->_Shop_Producer_Dirs;
 	}
 
 	/**
@@ -101,6 +146,8 @@ class Shop_Producer_Controller_Show extends Core_Controller
 				->name('limit')
 				->value(intval($this->limit))
 		);
+
+		$this->dirsList && $this->addDirs();
 
 		// До вывода свойств групп
 		if ($this->limit > 0)
@@ -226,6 +273,48 @@ class Shop_Producer_Controller_Show extends Core_Controller
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Add all dirs to XML
+	 * @return self
+	 */
+	public function addDirs()
+	{
+		$this->_aShop_Producer_Dirs = array();
+
+		$aShop_Producer_Dirs = $this->_Shop_Producer_Dirs->findAll();
+
+		foreach ($aShop_Producer_Dirs as $oShop_Producer_Dir)
+		{
+			$oShop_Producer_Dir->clearEntities();
+			$this->_aShop_Producer_Dirs[$oShop_Producer_Dir->parent_id][] = $oShop_Producer_Dir;
+		}
+
+		$this->_addDirsByParentId(0, $this);
+
+		return $this;
+	}
+
+	/**
+	 * Add dirs by parent to XML
+	 * @param int $parent_id
+	 * @param object $parentObject
+	 * @return self
+	 */
+	protected function _addDirsByParentId($parent_id, $parentObject)
+	{
+		if (isset($this->_aShop_Producer_Dirs[$parent_id]))
+		{
+			foreach ($this->_aShop_Producer_Dirs[$parent_id] as $oShop_Producer_Dir)
+			{
+				$parentObject->addEntity($oShop_Producer_Dir);
+
+				$this->_addDirsByParentId($oShop_Producer_Dir->id, $oShop_Producer_Dir);
+			}
+		}
 
 		return $this;
 	}

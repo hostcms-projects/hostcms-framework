@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Imap extends Core_Servant_Properties
 {
@@ -227,7 +227,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			{
 				$this->_aMessages[$i]['from'] = '';
 			}
-			
+
 			// Reply To заменяет From если передан
 			if (isset($header_message->reply_to))
 			{
@@ -453,13 +453,31 @@ class Core_Mail_Imap extends Core_Servant_Properties
 							);
 						}
 
-						// В сообщение идет первый блок
-						$defaultPart = $aStructurePart['parts'][0];
-						$this->_aMessages[$i]['body'] = $this->_aMessages[$i]['multipart'][
-							$defaultPart['subtype']
-						];
+						if (isset($this->_aMessages[$i]['multipart']['HTML']))
+						{
+							$this->_aMessages[$i]['subtype'] = 'HTML';
+							$this->_aMessages[$i]['body'] = $this->_aMessages[$i]['multipart'][
+								$this->_aMessages[$i]['subtype']
+							];
+						}
+						elseif (isset($this->_aMessages[$i]['multipart']['PLAIN']))
+						{
+							$this->_aMessages[$i]['subtype'] = 'PLAIN';
+							$this->_aMessages[$i]['body'] = $this->_aMessages[$i]['multipart'][
+								$this->_aMessages[$i]['subtype']
+							];
+						}
+						else
+						{
+							// В сообщение идет первый блок
+							$defaultPart = $aStructurePart['parts'][0];
 
-						$this->_aMessages[$i]['subtype'] = $defaultPart['subtype'];
+							$this->_aMessages[$i]['body'] = $this->_aMessages[$i]['multipart'][
+								$defaultPart['subtype']
+							];
+
+							$this->_aMessages[$i]['subtype'] = $defaultPart['subtype'];
+						}
 					}
 				break;
 				// text
@@ -494,160 +512,6 @@ class Core_Mail_Imap extends Core_Servant_Properties
 							$aStructurePart['dparameters']['filename']
 						);
 					}
-
-					/*
-					if (function_exists('imap_fetchmime'))
-					{
-						$mime = imap_fetchmime($this->_stream, $i + 1, $iStructurePartNumber + 1);
-						$aImapMimeHeaderDecode = imap_mime_header_decode($mime);
-
-						foreach ($aImapMimeHeaderDecode as $key => $oObject)
-						{
-							var_dump($oObject);
-							// Если у $oObject->text встретился name=, то следующий объект будет содержать имя файла
-							if (strpos($oObject->text, 'name=') !== FALSE && isset($aImapMimeHeaderDecode[$key + 1]))
-							{
-								$attachmentEncode = strtoupper($aImapMimeHeaderDecode[$key + 1]->charset);
-								$attachmentName = $aImapMimeHeaderDecode[$key + 1]->text;
-
-								if ($attachmentEncode != 'UTF-8' && $attachmentEncode != 'DEFAULT')
-								{
-									$attachmentName = mb_convert_encoding($attachmentName, 'UTF-8', $attachmentEncode);
-								}
-								$this->_aMessages[$i]['attachments'][$n]['name'] = $attachmentName;
-							}
-						}
-					}
-					// Функция imap_fetchmime() отсутствует
-					else
-					{
-						if (isset($aStructurePart['dparameters']['filename*0*'])
-						|| isset($aStructurePart['dparameters']['filename'])
-						|| isset($aStructurePart['dparameters']['filename*'])
-						|| (isset($aStructurePart['subtype'])
-							&& in_array(mb_strtolower($aStructurePart['subtype']), array('gif', 'jpg', 'jpeg', 'vnd.ms-excel', 'msword')))
-						|| (isset($aStructurePart['disposition'])
-							&& mb_strtolower($aStructurePart['disposition']) == 'attachment'))
-						{
-							// Имя вложения
-							if (isset($aStructurePart['dparameters'])
-							|| isset($aStructurePart['ifdparameters'])
-							|| isset($aStructurePart['name']))
-							{
-								$file_name = '';
-
-								if (isset($aStructurePart['dparameters']))
-								{
-									foreach ($aStructurePart['dparameters'] as $dparameters_key => $dparameters)
-									{
-										if (mb_strpos(mb_strtolower($dparameters_key), 'filename') !== FALSE)
-										{
-											$file_name .= $dparameters;
-										}
-									}
-								}
-								// GIF или JPG inline
-								elseif (isset($aStructurePart['parameters']['name']))
-								{
-									$file_name .= $aStructurePart['parameters']['name'];
-								}
-								elseif (isset($aStructurePart['name']))
-								{
-									$file_name .= $aStructurePart['name'];
-								}
-								elseif (isset($aStructurePart['ifparameters']['name']))
-								{
-									$file_name .= $aStructurePart['ifparameters']['name'];
-								}
-								elseif (isset($aStructurePart['ifdparameters']['filename*0*'])
-								|| isset($aStructurePart['dparameters']['filename'])
-								|| isset($aStructurePart['dparameters']['filename*']))
-								{
-									foreach ($aStructurePart['ifdparameters'] as $dparameters_key => $dparameters)
-									{
-										if (mb_strpos(mb_strtolower($dparameters_key), 'filename') !== FALSE)
-										{
-											$file_name .= $dparameters;
-										}
-									}
-								}
-
-								// Т.к. у некоторых между частями пробел не стоит
-								$file_name = str_replace('=?==?', '=?= =?', $file_name);
-
-								$file_name_explode = explode(' ', $file_name);
-
-								// Далее к имени файла будет дописываться информация
-								$this->_aMessages[$i]['attachments'][$n]['name'] = '';
-
-								// Цикл по всем частям названия файла, которые были разделены пробелом
-								foreach ($file_name_explode as $file_name_n)
-								{
-									// Ищем кодировку в имени файла
-									preg_match_all("'([^\'\"]*?)\'\'(\"([^\"]*?)\"|.*?)(\Z|;)'siu", $file_name_n, $code);
-									preg_match_all("'=\?([^=]*?)\?(Q?B?)\??(=?)([^\?]*?)\?=(.*?)'siu", $file_name_n, $code_1);
-
-									if (isset($code[1][0]) && $code[1][0] != '')
-									{
-										$file_name_code = $code[1][0];
-										$file_name = urldecode($code[2][0]);
-									}
-									elseif (isset($code_1[1][0]) && $code_1[1][0] != '')
-									{
-										$file_name_code = $code_1[1][0];
-										$file_name = $code_1[3][0] . $code_1[4][0] . $code_1[5][0];
-									}
-
-									// Тип кодирования по умолчанию 3
-									$encoding = 3;
-
-									// Если ыыл передан тип кодирования (B, Q)
-									if (isset($code_1[2][0]) && $code_1[2][0] != '')
-									{
-										switch ($code_1[2][0]) {
-											case 'Q':
-												$encoding = 4;
-											break;
-											case 'B':
-												$encoding = 3;
-											break;
-											default:
-												isset($aStructurePart['encoding']) && $encoding = $aStructurePart['encoding'];
-											break;
-										}
-									}
-
-									// Портит =?windows-1251?B?7+vg8uXm7e7lIO/u8PP35e3o5SAucGRm?=
-									// на     =?windows-1251?B?7 vg8uXm7e7lIO/u8PP35e3o5SAucGRm?=
-									// перенесено выше для случая "UTF-8''%D0%B1%D0%BB%D0%BE%D0%B3%2E%64%6F%63"
-									//$file_name = urldecode($file_name);
-									$decoded_str = $this->_bodyDecode($file_name, 4);
-
-									// Если декодированная строка аналогична переданной
-									if ($decoded_str == $file_name || $decoded_str . "=" == $file_name)
-									{
-										if (preg_match("'[!;:%\*\(\),\.]'u", $decoded_str))
-										{
-											$decoded_str = $file_name;
-										}
-										else
-										{
-											$decoded_str = $this->_bodyDecode($file_name, $encoding);
-										}
-									}
-
-									if (isset($file_name_code) && trim($file_name_code) != '')
-									{
-										$decoded_str = $this->_iconv($decoded_str, $file_name_code);
-									}
-
-									// Дописываем новую часть имени файла
-									$this->_aMessages[$i]['attachments'][$n]['name'] .= $decoded_str;
-								}
-							}
-						}
-					}*/
-
 					$n++;
 				break;
 			}
@@ -680,42 +544,27 @@ class Core_Mail_Imap extends Core_Servant_Properties
 	/**
 	 * Перекодировщик тела письма
 	 *
-	 * @param string $str Закодированная строка
-	 * @param string $encoding_type Кодировка
+	 * @param string $text Закодированная строка
+	 * @param int $encoding Кодировка: 0 - 7bit, 1 - 8bit, 2 - Binary, 3 - Base64, 4 - Quoted-Printable, 5 - other
 	 * @return string Раскодированная строка
 	 */
-	protected function _bodyDecode($str, $encoding_type = '')
+	protected function _bodyDecode($text, $encoding = 0)
 	{
-		if (trim($str) == '')
+		switch ($encoding)
 		{
-			return $str;
+			case 1: // 8bit
+				return imap_qprint(imap_8bit($text));
+			case 2: // Binary
+				return imap_base64(imap_binary($text));
+			case 3: // Base64
+				return imap_base64($text);
+			case 4: // Quoted-Printable
+				return imap_qprint($text);
+			case 0: // 7bit
+			case 5:
+			default:
+				return $text;
 		}
-
-		// Письмо закодировано методом base64
-		if (mb_strpos(mb_strtolower($encoding_type), "base") !== FALSE
-		|| $encoding_type == 3
-		|| $encoding_type == 2)
-		{
-			if ($encoding_type == 2)
-			{
-				$str = imap_binary($str);
-			}
-			//if ($this->_isBase64($str))
-			else
-			{
-				$str = base64_decode($str);
-			}
-		}
-		// Письмо закодировано методом quoted-printable
-		elseif (strpos(strtolower($encoding_type), "quoted") !== FALSE
-		/*|| mb_strpos(mb_strtolower($encoding_type), "bit") !== FALSE*/
-		|| $encoding_type == 4
-		/*|| $encoding_type == 1*/)
-		{
-			$str = imap_qprint($str);
-		}
-
-		return $str;
 	}
 
 	/**

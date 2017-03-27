@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Controller_Show extends Core_Controller
 {
@@ -185,15 +185,13 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 		$Shop_Cart_Controller = Shop_Cart_Controller::instance();
 
-		$amount = 0;
-		$quantity = 0;
-		$weight = 0;
-		$this->volume = 0;
+		$quantityPurchaseDiscount = $amountPurchaseDiscount = $amount = $quantity = $weight = $this->volume = 0;
 
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
-			if ($oShop_Cart->Shop_Item->id)
+			$oShop_Item = $oShop_Cart->Shop_Item;
+			if ($oShop_Item->id)
 			{
 				if ($oShop_Cart->postpone == 0)
 				{
@@ -210,7 +208,17 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
 
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
+					
+					// Сумма для скидок от суммы заказа рассчитывается отдельно
+					$oShop_Item->apply_purchase_discount
+						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
+					
 					$quantity += $oShop_Cart->quantity;
+					
+					// Количество для скидок от суммы заказа рассчитывается отдельно
+					$oShop_Item->apply_purchase_discount
+						&& $quantityPurchaseDiscount += $oShop_Cart->quantity;
+					
 					$weight += $oShop_Cart->Shop_Item->weight * $oShop_Cart->quantity;
 					$this->volume += Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->length * $oShop_Cart->Shop_Item->width * $oShop_Cart->Shop_Item->height, $oShop->size_measure, 0);
 				}
@@ -220,10 +228,10 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 		// Скидки от суммы заказа
 		$oShop_Purchase_Discount_Controller = new Shop_Purchase_Discount_Controller($oShop);
 		$oShop_Purchase_Discount_Controller
-			->amount($amount)
-			->quantity($quantity)
-			->couponText($this->couponText)
-			;
+			->amount($amountPurchaseDiscount)
+			->quantity($quantityPurchaseDiscount)
+			->couponText($this->couponText);
+			
 		$totalDiscount = 0;
 		$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
 		foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)

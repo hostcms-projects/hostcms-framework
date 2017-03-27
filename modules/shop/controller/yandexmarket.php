@@ -23,7 +23,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexMarket extends Core_Controller
 {
@@ -202,7 +202,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		parent::__construct($oShop->clearEntities());
 
 		$this->protocol = Core::httpsUses() ? 'https' : 'http';
-		
+
 		$this->_Shop_Items = $oShop->Shop_Items;
 
 		$siteuser_id = 0;
@@ -223,37 +223,6 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				}
 			}
 		}
-
-		/*switch ($oShop->items_sorting_direction)
-		{
-			case 1:
-				$items_sorting_direction = 'DESC';
-			break;
-			case 0:
-			default:
-				$items_sorting_direction = 'ASC';
-		}
-
-		// Определяем поле сортировки информационных элементов
-		switch ($oShop->items_sorting_field)
-		{
-			case 1:
-				$this->_Shop_Items
-					->queryBuilder()
-					->orderBy('shop_items.name', $items_sorting_direction);
-				break;
-			case 2:
-				$this->_Shop_Items
-					->queryBuilder()
-					->orderBy('shop_items.sorting', $items_sorting_direction)
-					->orderBy('shop_items.name', $items_sorting_direction);
-				break;
-			case 0:
-			default:
-				$this->_Shop_Items
-					->queryBuilder()
-					->orderBy('shop_items.datetime', $items_sorting_direction);
-		}*/
 
 		$this->_Shop_Items
 			->queryBuilder()
@@ -299,8 +268,9 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->_Shop_Groups
 			->queryBuilder()
 			->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-			->where('shop_groups.active', '=', 1)
-			->orderBy('shop_groups.parent_id');
+			//->where('shop_groups.active', '=', 1)
+			->clearOrderBy()
+			->orderBy('shop_groups.parent_id', 'ASC');
 
 		$this->itemsProperties = $this->modifications = TRUE;
 
@@ -362,13 +332,16 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	}
 
 	/**
+	 * Cache of categories IDs
+	 */
+	protected $_aCategoriesId = array();
+
+	/**
 	 * Show categories
 	 * @return self
 	 */
 	protected function _categories()
 	{
-		$aShop_Groups = $this->_Shop_Groups->findAll(FALSE);
-
 		echo "<categories>\n";
 
 		// Название магазина
@@ -376,11 +349,33 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		echo '<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n";
 
+		// Массив активных ID групп
+		$this->_aCategoriesId = array();
+
+		// Массив отключенных ID групп
+		$aDisabledCategoriesId = array();
+
+		$aShop_Groups = $this->_Shop_Groups->findAll(FALSE);
 		foreach ($aShop_Groups as $oShop_Group)
 		{
-			$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0 ? '' : ' parentId="' . $oShop_Group->parent_id . '"';
+			if ($oShop_Group->active
+				// Группа в корневой или в списке отключенных нет ее родителя
+				&& ($oShop_Group->parent_id == 0 || !isset($aDisabledCategoriesId[$oShop_Group->parent_id]))
+			)
+			{
+				$this->_aCategoriesId[$oShop_Group->id] = $oShop_Group->id;
 
-			echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
+				$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0
+					? ''
+					: ' parentId="' . $oShop_Group->parent_id . '"';
+
+				echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
+			}
+			else
+			{
+				// Группа в отключенные если она сама отключена или родитель отключен
+				$aDisabledCategoriesId[$oShop_Group->id] = $oShop_Group->id;
+			}
 		}
 		echo "</categories>\n";
 
@@ -422,19 +417,22 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			foreach ($aShop_Items as $oShop_Item)
 			{
-				$this->_showOffer($oShop_Item);
-
-				if ($this->modifications)
+				if (isset($this->_aCategoriesId[$oShop_Item->shop_group_id]))
 				{
-					$oModifications = $oShop_Item->Modifications;
-					$oModifications->queryBuilder()
-						->where('shop_items.yandex_market', '=', 1);
+					$this->_showOffer($oShop_Item);
 
-					$aModifications = $oModifications->findAll(FALSE);
-
-					foreach ($aModifications as $oModification)
+					if ($this->modifications)
 					{
-						$this->_showOffer($oModification);
+						$oModifications = $oShop_Item->Modifications;
+						$oModifications->queryBuilder()
+							->where('shop_items.yandex_market', '=', 1);
+
+						$aModifications = $oModifications->findAll(FALSE);
+
+						foreach ($aModifications as $oModification)
+						{
+							$this->_showOffer($oModification);
+						}
 					}
 				}
 			}
@@ -592,6 +590,15 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id, FALSE)
 			: $oShop_Item->getPropertyValues(FALSE);
 
+		// Допустимые значения возраста в годах
+		$aAgeYears = array(0, 6, 12, 16, 18);
+
+		// Допустимые значения возраста в месяцах
+		$aAgeMonthes = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+		$aForbid = array('age-month', 'age-year');
+
+		$bAge = FALSE;
+
 		foreach ($aProperty_Values as $oProperty_Value)
 		{
 			$oProperty = $oProperty_Value->Property;
@@ -674,7 +681,24 @@ class Shop_Controller_YandexMarket extends Core_Controller
 					}
 				}
 
-				echo '<' . $sTagName . $sAttr . '>' . Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8')) . '</' . $sTagName . '>'. "\n";
+				if ($value !== '')
+				{
+					if (!in_array($sTagName, $aForbid))
+					{
+						echo '<' . $sTagName . $sAttr . '>'
+							. Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8'))
+						. '</' . $sTagName . '>'. "\n";
+					}
+					elseif ($sTagName == 'age-year' && $value !== '' && in_array($value, $aAgeYears))
+					{
+						echo '<age unit="year">' . intval($value) . '</age>'. "\n";
+						$bAge = TRUE;
+					}
+					elseif (!$bAge && $sTagName == 'age-month' && $value !== '' && in_array($value, $aAgeMonthes))
+					{
+						echo '<age unit="month">' . intval($value) . '</age>'. "\n";
+					}
+				}
 			}
 		}
 

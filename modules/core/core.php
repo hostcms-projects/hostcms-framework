@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core
 {
@@ -540,7 +540,8 @@ class Core
 	{
 		return Core_Array::get($_SERVER, 'SERVER_PORT') == 443 || Core_Array::get($_SERVER, 'HTTP_PORT') == 443
 			|| strtolower(Core_Array::get($_SERVER, 'HTTPS')) == 'on' || Core_Array::get($_SERVER, 'HTTPS') == '1'
-			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_FORWARDED_PROTO')) == 'https';
+			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_FORWARDED_PROTO')) == 'https'
+			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_SCHEME')) == 'https';
 	}
 
 	/**

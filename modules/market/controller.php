@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Market_Controller extends Core_Servant_Properties
 {
@@ -28,7 +28,6 @@ class Market_Controller extends Core_Servant_Properties
 		'update_server',
 		'keys',
 		'category_id',
-		'categories',
 		'items',
 		'total',
 		'page',
@@ -46,6 +45,11 @@ class Market_Controller extends Core_Servant_Properties
 	 * @var mixed
 	 */
 	static public $instance = NULL;
+
+	/**
+	 * Categories
+	 */
+	protected $_categories = NULL;
 
 	/**
 	 * Register an existing instance as a singleton.
@@ -68,7 +72,7 @@ class Market_Controller extends Core_Servant_Properties
 	{
 		parent::__construct();
 
-		$this->categories = $this->items = array();
+		$this->_categories = $this->items = array();
 		$this->page = 1;
 		$this->limit = 9;
 		$this->error = 0;
@@ -124,6 +128,33 @@ class Market_Controller extends Core_Servant_Properties
 		return $this;
 	}
 
+	protected function _parseGroup($oXmlGroup, $parentId = 0)
+	{
+		foreach ($oXmlGroup as $value)
+		{
+			//if (intval($value->count))
+			//{
+				$oObject = new StdClass();
+				$oObject->id = intval($value->attributes()->id);
+				$oObject->name = strval($value->name);
+				$oObject->description = strval($value->description);
+				$oObject->count = intval($value->count);
+
+				if ($oObject->id)
+				{
+					$this->_categories[$parentId][] = $oObject;
+				}
+
+				if (isset($value->shop_group) && count($value->shop_group))
+				{
+					$this->_parseGroup($value->shop_group, $oObject->id);
+				}
+			//}
+		}
+
+		return $this->_categories;
+	}
+
 	/**
 	 * Загрузка магазина
 	 *
@@ -148,7 +179,7 @@ class Market_Controller extends Core_Servant_Properties
 			"&limit=" . intval($this->limit);
 
 		!is_null($this->order) && $url .= "&order=" . rawurlencode($this->order);
-			
+
 		try
 		{
 			$Core_Http = Core_Http::instance()
@@ -161,24 +192,27 @@ class Market_Controller extends Core_Servant_Properties
 
 			$oXml = @simplexml_load_string($data);
 
-			$aShop_Groups = array();
+			/*$aShop_Groups = array();
 			if (isset($oXml->shop_group) && count($oXml->shop_group))
 			{
 				foreach ($oXml->shop_group as $value)
 				{
-					if (intval($value->count))
-					{
+					//if (intval($value->count))
+					//{
 						$oObject = new StdClass();
 						$oObject->id = intval($value->attributes()->id);
 						$oObject->name = strval($value->name);
 						$oObject->description = strval($value->description);
 
 						$aShop_Groups[$oObject->id] = $oObject;
-					}
+					//}
 				}
 
-				$this->categories = $aShop_Groups;
-			}
+				$this->_categories = $aShop_Groups;
+			}*/
+			$this->_parseGroup($oXml->shop_group);
+
+			//print_r($this->_categories);
 
 			$aShop_Items = array();
 			if (isset($oXml->shop_item) && count($oXml->shop_item))
@@ -705,21 +739,6 @@ class Market_Controller extends Core_Servant_Properties
 											$this->admin_view->addMessage(
 												Core_Message::get(Core::_('Market.install_success', $oModule->name))
 											);
-
-											// Отправка отдельного письма автору модуля
-											/*Core_Mail::instance()
-												->to($oModule->author_email)
-												//->to('1@1.ru')
-												->from('no-reply@hostcms.ru')
-												->subject(Core::_('Market.mail_subject', $oModule->name))
-												->message(Core::_('Market.mail_message', $this->login, $oModule->name) . "\n" .
-													Core::_('Market.mail_message_license') . $this->contract . "\n" .
-													Core::_('Market.mail_message_date') . date("d.m.Y H:i:s")
-												)
-												->contentType('text/plain')
-												->header('X-HostCMS-Reason', 'MarketInstall')
-												->header('Precedence', 'bulk')
-												->send();*/
 										} catch (Exception $e) {}
 									}
 								}
@@ -829,6 +848,26 @@ class Market_Controller extends Core_Servant_Properties
 		return $Core_Http;
 	}
 
+	protected $_aTmpOptions = array();
+
+	protected function _getCategoryOptions($parentId, $level = 0)
+	{
+		if (isset($this->_categories[$parentId]))
+		{
+			foreach ($this->_categories[$parentId] as $object)
+			{
+				$this->_aTmpOptions[$object->id] = str_repeat('—', $level) . " " . $object->name;
+
+				if ($object->count)
+				{
+					$this->_aTmpOptions[$object->id] .= " (" . $object->count . ")";
+				}
+
+				$this->_getCategoryOptions($object->id, $level + 1);
+			}
+		}
+	}
+
 	public function showItemsList()
 	{
 		$this->admin_view
@@ -840,15 +879,12 @@ class Market_Controller extends Core_Servant_Properties
 
 		if ($this->error == 0)
 		{
-			$aCategories = array();
-			$aCategories = $this->categories;
-
-			$aTmp = array(Core::_('Market.select_section'));
-
-			foreach($aCategories as $object)
+			$this->_aTmpOptions = array(Core::_('Market.select_section'));
+			$this->_getCategoryOptions(0);
+			/*foreach($this->_categories as $object)
 			{
 				$aTmp[$object->id] = $object->name;
-			}
+			}*/
 
 			$oMainTab->add(
 				Admin_Form_Entity::factory('Div')->class('row')->add(
@@ -856,7 +892,7 @@ class Market_Controller extends Core_Servant_Properties
 						->name('category_id')
 						->value($this->category_id)
 						->onchange('changeCategory(this)')
-						->options($aTmp)
+						->options($this->_aTmpOptions)
 						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
 				)
 			);
@@ -902,7 +938,7 @@ class Market_Controller extends Core_Servant_Properties
 		}
 
 		$sWindowId = $this->controller->getWindowId();
-		
+
 		$oAdmin_Form_Entity_Form = Admin_Form_Entity::factory('Form')
 			->controller($this->controller)
 			->action($this->controller->getPath())
@@ -934,27 +970,29 @@ class Market_Controller extends Core_Servant_Properties
 			$sHtml .= $this->_getMarketItemHtml($object);
 		}
 		$sHtml .= '</div>';
-		
+
 		return $sHtml;
 	}
-	
+
 	protected function _getMarketItemHtml($object)
 	{
 		$sWindowId = $this->controller
 			? $this->controller->getWindowId()
 			: 'id_content';
-		
+
 		$sHtml = '<div class="col-lg-4 col-sm-6 col-xs-12 market-item">
 			<div class="databox databox-xlg databox-halved radius-bordered databox-shadowed databox-vertical">
 				<div class="databox-top bg-white padding-10">
-					<div class="col-lg-4 col-sm-4 col-xs-4">
-						<a target="_blank" href="' .  $object->url . '">
-							<img src="' . $object->image_small . '" style="width:75px; height:75px;" class="image-circular bordered-3 bordered-white" />
-						</a>
-					</div>
-					<div class="col-lg-8 col-sm-8 col-xs-8 text-align-left padding-10">
-						<span class="databox-header carbon no-margin"><a target="_blank" href="' .  $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
-						<span class="databox-text lightcarbon no-margin"> ' . htmlspecialchars($object->category_name) . ' </span>
+					<div class="row">
+						<div class="col-lg-4 col-sm-4 col-xs-4">
+							<a target="_blank" href="' .  $object->url . '">
+								<img src="' . $object->image_small . '" style="width:80px; height:80px;" class="market-item-image bordered-3 bordered-white" />
+							</a>
+						</div>
+						<div class="col-lg-8 col-sm-8 col-xs-8 text-align-left padding-10">
+							<span class="databox-header carbon no-margin"><a target="_blank" href="' .  $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
+							<span class="databox-text lightcarbon no-margin"> ' . htmlspecialchars($object->category_name) . ' </span>
+						</div>
 					</div>
 				</div>
 				<div class="databox-bottom bg-white no-padding">
@@ -980,8 +1018,12 @@ class Market_Controller extends Core_Servant_Properties
 			$sHtml .= '<div class="databox-row row-6 padding-10">
 
 				<div class="databox-cell cell-6 no-padding">
-					<div class="databox-text black"> ' . (floatval($object->price)
-						? round($object->price) . ' ' . $object->currency
+					<div class="databox-text black market-item-price"> ' . (floatval($object->price)
+						? number_format(round($object->price), 0, ',', ' ') . ' ' . (
+							$object->currency == 'руб.'
+								? '<i class="fa fa-rub"></i>'
+								: $object->currency
+						)
 						: Core::_('Market.free')
 					) . ' </div>
 				</div>

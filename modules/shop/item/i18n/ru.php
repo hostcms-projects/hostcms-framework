@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Товары магазина',
@@ -20,7 +20,9 @@ return array(
 	'image_large' => "<acronym title=\"Изображение товара\">Изображение товара</acronym>",
 	'image_small' => "<acronym title=\"Малое изображение товара\">Малое изображение товара</acronym>",
 	'weight' => "<acronym title=\"Вес товара\">Вес</acronym>",
-	'price' => "<acronym title=\"Цена товара в заказе в валюте заказа\">Цена</acronym>",
+
+	'price_header' => "Цены",
+	'price' => "<acronym title=\"Основная цена товара\">Основная</acronym>",
 	'active' => "<acronym title=\"Активный товар доступен для заказа и публикуется в каталоге\">Товар активен</acronym>",
 	'siteuser_group_id' => '<acronym title="Группа, имеющая права доступа к товару">Группа доступа</acronym>',
 	'sorting' => "<acronym title=\"Порядок сортировки товара\">Порядок сортировки</acronym>",
@@ -66,7 +68,9 @@ return array(
 	'properties_show_kind_from_to' => 'От.. до..',
 	'properties_show_kind_listbox' => 'Список - список с множественным выбором',
 
-	'warehouse_item_count' => "Количество товара на складе \"%s\"",
+	'warehouse_header' => "Количество товара на складах",
+	'property_header' => "Дополнительные свойства",
+	//'warehouse_item_count' => "Количество товара на складе \"%s\"",
 	'siteuser_group_id' => '<acronym title="Группа, имеющая права доступа к товару">Группа доступа</acronym>',
 	'shop_users_group_parrent' => 'Как у родителя',
 	'siteuser_id' => '<acronym title="Идентификатор пользователя сайта, добавившего товар">Код пользователя</acronym>',
@@ -268,6 +272,7 @@ return array(
 	'item_length'=>'Длина',
 	'item_width'=>'Ширина',
 	'item_height'=>'Высота',
+	'apply_purchase_discount' => 'Учитывать при расчете скидки от суммы заказа',
 	'show_in_group'=>'Показывать свойство в группе',
 	'show_in_item'=>'Показывать свойство в товаре',
 	'add_value'=>'Добавить отсутствующие значения свойства по умолчанию у товаров',

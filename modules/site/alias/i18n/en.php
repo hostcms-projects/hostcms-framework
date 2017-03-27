@@ -5,7 +5,7 @@
  * @package HostCMS 6\Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Domains',
@@ -32,13 +32,14 @@ return array(
 	'site_link_domen_add' => 'Add',
 	'site_show_domen_title' => 'Domains of website "%s"',
 	'constant_check_error' => 'Necessary constants not found; please fill in form fields Websites &#8594; Settings &#8594; Registration data',
+	'server_error_respond_0' => 'Unknown error!',
 	'server_error_respond_1' => 'Server configuration has been changed; you cannot get a key. Please contact administrator.',
 	'server_error_respond_2' => 'User not found. Please ensure that you specified a correct login in your registration data in section Websites.',
 	'server_error_respond_3' => 'Order not found. This order may belong to another user. Please ensure that you specified a correct login in your registration data in section Websites.',
 	'server_error_respond_4' => 'HostCMS system not found. Please try to request key once more. Please pay attention &mdash; that the management system should be available on the main domain of the current website. Specify a main domain in the domains list.',
 	'server_error_respond_5' => 'Invalid domain name.',
 	'server_error_respond_6' => 'You cannot get keys, please contact administrator.',
-	'server_error_respond_0' => 'Unknown error!',
+	'server_error_respond_10' => 'Error 10. Please contact the support.',
 	'server_error_respond_data' => 'Error while processing data.',
 	'site_delete_domens_message' => 'Domains deleted successfully!',
 	'getKey_success' => 'Key received successfully.',

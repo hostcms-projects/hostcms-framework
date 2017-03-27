@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -75,6 +75,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab = $this->getTab('main');
 				$oAdditionalTab = $this->getTab('additional');
 
+				$oAdditionalTab
+					->add($oAdditionalRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+				
+				$oMainTab
+					->move($this->getField("apply_purchase_discount"), $oAdditionalRow1);
+				
 				$this->getField('image_small_height')
 					->divAttr(array('style' => 'display: none'));
 				$this->getField('image_small_width')
@@ -394,35 +400,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value($this->_object->shop_measure_id)
 				);
 
-				$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
-
-				// Получаем список складов магазина
-				$aWarehouses = $oShop->Shop_Warehouses->findAll();
-
-				foreach ($aWarehouses as $oWarehouse)
-				{
-					// Получаем количество товара на текущем складе
-					$oWarehouseItem =
-						$this->_object->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id);
-
-					$value = is_null($oWarehouseItem)
-						? (defined('DEFAULT_REST') ? DEFAULT_REST : 0)
-						: $oWarehouseItem->count;
-
-					$oWarehouseCurrentRow->add(
-						Admin_Form_Entity::factory('Input')
-							->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
-							->value($value)
-							->name("warehouse_{$oWarehouse->id}")
-							->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
-					);
-				}
-
 				$oMainTab
 					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
+					//->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oPriceBlock = Admin_Form_Entity::factory('Div')->class('well with-header'))
 				;
 
 				// Удаляем группу доступа
@@ -430,16 +413,33 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				if (Core::moduleIsActive('siteuser'))
 				{
-					$oSiteuser_Controller_Edit =
-										new Siteuser_Controller_Edit($this->_Admin_Form_Action);
-					$aSiteuser_Groups =
-						$oSiteuser_Controller_Edit->fillSiteuserGroups
-						($this->_object->Shop->site_id);
+					$oSiteuser_Controller_Edit = new Siteuser_Controller_Edit($this->_Admin_Form_Action);
+					$aSiteuser_Groups = $oSiteuser_Controller_Edit->fillSiteuserGroups(
+						$this->_object->Shop->site_id
+					);
 				}
 				else
 				{
 					$aSiteuser_Groups = array();
 				}
+
+				// Удаляем производителей
+				$oAdditionalTab->delete($this->getField('shop_producer_id'));
+
+				$oDefault_Shop_Producer = $this->_object->Shop->Shop_Producers->getDefault();
+
+				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Item.shop_producer_id'))
+					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->options($this->fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
+					->name('shop_producer_id')
+						->value($this->_object->id
+						? $this->_object->shop_producer_id
+						: (!is_null($oDefault_Shop_Producer) ? $oDefault_Shop_Producer->id : 0)
+					);
+
+				// Добавляем продавцов
+				$oMainRow9->add($oShopProducerSelect);
 
 				// Создаем поле групп пользователей сайта как выпадающий список
 				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select')
@@ -470,30 +470,19 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Добавляем продавцов
 				$oMainRow9->add($oShopSellerSelect);
 
-				// Удаляем производителей
-				$oAdditionalTab->delete($this->getField('shop_producer_id'));
-
-				$oDefault_Shop_Producer = $this->_object->Shop->Shop_Producers->getDefault();
-
-				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
-					->caption(Core::_('Shop_Item.shop_producer_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
-					->options($this->fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
-					->name('shop_producer_id')
-						->value($this->_object->id
-						? $this->_object->shop_producer_id
-						: (!is_null($oDefault_Shop_Producer) ? $oDefault_Shop_Producer->id : 0)
-					);
-
-				// Добавляем продавцов
-				$oMainRow9->add($oShopProducerSelect);
-
 				// Перемещаем цену
+				$oPriceBlock
+					->add(Admin_Form_Entity::factory('Div')
+							->class('header bordered-palegreen')
+							->value(Core::_('Shop_Item.price_header'))
+						)
+					->add($oPriceRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$this->getField('price')
 					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-6'))
 					->id('price');
 
-				$oMainTab->move($this->getField('price'), $oMainRow10);
+				$oMainTab->move($this->getField('price'), $oPriceRow1);
 
 				// Удаляем валюты
 				$oAdditionalTab->delete($this->getField('shop_currency_id'));
@@ -507,7 +496,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->shop_currency_id);
 
 				// Добавляем валюты
-				$oMainRow10->add($oShopCurrencySelect);
+				$oPriceRow1->add($oShopCurrencySelect);
 
 				// Удаляем налоги
 				$oAdditionalTab->delete($this->getField('shop_tax_id'));
@@ -520,12 +509,23 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->shop_tax_id);
 
 				// Добавляем налоги
-				$oMainRow10->add($oShopTaxSelect);
+				$oPriceRow1->add($oShopTaxSelect);
 
+				//Checkbox применения цен для модификаций
+				if ($this->_object->Modifications->getCount())
+				{
+					$oModificationPrice = Admin_Form_Entity::factory('Checkbox')
+						->value(0)
+						->name("apply_price_for_modification")
+						->caption(Core::_("Shop_Item.apply_price_for_modification"));
+
+					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
+				}
+				
 				$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
 				foreach($aShopPrices as $oShopPrice)
 				{
-					$oMainTab->add($oPricesRow = Admin_Form_Entity::factory('Div')->class('row'));
+					$oPriceBlock->add($oPricesRowN = Admin_Form_Entity::factory('Div')->class('row'));
 
 					// Получаем значение специальной цены для товара
 					$oShop_Item_Price = $this->_object->Shop_Item_Prices->getByPriceId($oShopPrice->id);
@@ -539,7 +539,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->id("item_price_id_{$oShopPrice->id}")
 						->value($value)
 						->name("item_price_id_{$oShopPrice->id}")
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-9'))
+						->divAttr(array('class' => 'form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9'))
 						->onclick("document.getElementById('item_price_value_{$oShopPrice->id}').disabled
 					= !this.checked; if (this.checked)
 					{document.getElementById('item_price_value_{$oShopPrice->id}').value
@@ -555,24 +555,57 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$value == 0 && $oItemPriceTextBox->disabled('disabled');
 
-					$oPricesRow
+					$oPricesRowN
 						->add($oItemPriceCheckBox)
 						->add($oItemPriceTextBox);
 				}
 
-				if ($this->_object->Modifications->getCount())
+				// Получаем список складов магазина
+				$aWarehouses = $oShop->Shop_Warehouses->findAll();
+
+				if (count($aWarehouses))
 				{
-					//Checkbox применения цен для модификаций
-					$oModificationPrice = Admin_Form_Entity::factory('Checkbox');
-					$oModificationPrice
-						->value(0)
-						->name("apply_price_for_modification")
-						->caption(Core::_("Shop_Item.apply_price_for_modification"));
+					//$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+					$oMainTab
+						->add($oWarehouseBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
 
-					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
-					$fieldAfter = $oModificationPrice;
+					$oWarehouseBlock
+						->add(Admin_Form_Entity::factory('Div')
+							->class('header bordered-pink')
+							->value(Core::_("Shop_Item.warehouse_header"))
+						)
+						->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+
+					foreach ($aWarehouses as $oWarehouse)
+					{
+						// Получаем количество товара на текущем складе
+						$oWarehouseItem =
+							$this->_object->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id);
+
+						$oWarehouseCurrentRow
+							->add(
+								Admin_Form_Entity::factory('Div')
+									//->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
+									->value($oWarehouse->name)
+									->class('form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9')
+							)
+							->add(
+								Admin_Form_Entity::factory('Input')
+									//->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
+									->value(is_null($oWarehouseItem)
+										? (defined('DEFAULT_REST') ? DEFAULT_REST : 0)
+										: $oWarehouseItem->count
+									)
+									->name("warehouse_{$oWarehouse->id}")
+									->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-4 col-xs-3'))
+									//->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
+							);
+							
+						$oWarehouseBlock
+							->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+					}
 				}
-
+				
 				$oMainTab
 					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
 					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
@@ -863,7 +896,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField("indexing"), $oMainRow4)
 					->move($this->getField("active"), $oMainRow4)
 					->move($this->getField("sorting"), $oMainRow5);
-
+					
 				// Удаляем поле siteuser_group_id
 				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
@@ -1491,7 +1524,49 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->_object->save();
 
+		// Index item
 		$this->_object->index();
+
+		if ($modelName == 'shop_item')
+		{
+			// Index item by schedule
+			if (Core::moduleIsActive('schedule')
+				&& $this->_object->start_datetime != '0000-00-00 00:00:00'
+				&& Core_Date::sql2timestamp($this->_object->start_datetime) > time())
+			{
+				$oModule = Core_Entity::factory('Module')->getByPath('shop');
+
+				if (!is_null($oModule->id))
+				{
+					$oSchedule = Core_Entity::factory('Schedule');
+					$oSchedule->module_id = $oModule->id;
+					$oSchedule->site_id = CURRENT_SITE;
+					$oSchedule->entity_id = $this->_object->id;
+					$oSchedule->action = 0;
+					$oSchedule->start_datetime = $this->_object->start_datetime;
+					$oSchedule->save();
+				}
+			}
+
+			// Unindex item by schedule
+			if (Core::moduleIsActive('schedule')
+				&& $this->_object->end_datetime != '0000-00-00 00:00:00'
+				&& Core_Date::sql2timestamp($this->_object->end_datetime) > time())
+			{
+				$oModule = Core_Entity::factory('Module')->getByPath('shop');
+
+				if (!is_null($oModule->id))
+				{
+					$oSchedule = Core_Entity::factory('Schedule');
+					$oSchedule->module_id = $oModule->id;
+					$oSchedule->site_id = CURRENT_SITE;
+					$oSchedule->entity_id = $this->_object->id;
+					$oSchedule->action = 2;
+					$oSchedule->start_datetime = $this->_object->end_datetime;
+					$oSchedule->save();
+				}
+			}
+		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 

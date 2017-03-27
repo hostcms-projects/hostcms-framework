@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Constant_Model extends Core_Entity
 {
@@ -17,6 +17,14 @@ class Constant_Model extends Core_Entity
 	 * @var int
 	 */
 	public $img = 1;
+
+	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'constant_dir' => array()
+	);
 
 	/**
 	 * Constructor.

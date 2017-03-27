@@ -1,14 +1,49 @@
 <?php
 
+defined('HOSTCMS') || exit('HostCMS: access denied.');
+
+/**
+ * Implement "lang://" protocol
+ *
+ * Use to add DTD depends on SITE_LNG
+ * <!DOCTYPE xsl:stylesheet SYSTEM "lang://1">
+ * or
+ * <!DOCTYPE xsl:stylesheet SYSTEM "lang://xslname">
+ */
 class Xsl_Stream_Lang
 {
+	/**
+	 * Current position of a stream
+	 * @var int
+	 */
 	protected $_position = 0;
+
+	/**
+	 * XSL name
+	 * @var string
+	 */
 	protected $_xslName = NULL;
 
+	/**
+	 * XSL
+	 * @var Xsl_Model
+	 */
 	protected $_oXsl = NULL;
 
+	/**
+	 * Array of DTDs
+	 * @var array
+	 */
 	protected static $_aDTD = array();
 
+	/**
+	 * Opens file or URL
+	 * @param string $path Specifies the URL that was passed to the original function.
+	 * @param string $mode The mode used to open the file, as detailed for fopen().
+	 * @param string $options Holds additional flags set by the streams API.
+	 * @param string $opened_path
+	 * @return boolean
+	 */
 	public function stream_open($path, $mode, $options, &$opened_path)
 	{
 		$this->_xslName = substr($path, 7);
@@ -45,6 +80,11 @@ class Xsl_Stream_Lang
 		return TRUE;
 	}
 
+	/**
+	 * Read from stream
+	 * @param int $count How many bytes of data from the current position should be returned.
+	 * @return string
+	 */
 	public function stream_read($count)
 	{
 		$ret = substr(self::$_aDTD[$this->_xslName][SITE_LNG], $this->_position, $count);
@@ -53,21 +93,40 @@ class Xsl_Stream_Lang
 		return $ret;
 	}
 
+	/**
+	 * Write to stream
+	 * @param string $data Should be stored into the underlying stream.
+	 * @return FALSE
+	 */
 	public function stream_write($data)
 	{
 	   return FALSE;
 	}
 
+	/**
+	 * Retrieve the current position of a stream
+	 * @return int Current position of the stream
+	 */
 	public function stream_tell()
 	{
 		return $this->_position;
 	}
 
+	/**
+	 * Tests for end-of-file on a file pointer
+	 * @return Should return TRUE if the read/write position is at the end of the stream and if no more data is available to be read, or FALSE otherwise.
+	 */
 	public function stream_eof()
 	{
 		return $this->_position >= strlen(self::$_aDTD[$this->_xslName][SITE_LNG]);
 	}
 
+	/**
+	 * Seeks to specific location in a stream
+	 * @param int $offset The stream offset to seek to.
+	 * @param int $whence Possible values: SEEK_SET - Set position equal to offset bytes. SEEK_CUR - Set position to current location plus offset. SEEK_END - Set position to end-of-file plus offset.
+	 * @return boolean Return TRUE if the position was updated, FALSE otherwise.
+	 */
 	public function stream_seek($offset, $whence)
 	{
 		 switch ($whence) {
@@ -103,6 +162,12 @@ class Xsl_Stream_Lang
         }
 	}
 
+	/**
+	 * Retrieve information about a file
+	 * @param string $path The file path or URL to stat. Note that in the case of a URL, it must be a :// delimited URL. Other URL forms are not supported.
+	 * @param string $flags Holds additional flags set by the streams API.
+	 * @return array
+	 */
 	public function url_stat($path, $flags)
 	{
 		return array();

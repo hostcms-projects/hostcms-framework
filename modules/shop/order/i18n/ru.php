@@ -5,7 +5,7 @@
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Заказы магазина',
@@ -118,7 +118,7 @@ return array(
 	'acceptance_report_invoice' => 'Счёт-фактура',
 	'acceptance_report_year' => ' г.',
 	'document_number' => 'Номер документа',
-	
+	'document_datetime' => 'Дата документа',
 	'vat_invoice_title' => 'Счет-фактура %s от %s г.',
 	'vat_invoice_intro' => 'Приложение №1<br/>к Правилам ведения журналов учета полученных и выставленных счетов-фактур,<br/>книг покупок и книг продаж при расчетах по налогу на добавленную стоимость,<br/>утвержденным постановлением Правительства Российской Федерации от 2 декабря 2000 г. N 914<br/>(в редакции постановлений Правительства Российской Федерации от 15 марта 2001 г. N 189,<br/>от 27 июля 2002 г. N 575, от 16 февраля 2004 г. N 84, от 11 мая 2006 г. N 283)',
 	'vat_invoice_seller' => 'Продавец: ',
@@ -126,7 +126,7 @@ return array(
 	'vat_invoice_tin' => 'ИНН/КПП продавца ',
 	'vat_invoice_shipper' => 'Грузоотправитель и его адрес: ----',
 	'vat_invoice_consignee' => 'Грузополучатель и его адрес: ----',
-	'vat_invoice_payment_doc' => 'К платежно-расчетному документу № _________ от ____________',
+	'vat_invoice_payment_doc' => 'К платежно-расчетному документу № ____________ от ____________',
 	'vat_invoice_buyer' => 'Покупатель ',
 	'vat_invoice_buyer_address' => 'Адрес: ',
 	'vat_invoice_buyer_tin' => 'ИНН/КПП покупателя ',
@@ -140,10 +140,10 @@ return array(
 	'vat_invoice_fio' => '(ф.и.о.)',
 	'vat_invoice_details' => '(реквизиты свидетельства о государственной регоистрации индивидуального предпринимателя)',
 	'vat_invoice_note' => 'ПРИМЕЧАНИЕ. Первый экземпляр - покупателю, второй экземпляр - продавцу',
-	
+
 	'tin' => '<acronym title="ИНН">ИНН</acronym>',
 	'kpp' => '<acronym title="КПП">КПП</acronym>',
-	
+
 	'torg12_title' => 'ТОРГ-12',
 	'torg12_intro' => 'Унифицированная форма № ТОРГ-12<br/>Утверждена постановлением Госкомстата России от 25.12.98 № 132',
 	'torg12_codes' => 'Коды',
@@ -210,7 +210,7 @@ return array(
 	'torg12_gr_poluch' => 'Груз получил',
 	'torg12_gruzopol_s' => 'грузополучатель',
 	'torg12_mp' => 'М.П.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;"&emsp;&emsp;"_______________________20&emsp;года',
-	
+
 	'property_menu' => 'Свойства заказа',
 	'property_menu_add' => 'Добавить',
 	'property_title' => 'Дополнительные свойства',
@@ -218,7 +218,7 @@ return array(
 	'tab_properties' => "Дополнительные свойства",
 	'prefix' => '<acronym title="Префикс свойства">Префикс</acronym>',
 	'display' => '<acronym title="Способ отображения свойства">Способ отображения свойства</acronym>',
-	
+
 	'properties_show_kind_none' => 'Не отображать',
 	'properties_show_kind_text' => 'Поле ввода',
 	'properties_show_kind_list' => 'Список - списком',
@@ -228,7 +228,7 @@ return array(
 	'properties_show_kind_from_to' => 'От.. до..',
 	'properties_show_kind_listbox' => 'Список - список с множественным выбором',
 	'properties_show_kind_textarea' => 'Большое текстовое поле',
-	
+
 	'copy_success' => "Заказ успешно скопирован!",
 	'guid' => "GUID",
 );

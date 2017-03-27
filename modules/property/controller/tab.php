@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Tab extends Core_Servant_Properties
 {
@@ -207,15 +207,6 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 */
 	protected function _setPropertyDirs($parent_id = 0, $parentObject)
 	{
-		// Properties
-		$oProperties = $this->_getProperties();
-
-		$oProperties
-			->queryBuilder()
-			->where('property_dir_id', '=', $parent_id);
-
-		$aProperties = $oProperties->findAll();
-
 		$oAdmin_Form_Entity_Section = Admin_Form_Entity::factory('Section')
 			->caption($parent_id == 0
 				? Core::_('Property_Dir.main_section')
@@ -223,6 +214,13 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			)
 			->id('accordion_' . $parent_id);
 
+		// Properties
+		$oProperties = $this->_getProperties();
+		$oProperties
+			->queryBuilder()
+			->where('property_dir_id', '=', $parent_id);
+
+		$aProperties = $oProperties->findAll();
 		foreach ($aProperties as $oProperty)
 		{
 			$aProperty_Values = $this->_object->id

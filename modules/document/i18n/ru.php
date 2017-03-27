@@ -5,7 +5,7 @@
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Страницы и документы',
@@ -18,10 +18,8 @@ return array(
 	'deleteOldDocumentVersions_success' => 'Все нетекущие версии документов данного раздела успешно удалены!',
 	'deleteAllDirOldVersion' => 'Удалить нетекущие версии документов раздела',
 	'documents' => 'Документ',
-	'add' => 'Добавить',
 	'tab_1' => 'Атрибуты документа',
 	'write_error' => 'Ошибка записи файла',
-	'add' => 'Добавление документа',
 	'edit' => 'Редактирование документа',
 	'name' => '<acronym title="Внутреннее название документа в системе управления">Название документа</acronym>',
 	'document_dir_id' => '<acronym title="Раздел для размещения документа">Раздел</acronym>',

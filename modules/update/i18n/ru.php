@@ -5,7 +5,7 @@
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Обновления',
@@ -26,6 +26,7 @@ return array(
 	'server_error_respond_7' => 'Обновление недоступно для Вашей редакции.',
 	'server_error_respond_8' => 'Не соответствует редакция системы управления.',
 	'server_error_respond_9' => 'Лицензия имеет несколько установок.',
+	'server_error_respond_10' => 'Ошибка 10. Обратитесь в службу поддержки.',
 	'error_open_updatefile' => 'Файл обновлений не обнаружен.',
 	'error_write_file_update' => 'Ошибка записи данных в файл "%s".',
 	'update_constant_error' => 'Не обнаружена константа HOSTCMS_UPDATE_SERVER.',

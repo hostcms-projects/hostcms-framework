@@ -2,14 +2,16 @@
 /**
  * Benchmark.
  *
- * @package HostCMS 6\Benchmark
+ * @package HostCMS
+ * @subpackage Benchmark
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Оценка производительности',
 	'menu' => 'Производительность',
+	'menu_speed' => 'Быстродействие',
 	'menu_rate' => 'Оценить производительность',
 	'menu_site_speed' => 'Быстродействие сайта',
 	'title' => 'Оценка производительности',
@@ -36,10 +38,10 @@ return array(
 	'reset' => 'Исходный вид',
 	'benchmark_day' => 'Быстродействие по дням',
 	'benchmark_hour' => 'Быстродействие по часам',
-	
+
 	'cache' => 'Кэширование',
 	'cache_description' => 'Кэширует элементы страниц сайта с целью ускорения работы сайта, минимизации использования системных ресурсов в случае большой нагрузки на сервер.',
-	
+
 	'compression' => 'Компрессия страниц',
 	'compression_description' => 'Компрессия ускоряет загрузку страниц сайта, сжимает передаваемые посетителям страницы сайта, объединяет Javascript и CSS-файлы.',
 );

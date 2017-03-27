@@ -5,7 +5,7 @@
  * @package HostCMS 6\Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Updates',
@@ -26,6 +26,7 @@ return array(
 	'server_error_respond_7' => 'Update unavailable.',
 	'server_error_respond_8' => 'Does not fit the management system edition.',
 	'server_error_respond_9' => 'License has several installations.',
+	'server_error_respond_10' => 'Error 10. Please contact the support.',
 	'error_open_updatefile' => 'Update file not found.',
 	'error_write_file_update' => 'Error while writing data into file "%s".',
 	'update_constant_error' => 'Constant HOSTCMS_UPDATE_SERVER not found.',

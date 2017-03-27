@@ -6,7 +6,7 @@
  * @package HostCMS 6\Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Информационные системы',
@@ -116,4 +116,8 @@ return array(
 	'deleteEmptyDirs_success' => 'Пустые директории удалены!',
 	
 	'structureIsExist' => 'Уже существует информационная система, связанная с узлом структуры "%s"!',
+	
+	'schedule-searchIndexItem' => 'Индексировать информационный элемент',
+	'schedule-searchIndexGroup' => 'Индексировать группу информационных элементов',
+	'schedule-searchUnindexItem' => 'Снять информационный элемент с индексации',	
 );

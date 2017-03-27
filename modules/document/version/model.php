@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Version_Model extends Core_Entity
 {
@@ -59,6 +59,31 @@ class Document_Version_Model extends Core_Entity
 	}
 
 	/**
+	 * Document content
+	 */
+	protected $_content = NULL;
+
+	/**
+	 * Get $this->_content
+	 * @return string
+	 */
+	public function getContent()
+	{
+		return $this->_content;
+	}
+
+	/**
+	 * Set $this->_content
+	 * @param string $content
+	 * @return self
+	 */
+	public function setContent($content)
+	{
+		$this->_content = $content;
+		return $this;
+	}
+
+	/**
 	 * Show document version.
 	 *
 	 * @hostcms-event document_version.onBeforeExecute
@@ -69,6 +94,8 @@ class Document_Version_Model extends Core_Entity
 	 */
 	public function execute()
 	{
+		$this->setContent(Core_File::read($this->getPath()));
+
 		Core_Event::notify($this->_modelName . '.onBeforeExecute', $this);
 
 		$checkPanel = Core::checkPanel();
@@ -76,7 +103,10 @@ class Document_Version_Model extends Core_Entity
 		{
 			?><div hostcms:id="<?php echo intval($this->Document->id)?>" hostcms:field="editInPlaceVersion" hostcms:entity="document" hostcms:type="wysiwyg"><?php
 		}
-		echo Core_File::read($this->getPath());
+
+		// Show content of document
+		echo $this->getContent();
+
 		if ($checkPanel)
 		{
 			?></div><?php

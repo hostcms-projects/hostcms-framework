@@ -20,7 +20,7 @@ class Constant_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-12-09';
+	public $date = '2016-02-03';
 	/**
 	 * Module name
 	 * @var string

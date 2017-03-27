@@ -18,7 +18,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - groupsForbiddenTags(array('description')) массив тегов групп, запрещенных к передаче в генерируемый XML
  * - item(123) идентификатор показываемого товара
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
- * - itemsPropertiesList(TRUE|FALSE) выводить список дополнительных свойств товаров, по умолчанию TRUE
+ * - itemsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств товаров, по умолчанию TRUE
  * - itemsForbiddenTags(array('description')) массив тегов товаров, запрещенных к передаче в генерируемый XML
  * - parentItem(123) идентификатор родительского товара для отображаемой модификации
  * - modifications(TRUE|FALSE) показывать модификации для выбранных товаров, по умолчанию FALSE
@@ -76,7 +76,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Show extends Core_Controller
 {
@@ -865,7 +865,11 @@ class Shop_Controller_Show extends Core_Controller
 					// ID оригинального ярлыка
 					if ($iShortcut)
 					{
+						$oOriginal_Shop_Item = $oShop_Item;
+
+						$oShop_Item = clone $oShop_Item;
 						$oShop_Item
+							->id($oOriginal_Shop_Item->id)
 							->addForbiddenTag('shortcut_id')
 							->addForbiddenTag('shop_group_id')
 							->addEntity(
@@ -947,8 +951,11 @@ class Shop_Controller_Show extends Core_Controller
 		//if ($this->itemsProperties)
 		//{
 			$aProperties = $this->group === FALSE
-				? $oShop_Item_Property_List->Properties->findAll()
-				: $oShop_Item_Property_List->getPropertiesForGroup($this->group);
+				? (is_array($this->itemsPropertiesList) && count($this->itemsPropertiesList)
+					? $oShop_Item_Property_List->Properties->getAllByid($this->itemsPropertiesList, 'IN')
+					: $oShop_Item_Property_List->Properties->findAll()
+				)
+				: $oShop_Item_Property_List->getPropertiesForGroup($this->group, $this->itemsPropertiesList);
 
 			foreach ($aProperties as $oProperty)
 			{
@@ -1334,67 +1341,8 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	public function error404()
 	{
-		$oCore_Response = Core_Page::instance()->deleteChild()->response->status(404);
+		Core_Page::instance()->error404();
 
-		// Если определена константа с ID страницы для 404 ошибки и она не равна нулю
-		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
-		if ($oSite->error404)
-		{
-			$oStructure = Core_Entity::factory('Structure')->find($oSite->error404);
-
-			$oCore_Page = Core_Page::instance();
-
-			// страница с 404 ошибкой не найдена
-			if (is_null($oStructure->id))
-			{
-				throw new Core_Exception('Structure not found');
-			}
-
-			if ($oStructure->type == 0)
-			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$oCore_Page->template($oDocument_Versions->Template);
-				}
-			}
-			// Если динамическая страница или типовая дин. страница
-			elseif ($oStructure->type == 1 || $oStructure->type == 2)
-			{
-				$oCore_Page->template($oStructure->Template);
-			}
-
-			if ($oStructure->type == 2)
-			{
-				$oCore_Page->libParams
-					= $oStructure->Lib->getDat($oStructure->id);
-
-				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
-
-				if (is_file($LibConfig) && is_readable($LibConfig))
-				{
-					include $LibConfig;
-				}
-			}
-
-			$oCore_Page
-				->structure($oStructure)
-				->addChild($oStructure->getRelatedObjectByType());
-
-			$oStructure->setCorePageSeo($oCore_Page);
-
-			// Если уже идет генерация страницы, то добавленный потомок не будет вызван
-			$oCore_Page->buildingPage && $oCore_Page->execute();
-		}
-		else
-		{
-			if (Core::$url['path'] != '/')
-			{
-				// Редирект на главную страницу
-				$oCore_Response->header('Location', '/');
-			}
-		}
 		return $this;
 	}
 
@@ -1404,48 +1352,8 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	public function error403()
 	{
-		$oCore_Response = Core_Page::instance()->deleteChild()->response->status(403);
+		Core_Page::instance()->error403();
 
-		// Если определена константа с ID страницы для 403 ошибки и она не равна нулю
-		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
-		if ($oSite->error403)
-		{
-			$oStructure = Core_Entity::factory('Structure')->find($oSite->error403);
-
-			$oCore_Page = Core_Page::instance();
-
-			// страница с 403 ошибкой не найдена
-			if (is_null($oStructure->id))
-			{
-				throw new Core_Exception('Group not found');
-			}
-
-			if ($oStructure->type == 0)
-			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$oCore_Page->template($oDocument_Versions->Template);
-				}
-			}
-			// Если динамическая страница или типовая дин. страница
-			elseif ($oStructure->type == 1 || $oStructure->type == 2)
-			{
-				$oCore_Page->template($oStructure->Template);
-			}
-
-			$oCore_Page->addChild($oStructure->getRelatedObjectByType());
-			$oStructure->setCorePageSeo($oCore_Page);
-		}
-		else
-		{
-			if (Core::$url['path'] != '/')
-			{
-				// Редирект на главную страницу
-				$oCore_Response->header('Location', '/');
-			}
-		}
 		return $this;
 	}
 

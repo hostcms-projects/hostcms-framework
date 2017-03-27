@@ -5,13 +5,12 @@
  * @package HostCMS 6\Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Статусы документов',
 	'title' => 'Статусы документов',
 	'menu' => 'Статус документа',
-	'add' => 'Добавить',
 	'add_title' => 'Добавление статуса документов',
 	'edit_title' => 'Редактирование информации о статусе документов',
 	'edit_success' => 'Статус документа добавлен',

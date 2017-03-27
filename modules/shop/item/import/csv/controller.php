@@ -8,17 +8,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 
 class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 {
 	// Массивы для хранения идентификаторов вставленных/обновленных сущностей
+
 	/**
 	 * Array of inserted groups
 	 * @var array
 	 */
-	protected $_aInsertedGroups = array();
+	protected $_aInsertedGroupIDs = array();
 
 	/**
 	 * Array of property values
@@ -30,55 +31,19 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 * Array of updated groups
 	 * @var array
 	 */
-	protected $_aUpdatedGroups = array();
+	protected $_aUpdatedGroupIDs = array();
 
 	/**
 	 * Array of inserted items
 	 * @var array
 	 */
-	protected $_aInsertedItems = array();
+	protected $_aInsertedItemIDs = array();
 
 	/**
 	 * Array of updated items
 	 * @var array
 	 */
-	protected $_aUpdatedItems = array();
-
-	/**
-	 * Get inserted items count
-	 * @return int
-	 */
-	public function getInsertedItemsCount()
-	{
-		return $this->_InsertedItemsCount;
-	}
-
-	/**
-	 * Get inserted groups count
-	 * @return int
-	 */
-	public function getInsertedGroupsCount()
-	{
-		return $this->_InsertedGroupsCount;
-	}
-
-	/**
-	 * Get updated items count
-	 * @return int
-	 */
-	public function getUpdatedItemsCount()
-	{
-		return $this->_UpdatedItemsCount;
-	}
-
-	/**
-	 * Get updated groups count
-	 * @return int
-	 */
-	public function getUpdatedGroupsCount()
-	{
-		return $this->_UpdatedGroupsCount;
-	}
+	protected $_aUpdatedItemIDs = array();
 
 	/**
 	 * ID of current shop
@@ -92,7 +57,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected $_iCurrentGroupId = 0;
 
-	// Текущие сущности
 	/**
 	 * Current shop
 	 * @var Shop_Model
@@ -252,6 +216,42 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected $_sSmallImageFile = '';
 
+/**
+	 * Get inserted items count
+	 * @return int
+	 */
+	public function getInsertedItemsCount()
+	{
+		return $this->_InsertedItemsCount;
+	}
+
+	/**
+	 * Get inserted groups count
+	 * @return int
+	 */
+	public function getInsertedGroupsCount()
+	{
+		return $this->_InsertedGroupsCount;
+	}
+
+	/**
+	 * Get updated items count
+	 * @return int
+	 */
+	public function getUpdatedItemsCount()
+	{
+		return $this->_UpdatedItemsCount;
+	}
+
+	/**
+	 * Get updated groups count
+	 * @return int
+	 */
+	public function getUpdatedGroupsCount()
+	{
+		return $this->_UpdatedGroupsCount;
+	}
+
 	/**
 	 * Increment inserted groups
 	 * @param int $iGroupId group ID
@@ -259,9 +259,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected function _incInsertedGroups($iGroupId)
 	{
-		if (!in_array($iGroupId, $this->_aInsertedGroups))
+		if (!in_array($iGroupId, $this->_aInsertedGroupIDs))
 		{
-			$this->_aInsertedGroups[] = $iGroupId;
+			$this->_aInsertedGroupIDs[] = $iGroupId;
 			$this->_InsertedGroupsCount++;
 		}
 		return $this;
@@ -274,9 +274,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected function _incUpdatedGroups($iGroupId)
 	{
-		if (!in_array($iGroupId, $this->_aUpdatedGroups))
+		if (!in_array($iGroupId, $this->_aUpdatedGroupIDs))
 		{
-			$this->_aUpdatedGroups[] = $iGroupId;
+			$this->_aUpdatedGroupIDs[] = $iGroupId;
 			$this->_UpdatedGroupsCount++;
 		}
 		return $this;
@@ -289,9 +289,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected function _incInsertedItems($iItemId)
 	{
-		if (!in_array($iItemId, $this->_aInsertedItems))
+		if (!in_array($iItemId, $this->_aInsertedItemIDs))
 		{
-			$this->_aInsertedItems[] = $iItemId;
+			$this->_aInsertedItemIDs[] = $iItemId;
 			$this->_InsertedItemsCount++;
 		}
 		return $this;
@@ -304,9 +304,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	 */
 	protected function _incUpdatedItems($iItemId)
 	{
-		if (!in_array($iItemId, $this->_aUpdatedItems))
+		if (!in_array($iItemId, $this->_aUpdatedItemIDs))
 		{
-			$this->_aUpdatedItems[] = $iItemId;
+			$this->_aUpdatedItemIDs[] = $iItemId;
 			$this->_UpdatedItemsCount++;
 		}
 		return $this;
@@ -1399,26 +1399,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 					break;
 					// Передан путь товара
-					/*case 'shop_items_catalog_path':
-						if ($sData != '')
-						{
-							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()
-								->where('path', '=', $sData)
-								->where('shop_group_id', '=', $this->_oCurrentGroup->id)
-							;
-							$oTmpObject = $oTmpObject->findAll(FALSE);
-
-							if (count($oTmpObject))
-							{
-								$this->_oCurrentItem = $oTmpObject[0];
-							}
-							else
-							{
-								$this->_oCurrentItem->path = $sData;
-							}
-						}
-					break;*/
 					case 'shop_items_catalog_path':
 					if ($sData != '')
 					{
@@ -1432,19 +1412,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
-							if (count($oTmpObject))
-							{
-								$this->_oCurrentItem = $oTmpObject[0];
-							}
-							else
-							{
-								$this->_oCurrentItem->path = $sData;
-							}
+							count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
 						}
-						else
-						{
-							$this->_oCurrentItem->path = $sData;
-						}
+
+						$this->_oCurrentItem->path = $sData;
 					}
 					break;
 					// Передан Seo Title для товара
@@ -1614,16 +1585,20 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					case 'shop_items_cml_id':
 						if ($sData != '')
 						{
-							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()
-								->where('guid', '=', $sData)
-								->limit(1);
+							// Товар не был найден ранее, например, по артикулу
+							if (!$this->_oCurrentItem->id)
+							{
+								$oTmpObject = $this->_oCurrentShop->Shop_Items;
+								$oTmpObject->queryBuilder()
+									->where('guid', '=', $sData)
+									->limit(1);
 
-							$oTmpObject = $oTmpObject->findAll(FALSE);
+								$oTmpObject = $oTmpObject->findAll(FALSE);
+
+								count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
+							}
 
 							$this->_oCurrentItem->guid = $sData;
-
-							count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
 						}
 					break;
 					default:
@@ -2697,13 +2672,12 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			$this->_oCurrentOrder = NULL;
 			$this->_oCurrentOrderItem = NULL;
 
-
 			// Очищаем временные массивы
-			$this->_aExternalPrices = array();
-			$this->_aWarehouses = array();
-			$this->_aExternalPropertiesSmall = array();
-			$this->_aExternalProperties = array();
-			$this->_aAdditionalGroups = array();
+			$this->_aExternalPrices =
+				$this->_aWarehouses =
+				$this->_aExternalPropertiesSmall =
+				$this->_aExternalProperties =
+				$this->_aAdditionalGroups = array();
 
 			// Список меток для текущего товара
 			$this->_sCurrentTags = '';
@@ -2800,6 +2774,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		$this->_oCurrentOrderItem =
 		$this->_oCurrentShopEItem =
 		$this->_oCurrentShopSpecialPrice = NULL;
+
+		$this->_aTags = NULL;
 
 		return $this;
 	}

@@ -5,7 +5,7 @@
  * @package HostCMS 6\Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Hostmarket',
@@ -20,10 +20,6 @@ return array(
 	'free' => 'Free',
 	'buy' => 'Buy',
 	'install_warning' => 'Are you sure you want to install?',
-	'mail_subject' => 'Install %s',
-	'mail_message' => 'User %s install module "%s"!',
-	'mail_message_license' => 'Number: ',
-	'mail_message_date' => 'Date: ',
 	'options-title' => 'Fill options:',
 	'option-caption' => 'Option',
 	'option-value' => 'Value',

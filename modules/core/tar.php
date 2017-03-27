@@ -485,7 +485,7 @@ class Core_Tar
 	{
 		if ($this->_compress_type == 'gz')
 		{
-			$this->_file = gzopen($this->_tarname, "wb9");
+			$this->_file = $this->gzopen($this->_tarname, "wb9");
 		}
 		else if ($this->_compress_type == 'bz2')
 		{
@@ -546,7 +546,7 @@ class Core_Tar
 		$v_filename = $this->_tarname;
 
 		if ($this->_compress_type == 'gz')
-		$this->_file = gzopen($v_filename, "rb");
+		$this->_file = $this->gzopen($v_filename, "rb");
 		else if ($this->_compress_type == 'bz2')
 		$this->_file = bzopen($v_filename, "rb");
 		else if ($this->_compress_type == 'none')
@@ -570,7 +570,7 @@ class Core_Tar
 	protected function _openReadWrite()
 	{
 		if ($this->_compress_type == 'gz')
-		$this->_file = gzopen($this->_tarname, "r+b");
+		$this->_file = $this->gzopen($this->_tarname, "r+b");
 		else if ($this->_compress_type == 'bz2')
 		$this->_file = bzopen($this->_tarname, "r+b");
 		else if ($this->_compress_type == 'none')
@@ -1590,7 +1590,7 @@ class Core_Tar
 			}
 
 			if ($this->_compress_type == 'gz')
-			$v_temp_tar = gzopen($this->_tarname.".tmp", "rb");
+			$v_temp_tar = $this->gzopen($this->_tarname.".tmp", "rb");
 			elseif ($this->_compress_type == 'bz2')
 			$v_temp_tar = bzopen($this->_tarname.".tmp", "rb");
 
@@ -1785,5 +1785,18 @@ class Core_Tar
 			}
 		}
 		return $p_path;
+	}
+	
+	/**
+	 * Fix bug gzopen -> gzopen64
+	 * http://www.hostcms.ru/forums/2/10759/
+	 */
+	public function gzopen($filename, $mode, $use_include_path = 0)
+	{
+		$sFunctionName = function_exists('gzopen')
+			? 'gzopen'
+			: 'gzopen64';
+
+		return $sFunctionName($filename, $mode, $use_include_path);
 	}
 }

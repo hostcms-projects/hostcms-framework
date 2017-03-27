@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Seller_Model extends Core_Entity
 {
@@ -114,14 +114,6 @@ class Shop_Seller_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
 		//$oSearch_Page->save();
-
-		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
-			->where('search_page_id', '=', $oSearch_Page->id)
-			->execute();
-
-		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
-		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->Shop->siteuser_group_id;
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
 
 		return $oSearch_Page;
 	}
