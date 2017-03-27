@@ -302,12 +302,13 @@ function scrollTo(el, offeset) {
 }
 
 /*Show Notification*/
-function Notify(message, position, timeout, theme, icon, closable) {
+function Notify(message, position, timeout, theme, icon, closable, sound) {
     toastr.options.positionClass = 'toast-' + position;
     toastr.options.extendedTimeOut = 0; //1000;
     toastr.options.timeOut = timeout;
     toastr.options.closeButton = closable;
     toastr.options.iconClass = icon + ' toast-' + theme;
+	toastr.options.playSound = sound;
     toastr['custom'](message);
 }
 
@@ -512,6 +513,7 @@ function setCookiesForFixedSettings() {
 /*#endregion handle Settings*/
 
 //Chat
+/*
 $("#chat-link").click(function () {
     $('.page-chatbar').toggleClass('open');
     $("#chat-link").toggleClass('open');
@@ -525,19 +527,23 @@ $('.page-chatbar .chatbar-messages .back').on('click', function (e) {
     $('.page-chatbar .chatbar-contacts').show();
     $('.page-chatbar .chatbar-messages').hide();
 });
+
 var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
 $('.chatbar-messages .messages-list').slimscroll({
     position: position,
     size: '4px',
+	start: 'bottom',
     color: themeprimary,
     height: $(window).height() - 250,
 });
+
 $('.chatbar-contacts .contacts-list').slimscroll({
     position: position,
     size: '4px',
     color: themeprimary,
     height: $(window).height() - 86,
 });
+*/
 //End Chat
 
 /*#region Get Colors*/

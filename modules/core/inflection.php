@@ -79,7 +79,7 @@ abstract class Core_Inflection
 	 */
 	protected function __getPlural($word, $count = NULL)
 	{
-		if (isset($this->_pluralCache[$word]))
+		if (is_null($count) && isset($this->_pluralCache[$word]))
 		{
 			return $this->_pluralCache[$word];
 		}
@@ -88,8 +88,11 @@ abstract class Core_Inflection
 		{
 			$this->_pluralCache = array_slice($this->_pluralCache, floor(self::$_maxObjects / 4));
 		}
+		
+		$plural = $this->_getPlural($word, $count);
+		is_null($count) && $this->_pluralCache[$word] = $plural;
 
-		return $this->_pluralCache[$word] = $this->_getPlural($word, $count);
+		return $plural;
 	}
 
 	/**
@@ -106,7 +109,7 @@ abstract class Core_Inflection
 	 */
 	protected function __getSingular($word, $count = NULL)
 	{
-		if (isset($this->_singularCache[$word]))
+		if (is_null($count) && isset($this->_singularCache[$word]))
 		{
 			return $this->_singularCache[$word];
 		}
@@ -116,7 +119,10 @@ abstract class Core_Inflection
 			$this->_singularCache = array_slice($this->_singularCache, floor(self::$_maxObjects / 4));
 		}
 
-		return $this->_singularCache[$word] = $this->_getSingular($word, $count);
+		$singular = $this->_getSingular($word, $count);
+		is_null($count) && $this->_singularCache[$word] = $singular;
+		
+		return $singular;
 	}
 
 	/**

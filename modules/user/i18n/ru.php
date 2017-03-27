@@ -31,6 +31,8 @@ return array(
 	'patronymic' => '<acronym title="Отчество пользователя">Отчество</acronym>',
 	'surname' => '<acronym title="Фамилия пользователя">Фамилия</acronym>',
 	'email' => '<acronym title="Электронный адрес пользователя">Электронный адрес</acronym>',
+	'image' => '<acronym title="Фотография">Фотография</acronym>',
+	
 	'icq' => '<acronym title="Номер ICQ пользователя">ICQ</acronym>',
 	'site' => '<acronym title="Сайт пользователя">Сайт</acronym>',
 	'active' => "<acronym title=\"Активность пользователя\">Активность пользователя</acronym>",	
@@ -51,4 +53,10 @@ return array(
 	'demo_mode' => 'Демонстрационный режим, доступ запрещен!',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	
+	'chat_message' => 'Напишите сообщение',
+	'chat_messages_none' => 'Нет сообщений',
+	'chat_count_unread_message' => 'Непрочитанные сообщения: %s',
+	'chat_count_new_message' => 'Новые сообщения: ',
+	'new_message_from' => 'Новое сообщение от %s %s',
 );

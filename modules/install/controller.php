@@ -273,7 +273,6 @@ class Install_Controller
 		$oInformationsystem_Group->save();
 	}
 
-
 	/**
 	 * Копирование изображений для доп. свойств ИЭ
 	 *
@@ -283,7 +282,6 @@ class Install_Controller
 	 * @param $copyInformationsystemItemId - Идентификатор копируемого ИЭ
 	 * @param $copyInformationsystemPropertyValueId - Идентификатор значения доп. свойства типа "Файл" копируемого ИЭ
 	 */
-
 	function moveInformationsystemItemPropertyImage($informationsystemItemId, $informationsystemItemPropertyId, $copyInformationsystemId, $copyInformationsystemItemId, $copyInformationsystemPropertyValueId)
 	{
 		$informationsystemItemId = intval($informationsystemItemId);
@@ -336,6 +334,71 @@ class Install_Controller
 			Core_File::copy($information_item_property_small_image_from, $information_item_property_small_image_to);
 
 			$oValue->file_small_name = $oValue->file_small = basename($information_item_property_small_image_to);
+			$oValue->save();
+		}
+	}
+
+	/**
+	 * Копирование изображений для доп. свойств ИГ
+	 *
+	 * @param $informationsystemGroupId - Идентификатор новой ИГ
+	 * @param $informationsystemGroupPropertyId - Идентификатор нового доп. свойства типа "Файл"
+	 * @param $copyInformationsystemId - Идентификатор копирумой ИС
+	 * @param $copyInformationsystemGroupId - Идентификатор копируемой ИГ
+	 * @param $copyInformationsystemPropertyValueId - Идентификатор значения доп. свойства типа "Файл" копируемой ИГ
+	 */
+	function moveInformationsystemGroupPropertyImage($informationsystemGroupId, $informationsystemGroupPropertyId, $copyInformationsystemId, $copyInformationsystemGroupId, $copyInformationsystemPropertyValueId)
+	{
+		$informationsystemGroupId = intval($informationsystemGroupId);
+		$informationsystemGroupPropertyId = intval($informationsystemGroupPropertyId);
+		$copyInformationsystemId = intval($copyInformationsystemId);
+		$copyInformationsystemGroupId = intval($copyInformationsystemGroupId);
+		$copyInformationsystemPropertyValueId = intval($copyInformationsystemPropertyValueId);
+
+		$information_propertys_groups_value = '';
+		$information_propertys_groups_value_small = '';
+
+		$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group', $informationsystemGroupId);
+
+		$group_dir = $oInformationsystem_Group->getGroupPath();
+
+		$information_group_property_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$copyInformationsystemId}/" . Core_File::getNestingDirPath($copyInformationsystemGroupId, 3) . "/group_{$copyInformationsystemGroupId}/information_groups_property_{$copyInformationsystemPropertyValueId}";
+
+		$ext = $this->getFileExtension($information_group_property_image_from);
+
+		if (!empty($ext))
+		{
+			$ext = '.' . $ext;
+		}
+
+		$information_group_property_image_from .= $ext;
+
+		$oProperty = Core_Entity::factory('Property')->find($informationsystemGroupPropertyId);
+		$oValue = $oProperty->createNewValue($informationsystemGroupId);
+
+		if (is_file($information_group_property_image_from))
+		{
+			$oValue->save();
+
+			$information_group_property_image_to = $group_dir . "information_groups_property_" . $oValue->id . $ext;
+
+			Core_File::copy($information_group_property_image_from, $information_group_property_image_to);
+
+			$oValue->file_name = $oValue->file = basename($information_group_property_image_to);
+			$oValue->save();
+		}
+
+		$information_group_property_small_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$copyInformationsystemId}/" . Core_File::getNestingDirPath($copyInformationsystemGroupId, 3) . "/item_{$copyInformationsystemGroupId}/small_information_groups_property_{$copyInformationsystemPropertyValueId}";
+
+		if (is_file($information_group_property_small_image_from))
+		{
+			$oValue->save();
+
+			$information_group_property_small_image_to = $group_dir . "small_information_items_property_" . $oValue->id . $ext;
+
+			Core_File::copy($information_group_property_small_image_from, $information_group_property_small_image_to);
+
+			$oValue->file_small_name = $oValue->file_small = basename($information_group_property_small_image_to);
 			$oValue->save();
 		}
 	}
@@ -512,7 +575,7 @@ class Install_Controller
 
 		if (is_file($shop_item_property_image_from))
 		{
-			$shop_item_property_image_to = $item_dir . "shop_property_file_{$shopItemId}_{$oValue->id}.jpg";
+			$shop_item_property_image_to = $item_dir . "shop_property_file_{$shopItemId}_{$oValue->id}" . $ext;
 			Core_File::copy($shop_item_property_image_from, $shop_item_property_image_to);
 
 			$oValue->file_name = $oValue->file = basename($shop_item_property_image_to);
@@ -532,11 +595,73 @@ class Install_Controller
 
 		if (is_file($shop_item_property_small_image_from))
 		{
-			$shop_item_property_small_image_to = $item_dir . "small_shop_property_file_{$shopItemId}_{$oValue->id}.jpg";
+			$shop_item_property_small_image_to = $item_dir . "small_shop_property_file_{$shopItemId}_{$oValue->id}" . $ext;
 
 			Core_File::copy($shop_item_property_small_image_from, $shop_item_property_small_image_to);
 
 			$oValue->file_small_name = $oValue->file_small = basename($shop_item_property_small_image_to);
+		}
+
+		$oValue->save();
+	}
+
+	/**
+	 * Копирование изображений для доп. свойств групп товара
+	 *
+	 * @param $shopGroupId - идентификатор новой созданой группы товара
+	 * @param $shopGroupPropertyId - идентификатор нового созданного доп. свойства
+	 * @param $copyShopId - идентификатор копирумого магазина
+	 * @param $copyShopGroupId - идентификатор копируемой группы товара
+	 * @param $copyShopGroupPropertyId - идентификатор доп. свойства типа "Файл" копируемой группы
+	 */
+	function moveShopGroupPropertyImage($shopGroupId, $shopGroupPropertyId, $copyShopId, $copyShopGroupId, $copyShopGroupPropertyId)
+	{
+		$oShop_Group = Core_Entity::factory('Shop_Group', $shopGroupId);
+		$group_dir = $oShop_Group->getGroupPath();
+
+		$shop_group_property_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyShopGroupId, 3) . "/group_{$copyShopGroupId}/shop_property_file_{$copyShopGroupId}_{$copyShopGroupPropertyId}";
+
+		// Получаем расширение файла
+		$ext = $this->getFileExtension($shop_group_property_image_from);
+
+		if (!empty($ext))
+		{
+			$ext = '.' . $ext;
+		}
+		$shop_group_property_image_from .= $ext;
+
+		$oProperty = Core_Entity::factory('Property')->find($shopGroupPropertyId);
+
+		$oValue = $oProperty->createNewValue($shopGroupId);
+		$oValue->save();
+
+		if (is_file($shop_group_property_image_from))
+		{
+			$shop_group_property_image_to = $item_dir . "shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
+			Core_File::copy($shop_group_property_image_from, $shop_group_property_image_to);
+
+			$oValue->file_name = $oValue->file = basename($shop_group_property_image_to);
+		}
+
+		$shop_group_property_small_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyShopGroupId, 3) . "/group_{$copyShopGroupId}/small_shop_property_file_{$copyShopGroupId}_{$copyShopGroupPropertyId}";
+
+		// Получаем расширение файла
+		$ext = $this->getFileExtension($shop_group_property_small_image_from);
+
+		if (!empty($ext))
+		{
+			$ext = '.' . $ext;
+		}
+
+		$shop_group_property_small_image_from .= $ext;
+
+		if (is_file($shop_group_property_small_image_from))
+		{
+			$shop_group_property_small_image_to = $item_dir . "small_shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
+
+			Core_File::copy($shop_group_property_small_image_from, $shop_group_property_small_image_to);
+
+			$oValue->file_small_name = $oValue->file_small = basename($shop_group_property_small_image_to);
 		}
 
 		$oValue->save();

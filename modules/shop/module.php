@@ -20,13 +20,13 @@ class Shop_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-10-29';
+	public $date = '2015-12-09';
 	/**
 	 * Module name
 	 * @var string
 	 */
 	protected $_moduleName = 'shop';
-	
+
 	/**
 	 * Constructor.
 	 */	public function __construct()	{
@@ -186,6 +186,8 @@ class Shop_Module extends Core_Module{	/**
 		$limit = intval($limit);
 		$offset = intval($offset);
 
+		$dateTime = Core_Date::timestamp2sql(time());
+
 		$oShopItem = Core_Entity::factory('Shop_Item');
 
 		$oShopItem
@@ -200,6 +202,19 @@ class Shop_Module extends Core_Module{	/**
 			->where('shop_items.shortcut_id', '=', 0)
 			->where('shop_items.active', '=', 1)
 			->where('shop_items.deleted', '=', 0)
+
+			->open()
+			->where('shop_items.start_datetime', '<', $dateTime)
+			->setOr()
+			->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+			->setAnd()
+			->open()
+			->where('shop_items.end_datetime', '>', $dateTime)
+			->setOr()
+			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+
 			->open()
 			->where('shop_groups.id', 'IS', NULL)
 			->setOr()

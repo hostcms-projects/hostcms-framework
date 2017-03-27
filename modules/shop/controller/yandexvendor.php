@@ -30,6 +30,7 @@ class Shop_Controller_YandexVendor extends Core_Controller
 	 */
 	protected $_allowedProperties = array(
 		'itemsProperties',
+		'protocol'
 	);
 
 	/**
@@ -72,6 +73,8 @@ class Shop_Controller_YandexVendor extends Core_Controller
 	public function __construct(Shop_Model $oShop)
 	{
 		parent::__construct($oShop->clearEntities());
+
+		$this->protocol = Core::httpsUses() ? 'https' : 'http';
 
 		$this->_Shop_Producers = $oShop->Shop_Producers;
 
@@ -258,7 +261,7 @@ class Shop_Controller_YandexVendor extends Core_Controller
 					//URL изображения модели на сайте производителя.
 					if ($oShop_Item->image_large)
 					{
-						echo '<pictureUrl>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</pictureUrl>' . "\n";
+						echo '<pictureUrl>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</pictureUrl>' . "\n";
 					}
 
 					/* Дополнительные изображения */
@@ -272,7 +275,7 @@ class Shop_Controller_YandexVendor extends Core_Controller
 							{
 								if ($oImageValue->file)
 								{
-									echo '<pictureUrl>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getItemHref() . $oImageValue->file) . '</pictureUrl>' . "\n";
+									echo '<pictureUrl>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getItemHref() . $oImageValue->file) . '</pictureUrl>' . "\n";
 								}
 							}
 						}
@@ -351,7 +354,7 @@ class Shop_Controller_YandexVendor extends Core_Controller
 			}
 
 			Core_File::flush();
-			
+
 			$offset += $limit;
 		}
 		while (count($aShop_Items));
@@ -492,15 +495,15 @@ class Shop_Controller_YandexVendor extends Core_Controller
 		$oShop = $this->getEntity();
 		$oSite = $oShop->Site;
 
-		Core_Page::instance()->response
+		!is_null(Core_Page::instance()->response) && Core_Page::instance()->response
 			->header('Content-Type', "text/xml; charset={$oSite->coding}")
 			->sendHeaders();
 
 		$this->_siteAlias = $oSite->getCurrentAlias();
-		$this->_shopPath = 'http://' . $this->_siteAlias->name . $oShop->Structure->getPath();
+		$this->_shopPath = $this->protocol . '://' . $this->_siteAlias->name . $oShop->Structure->getPath();
 
 		echo '<?xml version="1.0" encoding="' . $oSite->coding . '"?>' . "\n";
-		echo '<yml_catalog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" date="'. date('c') . '" version="1.0" xsi:noNamespaceSchemaLocation="VendorYML-1.0.xsd">'."\n";
+		echo '<yml_catalog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" date="' . date('c') . '" version="1.0" xsi:noNamespaceSchemaLocation="VendorYML-1.0.xsd">' . "\n";
 
 		/* Производители */
 		$this->_vendors();

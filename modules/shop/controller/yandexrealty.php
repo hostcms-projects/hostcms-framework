@@ -21,6 +21,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Controller_YandexRealty extends Core_Controller
 {
 	/**
+	 * Allowed object properties
+	 * @var array
+	 */
+	protected $_allowedProperties = array(
+		'protocol'
+	);
+
+	/**
 	 * Shop's items object
 	 * @var Shop_Item_Model
 	 */
@@ -145,6 +153,8 @@ class Shop_Controller_YandexRealty extends Core_Controller
 	{
 		parent::__construct($oShop->clearEntities());
 
+		$this->protocol = Core::httpsUses() ? 'https' : 'http';
+		
 		$this->_Shop_Items = $oShop->Shop_Items;
 
 		$siteuser_id = 0;
@@ -411,7 +421,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 
 				if ($oShop_Item->image_large != '')
 				{
-					echo '<image>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</image>'."\n";
+					echo '<image>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</image>'."\n";
 				}
 
 				/* Дополнительные изображения */
@@ -425,7 +435,7 @@ class Shop_Controller_YandexRealty extends Core_Controller
 						{
 							if ($oImageValue->file)
 							{
-								echo '<image>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getItemHref() . $oImageValue->file) . '</image>'."\n";
+								echo '<image>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getItemHref() . $oImageValue->file) . '</image>'."\n";
 							}
 						}
 					}
@@ -490,12 +500,12 @@ class Shop_Controller_YandexRealty extends Core_Controller
 		$oShop = $this->getEntity();
 		$oSite = $oShop->Site;
 
-		Core_Page::instance()->response
+		!is_null(Core_Page::instance()->response) && Core_Page::instance()->response
 			->header('Content-Type', "text/xml; charset={$oSite->coding}")
 			->sendHeaders();
 
 		$this->_siteAlias = $oSite->getCurrentAlias();
-		$this->_shopPath = 'http://' . $this->_siteAlias->name . $oShop->Structure->getPath();
+		$this->_shopPath = $this->protocol . '://' . $this->_siteAlias->name . $oShop->Structure->getPath();
 
 		echo '<?xml version="1.0" encoding="' . $oSite->coding . '"?>' . "\n";
 		echo '<realty-feed xmlns="http://webmaster.yandex.ru/schemas/feed/realty/2010-06">'."\n";

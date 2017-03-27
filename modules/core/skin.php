@@ -594,13 +594,13 @@ abstract class Core_Skin
 			Core::factory('Core_Html_Entity_Div')
 				->value(
 					Core::_('Core.compression', (Core::moduleIsActive('compression')
-						? Core::_('Core.enabled') : Core::_('Core.disabled')))
+						? Core::_('Admin_Form.enabled') : Core::_('Admin_Form.disabled')))
 				)
 		)
 		->add(
 			Core::factory('Core_Html_Entity_Div')
 				->value(Core::_('Core.cache', (Core::moduleIsActive('cache')
-					? Core::_('Core.enabled') : Core::_('Core.disabled'))))
+					? Core::_('Admin_Form.enabled') : Core::_('Admin_Form.disabled'))))
 		);
 
 		if (Core::moduleIsActive('cache'))

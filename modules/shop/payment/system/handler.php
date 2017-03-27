@@ -53,12 +53,12 @@ abstract class Shop_Payment_System_Handler
 	 */
 	static protected function _check(Shop_Model $oShop, $methodName)
 	{
-		$aShop_Payment_Systems = $oShop->Shop_Payment_Systems->findAll();
+		$aShop_Payment_Systems = $oShop->Shop_Payment_Systems->getAllByActive(1);
 
 		foreach ($aShop_Payment_Systems as $oShop_Payment_System)
 		{
 			$oHandler = self::factory($oShop_Payment_System);
-			if (method_exists($oHandler, $methodName))
+			if ($oHandler && method_exists($oHandler, $methodName))
 			{
 				$oHandler->$methodName();
 			}
@@ -544,7 +544,9 @@ abstract class Shop_Payment_System_Handler
 		$oShop_Purchase_Discount_Controller
 			->amount($amount)
 			->quantity($quantity)
-			->couponText(trim($this->_orderParams['coupon_text']));
+			->couponText(trim($this->_orderParams['coupon_text']))
+			->siteuserId($this->_shopOrder->siteuser_id ? $this->_shopOrder->siteuser_id : 0)
+			;
 
 		// Получаем данные о купоне
 		$shop_purchase_discount_coupon_id = $shop_purchase_discount_id = 0;
@@ -563,6 +565,7 @@ abstract class Shop_Payment_System_Handler
 		}
 
 		$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
+
 		foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)
 		{
 			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');

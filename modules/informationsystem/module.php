@@ -20,7 +20,7 @@ class Informationsystem_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-10-29';
+	public $date = '2015-12-09';
 	/**
 	 * Module name
 	 * @var string
@@ -163,6 +163,8 @@ class Informationsystem_Module extends Core_Module{	/**
 		$offset = intval($offset);
 		$limit = intval($limit);
 
+		$dateTime = Core_Date::timestamp2sql(time());
+
 		$oInformationsystemItem = Core_Entity::factory('Informationsystem_Item');
 
 		$oInformationsystemItem
@@ -177,6 +179,19 @@ class Informationsystem_Module extends Core_Module{	/**
 			->where('informationsystem_items.active', '=', 1)
 			->where('informationsystem_items.shortcut_id', '=', 0)
 			->where('informationsystem_items.deleted', '=', 0)
+
+			->open()
+			->where('informationsystem_items.start_datetime', '<', $dateTime)
+			->setOr()
+			->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+			->setAnd()
+			->open()
+			->where('informationsystem_items.end_datetime', '>', $dateTime)
+			->setOr()
+			->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+
 			->open()
 			->where('informationsystem_groups.id', 'IS', NULL)
 			->setOr()

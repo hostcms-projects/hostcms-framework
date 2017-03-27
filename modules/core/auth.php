@@ -471,4 +471,28 @@ class Core_Auth
 
 		return TRUE;
 	}
+	
+	/**
+	 * Logout current user
+	 */
+	static public function logout()
+	{
+		Core_Session::start();
+
+		$aUnsets = array(
+			'current_users_id',
+			'valid_user',
+			'date_user',
+			'is_superuser',
+			'current_user_ip'
+		);
+
+		foreach ($aUnsets as $sUnsetName)
+		{
+			if (isset($_SESSION[$sUnsetName]))
+			{
+				unset($_SESSION[$sUnsetName]);
+			}
+		}
+	}
 }

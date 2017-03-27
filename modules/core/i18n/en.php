@@ -43,8 +43,6 @@ return array(
 	'time_xml_execution' => "XML execution time: <strong>%.3f</strong> sec",
 	'memory_usage' => "Memory usage: <strong>%.2f</strong> M.",
 	'number_of_queries' => "Number of queries: <strong>%d</strong>.",
-	'enabled' => 'Enabled',
-	'disabled' => 'Disabled',
 	'compression' => 'Compression: <strong>%s</strong>.',
 	'cache' => 'Cache: <strong>%s</strong>.',
 

@@ -47,7 +47,7 @@ class Core_Mail_Smtp extends Core_Mail
 				return FALSE;
 			}
 
-			fputs($fp, "EHLO {$this->_config['host']}\r\n");
+			fputs($fp, "EHLO " . Core_Array::get($_SERVER, 'SERVER_NAME') . "\r\n");
 
 			$server_response = $this->_serverFgets($fp);
 			if (!$this->_serverParse($server_response, "250"))

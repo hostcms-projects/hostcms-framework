@@ -35,6 +35,7 @@ class User_Model extends Core_Entity
 	protected $_hasMany = array(
 		'user_note' => array(),
 		'user_setting' => array(),
+		'user_message' => array(),
 		'admin_form_setting' => array(),
 		'informationsystem_dir' => array(),
 		'informationsystem' => array(),
@@ -264,6 +265,130 @@ class User_Model extends Core_Entity
 	}
 
 	/**
+	 * Get user href
+	 * @return string
+	 */
+	public function getHref()
+	{
+		// Используем upload вместо настроек сайта поскольку пользователь ЦА инвариантен относительно сайта
+		return 'upload/user/' . intval($this->id) . '/';
+	}
+
+	/**
+	 * Get user path
+	 * @return string
+	 */
+	public function getPath()
+	{
+		return CMS_FOLDER . $this->getHref();
+	}
+
+	/**
+	 * Get image file path
+	 * @return string|NULL
+	 */
+	public function getImageFilePath()
+	{
+		return $this->image != ''
+			? $this->getPath() . $this->image
+			: NULL;
+	}
+
+	/**
+	 * Get image href or default user icon
+	 * @return string
+	 */
+	public function getImageHref()
+	{
+		return $this->image
+			? $this->getImageFileHref()
+			: '/modules/skin/bootstrap/img/default_user.png';
+	}
+
+	/**
+	 * Get image href
+	 * @return string
+	 */
+	public function getImageFileHref()
+	{
+		return '/' . $this->getHref() . $this->image;
+	}
+
+	/**
+	 * Specify image file for user
+	 * @param string $fileSourcePath source file
+	 * @param string $fileName target file name
+	 * @return self
+	 */
+	/*public function saveImageFile($fileSourcePath, $fileName)
+	{
+		$this->createDir();
+
+		$fileExtension = Core_File::getExtension($fileName);
+
+		$this->image = 'avatar.' . $fileExtension;
+		$this->save();
+
+		Core_File::upload($fileSourcePath, $this->getImageFilePath());
+		return $this;
+	}*/
+
+	/**
+	 * Create files directory
+	 * @return self
+	 */
+	public function createDir()
+	{
+		clearstatcache();
+
+		if (!is_dir($this->getPath()))
+		{
+			try
+			{
+				Core_File::mkdir($this->getPath(), CHMOD, TRUE);
+			} catch (Exception $e) {}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete image file
+	 * @return self
+	 */
+	public function deleteImageFile()
+	{
+		try
+		{
+			is_file($this->getImageFilePath()) && Core_File::delete($this->getImageFilePath());
+		} catch (Exception $e) {}
+
+		$this->image = '';
+		$this->save();
+
+		return $this;
+	}
+
+	/**
+	 * Delete information system directory
+	 * @return self
+	 */
+	public function deleteDir()
+	{
+		$this->deleteImageFile();
+
+		if (is_dir($this->getPath()))
+		{
+			try
+			{
+				Core_File::deleteDir($this->getPath());
+			} catch (Exception $e) {}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Mark entity as deleted
 	 * @return Core_Entity
 	 */
@@ -302,7 +427,26 @@ class User_Model extends Core_Entity
 			$this->Helpdesk_User_Letter_Templates->deleteAll(FALSE);
 		}
 
+		// Удаляем директорию
+		$this->deleteDir();
+
 		return parent::delete($primaryKey);
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function login($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$lastActivity = $this->getLastActivity();
+		$sStatus = !is_null($lastActivity) && $lastActivity < 60 * 20
+			? 'online'
+			: 'offline';
+
+		return "{$this->login}&nbsp;<div class=\"{$sStatus}\"></div>";
 	}
 
 	/**
@@ -354,7 +498,9 @@ class User_Model extends Core_Entity
 	 */
 	public function getLastActivity()
 	{
-		return time() - Core_Date::sql2timestamp($this->last_activity);
+		return !is_null($this->last_activity)
+			? time() - Core_Date::sql2timestamp($this->last_activity)
+			: NULL;
 	}
 
 	/**
@@ -363,6 +509,27 @@ class User_Model extends Core_Entity
 	 */
 	public function isOnline()
 	{
-		return $this->getLastActivity() < 300;
+		$lastActivity = $this->getLastActivity();
+		return !is_null($lastActivity) && $lastActivity < 300;
+	}
+	
+	/**
+	 * Get count of unread messages
+	 * @param User_Model $oUser
+	 * @return int
+	 */
+	public function getUnreadCount(User_Model $oUser)
+	{
+		// Количество непрочитанных сообщений
+		$oCore_QueryBuilder_Select = Core_QueryBuilder::select()
+			->select(array(Core_QueryBuilder::expression('COUNT(*)'), 'count'))
+			->from('user_messages')
+			->where('user_messages.read', '=', 0)
+			->where('user_messages.user_id', '=', $oUser->id)
+			->where('user_messages.recipient_user_id', '=', $this->id);
+
+		$row = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+		
+		return intval($row['count']);
 	}
 }

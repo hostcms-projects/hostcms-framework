@@ -41,18 +41,49 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Array of discounts
+	 * @var array
+	 */
+	protected $_aReturn = array();
+	
+	/**
+	 * Get $this->_aReturn
+	 * @return array
+	 */
+	public function getReturn()
+	{
+		return $this->_aReturn;
+	}
+	
+	/**
+	 * Set $this->_aReturn
+	 * @param array $array
+	 * @return self
+	 */
+	public function setReturn(array $array)
+	{
+		$this->_aReturn = $array;
+		return $this;
+	}
+	
+	/**
 	 * Расчет скидки на сумму товара, в соответствии со списком скидок, доступных для указанного магазина
+	 * $return array
+	 * @hostcms-event Shop_Purchase_Discount_Controller.onBeforeGetDiscounts
+	 * @hostcms-event Shop_Purchase_Discount_Controller.onAfterGetDiscounts
 	 */
 	function getDiscounts()
 	{
 		$amount = floatval($this->amount);
 		$quantity = floatval($this->quantity);
 
-		$aReturn = array();
+		$this->_aReturn = array();
 
+		Core_Event::notify(get_class($this) . '.onBeforeGetDiscounts', $this);
+		
 		if ($amount <= 0 || $quantity <= 0)
 		{
-			return $aReturn;
+			return $this->_aReturn;
 		}
 
 		// Идентификатор скидки по купону
@@ -136,10 +167,12 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 
 				$discount = $oShop_Controller->round($discount);
 
-				$aReturn[] = $oShop_Purchase_Discount->discountAmount($discount);
+				$this->_aReturn[] = $oShop_Purchase_Discount->discountAmount($discount);
 			}
 		}
+		
+		Core_Event::notify(get_class($this) . '.onAfterGetDiscounts', $this);
 
-		return $aReturn;
+		return $this->_aReturn;
 	}
 }

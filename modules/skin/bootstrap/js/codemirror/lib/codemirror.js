@@ -4866,7 +4866,7 @@
     "Left": "goCharLeft", "Right": "goCharRight", "Up": "goLineUp", "Down": "goLineDown",
     "End": "goLineEnd", "Home": "goLineStartSmart", "PageUp": "goPageUp", "PageDown": "goPageDown",
     "Delete": "delCharAfter", "Backspace": "delCharBefore", "Shift-Backspace": "delCharBefore",
-    "Tab": "defaultTab", "Shift-Tab": "indentAuto",
+    "Tab": "defaultTab", "Shift-Tab": "indentLess",
     "Enter": "newlineAndIndent", "Insert": "toggleOverwrite",
     "Esc": "singleSelection"
   };

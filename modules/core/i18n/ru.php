@@ -43,8 +43,7 @@ return array(
 	'time_xml_execution' => "время обработки XML: <strong>%.3f</strong> с",
 	'memory_usage' => "Использовано памяти: <strong>%.2f</strong> Мб.",
 	'number_of_queries' => "Количество запросов: <strong>%d</strong>.",
-	'enabled' => 'Включено',
-	'disabled' => 'Отключено',
+
 	'compression' => 'Компрессия: <strong>%s</strong>.',
 	'cache' => 'Кэширование: <strong>%s</strong>.',
 

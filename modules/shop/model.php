@@ -59,6 +59,7 @@ class Shop_Model extends Core_Entity{
 		'shop_payment_system' => array(),
 		'shop_price' => array(),
 		'shop_producer' => array(),
+		'shop_producer_dir' => array(),
 		'shop_purchase_discount' => array(),
 		'shop_seller' => array(),
 		'shop_siteuser_transaction' => array(),

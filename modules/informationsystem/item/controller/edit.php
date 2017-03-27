@@ -1160,10 +1160,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$this->_object->save();
 
-		if (Core::moduleIsActive('search') && $this->_object->indexing && $this->_object->active)
-		{
-			Search_Controller::indexingSearchPages(array($this->_object->indexing()));
-		}
+		$this->_object->index();
 
 		if (Core::moduleIsActive('maillist') && Core_Array::getPost('maillist_id'))
 		{

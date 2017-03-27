@@ -779,7 +779,8 @@ function isEmpty(str) {
 			});
 		}
 		else{
-			  window.location = location.href;
+			popstate = false;
+			window.location = location.href;
 		}
 	});
 

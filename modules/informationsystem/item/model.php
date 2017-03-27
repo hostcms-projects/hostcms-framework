@@ -674,14 +674,31 @@ class Informationsystem_Item_Model extends Core_Entity
 			$oItemShortcut->save();
 		}
 
-		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
-		{
-			Search_Controller::indexingSearchPages(array($this->indexing()));
-		}
+		$this->index();
 
 		$this->clearCache();
 
 		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Add item into search index
+	 * @return self
+	 */
+	public function index()
+	{
+		if (Core::moduleIsActive('search')
+			&& $this->indexing && $this->active
+			&& ($this->start_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->start_datetime) <= time())
+			&& ($this->end_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->end_datetime) > time())
+		)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
 
 		return $this;
 	}
@@ -955,14 +972,6 @@ class Informationsystem_Item_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
 		//$oSearch_Page->save();
-
-		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
-			->where('search_page_id', '=', $oSearch_Page->id)
-			->execute();
-
-		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
-		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
 
 		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
 

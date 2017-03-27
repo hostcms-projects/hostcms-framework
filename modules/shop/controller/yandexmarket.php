@@ -35,7 +35,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		'itemsProperties',
 		'modifications',
 		'type',
-		'onStep'
+		'onStep',
+		'protocol'
 	);
 
 	/**
@@ -200,6 +201,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	{
 		parent::__construct($oShop->clearEntities());
 
+		$this->protocol = Core::httpsUses() ? 'https' : 'http';
+		
 		$this->_Shop_Items = $oShop->Shop_Items;
 
 		$siteuser_id = 0;
@@ -510,7 +513,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			if (isset($aProperty_Value_Market_Category[0]))
 			{
 				echo '<market_category>' .
-					Core_Str::xml($aProperty_Value_Market_Category[0]->velue) .
+					Core_Str::xml($aProperty_Value_Market_Category[0]->value) .
 				'</market_category>'. "\n";
 			}
 		}
@@ -518,7 +521,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		/* PICTURE */
 		if ($oShop_Item->image_large != '')
 		{
-			echo '<picture>' . 'http://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
+			echo '<picture>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
 		}
 
 		// (name, vendor?, vendorCode?)
@@ -702,7 +705,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$oShop = $this->getEntity();
 		$oSite = $oShop->Site;
 
-		Core_Page::instance()->response
+		!is_null(Core_Page::instance()->response) && Core_Page::instance()->response
 			->header('Content-Type', "text/xml; charset={$oSite->coding}")
 			->sendHeaders();
 
@@ -724,7 +727,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		echo "<company>" . Core_Str::xml($oShop->Shop_Company->name) . "</company>\n";
 
 		$this->_siteAlias = $oSite->getCurrentAlias();
-		$this->_shopPath = 'http://' . $this->_siteAlias->name . $oShop->Structure->getPath();
+		$this->_shopPath = $this->protocol . '://' . $this->_siteAlias->name . $oShop->Structure->getPath();
 
 		echo "<url>" . Core_Str::xml($this->_shopPath) . "</url>\n";
 		echo "<platform>HostCMS</platform>\n";

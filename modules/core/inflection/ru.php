@@ -16,7 +16,10 @@ class Core_Inflection_Ru extends Core_Inflection
 	 * Array of irregular form singular => plural
 	 * @var array
 	 */
-	static public $pluralIrregular = array();
+	static public $pluralIrregular = array(
+		'день' => 'дня,дней',
+		'год' => 'года,лет',
+	);
 
 	/**
 	 * Array of irregular form plural => singular
@@ -40,18 +43,50 @@ class Core_Inflection_Ru extends Core_Inflection
 	 */
 	protected function _getPlural($word, $count = NULL)
 	{
+		$last_digit = $count % 10;
+		$last_two_digits = $count % 100;
+
 		// Irregular words
 		if (isset(self::$pluralIrregular[$word]))
 		{
-			return self::$pluralIrregular[$word];
+			$irregular = explode(',', self::$pluralIrregular[$word]);
+
+			if ($last_digit == 1 && $last_two_digits != 11)
+			{
+				return $word;
+			}
+			elseif (isset($irregular[0]) &&
+				($last_digit == 2 && $last_two_digits != 12
+				|| $last_digit == 3 && $last_two_digits != 13
+				|| $last_digit == 4 && $last_two_digits != 14))
+			{
+				return $irregular[0];
+			}
+			elseif (isset($irregular[1]))
+			{
+				return $irregular[1];
+			}
+
+			return $word;
 		}
 
 		if (strlen($word))
 		{
 			$lastChar = mb_substr($word, -1, 1);
 
-			$nominative = $lastChar;
-			$cutWord = mb_substr($word, 0, -1);
+			switch ($lastChar)
+			{
+				case 'й':
+				case 'а':
+				case 'я':
+				case 'о':
+				case 'е':
+				case 'ь':
+					$cutWord = mb_substr($word, 0, -1);
+				break;
+				default:
+					$cutWord = $word;
+			}
 
 			switch ($lastChar)
 			{
@@ -75,22 +110,27 @@ class Core_Inflection_Ru extends Core_Inflection
 					$singular = 'я';
 					$plural = 'й';
 				break;
-				default:
-					$singular = 'ы';
+				case 'ь':
+					$singular = 'я';
+					$plural = 'ей';
+				break;
+				case 'с':
+				case 'д':
+					$singular = 'а';
 					$plural = 'ов';
-					$cutWord = $word;
+				break;
+				default:
+					$singular = '';
+					$plural = '';
 			}
 
-			$last_digit = $count % 10;
-			$last_two_digits = $count % 100;
-
-			if ($last_digit = 1 && $last_two_digits != 11)
+			if ($last_digit == 1 && $last_two_digits != 11)
 			{
-				return $cutWord . $nominative;
+				return $word;
 			}
-			elseif ($last_digit = 2 && $last_two_digits != 12
-				|| $last_digit = 3 && $last_two_digits != 13
-				|| $last_digit = 4 && $last_two_digits != 14)
+			elseif ($last_digit == 2 && $last_two_digits != 12
+				|| $last_digit == 3 && $last_two_digits != 13
+				|| $last_digit == 4 && $last_two_digits != 14)
 			{
 				return $cutWord . $singular;
 			}

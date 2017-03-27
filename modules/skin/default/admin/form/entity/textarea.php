@@ -73,7 +73,7 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 					'lineWrapping' => 'true',
 					'autoCloseTags' => 'true',
 
-					'tabSize' => 2, // из-зм indentUnit равного 2-м
+					'tabSize' => 2, // из-за indentUnit равного 2-м
 					'indentWithTabs' => 'true',
 					'smartIndent' => 'false',
 				)
@@ -170,7 +170,7 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 				$this->_init['theme'] = '$(window).width() < 700 ? "simple" : "advanced"';
 				
 				$aUserCsses = explode(',', trim(Core_Array::get($this->_init, 'content_css', ''), '\'"'));
-				$this->_init['content_css'] = '"' . implode(',', $aUserCsses + $aCSS) . '"';
+				$this->_init['content_css'] = '"' . implode(',', array_merge($aUserCsses, $aCSS)) . '"';
 
 				// Array of structures
 				$aStructure = $this->_fillStructureList(CURRENT_SITE);

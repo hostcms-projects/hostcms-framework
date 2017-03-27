@@ -967,9 +967,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		parent::_applyObjectProperty();
 
-		$oShop = $bNewObject
+		$oShop = /*$bNewObject
 			? Core_Entity::factory('Shop', intval(Core_Array::getGet('shop_id', 0)))
-			: $this->_object->Shop;
+			: */ $this->_object->Shop;
 
 		$modelName = $this->_object->getModelName();
 
@@ -1491,10 +1491,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->_object->save();
 
-		if (Core::moduleIsActive('search') && $this->_object->indexing && $this->_object->active)
-		{
-			Search_Controller::indexingSearchPages(array($this->_object->indexing()));
-		}
+		$this->_object->index();
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 

@@ -14,7 +14,7 @@ class Xsl_Processor_Observer
 {
 	/**
 	 * Xsl_Processor.onBeforeProcess event
-	 * @param Xsl_Model $object 
+	 * @param Xsl_Model $object
 	 * @param array $args list of arguments
 	 */
 	static public function onBeforeProcess($object, $args)
@@ -25,7 +25,7 @@ class Xsl_Processor_Observer
 
 	/**
 	 * Xsl_Processor.onBeforeProcess event
-	 * @param Xsl_Model $object 
+	 * @param Xsl_Model $object
 	 * @param array $args list of arguments
 	 */
 	static public function onAfterProcess($object, $args)
@@ -123,6 +123,13 @@ class Xsl_Processor_Observer
 							->value(
 								Core::_('Xsl.panel_xsl_size', number_format(mb_strlen($object->getXml()), 0, ',', ' '))
 							)
+					)
+			)->add(
+				Core::factory('Core_Html_Entity_Div')
+					->class('hostcmsButton')
+					->add(
+						Core::factory('Core_Html_Entity_Div')
+							->value("ID {$oXsl->id}")
 					)
 			);
 

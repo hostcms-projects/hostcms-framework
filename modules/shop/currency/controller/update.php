@@ -64,7 +64,10 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 				$this->_exchangeRate[strval($Valute->CharCode)] = floatval((str_replace(',', '.', $Valute->Value))) / floatval(str_replace(',', '.', $Valute->Nominal));
 			}
 
-			if ($oDefaultCurrency->code != 'RUR' && !isset($this->_exchangeRate[$oDefaultCurrency->code]))
+			if ($oDefaultCurrency->code != 'RUR'
+				&& $oDefaultCurrency->code != 'RUB'
+				&& !isset($this->_exchangeRate[$oDefaultCurrency->code])
+			)
 			{
 				throw new Exception('Валюта по умолчанию отсутствует во входящем XML');
 			}
@@ -78,11 +81,14 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 					И рубль присутсвует в списке валют
 				ставим рублю его котировку, относительно валюты по умолчанию
 			 */
-			if ($oDefaultCurrency->code != 'RUR')
+			if ($oDefaultCurrency->code != 'RUR' && $oDefaultCurrency->code != 'RUB')
 			{
 				$fRubRate = 1.0 / $this->_exchangeRate[$oDefaultCurrency->code];
 
-				!is_null($oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUR'))
+				$oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUB');
+				is_null($oRubCurrency) && $oRubCurrency = Core_Entity::factory('Shop_Currency')->getByCode('RUR');
+
+				!is_null($oRubCurrency)
 					&& $oRubCurrency
 						->exchange_rate($fRubRate)
 						->date($fDate)
@@ -99,7 +105,7 @@ class Shop_Currency_Controller_Update extends Admin_Form_Action_Controller
 					continue;
 				}
 
-				if ($oDefaultCurrency->code == 'RUR')
+				if ($oDefaultCurrency->code == 'RUB' || $oDefaultCurrency->code == 'RUR')
 				{
 					$oCurrentCurrency->exchange_rate = $rate;
 					$oCurrentCurrency->date($fDate);

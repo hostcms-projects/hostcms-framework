@@ -32,6 +32,8 @@ return array(
 	'surname' => '<acronym title="User surname">Surname</acronym>',
 	'email' => '<acronym title="User e-mail">E-mail</acronym>',
 	'icq' => '<acronym title="User ICQ number">ICQ</acronym>',
+	
+	'image' => '<acronym title="Photo">Photo</acronym>',
 	'site' => '<acronym title="User website">Website</acronym>',
 	'active' => "<acronym title=\"Active user\">Active user</acronym>",	
 	'position' => '<acronym title="User position">Position</acronym>',
@@ -50,4 +52,10 @@ return array(
 	'demo_mode' => 'Demo mode, access denied.',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	
+	'chat_message' => 'Type your message',
+	'chat_messages_none' => 'No messages',
+	'chat_count_unread_message' => 'Unread messages: %s',
+	'chat_count_new_message' => 'New messages: ',
+	'new_message_from' => 'New message from %s %s',	
 );

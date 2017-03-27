@@ -15,12 +15,17 @@ return array(
 	'actions' => 'Actions',
 
 	'add' => 'Add',
-	
+
 	'yes' => 'Yes',
 	'no' => 'No',
-
+	'enabled' => 'Enabled',
+	'disabled' => 'Disabled',
+	'enable' => 'Enable',
+	'disable' => 'Disable',
 	'asc' => 'Ascending',
 	'desc' => 'Descending',
+	'not-installed' => 'Not installed',
+	'buy' => 'Buy',
 
 	'model_name' => 'Administration center forms',
 	'menu' => 'Administration center forms',

@@ -131,7 +131,7 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 		);
 
 		// Определяем коэффициент пересчета
-		$fCurrencyCoefficient = $this->shop_currency_id > 0 && $oShop->shop_currency_id > 0
+		$fCurrencyCoefficient = $this->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
 			? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
 				$this->Shop_Currency, $oShop->Shop_Currency
 			)

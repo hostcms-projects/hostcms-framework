@@ -4,6 +4,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  * Online shop.
+ * 2.0.8 - http://v8.1c.ru/edi/edi_stnd/90/CML208.XSD
  *
  * @package HostCMS 6\Shop
  * @version 6.x
@@ -737,7 +738,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				clearstatcache();
-				
+
 				// Удаляем папку назначения вместе со всеми старыми файлами
 				//Core_File::deleteDir($sDestinationFolder);
 
@@ -1140,7 +1141,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						? strval($oItem->Штрихкод)
 						: ''
 					);*/
-				
+
 				$oShopItem->name = $sItemName;
 
 				if (is_array($aTmp = $this->xpath($oItem, 'Группы'))

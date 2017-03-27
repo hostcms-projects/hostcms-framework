@@ -313,6 +313,17 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	* Set $this->_oCurrentItem
+	* @param Shop_Item_Model $oCurrentItem
+	* @return self
+	*/
+	public function setCurrentItem(Shop_Item_Model $oCurrentItem)
+	{
+		$this->_oCurrentItem = $oCurrentItem;
+		return $this;
+	}
+
+	/**
 	 * Initialization
 	 * @return self
 	 */
@@ -1388,7 +1399,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 					break;
 					// Передан путь товара
-					case 'shop_items_catalog_path':
+					/*case 'shop_items_catalog_path':
 						if ($sData != '')
 						{
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
@@ -1407,6 +1418,34 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$this->_oCurrentItem->path = $sData;
 							}
 						}
+					break;*/
+					case 'shop_items_catalog_path':
+					if ($sData != '')
+					{
+						// Товар не был найден ранее, например, по артикулу
+						if (!$this->_oCurrentItem->id)
+						{
+							$oTmpObject = $this->_oCurrentShop->Shop_Items;
+							$oTmpObject->queryBuilder()
+								->where('path', '=', $sData)
+								->where('shop_group_id', '=', $this->_oCurrentGroup->id);
+
+							$oTmpObject = $oTmpObject->findAll(FALSE);
+
+							if (count($oTmpObject))
+							{
+								$this->_oCurrentItem = $oTmpObject[0];
+							}
+							else
+							{
+								$this->_oCurrentItem->path = $sData;
+							}
+						}
+						else
+						{
+							$this->_oCurrentItem->path = $sData;
+						}
+					}
 					break;
 					// Передан Seo Title для товара
 					case 'shop_items_catalog_seo_title':
@@ -1922,7 +1961,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 			if ($this->searchIndexation && $this->_oCurrentGroup->id)
 			{
-				Search_Controller::indexingSearchPages(array(Core_Entity::factory('Shop_Group', $this->_oCurrentGroup->id)->indexing()));
+				Core_Entity::factory('Shop_Group', $this->_oCurrentGroup->id)->index();
 			}
 
 			if ($this->_oCurrentItem->id)

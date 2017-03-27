@@ -15,6 +15,7 @@ class Core_Command_Controller_Benchmark extends Core_Command_Controller
 	/**
 	 * Default controller action
 	 * @return Core_Response
+	 * @hostcms-event Core_Command_Controller_Benchmark.onBeforeShowAction
 	 */
 	public function showAction()
 	{

@@ -95,44 +95,54 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 				try
 				{
-					$aPrice = Shop_Delivery_Handler::factory($oShop_Delivery)->country($this->shop_country_id)->location($this->shop_country_location_id)->city($this->shop_country_location_city_id)->weight($this->totalWeight)->postcode($this->postcode)->volume($this->volume)->execute();
+					$aPrice = Shop_Delivery_Handler::factory($oShop_Delivery)
+						->country($this->shop_country_id)
+						->location($this->shop_country_location_id)
+						->city($this->shop_country_location_city_id)
+						->weight($this->totalWeight)
+						->postcode($this->postcode)
+						->volume($this->volume)
+						->execute();
 
-					!is_array($aPrice) && $aPrice = array($aPrice);
-
-					foreach ($aPrice as $key => $object)
+					if (!is_null($aPrice))
 					{
-						if(!is_object($object))
+						!is_array($aPrice) && $aPrice = array($aPrice);
+
+						foreach ($aPrice as $key => $object)
 						{
-							$tmp = $object;
-							$object = new StdClass();
-							$object->price = $tmp;
-							$object->rate = 0;
-							$object->description = NULL;
-						}
+							if(!is_object($object))
+							{
+								$tmp = $object;
+								$object = new StdClass();
+								$object->price = $tmp;
+								$object->rate = 0;
+								$object->description = NULL;
+							}
 
-						$sIndex = $oShop_Delivery->id . '-' . $key;
-						
-						$_SESSION['hostcmsOrder']['deliveries'][$sIndex] = array(
-							'shop_delivery_id' => $oShop_Delivery->id,
-							'price' => $object->price,
-							'rate' => (isset($object->rate) ? intval($object->rate) : 0),
-							'name' => $object->description
-						);
+							$sIndex = $oShop_Delivery->id . '-' . $key;
 
-						$oShop_Delivery_Condition = Core::factory('Core_Xml_Entity')
-							->name('shop_delivery_condition')
-							->addAttribute('id', $sIndex . '#')
-							->addEntity(
-								Core::factory('Core_Xml_Entity')->name('shop_delivery_id')->value($oShop_Delivery->id)
-							)->addEntity(
-								Core::factory('Core_Xml_Entity')->name('shop_currency_id')->value($oShop_Delivery->Shop->shop_currency_id)
-							)->addEntity(
-								Core::factory('Core_Xml_Entity')->name('price')->value($object->price)
-							)->addEntity(
-								Core::factory('Core_Xml_Entity')->name('description')->value($object->description)
+							$_SESSION['hostcmsOrder']['deliveries'][$sIndex] = array(
+								'shop_delivery_id' => $oShop_Delivery->id,
+								'price' => $object->price,
+								'rate' => (isset($object->rate) ? intval($object->rate) : 0),
+								'name' => $object->description
 							);
 
-						$aShop_Delivery_Condition[] = $oShop_Delivery_Condition;
+							$oShop_Delivery_Condition = Core::factory('Core_Xml_Entity')
+								->name('shop_delivery_condition')
+								->addAttribute('id', $sIndex . '#')
+								->addEntity(
+									Core::factory('Core_Xml_Entity')->name('shop_delivery_id')->value($oShop_Delivery->id)
+								)->addEntity(
+									Core::factory('Core_Xml_Entity')->name('shop_currency_id')->value($oShop_Delivery->Shop->shop_currency_id)
+								)->addEntity(
+									Core::factory('Core_Xml_Entity')->name('price')->value($object->price)
+								)->addEntity(
+									Core::factory('Core_Xml_Entity')->name('description')->value($object->description)
+								);
+
+							$aShop_Delivery_Condition[] = $oShop_Delivery_Condition;
+						}
 					}
 				}
 				catch (Exception $e)

@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /* Панель в клиентском разделе */
-.hostcmsPanel{padding: 10px 10px; box-shadow: 0 0 5px rgba(100, 100, 100, 0.60); border-radius: 10px; zoom: 1; z-index: 991; position: absolute; margin-top: 10px; background-color: #FFF; cursor: move; opacity: .9; line-height: normal }
+.hostcmsPanel{padding: 10px 10px; box-shadow: 0 0 5px rgba(100, 100, 100, 0.60); border-radius: 10px; zoom: 1; z-index: 10001; position: absolute; margin-top: 10px; background-color: #FFF; cursor: move; opacity: .9; line-height: normal }
 .hostcmsPanel a:link,.hostcmsPanel a:visited,.hostcmsPanel a:hover{color:#0070BD;text-decoration:underline}
 .hostcmsPanel .hostcmsSubPanel{margin-bottom:-3px; white-space: nowrap}
 .hostcmsPanel .hostcmsSubPanel a img{margin: 0 2px; cursor: pointer; }

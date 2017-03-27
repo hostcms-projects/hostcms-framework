@@ -834,10 +834,7 @@ class Shop_Item_Model extends Core_Entity
 		$this->active = 1 - $this->active;
 		$this->save();
 
-		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
-		{
-			Search_Controller::indexingSearchPages(array($this->indexing()));
-		}
+		$this->index();
 
 		$this->clearCache();
 
@@ -846,6 +843,26 @@ class Shop_Item_Model extends Core_Entity
 		return $this;
 	}
 
+	/**
+	 * Add item into search index
+	 * @return self
+	 */
+	public function index()
+	{
+		if (Core::moduleIsActive('search')
+			&& $this->indexing && $this->active
+			&& ($this->start_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->start_datetime) <= time())
+			&& ($this->end_datetime == '0000-00-00 00:00:00'
+				|| Core_Date::sql2timestamp($this->end_datetime) > time())
+		)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+
+		return $this;
+	}
+	
 	/**
 	 * Mark entity as deleted
 	 * @return Core_Entity

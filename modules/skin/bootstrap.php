@@ -44,6 +44,7 @@ class Skin_Bootstrap extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.selection.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.pie.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/jquery.slimscroll.min.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/toastr/toastr.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/bootbox/bootbox.js')
 
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/easypiechart/jquery.easypiechart.js')
@@ -171,6 +172,19 @@ class Skin_Bootstrap extends Core_Skin
 					{
 						?><div class="navbar-account">
 							<ul class="account-area">
+								<?php
+								$oModule = Core_Entity::factory('Module')->getByPath('user');
+								?><li>
+									<a id="sound-switch" title="Sound" href="#">
+										<i class="icon fa fa-<?php echo $oUser->sound ? 'bell' : 'bell-slash'?>"></i>
+									</a>
+
+									<script type="text/javascript">
+										$(function(){
+											$("#sound-switch").on('click', {path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=84'}, $.soundSwitch );
+										});
+									</script>
+								</li>
 								<li>
 								<?php
 								$oCurrentSite = Core_Entity::factory('Site', CURRENT_SITE);
@@ -331,35 +345,111 @@ class Skin_Bootstrap extends Core_Skin
 										});
 									</script>
 								</li>
+								<?php
+								$oModule = Core_Entity::factory('Module')->getByPath('user');
+								?><li>
+									<a id="chat-link" title="Chat" href="#">
+										<i class="icon glyphicon glyphicon-comment"></i>
+										<span class="badge hidden"></span>
+									</a>
+									<div id="chatbar" class="page-chatbar">
+										<div class="chatbar-contacts">
+											<ul class="contacts-list">
+												<!-- Типовые -->
+												<li class="contact hidden">
+													<div class="contact-avatar">
+														<img />
+													</div>
+													<div class="contact-info">
+														<div class="contact-name"><span class="badge">0</span></div>
+														<div class="contact-status">
+															<div data-user-id="" class="online"></div>
+															<div class="status"></div>
+														</div>
+														<div class="last-chat-time"></div>
+													</div>
+												</li>
+											</ul>
+										</div>
+										<div class="chatbar-messages" style="display: none;">
+											<div class="messages-contact">
+												<div class="contact-avatar">
+													<img />
+												</div>
+												<div class="contact-info">
+													<div class="contact-name"></div>
+													<div class="contact-status">
+														<div data-user-id="" class="online"></div>
+														<div class="status"></div>
+													</div>
+													<div class="last-chat-time"></div>
+													<div class="back">
+														<i class="fa fa-arrow-circle-left"></i>
+													</div>
+												</div>
+											</div>
+											<div id="messages-none" class="hidden margin-left-10 margin-top-10"><?php echo Core::_('User.chat_messages_none')?></div>
+											<ul class="messages-list" data-module-id="<?php echo $oModule->id ?>">
+												<li class="message hidden">
+													<div class="message-info">
+														<div class="bullet"></div>
+														<div class="contact-name"></div>
+														<div class="message-time"></div>
+													</div>
+													<div class="message-body"></div>
+												</li>
+											</ul>
+											<form method="post">
+												<div class="send-message">
+													<span class="input-icon icon-right">
+														<textarea rows="4" class="form-control" placeholder="<?php echo Core::_('User.chat_message')?>"></textarea>
+														<i class="fa fa-comment-o themeprimary"></i>
+													</span>
+												</div>
+											</form>
+											<div id="new_messages" class="hidden margin-top-10 text-align-center"><?php echo Core::_('User.chat_count_new_message')?> <span class="count_new_messages"></span><i class="fa fa-caret-down margin-left-5"></i></div>
+											<i class="fa fa-spinner fa-pulse fa-3x chatbar-message-spinner hidden"></i>
+										</div>
+									</div>
+									<script type="text/javascript">
+										$(function(){
+											$('.page-container').append($('#chatbar'));
+											$("#chat-link, div.back").on('click', {path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=77', context: $('#chatbar .contacts-list') }, $.chatGetUsersList );
 
+											$('.contacts-list')
+												.on('click', 'li.contact', $.chatClearMessagesList)
+												.on('click', 'li.contact', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=78' }, $.chatGetUserMessages);
+
+												$('.send-message textarea').on('keyup', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=79' }, $.chatSendMessage);
+
+												$(document).ready(
+													$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'})
+												);
+										});
+									</script>
+								</li>
 								<li>
-									<a class="dropdown-toggle" data-toggle="dropdown">
-										<i class="icon fa fa-user"></i>
+									<a class="login-area dropdown-toggle" data-toggle="dropdown">
+										<div class="avatar" title="View your public profile">
+											<img src="<?php echo $oUser->getImageHref()?>">
+										</div>
+										<section>
+											<h2><span class="profile"><span><?php echo htmlspecialchars($oUser->name . ' ' . $oUser->surname)?></span></span></h2>
+										</section>
 									</a>
 									<!--Login Area Dropdown-->
 									<ul class="pull-right dropdown-menu dropdown-arrow dropdown-login-area">
 										<!--Avatar Area-->
-										<li role="presentation" class="dropdown-header">
-											<span><i class="fa fa-<?php echo $oUser->superuser ? 'graduation-cap' : 'user'?>"></i> <?php echo htmlspecialchars($_SESSION['valid_user'])?></span>
+										<li class="email">
+											<a>
+												<i class="fa fa-<?php echo $oUser->superuser ? 'graduation-cap' : 'user'?>"></i> <?php echo htmlspecialchars($_SESSION['valid_user'])?>
+											</a>
 										</li>
-										<!--Theme Selector Area-->
-										<!-- <li class="theme-area">
-											<ul class="colorpicker" id="skin-changer">
-												<li><a class="colorpick-btn" href="#" style="background-color:#5DB2FF;" rel="/modules/skin/bootstrap/css/skins/blue.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#2dc3e8;" rel="/modules/skin/bootstrap/css/skins/azure.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#03B3B2;" rel="/modules/skin/bootstrap/css/skins/teal.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#53a93f;" rel="/modules/skin/bootstrap/css/skins/green.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#FF8F32;" rel="/modules/skin/bootstrap/css/skins/orange.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#cc324b;" rel="/modules/skin/bootstrap/css/skins/pink.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#AC193D;" rel="/modules/skin/bootstrap/css/skins/darkred.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#8C0095;" rel="/modules/skin/bootstrap/css/skins/purple.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#0072C6;" rel="/modules/skin/bootstrap/css/skins/darkblue.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#585858;" rel="/modules/skin/bootstrap/css/skins/gray.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#474544;" rel="/modules/skin/bootstrap/css/skins/black.min.css"></a></li>
-												<li><a class="colorpick-btn" href="#" style="background-color:#001940;" rel="/modules/skin/bootstrap/css/skins/deepblue.min.css"></a></li>
-											</ul>
-										</li> -->
-										<!--/Theme Selector Area-->
+										<li>
+											<div class="avatar-area">
+												<img src="<?php echo $oUser->getImageHref()?>" class="avatar">
+											</div>
+										</li>
 										<li class="dropdown-footer">
 											<a href="/admin/logout.php"><?php echo Core::_('Admin.exit')?></a>
 										</li>
@@ -433,19 +523,23 @@ class Skin_Bootstrap extends Core_Skin
 				// Список основных меню скина
 				$this->_config = Core_Config::instance()->get('skin_bootstrap_config');
 
+				$aModules = $this->_getAllowedModules();
+
+				$aModuleList = $aCore_Module = array();
+				foreach ($aModules as $key => $oModule)
+				{
+					$aModuleList[$oModule->path] = $oModule;
+					// До onLoadSkinConfig, чтобы отработать навешенные в конструкторе Skin_Module_... хуки
+					$aCore_Module[$oModule->path] = $this->getSkinModule($oModule->path);
+					// Не для каждого модуля определен Skin_ класс
+					is_null($aCore_Module[$oModule->path]) && $aCore_Module[$oModule->path] = Core_Module::factory($oModule->path);
+				}
+				unset($aModules);
+				
 				Core_Event::notify(get_class($this) . '.onLoadSkinConfig', $this);
 
 				if (isset($this->_config['adminMenu']))
 				{
-					$aModules = $this->_getAllowedModules();
-
-					$aModuleList = array();
-					foreach ($aModules as $key => $oModule)
-					{
-						$aModuleList[$oModule->path] = $oModule;
-					}
-					unset($aModules);
-
 					foreach ($this->_config['adminMenu'] as $key => $aAdminMenu)
 					{
 						$aAdminMenu += array('ico' => 'fa-file-o',
@@ -467,7 +561,9 @@ class Skin_Bootstrap extends Core_Skin
 							?><li>
 								<a class="menu-dropdown">
 									<i class="menu-icon <?php echo $aAdminMenu['ico']?>"></i>
-									<span class="menu-text"> <?php echo nl2br(htmlspecialchars(Core::_("Skin_Bootstrap.admin_menu_{$key}"))) ?> </span>
+									<span class="menu-text"> <?php echo nl2br(htmlspecialchars(
+										Core_Array::get($aAdminMenu, 'caption', Core::_("Skin_Bootstrap.admin_menu_{$key}"))
+									))?> </span>
 									<i class="menu-expand"></i>
 								</a>
 
@@ -475,7 +571,8 @@ class Skin_Bootstrap extends Core_Skin
 								<?php
 								foreach ($subItems as $oModule)
 								{
-									$oCore_Module = Core_Module::factory($oModule->path);
+									//$oCore_Module = Core_Module::factory($oModule->path);
+									$oCore_Module = Core_Array::get($aCore_Module, $oModule->path);
 
 									if ($oCore_Module && is_array($oCore_Module->menu))
 									{
@@ -503,7 +600,8 @@ class Skin_Bootstrap extends Core_Skin
 					// Невошедшие в другие группы
 					foreach ($aModuleList as $oModule)
 					{
-						$oCore_Module = Core_Module::factory($oModule->path);
+						//$oCore_Module = Core_Module::factory($oModule->path);
+						$oCore_Module = Core_Array::get($aCore_Module, $oModule->path);
 
 						if ($oCore_Module && is_array($oCore_Module->menu))
 						{
@@ -558,15 +656,11 @@ class Skin_Bootstrap extends Core_Skin
 <head>
 <meta charset="utf-8" />
 <title><?php echo $this->_title?></title>
-
-<meta name="description" content="blank page" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
 <link rel="apple-touch-icon" href="/modules/skin/bootstrap/ico/icon-iphone-retina.png" />
 <link rel="shortcut icon" type="image/x-icon" href="/modules/skin/bootstrap/ico/favicon.ico" />
 <link rel="icon" type="image/png" href="/modules/skin/bootstrap/ico/favicon.png" />
-
 <?php $this->showHead()?>
 </head>
 <body class="body-<?php echo htmlspecialchars($this->_mode)?> hostcms-bootstrap1">
@@ -1034,5 +1128,4 @@ class Skin_Bootstrap extends Core_Skin
 		</form>
 		<?php
 	}
-
 }

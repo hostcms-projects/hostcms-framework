@@ -569,14 +569,25 @@ class Informationsystem_Group_Model extends Core_Entity
 		$this->active = 1 - $this->active;
 		$this->save();
 
-		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
-		{
-			Search_Controller::indexingSearchPages(array($this->indexing()));
-		}
+		$this->index();
 
 		$this->clearCache();
 
 		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Add group into search index
+	 * @return self
+	 */
+	public function index()
+	{
+		if (Core::moduleIsActive('search') && $this->indexing && $this->active)
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
 
 		return $this;
 	}
@@ -859,14 +870,6 @@ class Informationsystem_Group_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
 		//$oSearch_Page->save();
-
-		/*Core_QueryBuilder::delete('search_page_siteuser_groups')
-			->where('search_page_id', '=', $oSearch_Page->id)
-			->execute();
-
-		$oSearch_Page_Siteuser_Group = Core_Entity::factory('Search_Page_Siteuser_Group');
-		$oSearch_Page_Siteuser_Group->siteuser_group_id = $this->getSiteuserGroupId();
-		$oSearch_Page->add($oSearch_Page_Siteuser_Group);*/
 
 		return $oSearch_Page;
 	}

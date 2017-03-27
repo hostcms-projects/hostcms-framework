@@ -36,4 +36,10 @@ return array(
 	'reset' => 'Reset',
 	'benchmark_day' => 'Performance by days',
 	'benchmark_hour' => 'Performance by hours',
+	
+	'cache' => 'Cache',
+	'cache_description' => 'Cashing systems significantly reduce the load of the server and time of page generation speeding up page loading.',
+	
+	'compression' => 'Compression',
+	'compression_description' => 'Compresses the site pages transmitted to visitors speeding up site loading. Union, minify and compress CSS and Javascript.',
 );
