@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
- * - onStep(100) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 100
+ * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 100
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -20,7 +20,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * $Shop_Controller_YandexMarket->show();
  * </code>
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -34,6 +35,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected $_allowedProperties = array(
 		'itemsProperties',
 		'modifications',
+		'deliveryOptions',
 		'type',
 		'onStep',
 		'protocol'
@@ -203,8 +205,6 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->protocol = Core::httpsUses() ? 'https' : 'http';
 
-		$this->_Shop_Items = $oShop->Shop_Items;
-
 		$siteuser_id = 0;
 
 		$this->_aSiteuserGroups = array(0, -1);
@@ -224,6 +224,46 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			}
 		}
 
+		$this->_setShopItems();
+
+		$this->_setShopGroups();
+
+		$this->itemsProperties = $this->modifications = $this->deliveryOptions = TRUE;
+
+		$this->type = 'offer';
+		$this->onStep = 100;
+
+		$this->_Shop_Item_Controller = new Shop_Item_Controller();
+	}
+
+	/**
+	 * Prepare $this->Shop_Groups
+	 * @return self
+	 */
+	protected function _setShopGroups()
+	{
+		$oShop = $this->getEntity();
+
+		$this->_Shop_Groups = $oShop->Shop_Groups;
+		$this->_Shop_Groups
+			->queryBuilder()
+			->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+			//->where('shop_groups.active', '=', 1)
+			->clearOrderBy()
+			->orderBy('shop_groups.parent_id', 'ASC');
+
+		return $this;
+	}
+
+	/**
+	 * Prepare $this->_Shop_Items
+	 * @return self
+	 */
+	protected function _setShopItems()
+	{
+		$oShop = $this->getEntity();
+
+		$this->_Shop_Items = $oShop->Shop_Items;
 		$this->_Shop_Items
 			->queryBuilder()
 			->clearOrderBy()
@@ -264,20 +304,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_items.price', '>', 0)
 			->where('shop_items.modification_id', '=', 0);
 
-		$this->_Shop_Groups = $oShop->Shop_Groups;
-		$this->_Shop_Groups
-			->queryBuilder()
-			->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-			//->where('shop_groups.active', '=', 1)
-			->clearOrderBy()
-			->orderBy('shop_groups.parent_id', 'ASC');
-
-		$this->itemsProperties = $this->modifications = TRUE;
-
-		$this->type = 'offer';
-		$this->onStep = 100;
-
-		$this->_Shop_Item_Controller = new Shop_Item_Controller();
+		return $this;
 	}
 
 	/**
@@ -337,6 +364,24 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected $_aCategoriesId = array();
 
 	/**
+	 * get max group id
+	 * @return int
+	 */
+	protected function _getMaxGroupId()
+	{
+		$oShop = $this->getEntity();
+
+		$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+		$oCore_QueryBuilder_Select
+			->from('shop_groups')
+			->where('shop_id', '=', $oShop->id);
+
+		$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+
+		return $aRow['max_id'];
+	}
+
+	/**
 	 * Show categories
 	 * @return self
 	 */
@@ -355,28 +400,42 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		// Массив отключенных ID групп
 		$aDisabledCategoriesId = array();
 
-		$aShop_Groups = $this->_Shop_Groups->findAll(FALSE);
-		foreach ($aShop_Groups as $oShop_Group)
-		{
-			if ($oShop_Group->active
-				// Группа в корневой или в списке отключенных нет ее родителя
-				&& ($oShop_Group->parent_id == 0 || !isset($aDisabledCategoriesId[$oShop_Group->parent_id]))
-			)
-			{
-				$this->_aCategoriesId[$oShop_Group->id] = $oShop_Group->id;
+		$maxId = $this->_getMaxGroupId();
 
-				$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0
-					? ''
-					: ' parentId="' . $oShop_Group->parent_id . '"';
+		$iFrom = 0;
 
-				echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
-			}
-			else
+		do {
+			$this->_setShopGroups();
+			$this->_Shop_Groups->queryBuilder()
+				->where('shop_groups.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->onStep));
+
+			$aShop_Groups = $this->_Shop_Groups->findAll(FALSE);
+			foreach ($aShop_Groups as $oShop_Group)
 			{
-				// Группа в отключенные если она сама отключена или родитель отключен
-				$aDisabledCategoriesId[$oShop_Group->id] = $oShop_Group->id;
+				if ($oShop_Group->active
+					// Группа в корневой или в списке отключенных нет ее родителя
+					&& ($oShop_Group->parent_id == 0 || !isset($aDisabledCategoriesId[$oShop_Group->parent_id]))
+				)
+				{
+					$this->_aCategoriesId[$oShop_Group->id] = $oShop_Group->id;
+
+					$group_parent_id = $oShop_Group->parent_id == '' || $oShop_Group->parent_id == 0
+						? ''
+						: ' parentId="' . $oShop_Group->parent_id . '"';
+
+					echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
+				}
+				else
+				{
+					// Группа в отключенные если она сама отключена или родитель отключен
+					$aDisabledCategoriesId[$oShop_Group->id] = $oShop_Group->id;
+				}
 			}
+
+			$iFrom += $this->onStep;
 		}
+		while ($iFrom - $this->onStep < $maxId);
+
 		echo "</categories>\n";
 
 		unset($aShop_Groups);
@@ -391,6 +450,24 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected $_MarketCategory = NULL;
 
 	/**
+	 * get max item id
+	 * @return int
+	 */
+	protected function _getMaxId()
+	{
+		$oShop = $this->getEntity();
+
+		$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+		$oCore_QueryBuilder_Select
+			->from('shop_items')
+			->where('shop_id', '=', $oShop->id);
+
+		$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+
+		return $aRow['max_id'];
+	}
+
+	/**
 	 * Show offers
 	 * @return self
 	 * @hostcms-event Shop_Controller_YandexMarket.onBeforeOffer
@@ -400,20 +477,26 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	{
 		echo "<offers>\n";
 
-		$offset = 0;
+		//$offset = 0;
 
 		$oShop = $this->getEntity();
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
 
 		$this->_MarketCategory = $oShop_Item_Property_List->Properties->getByTag_name('market_category');
 
-		do {
-			$oShop_Items = $this->_Shop_Items;
-			$oShop_Items->queryBuilder()
-				->offset($offset)
-				->limit($this->onStep);
+		$maxId = $this->_getMaxId();
 
-			$aShop_Items = $oShop_Items->findAll(FALSE);
+		$iFrom = 0;
+
+		do {
+			$this->_setShopItems();
+			$this->_Shop_Items->queryBuilder()
+				->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->onStep))
+				//->offset($offset)
+				//->limit($this->onStep)
+				;
+
+			$aShop_Items = $this->_Shop_Items->findAll(FALSE);
 
 			foreach ($aShop_Items as $oShop_Item)
 			{
@@ -428,7 +511,6 @@ class Shop_Controller_YandexMarket extends Core_Controller
 							->where('shop_items.yandex_market', '=', 1);
 
 						$aModifications = $oModifications->findAll(FALSE);
-
 						foreach ($aModifications as $oModification)
 						{
 							$this->_showOffer($oModification);
@@ -438,9 +520,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			}
 
 			Core_File::flush();
-			$offset += $this->onStep;
+			//$offset += $this->onStep;
+			$iFrom += $this->onStep;
 		}
-		while (count($aShop_Items));
+		while ($iFrom - $this->onStep < $maxId);
 
 		echo '</offers>'. "\n";
 
@@ -460,8 +543,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? ' cbid="' . Core_Str::xml($oShop_Item->yandex_market_cid) . '"'
 			: '';
 
-		$oShop_Warehouse_Item = $oShop_Item->Shop_Warehouse_Items->getByShopItemId($oShop_Item->id, FALSE);
-		$available = !is_null($oShop_Warehouse_Item) && $oShop_Warehouse_Item->count > 0 ? 'true' : 'false';
+		$available = $oShop_Item->getRest() > 0 ? 'true' : 'false';
 
 		$sType = $this->type != 'offer'
 			? ' type="' . Core_Str::xml($this->type) . '"'
@@ -522,6 +604,16 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			echo '<picture>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
 		}
 
+		/* Delivery options */
+		if ($this->deliveryOptions)
+		{
+			echo '<store>' . ($oShop_Item->store == 1 ? 'true' : 'false') . '</store>'. "\n";
+			echo '<pickup>' . ($oShop_Item->pickup == 1 ? 'true' : 'false') . '</pickup>'. "\n";
+			echo '<delivery>' . ($oShop_Item->delivery == 1 ? 'true' : 'false') . '</delivery>'. "\n";
+
+			$this->_deliveryOptions($oShop, $oShop_Item);
+		}
+
 		// (name, vendor?, vendorCode?)
 		if (mb_strlen($oShop_Item->name) > 0)
 		{
@@ -554,7 +646,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		if ($oShop_Item->manufacturer_warranty)
 		{
-			echo '<manufacturer_warranty>true</manufacturer_warranty>'. "\n";
+			echo '<manufacturer_warranty>true</manufacturer_warranty>' . "\n";
 		}
 
 		if (trim($oShop_Item->country_of_origin) != '')
@@ -576,6 +668,104 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	}
 
 	/**
+	 * Show delivery options
+	 * @param Shop_Model $oShop
+	 * @param Shop_Item_Model $oShop_Item
+	 * @return self
+	 */
+	protected function _deliveryOptions(Shop_Model $oShop, $oShop_Item = NULL)
+	{
+		$oShop_Item_Delivery_Options = $oShop->Shop_Item_Delivery_Options;
+
+		$oShop_Item_Delivery_Options->queryBuilder()
+			->where('shop_item_delivery_options.shop_item_id', '=', !is_null($oShop_Item) ? $oShop_Item->id : 0);
+
+		$aShop_Item_Delivery_Options = $oShop_Item_Delivery_Options->findAll(FALSE);
+
+		if (count($aShop_Item_Delivery_Options))
+		{
+			echo '<delivery-options>';
+
+			foreach ($aShop_Item_Delivery_Options as $oShop_Item_Delivery_Option)
+			{
+				echo '<option cost="' . $oShop_Item_Delivery_Option->cost . '" days=" ' . $oShop_Item_Delivery_Option->day . '" order-before="' . $oShop_Item_Delivery_Option->order_before . '"/>' . "\n";
+			}
+
+			echo '</delivery-options>';
+		}
+
+		return count($aShop_Item_Delivery_Options);
+	}
+
+	/**
+	 * Допустимые значения возраста в годах
+	 * @var array
+	 */
+	protected $_aAgeYears = array(0, 6, 12, 16, 18);
+
+	/**
+	 * Допустимые значения возраста в месяцах
+	 * @var array
+	 */
+	protected $_aAgeMonthes = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+
+	/**
+	 * Исключаемые теги
+	 * @var array
+	 */
+	protected $_aForbid = array('age-month', 'age-year');
+
+	/**
+	 * Cache Properties
+	 * @var array
+	 */
+	protected $_cacheProperties = array();
+
+	/**
+	 * Get Property_Model by ID
+	 * @param int $property_id
+	 */
+	protected function _getProperty($property_id)
+	{
+		if (!isset($this->_cacheProperties[$property_id]))
+		{
+			$this->_cacheProperties[$property_id] = Core_Entity::factory('Property', $property_id);
+		}
+
+		return $this->_cacheProperties[$property_id];
+	}
+
+	/**
+	 * Cache List Items
+	 * @var array
+	 */
+	protected $_cacheListItems = array();
+
+	/**
+	 * Get List_Item value by ID
+	 * @param int $property_id
+	 */
+	protected function _getCacheListItem($oProperty, $listItemId)
+	{
+		if (!isset($this->_cacheListItems[$oProperty->list_id][$listItemId]))
+		{
+			$this->_cacheListItems[$oProperty->list_id][$listItemId] = NULL;
+
+			if ($listItemId)
+			{
+				$oList_Item = $oProperty->List->List_Items->getById(
+					$listItemId/*, FALSE*/
+				);
+
+				!is_null($oList_Item)
+					&& $this->_cacheListItems[$oProperty->list_id][$listItemId] = $oList_Item->value;
+			}
+		}
+
+		return $this->_cacheListItems[$oProperty->list_id][$listItemId];
+	}
+
+	/**
 	 * Print Shop_Item properties
 	 * @param Shop_Item_Model $oShop_Item
 	 * @return self
@@ -590,18 +780,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? Property_Controller_Value::getPropertiesValues($this->itemsProperties, $oShop_Item->id, FALSE)
 			: $oShop_Item->getPropertyValues(FALSE);
 
-		// Допустимые значения возраста в годах
-		$aAgeYears = array(0, 6, 12, 16, 18);
-
-		// Допустимые значения возраста в месяцах
-		$aAgeMonthes = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
-		$aForbid = array('age-month', 'age-year');
-
 		$bAge = FALSE;
 
 		foreach ($aProperty_Values as $oProperty_Value)
 		{
-			$oProperty = $oProperty_Value->Property;
+			//$oProperty = $oProperty_Value->Property;
+			$oProperty = $this->_getProperty($oProperty_Value->property_id);
 
 			switch ($oProperty->type)
 			{
@@ -615,13 +799,14 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				break;
 
 				case 3: // List
-					$value = NULL;
+					//$oList_Item = $oProperty->List->List_Items->getById(
+					//	$oProperty_Value->value/*, FALSE*/
+					//);
 
-					$oList_Item = $oProperty->List->List_Items->getById(
-						$oProperty_Value->value/*, FALSE*/
-					);
-
-					!is_null($oList_Item) && $value = $oList_Item->value;
+					//$value = !is_null($oList_Item)
+					//	? $oList_Item->value
+					//	: NULL;
+					$value = $this->_getCacheListItem($oProperty, $oProperty_Value->value);
 				break;
 
 				case 7: // Checkbox
@@ -683,18 +868,18 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 				if ($value !== '')
 				{
-					if (!in_array($sTagName, $aForbid))
+					if (!in_array($sTagName, $this->_aForbid))
 					{
 						echo '<' . $sTagName . $sAttr . '>'
 							. Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8'))
 						. '</' . $sTagName . '>'. "\n";
 					}
-					elseif ($sTagName == 'age-year' && $value !== '' && in_array($value, $aAgeYears))
+					elseif ($sTagName == 'age-year' && $value !== '' && in_array($value, $this->_aAgeYears))
 					{
 						echo '<age unit="year">' . intval($value) . '</age>'. "\n";
 						$bAge = TRUE;
 					}
-					elseif (!$bAge && $sTagName == 'age-month' && $value !== '' && in_array($value, $aAgeMonthes))
+					elseif (!$bAge && $sTagName == 'age-month' && $value !== '' && in_array($value, $this->_aAgeMonthes))
 					{
 						echo '<age unit="month">' . intval($value) . '</age>'. "\n";
 					}
@@ -762,6 +947,11 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		/* Категории */
 		$this->_categories();
+
+		/* Delivery options */
+		$this->deliveryOptions
+			// Disable if there aren't shop's delivery options
+			&& $this->deliveryOptions = $this->_deliveryOptions($oShop) > 0;
 
 		Core_File::flush();
 

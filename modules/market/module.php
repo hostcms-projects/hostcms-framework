@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Market.
+ * Market Module.
  *
- * @package HostCMS 6\Market
+ * @package HostCMS
+ * @subpackage Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Market_Module extends Core_Module
 {
@@ -22,7 +23,7 @@ class Market_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-02-03';
+	public $date = '2016-03-03';
 
 	/**
 	 * Module name

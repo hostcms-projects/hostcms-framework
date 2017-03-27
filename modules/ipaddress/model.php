@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * IP addresses.
+ * Ipaddress_Model
  *
- * @package HostCMS 6\Ipaddress
+ * @package HostCMS
+ * @subpackage Ipaddress
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Ipaddress_Model extends Core_Entity{
 	/**
@@ -35,7 +36,7 @@ class Ipaddress_Model extends Core_Entity{
 	 * Change access mode
 	 * @return self
 	 */	public function changeAccess()	{		$this->deny_access = 1 - $this->deny_access;		$this->save();		return $this;	}
-	    /**
+		/**
 	 * Change statistic mode
 	 * @return self
 	 */	public function changeStatistic()	{		$this->no_statistic = 1 - $this->no_statistic;		$this->save();		return $this;	}

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Votes.
+ * Vote_Comment_Model
  *
- * @package HostCMS 6\Vote
+ * @package HostCMS
+ * @subpackage Vote
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Vote_Comment_Model extends Core_Entity
 {
@@ -23,7 +24,7 @@ class Vote_Comment_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'comment' =>  array(),
+		'comment' => array(),
 		'vote' => array()
 	);
 }

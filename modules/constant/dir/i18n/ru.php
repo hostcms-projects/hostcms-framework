@@ -3,10 +3,11 @@
 /**
  * Constants.
  *
- * @package HostCMS 6\Constant
+ * @package HostCMS
+ * @subpackage Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 'root'=>'Корневая группа',

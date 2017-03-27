@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Abstract DataBase
  *
- * @package HostCMS 6\Core\Database
+ * @package HostCMS
+ * @subpackage Core\Database
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -216,7 +217,7 @@ abstract class Core_DataBase
 	 * Words array
 	 */
 	static protected $_words = array(
-		array('AND', 'IS',  '&&', 'LOG', 'NOT','NOW', 'MIN', '!', '\|\|', 'OR', 'OCT', 'TAN',
+		array('AND', 'IS', '&&', 'LOG', 'NOT','NOW', 'MIN', '!', '\|\|', 'OR', 'OCT', 'TAN',
 			'STD', 'SHA', 'ORD', 'XOR', 'ASC', 'DESC'),
 		array('SELECT', 'UPDATE', 'INSERT', 'DELETE', 'USING', 'LIMIT', 'OFFSET', 'SET' ),
 		array('DATE', 'INTO', 'FROM', 'THEN', 'WHEN', 'WHERE', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'INNER JOIN', 'JOIN', 'ELSE', 'ORDER BY', 'GROUP BY', 'HAVING', 'ON'),

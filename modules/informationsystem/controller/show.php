@@ -55,7 +55,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 	->show();
  * </code>
  *
- * @package HostCMS 6\Informationsystem
+ * @package HostCMS
+ * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -635,7 +636,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 				if ($oInformationsystem_Item->active == $desiredActivity
 					&& (!$iShortcut
-						||  (Core_Date::sql2timestamp($oInformationsystem_Item->end_datetime) >= $iCurrentTimestamp
+						|| (Core_Date::sql2timestamp($oInformationsystem_Item->end_datetime) >= $iCurrentTimestamp
 							|| $oInformationsystem_Item->end_datetime == '0000-00-00 00:00:00')
 						&& (Core_Date::sql2timestamp($oInformationsystem_Item->start_datetime) <= $iCurrentTimestamp
 							|| $oInformationsystem_Item->start_datetime == '0000-00-00 00:00:00')
@@ -866,6 +867,10 @@ class Informationsystem_Controller_Show extends Core_Controller
 				}
 			}
 		}
+		elseif (is_null($path))
+		{
+			return $this->error404();
+		}
 
 		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
 
@@ -896,7 +901,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 	/**
 	 * Apply forbidden tags
-	 * @param Informationsystem_Group $oInformationsystem_Group ticket
+	 * 
+	 * @param Informationsystem_Group $oInformationsystem_Group
 	 * @return self
 	 */
 	public function applyGroupsForbiddenTags($oInformationsystem_Group)
@@ -913,7 +919,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 	}
 
 	/**
-	 * Apply forbidden xml tags for items
+	 * Apply forbidden XML tags for items
 	 * @param Informationsystem_Item_Model $oInformationsystem_Item item
 	 * @return self
 	 */

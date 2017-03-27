@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Skin.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default extends Core_Skin
 {
@@ -850,8 +851,8 @@ if ($this->_mode != 'blank')
 
 			// Доступные текущие позиции курсора
 			$('#desktop').mousedown(function(e){
-			  window.mouseXPos = e.pageX;
-			  window.mouseYPos = e.pageY;
+				window.mouseXPos = e.pageX;
+				window.mouseYPos = e.pageY;
 			});
 
 			// Создаем контекстное меню

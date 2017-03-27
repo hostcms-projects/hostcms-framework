@@ -1031,6 +1031,9 @@ input[type="file"].form-control + .input-group-addon{
 .tooltip.in {
 	opacity: 0.9;
 }
+
+input[type=checkbox]~span.text, input[type=radio]~span.text {z-index: 12}
+
 /*
 .tooltip-magenta.tooltip > .tooltip-inner , .tooltip-magenta.tooltip.top .tooltip-arrow, .tooltip-magenta.tooltip.right .tooltip-arrow ,
 .tooltip-magenta.tooltip.left .tooltip-arrow , .tooltip-magenta.tooltip.bottom .tooltip-arrow {
@@ -1675,7 +1678,7 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 .ui-icon-closethick { background-position: -96px -128px; }
 /* /UI */
 
-.spec_prices:first-child .btn-delete{
+.spec_prices:first-child .btn-delete, .delivery_options:first-child .btn-delete{
 	display: none;
 }
 
@@ -1693,6 +1696,9 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 }
 .popover.left> .arrow::after{
 	border-left-color: #eee;
+}
+.popover a{
+	cursor: pointer;
 }
 
 .badge-hostcms {
@@ -1756,20 +1762,10 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
 /* --- /Notes --- */
 
 /* --- Market --- */
-.market-item  .databox .databox-header {
-	font-size: 15px;
-	font-weight: 800;
-}
-
-.market-item  .databox .databox-text > p {line-height: 16px}
-
-.market-item  .market-item-price {
-    font-size: 12pt;
-    font-weight: 300;
-    margin-top: 6px;
-}
-
-.market-item-image {background-clip: padding-box !important; border-radius: 10px !important;}
+.market-item  .databox .databox-header { font-size: 15px; font-weight: 800 }
+.market-item  .databox .databox-text > p {line-height: 16px }
+.market-item  .market-item-price { font-size: 12pt; font-weight: 300; margin-top: 6px }
+.market-item-image {background-clip: padding-box !important; border-radius: 10px !important }
 /* --- /Market --- */
 
 /* --- Badge --- */
@@ -1855,3 +1851,6 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 .margin-top-23 {
 	margin-top: 24px !important;
 }
+
+.siteuser_group_list_link>i {font-size:11px !important;margin-left:5px;}
+.siteuser_group_list_link>i:hover,.siteuser_group_list_link>i:focus {cursor:pointer;}

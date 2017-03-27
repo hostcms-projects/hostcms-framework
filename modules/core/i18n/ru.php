@@ -3,10 +3,11 @@
 /**
  * Core.
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'error_file_write' => 'Ошибка открытия файла для записи %s, проверьте права доступа к директории.',

@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Seller_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -91,7 +92,8 @@ class Shop_Seller_Model extends Core_Entity
 		$oSiteAlias = $this->Shop->Site->getCurrentAlias();
 		if ($oSiteAlias)
 		{
-			$oSearch_Page->url = 'http://' . $oSiteAlias->name
+			$oSearch_Page->url = ($this->Shop->Structure->https ? 'https://' : 'http://')
+				. $oSiteAlias->name
 				. $this->Shop->Structure->getPath()
 				. $this->getPath();
 		}

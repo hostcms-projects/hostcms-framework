@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Properties.
+ * Property_Value_Int_Model
  *
- * @package HostCMS 6\Property
+ * @package HostCMS
+ * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_Int_Model extends Core_Entity
 {
@@ -117,7 +118,8 @@ class Property_Value_Int_Model extends Core_Entity
 				{
 					$this
 						->addXmlTag('value', $oList_Item->value)
-						->addXmlTag('description', $oList_Item->description);
+						->addXmlTag('description', $oList_Item->description)
+						->addXmlTag('icon', $oList_Item->icon);
 				}
 			}
 		}

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Siteuser_Transaction_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Siteuser_Transaction_Model extends Core_Entity
 {
@@ -104,7 +105,7 @@ class Shop_Siteuser_Transaction_Model extends Core_Entity
 
 	/**
 	 * Change transaction status
-	 * @return Shop_Siteuser_Transaction_Model
+	 * @return self
 	 * @hostcms-event shop_siteuser_transaction.onBeforeChangeActive
 	 * @hostcms-event shop_siteuser_transaction.onAfterChangeActive
 	 */

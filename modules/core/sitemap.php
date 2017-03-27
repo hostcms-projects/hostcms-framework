@@ -11,10 +11,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - createIndex разбивать карту на несколько файлов
  * - perFile Count of nodes per one file
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Sitemap extends Core_Servant_Properties
 {
@@ -144,7 +145,11 @@ class Core_Sitemap extends Core_Servant_Properties
 
 		foreach ($aStructure as $oStructure)
 		{
-			$this->addNode('http://' . $oSite_Alias->name . $oStructure->getPath(), $oStructure->changefreq, $oStructure->priority);
+			$sProtocol = $oStructure->https
+				? 'https://'
+				: 'http://';
+
+			$this->addNode($sProtocol . $oSite_Alias->name . $oStructure->getPath(), $oStructure->changefreq, $oStructure->priority);
 
 			// Informationsystem
 			if ($this->showInformationsystemGroups && isset($this->_Informationsystems[$oStructure->id]))
@@ -168,7 +173,7 @@ class Core_Sitemap extends Core_Servant_Properties
 
 					$aInformationsystem_Groups = $oInformationsystem_Groups->findAll(FALSE);
 
-					$path = 'http://' . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
+					$path = $sProtocol . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
 
 					foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
 					{
@@ -243,7 +248,7 @@ class Core_Sitemap extends Core_Servant_Properties
 
 					$aShop_Groups = $oShop_Groups->findAll(FALSE);
 
-					$path = 'http://' . $oSite_Alias->name . $oShop->Structure->getPath();
+					$path = $sProtocol . $oSite_Alias->name . $oShop->Structure->getPath();
 					foreach ($aShop_Groups as $oShop_Group)
 					{
 						$this->addNode($path . $oShop_Group->getPath(), $oStructure->changefreq, $oStructure->priority);

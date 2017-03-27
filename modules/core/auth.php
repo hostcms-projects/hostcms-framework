@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * HostCMS administration center authorization
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -405,9 +406,9 @@ class Core_Auth
 
 		if ($oUser)
 		{
-			/*If the server time is not properly set, e.g(it is behind the client time).    Excution of the following code
+			/*If the server time is not properly set, e.g(it is behind the client time). Excution of the following code
 			session_set_cookie_params(2000);
-			will NOT set/send cookie to  Internet Explorer 6.0,*/
+			will NOT set/send cookie to Internet Explorer 6.0,*/
 			/*
 			$expiry = 60*60*4;
 			setcookie(session_name(),session_id(), time()+$expiry, "/");

@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Group_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -631,7 +632,8 @@ class Shop_Group_Model extends Core_Entity
 		$oSiteAlias = $this->Shop->Site->getCurrentAlias();
 		if ($oSiteAlias)
 		{
-			$oSearch_Page->url = 'http://' . $oSiteAlias->name
+			$oSearch_Page->url = ($this->Shop->Structure->https ? 'https://' : 'http://')
+				. $oSiteAlias->name
 				. $this->Shop->Structure->getPath()
 				. $this->getPath();
 		}
@@ -694,7 +696,8 @@ class Shop_Group_Model extends Core_Entity
 
 			if ($oCurrentAlias)
 			{
-				$href = 'http://' . $oCurrentAlias->name
+				$href = ($this->Shop->Structure->https ? 'https://' : 'http://')
+					. $oCurrentAlias->name
 					. $this->Shop->Structure->getPath()
 					. $this->getPath();
 
@@ -917,7 +920,7 @@ class Shop_Group_Model extends Core_Entity
 	 *	$oShop_Groups->queryBuilder()
 	 *		->where('parent_id', '=', $shop_group_id);
 	 *
-	 *	$aChildrenId =  $oShop_Groups->getGroupChildrenId();
+	 *	$aChildrenId = $oShop_Groups->getGroupChildrenId();
 	 *	foreach ($aChildrenId as $iGroupId)
 	 *	{
 	 *		var_dump($iGroupId);

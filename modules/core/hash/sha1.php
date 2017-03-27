@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Sha1
  *
- * @package HostCMS 6\Core\Hash
+ * @package HostCMS
+ * @subpackage Core\Hash
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Hash_Sha1 extends Core_Hash
 {

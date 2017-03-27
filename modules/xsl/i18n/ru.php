@@ -2,7 +2,8 @@
 /**
  * XSL.
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

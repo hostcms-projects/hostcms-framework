@@ -6,10 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Documents.
  * Контроллер удаления нетекущих версий документа
  *
- * @package HostCMS 6\Document
+ * @package HostCMS
+ * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Version_Controller_Document_Oldversions extends Admin_Form_Action_Controller
 {

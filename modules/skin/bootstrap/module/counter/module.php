@@ -1,12 +1,13 @@
 <?php
 
 /**
- * Counters.
+ * Counter. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 {
@@ -162,7 +163,7 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 			$iBotsCount += $oCounter->bots;
 		}
 
-		$sTitles  = implode(',', array_keys($aHits));
+		$sTitles = implode(',', array_keys($aHits));
 		$sHits = implode(',', array_values($aHits));
 		$sHosts = implode(',', array_values($aHosts));
 		$sBots = implode(',', array_values($aBots));
@@ -192,7 +193,7 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 					valueTitlesBots.push([new Date(titles[i]), bots_values[i]]);
 				}
 
-				var themeprimary = getThemeColorFromCss('themeprimary'), gridbordercolor = "#eee",  dataWebsiteTraffic = [{
+				var themeprimary = getThemeColorFromCss('themeprimary'), gridbordercolor = "#eee", dataWebsiteTraffic = [{
 					color: themeprimary,
 					label: "<?php echo Core::_('Counter.graph_sessions')?>",
 					data: valueTitlesSissions

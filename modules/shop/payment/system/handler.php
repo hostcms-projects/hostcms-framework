@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -671,7 +672,7 @@ abstract class Shop_Payment_System_Handler
 
 				$shop_delivery_name = strval(Core_Array::get($this->_orderParams, 'shop_delivery_name', 0));
 				$this->_shopOrder->delivery_information = trim(
-					$this->_shopOrder->delivery_information .  "\n" . $shop_delivery_name
+					$this->_shopOrder->delivery_information . "\n" . $shop_delivery_name
 				);
 			}
 

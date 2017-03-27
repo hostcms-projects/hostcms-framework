@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Updates.
  *
- * @package HostCMS 6\Update
+ * @package HostCMS
+ * @subpackage Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Controller extends Core_Servant_Properties
 {
@@ -216,11 +217,13 @@ class Update_Controller extends Core_Servant_Properties
 						'id' => array(),
 						'name' => array(),
 						'description' => array(),
+						'beta' => array(),
 					));
 
 					$oUpdate_Entity->id = $id;
 					$oUpdate_Entity->name = html_entity_decode((string)$value->update_name, ENT_COMPAT, 'UTF-8');
 					$oUpdate_Entity->description = html_entity_decode((string)$value->update_description, ENT_COMPAT, 'UTF-8');
+					$oUpdate_Entity->beta = (int)$value->beta;
 				}
 
 				$return['error'] = (int)$oXml->error;

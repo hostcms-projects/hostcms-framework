@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Price_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Price_Model extends Core_Entity
 {
@@ -58,7 +59,7 @@ class Shop_Price_Model extends Core_Entity
 	 * Get Shop_Price by user group and shop
 	 * @param int $siteuser_group_id user group id
 	 * @param int $shop_id shop id
-	 * @return Shop_Price_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getBySiteuserGroupAndShop($siteuser_group_id, $shop_id)
 	{
@@ -124,6 +125,8 @@ class Shop_Price_Model extends Core_Entity
 
 		$aObjects = $this->findAll(FALSE);
 
-		return isset($aObjects[0]) ? $aObjects[0] : NULL;
+		return isset($aObjects[0])
+			? $aObjects[0]
+			: NULL;
 	}
 }

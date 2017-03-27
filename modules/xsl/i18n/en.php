@@ -2,10 +2,11 @@
 /**
  * XSL.
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'XSL templates',
@@ -28,7 +29,6 @@ return array(
 	'description' => '<acronym title="Additional information on XSL template in free format">Description</acronym>',
 	'xsl_already_exists' => 'XSL template with this name already exists! Enter a unique name of XSL template',
 	'main_menu' => 'XSL template',
-	'add' => 'Add',
 	'panel_edit_xsl' => 'Edit XSL template "%s"',
 	'panel_edit_xml' => 'XML for XSL template "%s"',
 	'panel_xsl_time' => '%.3f sec.',

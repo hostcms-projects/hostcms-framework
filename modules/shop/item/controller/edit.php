@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Item Backend Editing Controller.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -77,10 +78,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAdditionalTab
 					->add($oAdditionalRow1 = Admin_Form_Entity::factory('Div')->class('row'));
-				
+
 				$oMainTab
 					->move($this->getField("apply_purchase_discount"), $oAdditionalRow1);
-				
+
 				$this->getField('image_small_height')
 					->divAttr(array('style' => 'display: none'));
 				$this->getField('image_small_width')
@@ -124,14 +125,19 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				;
 
 				$oShopItemTabExportImport
+					->add($oGuidRow = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oYandexMarketBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+
+				$oYandexMarketBlock
+					->add(Admin_Form_Entity::factory('Div')
+						->class('header bordered-yellow')
+						->value(Core::_("Shop_Item.yandex_market_header"))
+					)
 					->add($oShopItemTabExportImportRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow3 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow5 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oShopItemTabExportImportRow6 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oShopItemTabExportImportRow7 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oShopItemTabExportImportRow8 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
 
 				$oShopItemTabSEO
@@ -142,10 +148,6 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oShopItemTabTags
 					->add($oShopItemTabTagsRow1 = Admin_Form_Entity::factory('Div')->class('row'))
-				;
-
-				$oShopItemTabSpecialPrices
-					->add($oShopItemTabSpecialPricesRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
 
 				// Добавляем вкладки
@@ -183,21 +185,36 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('country_of_origin'), $oShopItemTabExportImport)
 					->move($this->getField('guid'), $oShopItemTabExportImport)
 					->move($this->getField('yandex_market_sales_notes'), $oShopItemTabExportImport)
+					->move($this->getField('delivery'), $oShopItemTabExportImport)
+					->move($this->getField('pickup'), $oShopItemTabExportImport)
+					->move($this->getField('store'), $oShopItemTabExportImport)
 					->move($this->getField('seo_title')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_description')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_keywords')->rows(3), $oShopItemTabSEO)
 				;
 
 				$oShopItemTabExportImport
+					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oGuidRow)
 					->move($this->getField('yandex_market')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow1)
-					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow2)
-					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow3)
-					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow4)
-					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow5)
-					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow6)
-					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow7)
-					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow8)
+					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow2)
+					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow2)
+					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-top-21')), $oShopItemTabExportImportRow3)
+					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-lg-8 col-md-8 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow3)
+					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow4)
+					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-lg-8 col-md-8 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow4)
+					->move($this->getField('delivery')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
+					->move($this->getField('pickup')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
+					->move($this->getField('store')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
 				;
+
+				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
+
+				$oDeliveryOption = $oShop_Item_Delivery_Option_Controller_Tab
+					->shop_id($oShop->id)
+					->shop_item_id($this->_object->id)
+					->execute();
+
+				$oYandexMarketBlock->add($oDeliveryOption);
 
 				$oShopItemTabSEO
 					->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow1)
@@ -521,7 +538,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
 				}
-				
+
 				$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
 				foreach($aShopPrices as $oShopPrice)
 				{
@@ -600,12 +617,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 									->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-4 col-xs-3'))
 									//->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
 							);
-							
+
 						$oWarehouseBlock
 							->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
 					}
 				}
-				
+
 				$oMainTab
 					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
 					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
@@ -647,8 +664,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->divAttr(array('class' => 'form-group col-xs-4 col-sm-2 col-md-2 col-lg-2'))
 					->format(array('maxlen' => array('value' => 12), 'lib' => array('value' => 'decimal')));
 
-				$oDivOpen = Admin_Form_Entity::factory('Code')->html('<div class="spec_prices item_div clear" width="600">');
+				$oDivOpen = Admin_Form_Entity::factory('Code')->html('<div class="row spec_prices item_div clear" width="600">');
 				$oDivClose = Admin_Form_Entity::factory('Code')->html('</div>');
+
+				$oShopItemTabSpecialPrices->add($oSpecialPriceDiv = Admin_Form_Entity::factory('Div'));
 
 				if(count($aShop_Specialprices) > 0)
 				{
@@ -658,32 +677,48 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						$oSpecMaxQuantity = clone $oSpecMaxQuantity;
 						$oSpecPrice = clone $oSpecPrice;
 						$oSpecPricePercent = clone $oSpecPricePercent;
-						$oSpecMinQuantity->value($oShop_Specialprice->min_quantity);
-						$oSpecMaxQuantity->value($oShop_Specialprice->max_quantity);
-						$oSpecPrice->value($oShop_Specialprice->price);
-						$oSpecPricePercent->value($oShop_Specialprice->percent);
 
-						$oShopItemTabSpecialPricesRow1
+						$oSpecialPriceDiv
 							->add($oDivOpen)
-							->add($oSpecMinQuantity->name("specMinQuantity_{$oShop_Specialprice->id}"))
-							->add($oSpecMaxQuantity->name("specMaxQuantity_{$oShop_Specialprice->id}"))
-							->add($oSpecPrice->name("specPrice_{$oShop_Specialprice->id}"))
+							->add(
+								$oSpecMinQuantity
+									->value($oShop_Specialprice->min_quantity)
+									->name("specMinQuantity_{$oShop_Specialprice->id}")
+									->id("specMinQuantity_{$oShop_Specialprice->id}")
+							)
+							->add(
+								$oSpecMaxQuantity
+									->value($oShop_Specialprice->max_quantity)
+									->name("specMaxQuantity_{$oShop_Specialprice->id}")
+									->id("specMaxQuantity_{$oShop_Specialprice->id}")
+							)
+							->add(
+								$oSpecPrice
+									->value($oShop_Specialprice->price)
+									->name("specPrice_{$oShop_Specialprice->id}")
+									->id("specPrice_{$oShop_Specialprice->id}")
+							)
 							->add($oOR)
-							->add($oSpecPricePercent->name("specPercent_{$oShop_Specialprice->id}"))
-							->add($this->_imgBox())
+							->add(
+								$oSpecPricePercent
+									->value($oShop_Specialprice->percent)
+									->name("specPercent_{$oShop_Specialprice->id}")
+									->id("specPercent_{$oShop_Specialprice->id}")
+							)
+							->add($this->imgBox())
 							->add($oDivClose);
 					}
 				}
 				else
 				{
-					$oShopItemTabSpecialPricesRow1
+					$oSpecialPriceDiv
 						->add($oDivOpen)
 						->add($oSpecMinQuantity)
 						->add($oSpecMaxQuantity)
 						->add($oSpecPrice)
 						->add($oOR)
 						->add($oSpecPricePercent)
-						->add($this->_imgBox())
+						->add($this->imgBox())
 						->add($oDivClose);
 				}
 
@@ -896,7 +931,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField("indexing"), $oMainRow4)
 					->move($this->getField("active"), $oMainRow4)
 					->move($this->getField("sorting"), $oMainRow5);
-					
+
 				// Удаляем поле siteuser_group_id
 				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
 
@@ -1162,6 +1197,13 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						!is_null($oAdditionalPriceValue) && $oAdditionalPriceValue->delete();
 					}
 				}
+
+				//Яндекс.Маркет доставка
+				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
+				$oShop_Item_Delivery_Option_Controller_Tab
+					->shop_id($oShop->id)
+					->shop_item_id($this->_object->id)
+					->applyObjectProperty();
 
 				// Специальные цены, установленные значения
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();
@@ -1848,45 +1890,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		return $aReturn;
 	}
 
-	/**
-	 * Show plus button
-	 * @param string $function function name
-	 * @return string
-	 */
-	protected function _getImgAdd($function = '$.cloneSpecialPrice')
-	{
-		$windowId = $this->_Admin_Form_Controller->getWindowId();
-
-		ob_start();
-		Core::factory('Core_Html_Entity_Img')
-			->src('/admin/images/action_add.gif')
-			->id('add')
-			->class('pointer left5px img_line')
-			->onclick("{$function}('{$windowId}', this)")
-			->execute();
-
-		return Admin_Form_Entity::factory('Code')->html(ob_get_clean());
-	}
-
-	/**
-	 * Show minus button
-	 * @param string $onclick onclick attribute value
-	 * @return string
-	 */
-	protected function _getImgDelete($onclick = '$.deleteNewSpecialprice(this)')
-	{
-		ob_start();
-		Core::factory('Core_Html_Entity_Img')
-			->src('/admin/images/action_delete.gif')
-			->id('delete')
-			->class('pointer left5px img_line')
-			->onclick($onclick)
-			->execute();
-
-		return Admin_Form_Entity::factory('Code')->html(ob_get_clean());
-	}
-
-	protected function _imgBox($addFunction = '$.cloneSpecialPrice', $deleteOnclick = '$.deleteNewSpecialprice(this)')
+	public function imgBox($addFunction = '$.cloneSpecialPrice', $deleteOnclick = '$.deleteNewSpecialprice(this)')
 	{
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 

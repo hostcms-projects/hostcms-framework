@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -64,7 +65,8 @@ class Shop_Model extends Core_Entity{
 		'shop_seller' => array(),
 		'shop_siteuser_transaction' => array(),
 		'shop_warehouse' => array(),
-		'shop_item_property_for_group' => array(),	);
+		'shop_item_property_for_group' => array(),
+		'shop_item_delivery_option' => array(),	);
 	/**
 	 * List of preloaded values
 	 * @var array
@@ -123,12 +125,12 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Get shop by structure id.
 	 * @param int $structure_id
-	 * @return Shop_Model|NULL
+	 * @return self|NULL
 	 */	public function getByStructureId($structure_id)	{		$this->queryBuilder()			->clear()			->where('structure_id', '=', $structure_id)			->limit(1);		$aShops = $this->findAll();		return isset($aShops[0]) ? $aShops[0] : NULL;	}
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Shop_Model
+	 * @return self
 	 */	public function delete($primaryKey = NULL)	{		if (is_null($primaryKey))		{			$primaryKey = $this->getPrimaryKey();		}		$this->id = $primaryKey;
 
 		// Fix bug with 'deleted' relations
@@ -171,6 +173,7 @@ class Shop_Model extends Core_Entity{
 		$this->Shop_Siteuser_Transactions->deleteAll(FALSE);
 		$this->Shop_Warehouses->deleteAll(FALSE);
 		$this->Shop_Item_Property_For_Groups->deleteAll(FALSE);
+		$this->Shop_Item_Delivery_Options->deleteAll(FALSE);
 
 		// Shop dir
 		Core_File::deleteDir($this->getPath());
@@ -209,7 +212,7 @@ class Shop_Model extends Core_Entity{
 	 */	public function saveWatermarkFile($fileSourcePath)	{		$this->watermark_file = 'shop_watermark_' . $this->id . '.png';		$this->save();		Core_File::upload($fileSourcePath, $this->getWatermarkFilePath());	}
 	/**
 	 * Save object. Use self::update() or self::create()
-	 * @return Shop_Model
+	 * @return self
 	 */	public function save()	{		parent::save();		// Создание директории для Watermark		$sWatermarkDirPath = $this->getPath() . '/watermarks';
 		if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
 	/**
@@ -452,7 +455,7 @@ class Shop_Model extends Core_Entity{
 		return $newObject;	}
 	/**
 	 * Recount items and subgroups
-	 * @return Shop_Model
+	 * @return self
 	 */
 	public function recount()
 	{
@@ -654,8 +657,7 @@ class Shop_Model extends Core_Entity{
 		$this->clearXmlTags()
 			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))
 			->addXmlTag('url', $this->Structure->getPath())
-			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0)
-			;
+			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0);
 
 		$this->shop_currency_id && $this->addEntity($this->Shop_Currency->clearEntities());
 		$this->shop_measure_id && $this->addEntity($this->Shop_Measure->clearEntities());

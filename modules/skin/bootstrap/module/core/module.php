@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Core.
+ * Core. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -640,7 +641,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				if ($oSite->id != CURRENT_SITE)
 				{
 					$sListSitesContent .= '<li>
-						<a href="/admin/index.php?changeSiteId=' . $oSite->id . '"' . '>
+						<a href="/admin/index.php?changeSiteId=' . $oSite->id . '" onmousedown="$(window).off(\'beforeunload\')">
 							<div class="clearfix">
 								<div class="notification-icon">
 									<i class="fa '. $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>

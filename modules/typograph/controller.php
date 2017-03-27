@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Typograph.
  *
- * @package HostCMS 6\Typograph
+ * @package HostCMS
+ * @subpackage Typograph
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Typograph_Controller
 {
@@ -202,7 +203,7 @@ class Typograph_Controller
 		 * и текущая подмаска не нумеруется.
 		 *
 		 * Утверждения касательно предшествующего текста начинаются с (?<= для положительных утверждений
-		 * и (?<! для отрицающих. Например, (?<!foo)bar  не найдёт вхождения "bar", которым не предшествует
+		 * и (?<! для отрицающих. Например, (?<!foo)bar не найдёт вхождения "bar", которым не предшествует
 		 * "foo". Сами утверждения 'назад' ограничены так, чтобы все подстроки, которым они соответствуют,
 		 * имели фиксированную длину.
 		 */
@@ -544,7 +545,7 @@ class Typograph_Controller
 			$str = str_replace(chr(0x03), "&bdquo;", $str);
 		}
 
-		// меняем  "¬" обратно на кавычки
+		// меняем "¬" обратно на кавычки
 		$str = str_replace('¬','"', $str);
 
 		$replace = array(

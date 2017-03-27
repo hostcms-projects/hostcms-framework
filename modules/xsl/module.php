@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * XSL.
+ * XSL Module.
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -20,7 +21,7 @@ class Xsl_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-02-03';
+	public $date = '2016-03-03';
 	/**
 	 * Module name
 	 * @var string

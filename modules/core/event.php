@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Event system adds function calls for extending functionality.
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Event
 {
@@ -68,9 +69,9 @@ class Core_Event
 	 * @var misex
 	 */
 	static protected $_lastReturn = NULL;
-	
+
 	/**
-	 * Get the last returned value 
+	 * Get the last returned value
 	 *
 	 * <code>
 	 * $value = Core_Event::getLastReturn();
@@ -82,7 +83,7 @@ class Core_Event
 	{
 		return self::$_lastReturn;
 	}
-	
+
 	/**
 	 * Notify all observers. If observer return FALSE, the cycle will stop.
 	 *
@@ -97,6 +98,8 @@ class Core_Event
 	 */
 	static public function notify($eventName, $object = NULL, $args = array())
 	{
+		self::$_lastReturn = NULL;
+
 		if (isset(self::$_attached[$eventName]))
 		{
 			foreach (self::$_attached[$eventName] as $observer)

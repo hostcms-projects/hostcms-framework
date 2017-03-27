@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Templates.
+ * Template Backend Editing Controller.
  *
- * @package HostCMS 6\Template
+ * @package HostCMS
+ * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -25,10 +26,15 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$object->site_id = CURRENT_SITE;
 
-			if ($modelName == 'template')
+			switch ($modelName)
 			{
-				$object->template_id = intval(Core_Array::getGet('template_id', 0));
-				$object->template_dir_id = intval(Core_Array::getGet('template_dir_id', 0));
+				case 'template':
+					$object->template_id = intval(Core_Array::getGet('template_id', 0));
+					$object->template_dir_id = intval(Core_Array::getGet('template_dir_id', 0));
+				break;
+				case 'template_dir':
+					$object->parent_id = intval(Core_Array::getGet('template_dir_id', 0));
+				break;
 			}
 		}
 
@@ -67,15 +73,13 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
 
-
 				$this
 					->addTabAfter($oTemplateTab, $oMainTab)
 					->addTabAfter($oCssTab, $oTemplateTab);
 
-
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
-					 $this->getField('template_dir_id')
+					$this->getField('template_dir_id')
 				);
 
 				// Селектор с группой
@@ -163,9 +167,6 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$title = $this->_object->id
 					? Core::_('Template_Dir.title_edit')
 					: Core::_('Template_Dir.title_add');
-
-				// Значения директории для добавляемого объекта
-				!$this->_object->id && $this->_object->parent_id = Core_Array::getGet('template_dir_id');
 
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Structure.
+ * Structure_Property_Dir_Model
  *
- * @package HostCMS 6\Structure
+ * @package HostCMS
+ * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Property_Dir_Model extends Core_Entity{
 	/**

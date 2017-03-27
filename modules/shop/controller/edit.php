@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop Backend Editing Controller.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -131,9 +132,16 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oShopTabFormatsRow8 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$oShopTabExport
+					->add($oGuidRow = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oYandexMarketBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+
+				$oYandexMarketBlock
+					->add(Admin_Form_Entity::factory('Div')
+						->class('header bordered-yellow')
+						->value(Core::_("Shop_Item.yandex_market_header"))
+					)
 					->add($oShopTabExportRow1 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oShopTabExportRow2 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oShopTabExportRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+				;
 
 				$oShopTabWatermark
 					->add($oShopTabWatermarkRow1 = Admin_Form_Entity::factory('Div')->class('row'))
@@ -424,9 +432,17 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopTabFormats->move($this->getField('typograph_default_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oShopTabFormatsRow8);
 				$oShopTabFormats->move($this->getField('typograph_default_groups')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oShopTabFormatsRow8);
 
-				$oShopTabExport->move($this->getField('yandex_market_name')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow1);
-				$oShopTabExport->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow2);
-				$oShopTabExport->move($this->getField('yandex_market_sales_notes_default')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oShopTabExportRow3);
+				$oShopTabExport->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oGuidRow);
+				$oShopTabExport->move($this->getField('yandex_market_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')),$oShopTabExportRow1);
+				$oShopTabExport->move($this->getField('yandex_market_sales_notes_default')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')),$oShopTabExportRow1);
+
+				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
+
+				$oDeliveryOption = $oShop_Item_Delivery_Option_Controller_Tab
+					->shop_id($this->_object->id)
+					->execute();
+
+				$oYandexMarketBlock->add($oDeliveryOption);
 
 				$watermarkPath =
 					is_file($this->_object->getWatermarkFilePath())
@@ -605,6 +621,12 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 			}
 		}
+
+		//Яндекс.Маркет доставка
+		$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
+		$oShop_Item_Delivery_Option_Controller_Tab
+			->shop_id($this->_object->id)
+			->applyObjectProperty();
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}

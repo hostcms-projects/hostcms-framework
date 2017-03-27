@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Bootstrap view.
+ * Admin View.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ÎÎÎ "Õîñòìýéê" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ÎÎÎ "Õîñòìýéê" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_View extends Core_Servant_Properties
 {
@@ -34,7 +35,7 @@ abstract class Admin_View extends Core_Servant_Properties
 	 */
 	static public function create()
 	{
-		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__;
 
 		if (!class_exists($className))
 		{

@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Item_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -138,7 +139,8 @@ class Shop_Item_Model extends Core_Entity
 		'tag_shop_item' => array(),
 		'shop_warehouse' => array('through' => 'shop_warehouse_item'),
 		'shop_warehouse_item' => array(),
-		'vote' => array('through' => 'vote_shop_item')
+		'vote' => array('through' => 'vote_shop_item'),
+		'shop_item_delivery_option' => array(),
 	);
 
 	/**
@@ -212,6 +214,7 @@ class Shop_Item_Model extends Core_Entity
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
+			$this->_preloadValues['delivery'] = $this->_preloadValues['pickup'] = 1;
 		}
 
 		if (/*$this->_loaded && */$this->shortcut_id != 0)
@@ -1086,7 +1089,8 @@ class Shop_Item_Model extends Core_Entity
 		$oSiteAlias = $this->Shop->Site->getCurrentAlias();
 		if ($oSiteAlias)
 		{
-			$oSearch_Page->url = 'http://' . $oSiteAlias->name
+			$oSearch_Page->url = ($this->Shop->Structure->https ? 'https://' : 'http://')
+				. $oSiteAlias->name
 				. $this->Shop->Structure->getPath()
 				. $this->getPath();
 		}
@@ -1297,6 +1301,9 @@ class Shop_Item_Model extends Core_Entity
 		// Удаляем связи с зарезервированными, прямая связь
 		$this->Shop_Item_Reserveds->deleteAll(FALSE);
 
+		// Удаляем данные по доставке товаров (Яндекс.Маркет)
+		$this->Shop_Item_Delivery_Options->deleteAll(FALSE);
+
 		// Удаляем директорию товара
 		$this->deleteDir();
 
@@ -1376,7 +1383,8 @@ class Shop_Item_Model extends Core_Entity
 
 			if ($oCurrentAlias)
 			{
-				$href = 'http://' . $oCurrentAlias->name
+				$href = ($object->Shop->Structure->https ? 'https://' : 'http://')
+					. $oCurrentAlias->name
 					. $object->Shop->Structure->getPath()
 					. $object->getPath();
 

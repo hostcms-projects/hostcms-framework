@@ -7,10 +7,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Основной контроллер показа при использовании совместимости с HostCMS v. 5
  * Будет полностью исключен в HostCMS v. 7
  *
- * @package HostCMS 6\Core\Command
+ * @package HostCMS
+ * @subpackage Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Hostcms5_Default extends Core_Command_Controller_Default
 {

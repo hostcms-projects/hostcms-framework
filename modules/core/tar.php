@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Creates a tar archive
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Vincent Blavet <vincent@phpconcept.net>
  */

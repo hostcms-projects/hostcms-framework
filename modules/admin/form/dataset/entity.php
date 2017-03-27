@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -99,10 +100,10 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			$this->_count = $row['count'];
 
 			// Warning
-			/*if (Core_Array::getRequest('debug'))
+			if (Core_Array::getRequest('debug'))
 			{
 				echo '<p><b>Запрос количества</b>: <pre>', $Core_DataBase->getLastQuery(), '</pre></p>';
-			}*/
+			}
 			//$this->_count = count($this->_entity->findAll());
 		}
 
@@ -111,7 +112,7 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 
 	/**
 	 * Dataset objects list
-	 *  @var array
+	 * @var array
 	 */
 	protected $_objects = array();
 
@@ -156,10 +157,10 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			$this->_objects = $this->_entity->findAll(FALSE);
 
 			// Warning
-			/*if (Core_Array::getRequest('debug'))
+			if (Core_Array::getRequest('debug'))
 			{
 				echo '<p><b>Запрос на выборку</b>: <pre>', Core_DataBase::instance()->getLastQuery(), '</pre></p>';
-			}*/
+			}
 
 			$this->_loaded = TRUE;
 
@@ -218,7 +219,7 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			list($operator, $args) = each($condition);
 			call_user_func_array(array($queryBuilder, $operator), $args);
 		}
-		
+
 		// Orders
 		foreach ($this->_orders as $order)
 		{

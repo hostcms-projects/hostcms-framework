@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Item_Discount Backend Editing Controller.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -77,7 +78,7 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 			->name($name)
 			->value($this->_object->id));
 
-		$windowId =  $this->_Admin_Form_Controller->getWindowId();
+		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oMainRow2->add(Admin_Form_Entity::factory('Radiogroup')
 			->radio(array(

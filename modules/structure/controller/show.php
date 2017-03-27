@@ -39,10 +39,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 		->show();
  * </code>
  *
- * @package HostCMS 6\Structure
+ * @package HostCMS
+ * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Show extends Core_Controller
 {

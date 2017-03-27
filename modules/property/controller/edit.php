@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Properties.
+ * Property Backend Editing Controller.
  *
- * @package HostCMS 6\Property
+ * @package HostCMS
+ * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -217,7 +218,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('shop_id')
 						->value($this->_object->shop_id)
 						->caption(Core::_('Property.shop_id'))
-						->divAttr(array('id' => 'shop_id',  'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+						->divAttr(array('id' => 'shop_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
 
 					$oMainRow5->add($oSelect_Shops);
 				}

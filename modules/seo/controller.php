@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * SEO.
  *
- * @package HostCMS 6\Seo
+ * @package HostCMS
+ * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller
 {
@@ -198,12 +199,12 @@ class Seo_Controller
 	}
 
 	/**
-     * Google hash
-     *
-     * @param str $string Строка
-     * @access private
-     * @return mixed
-     */
+	 * Google hash
+	 *
+	 * @param str $string Строка
+	 * @access private
+	 * @return mixed
+	 */
 	protected function _googleHash($string)
 	{
 		$check1 = $this->_string2int($string, 0x1505, 0x21);
@@ -343,7 +344,7 @@ class Seo_Controller
 		{
 			$domain = substr($domain, 4);
 		}
-		return  $domain;
+		return $domain;
 	}
 
 	/**
@@ -378,8 +379,8 @@ class Seo_Controller
 
 		$hash = $this->_googleHash($domain);
 
-		//$url_page  = "http://toolbarqueries.google.com/search?sourceid=navclient-ff&features=Rank&client=navclient-auto-ff&ch={$hash}&q=info:".rawurlencode($domain);
-		$url_page  = "http://toolbarqueries.google.com/tbr?features=Rank&sourceid=navclient-ff&client=navclient-auto-ff&ch={$hash}&q=info:" . rawurlencode($domain);
+		//$url_page = "http://toolbarqueries.google.com/search?sourceid=navclient-ff&features=Rank&client=navclient-auto-ff&ch={$hash}&q=info:".rawurlencode($domain);
+		$url_page = "http://toolbarqueries.google.com/tbr?features=Rank&sourceid=navclient-ff&client=navclient-auto-ff&ch={$hash}&q=info:" . rawurlencode($domain);
 
 		$content = $this->_getUrl($url_page, false);
 
@@ -1209,7 +1210,7 @@ class Seo_Controller
 
 		for($i = 0; $i < $param['page_count']; $i++)
 		{
-			$url = "http://nova.rambler.ru/srch?btnG=%D0%9D%D0%B0%D0%B9%D1%82%D0%B8%21&query=" .  rawurlencode($text) . "&page=" . ($i + 1) . "&start=" . ($i * 10 + 1);
+			$url = "http://nova.rambler.ru/srch?btnG=%D0%9D%D0%B0%D0%B9%D1%82%D0%B8%21&query=" . rawurlencode($text) . "&page=" . ($i + 1) . "&start=" . ($i * 10 + 1);
 
 			$content = $this->_getUrl($url, false);
 
@@ -1273,7 +1274,7 @@ class Seo_Controller
 
 		for($i = 0; $i < $param['page_count']; $i++)
 		{
-			$url = "https://www.google.ru/search?complete=1&hl=ru&newwindow=1&q=" .  rawurlencode($text) . "&start=" .(10* $i) . "&sa=N&gws_rd=ssl";
+			$url = "https://www.google.ru/search?complete=1&hl=ru&newwindow=1&q=" . rawurlencode($text) . "&start=" .(10* $i) . "&sa=N&gws_rd=ssl";
 			$content = $this->_getUrl($url, false);
 
 			if ($content)

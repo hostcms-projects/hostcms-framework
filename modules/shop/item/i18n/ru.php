@@ -2,7 +2,8 @@
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -70,6 +71,7 @@ return array(
 
 	'warehouse_header' => "Количество товара на складах",
 	'property_header' => "Дополнительные свойства",
+	'yandex_market_header' => "Экспорт в Яндекс.Маркет",
 	//'warehouse_item_count' => "Количество товара на складе \"%s\"",
 	'siteuser_group_id' => '<acronym title="Группа, имеющая права доступа к товару">Группа доступа</acronym>',
 	'shop_users_group_parrent' => 'Как у родителя',
@@ -273,6 +275,9 @@ return array(
 	'item_width'=>'Ширина',
 	'item_height'=>'Высота',
 	'apply_purchase_discount' => 'Учитывать при расчете скидки от суммы заказа',
+	'delivery' => 'Доставка',
+	'pickup' => 'Самовывоз',
+	'store' => 'В розничном магазине',
 	'show_in_group'=>'Показывать свойство в группе',
 	'show_in_item'=>'Показывать свойство в товаре',
 	'add_value'=>'Добавить отсутствующие значения свойства по умолчанию у товаров',

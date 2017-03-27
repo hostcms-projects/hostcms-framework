@@ -5,10 +5,20 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Implement "import://" protocol
  *
- * Use to add 
+ * Use to add
+ * <code>
  * <xsl:include href="import://1"/>
+ * </code>
  * or
+ * <code>
  * <xsl:include href="import://xslname"/>
+ * </code>
+ *
+ * @package HostCMS
+ * @subpackage Xsl
+ * @version 6.x
+ * @author Hostmake LLC
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Stream_Import
 {
@@ -95,7 +105,7 @@ class Xsl_Stream_Import
 	 */
 	public function stream_write($data)
 	{
-	   return FALSE;
+		return FALSE;
 	}
 
 	/**
@@ -124,37 +134,45 @@ class Xsl_Stream_Import
 	 */
 	public function stream_seek($offset, $whence)
 	{
-		 switch ($whence) {
-            case SEEK_SET:
-                if ($offset < strlen(self::$_aXSL[$this->_xslName]) && $offset >= 0) {
-                     $this->position = $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
+		 switch ($whence)
+		 {
+			case SEEK_SET:
+				if ($offset < strlen(self::$_aXSL[$this->_xslName]) && $offset >= 0)
+				{
+					$this->position = $offset;
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+			break;
 
-            case SEEK_CUR:
-                if ($offset >= 0) {
-                     $this->position += $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
-
-            case SEEK_END:
-                if (strlen(self::$_aXSL[$this->_xslName]) + $offset >= 0) {
-                     $this->position = strlen(self::$_aXSL[$this->_xslName]) + $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
-
-            default:
-                return FALSE;
-        }
+			case SEEK_CUR:
+				if ($offset >= 0)
+				{
+					$this->position += $offset;
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+			break;
+			case SEEK_END:
+				if (strlen(self::$_aXSL[$this->_xslName]) + $offset >= 0)
+				{
+					$this->position = strlen(self::$_aXSL[$this->_xslName]) + $offset;
+					return TRUE;
+				}
+				else
+				{
+					 return FALSE;
+				}
+			break;
+			default:
+			return FALSE;
+		}
 	}
 
 	/**

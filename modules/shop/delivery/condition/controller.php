@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 {
@@ -45,7 +46,7 @@ class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 			$oShop_Delivery_Conditions->queryBuilder()
 				->select('shop_delivery_conditions.*')
 				// Поле orderfield внесено для того, чтобы поля со всеми заполенынми условиями были выше
-				//->select(array(Core_QueryBuilder::expression('IF ( `min_weight` > 0 AND `max_weight` > 0 AND  `min_price` > 0 AND `max_price` > 0, 1, 0)'), 'orderfield'))
+				//->select(array(Core_QueryBuilder::expression('IF ( `min_weight` > 0 AND `max_weight` > 0 AND `min_price` > 0 AND `max_price` > 0, 1, 0)'), 'orderfield'))
 				// Отрезаем по Стране, Области, Городу и Району
 				->open()
 				->where('shop_country_id_inverted', '=', '0')
@@ -90,7 +91,7 @@ class Shop_Delivery_Condition_Controller extends Core_Servant_Properties
 				->where('max_price', '=', 0)
 				->close()
 				// Сортируем вывод
-				->orderBy(Core_QueryBuilder::expression('IF ( `min_weight` > 0 AND `max_weight` > 0 AND  `min_price` > 0 AND `max_price` > 0, 1, 0)'), 'DESC')
+				->orderBy(Core_QueryBuilder::expression('IF ( `min_weight` > 0 AND `max_weight` > 0 AND `min_price` > 0 AND `max_price` > 0, 1, 0)'), 'DESC')
 				->orderBy('min_weight', 'DESC')
 				->orderBy('max_weight', 'DESC')
 				->orderBy('min_price', 'DESC')

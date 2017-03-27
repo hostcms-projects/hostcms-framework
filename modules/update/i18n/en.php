@@ -2,7 +2,8 @@
 /**
  * Updates.
  *
- * @package HostCMS 6\Update
+ * @package HostCMS
+ * @subpackage Update
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Update.
+ * Update. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Update_Module extends Update_Module{
 	/**

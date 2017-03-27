@@ -4,10 +4,12 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  * Shop_Item_Property_Group_Model
- * @package HostCMS 6\Shop
+ *
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Group_Model extends Property_Model
 {
@@ -105,7 +107,7 @@ class Shop_Item_Property_Group_Model extends Property_Model
 		$oShop_Groups->queryBuilder()
 			->where('parent_id', '=', $shop_group_id);
 
-		$aChildrenId =  $oShop_Groups->getGroupChildrenId();
+		$aChildrenId = $oShop_Groups->getGroupChildrenId();
 		foreach ($aChildrenId as $iGroupId)
 		{
 			$this->allowAccess($iGroupId);
@@ -132,7 +134,7 @@ class Shop_Item_Property_Group_Model extends Property_Model
 		$oShop_Groups->queryBuilder()
 			->where('parent_id', '=', $shop_group_id);
 
-		$aChildrenId =  $oShop_Groups->getGroupChildrenId();
+		$aChildrenId = $oShop_Groups->getGroupChildrenId();
 		foreach ($aChildrenId as $iGroupId)
 		{
 			$this->denyAccess($iGroupId);

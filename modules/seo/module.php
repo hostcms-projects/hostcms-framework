@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * SEO.
+ * SEO Module.
  *
- * @package HostCMS 6\Seo
+ * @package HostCMS
+ * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Module extends Core_Module
 {
@@ -22,7 +23,7 @@ class Seo_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2015-12-09';
+	public $date = '2016-03-03';
 
 	/**
 	 * Module name

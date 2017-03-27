@@ -3,10 +3,11 @@
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Administration center',
@@ -83,6 +84,7 @@ return array(
 	'website' => 'Content management system: ',
 	'support_email' => 'Support: ',
 	'viewSite' => 'View site in a new window',
+	'selectSite' => 'Select Site',
 
 	'company' => 'Hostmake LLC',
 	'company-website' => 'www.hostcms.ru',

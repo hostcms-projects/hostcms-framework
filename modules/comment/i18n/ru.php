@@ -2,10 +2,11 @@
 /**
  * Comments.
  *
- * @package HostCMS 6\Comment
+ * @package HostCMS
+ * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'title' => 'Комментарии',

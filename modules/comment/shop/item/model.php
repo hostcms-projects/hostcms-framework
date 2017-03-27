@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Comments.
+ * Comment_Shop_Item_Model
  *
- * @package HostCMS 6\Comment
+ * @package HostCMS
+ * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Shop_Item_Model extends Core_Entity
 {
@@ -24,6 +25,6 @@ class Comment_Shop_Item_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop_item' => array(),
-		'comment' =>  array()
+		'comment' => array()
 	);
 }

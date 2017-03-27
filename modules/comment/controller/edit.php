@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Comments.
+ * Comment Backend Editing Controller.
  *
- * @package HostCMS 6\Comment
+ * @package HostCMS
+ * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -50,7 +51,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow2);
 
 		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oMainRow2);
-			
+
 		if ($this->_object->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = $this->_object->Siteuser;
@@ -70,7 +71,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oMainRow2->add($oSiteuserLink);
 		}
-			
+
 		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
 		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
 		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 margin-top-21')), $oMainRow3);
@@ -88,6 +89,33 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->value($this->_object->grade)
 				->divAttr(array('class' => 'form-group stars col-lg-4 col-md-4 col-sm-4'))
 		);
+
+		return $this;
+	}
+
+	/**
+	 * Processing of the form. Apply object fields.
+	 * @return self
+	 */
+	protected function _applyObjectProperty()
+	{
+		parent::_applyObjectProperty();
+
+		// Clear tagged cache
+		if ($this->_object->Comment_Informationsystem_Item->id)
+		{
+			$this->_object
+				->Comment_Informationsystem_Item
+				->Informationsystem_Item
+				->clearCache();
+		}
+		elseif ($this->_object->Comment_Shop_Item->id)
+		{
+			$this->_object
+				->Comment_Shop_Item
+				->Shop_Item
+				->clearCache();
+		}
 
 		return $this;
 	}

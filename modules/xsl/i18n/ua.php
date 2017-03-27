@@ -2,10 +2,11 @@
 /**
  * XSL.
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'XSL-шаблони',
@@ -26,7 +27,6 @@ return array(
 	'description' => '<acronym title="Додаткова інформаця про XSL-шаблон у довільній формі">Комментар до XSL-шаблона</acronym>',
 	'xsl_already_exists' => 'XSL-шаблон з такою назвою вже існує! Введіть унікальну назву XSL-шаблона',
 	'main_menu' => 'XSL-шаблон',
-	'add' => 'Додати',
 	'panel_edit_xsl' => 'Редагувати XSL-шаблон "%s"',
 	'panel_edit_xml' => 'XML для XSL-шаблона "%s"',
 	'panel_xsl_time' => '%.3f с',

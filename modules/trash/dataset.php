@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Trash.
+ * Trash Dataset.
  *
- * @package HostCMS 6\Trash
+ * @package HostCMS
+ * @subpackage Trash
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Trash_Dataset extends Admin_Form_Dataset
 {
@@ -49,7 +50,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 
 	/**
 	 * Dataset objects list
-	 *  @var array
+	 * @var array
 	 */
 	protected $_objects = array();
 

@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 {
@@ -23,6 +24,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		'value', // идет в selected
 		'format', // array, массив условий форматирования
 		'filter',
+		'caseSensitive',
 		'invertor',
 		'invertor_id',
 		'invertorCaption',
@@ -59,9 +61,11 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 
 		$iAdmin_Form_Count++;
 		$this->invertor_id = 'field_id_' . $iAdmin_Form_Count;
-		
+
 		$this->class .= ' form-control';
 		$this->divAttr = array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12');
+
+		$this->caseSensitive = TRUE;
 	}
 
 	/**
@@ -138,7 +142,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 
 		?></div><?php
 	}
-	
+
 	/**
 	 * Show filter
 	 * @return self
@@ -192,7 +196,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 			->execute();
 
 		self::$iFilterCount++;
-		
+
 		return $this;
 	}
 }

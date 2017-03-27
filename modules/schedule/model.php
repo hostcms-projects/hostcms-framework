@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Schedule.
+ * Schedule_Model
  *
- * @package HostCMS 6\Schedule
+ * @package HostCMS
+ * @subpackage Schedule
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

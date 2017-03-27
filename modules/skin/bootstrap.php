@@ -116,7 +116,7 @@ class Skin_Bootstrap extends Core_Skin
 				->execute();
 		}
 		?>
-		<!--Fonts-->
+		<!-- Fonts -->
 		<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic" rel="stylesheet" type="text/css">
 
 		<script type="text/javascript">
@@ -204,7 +204,7 @@ class Skin_Bootstrap extends Core_Skin
 										<?php echo htmlspecialchars($oCurrentSite->name)?>
 									</span>
 
-									<a class="dropdown-toggle" id="sitesListIcon" data-toggle="dropdown" title="Выберите сайт" href="#">
+									<a class="dropdown-toggle" id="sitesListIcon" data-toggle="dropdown" title="<?php echo Core::_('Admin.selectSite')?>" href="#">
 										<i class="icon fa fa-globe"></i>
 										<span class="badge"></span>
 									</a>
@@ -232,17 +232,13 @@ class Skin_Bootstrap extends Core_Skin
 										<div class="scroll-languages">
 											<ul>
 											<?php
-											$oAdmin_Language = Core_Entity::factory('Admin_Language');
-											$oAdmin_Language->queryBuilder()->where('active', '=', 1);
-
-											$aAdmin_Languages = $oAdmin_Language->findAll();
-											$i = 1;
-
+											$aAdmin_Languages = Core_Entity::factory('Admin_Language')
+												->getAllByActive(1);
+												
 											foreach ($aAdmin_Languages as $oAdmin_Language)
 											{
-											?>
-											<li>
-												<a <?php echo Core_Array::get($_SESSION, 'current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . $oAdmin_Language->shortname . '"' : '';?>>
+												?><li>
+												<a <?php echo Core_Array::get($_SESSION, 'current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . $oAdmin_Language->shortname . '"' : ''?> onmousedown="$(window).off('beforeunload')">
 
 													<div class="clearfix">
 														<div class="notification-icon">
@@ -260,8 +256,7 @@ class Skin_Bootstrap extends Core_Skin
 															?>
 														</div>
 													</div>
-												</a>
-											</li>
+												</a></li>
 											<?php
 											}
 											?>
@@ -274,10 +269,10 @@ class Skin_Bootstrap extends Core_Skin
 											event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
 										};
 										$('.scroll-languages').slimscroll({
-										 // height: '215px',
-										 height: 'auto',
-										 color: 'rgba(0, 0, 0, 0.3)',
-										 size: '5px'
+											// height: '215px',
+											height: 'auto',
+											color: 'rgba(0, 0, 0, 0.3)',
+											size: '5px'
 										});
 									</script>
 								</li>
@@ -387,7 +382,7 @@ class Skin_Bootstrap extends Core_Skin
 											</div>
 										</li>
 										<li class="dropdown-footer">
-											<a href="/admin/logout.php"><?php echo Core::_('Admin.exit')?></a>
+											<a href="/admin/logout.php"onmousedown="$(window).off('beforeunload')"><?php echo Core::_('Admin.exit')?></a>
 										</li>
 									</ul>
 									<!--/Login Area Dropdown-->

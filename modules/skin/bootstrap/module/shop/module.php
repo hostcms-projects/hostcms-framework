@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Shops.
+ * Shop. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 {
@@ -344,9 +345,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 										<div class="databox-top">
 											<div class="databox-sparkline">
 												<span data-sparkline="line" data-height="125px" data-width="100%" data-fillcolor="false" data-linecolor="themesecondary"
-													  data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#ffce55"
-													  data-highlightspotcolor="#ffce55" data-highlightlinecolor="#ffce55"
-													  data-linewidth="1.5" data-spotradius="2">
+													 data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#ffce55"
+													 data-highlightspotcolor="#ffce55" data-highlightlinecolor="#ffce55"
+													 data-linewidth="1.5" data-spotradius="2">
 													<?php echo implode(',', $aOrdered)?>
 												</span>
 											</div>
@@ -362,10 +363,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 										<div class="databox-top">
 											<div class="databox-sparkline">
 												<span data-sparkline="line" data-height="125px" data-width="100%" data-fillcolor="false" data-linecolor="themefourthcolor"
-													  data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#8cc474"
-													  data-highlightspotcolor="#8cc474" data-highlightlinecolor="#8cc474"
-													  data-linewidth="1.5" data-spotradius="2">
-													  <?php echo implode(',', $aPaid)?>
+													 data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#8cc474"
+													 data-highlightspotcolor="#8cc474" data-highlightlinecolor="#8cc474"
+													 data-linewidth="1.5" data-spotradius="2">
+													 <?php echo implode(',', $aPaid)?>
 												</span>
 											</div>
 										</div>
@@ -381,10 +382,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 										<div class="databox-top">
 											<div class="databox-sparkline">
 												<span data-sparkline="line" data-height="125px" data-width="100%" data-fillcolor="false" data-linecolor="themeprimary"
-													  data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#0072C6"
-													  data-highlightspotcolor="#0072C6" data-highlightlinecolor="#0072C6	"
-													  data-linewidth="1.5" data-spotradius="2">
-													  <?php echo implode(',', $aOrderedAmount)?>
+													 data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#0072C6"
+													 data-highlightspotcolor="#0072C6" data-highlightlinecolor="#0072C6	"
+													 data-linewidth="1.5" data-spotradius="2">
+													 <?php echo implode(',', $aOrderedAmount)?>
 												</span>
 											</div>
 										</div>
@@ -400,10 +401,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 										<div class="databox-top">
 											<div class="databox-sparkline">
 												<span data-sparkline="line" data-height="125px" data-width="100%" data-fillcolor="false" data-linecolor="themethirdcolor"
-													  data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="red"
-													  data-highlightspotcolor="red" data-highlightlinecolor="red"
-													  data-linewidth="1.5" data-spotradius="2">
-													  <?php echo implode(',', $aPaidAmount)?>
+													 data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="red"
+													 data-highlightspotcolor="red" data-highlightlinecolor="red"
+													 data-linewidth="1.5" data-spotradius="2">
+													 <?php echo implode(',', $aPaidAmount)?>
 												</span>
 											</div>
 										</div>

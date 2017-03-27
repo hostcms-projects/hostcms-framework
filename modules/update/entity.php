@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Updates.
  *
- * @package HostCMS 6\Update
+ * @package HostCMS
+ * @subpackage Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Entity extends Core_Entity
 {
@@ -29,6 +30,12 @@ class Update_Entity extends Core_Entity
 	 * @var int
 	 */
 	public $description = NULL;
+
+	/**
+	 * Backend property
+	 * @var int
+	 */
+	public $beta = NULL;
 
 	/**
 	 * Name of the model
@@ -183,17 +190,21 @@ class Update_Entity extends Core_Entity
 					// по умолчанию ошибок обновления нет
 					$error_update = FALSE;
 
+					$current_update_dir = $update_dir . '/' . $current_update_id;
+					!is_dir($current_update_dir) && Core_File::mkdir($current_update_dir);
+
+					$aUpdateItems = array();
+
 					$aModules = $value->xpath('modules/module');
 					foreach ($aModules as $key => $module)
 					{
+						$aTmpUpdateItem = array();
+
 						$current_update_list_id = (int)$module->attributes()->id;
 
 						Core_Log::instance()->clear()
 							->status(Core_Log::$MESSAGE)
 							->write(Core::_('Update.msg_installing_package', $current_update_list_id));
-
-						$current_update_dir = $update_dir . '/' . $current_update_id;
-						!is_dir($current_update_dir) && Core_File::mkdir($current_update_dir);
 
 						$update_list_file = (string)$module->update_list_file;
 						if ($update_list_file != '')
@@ -222,28 +233,18 @@ class Update_Entity extends Core_Entity
 
 							$source_file = $current_update_dir . '/' . $current_update_list_id . '_' . $original_filename;
 
-							Core_File::write($source_file, $Core_Http->getBody());
+							$content = $Core_Http->getBody();
 
-							$Core_Tar = new Core_Tar($source_file);
-
-							Core_Log::instance()->clear()
-								->status(Core_Log::$MESSAGE)
-								->write(Core::_('Update.msg_unpack_package', $original_filename));
-
-							// Распаковываем файлы
-							if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
+							if (strlen($content) > 100)
 							{
-								$error_update = TRUE;
-
-								$message = Core::_('Update.update_files_error');
-
-								Core_Log::instance()->clear()
-									->status(Core_Log::$WARNING)
-									->write($message);
-
-								// Возникла ошибка распаковки
-								Core_Message::show($message, 'error');
+								Core_File::write($source_file, $content);
 							}
+							else
+							{
+								throw new Core_Exception(Core::_('Update.update_files_error'));
+							}
+
+							$aTmpUpdateItem['tar'] = $source_file;
 						}
 						else
 						{
@@ -260,7 +261,56 @@ class Update_Entity extends Core_Entity
 
 							Core_File::write($filename, html_entity_decode($update_list_sql, ENT_COMPAT, 'UTF-8'));
 
-							$sql_code = html_entity_decode($update_list_sql, ENT_COMPAT, 'UTF-8');
+							$aTmpUpdateItem['sql'] = $filename;
+						}
+
+						$update_list_php = (string)$module->update_list_php;
+						if (!$error_update)
+						{
+							$filename = $current_update_dir . '/' . $current_update_list_id . '.php';
+
+							Core_File::write($filename, html_entity_decode($update_list_php, ENT_COMPAT, 'UTF-8'));
+
+							$aTmpUpdateItem['file'] = $filename;
+						}
+
+						$aUpdateItems[] = $aTmpUpdateItem;
+					}
+
+					// Extract and execute after load
+					foreach ($aUpdateItems as $aTmpUpdateItem)
+					{
+						if (isset($aTmpUpdateItem['tar']))
+						{
+							$Core_Tar = new Core_Tar($aTmpUpdateItem['tar']);
+
+							Core_Log::instance()->clear()
+								->status(Core_Log::$MESSAGE)
+								->write(Core::_('Update.msg_unpack_package', $original_filename));
+
+							// Распаковываем файлы
+							if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))
+							{
+								$error_update = TRUE;
+
+								$message = Core::_('Update.update_files_error');
+
+								Core_Log::instance()->clear()
+									->status(Core_Log::$MESSAGE)
+									->write($message);
+
+								// Возникла ошибка распаковки
+								Core_Message::show($message, 'error');
+
+								try {
+									Core_File::copy($aTmpUpdateItem['tar'], tempnam(CMS_FOLDER . TMP_DIR, 'update'));
+								} catch (Exception $e) {}
+							}
+						}
+
+						if (isset($aTmpUpdateItem['sql']))
+						{
+							$sql_code = Core_File::read($aTmpUpdateItem['sql']);
 
 							// Если версия MySQL меньше 4.1.0
 							/*if (version_compare($kernel->GetDBVersion(), '4.1.0', "<"))
@@ -274,29 +324,25 @@ class Update_Entity extends Core_Entity
 							Sql_Controller::instance()->execute($sql_code);
 						}
 
-						$update_list_php = (string)$module->update_list_php;
-						if (!$error_update)
+						if (isset($aTmpUpdateItem['file']))
 						{
-							$filename = $current_update_dir . '/' . $current_update_list_id . '.php';
-
-							Core_File::write($filename, html_entity_decode($update_list_php, ENT_COMPAT, 'UTF-8'));
-
-							include($current_update_dir . '/' . $current_update_list_id . '.php');
+							include($aTmpUpdateItem['file']);
 						}
-
-						// Удаляем папку с файлами
-						is_dir($current_update_dir) && Core_File::deleteDir($current_update_dir);
-
-						$update_file = Update_Controller::instance()->getFilePath();
-						is_file($update_file) && Core_File::delete($update_file);
 					}
+
+					// Удаляем папку с файлами
+					is_dir($current_update_dir) && Core_File::deleteDir($current_update_dir);
+					// Удаляем XML обновления
+					$update_file = Update_Controller::instance()->getFilePath();
+					is_file($update_file) && Core_File::delete($update_file);
 
 					// Clear Core_ORM_ColumnCache
-					if (Core::moduleIsActive('cache'))
-					{
-						$oCore_Cache = Core_Cache::instance(Core::$mainConfig['defaultCache']);
-						$oCore_Cache->deleteAll('Core_ORM_ColumnCache');
-					}
+					$aCore_Orm_Config = Core::$config->get('core_orm') + array(
+						'cache' => 'memory',
+						'columnCache' => 'memory'
+					);
+					$oCore_Cache = Core_Cache::instance($aCore_Orm_Config['columnCache']);
+					$oCore_Cache->deleteAll('Core_ORM_ColumnCache');
 
 					// Если не было ошибок
 					if (!$error_update)
@@ -314,16 +360,34 @@ class Update_Entity extends Core_Entity
 					}
 				}
 			}
-		}
 
-		if ($error > 0)
+			if ($error > 0)
+			{
+				Core_Message::show(Core::_('Update.server_error_respond_' . $error, $this->name), 'error');
+			}
+		}
+		else
 		{
-			Core_Message::show(Core::_('Update.server_error_respond_' . $error, $this->name), 'error');
+			Core_Message::show(Core::_('Update.server_error_xml'), 'error');
 		}
 
 		// Load new updates list
 		$this->loadUpdates();
 
 		return NULL;
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$this->beta && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-hostcms badge-square')
+			->value('β')
+			->execute();
 	}
 }

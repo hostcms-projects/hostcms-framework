@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Default entity controller
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Controller extends Core_Servant_Properties
 {
@@ -230,11 +231,11 @@ class Core_Controller extends Core_Servant_Properties
 	 * @return string
 	 */
 	public function __toString()
-    {
+	{
 		$str = parent::__toString();
 		!is_null($this->_xsl) && $str .= ',xsl=' . $this->_xsl->name;
 		count($this->_cacheSignatures) && $str .= ',cacheSignatures=' . implode(',', $this->_cacheSignatures);
 
 		return $str;
-    }
+	}
 }

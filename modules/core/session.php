@@ -5,7 +5,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Sessions
  *
- * @package HostCMS 6\Core
+ * Start Session
+ * <code>
+ * Core_Session::start();
+ * </code>
+ *
+ * Close Session
+ * <code>
+ * Core_Session::close();
+ * </code>
+ *
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Install.
  *
- * @package HostCMS 6\Install
+ * @package HostCMS
+ * @subpackage Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Install_Controller
 {
@@ -485,7 +486,7 @@ class Install_Controller
 		$oShop_Group = Core_Entity::factory('Shop_Group', $shopGroupId);
 		$group_dir = $oShop_Group->getGroupPath();
 
-		$shop_group_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" .  Core_File::getNestingDirPath($copyGroupId, 3) . "/group_{$copyGroupId}/shop_group_image{$copyGroupId}";
+		$shop_group_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyGroupId, 3) . "/group_{$copyGroupId}/shop_group_image{$copyGroupId}";
 
 		// Получаем расширение файла
 		$ext = $this->getFileExtension($shop_group_image_from);

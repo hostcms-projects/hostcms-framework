@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Information systems.
+ * Informationsystem Backend Editing Controller.
  *
- * @package HostCMS 6\Informationsystem
+ * @package HostCMS
+ * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -396,7 +397,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->value($this->_object->parent_id)
 					->caption(Core::_('Informationsystem_Dir.parent_name'));
 
-				$oMainTab->addAfter($oSelect_Dirs,  $this->getField('description'));
+				$oMainTab->addAfter($oSelect_Dirs, $this->getField('description'));
 			break;
 		}
 

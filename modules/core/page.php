@@ -5,6 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Frontend data, e.g. title, description, template and data hierarchy
  *
+ * Доступные методы:
+ *
+ * - fileTimestamp(TRUE|FALSE) использовать в качестве временной метки дату файла, а не дату изменения макета, по умолчанию FALSE.
+ * - compress(TRUE|FALSE) использовать компрессию, по умочанию TRUE. Требует модуль "Компрессия страниц".
+ *
  * <code>
  * // Get Title
  * $title = Core_Page::instance()->title;
@@ -67,11 +72,12 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * if (is_object(Core_Page::instance()->object)
  * && get_class(Core_Page::instance()->object) == 'Informationsystem_Controller_Show')
  * {
- *    $Informationsystem_Controller_Show = Core_Page::instance()->object;
+ * 	$Informationsystem_Controller_Show = Core_Page::instance()->object;
  * }
  * </code>
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -91,7 +97,9 @@ class Core_Page extends Core_Servant_Properties
 		'response',
 		'libParams',
 		'object',
-		'buildingPage'
+		'buildingPage',
+		'fileTimestamp',
+		'compress'
 	);
 
 	/**
@@ -158,7 +166,8 @@ class Core_Page extends Core_Servant_Properties
 		parent::__construct();
 
 		$this->libParams = array();
-		$this->buildingPage = FALSE;
+		$this->buildingPage = $this->fileTimestamp = FALSE;
+		$this->compress = TRUE;
 	}
 
 	/**
@@ -222,7 +231,11 @@ class Core_Page extends Core_Servant_Properties
 		{
 			if ($bExternal)
 			{
-				$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $css . '?' . Core_Date::sql2timestamp($this->template->timestamp) . '" />' . "\n";
+				$timestamp = $this->fileTimestamp && is_file($sPath = CMS_FOLDER . ltrim($css, DIRECTORY_SEPARATOR))
+					? filemtime($sPath)
+					: Core_Date::sql2timestamp($this->template->timestamp);
+
+				$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $css . '?' . $timestamp . '" />' . "\n";
 			}
 			else
 			{
@@ -274,7 +287,7 @@ class Core_Page extends Core_Servant_Properties
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeGetCss', $this);
 
-		return Core::moduleIsActive('compression')
+		return $this->compress && Core::moduleIsActive('compression')
 			? $this->_getCssCompressed()
 			: $this->_getCss($bExternal);
 	}
@@ -321,8 +334,11 @@ class Core_Page extends Core_Servant_Properties
 
 		foreach ($this->js as $aJs)
 		{
-			$sAsync = $aJs[1] ? ' async="async"' : '';
-			$sReturn .= '<script type="text/javascript"' . $sAsync . ' src="' . $aJs[0] . '"></script>' . "\n";
+			$timestamp = $this->fileTimestamp && is_file($sPath = CMS_FOLDER . ltrim($aJs[0], DIRECTORY_SEPARATOR))
+				? filemtime($sPath)
+				: NULL;
+
+			$sReturn .= '<script type="text/javascript"' . ($aJs[1] ? ' async="async"' : '') . ' src="' . $aJs[0] . (!is_null($timestamp) ? '?' . $timestamp : '') . '"></script>' . "\n";
 		}
 
 		return $sReturn;
@@ -369,7 +385,7 @@ class Core_Page extends Core_Servant_Properties
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeGetJs', $this);
 
-		return Core::moduleIsActive('compression')
+		return $this->compress && Core::moduleIsActive('compression')
 			? $this->_getJsCompressed($async)
 			: $this->_getJs();
 	}
@@ -499,8 +515,8 @@ class Core_Page extends Core_Servant_Properties
 	{
 		$oCore_Response = $this->deleteChild()->response->status(404);
 
-		// Если определена константа с ID страницы для 404 ошибки и она не равна нулю
 		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
+
 		if ($oSite->error404)
 		{
 			$oStructure = Core_Entity::factory('Structure')->find($oSite->error404);

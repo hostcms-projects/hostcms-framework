@@ -2,7 +2,8 @@
 /**
  * Documents.
  *
- * @package HostCMS 6\Document
+ * @package HostCMS
+ * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

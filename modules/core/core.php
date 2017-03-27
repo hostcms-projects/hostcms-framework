@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Core
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -461,7 +462,7 @@ class Core
 	static public function initConstants(Site_Model $oSite)
 	{
 		Core_Event::notify('Core.onBeforeInitConstants', $oSite);
-		
+
 		!defined('UPLOADDIR') && define('UPLOADDIR', $oSite->uploaddir);
 
 		define('SITE_LOCAL', $oSite->locale);
@@ -482,10 +483,10 @@ class Core
 
 		// Язык
 		define('SITE_LNG', $oSite->lng);
-		
+
 		// Кодировка
 		define('SITE_CODING', $oSite->coding);
-		
+
 		// Максимальный размер в одном из измерений при преобразовании загруженных изображений (малое изображение)
 		define('MAX_SIZE_LOAD_IMAGE', $oSite->max_size_load_image);
 		// Максимальный размер в одном из измерений при преобразовании загруженных изображений (большое изображение)
@@ -528,7 +529,7 @@ class Core
 
 		// Изменяем уровень вывода ошибок
 		error_reporting(SITE_ERROR);
-		
+
 		Core_Event::notify('Core.onAfterInitConstants', $oSite);
 	}
 
@@ -657,13 +658,22 @@ class Core
 			}
 
 			// Исключаем редирект /index.php --> /index.php/ для IIS
-			if (mb_strtolower(Core_Array::get(self::$url, 'path')) == '/index.php')
+			if (strtolower(Core_Array::get(self::$url, 'path')) == '/index.php' && self::isIIS())
 			{
 				self::$url['path'] = '/';
 			}
 		}
 
 		return self::$url;
+	}
+
+	/**
+	 * Check if server is Microsoft IIS
+	 * @return boolean
+	 */
+	static public function isIIS()
+	{
+		return strpos(strtolower(Core_Array::get($_SERVER, 'SERVER_SOFTWARE')), 'microsoft-iis') !== FALSE;
 	}
 
 	/**
@@ -702,11 +712,11 @@ class Core
 	static public function setCookie($name, $value, $expire = 0, $path = '', $domain = '', $secure = FALSE, $httponly = FALSE, $replace = FALSE)
 	{
 		header('Set-Cookie: ' . rawurlencode($name) . '=' . rawurlencode($value)
-		  . (empty($expire) ? '' : '; expires=' . gmdate('D, d-M-Y H:i:s', $expire) . ' GMT')
-		  . (empty($path) ? '' : '; path=' . $path)
-		  . (empty($domain) ? '' : '; domain=' . $domain)
-		  . (!$secure ? '' : '; secure')
-		  . (!$httponly ? '' : '; HttpOnly'), $replace);
+		 . (empty($expire) ? '' : '; expires=' . gmdate('D, d-M-Y H:i:s', $expire) . ' GMT')
+		 . (empty($path) ? '' : '; path=' . $path)
+		 . (empty($domain) ? '' : '; domain=' . $domain)
+		 . (!$secure ? '' : '; secure')
+		 . (!$httponly ? '' : '; HttpOnly'), $replace);
 	}
 
 	/**

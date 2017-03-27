@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Affiliates.
+ * Affiliate_Plan_Model
  *
- * @package HostCMS 6\Affiliate
+ * @package HostCMS
+ * @subpackage Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Model extends Core_Entity
 {

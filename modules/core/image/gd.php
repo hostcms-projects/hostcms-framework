@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Image helper
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Image_Gd extends Core_Image
 {
@@ -185,6 +186,9 @@ class Core_Image_Gd extends Core_Image
 				{
 					imagealphablending($targetResourceStep1, FALSE);
 					imagesavealpha($targetResourceStep1, TRUE);
+
+					//$transparent = imagecolorallocatealpha($targetResourceStep1, 255, 255, 255, 127);
+					//imagefilledrectangle($targetResourceStep1, 0, 0, $destX, $destY, $transparent);
 
 					imagecopyresampled($targetResourceStep1, $sourceResource, 0, 0, 0, 0, $destX, $destY, $sourceX, $sourceY);
 

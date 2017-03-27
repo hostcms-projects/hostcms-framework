@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * SEO.
+ * Seo_Query_Position Backend Editing Controller.
  *
- * @package HostCMS 6\Seo
+ * @package HostCMS
+ * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {

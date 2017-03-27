@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Filemanager.
  *
- * @package HostCMS 6\Wysiwyg
+ * @package HostCMS
+ * @subpackage Wysiwyg
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Wysiwyg_Filemanager_File extends Core_Entity
 {

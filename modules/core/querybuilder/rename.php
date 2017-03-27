@@ -18,10 +18,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 	->execute();
  * </code>
  *
- * @package HostCMS 6\Core\Querybuilder
+ * @package HostCMS
+ * @subpackage Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_QueryBuilder_Rename extends Core_QueryBuilder_Statement
 {

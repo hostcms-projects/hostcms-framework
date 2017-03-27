@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Shops.
+ * Shop. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Module_Shop_Module extends Shop_Module
 {
@@ -158,7 +159,7 @@ class Skin_Default_Module_Shop_Module extends Shop_Module
 						$oCore_Html_Entity_Div_Action->add(
 							Core::factory('Core_Html_Entity_A')
 								->href(
-									($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id
+									($oStructure->https ? 'https://' : 'http://') . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id
 								)
 								->target('_blank')
 								->title(

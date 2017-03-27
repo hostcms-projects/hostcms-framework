@@ -23,7 +23,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 		->show();
  * </code>
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -39,6 +40,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		'itemsProperties',
 		'itemsPropertiesList',
 		'taxes',
+		'cartUrl'
 	);
 
 	/**
@@ -88,6 +90,8 @@ class Shop_Cart_Controller_Show extends Core_Controller
 
 		$this->itemsProperties = $this->taxes = FALSE;
 		$this->itemsPropertiesList = TRUE;
+
+		$this->cartUrl = $oShop->Structure->getPath() . 'cart/';
 	}
 
 	/**
@@ -193,7 +197,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 					// Сумма для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
 						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
-					
+
 					$tax += $aPrices['tax'] * $oShop_Cart->quantity;
 
 					$weight += $oShop_Cart->Shop_Item->weight * $oShop_Cart->quantity;
@@ -247,6 +251,40 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		);
 
 		return parent::show();
+	}
+
+	/**
+	 * AJAX refresh little cart
+	 * @return self
+	 */
+	public function refreshLittleCart()
+	{
+		if (Core::moduleIsActive('cache'))
+		{
+			$oShop = $this->getEntity();
+
+			if ($oShop->Site->html_cache_use)
+			{
+				?><script type="text/javascript">
+				var parentNode = jQuery('script').last().parent();
+				jQuery(function() {
+					jQuery.ajax({
+						context: parentNode,
+						url: '<?php echo $this->cartUrl?>',
+						type: 'POST',
+						dataType: 'json',
+						data: {'_': Math.round(new Date().getTime()), 'loadCart': 1},
+						success: function (ajaxData) {
+							jQuery(this).html(ajaxData);
+						},
+						error: function (){return false}
+					});
+				});
+				</script><?php
+			}
+		}
+
+		return $this;
 	}
 
 	/**

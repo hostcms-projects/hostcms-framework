@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -391,6 +392,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	* Импорт CSV
 	* @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeFindByMarking
 	* @hostcms-event Shop_Item_Import_Cml_Controller.onAfterFindByMarking
+	* @hostcms-event Shop_Item_Import_Cml_Controller.oBeforeAdminUpload
+	* @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImportGroupProperty
+	* @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImportItemProperty
 	*/
 	public function import()
 	{
@@ -675,7 +679,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 					//=======================================//
 
-					//==============    order items    ==============//
+					//============== order items ==============//
 
 					case 'order_item_marking':
 						if (strval($sData) && !is_null($this->_oCurrentOrder))
@@ -982,9 +986,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
+									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 									$result = Core_File::adminUpload($aPicturesParam);
-								} catch (Exception $exc) {
-									Core_Message::show($exc->getMessage(), 'error');
+								}
+								catch (Exception $e)
+								{
+									Core_Message::show($e->getMessage(), 'error');
 									$result = array('large_image' => FALSE, 'small_image' => FALSE);
 								}
 
@@ -1083,9 +1092,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
+									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 									$result = Core_File::adminUpload($aPicturesParam);
-								} catch (Exception $exc) {
-									Core_Message::show($exc->getMessage(), 'error');
+								}
+								catch (Exception $e)
+								{
+									Core_Message::show($e->getMessage(), 'error');
 									$result = array('small_image' => FALSE);
 								}
 
@@ -1306,7 +1320,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					case 'shop_items_catalog_marking':
 						if ($sData != '')
 						{
-							Core_Event::notify('ImportShopItems.onBeforeFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
+							Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
 
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
 							$oTmpObject->queryBuilder()
@@ -1318,7 +1332,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$this->_oCurrentItem->marking = $sData;
 							count($aTmpObject) && $this->_oCurrentItem = $aTmpObject[0];
 
-							Core_Event::notify('ImportShopItems.onAfterFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
+							Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
 						}
 					break;
 					// Передана дата добавления товара
@@ -1647,6 +1661,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 								$oProperty = Core_Entity::factory('Property', $iPropertyId);
 
+								Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportGroupProperty', $this, array($this->_oCurrentShop, $this->_oCurrentGroup, $oProperty, $sData));
+								
 								$aPropertyValues = $oProperty->getValues($this->_oCurrentGroup->id, FALSE);
 
 								$oProperty_Value = isset($aPropertyValues[0])
@@ -1751,9 +1767,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 											}
 
 											try {
+												$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+												is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 												$result = Core_File::adminUpload($aPicturesParam);
-											} catch (Exception $exc) {
-												Core_Message::show($exc->getMessage(), 'error');
+											}
+											catch (Exception $e)
+											{
+												Core_Message::show($e->getMessage(), 'error');
 												$result = array('large_image' => FALSE, 'small_image' => FALSE);
 											}
 
@@ -2151,11 +2172,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 						try
 						{
+							$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 							$result = Core_File::adminUpload($aPicturesParam);
 						}
-						catch (Exception $exc)
+						catch (Exception $e)
 						{
-							Core_Message::show($exc->getMessage(), 'error');
+							Core_Message::show($e->getMessage(), 'error');
 							$result = array('large_image' => FALSE, 'small_image' => FALSE);
 						}
 
@@ -2264,9 +2288,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$aPicturesParam['small_image_preserve_aspect_ratio'] = $this->_oCurrentShop->preserve_aspect_ratio_small;
 
 							try {
+								$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+								is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 								$result = Core_File::adminUpload($aPicturesParam);
-							} catch (Exception $exc) {
-								Core_Message::show($exc->getMessage(), 'error');
+							}
+							catch (Exception $e)
+							{
+								Core_Message::show($e->getMessage(), 'error');
 								$result = array('small_image' => FALSE);
 							}
 
@@ -2303,6 +2332,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				{
 					$oProperty = Core_Entity::factory('Property')->find($iPropertyID);
 
+					Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportItemProperty', $this, array($this->_oCurrentShop, $this->_oCurrentItem, $oProperty, $sPropertyValue));
+					
 					$iShop_Item_Property_Id = $oProperty->Shop_Item_Property->id;
 
 					$group_id = $this->_oCurrentItem->modification_id == 0
@@ -2336,7 +2367,6 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 						$this->_aClearedPropertyValues[$this->_oCurrentItem->id][] = $oProperty->guid;
 					}
-
 
 					if ($oProperty->multiple)
 					{
@@ -2452,9 +2482,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
+									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 									$aResult = Core_File::adminUpload($aPicturesParam);
-								} catch (Exception $exc) {
-									Core_Message::show($exc->getMessage(), 'error');
+								}
+								catch (Exception $e)
+								{
+									Core_Message::show($e->getMessage(), 'error');
 									$aResult = array('large_image' => FALSE, 'small_image' => FALSE);
 								}
 
@@ -2504,22 +2539,22 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 							}
 						break;
-				   case 8:
-					  if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $sPropertyValue))
-					  {
-						 $sPropertyValue = Core_Date::datetime2sql($sPropertyValue);
-					  }
+						case 8:
+							if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $sPropertyValue))
+							{
+							 $sPropertyValue = Core_Date::datetime2sql($sPropertyValue);
+							}
 
-					  $oProperty_Value->setValue($sPropertyValue);
-				   break;
-				   case 9:
-					  if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sPropertyValue))
-					  {
-						 $sPropertyValue = Core_Date::datetime2sql($sPropertyValue);
-					  }
+							$oProperty_Value->setValue($sPropertyValue);
+						break;
+						case 9:
+							if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sPropertyValue))
+							{
+							 $sPropertyValue = Core_Date::datetime2sql($sPropertyValue);
+							}
 
-					  $oProperty_Value->setValue($sPropertyValue);
-				   break;
+							$oProperty_Value->setValue($sPropertyValue);
+						break;
 						default:
 							$oProperty_Value->setValue($sPropertyValue);
 						break;
@@ -2618,9 +2653,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 
 						try {
+							$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
+
 							$aResult = Core_File::adminUpload($aPicturesParam);
-						} catch (Exception $exc) {
-							Core_Message::show($exc->getMessage(), 'error');
+						}
+						catch (Exception $e)
+						{
+							Core_Message::show($e->getMessage(), 'error');
 							$aResult = array('large_image' => FALSE, 'small_image' => FALSE);
 						}
 
@@ -2662,7 +2702,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 			//$this->_oCurrentItem->clear();
 			$this->_oCurrentItem = Core_Entity::factory('Shop_Item');
-			$this->_oCurrentGroup =  Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
+			$this->_oCurrentGroup = Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
 			$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
 
 			if (!is_null($this->_oCurrentOrderItem))

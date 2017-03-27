@@ -5,14 +5,15 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Property_Controller_Tab extends Property_Controller_Tab {
 
-	protected function _imgBox($oAdmin_Form_Entity, $oProperty, $addFunction = '$.cloneProperty', $deleteOnclick = '$.deleteNewProperty(this)')
+	public function imgBox($oAdmin_Form_Entity, $oProperty, $addFunction = '$.cloneProperty', $deleteOnclick = '$.deleteNewProperty(this)')
 	{
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 		
@@ -37,10 +38,7 @@ class Skin_Bootstrap_Property_Controller_Tab extends Property_Controller_Tab {
 								->onclick($deleteOnclick . '; event.stopPropagation();')
 						)
 					)
-			)
-			//->add($this->_getImgAdd($oProperty, $addFunction))
-			//->add($this->_getImgDelete($deleteOnclick))
-			;
+			);
 
 		return $this;
 	}

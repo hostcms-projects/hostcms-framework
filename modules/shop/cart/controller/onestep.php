@@ -29,7 +29,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 		->show();
  * </code>
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

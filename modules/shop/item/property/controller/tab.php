@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Properties for item group.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Controller_Tab extends Property_Controller_Tab
 {
@@ -18,7 +19,7 @@ class Shop_Item_Property_Controller_Tab extends Property_Controller_Tab
 	 */
 	static public function factory(Admin_Form_Controller $Admin_Form_Controller)
 	{
-		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__;
 
 		if (!class_exists($className))
 		{

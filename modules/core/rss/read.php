@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Parse RSS 2.0
  *
- * @package HostCMS 6\Core\Rss
+ * @package HostCMS
+ * @subpackage Core\Rss
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Rss_Read
 {
@@ -302,7 +303,7 @@ class Core_Rss_Read
 
 		/*
 		$this->_xml_parser = xml_parser_create();
-		xml_set_element_handler($this->_xml_parser, Array(&$this, 'fetchOpen'),  Array(&$this, 'fetchClose'));
+		xml_set_element_handler($this->_xml_parser, Array(&$this, 'fetchOpen'), Array(&$this, 'fetchClose'));
 		xml_set_character_data_handler($this->_xml_parser, Array(&$this, 'characterData'));
 		*/
 		if (!empty($this->_data))

@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Http cUrl driver
  *
- * @package HostCMS 6\Core\Http
+ * @package HostCMS
+ * @subpackage Core\Http
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -37,7 +38,7 @@ class Core_Http_Curl extends Core_Http
 		{
 			case 'GET':
 				curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
-				curl_setopt($curl, CURLOPT_POST, FALSE);
+				//curl_setopt($curl, CURLOPT_POST, FALSE);
 			break;
 
 			case 'PUT':
@@ -48,13 +49,13 @@ class Core_Http_Curl extends Core_Http
 
 			case 'POST':
 				curl_setopt($curl, CURLOPT_POST, TRUE);
-				curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
+				//curl_setopt($curl, CURLOPT_HTTPGET, FALSE);
 			break;
-			
+
 			case 'HEAD':
 				curl_setopt($curl, CURLOPT_NOBODY, TRUE);
 			break;
-			
+
 			default:
 				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->_method);
 		}
@@ -64,7 +65,13 @@ class Core_Http_Curl extends Core_Http
 			if ($this->_rawData)
 			{
 				curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_rawData);
-				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+
+				if ($this->_method == 'POST')
+				{
+					curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+				}
+
+				$this->additionalHeader('Content-Length', strlen($this->_rawData));
 			}
 			else
 			{

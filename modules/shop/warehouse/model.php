@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Warehouse_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Warehouse_Model extends Core_Entity
 {
@@ -116,7 +117,7 @@ class Shop_Warehouse_Model extends Core_Entity
 	/**
 	 * Get default warehouse
 	 * @param boolean $bCache cache mode
-	 * @return Shop_Warehouse_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getDefault($bCache = TRUE)
 	{

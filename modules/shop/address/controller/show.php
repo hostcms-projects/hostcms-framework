@@ -10,10 +10,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - countries(TRUE|FALSE) выводить в XML данные о странах.
  * - orderProperties(TRUE|FALSE|array()) выводить список дополнительных свойств заказа, по умолчанию TRUE.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Address_Controller_Show extends Core_Controller
 {

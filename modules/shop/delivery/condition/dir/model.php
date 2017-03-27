@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Delivery_Condition_Dir_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Dir_Model extends Core_Entity
 {
@@ -46,7 +47,7 @@ class Shop_Delivery_Condition_Dir_Model extends Core_Entity
 	
 	/**
 	 * Get parent
-	 * @return Shop_Delivery_Condition_Dir_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getParent()
 	{

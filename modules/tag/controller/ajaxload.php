@@ -6,10 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Контроллер загрузки списка тегов(меток), соответствующих фильтру
  *
- * @package HostCMS 6\Tag
+ * @package HostCMS
+ * @subpackage Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Controller_Ajaxload extends Admin_Form_Action_Controller
 {

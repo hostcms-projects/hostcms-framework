@@ -5,12 +5,13 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Completely Automated Public Turing test to tell Computers and Humans Apart.
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Kruglov Sergei
  * @author Hostmake LLC
  * @copyright © 2006, 2007, 2008, 2011 Kruglov Sergei, http://www.captcha.ru
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Captcha
 {
@@ -347,7 +348,7 @@ class Core_Captcha
 				$shift = 1;
 			}
 
-			// Наносим  символ на рисунок CAPTCHA
+			// Наносим символ на рисунок CAPTCHA
 			imagecopy($img, $font, $x, mt_rand(4, 10), $m['start'], 1, $m['end'] - $m['start'], $fontfile_height);
 
 			// Курсор после последнего нанесенного символа

@@ -6,10 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Schedule
  * Типовой контроллер загрузки значений списка для <select>
  *
- * @package HostCMS 6\Schedule
+ * @package HostCMS
+ * @subpackage Schedule
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Schedule_Load_Select_Options extends Admin_Form_Action_Controller
 {

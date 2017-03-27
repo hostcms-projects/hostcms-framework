@@ -17,7 +17,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * $Shop_Controller_YandexVendor->show();
  * </code>
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -324,13 +325,13 @@ class Shop_Controller_YandexVendor extends Core_Controller
 					echo '<inStockDate>' . date('Y-m-d', Core_Date::sql2timestamp($oShop_Item->start_datetime)) . '</inStockDate>' . "\n";
 
 					// Актуальность модели
-					$bIsActual =  $oShop_Item->active == 1 ? 'true' : 'false';
+					$bIsActual = $oShop_Item->active == 1 ? 'true' : 'false';
 					echo '<isActual>' . Core_Str::xml($bIsActual) . '</isActual>' . "\n";
 
 					// Рекомендованная цена.
 					$aPrices = $oShop_Item_Controller->calculatePriceInItemCurrency($oShop_Item->price, $oShop_Item);
 
-					echo '<recomendedPrice currency="' . $oShop_Item->Shop_Currency->code . '">' . $aPrices['price_discount'] . '</recomendedPrice>'  . "\n";
+					echo '<recomendedPrice currency="' . $oShop_Item->Shop_Currency->code . '">' . $aPrices['price_discount'] . '</recomendedPrice>' . "\n";
 
 					// Дата добавления описания модели в каталог.
 					echo '<addDate>' . date('Y-m-d', Core_Date::sql2timestamp($oShop_Item->datetime)) . '</addDate>' . "\n";

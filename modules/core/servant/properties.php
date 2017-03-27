@@ -21,10 +21,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * var_dump($oFoo->value);
  * </code>
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Servant_Properties
 {
@@ -182,9 +183,9 @@ class Core_Servant_Properties
 	 * @return boolean
 	 */
 	public function __isset($property)
-    {
-        return array_key_exists($property, $this->_propertiesValues);
-    }
+	{
+		return array_key_exists($property, $this->_propertiesValues);
+	}
 
 	/**
 	 * Convert object to string

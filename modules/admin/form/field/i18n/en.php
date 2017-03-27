@@ -3,10 +3,11 @@
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Administration center form fields',

@@ -3,18 +3,19 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Order_Item_Model
  *
- * Типы твоаров:
- * 0 - Товар
- * 1 - Доставка
- * 2 - Пополнение лицевого счета
- * 3 - Списание бонусов в счет оплаты счета
+ * Типы товаров:
+ * 0 - Товар,
+ * 1 - Доставка,
+ * 2 - Пополнение лицевого счета,
+ * 3 - Списание бонусов в счет оплаты счета.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Item_Model extends Core_Entity
 {

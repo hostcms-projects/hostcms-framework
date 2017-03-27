@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -44,27 +45,10 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 				return TRUE;
 			}
 
-			ob_start();
-
-			// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
-			array_unshift($this->_children,
-				Admin_Form_Entity::factory('Title')
-					->name($this->title)
-				);
-
-			foreach ($this->_children as $oAdmin_Form_Entity)
-			{
-				$oAdmin_Form_Entity->execute();
-			}
-
 			$oShopDelivery = Core_Entity::factory('Shop_Delivery', Core_Array::getGet('delivery_id', 0));
 
 			$this->addMessage(
-					Core_Message::get(Core::_("Shop_Delivery_Condition.import_delivery_result", $this->import($aFileData['tmp_name'], $oShopDelivery)))
-				);
-
-			$this->addContent(
-				ob_get_clean()
+				Core_Message::get(Core::_("Shop_Delivery_Condition.import_delivery_result", $this->import($aFileData['tmp_name'], $oShopDelivery)))
 			);
 
 			return TRUE;

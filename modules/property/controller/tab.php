@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Properties.
  *
- * @package HostCMS 6\Property
+ * @package HostCMS
+ * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -34,6 +35,15 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	protected $_Admin_Form_Controller = NULL;
 
 	/**
+	 * Get _Admin_Form_Controller
+	 * @return Admin_Form_Controller
+	 */
+	public function getAdmin_Form_Controller()
+	{
+		return $this->_Admin_Form_Controller;
+	}
+	
+	/**
 	 * Constructor.
 	 * @param Admin_Form_Controller $Admin_Form_Controller controller
 	 */
@@ -55,7 +65,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 */
 	static public function factory(Admin_Form_Controller $Admin_Form_Controller)
 	{
-		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__;
 		//die($className);
 
 		if (!class_exists($className))
@@ -137,11 +147,11 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		return $this;
 	}
 
-	protected function _imgBox($oAdmin_Form_Entity, $oProperty, $addFunction = '$.cloneProperty', $deleteOnclick = '$.deleteNewProperty(this)')
+	public function imgBox($oAdmin_Form_Entity, $oProperty, $addFunction = '$.cloneProperty', $deleteOnclick = '$.deleteNewProperty(this)')
 	{
 		$oAdmin_Form_Entity
-			->add($this->_getImgAdd($oProperty, $addFunction))
-			->add($this->_getImgDelete($deleteOnclick));
+			->add($this->getImgAdd($oProperty, $addFunction))
+			->add($this->getImgDelete($deleteOnclick));
 
 		return $this;
 	}
@@ -152,7 +162,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param string $function function name
 	 * @return string
 	 */
-	protected function _getImgAdd($oProperty, $addFunction = '$.cloneProperty')
+	public function getImgAdd($oProperty, $addFunction = '$.cloneProperty')
 	{
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
@@ -173,7 +183,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param string $onclick onclick attribute value
 	 * @return string
 	 */
-	protected function _getImgDelete($onclick = '$.deleteNewProperty(this)')
+	public function getImgDelete($onclick = '$.deleteNewProperty(this)')
 	{
 		ob_start();
 		Core::factory('Core_Html_Entity_Img')
@@ -190,10 +200,10 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	}
 
 	/**
-	  * Get path to delete image
-	  * @return string
-	  */
-	protected function _getImgDeletePath()
+	 * Get path to delete image
+	 * @return string
+	 */
+	public function getImgDeletePath()
 	{
 		return "res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { $.deleteProperty(this, {path: '{$this->_Admin_Form_Controller->getPath()}', action: 'deletePropertyValue', datasetId: '{$this->_datasetId}', objectId: '{$this->_object->id}'}) } else {return false}";
 	}
@@ -204,6 +214,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param object $parentObject
 	 * @hostcms-event Property_Controller_Tab.onBeforeAddFormEntity
 	 * @hostcms-event Property_Controller_Tab.onAfterCreatePropertyListValues
+	 * @hostcms-event Property_Controller_Tab.onSetPropertyType
 	 */
 	protected function _setPropertyDirs($parent_id = 0, $parentObject)
 	{
@@ -359,7 +370,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 									: ' col-sm-12 col-md-12 col-lg-12')
 							));
 
-						//$oProperty->multiple && $oAdmin_Form_Entity->add($this->_getImgAdd($oProperty));
+						//$oProperty->multiple && $oAdmin_Form_Entity->add($this->getImgAdd($oProperty));
 
 						// Значений св-в нет для объекта
 						if (count($aProperty_Values) == 0)
@@ -374,7 +385,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 									->add($oAdmin_Form_Entity)
 							);
 
-							$oProperty->multiple && $this->_imgBox($oAdmin_Form_Entity, $oProperty);
+							$oProperty->multiple && $this->imgBox($oAdmin_Form_Entity, $oProperty);
 
 							Core_Event::notify('Property_Controller_Tab.onBeforeAddFormEntity', $this, array($oAdmin_Form_Entity, $oAdmin_Form_Entity_Section, $oProperty));
 						}
@@ -460,7 +471,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								);
 
 								// Визуальный редактор клонировать запрещено
-								$oProperty->multiple && $oProperty->type != 6 && $this->_imgBox($oNewAdmin_Form_Entity, $oProperty, '$.cloneProperty', $this->_getImgDeletePath());
+								$oProperty->multiple && $oProperty->type != 6 && $this->imgBox($oNewAdmin_Form_Entity, $oProperty, '$.cloneProperty', $this->getImgDeletePath());
 							}
 						}
 					}
@@ -547,10 +558,11 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				break;
 
 				default:
-					throw new Core_Exception(
+					/*throw new Core_Exception(
 						Core::_('Property.type_does_not_exist'),
 							array('%d' => $oProperty->type)
-					);
+					);*/
+					Core_Event::notify('Property_Controller_Tab.onSetPropertyType', $this, array($oAdmin_Form_Entity_Section, $oProperty, $aProperty_Values));
 			}
 		}
 
@@ -657,13 +669,13 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->add($oAdmin_Form_Entity_InfGroups)
 			->add($oAdmin_Form_Entity_InfItems);
 
-		$oProperty->multiple && $this->_imgBox(
+		$oProperty->multiple && $this->imgBox(
 			$oDiv_Group,
 			$oProperty,
 			'$.clonePropertyInfSys',
 			!$bIsNullValue
-				? $this->_getImgDeletePath()
-				: $this->_getImgDelete()
+				? $this->getImgDeletePath()
+				: $this->getImgDelete()
 		);
 
 		$oAdmin_Form_Entity_Section
@@ -763,13 +775,13 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			->add($oAdmin_Form_Entity_Shop_Groups)
 			->add($oAdmin_Form_Entity_Shop_Items);
 
-		$oProperty->multiple && $this->_imgBox(
+		$oProperty->multiple && $this->imgBox(
 			$oDiv_Group,
 			$oProperty,
 			'$.clonePropertyInfSys',
 			!$bIsNullValue
-				? $this->_getImgDeletePath()
-				: $this->_getImgDelete()
+				? $this->getImgDeletePath()
+				: $this->getImgDelete()
 		);
 
 		$oAdmin_Form_Entity_Section
@@ -793,6 +805,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 	/**
 	 * Apply object property
+	 * @hostcms-event Property_Controller_Tab.onApplyObjectProperty
 	 */
 	public function applyObjectProperty()
 	{
@@ -971,10 +984,11 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				break;
 
 				default:
-					throw new Core_Exception(
+					/*throw new Core_Exception(
 						Core::_('Property.type_does_not_exist'),
 							array('%d' => $oProperty->type)
-					);
+					);*/
+					Core_Event::notify('Property_Controller_Tab.onApplyObjectProperty', $this, array($oProperty, $aProperty_Values));
 			}
 		}
 	}

@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 {
@@ -57,7 +58,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 			// Change to Font Awesome
 			if (strlen($oAdmin_Form_Field->ico))
 			{
-				$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field->ico) . '" title="' . $fieldName .  '" />';
+				$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field->ico) . '" title="' . $fieldName . '" />';
 			}
 
 			$oAdmin_Form_Field->allow_sorting
@@ -199,7 +200,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 							$date_to = Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}", NULL);
 							$date_to = htmlspecialchars($date_to);
 
-							?><input name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="17"  class="form-control input-sm calendar_field" type="text" />
+							?><input name="admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" size="17" class="form-control input-sm calendar_field" type="text" />
 							<div><input name="admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_to_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_to?>" size="17" class="form-control input-sm calendar_field" type="text" /></div>
 							<script type="text/javascript">
 							(function($) {
@@ -309,7 +310,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 					}
 					catch (Exception $e)
 					{
-						Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
+						Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
 						$key_field_value = NULL;
 					}
 
@@ -385,7 +386,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										?></div></div><?php
 									break;
 									case 2: // Поле ввода.
-										?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>"  onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" class="form-control input-xs" /><?php
+										?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>" onchange="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight()" class="form-control input-xs" /><?php
 									break;
 									case 3: // Checkbox.
 										?><input type="checkbox" name="<?php echo $element_name?>" id="<?php echo $element_name?>" <?php echo intval($value) ? 'checked="checked"' : ''?> onclick="$.setCheckbox('<?php echo $windowId?>', 'check_<?php echo $datasetKey?>_<?php echo $key_field_value?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $datasetKey?>_<?php echo $key_field_value?>').toggleHighlight();" value="1" /><?php
@@ -630,7 +631,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 							}
 							catch (Exception $e)
 							{
-								Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
+								Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
 							}
 							?></td><?php
 						}

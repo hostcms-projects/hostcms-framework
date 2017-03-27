@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * XSL.
+ * Xsl_Dir_Model
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Dir_Model extends Core_Entity
 {

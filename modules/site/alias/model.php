@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Sites.
+ * Site_Alias_Model
  *
- * @package HostCMS 6\Site
+ * @package HostCMS
+ * @subpackage Site
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -216,8 +217,8 @@ class Site_Alias_Model extends Core_Entity
 
 	/**
 	 * Get alias by name
-	 * @param string $name name
-	 * @return Site_Alias_Model|NULL
+	 * @param string $name
+	 * @return self|NULL
 	 */
 	public function getByName($name)
 	{
@@ -231,13 +232,17 @@ class Site_Alias_Model extends Core_Entity
 		if (count($aSiteAlias) > 0)
 		{
 			$aSiteAlias[0]->name = $aSiteAlias[0]->alias_name_without_mask;
-
 			return $aSiteAlias[0];
 		}
 
 		return NULL;
 	}
 
+	/**
+	 * Find alias by name with mask
+	 * @param string $name Alias, e.g. '*.site.ru'
+	 * @return self|NULL
+	 */
 	public function findAlias($aliasName)
 	{
 		$this->queryBuilder()
@@ -259,7 +264,7 @@ class Site_Alias_Model extends Core_Entity
 		$newAliasName = $this->ReplaceMask($aliasName);
 
 		// Если в переданном алиасе небыло *.
-		if (mb_strpos($aliasName, '*.') === FALSE)
+		if (strpos($aliasName, '*.') === FALSE)
 		{
 			$newAliasName = "*." . $aliasName;
 			return $this->findAlias($newAliasName);

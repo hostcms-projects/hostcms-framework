@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Diagrams
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Diagram extends Core_Servant_Properties
 {
@@ -573,7 +574,7 @@ class Core_Diagram extends Core_Servant_Properties
 				: $y2 + abs($min_val_y) * $koef_y;
 		}
 
-		// Ось x  и построение графика
+		// Ось x и построение графика
 		// Максимальное количество делений по оси х
 		$max_division_x = floor(($x2 - $x1) /($min_division_x));
 

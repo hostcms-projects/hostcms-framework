@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Abstract HTTP
  *
- * @package HostCMS 6\Core\Http
+ * @package HostCMS
+ * @subpackage Core\Http
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -21,6 +22,11 @@ abstract class Core_Http
 	{
 		return __CLASS__ . '_' . ucfirst($driver);
 	}
+
+	/**
+	 * Original Config
+	 */
+	protected $_originalConfig = NULL;
 
 	/**
 	 * Register an existing instance as a singleton.
@@ -49,6 +55,17 @@ abstract class Core_Http
 		return $oDriver->config($aConfig[$name]);
 	}
 
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct($config)
+	{
+		$this->_originalConfig = $config;
+
+		$this->_init();
+	}
+
 	/**
 	 * Additional parameters
 	 * @var array
@@ -64,6 +81,15 @@ abstract class Core_Http
 	{
 		$this->_config = $array;
 		return $this;
+	}
+
+	/**
+	 * Get config
+	 * @return array
+	 */
+	public function getConfig()
+	{
+		return $this->_config;
 	}
 
 	/**
@@ -94,14 +120,6 @@ abstract class Core_Http
 	abstract protected function _execute($host, $path, $query, $scheme = 'http');
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct()
-	{
-		$this->_init();
-	}
-
-	/**
 	 * Clear object
 	 *
 	 * @return self
@@ -111,7 +129,7 @@ abstract class Core_Http
 		$this->_additionalHeaders = $this->_data = array();
 		$this->_url = $this->_referer = $this->_headers = $this->_body = NULL;
 
-		return $this->_init();
+		return $this->config($this->_originalConfig)->_init();
 	}
 
 	/**
@@ -131,7 +149,7 @@ abstract class Core_Http
 			->additionalHeader('Accept-Charset', 'windows-1251,utf-8;q=0.7,*;q=0.7')
 			->additionalHeader('Accept-Language', 'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3')
 			//->additionalHeader('Keep-Alive', '300')
-			->additionalHeader('Accept', 'text/html,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,**;q=0.5');
+			->additionalHeader('Accept', 'text/html,application/xml,application/xhtml+xml;q=0.9,text/plain;q=0.8,*/*;q=0.7');
 
 		return $this;
 	}

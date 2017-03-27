@@ -59,7 +59,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * }
  * </code>
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -1302,7 +1303,7 @@ class Core_ORM
 	 * @return boolean
 	 */
 	public function __isset($property)
-    {
+	{
 		$lowerProperty = strtolower($property);
 
 		if (isset($this->_relationCache[$lowerProperty]) || isset($this->_relations[$lowerProperty]))
@@ -1326,8 +1327,8 @@ class Core_ORM
 			return TRUE;
 		}
 
-        return FALSE;
-    }
+		return FALSE;
+	}
 
 	/**
 	 * Run when writing data to inaccessible properties
@@ -1361,8 +1362,10 @@ class Core_ORM
 
 			$this->setValues(array($property => $value), $changed);
 
-			// If property was changed
-			$changed && $this->_saved = FALSE;
+			// If property was changed. _saved is NULL after __construct
+			!is_null($this->_saved)
+				&& $changed
+				&& $this->_saved = FALSE;
 
 			return $this;
 		}

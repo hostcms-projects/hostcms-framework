@@ -3,10 +3,11 @@
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Administration center languages',
@@ -22,10 +23,10 @@ return array(
 	'sorting' => '<acronym title="Language order number in the languages sorting list">Sorting order</acronym>',
 	'id' => 'Id',
 
-	'edit_success' =>  'Administration center language information modified successfully!',
+	'edit_success' => 'Administration center language information modified successfully!',
 	'edit_error' => 'Error! Administration center language information has not been modified!',
 
-	'apply_success' =>  'Administration center language information modified successfully!',
+	'apply_success' => 'Administration center language information modified successfully!',
 	'apply_error' => 'Error! Administration center language information has not been modified!',
 
 	'markDeleted_success' => 'Administration center language deleted successfully!',

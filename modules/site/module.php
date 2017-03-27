@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Sites.
+ * Site Module.
  *
- * @package HostCMS 6\Site
+ * @package HostCMS
+ * @subpackage Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +21,7 @@ class Site_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-02-03';
+	public $date = '2016-03-03';
 	/**
 	 * Module name
 	 * @var string

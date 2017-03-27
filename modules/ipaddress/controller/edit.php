@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * IP addresses.
+ * Ipaddress Backend Editing Controller.
  *
- * @package HostCMS 6\Ipaddress
+ * @package HostCMS
+ * @subpackage Ipaddress
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

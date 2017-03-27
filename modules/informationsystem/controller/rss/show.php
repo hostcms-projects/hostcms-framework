@@ -24,10 +24,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 		->show();
  * </code>
  *
- * @package HostCMS 6\Informationsystem
+ * @package HostCMS
+ * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Rss_Show extends Core_Controller
 {

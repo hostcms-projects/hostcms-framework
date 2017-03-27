@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Site users.
+ * Site User. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Siteuser_Module extends Siteuser_Module{
 	/**
@@ -59,7 +60,7 @@ class Skin_Bootstrap_Module_Siteuser_Module extends Siteuser_Module{
 				<div class="databox-left bg-white">
 					<div class="databox-sparkline">
 						<span id="siteuserWidget" data-height="40px" data-width="100%" data-barcolor="#57b5e3" data-negbarcolor="#a0d468" data-zerocolor="#d73d32"
-							  data-barwidth="5px" data-barspacing="1px">
+							 data-barwidth="5px" data-barspacing="1px">
 							<?php echo implode(',', $aCount)?>
 						</span>
 					</div>

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Discount_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
  class Shop_Discount_Model extends Core_Entity
 {
@@ -98,11 +99,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 		$this->id = $primaryKey;
 
-		$aShop_Item_Discounts = $this->Shop_Item_Discounts->findAll(FALSE);
-		foreach($aShop_Item_Discounts as $oShop_Item_Discount)
-		{
-			$oShop_Item_Discount->delete();
-		}
+		$this->Shop_Item_Discounts->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Libs.
+ * Constant_Dir_Model
  *
- * @package HostCMS 6\Lib
+ * @package HostCMS 6
+ * @subpackage Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Constant_Dir_Model extends Core_Entity
 {

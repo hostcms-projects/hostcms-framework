@@ -5,16 +5,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 {
 	/**
 	 * Show form content in administration center
 	 * @return self
+	 * @hostcms-event Admin_Form_Controller.onBeforeShowActions
 	 */
 	public function showContent()
 	{
@@ -66,7 +68,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						// Change to Font Awesome
 						if (strlen($oAdmin_Form_Field_Changed->ico))
 						{
-							$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field_Changed->ico) . '" title="' . $fieldName .  '"></i>';
+							$fieldName = '<i class="' . htmlspecialchars($oAdmin_Form_Field_Changed->ico) . '" title="' . $fieldName . '"></i>';
 						}
 
 						$oAdmin_Form_Field_Changed->allow_sorting
@@ -337,7 +339,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						}
 						catch (Exception $e)
 						{
-							Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
+							Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
 							$entityKey = NULL;
 						}
 
@@ -666,7 +668,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 								}
 								catch (Exception $e)
 								{
-									Core_Message::show('Caught exception: ' .  $e->getMessage() . "\n", 'error');
+									Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
 								}
 
 								// Badges
@@ -703,7 +705,13 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 								$iActionsCount = 0;
 
-								foreach ($aAllowed_Admin_Form_Actions as $key => $o_Admin_Form_Action)
+								// Подмена массива действий через событие
+								$aActions = Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
+								
+								!is_array($aActions)
+									&& $aActions = $aAllowed_Admin_Form_Actions;
+								
+								foreach ($aActions as $key => $o_Admin_Form_Action)
 								{
 									// Отображаем действие, только если разрешено.
 									if (!$o_Admin_Form_Action->single)
@@ -1120,7 +1128,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 					$href = $this->getAdminLoadHref($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
 					$onclick = $this->getAdminLoadAjax($this->getPath(), NULL, NULL, NULL, NULL, $total_page - 1);
 
-					$oCore_Html_Entity_A  = Core::factory('Core_Html_Entity_A')
+					$oCore_Html_Entity_A = Core::factory('Core_Html_Entity_A')
 						->href($href)
 						->onclick($onclick)
 						->value('…');

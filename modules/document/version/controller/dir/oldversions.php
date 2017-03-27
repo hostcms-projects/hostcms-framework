@@ -6,10 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Documents.
  * Контроллер удаления нетекущих версий документа
  *
- * @package HostCMS 6\Document
+ * @package HostCMS
+ * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Version_Controller_Dir_Oldversions extends Admin_Form_Action_Controller
 {
@@ -60,7 +61,7 @@ class Document_Version_Controller_Dir_Oldversions extends Admin_Form_Action_Cont
 		$oDocument_Dirs->queryBuilder()
 			->where('parent_id', '=', $document_dir_id);
 
-		$aDocument_Dirs =  $oDocument_Dirs->findAll(FALSE);
+		$aDocument_Dirs = $oDocument_Dirs->findAll(FALSE);
 		
 		$result = array();
 		foreach ($aDocument_Dirs as $oDocument_Dir)

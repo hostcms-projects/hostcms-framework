@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms. Bootstrap.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_Form_Action_Controller_Type_Edit_Show
 {
@@ -95,9 +96,13 @@ class Skin_Bootstrap_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_F
 	/**
 	 * Add save and apply buttons
 	 * @return Admin_Form_Entity_Buttons
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit_Show.onBeforeAddButtons
+	 * @hostcms-event Admin_Form_Action_Controller_Type_Edit_Show.onAfterAddButtons
 	 */
 	protected function _addButtons()
 	{
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit_Show.onBeforeAddButtons', $this);
+
 		if ($this->buttons === TRUE)
 		{
 			// Кнопки
@@ -131,6 +136,8 @@ class Skin_Bootstrap_Admin_Form_Action_Controller_Type_Edit_Show extends Admin_F
 		{
 			$oAdmin_Form_Entity_Buttons = $this->buttons;
 		}
+
+		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit_Show.onAfterAddButtons', $this, array($oAdmin_Form_Entity_Buttons));
 
 		return $oAdmin_Form_Entity_Buttons;
 	}

@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Search.
+ * Search. Backend's Index Pages and Widget.
  *
- * @package HostCMS 6\Skin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 	/**
@@ -32,7 +33,6 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 					<div class="databox-piechart">
 						<?php
 						$iSearchPagesOnCurrentSite = Search_Controller::instance()->getPageCount(CURRENT_SITE);
-						
 						// Общее количество проиндексированных страниц
 						//$iSearchPagesTotal = Search_Controller::instance()->getPageCount(NULL);
 
@@ -55,7 +55,7 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 		</div>
 		
 		<script>
-		$(function() {
+		/*$(function() {
 			setTimeout(function() {
 
 					var searchWidget = $('#searchWidget');
@@ -79,7 +79,7 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module{
 					});
 
 			}, 500);
-		});
+		});*/
 		</script>
 		<?php
 	}}

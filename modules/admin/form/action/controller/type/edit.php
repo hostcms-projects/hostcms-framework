@@ -3,13 +3,15 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Admin forms.
- * Типовой контроллер редактирования
+ * Typical editing controller
+ * 
+ * Типовой контроллер редактирования.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controller
 {

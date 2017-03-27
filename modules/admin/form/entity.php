@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_Form_Entity extends Core_Html_Entity
 {
@@ -45,7 +46,7 @@ abstract class Admin_Form_Entity extends Core_Html_Entity
 	 */
 	static public function factory($className)
 	{
-		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__ . '_' . ucfirst($className);
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__ . '_' . ucfirst($className);
 
 		if (!class_exists($className))
 		{

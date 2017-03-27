@@ -3,7 +3,8 @@
 /**
  * Install.
  *
- * @package HostCMS 6\Install
+ * @package HostCMS
+ * @subpackage Install
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Sendmail driver
  *
- * @package HostCMS 6\Core\Mail
+ * @package HostCMS
+ * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

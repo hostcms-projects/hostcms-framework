@@ -6,7 +6,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * IMAP, POP3 and NNTP
  * http://php.net/manual/en/book.imap.php
  *
- * @package HostCMS 6\Core\Mail
+ * @package HostCMS
+ * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -130,8 +131,6 @@ class Core_Mail_Imap extends Core_Servant_Properties
 		// Формируем имя ящика
 		$mailbox = '{' . $this->server . ':' . $this->port . $this->_protocol . '}INBOX';
 
-		//echo $this->login, '  *** ', $this->password, '  **** ', $mailbox, ' ';
-
 		$aParam = $this->ssl
 			? array('DISABLE_AUTHENTICATOR' => 'GSSAPI') // PLAIN
 			: array();
@@ -173,7 +172,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			{
 				// skip broken message
 				$i++;
-			    continue;
+				continue;
 			}
 
 			// Метаданные сообщения (структура)
@@ -589,7 +588,7 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			return FALSE;
 		}*/
 		// Проверка на равно, который разрешен в начале или в конце строки
-		if (mb_strpos(mb_substr($string, 2, ($length - 4)),  '=') === FALSE)
+		if (mb_strpos(mb_substr($string, 2, ($length - 4)), '=') === FALSE)
 		{
 			return FALSE;
 		}

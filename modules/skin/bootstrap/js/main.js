@@ -531,12 +531,30 @@ function isEmpty(str) {
 			});
 			jNewObject.find("input").val('');
 
-			//jNewObject.find("img#delete").attr('onclick', "jQuery.deleteNewProperty(this)");
 			jNewObject.insertAfter(jSpecialPrice);
 		},
 		deleteNewSpecialprice: function(object)
 		{
 			var jObject = jQuery(object).closest('.spec_prices').remove();
+		},
+		cloneDeliveryOption: function(windowId, cloneDelete)
+		{
+			var jDeliveryOption = jQuery(cloneDelete).closest('.delivery_options'),
+			jNewObject = jDeliveryOption.clone();
+
+			// Change input name
+			jNewObject.find(':regex(name, ^\\S+_\\d+$)').each(function(index, object){
+				var reg = /^(\S+)_(\d+)$/;
+				var arr = reg.exec(object.name);
+				jQuery(object).prop('name', arr[1] + '_' + '[]');
+			});
+			jNewObject.find("input,select").val('');
+
+			jNewObject.insertAfter(jDeliveryOption);
+		},
+		deleteNewDeliveryOption: function(object)
+		{
+			var jObject = jQuery(object).closest('.delivery_options').remove();
 		},
 		clonePropertyInfSys: function(windowId, index)
 		{
@@ -1186,7 +1204,8 @@ function ShowExport(windowId, index)
 		shop_groups_parent_id = 'none',
 		export_external_properties_allow_items = 'none',
 		export_external_properties_allow_groups = 'none',
-		export_modifications_allow = 'none'
+		export_modifications_allow = 'none',
+		property_block = 'none'
 	;
 
 	switch(index)
@@ -1203,6 +1222,7 @@ function ShowExport(windowId, index)
 			export_price_separator = 'block';
 			order_begin_date = 'block';
 			order_end_date = 'block';
+			property_block = 'block';
 			import_price_encoding = 'block';
 		break;
 		case 2:
@@ -1220,6 +1240,7 @@ function ShowExport(windowId, index)
 	$("#"+windowId+" #export_external_properties_allow_items").css('display', export_external_properties_allow_items);
 	$("#"+windowId+" #export_external_properties_allow_groups").css('display', export_external_properties_allow_groups);
 	$("#"+windowId+" #export_modifications_allow").css('display', export_modifications_allow);
+	$("#"+windowId+" #property_block").css('display', property_block);
 }
 
 function ShowRowsLibProperty(windowId, index)

@@ -40,9 +40,16 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		$oCore_Response->header('X-Powered-By', 'HostCMS');
 
-		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
-
 		$this->_uri == '' && $this->_uri = '/';
+
+		if ($this->_uri == '/index.php' && !Core::isIIS())
+		{
+			$oCore_Response
+				->status(301)
+				->header('Location', '/');
+
+			return $oCore_Response;
+		}
 
 		// Путь заканчивается на слэш
 		if (substr($this->_uri, -1) == '/'
@@ -96,6 +103,8 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 			return $oCore_Response;
 		}
+
+		$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 
 		// Отдача статичного кэша в случае, если правила mod_rewrite не сработали
 		// из-за %{HTTP_COOKIE} !^.*PHPSESSID=.*$
@@ -383,7 +392,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		{
 			$oCore_Page->error404();
 		}
-		
+
 		// Динамическая страница
 		if ($oStructure->type == 1)
 		{
@@ -547,7 +556,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		!$bIsUtf8 && $sContent = $this->_iconv($oSite->coding, $sContent);
 
-		if ($bCheckCache)
+		if ($bCheckCache && $oCore_Response->getStatus() == 200)
 		{
 			// Проверяем, нужно ли очищать кэш
 			if ($oSite->html_cache_clear_probability > 0 && rand(0, $oSite->html_cache_clear_probability) == 0)

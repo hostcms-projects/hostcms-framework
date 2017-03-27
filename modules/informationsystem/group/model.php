@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Information systems.
+ * Informationsystem_Group_Model
  *
- * @package HostCMS 6\Informationsystem
+ * @package HostCMS
+ * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -769,7 +770,8 @@ class Informationsystem_Group_Model extends Core_Entity
 
 			if ($oCurrentAlias)
 			{
-				$href = 'http://' . $oCurrentAlias->name
+				$href = ($this->Informationsystem->Structure->https ? 'https://' : 'http://')
+					. $oCurrentAlias->name
 					. $this->Informationsystem->Structure->getPath()
 					. $this->getPath();
 
@@ -847,7 +849,8 @@ class Informationsystem_Group_Model extends Core_Entity
 		$oSiteAlias = $this->Informationsystem->Site->getCurrentAlias();
 		if ($oSiteAlias)
 		{
-			$oSearch_Page->url = 'http://' . $oSiteAlias->name
+			$oSearch_Page->url = ($this->Informationsystem->Structure->https ? 'https://' : 'http://')
+				. $oSiteAlias->name
 				. $this->Informationsystem->Structure->getPath()
 				. $this->getPath();
 		}
@@ -941,7 +944,7 @@ class Informationsystem_Group_Model extends Core_Entity
 	 *	$oInformationsystem_Groups->queryBuilder()
 	 *		->where('parent_id', '=', $informationsystem_group_id);
 	 *
-	 *	$aChildrenId =  $oInformationsystem_Groups->getGroupChildrenId();
+	 *	$aChildrenId = $oInformationsystem_Groups->getGroupChildrenId();
 	 *	foreach ($aChildrenId as $iGroupId)
 	 *	{
 	 *		var_dump($iGroupId);

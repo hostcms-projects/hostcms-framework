@@ -15,10 +15,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - siteuser_id($id) идентификатор пользователя сайта
  * - checkStock(TRUE|FALSE) проверять наличие товара на складе, по умолчанию FALSE
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Controller extends Core_Servant_Properties
 {

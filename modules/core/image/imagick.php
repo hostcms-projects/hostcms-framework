@@ -7,10 +7,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * http://www.php.net/manual/book.imagick.php
  *
- * @package HostCMS 6\Core
+ * @package HostCMS
+ * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Image_Imagick extends Core_Image
 {

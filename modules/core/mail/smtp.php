@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * SMTP driver
  *
- * @package HostCMS 6\Core\Mail
+ * @package HostCMS
+ * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -29,7 +30,7 @@ class Core_Mail_Smtp extends Core_Mail
 		$header .= "To: <{$to}>{$sSingleSeparator}";
 		$header .= $additional_headers . $sSingleSeparator . $sSingleSeparator;
 
-		$header .=  $message . $sSingleSeparator;
+		$header .= $message . $sSingleSeparator;
 		$timeout = 5;
 
 		$fp = function_exists('stream_socket_client')

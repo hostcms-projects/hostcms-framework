@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * SEO.
  *
- * @package HostCMS 6\Seo
+ * @package HostCMS
+ * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -281,7 +282,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				?>
 				<script type="text/javascript">
 				// Настройки графиков
-				var gridbordercolor = "#eee",  optionsForGraph = {
+				var gridbordercolor = "#eee", optionsForGraph = {
 						series: {
 							lines: {show: true}
 						},

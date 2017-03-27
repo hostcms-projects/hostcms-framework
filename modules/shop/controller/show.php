@@ -73,7 +73,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 	->show();
  * </code>
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -1323,6 +1324,10 @@ class Shop_Controller_Show extends Core_Controller
 				}
 			}
 		}
+		elseif (is_null($path))
+		{
+			return $this->error404();
+		}
 
 		// Ограничение на список товаров
 		//!$this->item && is_null($this->tag) && $this->forbidSelectModifications();
@@ -1332,8 +1337,6 @@ class Shop_Controller_Show extends Core_Controller
 
 		return $this;
 	}
-
-
 
 	/**
 	 * Define handler for 404 error
@@ -1794,13 +1797,13 @@ class Shop_Controller_Show extends Core_Controller
 			Core::factory('Core_Xml_Entity')
 				->name('min_price')
 				->value(
-					round($rows['min'])
+					floor($rows['min'])
 				)
 		)->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('max_price')
 				->value(
-					round($rows['max'])
+					ceil($rows['max'])
 				)
 		);
 

@@ -5,7 +5,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Market.
  *
- * @package HostCMS 6\Market
+ * @package HostCMS
+ * @subpackage Market
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -985,12 +986,12 @@ class Market_Controller extends Core_Servant_Properties
 				<div class="databox-top bg-white padding-10">
 					<div class="row">
 						<div class="col-lg-4 col-sm-4 col-xs-4">
-							<a target="_blank" href="' .  $object->url . '">
+							<a target="_blank" href="' . $object->url . '">
 								<img src="' . $object->image_small . '" style="width:80px; height:80px;" class="market-item-image bordered-3 bordered-white" />
 							</a>
 						</div>
 						<div class="col-lg-8 col-sm-8 col-xs-8 text-align-left padding-10">
-							<span class="databox-header carbon no-margin"><a target="_blank" href="' .  $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
+							<span class="databox-header carbon no-margin"><a target="_blank" href="' . $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
 							<span class="databox-text lightcarbon no-margin"> ' . htmlspecialchars($object->category_name) . ' </span>
 						</div>
 					</div>
@@ -1034,7 +1035,7 @@ class Market_Controller extends Core_Servant_Properties
 			if ($object->paid && !$object->installed || $object->price == 0)
 			{
 				$sHtml .= '
-					<a class="btn btn-labeled btn-darkorange pull-right" onclick="res =confirm(\'' . Core::_('Market.install_warning') . '\'); if (res){ $.adminLoad({path:\'/admin/market/index.php\',action:\'\',operation:\'\',additionalParams:\'install=' . $object->id . '&category_id=' . $this->category_id . '&current=' .  $this->page . '\',windowId:\'' . $sWindowId . '\'}); } return false"  href="/admin/market/index.php?hostcms[window]=' . $sWindowId . '&install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '">
+					<a class="btn btn-labeled btn-darkorange pull-right" onclick="res =confirm(\'' . Core::_('Market.install_warning') . '\'); if (res){ $.adminLoad({path:\'/admin/market/index.php\',action:\'\',operation:\'\',additionalParams:\'install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '\',windowId:\'' . $sWindowId . '\'}); } return false" href="/admin/market/index.php?hostcms[window]=' . $sWindowId . '&install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '">
 						<i class="btn-label fa fa-download"></i>
 						' . Core::_('Market.install') . '
 					</a>
@@ -1042,7 +1043,7 @@ class Market_Controller extends Core_Servant_Properties
 			}
 			else
 			{
-				$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' .  $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+				$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
 			}
 
 			$sHtml .= '</div>

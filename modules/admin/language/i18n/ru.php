@@ -3,10 +3,11 @@
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Языки центра администрирования',
@@ -22,10 +23,10 @@ return array(
 	'sorting' => '<acronym title="Порядковый номер языка в списке сортировки языков">Порядок сортировки</acronym>',
 	'id' => 'Идентификатор',
 
-	'edit_success' =>  'Информация о языке центра администрирования изменена!',
+	'edit_success' => 'Информация о языке центра администрирования изменена!',
 	'edit_error' => 'Ошибка! Информация о языке центра администрирования не изменена!',
 
-	'apply_success' =>  'Информация о языке центра администрирования изменена!',
+	'apply_success' => 'Информация о языке центра администрирования изменена!',
 	'apply_error' => 'Ошибка! Информация о языке центра администрирования не изменена!',
 
 	'markDeleted_success' => 'Язык центра администрирования успешно удален!',

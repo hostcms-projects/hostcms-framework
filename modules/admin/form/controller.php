@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Controller
 {
@@ -61,7 +62,7 @@ class Admin_Form_Controller
 	 */
 	static public function create(Admin_Form_Model $oAdmin_Form = NULL)
 	{
-		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_'  . __CLASS__;
+		$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__;
 
 		if (!class_exists($className))
 		{
@@ -360,7 +361,7 @@ class Admin_Form_Controller
 	/**
 	* Add external replacement
 	* Добавление внешней подстановки
-	* @param string $key name of  replacement
+	* @param string $key name of replacement
 	* @param string $value value of replacement
 	* @return self
 	*/
@@ -988,19 +989,33 @@ class Admin_Form_Controller
 								}
 								else
 								{
-									// Уже есть выше при проверке права доступа к действию, если действие было, то здесь также есть доступ
-									// Проверяем наличие действия с такими именем у формы
-									/*$oAdmin_Form_Action = $this->_Admin_Form->Admin_Form_Actions->getByName($actionName);
-									if (!is_null($oAdmin_Form_Action))
-									{*/
-										$actionResult = $oObject->$actionName();
-									/*}
+									Core_Event::notify('Admin_Form_Controller.onCall' . $actionName, $this, array($datasetKey, $oObject, $this->_operation));
+									
+									$eventResult = Core_Event::getLastReturn();
+									if (is_array($eventResult))
+									{
+										list($actionResult, $message, $content) = $eventResult;
+										
+										$this
+											->addMessage($message)
+											->addContent($content);
+									}
 									else
 									{
-										throw new Core_Exception('Action "%actionName" does not exist.',
-											array('%actionName' => $actionName)
-										);
-									}*/
+										// Уже есть выше при проверке права доступа к действию, если действие было, то здесь также есть доступ
+										// Проверяем наличие действия с такими именем у формы
+										/*$oAdmin_Form_Action = $this->_Admin_Form->Admin_Form_Actions->getByName($actionName);
+										if (!is_null($oAdmin_Form_Action))
+										{*/
+											$actionResult = $oObject->$actionName();
+										/*}
+										else
+										{
+											throw new Core_Exception('Action "%actionName" does not exist.',
+												array('%actionName' => $actionName)
+											);
+										}*/
+									}
 								}
 
 								// Действие вернуло TRUE, прерываем выполнение

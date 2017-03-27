@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Create an RSS 2.0 feed
  *
- * @package HostCMS 6\Core\Rss
+ * @package HostCMS
+ * @subpackage Core\Rss
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Rss
 {
@@ -132,9 +133,9 @@ class Core_Rss
 	}
 
 	/**
-	  * Show RSS with headers
-	  * @param string $rss content
-	  */
+	 * Show RSS with headers
+	 * @param string $rss content
+	 */
 	public function showWithHeader($rss)
 	{
 		$oCore_Response = new Core_Response();

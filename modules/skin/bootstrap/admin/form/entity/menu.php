@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 {
@@ -61,32 +62,23 @@ class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 
 		$oCore_Html_Entity_A = Core::factory('Core_Html_Entity_A');
 
-		if ($this->href && $this->onclick)
+		if (strlen($this->href)/*&& $this->onclick*/)
 		{
-			$oCore_Html_Entity_A
-				->href($this->href)
-				->onclick($this->onclick);
+			strlen($this->onclick) && $oCore_Html_Entity_A->onclick($this->onclick);
+			$oCore_Html_Entity_A->href($this->href);
 
 			!is_null($this->target) && $oCore_Html_Entity_A->target($this->target);
-			/*?><a href="<?php echo $this->href?>" onclick="<?php echo $this->onclick?>" ><?php*/
 		}
 		else
 		{
 			$oCore_Html_Entity_A
 				->class("btn {$aFirstColors[$index]}")
 				->set('data-toggle', 'dropdown');
-			/*?><a class="btn <?php echo $aFirstColors[$index]?>" data-toggle="dropdown"><?php*/
 		}
 
-		if ($this->icon)
-		{
-			$oCore_Html_Entity_A->add(
-				Core::factory('Core_Html_Entity_I')
-					->class("{$this->icon} icon-separator")
-			);
-
-			/*?><i class="<?php echo htmlspecialchars($this->icon)?> icon-separator"></i><?php*/
-		}
+		$this->icon && $oCore_Html_Entity_A->add(
+			Core::factory('Core_Html_Entity_I')->class("{$this->icon} icon-separator")
+		);
 
 		//$oCore_Html_Entity_A->value($this->name);
 

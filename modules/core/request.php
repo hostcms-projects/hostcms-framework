@@ -3,10 +3,11 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Incoming Http Request helper
+ * Incoming Http Request helper.
  * Вспомогательный класс для работы с данными и заголовоками входящего http-запроса
  *
- * @package HostCMS 6 Purchase on Yandex.Market
+ * @package HostCMS
+ * @subpackage Core
  * @author James V. Kotov
  * @copyright 2014
  * @version 1.0a
@@ -57,15 +58,15 @@ class Core_Request
 		if (is_null($this->_rawPost))
 		{
 			$this->_rawPost = strcasecmp(Core_Array::get($_SERVER, 'REQUEST_METHOD'), 'POST') == 0
-		        ? (isset($GLOBALS['HTTP_RAW_POST_DATA'])
+				? (isset($GLOBALS['HTTP_RAW_POST_DATA'])
 					? $GLOBALS['HTTP_RAW_POST_DATA']
 					: @file_get_contents("php://input")
 				)
 				: NULL;
 
-	  		$this->_rawPost = trim($this->_rawPost);
+			$this->_rawPost = trim($this->_rawPost);
 		}
-   		return $this->_rawPost;
+		return $this->_rawPost;
 	}
 
 	/**

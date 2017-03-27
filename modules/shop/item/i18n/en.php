@@ -2,7 +2,8 @@
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -69,6 +70,7 @@ return array(
 
 	'warehouse_header' => "Quantity of products in stocks",
 	'property_header' => "Shop properties",
+	'yandex_market_header' => "Yandex.Market export",
 	//'warehouse_item_count' => "Quantity of products in stock \"%s\"",
 	'siteuser_group_id' => '<acronym title="Group having access rights to product">Access group</acronym>',
 	'shop_users_group_parrent' => 'Like parent',
@@ -272,6 +274,9 @@ return array(
 	'item_width'=>'Width',
 	'item_height'=>'Height',
 	'apply_purchase_discount' => 'Take into account when calculating the purchase discount',
+	'delivery' => 'Delivery',
+	'pickup' => 'Pickup',
+	'store' => 'Offline Store',
 	'show_in_group'=>'Show property in group',
 	'show_in_item'=>'Show property in item',
 	'add_value'=>'Add the default property values ​​for the items with unset values',

@@ -2,7 +2,8 @@
 /**
  * Market.
  *
- * @package HostCMS 6\Market
+ * @package HostCMS
+ * @subpackage Market
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru

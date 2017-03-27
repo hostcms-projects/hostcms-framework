@@ -3,10 +3,11 @@
 /**
  * Constants.
  *
- * @package HostCMS 6\Constant
+ * @package HostCMS
+ * @subpackage Constant
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Константи',
@@ -23,7 +24,6 @@ return array(
 	'value' => "<acronym title = \"Значення константи\">Значення константи</acronym>",
 	'description' => "<acronym title = \"Опис константи\">Опис константи</acronym>",
 	'active' => "<acronym title = \"Параметр, який виявляє, чи використовується константа\">Активність константи</acronym>",
-	'add' => 'Додати',
 	'id' => 'Ідентифікатор',
 	'changeStatus_success' => 'Активність змінено',
 	'changeStatus_error' => 'Помилка зміни активності',

@@ -2,10 +2,11 @@
 /**
  * Documents.
  *
- * @package HostCMS 6\Document
+ * @package HostCMS
+ * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Сторінки та документи',
@@ -18,10 +19,8 @@ return array(
 	'deleteOldDocumentVersions_success' => 'Усі непотоінч версії документів даного розділу успішно видалені!',
 	'deleteAllDirOldVersion' => 'видалити непоточні версії документів розділу',
 	'documents' => 'Документ',
-	'add' => 'Додати',
 	'tab_1' => 'Атрибути документа',
 	'write_error' => 'Помилка запису файла',
-	'add' => 'Додавання документа',
 	'edit' => 'Редагування документа',
 	'name' => '<acronym title="Внутрішня назва документа в системі управління">Назва документа</acronym>',
 	'document_dir_id' => '<acronym title="Розділ для розмещення документа">Розділ</acronym>',

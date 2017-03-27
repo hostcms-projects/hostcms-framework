@@ -6,7 +6,15 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Online shop.
  * 2.0.8 - http://v8.1c.ru/edi/edi_stnd/90/CML208.XSD
  *
- * @package HostCMS 6\Shop
+ * Доступные методы:
+ *
+ * - importGroups(TRUE|FALSE) импортировать группы товаров, по умолчанию TRUE
+ * - createShopItems(TRUE|FALSE) создавать новые товары, по умолчанию TRUE
+ * - updateFields(array()) массив полей товара, которые необходимо обновлять при импорте CML товара, если не заполнен, то обновляются все поля. Пример массива array('marking', 'name', 'shop_group_id', 'text', 'description', 'images', 'taxes', 'shop_producer_id')
+ *
+ *
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -14,286 +22,22 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 {
 	/**
-	 * Коды валют для МойСклад
+	 * Allowed object properties
 	 * @var array
 	 */
-	protected $_aCurrencyCodes = array(
-		'971' => 'AFN',
-		'978' => 'EUR',
-		'008' => 'ALL',
-		'012' => 'DZD',
-		'840' => 'USD',
-		'978' => 'EUR',
-		'973' => 'AOA',
-		'951' => 'XCD',
-		'951' => 'XCD',
-		'032' => 'ARS',
-		'051' => 'AMD',
-		'533' => 'AWG',
-		'036' => 'AUD',
-		'978' => 'EUR',
-		'944' => 'AZN',
-		'044' => 'BSD',
-		'048' => 'BHD',
-		'050' => 'BDT',
-		'052' => 'BBD',
-		'974' => 'BYR',
-		'978' => 'EUR',
-		'084' => 'BZD',
-		'952' => 'XOF',
-		'060' => 'BMD',
-		'064' => 'BTN',
-		'356' => 'INR',
-		'068' => 'BOB',
-		'984' => 'BOV',
-		'840' => 'USD',
-		'977' => 'BAM',
-		'072' => 'BWP',
-		'578' => 'NOK',
-		'986' => 'BRL',
-		'840' => 'USD',
-		'096' => 'BND',
-		'975' => 'BGN',
-		'952' => 'XOF',
-		'108' => 'BIF',
-		'116' => 'KHR',
-		'950' => 'XAF',
-		'124' => 'CAD',
-		'132' => 'CVE',
-		'136' => 'KYD',
-		'950' => 'XAF',
-		'950' => 'XAF',
-		'990' => 'CLF',
-		'152' => 'CLP',
-		'156' => 'CNY',
-		'036' => 'AUD',
-		'036' => 'AUD',
-		'170' => 'COP',
-		'970' => 'COU',
-		'174' => 'KMF',
-		'950' => 'XAF',
-		'976' => 'CDF',
-		'554' => 'NZD',
-		'188' => 'CRC',
-		'952' => 'XOF',
-		'191' => 'HRK',
-		'931' => 'CUC',
-		'192' => 'CUP',
-		'532' => 'ANG',
-		'978' => 'EUR',
-		'203' => 'CZK',
-		'208' => 'DKK',
-		'262' => 'DJF',
-		'951' => 'XCD',
-		'214' => 'DOP',
-		'840' => 'USD',
-		'818' => 'EGP',
-		'222' => 'SVC',
-		'840' => 'USD',
-		'950' => 'XAF',
-		'232' => 'ERN',
-		'978' => 'EUR',
-		'230' => 'ETB',
-		'978' => 'EUR',
-		'238' => 'FKP',
-		'208' => 'DKK',
-		'242' => 'FJD',
-		'978' => 'EUR',
-		'978' => 'EUR',
-		'978' => 'EUR',
-		'953' => 'XPF',
-		'978' => 'EUR',
-		'950' => 'XAF',
-		'270' => 'GMD',
-		'981' => 'GEL',
-		'978' => 'EUR',
-		'936' => 'GHS',
-		'292' => 'GIP',
-		'978' => 'EUR',
-		'208' => 'DKK',
-		'951' => 'XCD',
-		'978' => 'EUR',
-		'840' => 'USD',
-		'320' => 'GTQ',
-		'826' => 'GBP',
-		'324' => 'GNF',
-		'952' => 'XOF',
-		'328' => 'GYD',
-		'332' => 'HTG',
-		'840' => 'USD',
-		'036' => 'AUD',
-		'978' => 'EUR',
-		'340' => 'HNL',
-		'344' => 'HKD',
-		'348' => 'HUF',
-		'352' => 'ISK',
-		'356' => 'INR',
-		'360' => 'IDR',
-		'960' => 'XDR',
-		'364' => 'IRR',
-		'368' => 'IQD',
-		'978' => 'EUR',
-		'826' => 'GBP',
-		'376' => 'ILS',
-		'978' => 'EUR',
-		'388' => 'JMD',
-		'392' => 'JPY',
-		'826' => 'GBP',
-		'400' => 'JOD',
-		'398' => 'KZT',
-		'404' => 'KES',
-		'036' => 'AUD',
-		'408' => 'KPW',
-		'410' => 'KRW',
-		'414' => 'KWD',
-		'417' => 'KGS',
-		'418' => 'LAK',
-		'978' => 'EUR',
-		'422' => 'LBP',
-		'426' => 'LSL',
-		'710' => 'ZAR',
-		'430' => 'LRD',
-		'434' => 'LYD',
-		'756' => 'CHF',
-		'978' => 'EUR',
-		'978' => 'EUR',
-		'446' => 'MOP',
-		'807' => 'MKD',
-		'969' => 'MGA',
-		'454' => 'MWK',
-		'458' => 'MYR',
-		'462' => 'MVR',
-		'952' => 'XOF',
-		'978' => 'EUR',
-		'840' => 'USD',
-		'978' => 'EUR',
-		'478' => 'MRO',
-		'480' => 'MUR',
-		'978' => 'EUR',
-		'965' => 'XUA',
-		'484' => 'MXN',
-		'979' => 'MXV',
-		'840' => 'USD',
-		'498' => 'MDL',
-		'978' => 'EUR',
-		'496' => 'MNT',
-		'978' => 'EUR',
-		'951' => 'XCD',
-		'504' => 'MAD',
-		'943' => 'MZN',
-		'104' => 'MMK',
-		'516' => 'NAD',
-		'710' => 'ZAR',
-		'036' => 'AUD',
-		'524' => 'NPR',
-		'978' => 'EUR',
-		'953' => 'XPF',
-		'554' => 'NZD',
-		'558' => 'NIO',
-		'952' => 'XOF',
-		'566' => 'NGN',
-		'554' => 'NZD',
-		'036' => 'AUD',
-		'840' => 'USD',
-		'578' => 'NOK',
-		'512' => 'OMR',
-		'586' => 'PKR',
-		'840' => 'USD',
-		'590' => 'PAB',
-		'840' => 'USD',
-		'598' => 'PGK',
-		'600' => 'PYG',
-		'604' => 'PEN',
-		'608' => 'PHP',
-		'554' => 'NZD',
-		'985' => 'PLN',
-		'978' => 'EUR',
-		'840' => 'USD',
-		'634' => 'QAR',
-		'978' => 'EUR',
-		'946' => 'RON',
-		'643' => 'RUB',
-		'810' => 'RUR',
-		'646' => 'RWF',
-		'978' => 'EUR',
-		'654' => 'SHP',
-		'951' => 'XCD',
-		'951' => 'XCD',
-		'978' => 'EUR',
-		'978' => 'EUR',
-		'951' => 'XCD',
-		'882' => 'WST',
-		'978' => 'EUR',
-		'678' => 'STD',
-		'682' => 'SAR',
-		'952' => 'XOF',
-		'941' => 'RSD',
-		'690' => 'SCR',
-		'694' => 'SLL',
-		'702' => 'SGD',
-		'532' => 'ANG',
-		'994' => 'XSU',
-		'978' => 'EUR',
-		'978' => 'EUR',
-		'090' => 'SBD',
-		'706' => 'SOS',
-		'710' => 'ZAR',
-		'728' => 'SSP',
-		'978' => 'EUR',
-		'144' => 'LKR',
-		'938' => 'SDG',
-		'968' => 'SRD',
-		'578' => 'NOK',
-		'748' => 'SZL',
-		'752' => 'SEK',
-		'947' => 'CHE',
-		'756' => 'CHF',
-		'948' => 'CHW',
-		'760' => 'SYP',
-		'901' => 'TWD',
-		'972' => 'TJS',
-		'834' => 'TZS',
-		'764' => 'THB',
-		'840' => 'USD',
-		'952' => 'XOF',
-		'554' => 'NZD',
-		'776' => 'TOP',
-		'780' => 'TTD',
-		'788' => 'TND',
-		'949' => 'TRY',
-		'934' => 'TMT',
-		'840' => 'USD',
-		'036' => 'AUD',
-		'800' => 'UGX',
-		'980' => 'UAH',
-		'784' => 'AED',
-		'826' => 'GBP',
-		'840' => 'USD',
-		'997' => 'USN',
-		'840' => 'USD',
-		'940' => 'UYI',
-		'858' => 'UYU',
-		'860' => 'UZS',
-		'548' => 'VUV',
-		'937' => 'VEF',
-		'704' => 'VND',
-		'840' => 'USD',
-		'840' => 'USD',
-		'953' => 'XPF',
-		'504' => 'MAD',
-		'886' => 'YER',
-		'967' => 'ZMW',
-		'932' => 'ZWL',
-		'955' => 'XBA',
-		'956' => 'XBB',
-		'957' => 'XBC',
-		'958' => 'XBD',
-		'963' => 'XTS',
-		'999' => 'XXX',
-		'959' => 'XAU',
-		'964' => 'XPD',
-		'962' => 'XPT',
-		'961' => 'XAG'
+	protected $_allowedProperties = array(
+		'importGroups',
+		'createShopItems',
+		'updateFields',
+		'itemDescription',
+		'iShopId',
+		'iShopGroupId',
+		'sShopDefaultPriceName',
+		'sShopDefaultPriceGUID',
+		'sPicturesPath',
+		'importAction',
+		'namespace',
+		'debug'
 	);
 
 	/**
@@ -326,7 +70,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * List of predefined base properties
 	 * @var array
 	 */
-	protected $aPredefinedBaseProperties = array(
+	protected $_aPredefinedBaseProperties = array(
 		"HOSTCMS_TITLE",
 		"HOSTCMS_DESCRIPTION",
 		"HOSTCMS_KEYWORDS",
@@ -335,6 +79,17 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		"ПРОДАВЕЦ",
 		"ПРОИЗВОДИТЕЛЬ",
 		"АКТИВНОСТЬ");
+
+	/**
+	 * List of predefined base properties (ЗначениеРеквизита)
+	 * @var array
+	 */
+	protected $_aBaseAttributes = array(
+		'ВЕС' => 'weight',
+		'ДЛИНА' => 'length',
+		'ШИРИНА' => 'width',
+		'ВЫСОТА' => 'height',
+	);
 
 	/**
 	 * List of predefined additional properties
@@ -346,7 +101,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * List of base properties
 	 * @var array
 	 */
-	protected $aBaseProperties = array();
+	protected $_aBaseProperties = array();
 
 	/**
 	 * List of additional properties
@@ -359,22 +114,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @var object
 	 */
 	protected $_oTaxForBasePrice = NULL;
-
-	/**
-	 * Allowed object properties
-	 * @var array
-	 */
-	protected $_allowedProperties = array(
-		'itemDescription',
-		'iShopId',
-		'iShopGroupId',
-		'sShopDefaultPriceName',
-		'sShopDefaultPriceGUID',
-		'sPicturesPath',
-		'importAction',
-		'namespace',
-		'debug'
-	);
 
 	/**
 	 * Values of property
@@ -401,7 +140,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			: array();
 
 		$this->_oSimpleXMLElement = new SimpleXMLElement(
-			// Delete  xmlns="urn:1C.ru:commerceml_2"
+			// Delete xmlns="urn:1C.ru:commerceml_2"
 			/*str_replace(array(' xmlns="urn:1C.ru:commerceml_2"', ' xmlns="urn:1C.ru:commerceml_205"'), '',*/
 				Core_File::read($sXMLFilePath)
 			/*)*/
@@ -410,6 +149,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$this->sShopDefaultPriceGUID = '';
 
 		$this->itemDescription = 'text';
+
+		$this->updateFields = array();
+		$this->importGroups = $this->createShopItems = TRUE;
 
 		$this->_temporaryPropertyFile = CMS_FOLDER . TMP_DIR . "1c_exchange_files/modproplist.tmp";
 		Core_File::mkdir(dirname($this->_temporaryPropertyFile));
@@ -445,8 +187,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			is_null($oShopGroup->path) && $oShopGroup->path= '';
 			$oShopGroup->save();
 
-			//$oSubGroups = $oXMLGroupNode->Группы;
-			//is_object($oSubGroups) && $this->_importGroups($oSubGroups, $oShopGroup->id);
 			foreach ($this->xpath($oXMLGroupNode, 'Группы') as $Groups)
 			{
 				$this->_importGroups($Groups, $oShopGroup->id);
@@ -473,18 +213,20 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$sModificationGuid = strval($aIdModificationArray[0]);
 
 			// Модификация найдена - добавляем ей это свойство
-			if (count($aShop_Items = $oShop->Shop_Items->getAllByguid($sModificationGuid)))
+			if (count($aShop_Items = $oShopItem->Shop_Items->getAllByguid($sModificationGuid)))
 			{
 				$oTempShopItem = $aShop_Items[0];
 			}
 			else
 			{
 				// модификация не найдена, возможно, она будет загружена из файла offers.xml, сохраняем свойства в массив
-				$aModificationProperties[$sModificationGuid][] = array('name'=>strval($oItemProperty->Наименование),'value'=>strval($oItemProperty->Значение));
+				$aModificationProperties[$sModificationGuid][] = array(
+					'name' => strval($oItemProperty->Наименование),
+					'value' => strval($oItemProperty->Значение)
+				);
 			}
 		}
 
-		// Характеристики загружаются безотносительно содержимого конфигурационного файла cml.php
 		$this->_addPredefinedAdditionalProperty($oTempShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
 
 		return $this;
@@ -500,9 +242,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		{
 			return $this;
 		}
-		if (mb_strtoupper($sPropertyGUID) == 'ВЕС')
+
+		$sUpperGUID = mb_strtoupper($sPropertyGUID);
+
+		if (isset($this->_aBaseAttributes[$sUpperGUID]))
 		{
-			$oShopItem->weight = Shop_Controller::instance()->convertPrice($sValue);
+			$sFieldName = $this->_aBaseAttributes[$sUpperGUID];
+			$oShopItem->$sFieldName = Shop_Controller::instance()->convertPrice($sValue);
 			$oShopItem->save();
 			return $this;
 		}
@@ -514,7 +260,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oShopItem->save();
 			return $this;
 		}*/
-		if ($bForcedAdd || (in_array(mb_strtoupper($sPropertyGUID), array_map('mb_strtoupper', $this->aPredefinedAdditionalProperties))!==FALSE))
+		if ($bForcedAdd
+			|| (in_array(mb_strtoupper($sPropertyGUID), array_map('mb_strtoupper', $this->aPredefinedAdditionalProperties)) !== FALSE)
+		)
 		{
 			$this->_addItemProperty($oShopItem, $sPropertyGUID, $sValue);
 		}
@@ -865,37 +613,37 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 	/**
 	 * Import properties
-	 * @param Shop_Item_Model $oItem item
+	 * @param Shop_Item_Model $oShop_Item item
 	 * @param SimpleXMLElement $oProperty
 	 */
-	protected function _importProperties(Shop_Item_Model $oItem, SimpleXMLElement $oProperty)
+	protected function _importProperties(Shop_Item_Model $oShop_Item, SimpleXMLElement $oProperty)
 	{
 		$sValue = strval($oProperty->Значение);
 
 		$sPropertyGUID = strval($oProperty->Ид);
 
-		if (isset($this->aBaseProperties[$sPropertyGUID]))
+		if (isset($this->_aBaseProperties[$sPropertyGUID]))
 		{
 			$sPropertyValue = isset($this->_aPropertyValues[$sValue])
 				? $this->_aPropertyValues[$sValue]
 				: $sValue;
 
-			switch (mb_strtoupper($this->aBaseProperties[$sPropertyGUID]))
+			switch (mb_strtoupper($this->_aBaseProperties[$sPropertyGUID]))
 			{
 				case 'HOSTCMS_TITLE':
-					$oItem->seo_title = $sPropertyValue;
+					$oShop_Item->seo_title = $sPropertyValue;
 				break;
 				case 'HOSTCMS_DESCRIPTION':
-					$oItem->seo_description = $sPropertyValue;
+					$oShop_Item->seo_description = $sPropertyValue;
 				break;
 				case 'HOSTCMS_KEYWORDS':
-					$oItem->seo_keywords = $sPropertyValue;
+					$oShop_Item->seo_keywords = $sPropertyValue;
 				break;
 				case 'HOSTCMS_МЕТКИ':
-					$oItem->applyTags($sPropertyValue);
+					$oShop_Item->applyTags($sPropertyValue);
 				break;
 				case 'YANDEX_MARKET':
-					$oItem->yandex_market = $sPropertyValue;
+					$oShop_Item->yandex_market = $sPropertyValue;
 				break;
 				case 'ПРОДАВЕЦ':
 					$oSeller = Core_Entity::factory('Shop', $this->iShopId)->Shop_Sellers->getByName($sPropertyValue, FALSE);
@@ -906,56 +654,25 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oSeller->shop_id($this->iShopId)->name($sPropertyValue)->path(Core_Guid::get())->save();
 					}
 
-					$oItem->shop_seller_id = $oSeller->id;
+					$oShop_Item->shop_seller_id = $oSeller->id;
 				break;
 				case 'ПРОИЗВОДИТЕЛЬ':
 
 					if (trim($sPropertyValue) != '')
 					{
-						$oProducer = Core_Entity::factory('Shop', $this->iShopId)->Shop_Producers->getByName($sPropertyValue, FALSE);
-
-						if (is_null($oProducer))
-						{
-							$oProducer = Core_Entity::factory('Shop_Producer');
-							$oProducer->shop_id($this->iShopId)->name($sPropertyValue)->save();
-						}
-
-						$oItem->shop_producer_id = $oProducer->id;
-
-						if ($oItem->modification_id)
-						{
-							$oItem->Modification->shop_producer_id = $oProducer->id;
-							$oItem->Modification->save();
-						}
+						$this->_setProducer($sPropertyValue, $oShop_Item);
 					}
 				break;
 				case 'АКТИВНОСТЬ':
-					$oItem->active = $sPropertyValue;
+					$oShop_Item->active = $sPropertyValue;
 				break;
 			}
 
-			$oItem->save();
+			$oShop_Item->save();
 		}
 		elseif ($sValue != '')
 		{
-			/*$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
-			$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE);
-
-			if (!is_null($oProperty))
-			{
-				$aPropertyValues = $oProperty->getValues($oItem->id, FALSE);
-
-				$oProperty_Value = isset($aPropertyValues[0])
-					? $aPropertyValues[0]
-					: $oProperty->createNewValue($oItem->id);
-
-				$value = isset($this->_aPropertyValues[$sPropertyValue])
-					? $this->_aPropertyValues[$sPropertyValue]
-					: $sPropertyValue;
-
-				$this->_setPropertyValue($oProperty_Value, $value);
-			}*/
-			$this->_addItemProperty($oItem, $sPropertyGUID, $sValue);
+			$this->_addItemProperty($oShop_Item, $sPropertyGUID, $sValue);
 		}
 	}
 
@@ -997,10 +714,30 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * Is new Shop_Item
+	 * @var boolean
+	 */
+	protected $_bNewShopItem = TRUE;
+
+	/**
+	 * Check if necessary to update the field
+	 * @param string $fieldName
+	 * @return boolean
+	 */
+	protected function _checkUpdateField($fieldName)
+	{
+		return $this->_bNewShopItem
+			|| !count($this->updateFields)
+			|| in_array($fieldName, $this->updateFields);
+	}
+
+	/**
 	 * Start import
 	 * @return array
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImport
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImport
+	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImportShopItem
+	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterOffersShopItem
 	 */
 	public function import()
 	{
@@ -1043,14 +780,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		}
 
 		// Проверяем, есть ли файл с дополнительными свойствами для модификаций, если есть - извлекаем данные
-		if (is_file($this->_temporaryPropertyFile))
-		{
-			$aModificationProperties = unserialize(file_get_contents($this->_temporaryPropertyFile));
-		}
-		else
-		{
-			$aModificationProperties = array();
-		}
+		$aModificationProperties = is_file($this->_temporaryPropertyFile)
+			? unserialize(file_get_contents($this->_temporaryPropertyFile))
+			: array();
 
 		// Файл import.xml
 		if (count((array)$this->_oSimpleXMLElement->Классификатор) && count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0)
@@ -1065,11 +797,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			//print_r($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар'));
 
 			// Импортируем группы товаров
-			foreach ($this->xpath($classifier, 'Группы') as $Groups)
+			if ($this->importGroups)
 			{
-				$this->_importGroups($Groups, $this->iShopGroupId);
+				foreach ($this->xpath($classifier, 'Группы') as $Groups)
+				{
+					$this->_importGroups($Groups, $this->iShopGroupId);
+				}
 			}
-			//is_object($classifier->Группы) && $this->_importGroups($classifier->Группы, $this->iShopGroupId);
 
 			// Импортируем дополнительные свойства товаров
 			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
@@ -1081,10 +815,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->_aPropertyValues[strval($oValue->ИдЗначения)] = strval($oValue->Значение);
 				}
 
-				if (in_array(mb_strtoupper($sPropertyName), $this->aPredefinedBaseProperties))
+				if (in_array(mb_strtoupper($sPropertyName), $this->_aPredefinedBaseProperties))
 				{
 					// Основное свойство товара
-					$this->aBaseProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
+					$this->_aBaseProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
 				}
 				else
 				{
@@ -1108,8 +842,16 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 				$sItemName = strval($oItem->Наименование);
 
-				if (is_null($oShopItem))
+				$this->_bNewShopItem = is_null($oShopItem);
+
+				if ($this->_bNewShopItem)
 				{
+					// Не создавать товары, переходим к следующему
+					if (!$this->createShopItems)
+					{
+						continue;
+					}
+
 					// Создаем товар
 					$oShopItem = Core_Entity::factory('Shop_Item')->guid($sGUID);
 					// Минимально необходимы данные
@@ -1128,8 +870,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				{
 					$oModificationItem = $oShopItem->Modifications->getByGuid($sGUIDmod, FALSE);
 
+					$this->_bNewShopItem = is_null($oModificationItem);
 					// Модификация у товара не найдена, создаем ее
-					if (is_null($oModificationItem))
+					if ($this->_bNewShopItem)
 					{
 						// Если товар - модификация, оставляем лишь базовые данные, название и идентификатор магазина/группы товаров
 						$oModificationItem = Core_Entity::factory('Shop_Item')
@@ -1144,30 +887,36 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopItem = $oModificationItem;
 				}
 
-				$oShopItem->marking = strval($oItem->Артикул);
+				$this->_checkUpdateField('marking') && $oShopItem->marking = strval($oItem->Артикул);
 					/*? strval($oItem->Артикул)
 					: (strlen(strval($oItem->Штрихкод))
 						? strval($oItem->Штрихкод)
 						: ''
 					);*/
 
-				$oShopItem->name = $sItemName;
+				$this->_checkUpdateField('name') && $oShopItem->name = $sItemName;
 
-				if (is_array($aTmp = $this->xpath($oItem, 'Группы'))
-				&& count($aTmp) > 0
-				&& !is_null($oShop_Group = $oShop->Shop_Groups->getByGuid(strval($aTmp[0]->Ид), FALSE)))
+				// БазоваяЕдиница
+				$this->_importBaseMeasure($oItem, $oShopItem);
+
+				if ($this->_checkUpdateField('shop_group_id'))
 				{
-					// Группа указана в файле и существует в магазине
-					$sGUIDmod === FALSE
-						? $oShopItem->shop_group_id = $oShop_Group->id
+					if (is_array($aTmp = $this->xpath($oItem, 'Группы'))
+					&& count($aTmp) > 0
+					&& !is_null($oShop_Group = $oShop->Shop_Groups->getByGuid(strval($aTmp[0]->Ид), FALSE)))
+					{
+						// Группа указана в файле и существует в магазине
+						$sGUIDmod === FALSE
+							? $oShopItem->shop_group_id = $oShop_Group->id
 							: $oShopItem->Modification->shop_group_id($oShop_Group->id)->save();
-				}
-				else
-				{
-					// Группа не указана в файле, размещаем в корне (iShopGroupId)
-					$sGUIDmod === FALSE
-						? $oShopItem->shop_group_id = $this->iShopGroupId
-						: $oShopItem->Modification->shop_group_id($this->iShopGroupId)->save();
+					}
+					else
+					{
+						// Группа не указана в файле, размещаем в корне (iShopGroupId)
+						$sGUIDmod === FALSE
+							? $oShopItem->shop_group_id = $this->iShopGroupId
+							: $oShopItem->Modification->shop_group_id($this->iShopGroupId)->save();
+					}
 				}
 
 				$oShopItem->shop_id = $this->iShopId;
@@ -1211,11 +960,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Обрабатываем описание товара
 				foreach ($this->xpath($oItem, 'Описание') as $DescriptionData)
 				{
-					if ($this->itemDescription == 'text')
+					if ($this->itemDescription == 'text' && $this->_checkUpdateField('text'))
 					{
 						$oShopItem->text = nl2br(strval($DescriptionData));
 					}
-					elseif ($this->itemDescription == 'description')
+					elseif ($this->itemDescription == 'description' && $this->_checkUpdateField('description'))
 					{
 						$oShopItem->description = nl2br(strval($DescriptionData));
 					}
@@ -1230,7 +979,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Картинки основного товара
-				$this->_importImages($oShopItem, $this->xpath($oItem, 'Картинка'));
+				$this->_checkUpdateField('images') && $this->_importImages($oShopItem, $this->xpath($oItem, 'Картинка'));
 
 				// До обработки свойств из 1С нужно записать значения "по умолчанию" для всех свойств, заданных данной группе товара
 				$aProperties = Core_Entity::factory('Shop_Item_Property_List', $oShop->id)->Properties;
@@ -1262,10 +1011,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Добавляем значения для общих свойств всех товаров
 				foreach ($this->xpath($oItem, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
 				{
-					/*if (isset($this->aAdditionalProperties[$sPropertyGUID = strval($ItemPropertyValue->Ид)]))
-					{
-						$this->_addItemProperty($oShopItem, $sPropertyGUID, strval($ItemPropertyValue->Значение));
-					}*/
 					$this->_importProperties($oShopItem, $ItemPropertyValue);
 				}
 
@@ -1280,59 +1025,36 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					file_put_contents($this->_temporaryPropertyFile, serialize($aModificationProperties));
 				}
 
-				foreach ($this->xpath($oItem, 'ЗначенияРеквизитов/ЗначениеРеквизита')
-						  as $oItemProperty)
+				foreach ($this->xpath($oItem, 'ЗначенияРеквизитов/ЗначениеРеквизита') as $oItemProperty)
 				{
 					$this->_addPredefinedAdditionalProperty($oShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение));
 				}
 
-				// Обрабатываем свойства/значения свойств для конкретно данного товара
-				/*foreach ($this->xpath($oItem, 'ХарактеристикиТовара/ХарактеристикаТовара or ЗначенияРеквизитов/ЗначениеРеквизита')
-						  as $oItemProperty)
+				// Налоги
+				if ($this->_checkUpdateField('taxes'))
 				{
-					if (mb_strtoupper(strval($oItemProperty->Наименование)) == 'ВЕС')
+					foreach ($this->xpath($oItem, 'СтавкиНалогов/СтавкаНалога') as $oTax)
 					{
-						$oShopItem->weight = Shop_Controller::instance()->convertPrice(strval($oItemProperty->Значение));
+						$oShopTax = $this->_addTax($oTax);
+						$oShopItem->shop_tax_id = $oShopTax->id;
 						$oShopItem->save();
-
-						continue;
 					}
-					elseif ($oItemProperty->getName() == 'ЗначениеРеквизита')
-					{
-						continue;
-					}
-
-					$this->_addItemProperty($oShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение));
-				}*/
-
-				// Обрабатываем налоги
-				foreach ($this->xpath($oItem, 'СтавкиНалогов/СтавкаНалога') as $oTax)
-				{
-					$oShopTax = $this->_addTax($oTax);
-					$oShopItem->shop_tax_id = $oShopTax->id;
-					$oShopItem->save();
 				}
-				
+
 				// Производитель
-				if (isset($oItem->Производитель->ТорговаяМарка))
+				if ($this->_checkUpdateField('shop_producer_id'))
 				{
-					$sProducerName = strval($oItem->Производитель->ТорговаяМарка);
-					
-					$oProducer = Core_Entity::factory('Shop', $this->iShopId)
-						->Shop_Producers
-						->getByName($sProducerName, FALSE);
-						
-					if (is_null($oProducer))
+					if (isset($oItem->ТорговаяМарка))
 					{
-						$oProducer = Core_Entity::factory('Shop_Producer')
-							->shop_id($this->iShopId)
-							->name($sProducerName)
-							->save();
+						$this->_setProducer(strval($oItem->ТорговаяМарка), $oShopItem);
 					}
-
-					$oShopItem->shop_producer_id = $oProducer->id;
-					$oShopItem->save();
+					elseif (isset($oItem->Изготовитель))
+					{
+						$this->_setProducer(strval($oItem->Изготовитель->Наименование), $oShopItem);
+					}
 				}
+
+				Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImportShopItem', $this, array($oShopItem));
 			}
 		}
 		// Файл offers.xml
@@ -1358,7 +1080,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Если это основная цена, обновляем информацию о налоге
 				if (mb_strtoupper($oShopPrice->name) == mb_strtoupper($this->sShopDefaultPriceName))
 				{
-
 					$sTaxGUID = md5(mb_strtoupper($oPrice->Налог->Наименование));
 					$oShopTax = Core_Entity::factory('Shop_Tax')->getByGuid($sTaxGUID, FALSE);
 
@@ -1377,6 +1098,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				{
 					$oShopPrice->save();
 				}
+
 			}
 
 			// Обработка складов
@@ -1452,24 +1174,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					// Товар найден, начинаем обновление
+					// Данные указываются при импорте import.xml, из offers.xml не обновляются
 					//$oShopItem->marking = strval($oProposal->Артикул);
-					$oShopItem->name = strval($oProposal->Наименование);
+					//$oShopItem->name = strval($oProposal->Наименование);
 
-					$sMeasure = strval($oProposal->БазоваяЕдиница);
-					if (strlen($sMeasure))
-					{
-						$oShopMeasure = Core_Entity::factory('Shop_Measure')->getByName($sMeasure, FALSE);
-
-						if (is_null($oShopMeasure))
-						{
-							$oShopMeasure = Core_Entity::factory('Shop_Measure');
-							$oShopMeasure->name = strval($sMeasure);
-							$oShopMeasure->description = strval($oProposal->БазоваяЕдиница->attributes()->НаименованиеПолное);
-							$oShopMeasure->save();
-						}
-
-						$oShopItem->shop_measure_id = $oShopMeasure->id;
-					}
+					// БазоваяЕдиница
+					$this->_importBaseMeasure($oProposal, $oShopItem);
 
 					// Картинки предложений (модификаций)
 					$this->_importImages($oShopItem, $this->xpath($oProposal, 'Картинка'));
@@ -1481,8 +1191,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 
 					// Обработка характеристик товара из файла offers для совместимости с МойСклад
-					foreach ($this->xpath($oProposal, 'ХарактеристикиТовара/ХарактеристикаТовара')
-						  as $oItemProperty)
+					foreach ($this->xpath($oProposal, 'ХарактеристикиТовара/ХарактеристикаТовара') as $oItemProperty)
 					{
 						$this->_addCharacteristic($oShopItem, $oItemProperty);
 					}
@@ -1573,14 +1282,15 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 								$this->_oTaxForBasePrice = NULL;
 							}
 
-							if (($sMeasureName = strval($oPrice->Единица)) != '')
+							// Импортируется только через "БазоваяЕдиница"
+							/*if (($sMeasureName = strval($oPrice->Единица)) != '')
 							{
 								if (is_null($oShop_Measure = Core_Entity::factory('Shop_Measure')->getByName($sMeasureName, FALSE)))
 								{
 									$oShop_Measure = Core_Entity::factory('Shop_Measure')->name($sMeasureName)->save();
 								}
 								$oShopItem->add($oShop_Measure);
-							}
+							}*/
 						}
 					}
 
@@ -1653,6 +1363,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 					$oShopItem->save();
 					$this->_aReturn['updateItemCount']++;
+
+					Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterOffersShopItem', $this, array($oShopItem));
 				}
 			}
 		}
@@ -1739,6 +1451,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopGroup = Core_Entity::factory('Shop_Group', 0);
 				}
 				$oShopItem->shop_group_id = $oShopGroup->id;
+
 				$oShopMeasure = Core_Entity::factory('Shop_Measure')->getByName(strval($oXmlItem->attributes()->Единица), FALSE);
 				if (is_null($oShopMeasure))
 				{
@@ -1792,8 +1505,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$oShopItem->shop_currency_id = $oShop_Currency->id;
 					}
 					$oShopItem->save();
-					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
 
+					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
 					if (!is_null($oWarehouse))
 					{
 						$oShop_Warehouse_Item = $oWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
@@ -1815,6 +1528,72 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImport', $this);
 
 		return $this->_aReturn;
+	}
+
+	/**
+	 * Импорт "БазоваяЕдиница"
+	 * @param object $oNode
+	 * @param Shop_Item_Model $oShopItem
+	 * @return self
+	 */
+	protected function _importBaseMeasure($oNode, Shop_Item_Model $oShopItem)
+	{
+		$sMeasure = strval($oNode->БазоваяЕдиница);
+		if (strlen($sMeasure))
+		{
+			$okei = strval($oNode->БазоваяЕдиница->attributes()->Код);
+
+			// Получаем по коду ОКЕЙ
+			$oShopMeasure = strlen($okei)
+				? Core_Entity::factory('Shop_Measure')->getByOkei($okei, FALSE)
+				: NULL;
+
+			// Получаем по названию
+			is_null($oShopMeasure)
+				&& $oShopMeasure = Core_Entity::factory('Shop_Measure')->getByName($sMeasure, FALSE);
+
+			if (is_null($oShopMeasure))
+			{
+				$oShopMeasure = Core_Entity::factory('Shop_Measure');
+				$oShopMeasure->name = strval($sMeasure);
+				$oShopMeasure->description = strval($oNode->БазоваяЕдиница->attributes()->НаименованиеПолное);
+				$oShopMeasure->okei = $okei;
+				$oShopMeasure->save();
+			}
+
+			$oShopItem->shop_measure_id = $oShopMeasure->id;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set Producer
+	 * @param string $producerName
+	 * @param Shop_Item_Model $shopItem
+	 */
+	protected function _setProducer($producerName, Shop_Item_Model $shopItem)
+	{
+		$oProducer = Core_Entity::factory('Shop', $this->iShopId)
+			->Shop_Producers
+			->getByName($producerName, FALSE);
+
+		if (is_null($oProducer))
+		{
+			$oProducer = Core_Entity::factory('Shop_Producer')
+				->shop_id($this->iShopId)
+				->name($producerName)
+				->save();
+		}
+
+		$shopItem->shop_producer_id = $oProducer->id;
+		$shopItem->save();
+
+		if ($shopItem->modification_id)
+		{
+			$shopItem->Modification->shop_producer_id = $oProducer->id;
+			$shopItem->Modification->save();
+		}
 	}
 
 	/**
@@ -1894,4 +1673,287 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 		$oProperty_Value->save();
 	}
+
+	/**
+	 * Коды валют для МойСклад
+	 * @var array
+	 */
+	protected $_aCurrencyCodes = array(
+		'971' => 'AFN',
+		'978' => 'EUR',
+		'008' => 'ALL',
+		'012' => 'DZD',
+		'840' => 'USD',
+		'978' => 'EUR',
+		'973' => 'AOA',
+		'951' => 'XCD',
+		'951' => 'XCD',
+		'032' => 'ARS',
+		'051' => 'AMD',
+		'533' => 'AWG',
+		'036' => 'AUD',
+		'978' => 'EUR',
+		'944' => 'AZN',
+		'044' => 'BSD',
+		'048' => 'BHD',
+		'050' => 'BDT',
+		'052' => 'BBD',
+		'974' => 'BYR',
+		'978' => 'EUR',
+		'084' => 'BZD',
+		'952' => 'XOF',
+		'060' => 'BMD',
+		'064' => 'BTN',
+		'356' => 'INR',
+		'068' => 'BOB',
+		'984' => 'BOV',
+		'840' => 'USD',
+		'977' => 'BAM',
+		'072' => 'BWP',
+		'578' => 'NOK',
+		'986' => 'BRL',
+		'840' => 'USD',
+		'096' => 'BND',
+		'975' => 'BGN',
+		'952' => 'XOF',
+		'108' => 'BIF',
+		'116' => 'KHR',
+		'950' => 'XAF',
+		'124' => 'CAD',
+		'132' => 'CVE',
+		'136' => 'KYD',
+		'950' => 'XAF',
+		'950' => 'XAF',
+		'990' => 'CLF',
+		'152' => 'CLP',
+		'156' => 'CNY',
+		'036' => 'AUD',
+		'036' => 'AUD',
+		'170' => 'COP',
+		'970' => 'COU',
+		'174' => 'KMF',
+		'950' => 'XAF',
+		'976' => 'CDF',
+		'554' => 'NZD',
+		'188' => 'CRC',
+		'952' => 'XOF',
+		'191' => 'HRK',
+		'931' => 'CUC',
+		'192' => 'CUP',
+		'532' => 'ANG',
+		'978' => 'EUR',
+		'203' => 'CZK',
+		'208' => 'DKK',
+		'262' => 'DJF',
+		'951' => 'XCD',
+		'214' => 'DOP',
+		'840' => 'USD',
+		'818' => 'EGP',
+		'222' => 'SVC',
+		'840' => 'USD',
+		'950' => 'XAF',
+		'232' => 'ERN',
+		'978' => 'EUR',
+		'230' => 'ETB',
+		'978' => 'EUR',
+		'238' => 'FKP',
+		'208' => 'DKK',
+		'242' => 'FJD',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'953' => 'XPF',
+		'978' => 'EUR',
+		'950' => 'XAF',
+		'270' => 'GMD',
+		'981' => 'GEL',
+		'978' => 'EUR',
+		'936' => 'GHS',
+		'292' => 'GIP',
+		'978' => 'EUR',
+		'208' => 'DKK',
+		'951' => 'XCD',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'320' => 'GTQ',
+		'826' => 'GBP',
+		'324' => 'GNF',
+		'952' => 'XOF',
+		'328' => 'GYD',
+		'332' => 'HTG',
+		'840' => 'USD',
+		'036' => 'AUD',
+		'978' => 'EUR',
+		'340' => 'HNL',
+		'344' => 'HKD',
+		'348' => 'HUF',
+		'352' => 'ISK',
+		'356' => 'INR',
+		'360' => 'IDR',
+		'960' => 'XDR',
+		'364' => 'IRR',
+		'368' => 'IQD',
+		'978' => 'EUR',
+		'826' => 'GBP',
+		'376' => 'ILS',
+		'978' => 'EUR',
+		'388' => 'JMD',
+		'392' => 'JPY',
+		'826' => 'GBP',
+		'400' => 'JOD',
+		'398' => 'KZT',
+		'404' => 'KES',
+		'036' => 'AUD',
+		'408' => 'KPW',
+		'410' => 'KRW',
+		'414' => 'KWD',
+		'417' => 'KGS',
+		'418' => 'LAK',
+		'978' => 'EUR',
+		'422' => 'LBP',
+		'426' => 'LSL',
+		'710' => 'ZAR',
+		'430' => 'LRD',
+		'434' => 'LYD',
+		'756' => 'CHF',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'446' => 'MOP',
+		'807' => 'MKD',
+		'969' => 'MGA',
+		'454' => 'MWK',
+		'458' => 'MYR',
+		'462' => 'MVR',
+		'952' => 'XOF',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'978' => 'EUR',
+		'478' => 'MRO',
+		'480' => 'MUR',
+		'978' => 'EUR',
+		'965' => 'XUA',
+		'484' => 'MXN',
+		'979' => 'MXV',
+		'840' => 'USD',
+		'498' => 'MDL',
+		'978' => 'EUR',
+		'496' => 'MNT',
+		'978' => 'EUR',
+		'951' => 'XCD',
+		'504' => 'MAD',
+		'943' => 'MZN',
+		'104' => 'MMK',
+		'516' => 'NAD',
+		'710' => 'ZAR',
+		'036' => 'AUD',
+		'524' => 'NPR',
+		'978' => 'EUR',
+		'953' => 'XPF',
+		'554' => 'NZD',
+		'558' => 'NIO',
+		'952' => 'XOF',
+		'566' => 'NGN',
+		'554' => 'NZD',
+		'036' => 'AUD',
+		'840' => 'USD',
+		'578' => 'NOK',
+		'512' => 'OMR',
+		'586' => 'PKR',
+		'840' => 'USD',
+		'590' => 'PAB',
+		'840' => 'USD',
+		'598' => 'PGK',
+		'600' => 'PYG',
+		'604' => 'PEN',
+		'608' => 'PHP',
+		'554' => 'NZD',
+		'985' => 'PLN',
+		'978' => 'EUR',
+		'840' => 'USD',
+		'634' => 'QAR',
+		'978' => 'EUR',
+		'946' => 'RON',
+		'643' => 'RUB',
+		'810' => 'RUR',
+		'646' => 'RWF',
+		'978' => 'EUR',
+		'654' => 'SHP',
+		'951' => 'XCD',
+		'951' => 'XCD',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'951' => 'XCD',
+		'882' => 'WST',
+		'978' => 'EUR',
+		'678' => 'STD',
+		'682' => 'SAR',
+		'952' => 'XOF',
+		'941' => 'RSD',
+		'690' => 'SCR',
+		'694' => 'SLL',
+		'702' => 'SGD',
+		'532' => 'ANG',
+		'994' => 'XSU',
+		'978' => 'EUR',
+		'978' => 'EUR',
+		'090' => 'SBD',
+		'706' => 'SOS',
+		'710' => 'ZAR',
+		'728' => 'SSP',
+		'978' => 'EUR',
+		'144' => 'LKR',
+		'938' => 'SDG',
+		'968' => 'SRD',
+		'578' => 'NOK',
+		'748' => 'SZL',
+		'752' => 'SEK',
+		'947' => 'CHE',
+		'756' => 'CHF',
+		'948' => 'CHW',
+		'760' => 'SYP',
+		'901' => 'TWD',
+		'972' => 'TJS',
+		'834' => 'TZS',
+		'764' => 'THB',
+		'840' => 'USD',
+		'952' => 'XOF',
+		'554' => 'NZD',
+		'776' => 'TOP',
+		'780' => 'TTD',
+		'788' => 'TND',
+		'949' => 'TRY',
+		'934' => 'TMT',
+		'840' => 'USD',
+		'036' => 'AUD',
+		'800' => 'UGX',
+		'980' => 'UAH',
+		'784' => 'AED',
+		'826' => 'GBP',
+		'840' => 'USD',
+		'997' => 'USN',
+		'840' => 'USD',
+		'940' => 'UYI',
+		'858' => 'UYU',
+		'860' => 'UZS',
+		'548' => 'VUV',
+		'937' => 'VEF',
+		'704' => 'VND',
+		'840' => 'USD',
+		'840' => 'USD',
+		'953' => 'XPF',
+		'504' => 'MAD',
+		'886' => 'YER',
+		'967' => 'ZMW',
+		'932' => 'ZWL',
+		'955' => 'XBA',
+		'956' => 'XBB',
+		'957' => 'XBC',
+		'958' => 'XBD',
+		'963' => 'XTS',
+		'999' => 'XXX',
+		'959' => 'XAU',
+		'964' => 'XPD',
+		'962' => 'XPT',
+		'961' => 'XAG'
+	);
 }

@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 {
@@ -21,6 +22,7 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 		'a',
 		'img',
 		'icon',
+		'caption',
 		'div'
 	);
 
@@ -61,6 +63,15 @@ class Skin_Default_Admin_Form_Entity_Link extends Admin_Form_Entity
 		if (count($this->_children))
 		{
 			?><div class="input-group"><?php
+		}
+		
+		if (strlen($this->caption))
+		{
+			$this->div->add(
+				Core::factory('Core_Html_Entity_Span')
+					->class('caption')
+					->value(htmlspecialchars($this->caption))
+			);
 		}
 		
 		$this->div

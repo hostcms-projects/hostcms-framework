@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Libs.
+ * Lib Module.
  *
- * @package HostCMS 6\Lib
+ * @package HostCMS
+ * @subpackage Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Module extends Core_Module{	/**
 	 * Module version
@@ -20,7 +21,7 @@ class Lib_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-02-03';
+	public $date = '2016-03-03';
 	/**
 	 * Module name
 	 * @var string

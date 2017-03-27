@@ -2,15 +2,15 @@
 /**
  * XSL.
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ТОВ "Хостмейк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Розділи XSL',
 	'main_menu' => 'Розділ XSL',
-	'add' => 'Додати',
 	'edit_success' => 'Розділ успішно змінено!',
 	'edit_error' => 'Помилка! Розділ не змінено!',
 	'apply_success' => 'Информацію змінено!',

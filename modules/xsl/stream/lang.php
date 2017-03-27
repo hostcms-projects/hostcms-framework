@@ -6,9 +6,19 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Implement "lang://" protocol
  *
  * Use to add DTD depends on SITE_LNG
+ * <code>
  * <!DOCTYPE xsl:stylesheet SYSTEM "lang://1">
+ * </code>
  * or
+ * <code>
  * <!DOCTYPE xsl:stylesheet SYSTEM "lang://xslname">
+ * </code>
+ *
+ * @package HostCMS
+ * @subpackage Xsl
+ * @version 6.x
+ * @author Hostmake LLC
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Stream_Lang
 {
@@ -100,7 +110,7 @@ class Xsl_Stream_Lang
 	 */
 	public function stream_write($data)
 	{
-	   return FALSE;
+		return FALSE;
 	}
 
 	/**
@@ -129,37 +139,43 @@ class Xsl_Stream_Lang
 	 */
 	public function stream_seek($offset, $whence)
 	{
-		 switch ($whence) {
-            case SEEK_SET:
-                if ($offset < strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) && $offset >= 0) {
-                     $this->position = $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
+		switch ($whence) {
+			case SEEK_SET:
+			if ($offset < strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) && $offset >= 0)
+			{
+				 $this->position = $offset;
+				 return TRUE;
+			}
+			else
+			{
+				 return FALSE;
+			}
+			break;
+			case SEEK_CUR:
+				if ($offset >= 0)
+				{
+					$this->position += $offset;
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+			break;
 
-            case SEEK_CUR:
-                if ($offset >= 0) {
-                     $this->position += $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
-
-            case SEEK_END:
-                if (strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) + $offset >= 0) {
-                     $this->position = strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) + $offset;
-                     return TRUE;
-                } else {
-                     return FALSE;
-                }
-                break;
-
-            default:
-                return FALSE;
-        }
+			case SEEK_END:
+			if (strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) + $offset >= 0) {
+				 $this->position = strlen(self::$_aDTD[$this->_xslName][SITE_LNG]) + $offset;
+				 return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
+			break;
+			default:
+				return FALSE;
+		}
 	}
 
 	/**

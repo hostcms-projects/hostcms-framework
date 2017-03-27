@@ -3,11 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Shop_Item_Property_For_Group_Model class
- * @package HostCMS 6\Shop
+ * Shop_Item_Property_For_Group_Model
+ *
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_For_Group_Model extends Core_Entity
 {
@@ -74,7 +76,7 @@ class Shop_Item_Property_For_Group_Model extends Core_Entity
 	 * Get element by property ID and group ID
 	 * @param int $shop_item_property_id property ID
 	 * @param int $shop_group_id group ID
-	 * @return Shop_Item_Property_For_Group_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getByShopItemPropertyIdAndGroupId($shop_item_property_id, $shop_group_id)
 	{
@@ -89,6 +91,8 @@ class Shop_Item_Property_For_Group_Model extends Core_Entity
 
 		$aShop_Item_Property_For_Group = $this->findAll(FALSE);
 
-		return isset($aShop_Item_Property_For_Group[0]) ? $aShop_Item_Property_For_Group[0] : NULL;
+		return isset($aShop_Item_Property_For_Group[0])
+			? $aShop_Item_Property_For_Group[0]
+			: NULL;
 	}
 }

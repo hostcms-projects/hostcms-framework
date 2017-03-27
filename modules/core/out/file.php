@@ -15,10 +15,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * 	->write('content 3')
  * 	->close();
  * </code>
- * @package HostCMS 6\Core\Out
+ * @package HostCMS
+ * @subpackage Core\Out
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Out_File extends Core_Out
 {

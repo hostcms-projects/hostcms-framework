@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Votes.
+ * Vote_Model
  *
- * @package HostCMS 6\Comment
+ * @package HostCMS
+ * @subpackage Vote
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Vote_Model extends Core_Entity
 {
@@ -35,19 +36,6 @@ class Vote_Model extends Core_Entity
 		'vote_shop_item' => array(),
 		'vote_comment' => array()
 	);
-
-	/**
-	 * List of preloaded values
-	 * @var array
-	 */
-	/*
-	protected $_preloadValues = array(
-		'text' => '',
-		'siteuser_id' => 0,
-		'parent_id' => 0,
-		'grade' => 0
-	);
-	*/
 
 	/**
 	 * Forbidden tags. If list of tags is empty, all tags will show.

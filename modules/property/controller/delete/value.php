@@ -6,10 +6,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Properties.
  * Контроллер удаления значения дополнительного свойства
  *
- * @package HostCMS 6\Property
+ * @package HostCMS
+ * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Delete_Value extends Admin_Form_Action_Controller
 {

@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Information systems.
+ * Informationsystem_Item and Informationsystem_Group Backend Editing Controller.
  *
- * @package HostCMS 6\Informationsystem
+ * @package HostCMS
+ * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -235,7 +236,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 							// watermark_position_y - значение поля ввода с подписью "По оси Y"
 							'watermark_position_y' => $oInformationsystem->watermark_default_position_y,
 
-							// large_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+							// large_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 							'place_watermark_checkbox_checked' => $oInformationsystem->watermark_default_use_large_image,
 
 							// onclick_delete_big_image - значение onclick для удаления большой картинки
@@ -243,7 +244,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 							'caption' => Core::_('Informationsystem_Item.image_large'),
 
-							// used_big_image_preserve_aspect_ratio_checked -  вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+							// used_big_image_preserve_aspect_ratio_checked - вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 							'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio
 						)
 					)
@@ -256,10 +257,10 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 							// small_image_path - адрес малого загруженного изображения
 							'path' => $oSmallFilePath,
 
-							// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+							// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 							'create_small_image_from_large_checked' => $this->_object->image_small == '',
 
-							// small_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+							// small_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 							'place_watermark_checkbox_checked' => $oInformationsystem->watermark_default_use_small_image,
 
 							// onclick_delete_small_image - значение onclick для удаления малой картинки
@@ -582,7 +583,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						// watermark_position_y - значение поля ввода с подписью "По оси Y"
 						'watermark_position_y' => $oInformationsystem->watermark_default_position_y,
 
-						// large_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+						// large_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 						'place_watermark_checkbox_checked' => $oInformationsystem->watermark_default_use_large_image,
 
 						// onclick_delete_big_image - значение onclick для удаления большой картинки
@@ -590,7 +591,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 						'caption' => Core::_('Informationsystem_Group.image_large'),
 
-						// used_big_image_preserve_aspect_ratio_checked -  вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+						// used_big_image_preserve_aspect_ratio_checked - вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio_group
 						)
 					)
@@ -604,10 +605,10 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						// small_image_path - адрес малого загруженного изображения
 						'path' => $oSmallFilePath,
 
-						// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+						// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 						'create_small_image_from_large_checked' => $this->_object->image_small == '',
 
-						// small_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+						// small_image_watermark_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 						'place_watermark_checkbox_checked' => $oInformationsystem->watermark_default_use_small_image,
 
 						// onclick_delete_small_image - значение onclick для удаления малой картинки

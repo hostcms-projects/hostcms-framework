@@ -109,6 +109,17 @@ $('.page-content')
     });
 
 /*Handles Popovers*/
+/*$('.page-content').popover({
+	html: true,
+	title: function(){console.log($(this).find('div[id ^= "popover"]')); return 1111;},
+	selector: '[data-toggle=popover]',
+	template: '<div class="popover ' + $(this)
+		.data("class") +
+		'"><div class="arrow"></div><h3 class="popover-title ' +
+		$(this)
+		.data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>'
+});*/
+
 var popovers = $('[data-toggle=popover]');
 $.each(popovers, function () {
     $(this)

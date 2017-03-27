@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Warehouse_Item_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Warehouse_Item_Model extends Core_Entity
 {
@@ -88,7 +89,7 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 	 * Get item count by item ID
 	 * @param int $shop_item_id item ID
 	 * @param boolean $bCache cache mode
-	 * @return Shop_Warehouse_Item_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getByShopItemId($shop_item_id, $bCache = TRUE)
 	{
@@ -108,7 +109,7 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 	 * Get item count by warehouse ID
 	 * @param int $shop_warehouse_id warehouse ID
 	 * @param boolean $bCache cache mode
-	 * @return Shop_Warehouse_Item_Model|NULL
+	 * @return self|NULL
 	 */
 	public function getByWarehouseId($shop_warehouse_id, $bCache = TRUE)
 	{

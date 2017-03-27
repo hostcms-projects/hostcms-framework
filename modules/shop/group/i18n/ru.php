@@ -2,10 +2,11 @@
 /**
  * Online shop.
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Группы товаров',
@@ -42,7 +43,7 @@ return array(
 	'tab_properties' => "Дополнительные свойства",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
-	'error_URL_shop_group' => 'В группе уже существует  подгруппа с таким URL!',
+	'error_URL_shop_group' => 'В группе уже существует подгруппа с таким URL!',
 	'error_URL_isset_item' => 'В группе существует товар с названием в URL, совпадающим с URL добавляемой/редактируемой подгруппы!',
 	'apply_success' => "Информация успешно изменена",
 	'move_success' => 'Группы товаров перенесены',

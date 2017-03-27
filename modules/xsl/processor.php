@@ -14,7 +14,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * echo $return;
  * </code>
  *
- * @package HostCMS 6\Xsl
+ * @package HostCMS
+ * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -229,12 +230,12 @@ abstract class Xsl_Processor
 			$string_array[$key] = str_pad('', $current_level, "\t") . $value;
 
 			// Подсчитываем количество открывающихся тегов
-			$count_opening_tag += mb_substr_count($value, '<') -  mb_substr_count($value, '</') - mb_substr_count($value, '/>') - mb_substr_count($value, '<!') - mb_substr_count($value, '<?xml');
+			$count_opening_tag += mb_substr_count($value, '<') - mb_substr_count($value, '</') - mb_substr_count($value, '/>') - mb_substr_count($value, '<!') - mb_substr_count($value, '<?xml');
 		}
 
 		// \r\n, т.к. трим удаляет \r, оставленный выше
 		$new_content = implode("\r\n", $string_array);
 
-		return  $new_content;
+		return $new_content;
 	}
 }

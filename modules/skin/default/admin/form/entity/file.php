@@ -5,10 +5,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 /**
  * Admin forms.
  *
- * @package HostCMS 6\Admin
+ * @package HostCMS
+ * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 {
@@ -76,10 +77,10 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			// watermark_position_y - значение поля ввода с подписью "По оси Y"
 			'watermark_position_y' => '100%',
 
-			// used_watermark_big_image_show - отображать ли checkbox с подписью "Наложить водяной знак на большое изображение" (1 -  отображать (по умолчанию), 0 - не отображать);
+			// used_watermark_big_image_show - отображать ли checkbox с подписью "Наложить водяной знак на большое изображение" (1 - отображать (по умолчанию), 0 - не отображать);
 			'place_watermark_checkbox' => TRUE,
 
-			// used_watermark_big_image_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+			// used_watermark_big_image_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 			'place_watermark_checkbox_checked' => TRUE,
 
 			// onclick_delete_big_image - значение onclick для удаления большой картинки
@@ -92,10 +93,10 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			'name' => $this->name,
 			'id' => $this->id,
 
-			// used_big_image_preserve_aspect_ratio - параметр Отображать ли checkbox с подписью "Сохранять пропорции изображения" (1 -  отображать (по умолчанию), 0 - не отображать);
+			// used_big_image_preserve_aspect_ratio - параметр Отображать ли checkbox с подписью "Сохранять пропорции изображения" (1 - отображать (по умолчанию), 0 - не отображать);
 			'preserve_aspect_ratio_checkbox' => TRUE,
 
-			// used_big_image_preserve_aspect_ratio_checked -  вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+			// used_big_image_preserve_aspect_ratio_checked - вид ображения checkbox'а с подписью "Сохранять пропорции изображения" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 			'preserve_aspect_ratio_checkbox_checked' => TRUE,
 
 			// Показать поле описания файла
@@ -117,7 +118,7 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 		// -------------------
 
 		$aTypicalSmallParams = array(
-			// load_small_image_show - отображать ли поле загрузки малого изображения (1 -  отображать (по умолчанию), 0 - не отображать);
+			// load_small_image_show - отображать ли поле загрузки малого изображения (1 - отображать (по умолчанию), 0 - не отображать);
 			'show' => TRUE,
 
 			// image_small_max_width - значение максимальной ширины малого изображения;
@@ -132,16 +133,16 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			// show_small_image_params - параметр, определяющий отображать ли настройки малого изображения
 			'show_params' => TRUE,
 
-			// make_small_image_from_big_show - отображать ли checkbox с подписью "Создать малое изображение из большого" (1 -  отображать (по умолчанию), 0 - не отображать);
+			// make_small_image_from_big_show - отображать ли checkbox с подписью "Создать малое изображение из большого" (1 - отображать (по умолчанию), 0 - не отображать);
 			'create_small_image_from_large' => TRUE,
 
-			// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+			// make_small_image_from_big_checked - вид ображения checkbox'а с подписью "Создать малое изображение из большого" выбранным (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 			'create_small_image_from_large_checked' => TRUE,
 
-			// used_watermark_small_image_show - отображать ли checkbox с подписью "Наложить водяной знак на малое изображение" (1 -  отображать (по умолчанию), 0 - не отображать);
+			// used_watermark_small_image_show - отображать ли checkbox с подписью "Наложить водяной знак на малое изображение" (1 - отображать (по умолчанию), 0 - не отображать);
 			'place_watermark_checkbox' => TRUE,
 
-			// used_watermark_small_image_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+			// used_watermark_small_image_checked - вид ображения checkbox'а с подписью "Наложить водяной знак на малое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 			'place_watermark_checkbox_checked' => TRUE,
 
 			// onclick_delete_small_image - значение onclick для удаления малой картинки
@@ -156,10 +157,10 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			'name' => 'small_' . $this->largeImage['name'],
 			'id' => 'small_' . $this->largeImage['id'],
 
-			// used_small_image_preserve_aspect_ratio - параметр Отображать ли checkbox с подписью "Сохранять пропорции изображения" (1 -  отображать (по умолчанию), 0 - не отображать);
+			// used_small_image_preserve_aspect_ratio - параметр Отображать ли checkbox с подписью "Сохранять пропорции изображения" (1 - отображать (по умолчанию), 0 - не отображать);
 			'preserve_aspect_ratio_checkbox' => TRUE,
 
-			// Не задан вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 -  отображать выбранным (по умолчанию), 0 - невыбранным);
+			// Не задан вид ображения checkbox'а с подписью "Наложить водяной знак на большое изображение" (1 - отображать выбранным (по умолчанию), 0 - невыбранным);
 			'preserve_aspect_ratio_checkbox_checked' => TRUE,
 
 			// Показать поле описания файла

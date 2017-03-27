@@ -3,12 +3,13 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Tags.
+ * Tag Backend Editing Controller.
  *
- * @package HostCMS 6\Tag
+ * @package HostCMS
+ * @subpackage Tag
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -130,7 +131,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->parent_id)
 					->caption(Core::_('Tag_Dir.parent_name'));
 
-				$oMainTab->addAfter($oSelect_Dirs,  $this->getField('name'));
+				$oMainTab->addAfter($oSelect_Dirs, $this->getField('name'));
 			break;
 		}
 

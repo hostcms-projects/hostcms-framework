@@ -3,9 +3,10 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Online shop.
+ * Shop_Order_Model
  *
- * @package HostCMS 6\Shop
+ * @package HostCMS
+ * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
@@ -1191,34 +1192,63 @@ class Shop_Order_Model extends Core_Entity
 		$oContractor = $oOrderXml->addChild('Контрагенты');
 		$oContractor = $oContractor->addChild('Контрагент');
 
+		$bCompany = strlen(trim($this->company)) > 0;
+
 		$aTmpArray = array();
 		$this->surname != '' && $aTmpArray[] = $this->surname;
 		$this->name != '' && $aTmpArray[] = $this->name;
 		$this->patronymic != '' && $aTmpArray[] = $this->patronymic;
 		!count($aTmpArray) && $aTmpArray[] = $this->email;
 
-		$sContractorName = implode(' ', $aTmpArray);
+		$sUserFullName = implode(' ', $aTmpArray);
 
+		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32()
 		$sContractorId = $this->siteuser_id
 			? $this->siteuser_id
-			: abs(Core::crc32($sContractorName));
+			: abs(Core::crc32($bCompany
+					? $this->company
+					: $sUserFullName
+				)
+			);
+
+		$sContractorName = $bCompany
+			? $this->company
+			: $sUserFullName;
 
 		!strlen($sContractorName)
 			&& $sContractorName = 'Контрагент ' . $sContractorId;
 
-		// При отсутствии модуля "Пользователи сайта" ИД пользователя рассчитывается как crc32($sContractorName)
 		$oContractor->addChild('Ид', $sContractorId);
 		$oContractor->addChild('Наименование', $sContractorName);
 		$oContractor->addChild('Роль', 'Покупатель');
-		$oContractor->addChild('ПолноеНаименование', $sContractorName);
-		$oContractor->addChild('Фамилия', $this->surname);
-		$oContractor->addChild('Имя', $this->name);
-		$oContractor->addChild('Отчество', $this->patronymic);
-		$oContractor->addChild('АдресРегистрации')->addChild('Представление', $this->address);
+
+		$aAddress = array(
+			$this->postcode,
+			$this->shop_country->name,
+			$this->shop_country_location_city->name,
+			$this->address
+		);
+		$aAddress = array_filter($aAddress, 'strlen');
+		$sFullAddress = implode(', ', $aAddress);
+
+		if ($bCompany)
+		{
+			$oContractor->addChild('ОфициальноеНаименование', $this->company);
+			$oContractor->addChild('ИНН', $this->tin);
+			$oContractor->addChild('КПП', $this->kpp);
+		}
+		else
+		{
+			$oContractor->addChild('ПолноеНаименование', $sUserFullName);
+			$oContractor->addChild('Фамилия', $this->surname);
+			$oContractor->addChild('Имя', $this->name);
+			$oContractor->addChild('Отчество', $this->patronymic);
+			$oContractor->addChild('АдресРегистрации')->addChild('Представление', $sFullAddress);
+		}
 
 		// Адрес контрагента
 		$oContractorAddress = $oContractor->addChild('Адрес');
-		$oContractorAddress->addChild('Представление', implode(', ', array($this->postcode,$this->shop_country->name,$this->shop_country_location_city->name,$this->address)));
+		$oContractorAddress->addChild('Представление', $sFullAddress);
 		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
 		$oAddressField->addChild('Тип', 'Почтовый индекс');
 		$oAddressField->addChild('Значение', $this->postcode);
@@ -1231,13 +1261,30 @@ class Shop_Order_Model extends Core_Entity
 		$oAddressField = $oContractorAddress->addChild('АдресноеПоле');
 		$oAddressField->addChild('Тип', 'Улица');
 		$oAddressField->addChild('Значение', $this->address);
-		$oAddressContacts = $oContractor->addChild('Контакты');
-		$oContact = $oAddressContacts->addChild('Контакт');
-		$oContact->addChild('Тип','Почта');
-		$oContact->addChild('Значение', $this->email);
-		$oContact = $oAddressContacts->addChild('Контакт');
-		$oContact->addChild('Тип','Телефон');
-		$oContact->addChild('Значение',$this->phone);
+
+		// Контакты
+		$oContacts = $oContractor->addChild('Контакты');
+		$oContactEmail = $oContacts->addChild('Контакт');
+		$oContactEmail->addChild('Тип', 'Электронная почта');
+		$oContactEmail->addChild('Значение', $this->email);
+
+		$oContactPhone = $oContacts->addChild('Контакт');
+		$oContactPhone->addChild('Тип', 'Телефон рабочий');
+		$oContactPhone->addChild('Значение', $this->phone);
+
+		$oContactFax = $oContacts->addChild('Контакт');
+		$oContactFax->addChild('Тип', 'Факс');
+		$oContactFax->addChild('Значение', $this->fax);
+
+		// Представители
+		if ($bCompany)
+		{
+			$oRepresentatives = $oContractor->addChild('Представители');
+			$oRepresentative = $oRepresentatives->addChild('Представитель');
+			$oRepresentative->addChild('Отношение', 'Контактное лицо');
+			$oRepresentative->addChild('Ид', abs(Core::crc32($sUserFullName)));
+			$oRepresentative->addChild('Наименование', $sUserFullName);
+		}
 
 		// Статус оплаты заказа
 		$oOrderProperties = $oOrderXml->addChild('ЗначенияРеквизитов');
@@ -1255,6 +1302,11 @@ class Shop_Order_Model extends Core_Entity
 		$oOrderProperty->addChild('Наименование', 'Метод оплаты');
 		$oOrderProperty->addChild('Значение', $this->shop_payment_system->name);
 
+		// Адрес доставки
+		$oOrderProperty = $oOrderProperties->addChild('ЗначениеРеквизита');
+		$oOrderProperty->addChild('Наименование', 'Адрес доставки');
+		$oOrderProperty->addChild('Значение', $sFullAddress);
+
 		$oOrderXml->addChild('Время', $time);
 		$oOrderXml->addChild('Комментарий', $this->description);
 
@@ -1262,12 +1314,24 @@ class Shop_Order_Model extends Core_Entity
 
 		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
 
-		foreach($aOrderItems as $oOrderItem)
+		foreach ($aOrderItems as $oOrderItem)
 		{
 			$oCurrentItem = $oOrderItems->addChild('Товар');
-			$oCurrentItem->addChild('Ид', $oOrderItem->Shop_Item->modification_id ? sprintf('%s#%s', $oOrderItem->Shop_Item->Modification->guid, $oOrderItem->Shop_Item->guid) : ($oOrderItem->type == 1 ? 'ORDER_DELIVERY' : $oOrderItem->Shop_Item->guid));
+			$oCurrentItem->addChild('Ид',
+				$oOrderItem->Shop_Item->modification_id
+					? sprintf('%s#%s', $oOrderItem->Shop_Item->Modification->guid, $oOrderItem->Shop_Item->guid)
+					: ($oOrderItem->type == 1
+						? 'ORDER_DELIVERY'
+						: $oOrderItem->Shop_Item->guid
+					)
+			);
 			$oCurrentItem->addChild('Наименование', $oOrderItem->name);
-			$oCurrentItem->addChild('БазоваяЕдиница', $oOrderItem->Shop_Item->Shop_Measure->name);
+
+			$oShop_Measure = $oOrderItem->Shop_Item->Shop_Measure;
+			$oXmlMeasure = $oCurrentItem->addChild('БазоваяЕдиница', $oShop_Measure->name);
+			$oShop_Measure->okei && $oXmlMeasure->addAttribute('Код', $oShop_Measure->okei);
+			strlen($oShop_Measure->description) && $oXmlMeasure->addAttribute('НаименованиеПолное', $oShop_Measure->description);
+
 			$oCurrentItem->addChild('ЦенаЗаЕдиницу', $oOrderItem->price);
 			$oCurrentItem->addChild('Количество', $oOrderItem->quantity);
 			$oCurrentItem->addChild('Сумма', $oOrderItem->getAmount());
