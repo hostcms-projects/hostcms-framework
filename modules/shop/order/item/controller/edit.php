@@ -40,17 +40,28 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 
 		$oOrder = Core_Entity::factory('Shop_Order', intval(Core_Array::getGet('shop_order_id')));
 
-		$oMainTab->move($this->getField('quantity')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
-		$oMainTab->move($this->getField('price')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-5')), $oMainRow1);
-		$oMainTab->move($this->getField('rate')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-5')), $oMainRow1);
+		$oMainTab->move($this->getField('quantity')->divAttr(array('class' => 'form-group col-sm-3 col-xs-12')), $oMainRow1);
+		$oMainTab->move($this->getField('price')
+				->id('itemPrice')
+				->divAttr(array('class' => 'form-group col-sm-3 col-xs-5')),
+			$oMainRow1
+		);
+		$oMainTab->move($this->getField('rate')
+				->id('itemRate')
+				->divAttr(array('class' => 'form-group col-xs-5 col-sm-1')),
+			$oMainRow1
+		);
 
 		$oMainRow1->add(Admin_Form_Entity::factory('Span')
 			->value('%')
 			->style("font-size: 200%")
-			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-2', 'style' => 'padding-top: 20px'))
-			);
+			->divAttr(array(
+				'class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-2',
+				'style' => 'padding-top: 20px'
+			))
+		);
 
-		$this->getField('name')->format(array('minlen' => array('value' => 0)));
+		$this->getField('name')->id('itemInput')->format(array('minlen' => array('value' => 0)));
 
 		$oMainTab->moveAfter($this->getField('rate'), $this->getField('price'));
 
@@ -84,12 +95,57 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'))
 		);
 
-		$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
-		$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+		$oMainTab->move($this->getField('marking')->id('itemMarking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
 
-		$oAdditionalTab->move($this->getField('shop_item_id')/*->style("width: 200px")*/, $oMainTab);
+		$oAdditionalTab->move($this->getField('shop_item_id'), $oMainTab);
 
-		$oMainTab->move($this->getField('shop_item_id')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+		$oMainTab->move($this->getField('shop_item_id')->id('itemId')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+
+		$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
+		->type("text/javascript")
+		->value("
+			$('#itemInput').autocomplete({
+				  source: function(request, response) {
+					$.ajax({
+					  url: '/admin/shop/order/item/index.php?autocomplete=1&shop_order_id={$object->Shop_Order->id}',
+					  dataType: 'json',
+					  data: {
+						queryString: request.term
+					  },
+					  success: function( data ) {
+						response( data );
+					  }
+					});
+				  },
+				  minLength: 1,
+				  create: function() {
+					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+						return $('<li></li>')
+							.data('item.autocomplete', item)
+							.append('<a>' + item.label + '</a>')
+							.append('<span>' + item.price_with_tax + ' ' + item.currency + '</span>')
+							.append('<span>' + item.marking + '</span>')
+							.appendTo(ul);
+					}
+
+					 $(this).prev('.ui-helper-hidden-accessible').remove();
+				  },
+				  select: function( event, ui ) {
+					$('#itemId').val(typeof ui.item.id !== 'undefined' ? ui.item.id : 0);
+					$('#itemPrice').val(typeof ui.item.price !== 'undefined' ? ui.item.price : 0);
+					$('#itemRate').val(typeof ui.item.rate !== 'undefined' ? ui.item.rate : 0);
+					$('#itemMarking').val(typeof ui.item.marking !== 'undefined' ? ui.item.marking : 0);
+				  },
+				  open: function() {
+					$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+				  },
+				  close: function() {
+					$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+				  }
+			});
+		");
+
+		$oMainTab->add($oCore_Html_Entity_Script);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Order_Item.order_items_edit_form_title', $oOrder->invoice)
@@ -141,20 +197,20 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 	 */
 	protected function _fillWarehousesList($iShopId)
 	{
-		$oObject = Core_Entity::factory('Shop_Warehouse');
-
-		$oObject->queryBuilder()
-			->where("shop_id", "=", $iShopId)
-			->orderBy("sorting")
-			->orderBy("id");
-
-		$aObjects = $oObject->findAll();
-
 		$aReturn = array(" … ");
 
-		foreach ($aObjects as $oObject)
+		$oShop_Warehouses = Core_Entity::factory('Shop_Warehouse');
+		$oShop_Warehouses->queryBuilder()
+			->where('shop_warehouses.shop_id', '=', $iShopId)
+			->clearOrderBy()
+			->orderBy('shop_warehouses.sorting')
+			->orderBy('shop_warehouses.id');
+
+		$aShop_Warehouses = $oShop_Warehouses->findAll(FALSE);
+
+		foreach ($aShop_Warehouses as $oShop_Warehouse)
 		{
-			$aReturn[$oObject->id] = $oObject->name;
+			$aReturn[$oShop_Warehouse->id] = '[' . $oShop_Warehouse->id . '] ' . $oShop_Warehouse->name;
 		}
 
 		return $aReturn;

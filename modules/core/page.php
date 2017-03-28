@@ -197,6 +197,16 @@ class Core_Page extends Core_Servant_Properties
 	public $css = array();
 
 	/**
+	 * Clear $css list
+	 * @return Core_Page
+	 */
+	public function clearCss()
+	{
+		$this->css = array();
+		return $this;
+	}
+	
+	/**
 	 * Link $css to the beginning of list
 	 * @param string $css path
 	 * @return Core_Page
@@ -316,6 +326,16 @@ class Core_Page extends Core_Servant_Properties
 	 */
 	public $js = array();
 
+	/**
+	 * Clear $js list
+	 * @return Core_Page
+	 */
+	public function clearJs()
+	{
+		$this->js = array();
+		return $this;
+	}
+	
 	/**
 	 * Link js
 	 * @param string $js path
@@ -482,7 +502,7 @@ class Core_Page extends Core_Servant_Properties
 			// страница с 403 ошибкой не найдена
 			if (is_null($oStructure->id))
 			{
-				throw new Core_Exception('Group not found');
+				throw new Core_Exception('Structure 403 not found');
 			}
 
 			if ($oStructure->type == 0)
@@ -532,7 +552,7 @@ class Core_Page extends Core_Servant_Properties
 			// страница с 404 ошибкой не найдена
 			if (is_null($oStructure->id))
 			{
-				throw new Core_Exception('Structure not found');
+				throw new Core_Exception('Structure 404 not found');
 			}
 
 			if ($oStructure->type == 0)

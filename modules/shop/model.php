@@ -748,7 +748,9 @@ class Shop_Model extends Core_Entity
 	{
 		$siteuser_id = Core_Array::getGet('siteuser_id');
 
-		$aShop_Siteuser_Transactions = Core_Entity::factory('Siteuser', $siteuser_id)->Shop_Siteuser_Transactions->getByShop($this->id);
+		$aShop_Siteuser_Transactions = Core_Entity::factory('Siteuser', $siteuser_id)
+			->Shop_Siteuser_Transactions
+			->getByShop($this->id);
 
 		$amount = 0;
 		foreach ($aShop_Siteuser_Transactions as $oShop_Siteuser_Transaction)
@@ -759,7 +761,7 @@ class Shop_Model extends Core_Entity
 			}
 		}
 
-		return $amount;
+		return round($amount, 2);
 	}
 
 	/**

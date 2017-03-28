@@ -54,11 +54,18 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 	{
 		if (is_null($operation))
 		{
+			// Original windowId
+			$windowId = $this->_Admin_Form_Controller->getWindowId();
+
 			$newWindowId = 'Shortcut_' . time();
 
 			$oCore_Html_Entity_Form = Core::factory('Core_Html_Entity_Form')
 				->action($this->_Admin_Form_Controller->getPath())
 				->method('post');
+
+			$window_Admin_Form_Controller = clone $this->_Admin_Form_Controller;
+			// Select на всплывающем окне должен быть найден через ID нового окна, а не id_content
+			$window_Admin_Form_Controller->window($newWindowId);
 
 			$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
 				->id($newWindowId)
@@ -71,10 +78,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller(
-					// Select на всплывающем окне должен быть найден через ID нового окна, а не id_content
-					$this->_Admin_Form_Controller->window($newWindowId)
-				);
+				->controller($window_Admin_Form_Controller);
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
@@ -91,7 +95,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 							->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
 							->value(1)
 							->type('hidden')
-							//->controller($this->_Admin_Form_Controller)
+							//->controller($window_Admin_Form_Controller)
 					);
 				}
 			}
@@ -118,8 +122,6 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 			$oCore_Html_Entity_Div->execute();
 
 			ob_start();
-
-			$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 			Core::factory('Core_Html_Entity_Script')
 				->type("text/javascript")

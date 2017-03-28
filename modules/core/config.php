@@ -113,9 +113,9 @@ class Core_Config
 		}
 		else
 		{
-			return is_numeric($value)
-				? $value
-				: "'" . str_replace("'", "\'", $value) . "'";
+			return is_string($value)
+				? "'" . str_replace("'", "\'", $value) . "'"
+				: $value;
 		}
 	}
 

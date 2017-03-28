@@ -27,6 +27,7 @@ return array(
 	'edit_success' => 'Delivery type information added successfully!',
 	'edit_error' => 'Error while adding delivery type information!',
 	'apply_success' => 'Information has been successfully changed',
+	'copy_success' => "Information has been copied successfully!",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
 	'markDeleted_success' => 'Delivery type information deleted successfully!',

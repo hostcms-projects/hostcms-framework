@@ -22,6 +22,12 @@ class Shop_Payment_System_Controller_Show extends Core_Controller
 	);
 
 	/**
+	 * Shop_Payment_Systems object
+	 * @var Shop_Payment_Systems_Model
+	 */
+	protected $_Shop_Payment_Systems = NULL;
+
+	/**
 	 * Constructor.
 	 * @param Shop_Model $oShop shop
 	 */
@@ -49,6 +55,20 @@ class Shop_Payment_System_Controller_Show extends Core_Controller
 				}
 			}
 		}
+
+		$this->_Shop_Payment_Systems = $oShop->Shop_Payment_Systems;
+		$this->_Shop_Payment_Systems
+			->queryBuilder()
+			->where('shop_payment_systems.active', '=', 1);
+	}
+
+	/**
+	 * Get Shop_Payment_Systems set
+	 * @return _Shop_Payment_Systems_Model
+	 */
+	public function shopPaymentSystems()
+	{
+		return $this->_Shop_Payment_Systems;
 	}
 
 	/**
@@ -60,23 +80,21 @@ class Shop_Payment_System_Controller_Show extends Core_Controller
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
 
-		$oShop = $this->getEntity();
-
-		$oShop_Payment_Systems = $oShop->Shop_Payment_Systems;
-
 		if ($this->shop_delivery_id)
 		{
-			$oShop_Payment_Systems
+			$this->_Shop_Payment_Systems
 				->queryBuilder()
 				->select('shop_payment_systems.*')
 				->join('shop_delivery_payment_systems', 'shop_delivery_payment_systems.shop_payment_system_id', '=', 'shop_payment_systems.id')
 				->where('shop_delivery_payment_systems.shop_delivery_id', '=', $this->shop_delivery_id);
 		}
 
-		$aShop_Payment_Systems = $oShop_Payment_Systems->getAllByActive(1);
+		$aShop_Payment_Systems = $this->_Shop_Payment_Systems->findAll();
 		foreach ($aShop_Payment_Systems as $oShop_Payment_System)
 		{
-			$this->addEntity($oShop_Payment_System->clearEntities());
+			$this->addEntity(
+				$oShop_Payment_System->clearEntities()
+			);
 		}
 
 		return parent::show();

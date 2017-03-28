@@ -822,7 +822,7 @@ class Shop_Item_Model extends Core_Entity
 	public function move($iShopGroupId)
 	{
 		$this->shop_group_id = $iShopGroupId;
-		return $this->save();
+		return $this->save()->clearCache();
 	}
 
 	/**
@@ -897,7 +897,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Create shortcut and move into group $group_id
 	 * @param int $group_id group id
-	 * @return self
+	 * @return Shop_Item_Model Shortcut
 	 */
 	public function shortcut($group_id = NULL)
 	{
@@ -920,7 +920,7 @@ class Shop_Item_Model extends Core_Entity
 			? $object->shop_group_id
 			: $group_id;
 
-		return $oShop_ItemShortcut->save();
+		return $oShop_ItemShortcut->save()->clearCache();
 	}
 
 	/**
@@ -1117,8 +1117,6 @@ class Shop_Item_Model extends Core_Entity
 		return $oSearch_Page;
 	}
 
-
-
 	/**
 	 * Backend callback method
 	 * @param Admin_Form_Field $oAdmin_Form_Field
@@ -1313,6 +1311,9 @@ class Shop_Item_Model extends Core_Entity
 			$this->Shop_Group->decCountItems();
 		}
 
+		// Remove from search index
+		$this->unindex();
+		
 		return parent::delete($primaryKey);
 	}
 
@@ -1675,14 +1676,19 @@ class Shop_Item_Model extends Core_Entity
 		$this->clearXmlTags()
 			->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
 
-		!isset($this->_forbiddenTags['date']) && $this->addXmlTag('date', strftime($oShop->format_date, Core_Date::sql2timestamp($this->datetime)));
+		!isset($this->_forbiddenTags['date'])
+			&& $this->addXmlTag('date', strftime($oShop->format_date, Core_Date::sql2timestamp($this->datetime)));
 
-		$this
-			->addXmlTag('datetime', strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->datetime)))
-			->addXmlTag('start_datetime', $this->start_datetime == '0000-00-00 00:00:00'
+		/*!isset($this->_forbiddenTags['datetime'])
+			&& */$this->addXmlTag('datetime', strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->datetime)));
+
+		/*!isset($this->_forbiddenTags['start_datetime'])
+			&& */$this->addXmlTag('start_datetime', $this->start_datetime == '0000-00-00 00:00:00'
 				? $this->start_datetime
-				: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->start_datetime)))
-			->addXmlTag('end_datetime', $this->end_datetime == '0000-00-00 00:00:00'
+				: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->start_datetime)));
+
+		/*!isset($this->_forbiddenTags['end_datetime'])
+			&& */$this->addXmlTag('end_datetime', $this->end_datetime == '0000-00-00 00:00:00'
 				? $this->end_datetime
 				: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
 
@@ -1847,6 +1853,7 @@ class Shop_Item_Model extends Core_Entity
 						->showXmlSpecialprices($this->_showXmlSpecialprices)
 						->showXmlTags($this->_showXmlTags)
 						->showXmlWarehousesItems($this->_showXmlWarehousesItems)
+						->showXmlBonuses($this->_showXmlBonuses)
 						->showXmlSiteuser($this->_showXmlSiteuser)
 						->showXmlProperties($this->_showXmlProperties);
 
@@ -2092,6 +2099,22 @@ class Shop_Item_Model extends Core_Entity
 				? $this->Shop_Group->clearCache()
 				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
 					->deleteByTag('shop_group_0');
+					
+			// Static cache
+			$oSite = $this->Shop->Site;
+			if ($oSite->html_cache_use)
+			{
+				$oSiteAlias = $oSite->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$url = $oSiteAlias->name
+						. $this->Shop->Structure->getPath()
+						. $this->getPath();
+					
+					$oCache_Static = Core_Cache::instance('static');
+					$oCache_Static->delete($url);
+				}
+			}
 		}
 
 		return $this;

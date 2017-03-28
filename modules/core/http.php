@@ -429,13 +429,13 @@ abstract class Core_Http
 	 * @return array
 	 */
 	protected function _parseHeaders($header)
-	{
+	{			
 		$aReturn = array();
 		$fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header));
 
 		foreach ($fields as $field)
 		{
-			if (preg_match('/([^:]+): (.+)/m', $field, $match))
+			if (preg_match('/([^:]+): (.*)/m', $field, $match))
 			{
 				$match[1] = preg_replace_callback(
 					'/(?<=^|[\x09\x20\x2D])./',
@@ -458,7 +458,7 @@ abstract class Core_Http
 					$aReturn[$match[1]] = trim($match[2]);
 				}
 			}
-			else
+			elseif (!isset($aReturn['status']))
 			{
 				$aReturn['status'] = trim($field);
 			}

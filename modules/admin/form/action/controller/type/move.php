@@ -54,6 +54,9 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 	{
 		if (is_null($operation))
 		{
+			// Original windowId
+			$windowId = $this->_Admin_Form_Controller->getWindowId();
+
 			$newWindowId = 'Move_' . time();
 
 			$oCore_Html_Entity_Form = Core::factory('Core_Html_Entity_Form');
@@ -65,6 +68,10 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 			$oCore_Html_Entity_Form->action($this->_Admin_Form_Controller->getPath())
 				->method('post');
 
+			$window_Admin_Form_Controller = clone $this->_Admin_Form_Controller;
+			// Select на всплывающем окне должен быть найден через ID нового окна, а не id_content
+			$window_Admin_Form_Controller->window($newWindowId);
+
 			$oAdmin_Form_Entity_Select = Admin_Form_Entity::factory('Select')
 				->name('destinationId')
 				->id('destinationId')
@@ -73,10 +80,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller(
-					// Select на всплывающем окне должен быть найден через ID нового окна, а не id_content
-					$this->_Admin_Form_Controller->window($newWindowId)
-				);
+				->controller($window_Admin_Form_Controller);
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
@@ -92,7 +96,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 							->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
 							->value(1)
 							->type('hidden')
-							//->controller($this->_Admin_Form_Controller)
+							//->controller($window_Admin_Form_Controller)
 					);
 				}
 			}
@@ -119,8 +123,6 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 			$oCore_Html_Entity_Div->execute();
 
 			ob_start();
-
-			$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 			Core::factory('Core_Html_Entity_Script')
 				->type("text/javascript")

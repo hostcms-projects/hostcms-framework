@@ -165,20 +165,47 @@ class Shop_Delivery_Model extends Core_Entity
 	 */
 	public function copy()
 	{
+		$limit = 100;
+		$offset = 0;
+
 		$newObject = parent::copy();
 
 		try
 		{
-			Core_File::copy($this->getDeliveryFilePath(), $newObject->getDeliveryFilePath());
-			Core_File::copy($this->getHandlerFilePath(), $newObject->getHandlerFilePath());
-		} catch (Exception $e) {}
-
-		$aShop_Delivery_Conditions = $this->Shop_Delivery_Conditions->findAll();
-		foreach($aShop_Delivery_Conditions as $oShop_Delivery_Condition)
-		{
-			$oNew_Shop_Delivery_Condition = $oShop_Delivery_Condition->copy();
-			$newObject->add($oNew_Shop_Delivery_Condition);
+			if (is_file($this->getDeliveryFilePath()))
+			{
+				Core_File::copy($this->getDeliveryFilePath(), $newObject->getDeliveryFilePath());
+			}
 		}
+		catch (Exception $e) {}
+
+		try
+		{
+			if (is_file($this->getHandlerFilePath()))
+			{
+				$sReplace = str_replace("Shop_Delivery_Handler" . $this->id, "Shop_Delivery_Handler" . $newObject->id, $this->loadHandlerFile());
+
+				$this->saveHandlerFile($sReplace);
+
+				Core_File::copy($this->getHandlerFilePath(), $newObject->getHandlerFilePath());
+			}
+		}
+		catch (Exception $e) {}
+
+		do {
+			$oShop_Delivery_Conditions = $this->Shop_Delivery_Conditions;
+			$oShop_Delivery_Conditions->queryBuilder()->offset($offset)->limit($limit);
+			$aShop_Delivery_Conditions = $oShop_Delivery_Conditions->findAll(FALSE);
+
+			foreach($aShop_Delivery_Conditions as $oShop_Delivery_Condition)
+			{
+				$oNew_Shop_Delivery_Condition = $oShop_Delivery_Condition->copy();
+				$newObject->add($oNew_Shop_Delivery_Condition);
+			}
+
+			$offset += $limit;
+		}
+		while (count($aShop_Delivery_Conditions));
 
 		return $newObject;
 	}

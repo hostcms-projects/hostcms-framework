@@ -387,6 +387,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 	/**
 	* Импорт CSV
+	* @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImport
+	* @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImport
 	* @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeFindByMarking
 	* @hostcms-event Shop_Item_Import_Cml_Controller.onAfterFindByMarking
 	* @hostcms-event Shop_Item_Import_Cml_Controller.oBeforeAdminUpload
@@ -395,6 +397,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	*/
 	public function import()
 	{
+		Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImport', $this, array($this->_oCurrentShop));
+
 		if ($this->importAction == 0)
 		{
 			Core_QueryBuilder::update('shop_groups')
@@ -410,7 +414,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 		$fInputFile = fopen($this->file, 'rb');
 
-		if ($fInputFile === FALSE) throw new Core_Exception("");
+		if ($fInputFile === FALSE)
+		{
+			throw new Core_Exception("");
+		}
 
 		fseek($fInputFile, $this->seek);
 
@@ -2622,6 +2629,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 		fclose($fInputFile);
 
+		Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImport', $this, array($this->_oCurrentShop, $iCurrentSeekPosition));
+		
 		return $iCurrentSeekPosition;
 	}
 

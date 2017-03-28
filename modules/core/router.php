@@ -64,6 +64,14 @@ class Core_Router
 			}
 		}
 
-		throw new Core_Exception("Unroutable URI '%uri'.", array('%uri' => $uri));
+		$oCore_Response = new Core_Response();
+		$oCore_Response
+			->status(503)
+			->header('Content-Type', "text/html; charset=UTF-8")
+			->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . ' GMT')
+			->header('X-Powered-By', 'HostCMS')
+			->sendHeaders();
+		
+		throw new Core_Exception("Unroutable URI '%uri'.", array('%uri' => $uri), NULL, FALSE);
 	}
 }

@@ -50,18 +50,18 @@ class Shop_Seller_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oDescriptionField->wysiwyg = TRUE;
 
-		$oMainTab->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
-		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2')), $oMainRow1);
+		$oMainTab->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow1);
+		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow1);
 
-		$oMainTab->move($this->getField('contact_person')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
-		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
+		$oMainTab->move($this->getField('contact_person')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow2);
+		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow2);
 
-		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
-		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow3);
 
-		$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
-		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
-		$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow4);
 
 		// Добавляем новое поле типа файл
 		$oImageField = Admin_Form_Entity::factory('File');

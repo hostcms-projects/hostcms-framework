@@ -23,7 +23,7 @@ class Informationsystem_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-05-06';
+	public $date = '2016-06-09';
 
 	/**
 	 * Module name
@@ -290,20 +290,23 @@ class Informationsystem_Module extends Core_Module
 	 */
 	public function callSchedule($action, $entityId)
 	{
-		switch ($action)
+		if ($entityId)
 		{
-			// Index item
-			case 0:
-				$entityId && Core_Entity::factory('Informationsystem_Item', $entityId)->index();
-			break;
-			// Index group
-			case 1:
-				$entityId && Core_Entity::factory('Informationsystem_Group', $entityId)->index();
-			break;
-			// Unindex item
-			case 2:
-				$entityId && Core_Entity::factory('Informationsystem_Item', $entityId)->unindex();
-			break;
+			switch ($action)
+			{
+				// Index item
+				case 0:
+					Core_Entity::factory('Informationsystem_Item', $entityId)->index()->clearCache();
+				break;
+				// Index group
+				case 1:
+					Core_Entity::factory('Informationsystem_Group', $entityId)->index()->clearCache();
+				break;
+				// Unindex item
+				case 2:
+					Core_Entity::factory('Informationsystem_Item', $entityId)->unindex()->clearCache();
+				break;
+			}
 		}
 	}
 }

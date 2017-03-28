@@ -341,7 +341,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oMainRow3->add($oModificationSelect);
 
-				if(!$object->modification_id)
+				if (!$object->modification_id)
 				{
 					// Удаляем группу товаров
 					$oAdditionalTab->delete($this->getField('shop_group_id'));
@@ -539,7 +539,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
 				}
 
-				if (Core::moduleIsActive('siteuser'))
+				if (Core::moduleIsActive('siteuser') || defined('BACKEND_SHOP_PRICES'))
 				{
 					$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
 					foreach($aShopPrices as $oShopPrice)
@@ -672,7 +672,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oShopItemTabSpecialPrices->add($oSpecialPriceDiv = Admin_Form_Entity::factory('Div'));
 
-				if(count($aShop_Specialprices) > 0)
+				if (count($aShop_Specialprices) > 0)
 				{
 					foreach($aShop_Specialprices as $oShop_Specialprice)
 					{
@@ -736,7 +736,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 								jQuery(function($){
 									//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
 									var tag_input = $(\'#form-field-tags\');
-									if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
+									if (! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
 									{
 										tag_input.tag( { placeholder:tag_input.attr(\'placeholder\') } );
 									}
@@ -1178,12 +1178,14 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Дополнительные цены для групп пользователей
-				if (Core::moduleIsActive('siteuser'))
+				if (Core::moduleIsActive('siteuser') || defined('BACKEND_SHOP_PRICES'))
 				{
 					$aAdditionalPrices = $this->_object->Shop->Shop_Prices->findAll();
-					foreach($aAdditionalPrices as $oAdditionalPrice)
+					foreach ($aAdditionalPrices as $oAdditionalPrice)
 					{
-						$oAdditionalPriceValue = $this->_object->Shop_Item_Prices->getByPriceId($oAdditionalPrice->id);
+						$oAdditionalPriceValue = $this->_object
+							->Shop_Item_Prices
+							->getByPriceId($oAdditionalPrice->id);
 
 						if (is_null($oAdditionalPriceValue))
 						{
@@ -1192,7 +1194,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							$oAdditionalPriceValue->shop_price_id = $oAdditionalPrice->id;
 						}
 
-						if(!is_null(Core_Array::getPost("item_price_id_{$oAdditionalPrice->id}")))
+						if (!is_null(Core_Array::getPost("item_price_id_{$oAdditionalPrice->id}")))
 						{
 							$oAdditionalPriceValue->value = Core_Array::getPost("item_price_value_{$oAdditionalPrice->id}", 0);
 							$oAdditionalPriceValue->save();
@@ -1204,7 +1206,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					}
 				}
 
-				//Яндекс.Маркет доставка
+				// Яндекс.Маркет доставка
 				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
 				$oShop_Item_Delivery_Option_Controller_Tab
 					->shop_id($oShop->id)
@@ -1286,7 +1288,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oShopItemWarehouse = $this->_object->Shop_Warehouse_Items->getByWarehouseId($oShopWarehouse->id);
 
-					if(is_null($oShopItemWarehouse))
+					if (is_null($oShopItemWarehouse))
 					{
 						$oShopItemWarehouse = Core_Entity::factory('Shop_Warehouse_Item');
 

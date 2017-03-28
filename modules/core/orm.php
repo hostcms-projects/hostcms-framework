@@ -1390,7 +1390,7 @@ class Core_ORM
 	{
 		$this->_loadColumns();
 
-		if (isset($this->_tableColumns[$name]) && isset($arguments[0]))
+		if (isset($this->_tableColumns[$name]) && array_key_exists(0, $arguments))
 		{
 			return $this->__set($name, $arguments[0]);
 		}

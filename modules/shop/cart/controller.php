@@ -44,25 +44,35 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	{
 		parent::__construct();
 
-		$this->quantity = 1;
-		$this->postpone = 0;
-		$this->shop_warehouse_id = 0;
-		$this->marking = '';
+		$this->clear();
 
 		$this->siteuser_id = 0;
 		if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
-			if ($oSiteuser)
-			{
-				$this->siteuser_id = $oSiteuser->id;
-			}
+			!is_null($oSiteuser)
+				&& $this->siteuser_id = $oSiteuser->id;
 		}
 
 		$this->checkStock = FALSE;
 	}
 
+	/**
+	 * Clear cart operation's options
+	 * @return Shop_Cart_Controller
+	 */
+	public function clear()
+	{
+		$this->shop_item_id = NULL;
+		
+		$this->quantity = 1;
+		$this->postpone = $this->shop_warehouse_id = 0;
+		$this->marking = '';
+		
+		return $this;
+	}
+	
 	/**
 	 * The singleton instances.
 	 * @var mixed
@@ -399,16 +409,6 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 			}
 		}
 
-		return $this;
-	}
-
-	/**
-	 * Clear the cart
-	 * @return Shop_Cart_Controller
-	 */
-	public function clear()
-	{
-		$this->shop_item_id = $this->quantity = $this->postpone = $this->shop_warehouse_id = NULL;
 		return $this;
 	}
 }

@@ -30,7 +30,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 	/**
 	 * Show menu item
 	 */
-	protected function _showMenuItem()
+	protected function _showMenuItem($subMenu)
 	{
 		$aFirstColors = array(
 			'btn-success',
@@ -62,32 +62,22 @@ class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 
 		$oCore_Html_Entity_A = Core::factory('Core_Html_Entity_A');
 
-		if (strlen($this->href)/*&& $this->onclick*/)
-		{
-			strlen($this->onclick) && $oCore_Html_Entity_A->onclick($this->onclick);
-			$oCore_Html_Entity_A->href($this->href);
-
-			!is_null($this->target) && $oCore_Html_Entity_A->target($this->target);
-		}
-		else
-		{
-			$oCore_Html_Entity_A
-				->class("btn {$aFirstColors[$index]}")
-				->set('data-toggle', 'dropdown');
-		}
-
-		$this->icon && $oCore_Html_Entity_A->add(
+		strlen($this->href) && $oCore_Html_Entity_A->href($this->href);
+		strlen($this->onclick) && $oCore_Html_Entity_A->onclick($this->onclick);
+		!is_null($this->target) && $oCore_Html_Entity_A->target($this->target);
+		strlen($this->icon) && $oCore_Html_Entity_A->add(
 			Core::factory('Core_Html_Entity_I')->class("{$this->icon} icon-separator")
 		);
-
-		//$oCore_Html_Entity_A->value($this->name);
+		
+		!$subMenu && $oCore_Html_Entity_A
+			->class("btn {$aFirstColors[$index]}")
+			->set('data-toggle', 'dropdown');
 
 		$oCore_Html_Entity_A->add(
 			Core::factory('Core_Html_Entity_Code')
 				->value(htmlspecialchars($this->name))
-		);
-
-		$oCore_Html_Entity_A->execute();
+		)
+		->execute();
 
 		if (!$this->href && !$this->onclick)
 		{
@@ -99,9 +89,9 @@ class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 			?><ul class="dropdown-menu <?php echo $aDropdownColors[$index]?>"><?php
 
 			// Вывод подменю
-			foreach ($this->_children as $key => $subMenu)
+			foreach ($this->_children as $subMenu)
 			{
-				?><li><?php $subMenu->_showMenuItem()?></li><?php
+				?><li><?php $subMenu->_showMenuItem(TRUE)?></li><?php
 			}
 			?></ul><?php
 		}
@@ -112,6 +102,6 @@ class Skin_Bootstrap_Admin_Form_Entity_Menu extends Admin_Form_Entity
 	 */
 	public function execute()
 	{
-		?><div class="btn-group"><?php $this->_showMenuItem()?></div><?php
+		?><div class="btn-group"><?php $this->_showMenuItem(FALSE)?></div><?php
 	}
 }

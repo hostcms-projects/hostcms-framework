@@ -242,6 +242,9 @@ class Informationsystem_Item_Model extends Core_Entity
 			$this->Informationsystem_Group->decCountItems();
 		}
 
+		// Remove from search index
+		$this->unindex();
+		
 		return parent::delete($primaryKey);
 	}
 
@@ -288,7 +291,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	public function move($informationsystem_group_id)
 	{
 		$this->informationsystem_group_id = $informationsystem_group_id;
-		return $this->save();
+		return $this->save()->clearCache();
 	}
 
 	/**
@@ -744,14 +747,14 @@ class Informationsystem_Item_Model extends Core_Entity
 		$this->active && $this->indexing
 			? $this->index()
 			: $this->unindex();
-
+			
 		return $this->save();
 	}
 
 	/**
 	 * Create shortcut and move into group $group_id
 	 * @param int $group_id group id
-	 * @return self
+	 * @return Informationsystem_Item_Model Shortcut
 	 */
 	public function shortcut($group_id = NULL)
 	{
@@ -773,8 +776,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			? $object->informationsystem_group_id
 			: $group_id;
 
-		$oInformationsystem_ItemShortcut->save();
-		return $this;
+		return $oInformationsystem_ItemShortcut->save()->clearCache();
 	}
 
 	/**
@@ -1174,14 +1176,19 @@ class Informationsystem_Item_Model extends Core_Entity
 		$this->clearXmlTags()
 			->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath());
 
-		!isset($this->_forbiddenTags['date']) && $this->addXmlTag('date', strftime($oInformationsystem->format_date, Core_Date::sql2timestamp($this->datetime)));
+		!isset($this->_forbiddenTags['date'])
+			&& $this->addXmlTag('date', strftime($oInformationsystem->format_date, Core_Date::sql2timestamp($this->datetime)));
 
-		$this
-			->addXmlTag('datetime', strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->datetime)))
-			->addXmlTag('start_datetime', $this->start_datetime == '0000-00-00 00:00:00'
+		/*!isset($this->_forbiddenTags['datetime'])
+			&& */$this->addXmlTag('datetime', strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->datetime)));
+
+		/*!isset($this->_forbiddenTags['start_datetime'])
+			&& */$this->addXmlTag('start_datetime', $this->start_datetime == '0000-00-00 00:00:00'
 				? $this->start_datetime
-				: strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->start_datetime)))
-			->addXmlTag('end_datetime', $this->end_datetime == '0000-00-00 00:00:00'
+				: strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->start_datetime)));
+
+		/*!isset($this->_forbiddenTags['end_datetime'])
+			&& */$this->addXmlTag('end_datetime', $this->end_datetime == '0000-00-00 00:00:00'
 				? $this->end_datetime
 				: strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
 
@@ -1412,6 +1419,22 @@ class Informationsystem_Item_Model extends Core_Entity
 				? $this->Informationsystem_Group->clearCache()
 				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
 					->deleteByTag('informationsystem_group_0');
+					
+			// Static cache
+			$oSite = $this->Informationsystem->Site;
+			if ($oSite->html_cache_use)
+			{
+				$oSiteAlias = $oSite->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$url = $oSiteAlias->name
+						. $this->Informationsystem->Structure->getPath()
+						. $this->getPath();
+					
+					$oCache_Static = Core_Cache::instance('static');
+					$oCache_Static->delete($url);
+				}
+			}
 		}
 
 		return $this;

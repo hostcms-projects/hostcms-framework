@@ -19,13 +19,20 @@ class Shop_Item_Discount_Controller_Delete extends Admin_Form_Action_Controller
 	 */
 	public function execute($operation = NULL)
 	{
-		$oShopItem = Core_Entity::factory('Shop_Item', Core_Array::getGet('shop_item_id', 0));
-		$oShopDiscount = Core_Entity::factory('Shop_Discount', $this->_object->id);
-		$oShopItemDiscount = $oShopItem->Shop_Item_Discounts->getByDiscountId($oShopDiscount->id);
+		$oShop_Item = Core_Entity::factory('Shop_Item', Core_Array::getGet('shop_item_id', 0));
 
-		if(!is_null($oShopItemDiscount))
+		switch (get_class($this->_object))
 		{
-			$oShopItemDiscount->delete();
+			case 'Shop_Bonus_Model':
+				$oEntity = $oShop_Item->Shop_Item_Bonuses->getByShop_bonus_id($this->_object->id);
+			break;
+			case 'Shop_Discount_Model':
+				$oEntity = $oShop_Item->Shop_Item_Discounts->getByShop_discount_id($this->_object->id);
+			break;
+			default:
+				$oEntity = NULL;
 		}
+
+		!is_null($oEntity) && $oEntity->delete();
 	}
 }

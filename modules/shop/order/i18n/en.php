@@ -10,6 +10,8 @@
  */
 return array(
 	'model_name' => 'Online store orders',
+	'orders' => 'Orders',
+	'order_edit' => 'Edit order %s',
 	'shops_link_order' => "Order",
 	'shops_link_order_add' => "Add",
 	'show_order_title' => "Orders of online store \"%s\"",

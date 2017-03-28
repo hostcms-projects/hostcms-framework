@@ -43,9 +43,6 @@ class Source_Controller extends Core_Servant_Properties
 				// Обрезаем www у домена
 				strpos($domain, 'www.') === 0 && $domain = substr($domain, 4);
 
-				// явное указание domain возможно только для домена второго и более уровня
-				// http://wp.netscape.com/newsref/std/cookie_spec.html
-				// http://web-notes.ru/2008/07/cookies_within_local_domains/
 				$domain = strpos($domain, '.') !== FALSE && !Core_Valid::ip($domain)
 					? '.' . $domain
 					: '';

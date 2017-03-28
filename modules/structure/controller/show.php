@@ -820,16 +820,16 @@ class Structure_Controller_Show extends Core_Controller
 
 	/**
 	 * Apply forbidden tags
-	 * @param Structure $oStructure
+	 * @param Core_Entity $object
 	 * @return self
 	 */
-	public function applyForbiddenTags($oStructure)
+	public function applyForbiddenTags($object)
 	{
 		if (!is_null($this->forbiddenTags))
 		{
 			foreach ($this->forbiddenTags as $forbiddenTag)
 			{
-				$oStructure->addForbiddenTag($forbiddenTag);
+				$object->addForbiddenTag($forbiddenTag);
 			}
 		}
 

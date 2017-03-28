@@ -219,14 +219,16 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->_setShopItems()->_setShopGroups();
 
-		$this->group = 0;
+		$this->limit = 10;
+		$this->group = $this->offset = $this->page = 0;
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems
 			= $this->taxes = $this->cart = $this->modifications = $this->modificationsList = $this->filterShortcuts = FALSE;
 
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
-			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed = $this->votes = TRUE;
+			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed
+			= $this->votes = $this->showPanel = TRUE;
 
 		$this->viewedLimit = $this->comparingLimit = $this->favoriteLimit = 10;
 
@@ -234,9 +236,6 @@ class Shop_Controller_Show extends Core_Controller
 		$this->viewedOrder = 'DESC';
 
 		$this->groupsMode = 'tree';
-		$this->offset = 0;
-		$this->page = 0;
-		$this->showPanel = TRUE;
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
@@ -855,7 +854,8 @@ class Shop_Controller_Show extends Core_Controller
 
 				$oShop_Item->clearEntities();
 
-				if ($oShop_Item->active == $desiredActivity
+				if ($oShop_Item->id // Can be shortcut on markDeleted item
+					&& $oShop_Item->active == $desiredActivity
 					&& (!$iShortcut
 						|| (Core_Date::sql2timestamp($oShop_Item->end_datetime) >= $iCurrentTimestamp
 							|| $oShop_Item->end_datetime == '0000-00-00 00:00:00')
@@ -1777,7 +1777,7 @@ class Shop_Controller_Show extends Core_Controller
 				->where('shop_items.shop_group_id', '=', 0)
 				->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Modifications);
 		}
-			
+
 		if ($this->filterShortcuts)
 		{
 			$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')

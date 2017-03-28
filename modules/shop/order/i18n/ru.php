@@ -10,7 +10,9 @@
  */
 return array(
 	'model_name' => 'Заказы магазина',
+	'orders' => "Заказы",
 	'shops_link_order' => "Заказ",
+	'order_edit' => "Редактирование заказа №%s",
 	'shops_link_order_add' => "Добавить",
 	'show_order_title' => "Заказы магазина \"%s\"",
 	'order_add_form_title' => "Добавление информации о заказе",

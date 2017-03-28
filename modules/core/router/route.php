@@ -61,7 +61,7 @@ class Core_Router_Route
 	 * @var string
 	 */
 	protected $_uriPattern = NULL;
-	
+
 	/**
 	 * Preg pattern
 	 * @var string
@@ -96,7 +96,8 @@ class Core_Router_Route
 		// http://www.php.net/manual/en/reference.pcre.pattern.modifiers.php
 		// D - dollar metacharacter in the pattern matches only at the end of the subject string
 		// u - pattern strings are treated as UTF-8
-		$this->_pregPattern = '/^' . $expression . '$/Du';
+		// s - a dot metacharacter in the pattern matches all characters, including newlines
+		$this->_pregPattern = '/^' . $expression . '$/Dsu';
 	}
 
 	/**
@@ -108,6 +109,7 @@ class Core_Router_Route
 	{
 		// skip first '/'
 		$uri = ltrim($uri, '/');
+
 		$result = preg_match($this->_pregPattern, $uri, $matches);
 
 		return $result

@@ -542,7 +542,8 @@ class Core
 		return Core_Array::get($_SERVER, 'SERVER_PORT') == 443 || Core_Array::get($_SERVER, 'HTTP_PORT') == 443
 			|| strtolower(Core_Array::get($_SERVER, 'HTTPS')) == 'on' || Core_Array::get($_SERVER, 'HTTPS') == '1'
 			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_FORWARDED_PROTO')) == 'https'
-			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_SCHEME')) == 'https';
+			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_SCHEME')) == 'https'
+			|| strtolower(Core_Array::get($_SERVER, 'HTTP_X_HTTPS')) == 'on' || Core_Array::get($_SERVER, 'HTTP_X_HTTPS') == '1';
 	}
 
 	/**

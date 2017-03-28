@@ -256,6 +256,9 @@ class Informationsystem_Group_Model extends Core_Entity
 		// Удаляем директорию информационной группы
 		$this->deleteDir();
 
+		// Remove from search index
+		$this->unindex();
+		
 		return parent::delete($primaryKey);
 	}
 
@@ -593,6 +596,20 @@ class Informationsystem_Group_Model extends Core_Entity
 		return $this;
 	}
 
+	/**
+	 * Remove item from search index
+	 * @return self
+	 */
+	public function unindex()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::deleteSearchPage(1, 1, $this->id);
+		}
+
+		return $this;
+	}
+	
 	/**
 	 * Mark entity as deleted
 	 * @return Core_Entity
@@ -976,6 +993,22 @@ class Informationsystem_Group_Model extends Core_Entity
 			Core_Cache::instance(Core::$mainConfig['defaultCache'])
 				->deleteByTag('informationsystem_group_' . $this->id)
 				->deleteByTag('informationsystem_group_' . $this->parent_id);
+				
+			// Static cache
+			$oSite = $this->Informationsystem->Site;
+			if ($oSite->html_cache_use)
+			{
+				$oSiteAlias = $oSite->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$url = $oSiteAlias->name
+						. $this->Informationsystem->Structure->getPath()
+						. $this->getPath();
+					
+					$oCache_Static = Core_Cache::instance('static');
+					$oCache_Static->delete($url);
+				}
+			}
 		}
 
 		return $this;

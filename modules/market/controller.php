@@ -193,63 +193,48 @@ class Market_Controller extends Core_Servant_Properties
 
 			$oXml = @simplexml_load_string($data);
 
-			/*$aShop_Groups = array();
-			if (isset($oXml->shop_group) && count($oXml->shop_group))
+			if (is_object($oXml) && !intval($oXml->error))
 			{
-				foreach ($oXml->shop_group as $value)
+				$this->_parseGroup($oXml->shop_group);
+
+				//print_r($this->_categories);
+
+				$aShop_Items = array();
+				if (isset($oXml->shop_item) && count($oXml->shop_item))
 				{
-					//if (intval($value->count))
-					//{
+					foreach ($oXml->shop_item as $value)
+					{
 						$oObject = new StdClass();
 						$oObject->id = intval($value->attributes()->id);
+
+						$shop_group_id = intval($value->shop_group_id);
+
+						$oObject->category_name = isset($aShop_Groups[$shop_group_id])
+							? $aShop_Groups[$shop_group_id]->name
+							: '';
+
 						$oObject->name = strval($value->name);
 						$oObject->description = strval($value->description);
+						$oObject->image_large = 'http://' . $this->update_server . strval($value->dir) . strval($value->image_large);
+						$oObject->image_small = 'http://' . $this->update_server . strval($value->dir) . strval($value->image_small);
+						$oObject->url = 'http://' . $this->update_server . strval($value->url) . '?contract=' . $md5_contract . '&pin=' . $md5_pin;
+						$oObject->siteuser_id = intval($value->siteuser_id);
+						$oObject->price = strval($value->price);
+						$oObject->currency = strval($value->currency);
+						$oObject->paid = isset($value->paid)
+							? intval($value->paid)
+							: 0;
 
-						$aShop_Groups[$oObject->id] = $oObject;
-					//}
+						$oAdminModule = Core_Entity::factory('Module')->getByPath(strval($value->path), FALSE);
+						$oObject->installed = !is_null($oAdminModule)
+							? 1
+							: 0;
+
+						$aShop_Items[] = $oObject;
+					}
+
+					$this->items = $aShop_Items;
 				}
-
-				$this->_categories = $aShop_Groups;
-			}*/
-			$this->_parseGroup($oXml->shop_group);
-
-			//print_r($this->_categories);
-
-			$aShop_Items = array();
-			if (isset($oXml->shop_item) && count($oXml->shop_item))
-			{
-				foreach ($oXml->shop_item as $value)
-				{
-					$oObject = new StdClass();
-					$oObject->id = intval($value->attributes()->id);
-
-					$shop_group_id = intval($value->shop_group_id);
-
-					$oObject->category_name = isset($aShop_Groups[$shop_group_id])
-						? $aShop_Groups[$shop_group_id]->name
-						: '';
-
-					$oObject->name = strval($value->name);
-					$oObject->description = strval($value->description);
-					$oObject->image_large = 'http://' . $this->update_server . strval($value->dir) . strval($value->image_large);
-					$oObject->image_small = 'http://' . $this->update_server . strval($value->dir) . strval($value->image_small);
-					$oObject->url = 'http://' . $this->update_server . strval($value->url) . '?contract=' . $md5_contract . '&pin=' . $md5_pin;
-					$oObject->siteuser_id = intval($value->siteuser_id);
-					$oObject->price = strval($value->price);
-					$oObject->currency = strval($value->currency);
-					$oObject->paid = isset($value->paid)
-						? intval($value->paid)
-						: 0;
-
-					$oAdminModule = Core_Entity::factory('Module')->getByPath(strval($value->path), FALSE);
-					$oObject->installed = !is_null($oAdminModule)
-						? 1
-						: 0;
-
-					$aShop_Items[] = $oObject;
-				}
-
-				$this->items = $aShop_Items;
 			}
 
 			$this->category_id = isset($oXml->category_id)

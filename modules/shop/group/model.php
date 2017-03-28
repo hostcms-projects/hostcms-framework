@@ -451,7 +451,21 @@ class Shop_Group_Model extends Core_Entity
 
 		return $this;
 	}
-	
+
+	/**
+	 * Remove group from search index
+	 * @return self
+	 */
+	public function unindex()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::deleteSearchPage(3, 1, $this->id);
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Mark entity as deleted
 	 * @return Core_Entity
@@ -833,6 +847,9 @@ class Shop_Group_Model extends Core_Entity
 		$this->Shop_Items->deleteAll(FALSE);
 		$this->Shop_Item_Property_For_Groups->deleteAll(FALSE);
 
+		// Remove from search index
+		$this->unindex();
+
 		return parent::delete($primaryKey);
 	}
 
@@ -981,6 +998,13 @@ class Shop_Group_Model extends Core_Entity
 				$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->_showXmlProperties, $this->id);
 				foreach ($aProperty_Values as $oProperty_Value)
 				{
+					if ($oProperty_Value->Property->type == 2)
+					{
+						$oProperty_Value
+							->setHref($this->getGroupHref())
+							->setDir($this->getGroupPath());
+					}
+
 					/*isset($this->_showXmlProperties[$oProperty_Value->property_id]) && */$this->addEntity(
 						$oProperty_Value
 					);
@@ -1008,6 +1032,22 @@ class Shop_Group_Model extends Core_Entity
 			Core_Cache::instance(Core::$mainConfig['defaultCache'])
 				->deleteByTag('shop_group_' . $this->id)
 				->deleteByTag('shop_group_' . $this->parent_id);
+
+			// Static cache
+			$oSite = $this->Shop->Site;
+			if ($oSite->html_cache_use)
+			{
+				$oSiteAlias = $oSite->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$url = $oSiteAlias->name
+						. $this->Shop->Structure->getPath()
+						. $this->getPath();
+
+					$oCache_Static = Core_Cache::instance('static');
+					$oCache_Static->delete($url);
+				}
+			}
 		}
 
 		return $this;

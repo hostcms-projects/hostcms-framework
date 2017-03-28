@@ -178,17 +178,15 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 		$this->_setInformationsystemItems()->_setInformationsystemGroups();
 
-		$this->group = 0;
+		$this->limit = 10;
+		$this->group = $this->offset = $this->page = 0;
 		$this->item = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = TRUE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = $this->showPanel = TRUE;
 
 		$this->groupsMode = 'tree';
-		$this->offset = 0;
-		$this->page = 0;
 		$this->part = 1;
-		$this->showPanel = TRUE;
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
@@ -634,7 +632,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 						);
 				}
 
-				if ($oInformationsystem_Item->active == $desiredActivity
+				if ($oInformationsystem_Item->id // Can be shortcut on markDeleted item
+					&& $oInformationsystem_Item->active == $desiredActivity
 					&& (!$iShortcut
 						|| (Core_Date::sql2timestamp($oInformationsystem_Item->end_datetime) >= $iCurrentTimestamp
 							|| $oInformationsystem_Item->end_datetime == '0000-00-00 00:00:00')

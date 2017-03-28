@@ -1858,3 +1858,11 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 
 .siteuser_group_list_link>i {font-size:11px !important;margin-left:5px;}
 .siteuser_group_list_link>i:hover,.siteuser_group_list_link>i:focus {cursor:pointer;}
+
+/* --- Autocomplete --- */
+.ui-autocomplete { position: absolute; top: 0; left: 0; cursor: default; padding: 0px; list-style: none; background-color: #fff; border: 1px solid #f5f5f5; }
+.ui-autocomplete .ui-menu-item { cursor: pointer; clear: both; display: table; width: 100%; }
+.ui-autocomplete .ui-state-focus { background-color: #f5f5f5; }
+.ui-autocomplete .ui-menu-item a { color: #838383; display: table-cell; width: 50%; padding: 5px 5px 5px 10px; text-decoration: none; }
+.ui-autocomplete .ui-menu-item span { color: #838383; display: table-cell; width: 25%; }
+/* --- /Autocomplete --- */

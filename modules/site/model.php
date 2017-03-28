@@ -1495,6 +1495,16 @@ class Site_Model extends Core_Entity
 	}
 
 	/**
+	 * Get first email
+	 * @return string
+	 */
+	public function getFirstEmail()
+	{
+		$aEmails = array_map('trim', explode(',', $this->admin_email));
+		return $aEmails[0];
+	}
+	
+	/**
 	 * Get site keys as array
 	 * @return array
 	 */
