@@ -361,7 +361,9 @@ class Structure_Model extends Core_Entity
 	public function getChildCount()
 	{
 		$count = 0;
+		
 		$aStructures = $this->Structures->findAll(FALSE);
+		
 		foreach ($aStructures as $oStructure)
 		{
 			$count++;

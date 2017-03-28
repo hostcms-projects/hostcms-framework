@@ -11,7 +11,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Xsl_Module extends Core_Module{	/**
+class Xsl_Module extends Core_Module
+{
+	/**
 	 * Module version
 	 * @var string
 	 */
@@ -21,7 +23,8 @@ class Xsl_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-03-03';
+	public $date = '2016-05-06';
+
 	/**
 	 * Module name
 	 * @var string
@@ -30,7 +33,20 @@ class Xsl_Module extends Core_Module{	/**
 	
 	/**
 	 * Constructor.
-	 */	public function __construct()	{
+	 */
+	public function __construct()
+	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 100,				'block' => 0,
-				'ico' => 'fa fa-code',				'name' => Core::_('Xsl.menu'),				'href' => "/admin/xsl/index.php",				'onclick' => "$.adminLoad({path: '/admin/xsl/index.php'}); return false"			)		);	}}
+
+		$this->menu = array(
+			array(
+				'sorting' => 100,
+				'block' => 0,
+				'ico' => 'fa fa-code',
+				'name' => Core::_('Xsl.menu'),
+				'href' => "/admin/xsl/index.php",
+				'onclick' => "$.adminLoad({path: '/admin/xsl/index.php'}); return false"
+			)
+		);
+	}
+}

@@ -11,17 +11,22 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Property_Controller_Value{
+class Property_Controller_Value
+{
 	/**
 	 * Create object of $type class
 	 * @param string $type type of the class
 	 * @return mixed
-	 */	static public function factory($type)	{
+	 */
+	static public function factory($type)
+	{
 		if (!is_numeric($type))
 		{
 			throw new Core_Exception('Unknown Property_Controller_Value type "%type"', array('%type' => $type));
-		}		$propertyValueName = __CLASS__ . '_type' . ucfirst($type);
-		return new $propertyValueName();	}
+		}
+		$propertyValueName = __CLASS__ . '_type' . ucfirst($type);
+		return new $propertyValueName();
+	}
 
 	/**
 	 * Получение значений свойств $aProperiesId объекта $entityId
@@ -88,4 +93,5 @@ class Property_Controller_Value{
 		}
 
 		return $aReturn;
-	}}
+	}
+}

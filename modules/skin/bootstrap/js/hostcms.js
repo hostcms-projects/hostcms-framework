@@ -523,40 +523,6 @@ function setCookiesForFixedSettings() {
 }
 /*#endregion handle Settings*/
 
-//Chat
-/*
-$("#chat-link").click(function () {
-    $('.page-chatbar').toggleClass('open');
-    $("#chat-link").toggleClass('open');
-});
-$('.page-chatbar .chatbar-contacts .contact').on('click', function(e) {
-    $('.page-chatbar .chatbar-contacts').hide();
-    $('.page-chatbar .chatbar-messages').show();
-});
-
-$('.page-chatbar .chatbar-messages .back').on('click', function (e) {
-    $('.page-chatbar .chatbar-contacts').show();
-    $('.page-chatbar .chatbar-messages').hide();
-});
-
-var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
-$('.chatbar-messages .messages-list').slimscroll({
-    position: position,
-    size: '4px',
-	start: 'bottom',
-    color: themeprimary,
-    height: $(window).height() - 250,
-});
-
-$('.chatbar-contacts .contacts-list').slimscroll({
-    position: position,
-    size: '4px',
-    color: themeprimary,
-    height: $(window).height() - 86,
-});
-*/
-//End Chat
-
 /*#region Get Colors*/
 //Get colors from a string base on theme colors
 function getcolor(colorString) {
@@ -630,4 +596,3 @@ function hasClass(elem, cls) {
     var testCls = " " + cls + " ";
     return (str.indexOf(testCls) != -1);
 }
-

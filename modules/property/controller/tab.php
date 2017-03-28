@@ -471,7 +471,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								);
 
 								// Визуальный редактор клонировать запрещено
-								$oProperty->multiple && $oProperty->type != 6 && $this->imgBox($oNewAdmin_Form_Entity, $oProperty, '$.cloneProperty', $this->getImgDeletePath());
+								$oProperty->multiple && $oProperty->type != 6
+									&& $this->imgBox($oNewAdmin_Form_Entity, $oProperty, '$.cloneProperty', $this->getImgDeletePath());
 							}
 						}
 					}
@@ -838,11 +839,15 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					{
 						$value = Core_Array::getPost("property_{$oProperty->id}_{$oProperty_Value->id}");
 
-						$value = $this->_correctValue($oProperty, $value);
+						// 000227947
+						if (!is_null($value))
+						{
+							$value = $this->_correctValue($oProperty, $value);
 
-						$oProperty_Value
-							->setValue($value)
-							->save();
+							$oProperty_Value
+								->setValue($value)
+								->save();
+						}
 					}
 
 					// New values of property

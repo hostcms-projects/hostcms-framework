@@ -289,7 +289,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 			return $this->_fields[$fieldName];
 		}
 
-		throw new Core_Exception("Field %fieldName does not exist.", array('%fieldName' => $fieldName));
+		throw new Core_Exception("Field `%fieldName` does not exist. Check field name and dataset!", array('%fieldName' => $fieldName));
 	}
 
 	/**

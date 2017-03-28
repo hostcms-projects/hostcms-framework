@@ -7,9 +7,16 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
- * - itemsProperties(TRUE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
- * - itemsPropertiesList(TRUE) выводить список дополнительных свойств товаров, по умолчанию TRUE
+ * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - itemsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств товаров, по умолчанию TRUE
  * - taxes(TRUE|FALSE) выводить список налогов, по умолчанию FALSE
+ *
+ * Доступные свойства:
+ *
+ * - amount сумма заказа с учетом скидок
+ * - tax сумма налога
+ * - quantity количество товаров в корзине
+ * - weight вес товаров в корзине
  *
  * <code>
  * $Shop_Cart_Controller_Show = new Shop_Cart_Controller_Show(
@@ -40,7 +47,11 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		'itemsProperties',
 		'itemsPropertiesList',
 		'taxes',
-		'cartUrl'
+		'cartUrl',
+		'amount',
+		'tax',
+		'quantity',
+		'weight',
 	);
 
 	/**
@@ -133,7 +144,9 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		{
 			$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
 
-			$aProperties = $oShop_Item_Property_List->Properties->findAll();
+			$aProperties = is_array($this->itemsPropertiesList) && count($this->itemsPropertiesList)
+					? $oShop_Item_Property_List->Properties->getAllByid($this->itemsPropertiesList, FALSE, 'IN')
+					: $oShop_Item_Property_List->Properties->findAll();
 
 			foreach ($aProperties as $oProperty)
 			{
@@ -165,15 +178,18 @@ class Shop_Cart_Controller_Show extends Core_Controller
 
 		$quantityPurchaseDiscount = $amountPurchaseDiscount = $quantity = $amount = $tax = $weight = 0;
 
+		// Массив цен для расчета скидок каждый N-й со скидкой N%
+		$aDiscountPrices = array();
+
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
 			$oShop_Item = Core_Entity::factory('Shop_Item')->find($oShop_Cart->shop_item_id);
 			if (!is_null($oShop_Item->id))
 			{
-				$this->itemsProperties && $oShop_Cart->showXmlProperties(TRUE);
-
+				$oShop_Cart->showXmlProperties($this->itemsProperties);
 				$this->addEntity($oShop_Cart->clearEntities());
+
 				if ($oShop_Cart->postpone == 0)
 				{
 					$quantity += $oShop_Cart->quantity;
@@ -193,6 +209,12 @@ class Shop_Cart_Controller_Show extends Core_Controller
 					$oShop_Item_Controller->count($oShop_Cart->quantity);
 					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
+
+					// По каждой единице товара добавляем цену в массив, т.к. может быть N единиц одого товара
+					for ($i = 0; $i < $oShop_Cart->quantity; $i++)
+					{
+						$aDiscountPrices[] = $aPrices['price_discount'];
+					}
 
 					// Сумма для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
@@ -216,7 +238,7 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			->quantity($quantityPurchaseDiscount)
 			->couponText($this->couponText)
 			->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0)
-			;
+			->prices($aDiscountPrices);
 
 		$totalDiscount = 0;
 		$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
@@ -231,23 +253,28 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		// Скидка больше суммы заказа
 		$totalDiscount > $amount && $totalDiscount = $amount;
 
+		$this->amount = $amount - $totalDiscount;
+		$this->tax = $tax;
+		$this->quantity = $quantity;
+		$this->weight = $weight;
+
 		// Total order amount
 		$this->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('total_amount')
-				->value($amount - $totalDiscount)
+				->value($this->amount)
 		)->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('total_tax')
-				->value($tax)
+				->value($this->tax)
 		)->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('total_quantity')
-				->value($quantity)
+				->value($this->quantity)
 		)->addEntity(
 			Core::factory('Core_Xml_Entity')
 				->name('total_weight')
-				->value($weight)
+				->value($this->weight)
 		);
 
 		return parent::show();

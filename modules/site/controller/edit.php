@@ -298,7 +298,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSiteTabErrorsRow2->add($oSelect_503);
 
 		/* $oSiteTabRobotsRow1 */
-		$this->getField('robots')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+		$this->getField('robots')->rows(15)->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
 		$oMainTab->move($this->getField('robots'), $oSiteTabRobotsRow1);
 
 		/* $oSiteTabLicenseRow1 */

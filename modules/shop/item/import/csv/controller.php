@@ -11,11 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-
 class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 {
-	// Массивы для хранения идентификаторов вставленных/обновленных сущностей
-
 	/**
 	 * Array of inserted groups
 	 * @var array
@@ -440,380 +437,379 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					continue;
 				}
 
-				switch ($this->csv_fields[$iKey])
+				if ($sData != '')
 				{
-					//=================ЗАКАЗЫ=================//
-					case 'order_guid':
-						if (strval($sData))
-						{
-							$this->_oCurrentOrder = $this->_oCurrentShop->Shop_Orders->getByGUID($sData, FALSE);
+					switch ($this->csv_fields[$iKey])
+					{
+						//=================ЗАКАЗЫ=================//
+						case 'order_guid':
+							$this->_oCurrentOrder = $this->_oCurrentShop->Shop_Orders->getByGuid($sData, FALSE);
 
 							if (is_null($this->_oCurrentOrder))
 							{
 								$this->_oCurrentOrder = Core_Entity::factory('Shop_Order');
 								$this->_oCurrentOrder->guid = $sData;
 							}
-						}
-					break;
-					case 'order_invoice':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->invoice = $sData;
-						}
-					break;
-					case 'order_shop_country_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Country = Core_Entity::factory('Shop_Country')->getByName($sData);
+						break;
+						case 'order_invoice':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->invoice = $sData;
+							}
+						break;
+						case 'order_shop_country_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Country = Core_Entity::factory('Shop_Country')->getByName($sData);
 
-							if (!is_null($oShop_Country))
-							{
-								$this->_oCurrentOrder->shop_country_id = $oShop_Country->id;
+								!is_null($oShop_Country)
+									&& $this->_oCurrentOrder->shop_country_id = $oShop_Country->id;
 							}
-						}
-					break;
-					case 'order_shop_country_location_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Country_Location = Core_Entity::factory('Shop_Country', $this->_oCurrentOrder->shop_country_id)->Shop_Country_Locations->getByName($sData);
+						break;
+						case 'order_shop_country_location_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Country_Location = Core_Entity::factory('Shop_Country', $this->_oCurrentOrder->shop_country_id)
+									->Shop_Country_Locations
+									->getByName($sData);
 
-							if (!is_null($oShop_Country_Location))
-							{
-								$this->_oCurrentOrder->shop_country_location_id = $oShop_Country_Location->id;
-							}
-						}
-					break;
-					case 'order_shop_country_location_city_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Country_Location_City = Core_Entity::factory('Shop_Country_Location', $this->_oCurrentOrder->shop_country_location_id)->Shop_Country_Location_Cities->getByName($sData);
-
-							if (!is_null($oShop_Country_Location_City))
-							{
-								$this->_oCurrentOrder->shop_country_location_city_id = $oShop_Country_Location_City->id;
-							}
-						}
-					break;
-					case 'order_shop_country_location_city_area_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Country_Location_City_Area = Core_Entity::factory('Shop_Country_Location_City', $this->_oCurrentOrder->shop_country_location_city_id)->Shop_Country_Location_City_Areas->getByName($sData);
-
-							if (!is_null($oShop_Country_Location_City_Area))
-							{
-								$this->_oCurrentOrder->shop_country_location_city_area_id = $oShop_Country_Location_City_Area->id;
-							}
-						}
-					break;
-					case 'order_name':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->name = $sData;
-						}
-					break;
-					case 'order_surname':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->surname = $sData;
-						}
-					break;
-					case 'order_patronymic':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->patronymic = $sData;
-						}
-					break;
-					case 'order_email':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->email = $sData;
-						}
-					break;
-					case 'order_acceptance_report':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->acceptance_report = $sData;
-						}
-					break;
-					case 'order_vat_invoice':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->vat_invoice = $sData;
-						}
-					break;
-					case 'order_company':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->company = $sData;
-						}
-					break;
-					case 'order_tin':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->tin = $sData;
-						}
-					break;
-					case 'order_kpp':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->kpp = $sData;
-						}
-					break;
-					case 'order_phone':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->phone = $sData;
-						}
-					break;
-					case 'order_fax':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->fax = $sData;
-						}
-					break;
-					case 'order_address':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->address = $sData;
-						}
-					break;
-					case 'order_shop_order_status_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Order_Status = Core_Entity::factory('Shop_Order_Status')->getByName($sData);
-							if (!is_null($oShop_Order_Status))
-							{
-								$this->_oCurrentOrder->shop_order_status_id = $oShop_Order_Status->id;
-							}
-						}
-					break;
-					case 'order_shop_currency_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Currency = Core_Entity::factory('Shop_Currency')->getByName($sData);
-							if (!is_null($oShop_Currency))
-							{
-								$this->_oCurrentOrder->shop_currency_id = $oShop_Currency->id;
-							}
-						}
-					break;
-					case 'order_shop_payment_system_id':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$oShop_Payment_System = $this->_oCurrentShop->Shop_Payment_Systems->getById($sData);
-							if (!is_null($oShop_Payment_System))
-							{
-								$this->_oCurrentOrder->shop_payment_system_id = $oShop_Payment_System->id;
-							}
-						}
-					break;
-					case 'order_datetime':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
-							{
-								$this->_oCurrentOrder->datetime = $sData;
-							}
-							else
-							{
-								$this->_oCurrentOrder->datetime = Core_Date::datetime2sql($sData);
-							}
-						}
-					break;
-					case 'order_paid':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->paid = ((bool)$sData)?1:0;
-						}
-					break;
-					case 'order_payment_datetime':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
-							{
-								$this->_oCurrentOrder->payment_datetime = $sData;
-							}
-							else
-							{
-								$this->_oCurrentOrder->payment_datetime = Core_Date::datetime2sql($sData);
-							}
-						}
-					break;
-					case 'order_description':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->description = $sData;
-						}
-					break;
-					case 'order_system_information':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->system_information = $sData;
-						}
-					break;
-					case 'order_canceled':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->canceled = ((bool)$sData)?1:0;
-						}
-					break;
-					case 'order_status_datetime':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
-							{
-								$this->_oCurrentOrder->status_datetime = $sData;
-							}
-							else
-							{
-								$this->_oCurrentOrder->status_datetime = Core_Date::datetime2sql($sData);
-							}
-						}
-					break;
-					case 'order_delivery_information':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrder->delivery_information = $sData;
-						}
-					break;
-
-					//=======================================//
-
-					//============== order items ==============//
-
-					case 'order_item_marking':
-						if (strval($sData) && !is_null($this->_oCurrentOrder))
-						{
-							$this->_oCurrentOrderItem = $this->_oCurrentOrder->Shop_Order_Items->getBymarking($sData, FALSE);
-
-							if (is_null($this->_oCurrentOrderItem))
-							{
-								$this->_oCurrentOrderItem = Core_Entity::factory('Shop_Order_Item');
-								$this->_oCurrentOrderItem->marking = $sData;
-							}
-						}
-					break;
-					case 'order_item_name':
-						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
-						{
-							$this->_oCurrentOrderItem->name = $sData;
-						}
-					break;
-					case 'order_item_quantity':
-						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
-						{
-							$this->_oCurrentOrderItem->quantity = $sData;
-						}
-					break;
-					case 'order_item_price':
-						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
-						{
-							$this->_oCurrentOrderItem->price = $sData;
-						}
-					break;
-					case 'order_item_rate':
-						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
-						{
-							$this->_oCurrentOrderItem->rate = $sData;
-						}
-					break;
-					case 'order_item_type':
-						if (strval($sData) && !is_null($this->_oCurrentOrderItem))
-						{
-							$this->_oCurrentOrderItem->type = $sData;
-						}
-					break;
-
-					//=======================================//
-
-					// Идентификатор группы товаров
-					case 'shop_groups_id':
-						if (intval($sData))
-						{
-							$oTmpObject = Core_Entity::factory("Shop_Group")->find($sData);
-
-							if (!is_null($oTmpObject->id))
-							{
-								$this->_oCurrentGroup = $oTmpObject;
-							}
-						}
-					break;
-					// Название группы товаров
-					case 'shop_groups_value':
-						if ($sData != '')
-						{
-							// CML_ID родительской (!) группы товаров
-							$sNeedKey = array_search("shop_shop_groups_parent_cml_id", $this->csv_fields);
-							if ($sNeedKey !== FALSE
-							&& ($sCMLID = Core_Array::get($aCsvLine, $sNeedKey, '')) != '')
-							{
-								if ($sCMLID == 'ID00000000')
+								if (!is_null($oShop_Country_Location))
 								{
-									$oTmpParentObject = Core_Entity::factory('Shop_Group', 0);
+									$this->_oCurrentOrder->shop_country_location_id = $oShop_Country_Location->id;
 								}
-								else
-								{
-									$oTmpParentObject = $this->_oCurrentShop->Shop_Groups->getByGuid($sCMLID, FALSE);
+							}
+						break;
+						case 'order_shop_country_location_city_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Country_Location_City = Core_Entity::factory('Shop_Country_Location', $this->_oCurrentOrder->shop_country_location_id)
+									->Shop_Country_Location_Cities
+									->getByName($sData);
 
-									if (is_null($oTmpParentObject))
+								if (!is_null($oShop_Country_Location_City))
+								{
+									$this->_oCurrentOrder->shop_country_location_city_id = $oShop_Country_Location_City->id;
+								}
+							}
+						break;
+						case 'order_shop_country_location_city_area_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Country_Location_City_Area = Core_Entity::factory('Shop_Country_Location_City', $this->_oCurrentOrder->shop_country_location_city_id)
+									->Shop_Country_Location_City_Areas
+									->getByName($sData);
+
+								if (!is_null($oShop_Country_Location_City_Area))
+								{
+									$this->_oCurrentOrder->shop_country_location_city_area_id = $oShop_Country_Location_City_Area->id;
+								}
+							}
+						break;
+						case 'order_name':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->name = $sData;
+							}
+						break;
+						case 'order_surname':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->surname = $sData;
+							}
+						break;
+						case 'order_patronymic':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->patronymic = $sData;
+							}
+						break;
+						case 'order_email':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->email = $sData;
+							}
+						break;
+						case 'order_acceptance_report':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->acceptance_report = $sData;
+							}
+						break;
+						case 'order_vat_invoice':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->vat_invoice = $sData;
+							}
+						break;
+						case 'order_company':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->company = $sData;
+							}
+						break;
+						case 'order_tin':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->tin = $sData;
+							}
+						break;
+						case 'order_kpp':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->kpp = $sData;
+							}
+						break;
+						case 'order_phone':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->phone = $sData;
+							}
+						break;
+						case 'order_fax':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->fax = $sData;
+							}
+						break;
+						case 'order_address':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->address = $sData;
+							}
+						break;
+						case 'order_shop_order_status_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Order_Status = Core_Entity::factory('Shop_Order_Status')->getByName($sData);
+								if (!is_null($oShop_Order_Status))
+								{
+									$this->_oCurrentOrder->shop_order_status_id = $oShop_Order_Status->id;
+								}
+							}
+						break;
+						case 'order_shop_currency_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Currency = Core_Entity::factory('Shop_Currency')->getByName($sData);
+								if (!is_null($oShop_Currency))
+								{
+									$this->_oCurrentOrder->shop_currency_id = $oShop_Currency->id;
+								}
+							}
+						break;
+						case 'order_shop_payment_system_id':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$oShop_Payment_System = $this->_oCurrentShop->Shop_Payment_Systems->getById($sData);
+								if (!is_null($oShop_Payment_System))
+								{
+									$this->_oCurrentOrder->shop_payment_system_id = $oShop_Payment_System->id;
+								}
+							}
+						break;
+						case 'order_datetime':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->datetime = preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData)
+									? $sData
+									: Core_Date::datetime2sql($sData);
+							}
+						break;
+						case 'order_paid':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->paid = ((bool)$sData) ? 1 : 0;
+							}
+						break;
+						case 'order_payment_datetime':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->payment_datetime = preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData)
+									? $sData
+									: Core_Date::datetime2sql($sData);
+							}
+						break;
+						case 'order_description':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->description = $sData;
+							}
+						break;
+						case 'order_system_information':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->system_information = $sData;
+							}
+						break;
+						case 'order_canceled':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->canceled = ((bool)$sData)?1:0;
+							}
+						break;
+						case 'order_status_datetime':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->status_datetime = preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData)
+									? $sData
+									: Core_Date::datetime2sql($sData);
+							}
+						break;
+						case 'order_delivery_information':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrder->delivery_information = $sData;
+							}
+						break;
+						//============== order items ==============//
+						case 'order_item_marking':
+							if (!is_null($this->_oCurrentOrder))
+							{
+								$this->_oCurrentOrderItem = $this->_oCurrentOrder->Shop_Order_Items->getBymarking($sData, FALSE);
+
+								if (is_null($this->_oCurrentOrderItem))
+								{
+									$this->_oCurrentOrderItem = Core_Entity::factory('Shop_Order_Item');
+									$this->_oCurrentOrderItem->marking = $sData;
+								}
+							}
+						break;
+						case 'order_item_name':
+							if (!is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem->name = $sData;
+							}
+						break;
+						case 'order_item_quantity':
+							if (!is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem->quantity = $sData;
+							}
+						break;
+						case 'order_item_price':
+							if (!is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem->price = $sData;
+							}
+						break;
+						case 'order_item_rate':
+							if (!is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem->rate = $sData;
+							}
+						break;
+						case 'order_item_type':
+							if (!is_null($this->_oCurrentOrderItem))
+							{
+								$this->_oCurrentOrderItem->type = $sData;
+							}
+						break;
+
+						//=======================================//
+
+						// Идентификатор группы товаров
+						case 'shop_groups_id':
+							if (intval($sData))
+							{
+								$oTmpObject = Core_Entity::factory("Shop_Group")->find($sData);
+
+								if (!is_null($oTmpObject->id))
+								{
+									$this->_oCurrentGroup = $oTmpObject;
+								}
+							}
+						break;
+						// Название группы товаров
+						case 'shop_groups_value':
+							// Позиция CML GROUP ID
+							$sNeedKeyCML = array_search('shop_groups_cml_id', $this->csv_fields);
+							// Позиция названия группы
+							$sNeedKeyName = array_search('shop_groups_value', $this->csv_fields);
+
+							// Группа была ранее найдена по CML GROUP ID и CML GROUP ID идет раньше,
+							// чем название группы, тогда просто обновляем название группы
+							if ($sNeedKeyCML !== FALSE
+								&& $sNeedKeyCML < $sNeedKeyName
+								&& $this->_oCurrentGroup->id)
+							{
+								// Меняем название на переданное
+								$this->_oCurrentGroup->name = $sData;
+								$this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+							}
+							else
+							{
+								// CML_ID родительской (!) группы товаров
+								$sNeedKeyParentCMLId = array_search('shop_shop_groups_parent_cml_id', $this->csv_fields);
+								if ($sNeedKeyParentCMLId !== FALSE
+									&& ($sCMLID = Core_Array::get($aCsvLine, $sNeedKeyParentCMLId, '')) != '')
+								{
+									if ($sCMLID == 'ID00000000')
 									{
 										$oTmpParentObject = Core_Entity::factory('Shop_Group', 0);
 									}
+									else
+									{
+										$oTmpParentObject = $this->_oCurrentShop->Shop_Groups->getByGuid($sCMLID, FALSE);
+
+										if (is_null($oTmpParentObject))
+										{
+											$oTmpParentObject = Core_Entity::factory('Shop_Group', 0);
+										}
+									}
+
+									$oTmpObject = $this->_oCurrentShop->Shop_Groups;
+									$oTmpObject->queryBuilder()
+										->where('parent_id', '=', $oTmpParentObject->id)
+										->where('name', '=', $sData)
+										->limit(1);
+								}
+								else
+								{
+									$oTmpObject = $this->_oCurrentShop->Shop_Groups;
+									$oTmpObject->queryBuilder()
+										->where('parent_id', '=', intval($this->_oCurrentGroup->id))
+										->where('name', '=', $sData)
+										->limit(1);
 								}
 
-								$oTmpObject = $this->_oCurrentShop->Shop_Groups;
-								$oTmpObject->queryBuilder()
-									->where('parent_id', '=', $oTmpParentObject->id)
-									->where('name', '=', $sData)
-									->limit(1);
-							}
-							else
-							{
-								$oTmpObject = $this->_oCurrentShop->Shop_Groups;
-								$oTmpObject->queryBuilder()
-									->where('parent_id', '=', intval($this->_oCurrentGroup->id))
-									->where('name', '=', $sData)
-									->limit(1);
-							}
+								$aTmpObject = $oTmpObject->findAll(FALSE);
 
-							$aTmpObject = $oTmpObject->findAll(FALSE);
-
-							if (count($aTmpObject))
-							{
-								// Группа нашлась
-								$this->_oCurrentGroup = $aTmpObject[0];
-							}
-							else
-							{
-								// Группа не нашлась
-								$oTmpObject = Core_Entity::factory('Shop_Group');
-								$oTmpObject->name = $sData;
-								$oTmpObject->parent_id = intval($this->_oCurrentGroup->id);
-								$oTmpObject->shop_id = $this->_oCurrentShop->id;
-
-								/*$sNeedKey = array_search("shop_groups_cml_id", $this->csv_fields);
-								if ($sNeedKey !== FALSE)
+								if (count($aTmpObject))
 								{
-									$oTmpObject->guid = strval(Core_Array::get($aCsvLine, $sNeedKey, ''));
-								}*/
+									// Группа нашлась
+									$this->_oCurrentGroup = $aTmpObject[0];
+								}
+								else
+								{
+									// Группа не нашлась
+									$oTmpObject = Core_Entity::factory('Shop_Group');
+									$oTmpObject->name = $sData;
+									$oTmpObject->parent_id = intval($this->_oCurrentGroup->id);
+									$oTmpObject->shop_id = $this->_oCurrentShop->id;
 
-								$this->_oCurrentGroup = $this->_doSaveGroup($oTmpObject);
+									// Переданные GUID для новой группы
+									if ($sNeedKeyCML !== FALSE
+										// CML ID идет раньше названия группы, тогда он присваивается новой группе
+										&& $sNeedKeyCML < $sNeedKeyName)
+									{
+										$oTmpObject->guid = strval(Core_Array::get($aCsvLine, $sNeedKeyCML, ''));
+									}
+
+									$this->_oCurrentGroup = $this->_doSaveGroup($oTmpObject);
+								}
 							}
 
 							$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
-						}
-					break;
-					// Путь группы товаров
-					case 'shop_groups_path':
-						if ($sData != '')
-						{
-							$oTmpObject = Core_Entity::factory("Shop_Group");
+
+						break;
+						// Путь группы товаров
+						case 'shop_groups_path':
+							$oTmpObject = Core_Entity::factory('Shop_Group');
 							$oTmpObject
 								->queryBuilder()
 								->where('parent_id', '=', intval($this->_oCurrentGroup->id))
 								->where('shop_id', '=', intval($this->_oCurrentShop->id))
-								->where('path', '=', $sData)
-							;
+								->where('path', '=', $sData);
 
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
@@ -828,61 +824,39 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$this->_oCurrentGroup->path = $sData;
 								$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
 							}
-						}
-					break;
-					// Порядок сортировки группы товаров
-					case 'shop_groups_order':
-						if ($sData != '')
-						{
+						break;
+						// Порядок сортировки группы товаров
+						case 'shop_groups_order':
 							$this->_oCurrentGroup->sorting = intval($sData);
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// Описание группы товаров
-					case 'shop_groups_description':
-						// Иначе будет обнуляться при указании пустого описания в списке товаров группы
-						if ($sData != '')
-						{
+						break;
+						// Описание группы товаров
+						case 'shop_groups_description':
 							$this->_oCurrentGroup->description = $sData;
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// SEO Title группы товаров
-					case 'shop_groups_seo_title':
-						if ($sData != '')
-						{
+						break;
+						// SEO Title группы товаров
+						case 'shop_groups_seo_title':
 							$this->_oCurrentGroup->seo_title = $sData;
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// SEO Description группы товаров
-					case 'shop_groups_seo_description':
-						if ($sData != '')
-						{
+						break;
+						// SEO Description группы товаров
+						case 'shop_groups_seo_description':
 							$this->_oCurrentGroup->seo_description = $sData;
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// SEO Keywords группы товаров
-					case 'shop_groups_seo_keywords':
-						if ($sData != '')
-						{
+						break;
+						// SEO Keywords группы товаров
+						case 'shop_groups_seo_keywords':
 							$this->_oCurrentGroup->seo_keywords = $sData;
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// Активность группы товаров
-					case 'shop_groups_activity':
-						if ($sData != '')
-						{
+						break;
+						// Активность группы товаров
+						case 'shop_groups_activity':
 							$this->_oCurrentGroup->active = intval($sData) >= 1 ? 1 : 0;
 							$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
-						}
-					break;
-					// Картинка группы товаров
-					case 'shop_groups_image':
-						if ($sData != '')
-						{
+						break;
+						// Картинка группы товаров
+						case 'shop_groups_image':
 							// Для гарантии получения идентификатора группы
 							$this->_oCurrentGroup->save();
 							$this->_incUpdatedGroups($this->_oCurrentGroup->id);
@@ -891,7 +865,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$sDestinationFolder = $this->_oCurrentGroup->getGroupPath();
 
 							// Файл-источник
-							$sSourceFile = $this->imagesPath . $sData;
+							$sSourceFile = $this->imagesPath . (
+								strtoupper($this->encoding) == 'UTF-8'
+									? $sData
+									: Core_File::convertfileNameToLocalEncoding($sData)
+							);
 							$sSourceFileBaseName = basename($sSourceFile, '');
 
 							$bHttp = strpos(strtolower($sSourceFile), "http://") === 0;
@@ -993,7 +971,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 								catch (Exception $e)
 								{
-									Core_Message::show($e->getMessage(), 'error');
+									Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+										? $e->getMessage()
+										: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+									, 'error');
+
 									$result = array('large_image' => FALSE, 'small_image' => FALSE);
 								}
 
@@ -1017,12 +999,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									Core_File::delete($sSourceFile);
 								}
 							}
-						}
-					break;
-					// Малая картинка группы товаров
-					case 'shop_groups_small_image':
-						if ($sData != '')
-						{
+						break;
+						// Малая картинка группы товаров
+						case 'shop_groups_small_image':
 							// Для гарантии получения идентификатора группы
 							$this->_oCurrentGroup->save();
 							$this->_incUpdatedGroups($this->_oCurrentGroup->id);
@@ -1031,7 +1010,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$sDestinationFolder = $this->_oCurrentGroup->getGroupPath();
 
 							// Файл-источник
-							$sSourceFile = $this->imagesPath . $sData;
+							$sSourceFile = $this->imagesPath . (
+								strtoupper($this->encoding) == 'UTF-8'
+									? $sData
+									: Core_File::convertfileNameToLocalEncoding($sData)
+							);
 							$sSourceFileBaseName = basename($sSourceFile, '');
 
 							$bHttp = strpos(strtolower($sSourceFile), "http://") === 0;
@@ -1099,7 +1082,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 								catch (Exception $e)
 								{
-									Core_Message::show($e->getMessage(), 'error');
+									Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+										? $e->getMessage()
+										: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+									, 'error');
+
 									$result = array('small_image' => FALSE);
 								}
 
@@ -1116,12 +1103,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									Core_File::delete($sSourceFile);
 								}
 							}
-						}
-					break;
-					// Передан GUID группы товаров
-					case 'shop_groups_cml_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан GUID группы товаров
+						case 'shop_groups_cml_id':
 							if ($sData == 'ID00000000')
 							{
 								$oTmpObject = array(Core_Entity::factory("Shop_Group", 0));
@@ -1148,68 +1132,53 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$this->_oCurrentGroup->guid = $sData;
 								$this->_oCurrentGroup->id && $this->_doSaveGroup($this->_oCurrentGroup);
 							}
-						}
-					break;
-					// Передан GUID родительской группы товаров
-					case 'shop_shop_groups_parent_cml_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан GUID родительской группы товаров
+						case 'shop_shop_groups_parent_cml_id':
 							$oTmpObject = Core_Entity::factory('Shop_Group', 0);
-
 							if ($sData != 'ID00000000')
 							{
 								$oTmpObject = $this->_oCurrentShop->Shop_Groups->getByGuid($sData, FALSE);
 							}
-
 							if (!is_null($oTmpObject))
 							{
 								if ($oTmpObject->id != $this->_oCurrentGroup->id)
 								{
 									$this->_oCurrentGroup->parent_id = $oTmpObject->id;
-									$this->_oCurrentGroup->id && $this->_oCurrentGroup->save() && $this->_incUpdatedGroups($this->_oCurrentGroup->id);
+									$this->_oCurrentGroup->id
+										&& $this->_oCurrentGroup->save()
+										&& $this->_incUpdatedGroups($this->_oCurrentGroup->id);
 								}
 
 								//$this->_oCurrentItem->shop_group_id = $oTmpObject->id;
 							}
-						}
-					break;
-					// Передан идентификатор валюты
-					case 'shop_currency_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан идентификатор валюты
+						case 'shop_currency_id':
 							$oTmpObject = Core_Entity::factory("Shop_Currency")->find($sData);
 							if (!is_null($oTmpObject->id))
 							{
 								$this->_oCurrentItem->shop_currency_id = $oTmpObject->id;
 							}
-						}
-					break;
-					// Передан идентификатор налога
-					case 'shop_tax_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан идентификатор налога
+						case 'shop_tax_id':
 							$oTmpObject = Core_Entity::factory("Shop_Tax")->find($sData);
 							if (!is_null($oTmpObject->id))
 							{
 								$this->_oCurrentItem->shop_tax_id = $oTmpObject->id;
 							}
-						}
-					break;
-					// Передан идентификатор производителя
-					case 'shop_producers_list_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан идентификатор производителя
+						case 'shop_producers_list_id':
 							$oTmpObject = Core_Entity::factory("Shop_Producer")->find($sData);
 							if (!is_null($oTmpObject->id))
 							{
 								$this->_oCurrentItem->shop_producer_id = $oTmpObject->id;
 							}
-						}
-					break;
-					// Передано название производителя
-					case 'shop_producers_list_value':
-						if ($sData != '')
-						{
+						break;
+						// Передано название производителя
+						case 'shop_producers_list_value':
 							$oTmpObject = $this->_oCurrentShop->Shop_Producers;
 							$oTmpObject->queryBuilder()->where('name', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
@@ -1226,12 +1195,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									->save()
 									->id;
 							}
-						}
-					break;
-					// Передан идентификатор продавца
-					case 'shop_shop_sallers_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан идентификатор продавца
+						case 'shop_shop_sallers_id':
 							$oTmpObject = $this->_oCurrentShop->Shop_Sellers;
 							$oTmpObject->queryBuilder()->where('id', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
@@ -1239,19 +1205,13 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							{
 								$this->_oCurrentItem->shop_seller_id = $oTmpObject[0]->id;
 							}
-						}
-					break;
-					// Передан Yandex Market Sales Notes
-					case 'shop_items_catalog_yandex_market_sales_notes':
-						if ($sData != '')
-						{
+						break;
+						// Передан Yandex Market Sales Notes
+						case 'shop_items_catalog_yandex_market_sales_notes':
 							$this->_oCurrentItem->yandex_market_sales_notes = $sData;
-						}
-					break;
-					// Передано название продавца
-					case 'shop_sallers_name':
-						if ($sData != '')
-						{
+						break;
+						// Передано название продавца
+						case 'shop_sallers_name':
 							$oTmpObject = $this->_oCurrentShop->Shop_Sellers;
 							$oTmpObject->queryBuilder()->where('name', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
@@ -1264,62 +1224,48 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									->shop_id($this->_oCurrentShop->id)
 									->save()
 									->id;
-						}
-					break;
-					// Передана единица измерения
-					case 'shop_mesures_id':
-						if ($sData != '')
-						{
+						break;
+						// Передана единица измерения
+						case 'shop_mesures_id':
 							$oTmpObject = Core_Entity::factory("Shop_Measure")->find($sData);
 							if (!is_null($oTmpObject->id))
 							{
 								$this->_oCurrentItem->shop_measure_id = $oTmpObject->id;
 							}
-						}
-					break;
-					// Передано название единицы измерения
-					case 'shop_mesures_value':
-						if ($sData != '')
-						{
+						break;
+						// Передано название единицы измерения
+						case 'shop_mesures_value':
 							$oTmpObject = Core_Entity::factory("Shop_Measure");
 							$oTmpObject->queryBuilder()->where('name', '=', $sData);
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
 							$this->_oCurrentItem->shop_measure_id = count($oTmpObject)
 								? $oTmpObject[0]->id
-								: Core_Entity::factory('Shop_Measure')->name($sData)->description($sData)->save()->id;
-						}
-					break;
-					// Дополнительные группы для товара (CML_ID), где нужно создавать ярлыки
-					case 'additional_group':
-						if ($sData != '')
-						{
+								: Core_Entity::factory('Shop_Measure')
+									->name($sData)
+									->description($sData)
+									->save()
+									->id;
+						break;
+						// Дополнительные группы для товара (CML_ID), где нужно создавать ярлыки
+						case 'additional_group':
 							$this->_aAdditionalGroups[] = $sData;
-						}
-					break;
-					// Идентификатор товара
-					case 'shop_items_catalog_item_id':
-						if ($sData != '')
-						{
+						break;
+						// Идентификатор товара
+						case 'shop_items_catalog_item_id':
 							$oTmpObject = Core_Entity::factory("Shop_Item")->find($sData);
 							if (!is_null($oTmpObject->id))
 							{
 								//$this->_oCurrentItem->id = $oTmpObject->id;
 								$this->_oCurrentItem = $oTmpObject;
 							}
-						}
-					break;
-					// Передано название товара
-					case 'shop_items_catalog_name':
-						if ($sData != '')
-						{
+						break;
+						// Передано название товара
+						case 'shop_items_catalog_name':
 							$this->_oCurrentItem->name = $sData;
-						}
-					break;
-					// Передан артикул товара
-					case 'shop_items_catalog_marking':
-						if ($sData != '')
-						{
+						break;
+						// Передан артикул товара
+						case 'shop_items_catalog_marking':
 							Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
 
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
@@ -1333,12 +1279,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							count($aTmpObject) && $this->_oCurrentItem = $aTmpObject[0];
 
 							Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterFindByMarking', $this, array($this->_oCurrentShop, $this->_oCurrentItem));
-						}
-					break;
-					// Передана дата добавления товара
-					case 'shop_shop_items_catalog_date_time':
-						if ($sData != '')
-						{
+						break;
+						// Передана дата добавления товара
+						case 'shop_shop_items_catalog_date_time':
 							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
 							{
 								$this->_oCurrentItem->datetime = $sData;
@@ -1347,146 +1290,107 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							{
 								$this->_oCurrentItem->datetime = Core_Date::datetime2sql($sData);
 							}
-						}
-					break;
-					// Передано описание товара
-					case 'shop_items_catalog_description':
-						if ($sData != '')
-						{
+						break;
+						// Передано описание товара
+						case 'shop_items_catalog_description':
 							$this->_oCurrentItem->description = $sData;
-						}
-					break;
-					// Передан текст товара
-					case 'shop_items_catalog_text':
-						if ($sData != '')
-						{
+						break;
+						// Передан текст товара
+						case 'shop_items_catalog_text':
 							$this->_oCurrentItem->text = $sData;
-						}
-					break;
-					// Передана большая картинка товара, обработка будет после вставки товара
-					case 'shop_items_catalog_image':
-						/*if ($sData != '')
-						{*/
+						break;
+						// Передана большая картинка товара, обработка будет после вставки товара
+						case 'shop_items_catalog_image':
+							/*if ($sData != '')
+							{*/
 							$this->_sBigImageFile = $sData;
-						//}
-					break;
-					// Передана малая картинка товара, обработка будет после вставки товара
-					case 'shop_items_catalog_small_image':
-						/*if ($sData != '')
-						{*/
+							//}
+						break;
+						// Передана малая картинка товара, обработка будет после вставки товара
+						case 'shop_items_catalog_small_image':
+							/*if ($sData != '')
+							{*/
 							$this->_sSmallImageFile = $sData;
-						//}
-					break;
-					// Переданы метки товара, обработка будет после вставки товара
-					case 'shop_items_catalog_label':
-						if ($sData != '')
-						{
+							//}
+						break;
+						// Переданы метки товара, обработка будет после вставки товара
+						case 'shop_items_catalog_label':
 							$this->_sCurrentTags = $sData;
-						}
-					break;
-					// Передан вес товара
-					case 'shop_items_catalog_weight':
-						if ($sData != '')
-						{
+						break;
+						// Передан вес товара
+						case 'shop_items_catalog_weight':
 							$this->_oCurrentItem->weight = Shop_Controller::instance()->convertPrice($sData);
-						}
-					break;
-					// Передана цена товара
-					case 'shop_items_catalog_price':
-						if ($sData != '')
-						{
+						break;
+						// Передана цена товара
+						case 'shop_items_catalog_price':
 							$this->_oCurrentItem->price = Shop_Controller::instance()->convertPrice($sData);
-						}
-					break;
-					// Передана активность товара
-					case 'shop_items_catalog_is_active':
-						if ($sData != '')
-						{
+						break;
+						// Передана активность товара
+						case 'shop_items_catalog_is_active':
 							$this->_oCurrentItem->active = $sData;
-						}
-					break;
-					// Передан порядок сортировки товара
-					case 'shop_items_catalog_order':
-						if ($sData != '')
-						{
+						break;
+						// Передан порядок сортировки товара
+						case 'shop_items_catalog_order':
 							$this->_oCurrentItem->sorting = $sData;
-						}
-					break;
-					// Передан путь товара
-					case 'shop_items_catalog_path':
-					if ($sData != '')
-					{
-						// Товар не был найден ранее, например, по артикулу
-						if (!$this->_oCurrentItem->id)
-						{
-							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()
-								->where('path', '=', $sData)
-								->where('shop_group_id', '=', $this->_oCurrentGroup->id);
+						break;
+						// Передан путь товара
+						case 'shop_items_catalog_path':
+							// Товар не был найден ранее, например, по артикулу
+							if (!$this->_oCurrentItem->id)
+							{
+								$oTmpObject = $this->_oCurrentShop->Shop_Items;
+								$oTmpObject->queryBuilder()
+									->where('path', '=', $sData)
+									->where('shop_group_id', '=', $this->_oCurrentGroup->id);
 
-							$oTmpObject = $oTmpObject->findAll(FALSE);
+								$oTmpObject = $oTmpObject->findAll(FALSE);
 
-							count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
-						}
+								count($oTmpObject) && $this->_oCurrentItem = $oTmpObject[0];
+							}
 
-						$this->_oCurrentItem->path = $sData;
-					}
-					break;
-					// Передан Seo Title для товара
-					case 'shop_items_catalog_seo_title':
-						if ($sData != '')
-						{
+							$this->_oCurrentItem->path = $sData;
+						break;
+						// Передан Seo Title для товара
+						case 'shop_items_catalog_seo_title':
 							$this->_oCurrentItem->seo_title = $sData;
-						}
-					break;
-					// Передан Seo Description для товара
-					case 'shop_items_catalog_seo_description':
-						if ($sData != '')
-						{
+						break;
+						// Передан Seo Description для товара
+						case 'shop_items_catalog_seo_description':
 							$this->_oCurrentItem->seo_description = $sData;
-						}
-					break;
-					// Передан Seo Keywords для товара
-					case 'shop_items_catalog_seo_keywords':
-						if ($sData != '')
-						{
+						break;
+						// Передан Seo Keywords для товара
+						case 'shop_items_catalog_seo_keywords':
 							$this->_oCurrentItem->seo_keywords = $sData;
-						}
-					break;
-					// Передан флаг индексации товара
-					case 'shop_items_catalog_indexation':
-						if ($sData != '')
-						{
+						break;
+						// Передан флаг индексации товара
+						case 'shop_items_catalog_indexation':
 							$this->_oCurrentItem->indexing = $sData;
-						}
-					break;
-					// Передан Yandex Market Allow
-					case 'shop_shop_items_catalog_yandex_market_allow':
-						if ($sData != '')
-						{
+						break;
+						// Передан Yandex Market Allow
+						case 'shop_shop_items_catalog_yandex_market_allow':
 							$this->_oCurrentItem->yandex_market = $sData;
-						}
-					break;
-					// Передан Yandex Market BID
-					case 'shop_shop_items_catalog_yandex_market_bid':
-						if ($sData != '')
-						{
+						break;
+						// Передан Yandex Market BID
+						case 'shop_shop_items_catalog_yandex_market_bid':
 							$this->_oCurrentItem->yandex_market_bid = $sData;
-						}
-					break;
-					// Передан Yandex Market CID
-					case 'shop_shop_items_catalog_yandex_market_cid':
-						if ($sData != '')
-						{
+						break;
+						// Передан Yandex Market CID
+						case 'shop_shop_items_catalog_yandex_market_cid':
 							$this->_oCurrentItem->yandex_market_cid = $sData;
-						}
-					break;
-					// Передан артикул родительского товара (модификация)
-					case 'shop_item_parent_mark':
-						if ($sData != '')
-						{
+						break;
+						// Передан артикул родительского товара (модификация)
+						case 'shop_item_parent_marking':
+						// Передан CML ID родительского товара (модификация)
+						case 'shop_item_parent_guid':
 							$oTmpObject = $this->_oCurrentShop->Shop_Items;
-							$oTmpObject->queryBuilder()->where('marking', '=', $sData);
+							$oTmpObject->queryBuilder()->where(
+								$this->csv_fields[$iKey] == 'shop_item_parent_marking'
+									? 'marking'
+									: 'guid',
+								'=',
+								$sData
+							);
+
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
 							if (count($oTmpObject) && $this->_oCurrentItem->id != $oTmpObject[0]->id)
@@ -1494,111 +1398,59 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$this->_oCurrentItem->shop_group_id = 0;
 								$this->_oCurrentItem->modification_id = $oTmpObject[0]->id;
 							}
-						}
-					break;
-					// Передан идентификатор пользователя сайта
-					case 'site_users_id':
-						if ($sData != '')
-						{
+						break;
+						// Передан идентификатор пользователя сайта
+						case 'site_users_id':
 							$this->_oCurrentItem->siteuser_id = $sData;
-						}
-					break;
-					// Передан артикул родительского товара для сопутствующего товара
-					case 'shop_item_parent_soput':
-						if ($sData != '')
-						{
+						break;
+						// Передан артикул родительского товара для сопутствующего товара
+						case 'shop_item_parent_soput':
 							$this->_sAssociatedItemMark = $sData;
-						}
-					break;
-					case 'shop_eitem_name':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_eitem_name':
 							$this->_oCurrentShopEItem->name = $sData;
 							$this->_oCurrentItem->type = 1;
-						}
-					break;
-					case 'shop_eitems_text':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_eitems_text':
 							$this->_oCurrentShopEItem->value = $sData;
 							$this->_oCurrentItem->type = 1;
-						}
-					break;
-					case 'shop_eitems_file':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_eitems_file':
 							$this->_oCurrentShopEItem->filename = $sData;
 							$this->_oCurrentItem->type = 1;
-						}
-					break;
-					case 'shop_eitem_count':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_eitem_count':
 							$this->_oCurrentShopEItem->count = $sData;
 							$this->_oCurrentItem->type = 1;
-						}
-					break;
-					case 'shop_shop_items_catalog_putend_date':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_shop_items_catalog_putend_date':
 							// Передана дата завершения публикации, проверяем ее на соответствие стандарту времени MySQL
-							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
-							{
-								$this->_oCurrentItem->end_datetime = $sData;
-							}
-							else
-							{
-								$this->_oCurrentItem->end_datetime = Core_Date::datetime2sql($sData);
-							}
-						}
-					break;
-					case 'shop_shop_items_catalog_putoff_date':
-						if ($sData != '')
-						{
+							$this->_oCurrentItem->end_datetime = preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData)
+								? $sData
+								: Core_Date::datetime2sql($sData);
+						break;
+						case 'shop_shop_items_catalog_putoff_date':
 							// Передана дата завершения публикации, проверяем ее на соответствие стандарту времени MySQL
-							if (preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData))
-							{
-								$this->_oCurrentItem->start_datetime = $sData;
-							}
-							else
-							{
-								$this->_oCurrentItem->start_datetime = Core_Date::datetime2sql($sData);
-							}
-						}
-					break;
-					case 'shop_shop_items_catalog_type':
-						if ($sData != '')
-						{
+							$this->_oCurrentItem->start_datetime = preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $sData)
+								? $sData
+								: Core_Date::datetime2sql($sData);
+						break;
+						case 'shop_shop_items_catalog_type':
 							$this->_oCurrentItem->type = $sData;
-						}
-					break;
-					case 'shop_special_prices_from':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_special_prices_from':
 							$this->_oCurrentShopSpecialPrice->min_quantity = $sData;
-						}
-					break;
-					case 'shop_special_prices_to':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_special_prices_to':
 							$this->_oCurrentShopSpecialPrice->max_quantity = $sData;
-						}
-					break;
-					case 'shop_special_prices_price':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_special_prices_price':
 							$this->_oCurrentShopSpecialPrice->price = $sData;
-						}
-					break;
-					case 'shop_special_prices_percent':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_special_prices_percent':
 							$this->_oCurrentShopSpecialPrice->percent = $sData;
-						}
-					break;
-					case 'shop_items_cml_id':
-						if ($sData != '')
-						{
+						break;
+						case 'shop_items_cml_id':
 							// Товар не был найден ранее, например, по артикулу
 							if (!$this->_oCurrentItem->id)
 							{
@@ -1613,11 +1465,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							}
 
 							$this->_oCurrentItem->guid = $sData;
-						}
-					break;
-					default:
-						if ($sData != '')
-						{
+						break;
+						default:
 							$sFieldName = $this->csv_fields[$iKey];
 
 							if (strpos($sFieldName, "price-") === 0)
@@ -1662,7 +1511,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								$oProperty = Core_Entity::factory('Property', $iPropertyId);
 
 								Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportGroupProperty', $this, array($this->_oCurrentShop, $this->_oCurrentGroup, $oProperty, $sData));
-								
+
 								$aPropertyValues = $oProperty->getValues($this->_oCurrentGroup->id, FALSE);
 
 								$oProperty_Value = isset($aPropertyValues[0])
@@ -1681,10 +1530,14 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 										$sDestinationFolder = $this->_oCurrentGroup->getGroupPath();
 
 										// Файл-источник
-										$sSourceFile = $this->imagesPath . $sData;
+										$sSourceFile = $this->imagesPath . (
+											strtoupper($this->encoding) == 'UTF-8'
+												? $sData
+												: Core_File::convertfileNameToLocalEncoding($sData)
+										);
 										$sSourceFileBaseName = basename($sSourceFile, '');
 
-										$bHttp = strpos(strtolower($sSourceFile), "http://") === 0;
+										$bHttp = strpos(strtolower($sSourceFile), 'http://') === 0;
 
 										if (Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']) || $bHttp)
 										{
@@ -1774,7 +1627,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 											}
 											catch (Exception $e)
 											{
-												Core_Message::show($e->getMessage(), 'error');
+												Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+													? $e->getMessage()
+													: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+												, 'error');
+
 												$result = array('large_image' => FALSE, 'small_image' => FALSE);
 											}
 
@@ -1839,8 +1696,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 								$oProperty_Value->save();
 							}
-						}
-					break;
+						break;
+					}
 				}
 			}
 
@@ -1886,67 +1743,67 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			$aTagsName = array();
 			/*if (!$this->_oCurrentItem->id)
 			{*/
-				if (Core::moduleIsActive('tag'))
+			if (Core::moduleIsActive('tag'))
+			{
+				// Вставка тэгов автоматически разрешена
+				if ($this->_sCurrentTags == '' && $this->_oCurrentShop->apply_tags_automatically)
 				{
-					// Вставка тэгов автоматически разрешена
-					if ($this->_sCurrentTags == '' && $this->_oCurrentShop->apply_tags_automatically)
+					$sTmpString = '';
+					$sTmpString .= $this->_oCurrentItem->name ? ' ' . $this->_oCurrentItem->name : '';
+					$sTmpString .= $this->_oCurrentItem->description ? ' ' . $this->_oCurrentItem->description : '';
+					$sTmpString .= $this->_oCurrentItem->text ? ' ' . $this->_oCurrentItem->text : '';
+
+					// получаем хэш названия и описания группы
+					$aText = Core_Str::getHashes($sTmpString, array ('hash_function' => 'crc32'));
+
+					$aText = array_unique($aText);
+
+					// Получаем список меток
+					$aTags = $this->_getTags();
+
+					if (count($aTags))
 					{
-						$sTmpString = '';
-						$sTmpString .= $this->_oCurrentItem->name ? ' ' . $this->_oCurrentItem->name : '';
-						$sTmpString .= $this->_oCurrentItem->description ? ' ' . $this->_oCurrentItem->description : '';
-						$sTmpString .= $this->_oCurrentItem->text ? ' ' . $this->_oCurrentItem->text : '';
+						// Удаляем уже существующие связи с метками
+						$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
 
-						// получаем хэш названия и описания группы
-						$aText = Core_Str::getHashes($sTmpString, array ('hash_function' => 'crc32'));
-
-						$aText = array_unique($aText);
-
-						// Получаем список меток
-						$aTags = $this->_getTags();
-
-						if (count($aTags))
+						foreach($aTags as $iTagId => $sTagName)
 						{
-							// Удаляем уже существующие связи с метками
-							$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
+							$aTmpTags = Core_Str::getHashes($sTagName, array ('hash_function' => 'crc32'));
+							$aTmpTags = array_unique($aTmpTags);
 
-							foreach($aTags as $iTagId => $sTagName)
+							if (count($aText) >= count($aTmpTags))
 							{
-								$aTmpTags = Core_Str::getHashes($sTagName, array ('hash_function' => 'crc32'));
-								$aTmpTags = array_unique($aTmpTags);
+								// Расчитываем пересечение
+								$iIntersect = count(array_intersect($aText, $aTmpTags));
 
-								if (count($aText) >= count($aTmpTags))
+								$iCoefficient = count($aTmpTags) != 0
+									? $iIntersect / count($aTmpTags)
+									: 0;
+
+								// Найдено полное вхождение
+								if ($iCoefficient == 1)
 								{
-									// Расчитываем пересечение
-									$iIntersect = count(array_intersect($aText, $aTmpTags));
-
-									$iCoefficient = count($aTmpTags) != 0
-										? $iIntersect / count($aTmpTags)
-										: 0;
-
-									// Найдено полное вхождение
-									if ($iCoefficient == 1)
+									// Если тэг еще не учтен
+									if (!in_array($sTagName, $aTmpTags))
 									{
-										// Если тэг еще не учтен
-										if (!in_array($sTagName, $aTmpTags))
-										{
-											// Добавляем в массив
-											$aTagsName[] = $sTagName;
+										// Добавляем в массив
+										$aTagsName[] = $sTagName;
 
-											// Add relation
-											$this->_oCurrentItem->add(
-												Core_Entity::factory('Tag', $iTagId)
-											);
-										}
+										// Add relation
+										$this->_oCurrentItem->add(
+											Core_Entity::factory('Tag', $iTagId)
+										);
 									}
 								}
 							}
 						}
 					}
-					elseif ($this->_sCurrentTags != '')
-					{
-						$this->_oCurrentItem->id && $this->_oCurrentItem->applyTags($this->_sCurrentTags);
-					}
 				}
+				elseif ($this->_sCurrentTags != '')
+				{
+					$this->_oCurrentItem->id && $this->_oCurrentItem->applyTags($this->_sCurrentTags);
+				}
+			}
 			//}
 
 			if ($this->_oCurrentItem->seo_keywords == '' && count($aTagsName))
@@ -2072,8 +1929,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$sTargetFile = $this->_oCurrentShop->getPath() . '/eitems/item_catalog_' . $this->_oCurrentItem->id . '/' . $this->_oCurrentShopEItem->id . ($sExtension == '' ? '' : '.' . $sExtension);
 
 					if (is_file($sSourceFile)
-					&& Core_File::isValidExtension($sSourceFile,
-					Core::$mainConfig['availableExtension']))
+						&& Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']))
 					{
 						try
 						{
@@ -2088,12 +1944,17 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$sDestinationFolder = $this->_oCurrentItem->getItemPath();
 
 					// Файл-источник
-					$sSourceFile = $this->imagesPath . $this->_sBigImageFile;
+					$sSourceFile = $this->imagesPath . (
+						strtoupper($this->encoding) == 'UTF-8'
+							? $this->_sBigImageFile
+							: Core_File::convertfileNameToLocalEncoding($this->_sBigImageFile)
+					);
 					$sSourceFileBaseName = basename($sSourceFile, '');
 
 					$bHttp = strpos(strtolower($sSourceFile), "http://") === 0;
 
-					if (Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']) || $bHttp)
+					if (Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension'])
+						|| $bHttp)
 					{
 						// Удаляем папку назначения вместе со всеми старыми файлами
 						//Core_File::deleteDir($sDestinationFolder);
@@ -2179,7 +2040,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 						catch (Exception $e)
 						{
-							Core_Message::show($e->getMessage(), 'error');
+							Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+								? $e->getMessage()
+								: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+							, 'error');
+
 							$result = array('large_image' => FALSE, 'small_image' => FALSE);
 						}
 
@@ -2224,13 +2089,17 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$sDestinationFolder = $this->_oCurrentItem->getItemPath();
 
 					// Файл-источник
-					$sSourceFile = $this->imagesPath . $this->_sSmallImageFile;
+					$sSourceFile = $this->imagesPath . (
+						strtoupper($this->encoding) == 'UTF-8'
+							? $this->_sSmallImageFile
+							: Core_File::convertfileNameToLocalEncoding($this->_sSmallImageFile)
+					);
 
 					$sSourceFileBaseName = basename($sSourceFile, '');
 
 					$bHttp = strpos(strtolower($sSourceFile), "http://") === 0;
 
-					if (Core_File::isValidExtension( $sSourceFile, Core::$mainConfig['availableExtension']) || $bHttp)
+					if (Core_File::isValidExtension($sSourceFile, Core::$mainConfig['availableExtension']) || $bHttp)
 					{
 						// Создаем папку назначения
 						$this->_oCurrentItem->createDir();
@@ -2295,7 +2164,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							}
 							catch (Exception $e)
 							{
-								Core_Message::show($e->getMessage(), 'error');
+								Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+									? $e->getMessage()
+									: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+								, 'error');
+
 								$result = array('small_image' => FALSE);
 							}
 
@@ -2333,7 +2206,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$oProperty = Core_Entity::factory('Property')->find($iPropertyID);
 
 					Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportItemProperty', $this, array($this->_oCurrentShop, $this->_oCurrentItem, $oProperty, $sPropertyValue));
-					
+
 					$iShop_Item_Property_Id = $oProperty->Shop_Item_Property->id;
 
 					$group_id = $this->_oCurrentItem->modification_id == 0
@@ -2388,7 +2261,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$sDestinationFolder = $this->_oCurrentItem->getItemPath();
 
 							// Файл-источник
-							$sSourceFile = $this->imagesPath . $sPropertyValue;
+							$sSourceFile = $this->imagesPath . (
+								strtoupper($this->encoding) == 'UTF-8'
+									? $sPropertyValue
+									: Core_File::convertfileNameToLocalEncoding($sPropertyValue)
+							);
 
 							$sSourceFileBaseName = basename($sSourceFile, '');
 
@@ -2489,7 +2366,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 								catch (Exception $e)
 								{
-									Core_Message::show($e->getMessage(), 'error');
+									Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+										? $e->getMessage()
+										: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+									, 'error');
+
 									$aResult = array('large_image' => FALSE, 'small_image' => FALSE);
 								}
 
@@ -2660,7 +2541,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 						catch (Exception $e)
 						{
-							Core_Message::show($e->getMessage(), 'error');
+							Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+								? $e->getMessage()
+								: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+							, 'error');
+
 							$aResult = array('large_image' => FALSE, 'small_image' => FALSE);
 						}
 
@@ -2696,13 +2581,15 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 					$oShop_Item_Price->value($sPriceValue);
 					$oShop_Item_Price->save();
 				}
-			}
+			} // end fields
 
 			$iCounter++;
 
 			//$this->_oCurrentItem->clear();
 			$this->_oCurrentItem = Core_Entity::factory('Shop_Item');
 			$this->_oCurrentGroup = Core_Entity::factory('Shop_Group', $this->_iCurrentGroupId);
+			$this->_oCurrentGroup->shop_id = $this->_oCurrentShop->id;
+
 			$this->_oCurrentItem->shop_group_id = $this->_oCurrentGroup->id;
 
 			if (!is_null($this->_oCurrentOrderItem))
@@ -2711,6 +2598,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			}
 			$this->_oCurrentOrder = NULL;
 			$this->_oCurrentOrderItem = NULL;
+
+			$this->_sBigImageFile = $this->_sSmallImageFile = '';
 
 			// Очищаем временные массивы
 			$this->_aExternalPrices =
@@ -2727,7 +2616,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			$this->_oCurrentShopEItem->clear();
 			// Текущая специальная цена для товара
 			$this->_oCurrentShopSpecialPrice->clear();
-		}
+		} // end line
 
 		$iCurrentSeekPosition = !$aCsvLine ? $aCsvLine : ftell($fInputFile);
 

@@ -689,4 +689,131 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 
 		Core::showJson($aJson);
 	}
+
+	public function widget()
+	{
+		if (
+			!defined('HOSTCMS_USER_LOGIN') || !defined('HOSTCMS_CONTRACT_NUMBER') || !defined('HOSTCMS_PIN_CODE')
+			||
+			!strlen(HOSTCMS_USER_LOGIN) || !strlen(HOSTCMS_CONTRACT_NUMBER) || !strlen(HOSTCMS_PIN_CODE)
+		)
+		{
+			$iAdmin_Form_Id = 42;
+			$sAdminFormAction = '/admin/site/index.php';
+
+			$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
+			$oAdmin_Form_Action = $oAdmin_Form
+				->Admin_Form_Actions
+				->getByName('accountInfo');
+
+			if ($oAdmin_Form_Action)
+			{
+				$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form);
+				$oAdmin_Form_Controller
+					->path($sAdminFormAction)
+					->window('accountInfo')
+					->checked(array(0 => array(0)));
+
+				$oMainTab = Admin_Form_Entity::factory('Tab')
+					->caption('Main')
+					->name('main');
+
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainRow1->add(Admin_Form_Entity::factory('Input')
+					->caption(Core::_("Site.accountinfo_login"))
+					->divAttr(array('class'=>'form-group col-lg-12 col-md-6'))
+					->name("HOSTCMS_USER_LOGIN")
+					->value(defined('HOSTCMS_USER_LOGIN')
+						? HOSTCMS_USER_LOGIN
+						: ''
+					));
+
+				$oMainRow2->add(Admin_Form_Entity::factory('Input')
+					->caption(Core::_("Site.accountinfo_contract_number"))
+					->divAttr(array('class'=>'form-group col-lg-12 col-md-6'))
+					->name("HOSTCMS_CONTRACT_NUMBER")
+					->value(defined('HOSTCMS_CONTRACT_NUMBER')
+						? HOSTCMS_CONTRACT_NUMBER
+						: ''
+					));
+
+				$oMainRow3->add(Admin_Form_Entity::factory('Input')
+					->caption(Core::_("Site.accountinfo_pin_code"))
+					->divAttr(array('class'=>'form-group col-lg-12 col-md-6'))
+					->name("HOSTCMS_PIN_CODE")
+					->value(defined('HOSTCMS_PIN_CODE')
+						? HOSTCMS_PIN_CODE
+						: ''
+					));
+
+				?><!-- Core License -->
+				<div id="note-license" class="hidden">
+					<div class="row">
+						<div class="col-xs-12 margin-bottom-20">
+							<strong><?php echo Core::_('Admin_Form.note')?>: </strong><?php echo Core::_('Admin_Form.note-license')?>
+						</div>
+						<div class="col-xs-12">
+							<?php Admin_Form_Entity::factory('Form')
+								->action($sAdminFormAction)
+								->controller($oAdmin_Form_Controller)
+								->add($oMainTab)
+								->add(
+									Admin_Form_Entity::factory('Buttons')
+										->add(
+											Admin_Form_Entity::factory('Button')
+											->name('apply')
+											->class('btn btn-palegreen')
+											->type('submit')
+											->value(Core::_('admin_form.apply'))
+											->onclick(
+												'$(\'.modal-license\').hide(); '
+												. $oAdmin_Form_Controller->getAdminSendForm('accountInfo', 'apply')
+											)
+										)
+								)
+								->execute();
+							?>
+						</div>
+					</div>
+				</div>
+
+				<script type="text/javascript">
+				var dialog = bootbox.dialog({
+					message: $("#note-license").html(),
+					title: '<?php echo Core::_('Site.menu2_sub_caption')?>',
+					className: "modal-darkorange modal-license"
+				});
+				</script>
+				<?php
+			}
+
+			/*?><!-- Core License -->
+			<div class="col-xs-12">
+				<div class="well bordered-left bordered-themesecondary">
+					<i class="fa fa-star yellow margin-right-5"></i>
+					<strong><?php echo Core::_('Admin_Form.note')?>: </strong><?php echo Core::_('Admin_Form.note-license')?>
+				</div>
+			</div>
+			<?php*/
+		}
+
+		// Check password
+		$oAdmin_User = Core_Entity::factory('User')->getByLogin('admin');
+		if (!is_null($oAdmin_User)
+			&& $oAdmin_User->password == Core_Hash::instance()->hash('admin'))
+		{
+			?><!-- Core Password -->
+			<div class="col-xs-12">
+				<div class="well bordered-left bordered-themesecondary">
+					<i class="fa fa-star yellow margin-right-5"></i>
+					<strong><?php echo Core::_('Admin_Form.note')?>: </strong><?php echo Core::_('Admin_Form.note-bad-password')?>
+				</div>
+			</div>
+			<?php
+		}
+	}
 }

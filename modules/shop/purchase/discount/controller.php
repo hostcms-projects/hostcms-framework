@@ -21,7 +21,8 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 		'amount', // сумма заказа
 		'quantity', // количество товаров в заказе
 		'couponText', // текст купона, если есть
-		'siteuserId' // Идентификатор пользователя сайта, нужен для расчета накопительных скидок
+		'siteuserId', // Идентификатор пользователя сайта, нужен для расчета накопительных скидок
+		'prices' // массив цен товаров, используется при расчете скидки на N-й товар
 	);
 
 	/**
@@ -39,6 +40,8 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 		$this->_shop = $oShop;
 
 		parent::__construct();
+
+		$this->prices = array();
 	}
 
 	/**
@@ -46,7 +49,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 	 * @var array
 	 */
 	protected $_aReturn = array();
-	
+
 	/**
 	 * Get $this->_aReturn
 	 * @return array
@@ -55,7 +58,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 	{
 		return $this->_aReturn;
 	}
-	
+
 	/**
 	 * Set $this->_aReturn
 	 * @param array $array
@@ -66,7 +69,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 		$this->_aReturn = $array;
 		return $this;
 	}
-	
+
 	/**
 	 * Расчет скидки на сумму товара, в соответствии со списком скидок, доступных для указанного магазина
 	 * $return array
@@ -81,7 +84,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 		$this->_aReturn = array();
 
 		Core_Event::notify(get_class($this) . '.onBeforeGetDiscounts', $this);
-		
+
 		if ($amount <= 0 || $quantity <= 0)
 		{
 			return $this->_aReturn;
@@ -142,7 +145,7 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 					$fSum = 0.0;
 
 					$oShop_Orders = $oSiteuser->Shop_Orders->getAllBypaid(1);
-					foreach($oShop_Orders as $oShop_Order)
+					foreach ($oShop_Orders as $oShop_Order)
 					{
 						$fSum += $oShop_Order->getAmount();
 					}
@@ -159,19 +162,40 @@ class Shop_Purchase_Discount_Controller extends Core_Servant_Properties
 			|| $oShop_Purchase_Discount->mode == 1 && ($bCheckAmount || $bCheckQuantity)
 			|| $oShop_Purchase_Discount->mode == 2 && $bCheckOrdersSum)
 			{
+				$fTmpAmount = $amount;
+
+				// Скидка на N-й товар
+				if ($oShop_Purchase_Discount->position)
+				{
+					// В заказе товаров достаточно для применения скидки на N-й
+					if (count($this->prices) >= $oShop_Purchase_Discount->position)
+					{
+						$fTmpAmount = min($this->prices);
+					}
+					else
+					{
+						// Товара недостаточно для применения этой скидки
+						continue;
+					}
+				}
+
 				// Учитываем перерасчет суммы скидки в валюту магазина
 				$discount = $fCoefficient * ($oShop_Purchase_Discount->type == 0
 					// Процент
-					? $amount * $oShop_Purchase_Discount->value / 100
+					? $fTmpAmount * $oShop_Purchase_Discount->value / 100
 					// Фиксированная скидка
-					: $oShop_Purchase_Discount->value);
+					: ($oShop_Purchase_Discount->value <= $fTmpAmount
+						? $oShop_Purchase_Discount->value
+						: $fTmpAmount
+						)
+					);
 
 				$discount = $oShop_Controller->round($discount);
 
 				$this->_aReturn[] = $oShop_Purchase_Discount->discountAmount($discount);
 			}
 		}
-		
+
 		Core_Event::notify(get_class($this) . '.onAfterGetDiscounts', $this);
 
 		return $this->_aReturn;

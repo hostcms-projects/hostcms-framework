@@ -148,6 +148,10 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 				}
 				catch (Exception $e)
 				{
+					// Show error message just for backend users
+					Core_Auth::logged()
+						&& Core_Message::show($e->getMessage(), 'error');
+
 					$aShop_Delivery_Condition = array();
 				}
 			}
@@ -188,6 +192,9 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 		$quantityPurchaseDiscount = $amountPurchaseDiscount = $amount = $quantity = $weight = $this->volume = 0;
 
+		// Массив цен для расчета скидок каждый N-й со скидкой N%
+		$aDiscountPrices = array();
+
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
@@ -209,17 +216,23 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
 
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
-					
+
+					// По каждой единице товара добавляем цену в массив, т.к. может быть N единиц одого товара
+					for ($i = 0; $i < $oShop_Cart->quantity; $i++)
+					{
+						$aDiscountPrices[] = $aPrices['price_discount'];
+					}
+
 					// Сумма для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
 						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
-					
+
 					$quantity += $oShop_Cart->quantity;
-					
+
 					// Количество для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
 						&& $quantityPurchaseDiscount += $oShop_Cart->quantity;
-					
+
 					$weight += $oShop_Cart->Shop_Item->weight * $oShop_Cart->quantity;
 					$this->volume += Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->length * $oShop_Cart->Shop_Item->width * $oShop_Cart->Shop_Item->height, $oShop->size_measure, 0);
 				}
@@ -231,8 +244,9 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 		$oShop_Purchase_Discount_Controller
 			->amount($amountPurchaseDiscount)
 			->quantity($quantityPurchaseDiscount)
-			->couponText($this->couponText);
-			
+			->couponText($this->couponText)
+			->prices($aDiscountPrices);
+
 		$totalDiscount = 0;
 		$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
 		foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)

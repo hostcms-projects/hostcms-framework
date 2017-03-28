@@ -14,12 +14,6 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Order_Model extends Core_Entity
 {
 	/**
-	 * Backend property
-	 * @var string
-	 */
-	public $order_status_name = NULL;
-
-	/**
 	 * Values of all properties of item
 	 * @var array
 	 */
@@ -123,6 +117,36 @@ class Shop_Order_Model extends Core_Entity
 	}
 
 	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function companyBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		if ($this->source_id)
+		{
+			$title = htmlspecialchars($this->Source->service);
+			
+			switch ($this->Source->service)
+			{
+				case 'google':
+					echo ' <span title="' . $title . '" class="badge badge-ico badge-blue white"><i class="fa fa-google"></i></span>';
+				break;
+				case 'direct.yandex.ru':
+					echo ' <span title="' . $title . '" class="badge badge-ico badge-darkorange white">Я</span>';
+				break;
+				case 'twitterfeed':
+					echo ' <span title="' . $title . '" class="badge badge-ico badge-blue white"><i class="fa fa-twitter"></i></span>';
+				break;
+				default:
+					echo ' <span title="' . $title . '" class="badge badge-ico badge-palegreen white"><i class="fa fa-tag"></i></span>';
+				break;
+			}
+		}
+	}
+	
+	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
@@ -149,6 +173,8 @@ class Shop_Order_Model extends Core_Entity
 		// Удаляем связи с зарезервированными, прямая связь
 		$this->Shop_Item_Reserveds->deleteAll(FALSE);
 
+		$this->source_id && $this->Source->delete();
+		
 		return parent::delete($primaryKey);
 	}
 
@@ -217,9 +243,9 @@ class Shop_Order_Model extends Core_Entity
 		$fAmount = 0;
 
 		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
-		foreach($aOrderItems as $oOrderItem)
+		foreach($aOrderItems as $oShop_Order_Item)
 		{
-			$fAmount += $oOrderItem->getAmount();
+			$fAmount += $oShop_Order_Item->getAmount();
 		}
 
 		return $fAmount;
@@ -234,9 +260,9 @@ class Shop_Order_Model extends Core_Entity
 		$quantity = 0;
 
 		$aOrderItems = $this->Shop_Order_Items->findAll();
-		foreach($aOrderItems as $oOrderItem)
+		foreach($aOrderItems as $oShop_Order_Item)
 		{
-			$quantity += $oOrderItem->quantity;
+			$quantity += $oShop_Order_Item->quantity;
 		}
 
 		return $quantity;
@@ -269,9 +295,9 @@ class Shop_Order_Model extends Core_Entity
 		$weight = 0;
 
 		$aOrderItems = $this->Shop_Order_Items->findAll();
-		foreach($aOrderItems as $oOrderItem)
+		foreach($aOrderItems as $oShop_Order_Item)
 		{
-			$weight += $oOrderItem->Shop_Item->weight * $oOrderItem->quantity;
+			$weight += $oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity;
 		}
 		return sprintf("%.2f", $weight);
 	}
@@ -341,10 +367,10 @@ class Shop_Order_Model extends Core_Entity
 		$aOrderItems = $this->Shop_Order_Items->findAll();
 		$oShop = $this->Shop;
 
-		foreach($aOrderItems as $oOrderItem)
+		foreach($aOrderItems as $oShop_Order_Item)
 		{
-			$iOrderSum += floatval($oOrderItem->price * $oOrderItem->quantity);
-			$iOrderWeight += floatval($oOrderItem->Shop_Item->weight * $oOrderItem->quantity);
+			$iOrderSum += floatval($oShop_Order_Item->price * $oShop_Order_Item->quantity);
+			$iOrderWeight += floatval($oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity);
 		}
 
 		$oShopDelivery = $this->Shop_Delivery_Condition->Shop_Delivery;
@@ -456,7 +482,7 @@ class Shop_Order_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			//->clear()
-		->where('shop_id', '=', $shop_id);
+			->where('shop_id', '=', $shop_id);
 
 		return $this->findAll();
 	}
@@ -1310,39 +1336,39 @@ class Shop_Order_Model extends Core_Entity
 		$oOrderXml->addChild('Время', $time);
 		$oOrderXml->addChild('Комментарий', $this->description);
 
-		$oOrderItems = $oOrderXml->addChild('Товары');
+		$oOrderItemsXml = $oOrderXml->addChild('Товары');
 
-		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
+		$aShop_Order_Items = $this->Shop_Order_Items->findAll(FALSE);
 
-		foreach ($aOrderItems as $oOrderItem)
+		foreach ($aShop_Order_Items as $oShop_Order_Item)
 		{
-			$oCurrentItem = $oOrderItems->addChild('Товар');
-			$oCurrentItem->addChild('Ид',
-				$oOrderItem->Shop_Item->modification_id
-					? sprintf('%s#%s', $oOrderItem->Shop_Item->Modification->guid, $oOrderItem->Shop_Item->guid)
-					: ($oOrderItem->type == 1
+			$oCurrentItemXml = $oOrderItemsXml->addChild('Товар');
+			$oCurrentItemXml->addChild('Ид',
+				$oShop_Order_Item->Shop_Item->modification_id
+					? sprintf('%s#%s', $oShop_Order_Item->Shop_Item->Modification->guid, $oShop_Order_Item->Shop_Item->guid)
+					: ($oShop_Order_Item->type == 1
 						? 'ORDER_DELIVERY'
-						: $oOrderItem->Shop_Item->guid
+						: $oShop_Order_Item->Shop_Item->guid
 					)
 			);
-			$oCurrentItem->addChild('Наименование', $oOrderItem->name);
+			$oCurrentItemXml->addChild('Наименование', $oShop_Order_Item->name);
 
-			$oShop_Measure = $oOrderItem->Shop_Item->Shop_Measure;
-			$oXmlMeasure = $oCurrentItem->addChild('БазоваяЕдиница', $oShop_Measure->name);
+			$oShop_Measure = $oShop_Order_Item->Shop_Item->Shop_Measure;
+			$oXmlMeasure = $oCurrentItemXml->addChild('БазоваяЕдиница', $oShop_Measure->name);
 			$oShop_Measure->okei && $oXmlMeasure->addAttribute('Код', $oShop_Measure->okei);
 			strlen($oShop_Measure->description) && $oXmlMeasure->addAttribute('НаименованиеПолное', $oShop_Measure->description);
 
-			$oCurrentItem->addChild('ЦенаЗаЕдиницу', $oOrderItem->price);
-			$oCurrentItem->addChild('Количество', $oOrderItem->quantity);
-			$oCurrentItem->addChild('Сумма', $oOrderItem->getAmount());
+			$oCurrentItemXml->addChild('ЦенаЗаЕдиницу', $oShop_Order_Item->price);
+			$oCurrentItemXml->addChild('Количество', $oShop_Order_Item->quantity);
+			$oCurrentItemXml->addChild('Сумма', $oShop_Order_Item->getAmount());
 
-			$oProperty = $oCurrentItem->addChild('ЗначенияРеквизитов');
+			$oProperty = $oCurrentItemXml->addChild('ЗначенияРеквизитов');
 			$oValue = $oProperty->addChild('ЗначениеРеквизита');
 			$oValue->addChild('Наименование', 'ВидНоменклатуры');
-			$oValue->addChild('Значение', $oOrderItem->type == 1 ? 'Услуга' : 'Товар');
+			$oValue->addChild('Значение', $oShop_Order_Item->type == 1 ? 'Услуга' : 'Товар');
 			$oValue = $oProperty->addChild('ЗначениеРеквизита');
 			$oValue->addChild('Наименование', 'ТипНоменклатуры');
-			$oValue->addChild('Значение', $oOrderItem->type == 1 ? 'Услуга' : 'Товар');
+			$oValue->addChild('Значение', $oShop_Order_Item->type == 1 ? 'Услуга' : 'Товар');
 		}
 
 		return $this;

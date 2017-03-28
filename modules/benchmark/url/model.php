@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Benchmark_Url_Model extends Core_Entity{
+class Benchmark_Url_Model extends Core_Entity
+{
 	/**
 	 * Model name
 	 * @var mixed
@@ -81,4 +82,5 @@ class Benchmark_Url_Model extends Core_Entity{
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR');
 		}
-	}}
+	}
+}

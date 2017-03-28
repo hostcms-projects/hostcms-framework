@@ -479,10 +479,9 @@ function isEmpty(str) {
 		deleteProperty: function(object, settings)
 		{
 			//var jObject = jQuery(object).siblings('input,select:not([onchange]),textarea');
-			var jObject = jQuery(object)
-				.parents('div.input-group');
+			var jObject = jQuery(object).parents('div.input-group');
 
-			jObject = jObject.find('input,select:not([onchange]),textarea');
+			jObject = jObject.find('input:not([id^="filter_"]),select:not([onchange]),textarea');
 
 			// For files
 			if (jObject.length === 0)
@@ -774,14 +773,14 @@ function isEmpty(str) {
 	var baseURL = location.href, popstate = ('state' in window.history && window.history.state !== null);
 	jQuery(window).bind('popstate', function(event){
 		// Ignore inital popstate that some browsers fire on page load
-		var startPop = !popstate && baseURL == location.href;
+		var startPop = !popstate && baseURL.split("#")[0] == location.href.split("#")[0];
 		popstate = true;
 		if (startPop){
 			return;
 		}
 
 		var state = event.state;
-		if (state && state.windowId/* && state.windowId == 'id_content'*/){
+		if (state && state.windowId/* && state.windowId == 'id_content'*/) {
 			var data = state.data;
 			data['_'] = Math.round(new Date().getTime());
 
@@ -796,7 +795,7 @@ function isEmpty(str) {
 				success: jQuery.ajaxCallback
 			});
 		}
-		else{
+		else {
 			popstate = false;
 			window.location = location.href;
 		}
@@ -867,7 +866,7 @@ function cSelectFilter(windowId, sObjectId)
 
 	this.Filter = function() {
 		var self = this;
-		var icon = $("#" + this.windowId + " #filer_" + this.sObjectId).prev('span').find('i');
+		var icon = $("#" + this.windowId + " #filter_" + this.sObjectId).prev('span').find('i');
 
 		icon.removeClass('fa-search').addClass('fa-spinner fa-spin');
 

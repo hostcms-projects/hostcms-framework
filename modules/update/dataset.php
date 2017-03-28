@@ -27,11 +27,15 @@ class Update_Dataset extends Admin_Form_Dataset
 	{
 		if (is_null($this->_count))
 		{
-			try			{
+			try
+			{
 				$this->_getUpdates();
-			}			catch (Exception $e)			{
+			}
+			catch (Exception $e)
+			{
 				Core_Message::show($e->getMessage(), 'error');
-			}		}
+			}
+		}
 
 		return $this->_count;
 	}

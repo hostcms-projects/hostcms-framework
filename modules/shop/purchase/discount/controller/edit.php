@@ -42,25 +42,48 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 
 		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow1);
 		$oMainTab->move($this->getField('coupon')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow2);
-		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
 
 		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 		$oMainTab->delete($this->getField('mode'));
 
-		$oMainTab->delete($this->getField('type'));
-		$oTypeSelectField = Admin_Form_Entity::factory('Select');
+		$oMainTab
+			->delete($this->getField('type'))
+			->delete($this->getField('position'));
 
-		$oTypeSelectField
+		$oTypeSelectField = Admin_Form_Entity::factory('Select')
 			->name('type')
 			->caption(Core::_('Shop_Purchase_Discount.type'))
 			->options(array(
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_percent'),
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_summ'))
 			)
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
 			->value($this->_object->type);
+			//->onchange('$.changeDiscountPosition(this)');
 
-		$oMainRow3->add($oTypeSelectField);
+			/*
+				changeDiscountPosition: function(object)
+				{
+					var jOption = $(object).find('option:selected'),
+						id = jOption.val(),
+						parentDiv = $("#position").parent();
+
+					id == 1 ? parentDiv.addClass("hidden") : parentDiv.removeClass("hidden");
+				},
+			*/
+
+		$oPositionSelectField = Admin_Form_Entity::factory('Select')
+			->id('position')
+			->name('position')
+			->caption(Core::_('Shop_Purchase_Discount.position'))
+			->options(array(0 => Core::_('Shop_Purchase_Discount.total-amount'), 2 => 2, 3 => 3, 4 => 4, 5 => 5))
+			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->value($this->_object->position);
+
+		$oMainRow3
+			->add($oTypeSelectField)
+			->add($oPositionSelectField);
 
 		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);
 		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);

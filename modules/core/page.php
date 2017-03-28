@@ -278,7 +278,7 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
-	 * Get block of linked css
+	 * Get block of linked css and clear added CSS list
 	 * @param boolean $bExternal add as link
 	 * @return string
 	 * @hostcms-event Core_Page.onBeforeGetCss
@@ -287,13 +287,17 @@ class Core_Page extends Core_Servant_Properties
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeGetCss', $this);
 
-		return $this->compress && Core::moduleIsActive('compression')
+		$return = $this->compress && Core::moduleIsActive('compression')
 			? $this->_getCssCompressed()
 			: $this->_getCss($bExternal);
+
+		$this->css = array();
+
+		return $return;
 	}
 
 	/**
-	 * Show block of linked css
+	 * Show block of linked css and clear added CSS list
 	 * @param boolean $bExternal add as link
 	 * @return Core_Page
 	 * @hostcms-event Core_Page.onBeforeShowCss
@@ -376,7 +380,7 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
-	 * Get block of linked js
+	 * Get block of linked JS and clear added JS list
 	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return string
 	 * @hostcms-event Core_Page.onBeforeGetJs
@@ -385,13 +389,17 @@ class Core_Page extends Core_Servant_Properties
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeGetJs', $this);
 
-		return $this->compress && Core::moduleIsActive('compression')
+		$return = $this->compress && Core::moduleIsActive('compression')
 			? $this->_getJsCompressed($async)
 			: $this->_getJs();
+
+		$this->js = array();
+
+		return $return;
 	}
 
 	/**
-	 * Show block of linked js
+	 * Show block of linked JS and clear added JS list
 	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return Core_Page
 	 * @hostcms-event Core_Page.onBeforeShowJs

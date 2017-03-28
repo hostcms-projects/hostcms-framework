@@ -23,7 +23,7 @@ class Update_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-03-03';
+	public $date = '2016-05-06';
 
 	/**
 	 * Module name

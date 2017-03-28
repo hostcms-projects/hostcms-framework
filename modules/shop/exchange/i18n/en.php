@@ -51,7 +51,8 @@ return array(
 	'item_yandex_market' => 'Checkbox "Export to Yandex.Market"',
 	'item_yandex_market_bid' => 'Yandex.Market base charge',
 	'item_yandex_market_cid' => 'Yandex.Market charge for model cards',
-	'item_parent_mark' => 'Parent marking of goods',
+	'item_parent_marking' => 'Parent\'s marking for modifications',
+	'item_parent_guid' => 'Parent\'s CommerceML for modifications',
 	'digital_item_value' => "Text of digital product",
 	'digital_item_filename' => "File of digital product",
 	'digital_item_count' => "Count of digital product",
@@ -65,7 +66,7 @@ return array(
 	'specialprices_percent' => "Percentage from price",
 	'item_guid' => "CommerceML product identifier",
 	'group_active' => "Group activity",
-	'item_parent_mark' => "Parent product's marking of goods for associated products",
+	
 	'siteuser_id' => "Идентификатор пользователя сайта",
 	'digital_item_name' => "Название электронного товара",
 	'item_yandex_market_sales_notes' => "Sales notes",

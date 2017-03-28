@@ -208,6 +208,6 @@ class Informationsystem_Item_Property_List_Model extends Informationsystem_Model
 	 */
 	public function preserveAspectRatioOfSmallImage()
 	{
-		return $this->preserve_aspect_ratio;
+		return $this->preserve_aspect_ratio_small;
 	}
 }

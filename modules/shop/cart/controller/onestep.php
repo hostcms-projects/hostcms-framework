@@ -191,7 +191,8 @@ class Shop_Cart_Controller_Onestep extends Core_Controller
 					->amount($aTotal['amount'])
 					->quantity($this->quantity)
 					->couponText($this->couponText)
-					->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0);
+					->siteuserId($this->_oSiteuser ? $this->_oSiteuser->id : 0)
+					->prices(array($aTotal['amount']));
 
 				$aShop_Purchase_Discounts = $oShop_Purchase_Discount_Controller->getDiscounts();
 				foreach ($aShop_Purchase_Discounts as $oShop_Purchase_Discount)

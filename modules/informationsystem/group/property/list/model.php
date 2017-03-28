@@ -199,7 +199,7 @@ class Informationsystem_Group_Property_List_Model extends Informationsystem_Mode
 	 */
 	public function preserveAspectRatioOfLargeImage()
 	{
-		return $this->preserve_aspect_ratio;
+		return $this->preserve_aspect_ratio_group;
 	}
 
 	/**
@@ -208,6 +208,6 @@ class Informationsystem_Group_Property_List_Model extends Informationsystem_Mode
 	 */
 	public function preserveAspectRatioOfSmallImage()
 	{
-		return $this->preserve_aspect_ratio;
+		return $this->preserve_aspect_ratio_group_small;
 	}
 }

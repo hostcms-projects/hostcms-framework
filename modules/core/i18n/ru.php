@@ -105,23 +105,40 @@ return array(
 	'deleteNote' => 'Удалить заметку',
 
 	'key_not_found' => 'Не найден лицензионный ключ!',
-	'getting_key' => '<h2>Получение ключа</h2>
-	<div style="overflow: auto; position: absolute; z-index: 9999; height: 400px"><p>После установки системы управления необходимо зарегистрироваться на нашем сайте в разделе «<a href="http://www.hostcms.ru/users/" target="_blank">Личный кабинет</a>»</p>
-	<p>После подтверждения регистрации пользователя и входа в личный кабинет, в разделе «Лицензии» доступен список выданных лицензий:<br/>
-	<img src="http://www.hostcms.ru/images/news/user-orders/img1.gif" class="screen" /></p>
-	<p>Коммерческие пользователи могут узнать свой номер договора и PIN-код из таблицы в разделе «Лицензии» личного кабинета, пользователи HostCMS.Халява могут добавить новую лицензию.</p>
-	<p>Узнав номер договора и PIN-код можно вернуться в <a href="/admin/" target="_blank">центр администрирования</a> и ввести эти данные в разделе «Сайты» — «Настройки» — «Регистрационные данные».</p>
-	<p>Далее можно получать ключи в <a href="/admin/" target="_blank">центре администрирования</a> системы управления (начиная с версии 5.1.1), перейдя в раздел «Сайты» — «Домены»:
-	<br/>
-	<img src="http://www.hostcms.ru/images/keys/domain_list.gif" class="screen" /></p>
-	<p>При нажатии на пиктограмму «Ключ» система запросит ключ для выбранного домена по вашей лицензии и внесет его в список ключей сайта.
+	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .3); padding: 0 20px">
+
+	<h2>Получение номера лицензии и PIN-кода <a href="http://www.hostcms.ru/documentation/introduction/licenses/licenses/" target="_blank"><i class="fa fa-external-link"></i></a></h2>
+
+	<p>После установки системы управления необходимо зарегистрироваться на нашем сайте в разделе «<a href="http://www.hostcms.ru/users/" target="_blank">Личный кабинет</a>»</p>
+	<p>После подтверждения регистрации пользователя и входа в личный кабинет, в разделе «Лицензии» доступен список выданных лицензий:</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/guide/site/licenses-list.png" class="screen" />
+	</p>
+
+	<p>Коммерческие пользователи могут узнать свой номер лицензии и PIN-код из таблицы в разделе «Лицензии» личного кабинета, пользователи HostCMS.Халява могут добавить новую лицензию.</p>
+	<p>Узнав номер лицензии и PIN-код можно вернуться в <a href="/admin/" target="_blank">центр администрирования</a> и ввести эти данные в разделе «Система» → «Сайты» → пункт меню «Настройки» → «Регистрационные данные».</p>
+	
+	<h2>Получение ключа <a href="http://www.hostcms.ru/documentation/introduction/key/key/" target="_blank"><i class="fa fa-external-link"></i></a></h2>
+	
+	<p>Далее можно получать ключи в <a href="/admin/" target="_blank">центре администрирования</a> системы управления, перейдя в раздел «Система» → «Сайты», выбрать глобус для соответствующего сайта в столбце «Домены»:</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/introduction/install/step-by-step/key/key-2.png" class="screen" />
+	</p>
+
+	<p>При нажатии на пиктограмму «Ключ» система запросит ключ для выбранного домена по вашей лицензии и внесет его в список ключей сайта.</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/introduction/install/step-by-step/key/key-3.png" class="screen" /></p>
+
 	<h2>Вход в центр администрирования</h2>
 	<p>Перейдите в <a href="/admin/" target="_blank">центр администрирования</a>, далее действуйте по инструкции.</p>
 	</div>',
 
 	'access_forbidden_title' => 'Доступ к сайту запрещен',
 	'access_forbidden' => 'Доступ к сайту запрещен. Обратитесь к администратору.',
-	
+
 	'extension_does_not_allow' => 'Загружать файл с расширением "%s" запрещено.',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',

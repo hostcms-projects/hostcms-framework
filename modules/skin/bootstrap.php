@@ -117,7 +117,7 @@ class Skin_Bootstrap extends Core_Skin
 		}
 		?>
 		<!-- Fonts -->
-		<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+		<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,300,400,600,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
 
 		<script type="text/javascript">
 		$(function() {
@@ -234,7 +234,7 @@ class Skin_Bootstrap extends Core_Skin
 											<?php
 											$aAdmin_Languages = Core_Entity::factory('Admin_Language')
 												->getAllByActive(1);
-												
+
 											foreach ($aAdmin_Languages as $oAdmin_Language)
 											{
 												?><li>
@@ -911,6 +911,17 @@ class Skin_Bootstrap extends Core_Skin
 
 			<div class="row">
 				<?php
+				// Core
+				$Core_Module = $this->getSkinModule('core');
+
+				if (!is_null($Core_Module))
+				{
+					if (method_exists($Core_Module, 'widget'))
+					{
+						$Core_Module->widget();
+					}
+				}
+
 				// Other modules
 				$oSite = Core_Entity::factory('Site', CURRENT_SITE);
 				foreach ($aModules as $oModule)
@@ -953,9 +964,8 @@ class Skin_Bootstrap extends Core_Skin
 						&& method_exists($Core_Module, 'adminPage')
 						&& $oUser->checkModuleAccess(array($oModule->path), $oSite))
 					{
-
 						// 77 - widget settings
-						$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId($oModule->id, 77, 0);
+						//$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId($oModule->id, 77, 0);
 
 						// Временно отключена проверка
 						//if (is_null($oUser_Setting) || $oUser_Setting->active)
@@ -984,7 +994,7 @@ class Skin_Bootstrap extends Core_Skin
 
 					foreach ($aTypes as $type => $title)
 					{
-						$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId(0, $type, 0);
+						//$oUser_Setting = $oUser->User_Settings->getByModuleIdAndTypeAndEntityId(0, $type, 0);
 
 						// Временно отключена проверка
 						//if (is_null($oUser_Setting) || $oUser_Setting->active)

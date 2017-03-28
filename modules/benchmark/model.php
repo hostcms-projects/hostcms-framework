@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Benchmark_Model extends Core_Entity{
+class Benchmark_Model extends Core_Entity
+{
 	/**
 	 * Model name
 	 * @var mixed
@@ -133,4 +134,5 @@ class Benchmark_Model extends Core_Entity{
 			$this->getCoefficient($this->network, $this->etalon_network) +
 			$this->getMailCoefficient())
 			/ 8);
-	}}
+	}
+}

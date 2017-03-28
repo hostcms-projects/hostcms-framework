@@ -66,12 +66,12 @@ class Core_Http_Curl extends Core_Http
 			{
 				curl_setopt($curl, CURLOPT_POSTFIELDS, $this->_rawData);
 
-				if ($this->_method == 'POST')
+				/*if ($this->_method == 'POST')
 				{
 					curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-				}
+				}*/
 
-				$this->additionalHeader('Content-Length', strlen($this->_rawData));
+				!is_array($this->_rawData) && $this->additionalHeader('Content-Length', strlen($this->_rawData));
 			}
 			else
 			{
@@ -86,13 +86,15 @@ class Core_Http_Curl extends Core_Http
 		}
 
 		curl_setopt($curl, CURLOPT_HEADER, TRUE);
-		curl_setopt($curl, CURLOPT_NOBODY, FALSE); // Return body
+		// Can't set for FILE send
+		//curl_setopt($curl, CURLOPT_NOBODY, FALSE); // Return body
 
 		curl_setopt($curl, CURLOPT_TIMEOUT, $this->_timeout);
 		curl_setopt($curl, CURLOPT_USERAGENT, $this->_userAgent);
 		curl_setopt($curl, CURLOPT_REFERER, $this->_referer);
 
 		curl_setopt($curl, CURLOPT_VERBOSE, FALSE); // Minimize logs
+		//curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE); // No certificate
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE); // Return in string
 

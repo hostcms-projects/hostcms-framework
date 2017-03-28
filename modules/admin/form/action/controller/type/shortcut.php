@@ -71,10 +71,14 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 				->options($this->selectOptions)
 				->caption($this->selectCaption)
 				->value($this->value)
-				->controller($this->_Admin_Form_Controller/*->window($newWindowId)*/);
+				->controller(
+					// Select на всплывающем окне должен быть найден через ID нового окна, а не id_content
+					$this->_Admin_Form_Controller->window($newWindowId)
+				);
 
 			// Идентификаторы переносимых указываем скрытыми полями в форме, чтобы не превысить лимит GET
 			$aChecked = $this->_Admin_Form_Controller->getChecked();
+
 			// Clear checked list
 			$this->_Admin_Form_Controller->clearChecked();
 

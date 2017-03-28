@@ -612,9 +612,13 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
-		$this->_formValues['unloaded'] = 0;
+		//$this->_formValues['unloaded'] = 0;
 
 		parent::_applyObjectProperty();
+
+		$this->_object
+			->unloaded(0)
+			->save();
 
 		// Properties
 		Property_Controller_Tab::factory($this->_Admin_Form_Controller)

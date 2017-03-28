@@ -166,6 +166,14 @@ abstract class Shop_Payment_System_Handler
 			$this->shopOrder(
 				Core_Entity::factory('Shop_Order', intval($_SESSION['last_order_id']))
 			);
+
+			// Пользователь сменил платежную систему
+			if (!$this->_shopOrder->paid
+				&& $this->_shopOrder->shop_payment_system_id != intval(Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0)))
+			{
+				$this->_shopOrder->shop_payment_system_id = intval(Core_Array::get($this->_orderParams, 'shop_payment_system_id', 0));
+				$this->_shopOrder->save();
+			}
 		}
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterExecute', $this);
@@ -342,10 +350,10 @@ abstract class Shop_Payment_System_Handler
 		// Если не установлен модуль пользователей сайта - записываем в сессию
 		// идентификатор вставленного заказа, чтобы далее можно было посмотреть квитаницию
 		// об оплате или счет.
-		if (!Core::moduleIsActive('siteuser'))
-		{
+		//if (!Core::moduleIsActive('siteuser'))
+		//{
 			$_SESSION['order_' . $this->_shopOrder->id] = TRUE;
-		}
+		//}
 
 		// Номер заказа
 		!$bInvoice && $this->_shopOrder->invoice($this->_shopOrder->id);
@@ -386,6 +394,9 @@ abstract class Shop_Payment_System_Handler
 
 		Core::moduleIsActive('siteuser') && $oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
+		// Массив цен для расчета скидок каждый N-й со скидкой N%
+		$aDiscountPrices = array();
+		
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
@@ -418,6 +429,12 @@ abstract class Shop_Payment_System_Handler
 
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
 
+					// По каждой единице товара добавляем цену в массив, т.к. может быть N единиц одого товара
+					for ($i = 0; $i < $oShop_Cart->quantity; $i++)
+					{
+						$aDiscountPrices[] = $aPrices['price_discount'];
+					}
+					
 					// Сумма для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
 						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
@@ -458,7 +475,7 @@ abstract class Shop_Payment_System_Handler
 		if ($amount > 0)
 		{
 			// Add a discount to the purchase
-			$this->_addPurchaseDiscount($amountPurchaseDiscount, $quantityPurchaseDiscount);
+			$this->_addPurchaseDiscount($amountPurchaseDiscount, $quantityPurchaseDiscount, $aDiscountPrices);
 		}
 
 		$this->_addDelivery();
@@ -555,9 +572,10 @@ abstract class Shop_Payment_System_Handler
 	 * Add a discount to the purchase
 	 * @param float $amount amount
 	 * @param float $quantity quantity
+	 * @param array $discountPrices array of item's prices
 	 * @return self
 	 */
-	protected function _addPurchaseDiscount($amount, $quantity)
+	protected function _addPurchaseDiscount($amount, $quantity, $discountPrices = array())
 	{
 		$oShop = $this->_Shop_Payment_System_Model->Shop;
 
@@ -568,6 +586,7 @@ abstract class Shop_Payment_System_Handler
 			->quantity($quantity)
 			->couponText(trim($this->_orderParams['coupon_text']))
 			->siteuserId($this->_shopOrder->siteuser_id ? $this->_shopOrder->siteuser_id : 0)
+			->prices($discountPrices)
 			;
 
 		// Получаем данные о купоне
@@ -593,6 +612,7 @@ abstract class Shop_Payment_System_Handler
 			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
 			$oShop_Order_Item->name = $oShop_Purchase_Discount->name;
 			$oShop_Order_Item->quantity = 1;
+			$oShop_Order_Item->type = 0;
 
 			$discountAmount = $oShop_Purchase_Discount->getDiscountAmount();
 
@@ -951,7 +971,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	public function getSiteuserEmail()
 	{
-		return Core_Mail::instance();
+		return Core_Mail::instance()->clear();
 	}
 
 	/**
@@ -960,7 +980,7 @@ abstract class Shop_Payment_System_Handler
 	 */
 	public function getAdminEmail()
 	{
-		return Core_Mail::instance();
+		return Core_Mail::instance()->clear();
 	}
 
 	/**
@@ -1054,11 +1074,14 @@ abstract class Shop_Payment_System_Handler
 
 		$oShopOrder = $this->_shopOrder;
 		$oShop = $oShopOrder->Shop;
-
-		// В адрес "ОТ КОГО" для администратора указывается email пользователя
-		$from = Core_Valid::email($oShopOrder->email)
+		
+		// В адрес "ОТ КОГО" для администратора указывается адрес магазина,
+		// а в Reply-To указывается email пользователя
+		$from = $this->_getEmailFrom();
+		
+		$replyTo = Core_Valid::email($oShopOrder->email)
 			? $oShopOrder->email
-			: $oShop->getFirstEmail();
+			: $from;
 
 		$this->xsl($this->_xslAdminMail);
 		$sInvoice = $this->_processXml();
@@ -1072,14 +1095,15 @@ abstract class Shop_Payment_System_Handler
 
 		$oCore_Mail
 			->from($from)
+			->header('Reply-To', $replyTo)
 			->subject($admin_subject)
 			->message($sInvoice)
 			->contentType($this->_adminMailContentType)
 			->header('X-HostCMS-Reason', 'Order')
 			->header('Precedence', 'bulk');
 
-		$aEmails = $this->getAdminEmails();
-
+		$aEmails = array_map('trim', $this->getAdminEmails());
+		
 		foreach ($aEmails as $key => $sEmail)
 		{
 			// Delay 0.350s for second mail and others
@@ -1133,6 +1157,15 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Get sender email
+	 * @return string
+	 */
+	protected function _getEmailFrom()
+	{
+		return $this->_shopOrder->Shop->getFirstEmail();
+	}
+	
+	/**
 	 * Send e-mail to user
 	 * @param Core_Mail $oCore_Mail mail
 	 * @return self
@@ -1151,7 +1184,7 @@ abstract class Shop_Payment_System_Handler
 		if (Core_Valid::email($to))
 		{
 			// Адрес "ОТ КОГО" для пользователя
-			$from = $oShop->getFirstEmail();
+			$from = $this->_getEmailFrom();
 
 			$this->xsl($this->_xslSiteuserMail);
 			$sInvoice = $this->_processXml();

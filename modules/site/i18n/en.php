@@ -71,7 +71,7 @@ return array(
 
 	'accountinfo_title' => 'Edit registration data',
 	'accountinfo_login' => '<acronym title="User login">Login</acronym>',
-	'accountinfo_contract_number' => '<acronym title="Contract number">Contract number</acronym>',
+	'accountinfo_contract_number' => '<acronym title="License number">License</acronym>',
 	'accountinfo_pin_code' => '<acronym title="PIN code">PIN code</acronym>',
 	'accountInfo_success' => 'Registration data modified successfully.',
 

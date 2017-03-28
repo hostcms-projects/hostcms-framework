@@ -785,7 +785,7 @@ class Admin_Form_Controller
 	 * Count of elements on page
 	 * @var array
 	 */
-	protected $_onPage = array (10 => 10, 20 => 20, 30 => 30, /*40 => 40, */50 => 50, 100 => 100, 500 => 500, 1000 => 1000);
+	protected $_onPage = array (10 => 10, 20 => 20, 30 => 30, 50 => 50, 100 => 100, 500 => 500, 1000 => 1000);
 
 	/**
 	 * Total founded items
@@ -1507,11 +1507,11 @@ class Admin_Form_Controller
 	* @return string
 	*/
 	public function getAdminSendForm($action = NULL, $operation = NULL, $additionalParams = NULL,
-		$limit = NULL, $current = NULL, $sortingFieldId = NULL, $sortingDirection = NULL)
+		$limit = NULL, $current = NULL, $sortingFieldId = NULL, $sortingDirection = NULL, $buttonObject = 'this')
 	{
 		$aData = array();
 
-		$aData[] = "buttonObject: this";
+		$aData[] = "buttonObject: {$buttonObject}";
 
 		// add
 		if (is_null($action))

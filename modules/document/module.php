@@ -11,7 +11,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Document_Module extends Core_Module{	/**
+class Document_Module extends Core_Module
+{
+	/**
 	 * Module version
 	 * @var string
 	 */
@@ -21,7 +23,8 @@ class Document_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-03-03';
+	public $date = '2016-05-06';
+
 	/**
 	 * Module name
 	 * @var string
@@ -30,8 +33,20 @@ class Document_Module extends Core_Module{	/**
 
 	/**
 	 * Constructor.
-	 */	public function __construct()	{
+	 */
+	public function __construct()
+	{
 		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 20,				'block' => 0,
+
+		$this->menu = array(
+			array(
+				'sorting' => 20,
+				'block' => 0,
 				'ico' => 'fa fa-file-text-o',
-				'name' => Core::_('Document.menu'),				'href' => "/admin/document/index.php",				'onclick' => "$.adminLoad({path: '/admin/document/index.php'}); return false"			)		);	}}
+				'name' => Core::_('Document.menu'),
+				'href' => "/admin/document/index.php",
+				'onclick' => "$.adminLoad({path: '/admin/document/index.php'}); return false"
+			)
+		);
+	}
+}

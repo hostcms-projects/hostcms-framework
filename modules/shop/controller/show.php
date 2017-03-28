@@ -579,6 +579,7 @@ class Shop_Controller_Show extends Core_Controller
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 					$this->comments && $oShop_Item->showXmlComments($this->comments);
 					$this->bonuses && $oShop_Item->showXmlBonuses($this->bonuses);
+					$this->specialprices && $oShop_Item->showXmlSpecialprices($this->specialprices);
 
 					$oViewedEntity->addEntity($oShop_Item);
 				}
@@ -953,7 +954,7 @@ class Shop_Controller_Show extends Core_Controller
 		//{
 			$aProperties = $this->group === FALSE
 				? (is_array($this->itemsPropertiesList) && count($this->itemsPropertiesList)
-					? $oShop_Item_Property_List->Properties->getAllByid($this->itemsPropertiesList, 'IN')
+					? $oShop_Item_Property_List->Properties->getAllByid($this->itemsPropertiesList, FALSE, 'IN')
 					: $oShop_Item_Property_List->Properties->findAll()
 				)
 				: $oShop_Item_Property_List->getPropertiesForGroup($this->group, $this->itemsPropertiesList);
@@ -1132,6 +1133,8 @@ class Shop_Controller_Show extends Core_Controller
 		{
 			$oCore_QueryBuilder_Select_Modifications = Core_QueryBuilder::select('shop_items.id')
 				->from('shop_items')
+				->where('shop_items.deleted', '=', 0)
+				->where('shop_items.active', '=', 1)
 				->where('shop_items.shop_group_id', '=', $shop_group_id);
 
 			// Стандартные ограничения для товаров
@@ -1148,6 +1151,8 @@ class Shop_Controller_Show extends Core_Controller
 		{
 			$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')
 				->from('shop_items')
+				->where('shop_items.deleted', '=', 0)
+				->where('shop_items.active', '=', 1)
 				->where('shop_items.shop_group_id', '=', $shop_group_id)
 				->where('shop_items.shortcut_id', '>', 0);
 
@@ -1749,18 +1754,36 @@ class Shop_Controller_Show extends Core_Controller
 
 		$oSubMinMaxQueryBuilder = Core_QueryBuilder::select(array(Core_QueryBuilder::expression($query_currency_switch), 'absolute_price'))
 			->from('shop_items')
+			->where('shop_items.deleted', '=', 0)
 			->where('shop_items.shop_id', '=', $oShop->id)
 			->where('shop_items.active', '=', 1)
 			->open()
-			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup);
-
-		$this->filterShortcuts && $oSubMinMaxQueryBuilder
+			->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
 			->where('shop_items.shortcut_id', '=', 0);
 
+		if ($this->modificationsList)
+		{
+			$oCore_QueryBuilder_Select_Modifications = Core_QueryBuilder::select('shop_items.id')
+				->from('shop_items')
+				->where('shop_items.deleted', '=', 0)
+				->where('shop_items.active', '=', 1)
+				->where('shop_items.shop_group_id', '=', $iCurrentShopGroup);
+
+			// Стандартные ограничения для товаров
+			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
+
+			$oSubMinMaxQueryBuilder
+				->setOr()
+				->where('shop_items.shop_group_id', '=', 0)
+				->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Modifications);
+		}
+			
 		if ($this->filterShortcuts)
 		{
 			$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')
 				->from('shop_items')
+				->where('shop_items.deleted', '=', 0)
+				->where('shop_items.active', '=', 1)
 				->where('shop_items.shop_group_id', '=', $iCurrentShopGroup)
 				->where('shop_items.shortcut_id', '>', 0);
 

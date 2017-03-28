@@ -3,7 +3,26 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Default entity controller
+ * Default entity controller.
+ *
+ * Set XSL:
+ * <code>
+ * ->xsl(
+ * 	Core_Entity::factory('Xsl')->getByName('myXslName')
+ * )
+ * </code>
+ *
+ * Add external entity:
+ * <code>
+ * ->addEntity(
+ * 	Core::factory('Core_Xml_Entity')->name('my_tag')->value(123)
+ * )
+ * </code>
+ *
+ * Add additional cache signature:
+ * <code>
+ * ->addCacheSignature('option=' . $value)
+ * </code>
  *
  * @package HostCMS
  * @subpackage Core
@@ -103,7 +122,7 @@ class Core_Controller extends Core_Servant_Properties
 	{
 		return $this->_entities;
 	}
-	
+
 	/**
 	 * Clear enities
 	 * @return self
@@ -217,7 +236,7 @@ class Core_Controller extends Core_Servant_Properties
 	 */
 	protected $_shownIDs = array();
 
-	/** 
+	/**
 	 * Get shown IDs
 	 * @return array
 	 */
@@ -225,7 +244,7 @@ class Core_Controller extends Core_Servant_Properties
 	{
 		return $this->_shownIDs;
 	}
-	
+
 	/**
 	 * Convert object to string
 	 * @return string

@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Ipaddress_Model extends Core_Entity{
+class Ipaddress_Model extends Core_Entity
+{
 	/**
 	 * Column consist item's name
 	 * @var string
@@ -21,25 +22,57 @@ class Ipaddress_Model extends Core_Entity{
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
-	 */	public function __construct($id = NULL)	{		parent::__construct($id);		if (is_null($id))		{			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;		}	}
+	 */
+	public function __construct($id = NULL)
+	{
+		parent::__construct($id);
+
+		if (is_null($id))
+		{
+			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
+			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+		}
+	}
+
 	/**
 	 * Get ipaddress by ip
 	 * @param string $ip ip
 	 * @return Ip|NULL
-	 */	public function getByIp($ip)	{		$this->queryBuilder()			->clear()			->where('ip', '=', $ip)			->limit(1);
+	 */
+	public function getByIp($ip)
+	{
+		$this->queryBuilder()
+			->clear()
+			->where('ip', '=', $ip)
+			->limit(1);
+
 		$aIp = $this->findAll();
 		return isset($aIp[0])
 			? $aIp[0]
 			: NULL;
-	}
+	}
+
 	/**
 	 * Change access mode
 	 * @return self
-	 */	public function changeAccess()	{		$this->deny_access = 1 - $this->deny_access;		$this->save();		return $this;	}
-		/**
+	 */
+	public function changeAccess()
+	{
+		$this->deny_access = 1 - $this->deny_access;
+		$this->save();
+		return $this;
+	}
+	
+	/**
 	 * Change statistic mode
 	 * @return self
-	 */	public function changeStatistic()	{		$this->no_statistic = 1 - $this->no_statistic;		$this->save();		return $this;	}
+	 */
+	public function changeStatistic()
+	{
+		$this->no_statistic = 1 - $this->no_statistic;
+		$this->save();
+		return $this;
+	}
 
 	/**
 	 * Check if there another ip with this address is
@@ -76,4 +109,5 @@ class Ipaddress_Model extends Core_Entity{
 	{
 		$this->_checkDuplicate();
 		return parent::save();
-	}}
+	}
+}

@@ -216,7 +216,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			);
 
 			// Добавляем в заголовок информацию о свойствах товара
-			foreach($this->_aItem_Properties as $oItem_Property)
+			foreach ($this->_aItem_Properties as $oItem_Property)
 			{
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->prepareString($oItem_Property->name));
 				$this->_iItem_Properties_Count++;
@@ -229,7 +229,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			}
 
 			// Добавляем в заголовок информацию о свойствах группы товаров
-			foreach($this->_aGroup_Properties as $oGroup_Property)
+			foreach ($this->_aGroup_Properties as $oGroup_Property)
 			{
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = sprintf('"%s"', $this->prepareString($oGroup_Property->name));
 				$this->_iGroup_Properties_Count++;
@@ -242,13 +242,13 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			}
 
 			// Добавляем в заголовок информацию о складах
-			foreach($this->_aShopWarehouses as $oWarehouse)
+			foreach ($this->_aShopWarehouses as $oWarehouse)
 			{
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = Core::_('Shop_Item.warehouse_import_field', $this->prepareString($oWarehouse->name));
 			}
 
 			// Добавляем информацию о ценах на группы пользователя
-			foreach($this->_aShopPrices as $oShopPrice)
+			foreach ($this->_aShopPrices as $oShopPrice)
 			{
 				$this->_aCurrentData[$this->_iCurrentDataPosition][] = $oShopPrice->name;
 			}
@@ -269,7 +269,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		// CML ID ТОВАРА
 		$aTmpArray[9] = $oShopItem->guid;
 
-		foreach($aShop_Specialprices as $oShop_Specialprice)
+		foreach ($aShop_Specialprices as $oShop_Specialprice)
 		{
 			$aTmpArray[39] = $oShop_Specialprice->min_quantity;
 			$aTmpArray[40] = $oShop_Specialprice->max_quantity;
@@ -326,18 +326,18 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			}
 		}
 
-		for($i = 0; $i < $this->_iGroup_Properties_Count; $i++)
+		for ($i = 0; $i < $this->_iGroup_Properties_Count; $i++)
 		{
 			$aGroupProperties[] = "";
 		}
 
-		foreach($this->_aShopWarehouses as $oWarehouse)
+		foreach ($this->_aShopWarehouses as $oWarehouse)
 		{
 			$oShop_Warehouse_Item = $oShopItem->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id, FALSE);
 			$aWarehouses[] = !is_null($oShop_Warehouse_Item) ? $oShop_Warehouse_Item->count : 0;
 		}
 
-		foreach($this->_aShopPrices as $oShopPrice)
+		foreach ($this->_aShopPrices as $oShopPrice)
 		{
 			$oShop_Price = $oShopItem->Shop_Item_Prices->getByPriceId($oShopPrice->id, FALSE);
 			$aShopPrices[] = !is_null($oShop_Price) ? $oShop_Price->value : 0;
@@ -435,17 +435,23 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	 */
 	public function execute()
 	{
+		$sFilename = 'CSV_' . date("Y_m_d_H_i_s") . '.csv';
+
 		header("Pragma: public");
 		header("Content-Description: File Transfer");
 		header("Content-Type: application/force-download");
-		header("Content-Disposition: attachment; filename = " . 'CSV_' . date("Y_m_d_H_i_s") . '.csv'. ";");
+		header("Content-Disposition: attachment; filename = " . $sFilename . ";");
 		header("Content-Transfer-Encoding: binary");
+
+		Core_Log::instance()->clear()
+			->status(Core_Log::$ERROR)
+			->write('Start CSV export ' . $sFilename);
 
 		$oShop = Core_Entity::factory('Shop', $this->shopId);
 
 		if(!$this->exportOrders)
 		{
-			foreach($this->_aCurrentData as $aData)
+			foreach ($this->_aCurrentData as $aData)
 			{
 				$this->_printRow($aData);
 			}
@@ -464,7 +470,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 			$aShopGroupsId = array_merge(array($this->parentGroup), $oShop_Groups->getGroupChildrenId());
 
-			foreach($aShopGroupsId as $iShopGroupId)
+			foreach ($aShopGroupsId as $iShopGroupId)
 			{
 				$aTmpArray = array();
 
@@ -490,25 +496,25 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					);
 
 					// Пропускаем поля товара
-					foreach($this->_aItemBase_Properties as $sNullData)
+					foreach ($this->_aItemBase_Properties as $sNullData)
 					{
 						$aTmpArray[] = $sNullData;
 					}
 
 					// Пропускаем поля специальных цен товара
-					foreach($this->_aSpecialPriceBase_Properties as $sNullData)
+					foreach ($this->_aSpecialPriceBase_Properties as $sNullData)
 					{
 						$aTmpArray[] = $sNullData;
 					}
 
 					// Пропускаем поля дополнительных свойств товара
-					for($i = 0; $i < $this->_iItem_Properties_Count; $i++)
+					for ($i = 0; $i < $this->_iItem_Properties_Count; $i++)
 					{
 						$aTmpArray[] = "";
 					}
 
 					// Выводим данные о дополнительных свойствах групп
-					foreach($this->_aGroup_Properties as $oGroup_Property)
+					foreach ($this->_aGroup_Properties as $oGroup_Property)
 					{
 						$aProperty_Values = $oGroup_Property->getValues($oShopGroup->id);
 						$iProperty_Values_Count = count($aProperty_Values);
@@ -551,8 +557,8 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					$oShopItems->queryBuilder()->offset($offset)->limit($limit);
 					$aShopItems = $oShopItems->findAll(FALSE);
 
-					foreach($aShopItems as $oShopItem)
-					{
+					foreach ($aShopItems as $oShopItem)
+					{				
 						$this->_printRow($this->getItemData($oShopItem));
 
 						$iPropertyFieldOffset = count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties) + count($this->_aSpecialPriceBase_Properties);
@@ -569,7 +575,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 							if(count($aProperty_Values))
 							{
-								foreach($aProperty_Values as $oProperty_Value)
+								foreach ($aProperty_Values as $oProperty_Value)
 								{
 									$aCurrentPropertyLine[$iPropertyFieldOffset] = sprintf('"%s"', $this->prepareString(($oItem_Property->type != 2
 										? ($oItem_Property->type == 3 && $oProperty_Value->value != 0 && Core::moduleIsActive('list')
@@ -613,7 +619,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 						$this->exportItemModifications && $aItemModifications = $oShopItem->Modifications->findAll(FALSE);
 
 						// Добавляем информацию о модификациях
-						foreach($aItemModifications as $oItemModification)
+						foreach ($aItemModifications as $oItemModification)
 						{
 							$this->_printRow(
 								$this->getItemData($oItemModification)
@@ -711,7 +717,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 				$aShop_Orders = $oShop_Orders->findAll(FALSE);
 
-				foreach($aShop_Orders as $oShop_Order)
+				foreach ($aShop_Orders as $oShop_Order)
 				{
 					$this->_printRow(array(
 						sprintf('"%s"', $this->prepareString($oShop_Order->guid)),
@@ -747,7 +753,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 					// Получаем все товары заказа
 					$aShop_Order_Items = $oShop_Order->Shop_Order_Items->findAll(FALSE);
-					foreach($aShop_Order_Items as $oShop_Order_Item)
+					foreach ($aShop_Order_Items as $oShop_Order_Item)
 					{
 						$this->_aCurrentRow = array(
 							sprintf('"%s"', $this->prepareString($oShop_Order->guid)),
@@ -849,6 +855,10 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			}
 			while (count($aShop_Orders));
 		}
+
+		Core_Log::instance()->clear()
+			->status(Core_Log::$ERROR)
+			->write('End CSV export ' . $sFilename);
 
 		exit();
 	}

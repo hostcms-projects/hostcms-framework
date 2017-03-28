@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Shop_Cart_Model extends Core_Entity{
+class Shop_Cart_Model extends Core_Entity
+{
 	/**
 	 * Disable markDeleted()
 	 * @var mixed
@@ -21,7 +22,8 @@ class Shop_Cart_Model extends Core_Entity{
 	/**
 	 * List of preloaded values
 	 * @var array
-	 */	protected $_preloadValues = array(
+	 */
+	protected $_preloadValues = array(
 		'postpone' => 0,
 		'quantity' => 0
 	);
@@ -30,9 +32,13 @@ class Shop_Cart_Model extends Core_Entity{
 	 * Belongs to relations
 	 * @var array
 	 */
-	protected $_belongsTo = array(		'shop' => array(),		'shop_item' => array(),
+	protected $_belongsTo = array(
+		'shop' => array(),
+		'shop_item' => array(),
 		'shop_warehouse' => array(),
-		'siteuser' => array()	);
+		'siteuser' => array()
+	);
+
 	/**
 	 * Get Shop_Cart by item $shop_item_id and site user $siteuser_id
 	 * @param int $shop_item_id

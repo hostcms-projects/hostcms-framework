@@ -77,9 +77,38 @@ abstract class Core_Mail
 		$driver = self::_getDriverName($aConfig[$name]['driver']);
 		$oDriver = new $driver();
 
+		$aConfigDriver = Core_Array::get($aConfig, $aConfig[$name]['driver'], array());
+
 		return $oDriver->config(
-			$aPersonalConfig + Core_Array::get($aConfig, $aConfig[$name]['driver'], array())
+			$aPersonalConfig + (
+				defined('CURRENT_SITE') && isset($aConfigDriver[CURRENT_SITE])
+					? $aConfigDriver[CURRENT_SITE]
+					: $aConfigDriver
+			)
 		);
+	}
+
+	/**
+	 * Clear object
+	 *
+	 * @return self
+	 */
+	public function clear()
+	{
+		$this
+			->bound('----------' . mb_strtoupper(uniqid(time())))
+			->separator("\n")
+			->chunklen(76)
+			->contentType('text/plain');
+
+		$this->_headers = $this->_files = array();
+
+		$this->_to = $this->_from = $this->_subject = $this->_message
+			= $this->_senderName = NULL;
+
+		$this->_multipartRelated = FALSE;
+
+		return $this;
 	}
 
 	/**
@@ -113,7 +142,7 @@ abstract class Core_Mail
 	 */
 	public function __construct()
 	{
-		$this->bound('----------' . mb_strtoupper(uniqid(time())));
+		$this->clear();
 	}
 
 	/**
@@ -132,13 +161,13 @@ abstract class Core_Mail
 		$this->_separator = $separator;
 		return $this;
 	}
-	
+
 	/**
 	 * The chunk length.
 	 * @var string
 	 */
 	protected $_chunklen = 76;
-	
+
 	/**
 	 * Set chunk length
 	 * @param int $chunklen The chunk length
@@ -149,7 +178,7 @@ abstract class Core_Mail
 		$this->_chunklen = $chunklen;
 		return $this;
 	}
-	
+
 	/**
 	 * Mail TO field
 	 * @var string

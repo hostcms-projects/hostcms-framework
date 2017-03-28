@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class User_Note_Model extends Core_Entity{
+class User_Note_Model extends Core_Entity
+{
 	/**
 	 * Column consist item's name
 	 * @var string

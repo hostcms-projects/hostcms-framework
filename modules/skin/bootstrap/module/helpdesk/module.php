@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Skin_Bootstrap_Module_Helpdesk_Module extends Helpdesk_Module{
+class Skin_Bootstrap_Module_Helpdesk_Module extends Helpdesk_Module
+{
 	/**
 	 * Constructor.
 	 */
@@ -55,4 +56,5 @@ class Skin_Bootstrap_Module_Helpdesk_Module extends Helpdesk_Module{
 			</div>
 		</div>
 		<?php
-	}}
+	}
+}

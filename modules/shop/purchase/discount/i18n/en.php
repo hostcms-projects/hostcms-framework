@@ -20,6 +20,8 @@ return array(
 	'coupon' => '<acronym title="Use discount only in the presence of discount coupon">Use only with discount coupon</acronym>',
 	'value' => '<acronym title="Discount amount; can be measured by per cents or a currency">Discount amount</acronym>',
 	'type' => '<acronym title="Discount type - per cent or a sum in a selected currency">Discount type</acronym>',
+	'position' => '<acronym title="Item position to calculate amount of discount">Item Position</acronym>',
+	'total-amount' => 'Total Amount',
 	'start_datetime' => '<acronym title="Starting date of discount activity">Discount active from</acronym>',
 	'end_datetime' => '<acronym title="End date of discount activity">Discount active to</acronym>',
 	'min_amount' => '<acronym title="Initial price interval">Initial price interval</acronym>',

@@ -193,6 +193,7 @@ span.profile > span {
 /* Truncate long text inside rows of a table */
 table.admin-table {
 	table-layout: fixed;
+	border: 1px solid #e9e9e9;
 }
 table.admin-table > tbody > tr > td:not(:last-child) {
   overflow: hidden;
@@ -216,7 +217,7 @@ body.body-authorization {
 	background: #FFF;
 	border: 1px solid #E6E6E6;
 	border-radius: 5px;
-	box-shadow: 3px 5px 17px rgba(100, 100, 100, 0.075);
+	box-shadow: 3px 5px 17px rgba(100,100,100,.075);
 }
 
 body.body-authorization .widget div.logo {
@@ -247,7 +248,7 @@ body.body-authorization #id_message .error {
 	background: #d9534f;
 	border: 1px solid #ebccd1;
 	border-radius: 5px;
-	box-shadow: 3px 5px 17px rgba(100, 100, 100, 0.075);
+	box-shadow: 3px 5px 17px rgba(100,100,100,.075);
 }
 
 body.body-authorization #id_message .error button.close {
@@ -284,14 +285,14 @@ body.body-authorization .indexMessage, .installContent {
 	top: 10%;
 	margin: 0 0 0 -30%;
 	padding: 30px;
-	background-color: rgba(255,255,255,0.15) !important;
+	background-color: rgba(255,255,255,.15) !important;
 }
 
 .installContent {
-	background-color: rgba(255,255,255,0.45) !important;
+	background-color: rgba(255,255,255,.45) !important;
 }
 .installContent .table {
-	background-color: rgba(255, 255, 255, 0.3);
+	background-color: rgba(255,255,255,.3);
 }
 .installContent .table thead tr {
 	background: transparent;
@@ -312,8 +313,8 @@ body.body-authorization .indexMessage, .installContent {
 	height: 200px !important;
 	background: #fff;
 	padding-top: 10px !important;
-	background-color: rgba(255,255,255,0.15) !important;
-	border: 1px solid rgba(255,255,255,0.1);
+	background-color: rgba(255,255,255,.15) !important;
+	border: 1px solid rgba(255,255,255,.1);
 }
 
 .login-container .loginbox .loginbox-logo {
@@ -401,19 +402,19 @@ body.body-authorization .hostcms-notice {
 .table thead tr td.highlight,
 */
 .table tbody tr td.highlight {
-	background-color: #F9F9F9;
+	background-color: #F9F9F9 !important;
 }
 .table-striped > tbody > tr:nth-child(2n+1) {
     background-color: #fff;
 }
 .table-striped > tbody > tr:nth-child(even) > td,
 .table-striped > tbody > tr:nth-child(even) > th {
-  background-color: #F9F9F9;
+  background-color: #fbfbfb;
 }
 /* Checked */
 .table-striped > tbody > tr.cheked:nth-child(odd) > td,
 .table-striped > tbody > tr.cheked:nth-child(odd) > th {
-  background-color: #F9F9F9;
+  background-color: #f9f9f9;
 }
 .table-striped > tbody > tr.cheked:nth-child(even) > td,
 .table-striped > tbody > tr.cheked:nth-child(even) > th {
@@ -422,11 +423,11 @@ body.body-authorization .hostcms-notice {
 /* Hover */
 .table-hover > tbody > tr:hover > td,
 .table-hover > tbody > tr:hover > th {
-  background-color: #E0EAEF;
+  background-color: #E4F0F6 !important;
 }
 .table-hover > tbody > tr.cheked:hover > td,
 .table-hover > tbody > tr.cheked:hover > th {
-  background-color: #CCDDE6;
+  background-color: #DAECF5 !important;
 }
 
 .table-scrollable > .table > thead > tr > td,
@@ -492,29 +493,29 @@ body.hostcms-bootstrap1:before {
 .hostcms-bootstrap1 h4.row-title,
 .hostcms-bootstrap1 h5.row-title,
 .hostcms-bootstrap1 h6.row-title  {
-	background-color: rgba(255,255,255,0.9);
+	background-color: rgba(255,255,255,.95);
 }
 .hostcms-bootstrap1 .page-header {
 	background: none;
-	border-bottom: 1px solid rgba(255, 255, 255, .3);
+	border-bottom: 1px solid rgba(255,255,255,.3);
 }
 .hostcms-bootstrap1 .page-header .header-buttons a {
     color: #888;
 }
 .hostcms-bootstrap1 .page-breadcrumbs,
 .hostcms-bootstrap1 .page-header{
-	background-color: rgba(255, 255, 255, .7);
+	background-color: rgba(255,255,255,.7);
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-header-wrapper .searchinput/*,
 .hostcms-bootstrap1 .page-sidebar:before*/ {
-	background-color: rgba(255, 255, 255, .5);
+	background-color: rgba(255,255,255,.5);
 }
 .hostcms-bootstrap1 .page-sidebar:before {
 	background: none;
 	box-shadow: none;
 }
 .hostcms-bootstrap1 .sidebar-menu {
-	background-color: rgba(255, 255, 255, .8);
+	background-color: rgba(255,255,255,.8);
 	box-shadow: 0 0 10px 0 rgba(0, 0, 0, .2);
 }
 
@@ -522,16 +523,16 @@ body.hostcms-bootstrap1:before {
 	color: #333;
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu > li > a {
-    border-top: 1px solid rgba(255, 255, 255,.3);
+    border-top: 1px solid rgba(255,255,255,.3);
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu > li > a:hover {
 	background-color: rgba(255,255,255,.7);
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu > li:last-child > a {
-	border-bottom: 1px solid rgba(255, 255, 255,.3);
+	border-bottom: 1px solid rgba(255,255,255,.3);
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-header-wrapper .searchinput {
-	border: 1px solid rgba(255, 255, 255,.5);
+	border: 1px solid rgba(255,255,255,.5);
 }
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu li.open,
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu > li > .submenu > li > a:before {
@@ -540,10 +541,10 @@ body.hostcms-bootstrap1:before {
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu li.active > a,
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu > li.open > a,
 .hostcms-bootstrap1 .page-sidebar .sidebar-menu .submenu {
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255,255,255,.5);
 }
 .hostcms-bootstrap1 .databox.hostcms-widget-databox {
-	background: rgba(255, 255, 255, 0.8);
+	background: rgba(255,255,255,.8);
 }
 .hostcms-bootstrap1 .databox.hostcms-widget-databox .databox-right,
 .hostcms-bootstrap1 .page-header .header-title h1 {
@@ -559,23 +560,23 @@ body.hostcms-bootstrap1:before {
 .hostcms-bootstrap1 .dashboard-box .box-header .deadline,
 .hostcms-bootstrap1 .dashboard-box .box-body,
 .hostcms-bootstrap1 .orders-list {
-    background: none repeat scroll 0 0 rgba(255, 255, 250, .9);
+    background: none repeat scroll 0 0 rgba(255,255,255,.95);
 	color:  #333;
 }
 .hostcms-bootstrap1 .tickets-container {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255,255,255,.4);
 }
 .hostcms-bootstrap1 .task-container .tasks-list .task-item {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255,255,255,.4);
 }
 .hostcms-bootstrap1 .navbar .navbar-inner {
 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3)
 }
 .hostcms-bootstrap1 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li > a .badge {
-	box-shadow: 1px 1px 0 rgba(100, 100, 100, 0.1);
+	box-shadow: 1px 1px 0 rgba(100,100,100,.1);
 }
 .hostcms-bootstrap1 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li.open > a {
- background-color: rgba(100, 100, 100, 0.1);
+ background-color: rgba(100,100,100,.1);
 }
 
 .account-area-site-name  {
@@ -601,7 +602,7 @@ body.hostcms-bootstrap1:before {
     width: auto;
 }
 .hostcms-bootstrap1 .dropdown-menu {
-	background-color: rgba(255, 255, 255,.95)
+	background-color: rgba(255,255,255,.95)
 }
 .hostcms-bootstrap1 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu li {
     background: none !important;
@@ -662,9 +663,10 @@ body.hostcms-bootstrap1:before {
 
 .DTTTFooter{
 	padding-left: 5px;
-	padding-top: 10px;
+	/*padding-top: 10px;*/
 	padding-bottom: 10px;
 	overflow: visible;
+	background: none;
 }
 
 .dataTables_actions{
@@ -713,8 +715,9 @@ table.table tr td:last-child {
 }
 
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
-padding: 6px;
-vertical-align: middle;
+	padding: 6px;
+	vertical-align: middle;
+	border-top: 1px solid #e9e9e9;
 }
 
 .table .datepicker tr td.active {
@@ -1263,7 +1266,7 @@ select{
     padding: 0;
 }
 
-/*.tickets-container .tickets-list .ticket-item .ticket-user .user-name { text-shadow: 0 1px rgba(100, 100, 100, 0.2) }*/
+/*.tickets-container .tickets-list .ticket-item .ticket-user .user-name { text-shadow: 0 1px rgba(100,100,100,.2) }*/
 
 /* Frontend */
 body.body-blank:before {
@@ -1278,7 +1281,7 @@ body.body-blank .page-breadcrumbs, body.body-blank .page-header {display:none}
 }
 
 .radio-group  input[type="radio"] +span{
-	border: 3px solid rgba(255, 255, 255, 0);
+	border: 3px solid rgba(255,255,255,0);
 	border-radius: 3px;
 	box-shadow: none;
 }
@@ -1300,6 +1303,7 @@ body.body-blank .page-breadcrumbs, body.body-blank .page-header {display:none}
 
 div.wrongTime {color: #AAA}
 div.inactive, .line-through {text-decoration: line-through}
+.thin { font-weight: 300 }
 .semi-bold {font-weight: 600}
 .bold {font-weight: 700}
 .extra-bold {font-weight: 800}
@@ -1665,7 +1669,7 @@ background: #F2F2F2 !important; font-size: 10pt;
 font-family: Arial, Verdana, 'MS Sans Serif', sans-serif !important;
 border-width: 0px 0px 1px 0px; border-color: #F2F2F2;
 text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
-.ui-dialog .ui-dialog-title { color: #000; font-weight: bold; margin: .1em 16px .2em 0; text-shadow: 1px 1px 0 rgba(255,255,255,0.8); white-space: nowrap }
+.ui-dialog .ui-dialog-title { color: #000; font-weight: bold; margin: .1em 16px .2em 0; text-shadow: 1px 1px 0 rgba(255,255,255,.8); white-space: nowrap }
 .ui-dialog .ui-dialog-content {  box-sizing: border-box; background: #FFF; border-radius: 0 0 9px 9px; padding: 0 0 0.3em 0 }
 
 .ui-dialog .ui-dialog-titlebar .ui-button-icon-only { background: none; border: 0 }

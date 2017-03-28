@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Shop_Model extends Core_Entity{
+class Shop_Model extends Core_Entity
+{
 	/**
 	 * Model name
 	 * @var mixed
@@ -21,12 +22,14 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Backend property
 	 * @var int
-	 */	public $img = 1;
+	 */
+	public $img = 1;
 
 	/**
 	 * Backend property
 	 * @var string
-	 */	public $shop_currency_name = '';
+	 */
+	public $shop_currency_name = '';
 
 	/**
 	 * Backend property
@@ -38,11 +41,14 @@ class Shop_Model extends Core_Entity{
 	 * Backend property
 	 * @var string
 	 */
-	public $currency_name = NULL;
+	public $currency_name = NULL;
+
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
-	 */	protected $_hasMany = array(		'affiliate_plan' => array('through' => 'shop_affiliate_plan'),
+	 */
+	protected $_hasMany = array(
+		'affiliate_plan' => array('through' => 'shop_affiliate_plan'),
 		'shop_affiliate_plan' => array(),
 		'shop_cart' => array(),
 		'shop_delivery' => array(),
@@ -66,12 +72,24 @@ class Shop_Model extends Core_Entity{
 		'shop_siteuser_transaction' => array(),
 		'shop_warehouse' => array(),
 		'shop_item_property_for_group' => array(),
-		'shop_item_delivery_option' => array(),	);
+		'shop_item_delivery_option' => array(),
+	);
+
 	/**
 	 * List of preloaded values
 	 * @var array
-	 */	protected $_preloadValues = array(
-		'use_captcha' => 1,		'image_small_max_width' => 100,		'image_large_max_width' => 800,		'image_small_max_height' => 100,		'image_large_max_height' => 800,		'group_image_small_max_width' => 100,		'group_image_large_max_width' => 800,		'group_image_small_max_height' => 100,		'group_image_large_max_height' => 800,		'group_image_large_max_height' => 800,
+	 */
+	protected $_preloadValues = array(
+		'use_captcha' => 1,
+		'image_small_max_width' => 100,
+		'image_large_max_width' => 800,
+		'image_small_max_height' => 100,
+		'image_large_max_height' => 800,
+		'group_image_small_max_width' => 100,
+		'group_image_large_max_width' => 800,
+		'group_image_small_max_height' => 100,
+		'group_image_large_max_height' => 800,
+		'group_image_large_max_height' => 800,
 		'items_sorting_field' => 0,
 		'items_sorting_direction' => 0,
 		'groups_sorting_field' => 0,
@@ -79,19 +97,42 @@ class Shop_Model extends Core_Entity{
 		'url_type' => 0,
 		'apply_tags_automatically' => 0,
 		'write_off_paid_items' => 0,
-		'comment_active' => 0,		'format_date' => '%d.%m.%Y',		'format_datetime' => '%d.%m.%Y %H:%M:%S',		'typograph_default_items' => 1,		'typograph_default_groups' => 1,		'watermark_default_position_x' => '50%',		'watermark_default_position_y' => '100%',		'preserve_aspect_ratio' => 1,		'items_on_page' => 10,
+		'comment_active' => 0,
+		'format_date' => '%d.%m.%Y',
+		'format_datetime' => '%d.%m.%Y %H:%M:%S',
+		'typograph_default_items' => 1,
+		'typograph_default_groups' => 1,
+		'watermark_default_position_x' => '50%',
+		'watermark_default_position_y' => '100%',
+		'preserve_aspect_ratio' => 1,
+		'items_on_page' => 10,
 		'reserve' => 0,
-		'reserve_hours' => 24,		'watermark_file' => '',
+		'reserve_hours' => 24,
+		'watermark_file' => '',
 		'producer_image_small_max_width' => 100,
 		'producer_image_large_max_width' => 800,
 		'producer_image_small_max_height' => 100,
-		'producer_image_large_max_height' => 800,	);
+		'producer_image_large_max_height' => 800,
+	);
 
 	/**
 	 * Belongs to relations
 	 * @var array
 	 */
-	protected $_belongsTo = array(		'shop_dir' => array(),		'site' => array(),		'structure' => array(),		'shop_country' => array(),		'shop_currency' => array(),		'shop_order_status' => array(),		'shop_measure' => array(),		'user' => array(),		'siteuser_group' => array(),		'shop_company' => array(),		'shop_country' => array()	);
+	protected $_belongsTo = array(
+		'shop_dir' => array(),
+		'site' => array(),
+		'structure' => array(),
+		'shop_country' => array(),
+		'shop_currency' => array(),
+		'shop_order_status' => array(),
+		'shop_measure' => array(),
+		'user' => array(),
+		'siteuser_group' => array(),
+		'shop_company' => array(),
+		'shop_country' => array()
+	);
+
 	/**
 	 * Forbidden tags. If list of tags is empty, all tags will be shown.
 	 * @var array
@@ -121,21 +162,55 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
-	 */	public function __construct($id = NULL)	{		parent::__construct($id);		if (is_null($id))		{			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;			$this->_preloadValues['site_id'] = defined('CURRENT_SITE') ? CURRENT_SITE : 0;			$this->_preloadValues['guid'] = Core_Guid::get();		}	}
+	 */
+	public function __construct($id = NULL)
+	{
+		parent::__construct($id);
+
+		if (is_null($id))
+		{
+			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
+			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			$this->_preloadValues['site_id'] = defined('CURRENT_SITE') ? CURRENT_SITE : 0;
+			$this->_preloadValues['guid'] = Core_Guid::get();
+		}
+	}
+
 	/**
 	 * Get shop by structure id.
 	 * @param int $structure_id
 	 * @return self|NULL
-	 */	public function getByStructureId($structure_id)	{		$this->queryBuilder()			->clear()			->where('structure_id', '=', $structure_id)			->limit(1);		$aShops = $this->findAll();		return isset($aShops[0]) ? $aShops[0] : NULL;	}
+	 */
+	public function getByStructureId($structure_id)
+	{
+		$this->queryBuilder()
+			->clear()
+			->where('structure_id', '=', $structure_id)
+			->limit(1);
+
+		$aShops = $this->findAll();
+
+		return isset($aShops[0]) ? $aShops[0] : NULL;
+	}
+
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return self
-	 */	public function delete($primaryKey = NULL)	{		if (is_null($primaryKey))		{			$primaryKey = $this->getPrimaryKey();		}		$this->id = $primaryKey;
+	 */
+	public function delete($primaryKey = NULL)
+	{
+		if (is_null($primaryKey))
+		{
+			$primaryKey = $this->getPrimaryKey();
+		}
+
+		$this->id = $primaryKey;
 
 		// Fix bug with 'deleted' relations
 		$this->deleted = 0;
-		$this->save();
+		$this->save();
+
 		// Доп. свойства товаров
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->id);
 		$oShop_Item_Property_List->Properties->deleteAll(FALSE);
@@ -157,7 +232,8 @@ class Shop_Model extends Core_Entity{
 		$this->Shop_Group_Properties->deleteAll(FALSE);
 		$this->Shop_Order_Property_Dirs->deleteAll(FALSE);
 		$this->Shop_Order_Properties->deleteAll(FALSE);
-		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
+
+		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Deliveries->deleteAll(FALSE);
 		$this->Shop_Bonuses->deleteAll(FALSE);
@@ -177,17 +253,30 @@ class Shop_Model extends Core_Entity{
 
 		// Shop dir
 		Core_File::deleteDir($this->getPath());
-		return parent::delete($primaryKey);	}
+
+		return parent::delete($primaryKey);
+	}
+
 	/**
 	 * Get watermark file path
 	 * @return string|NULL
-	 */	public function getWatermarkFilePath()	{		return $this->watermark_file != ''
+	 */
+	public function getWatermarkFilePath()
+	{
+		return $this->watermark_file != ''
 			? $this->getPath() . '/watermarks/' . $this->watermark_file
-			: NULL;	}
+			: NULL;
+	}
+
 	/**
 	 * Get watermark file href
 	 * @return string
-	 */	public function getWatermarkFileHref()	{		return '/' . $this->getHref() . '/watermarks/' . $this->watermark_file;	}
+	 */
+	public function getWatermarkFileHref()
+	{
+		return '/' . $this->getHref() . '/watermarks/' . $this->watermark_file;
+	}
+
 	/**
 	 * Get shop path include CMS_FOLDER
 	 * @return string
@@ -209,22 +298,64 @@ class Shop_Model extends Core_Entity{
 	/**
 	 * Save watermark file
 	 * @param string $fileSourcePath file to upload
-	 */	public function saveWatermarkFile($fileSourcePath)	{		$this->watermark_file = 'shop_watermark_' . $this->id . '.png';		$this->save();		Core_File::upload($fileSourcePath, $this->getWatermarkFilePath());	}
+	 */
+	public function saveWatermarkFile($fileSourcePath)
+	{
+		$this->watermark_file = 'shop_watermark_' . $this->id . '.png';
+		$this->save();
+		Core_File::upload($fileSourcePath, $this->getWatermarkFilePath());
+	}
+
 	/**
 	 * Save object. Use self::update() or self::create()
 	 * @return self
-	 */	public function save()	{		parent::save();		// Создание директории для Watermark		$sWatermarkDirPath = $this->getPath() . '/watermarks';
-		if (!is_dir($sWatermarkDirPath))		{			try			{				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);			} catch (Exception $e) {}		}		return $this;	}
+	 */
+	public function save()
+	{
+		parent::save();
+
+		// Создание директории для Watermark
+		$sWatermarkDirPath = $this->getPath() . '/watermarks';
+
+		if (!is_dir($sWatermarkDirPath))
+		{
+			try
+			{
+				Core_File::mkdir($sWatermarkDirPath, CHMOD, TRUE);
+			} catch (Exception $e) {}
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Delete watermark file
-	 */	public function deleteWatermarkFile()	{		try		{			Core_File::delete($this->getWatermarkFilePath());		} catch (Exception $e) {}		$this->watermark_file = '';		$this->save();	}
+	 */
+	public function deleteWatermarkFile()
+	{
+		try
+		{
+			Core_File::delete($this->getWatermarkFilePath());
+		} catch (Exception $e) {}
+
+		$this->watermark_file = '';
+		$this->save();
+	}
 
 	/**
 	 * Copy object
 	 * @return Core_Entity
 	 */
 	public function copy()
-	{		$newObject = parent::copy();		try		{			is_file($this->getWatermarkFilePath()) && Core_File::copy($this->getWatermarkFilePath(), $newObject->getWatermarkFilePath());		} catch (Exception $e) {}		// Копирование доп. свойств и разделов доп. свойств товаров
+	{
+		$newObject = parent::copy();
+
+		try
+		{
+			is_file($this->getWatermarkFilePath()) && Core_File::copy($this->getWatermarkFilePath(), $newObject->getWatermarkFilePath());
+		} catch (Exception $e) {}
+
+		// Копирование доп. свойств и разделов доп. свойств товаров
 		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->id);
 
 		// Linked object for new shop
@@ -452,7 +583,10 @@ class Shop_Model extends Core_Entity{
 		{
 			$newObject->add($oShop_Warehouse->copy());
 		}
-		return $newObject;	}
+
+		return $newObject;
+	}
+
 	/**
 	 * Recount items and subgroups
 	 * @return self

@@ -63,10 +63,7 @@ return array(
 	'notes' => 'Notes',
 	'notes_save' => 'Notes saved successfully.',
 	'save_notes' => 'Save',
-
-	'index_events_bad_password' => 'A user with standard login and password exists in the system; you need to change password of user "admin"',
-	'index_unset_tmp_dir' => 'No such directory "%s" for temporary file, you must create it. You can change path to the temporary directory in constant TMP_DIR',
-
+	
 	'updates_count_access' => '%s %s available. <a href="/admin/update/index.php">Display updates list</a>.',
 
 	'unknown' => 'Unknown',

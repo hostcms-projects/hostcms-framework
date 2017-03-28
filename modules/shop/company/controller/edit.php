@@ -11,13 +11,39 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit{
+class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
+{
 	/**
 	 * Load object's fields when object has been set
 	 * После установки объекта загружаются данные о его полях
 	 * @param object $object
 	 * @return Shop_Company_Controller_Edit
-	 */	public function setObject($object)	{		parent::setObject($object);		// Основная вкладка		$oMainTab = $this->getTab('main');		// Добавляем вкладки		$this			->addTabAfter($oTabManagers = Admin_Form_Entity::factory('Tab')				->caption(Core::_('Shop_Company.tabManagers'))				->name('Managers'),			$oMainTab)			->addTabAfter($oTabContacts = Admin_Form_Entity::factory('Tab')				->caption(Core::_('Shop_Company.tabContacts'))				->name('Contacts'),			$oTabManagers)			->addTabAfter($oTabBankingDetails = Admin_Form_Entity::factory('Tab')				->caption(Core::_('Shop_Company.tabBankingDetails'))				->name('BankingDetails'),			$oTabContacts)			->addTabAfter($oTabGUID = Admin_Form_Entity::factory('Tab')				->caption(Core::_('Shop_Company.guid'))				->name('GUID'),			$oTabBankingDetails);
+	 */
+	public function setObject($object)
+	{
+		parent::setObject($object);
+
+		// Основная вкладка
+		$oMainTab = $this->getTab('main');
+
+		// Добавляем вкладки
+		$this
+			->addTabAfter($oTabManagers = Admin_Form_Entity::factory('Tab')
+				->caption(Core::_('Shop_Company.tabManagers'))
+				->name('Managers'),
+			$oMainTab)
+			->addTabAfter($oTabContacts = Admin_Form_Entity::factory('Tab')
+				->caption(Core::_('Shop_Company.tabContacts'))
+				->name('Contacts'),
+			$oTabManagers)
+			->addTabAfter($oTabBankingDetails = Admin_Form_Entity::factory('Tab')
+				->caption(Core::_('Shop_Company.tabBankingDetails'))
+				->name('BankingDetails'),
+			$oTabContacts)
+			->addTabAfter($oTabGUID = Admin_Form_Entity::factory('Tab')
+				->caption(Core::_('Shop_Company.guid'))
+				->name('GUID'),
+			$oTabBankingDetails);
 
 		$oTabManagers
 			->add($oTabManagersRow1 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -35,7 +61,32 @@ class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			->add($oTabBankingDetailsRow5 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$oTabGUID
-			->add($oTabGUIDRow1 = Admin_Form_Entity::factory('Div')->class('row'));		$oMainTab			// Managers			->move($this->getField('legal_name'), $oTabManagers)			->move($this->getField('accountant_legal_name'), $oTabManagers)			// Contacts			->move($this->getField('address'), $oTabContacts)			->move($this->getField('phone'), $oTabContacts)			->move($this->getField('fax'), $oTabContacts)			->move($this->getField('site'), $oTabContacts)			->move($this->getField('email'), $oTabContacts)			// BankingDetails			->move($this->getField('tin'), $oTabBankingDetails)			->move($this->getField('kpp'), $oTabBankingDetails)			->move($this->getField('psrn'), $oTabBankingDetails)			->move($this->getField('okpo'), $oTabBankingDetails)			->move($this->getField('okved'), $oTabBankingDetails)			->move($this->getField('bic'), $oTabBankingDetails)			->move($this->getField('current_account'), $oTabBankingDetails)			->move($this->getField('correspondent_account'), $oTabBankingDetails)			->move($this->getField('bank_name'), $oTabBankingDetails)			->move($this->getField('bank_address'), $oTabBankingDetails)			// GUID			->move($this->getField('guid'), $oTabGUID)		;
+			->add($oTabGUIDRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab
+			// Managers
+			->move($this->getField('legal_name'), $oTabManagers)
+			->move($this->getField('accountant_legal_name'), $oTabManagers)
+			// Contacts
+			->move($this->getField('address'), $oTabContacts)
+			->move($this->getField('phone'), $oTabContacts)
+			->move($this->getField('fax'), $oTabContacts)
+			->move($this->getField('site'), $oTabContacts)
+			->move($this->getField('email'), $oTabContacts)
+			// BankingDetails
+			->move($this->getField('tin'), $oTabBankingDetails)
+			->move($this->getField('kpp'), $oTabBankingDetails)
+			->move($this->getField('psrn'), $oTabBankingDetails)
+			->move($this->getField('okpo'), $oTabBankingDetails)
+			->move($this->getField('okved'), $oTabBankingDetails)
+			->move($this->getField('bic'), $oTabBankingDetails)
+			->move($this->getField('current_account'), $oTabBankingDetails)
+			->move($this->getField('correspondent_account'), $oTabBankingDetails)
+			->move($this->getField('bank_name'), $oTabBankingDetails)
+			->move($this->getField('bank_address'), $oTabBankingDetails)
+			// GUID
+			->move($this->getField('guid'), $oTabGUID)
+		;
 
 		$oTabManagers->move($this->getField('legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
 		$oTabManagers->move($this->getField('accountant_legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
@@ -63,4 +114,14 @@ class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 		$oTabBankingDetails->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
 		$oTabBankingDetails->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
 
-		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabGUIDRow1);		$title = $this->_object->id			? Core::_('Shop_Company.company_form_edit_title')			: Core::_('Shop_Company.company_form_add_title');		$this->title($title);		return $this;	}}
+		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabGUIDRow1);
+
+		$title = $this->_object->id
+			? Core::_('Shop_Company.company_form_edit_title')
+			: Core::_('Shop_Company.company_form_add_title');
+
+		$this->title($title);
+
+		return $this;
+	}
+}

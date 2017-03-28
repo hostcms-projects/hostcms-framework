@@ -72,8 +72,8 @@ return array(
 
 	'accountinfo_title' => 'Редактирование регистрационных данных',
 	'accountinfo_login' => '<acronym title="Логин пользователя в личном кабинете на сайте www.hostcms.ru">Логин пользователя в личном кабинете на сайте www.hostcms.ru</acronym>',
-	'accountinfo_contract_number' => '<acronym title="Номер договора">Номер лицензии (договора)</acronym>',
-	'accountinfo_pin_code' => '<acronym title="PIN-код">PIN-код</acronym>',
+	'accountinfo_contract_number' => '<acronym title="Номер лицензии">Номер лицензии</acronym>',
+	'accountinfo_pin_code' => '<acronym title="PIN-код для лицензии">PIN-код</acronym>',
 	'accountInfo_success' => 'Регистрационные данные успешно изменены.',
 
 	'delete_success' => 'Элемент удален!',
@@ -89,28 +89,4 @@ return array(
 
 	'lng' => 'Язык сайта',
 	'lng_default' => 'ru',	
-
-	/*
-	'site_add_edit_domen_error' => 'Домен с таким именем уже создан для сайта %s!',
-	'error_domen_name' => 'Не задано название домена!',
-	'error_site_no_dir_ico' => 'Не создана директория для ico-файлов!',
-	'error_site_no_upload_ico' => 'ICO-файл для сайта не создан!',
-	'error_site_ico_extension' => 'Необходимо загружать ico-файл!',
-	'error_site_name' => 'Не задано название сайта!',
-	'error_site_double_name' => 'Сайт с таким именем уже существует!',
-	'error_delete_site' => 'Не выбран ни один сайт для удаления!',
-	'constant_succesfully_changed' => "Информация о константе %s успешно изменена",
-	'copy_sites_success' => 'Информация о сайтах успешно скопирована.',
-	'write_error' => 'Ошибка записи в файл %s.',
-	'template_data_information' => 'Внесенные данные будут использованы в макете.',
-	'table_field_param' => 'Параметр',
-	'table_field_value' => 'Значение',
-	'allowed_extension' => 'Разрешенные расширения файла: %s',
-	'max_file_size' => 'Максимальный размер файла: %s x %s',
-	'empty_settings' => 'Макет не имеет настроек.',
-	'file_not_found' => 'Файл %s не найден.',
-	'template_install_success' => 'Установка макета выполнена.',
-	'template_files_copy_success' => 'Файлы макета скопированы.',
-	'template_files_copy_error' => 'Ошибка копирования файлов макета!',
-	'file_disabled_extension' => 'Файл для %s имеет запрещенное расширение!'*/
 );

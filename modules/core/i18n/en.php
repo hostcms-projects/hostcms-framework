@@ -104,14 +104,29 @@ return array(
 	'deleteNote' => 'Delete note',
 
 	'key_not_found' => 'License Key Not Found!',
-	'getting_key' => '<h2>Getting key</h2>
-	<div style="overflow: auto; position: absolute; z-index: 9999; height: 400px"><p>After installing you should register new user on our site or use exist username and password to access your «<a href="http://www.hostcms.ru/users/" target="_blank">Personal account</a>»</p>
-	<p>When you have logged in, you will see a list of licenses at menu "My licenses":<br/>
-	<img src="http://www.hostcms.ru/images/news/user-orders/img1.gif" class="screen" /></p>
+	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .3); padding: 0 20px">
+	<h2>Getting key</h2>
+
+	<p>After installing you should register new user on our site or use exist username and password to access your «<a href="http://www.hostcms.ru/users/" target="_blank">Personal account</a>»</p>
+	<p>When you have logged in, you will see a list of licenses at menu "My licenses":</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/guide/site/licenses-list.png" class="screen" />
+	</p>
+
 	<p>You can enter given license number and PIN in the <a href="/admin/" target="_blank">administration center</a> HostCMS in the section "Websites" — "Settings" — "Registration data".</p>
-	<p>Afterwards you can get license key. In section "Websites" — "Domains" click on "key" in the column "License key":
-	<br/>
-	<img src="http://www.hostcms.ru/images/keys/domain_list.gif" class="screen" /></p>
+	<p>Afterwards you can get license key. In section "Websites" — "Domains" click on "key" in the column "License key":</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/introduction/install/step-by-step/key/key-2.png" class="screen" />
+	</p>
+
+	<p>Then click on key:</p>
+
+	<p align="center">
+	<img src="//www.hostcms.ru/images/documentation/introduction/install/step-by-step/key/key-3.png" class="screen" />
+	</p>
+
 	<h2>Administration Center</h2>
 	<p>Use login <b>admin</b> and password <b>admin</b> to enter into <a href="/admin/" target="_blank">administration center</a>.</p>
 	</div>',

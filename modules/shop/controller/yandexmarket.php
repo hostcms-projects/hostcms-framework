@@ -231,7 +231,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->itemsProperties = $this->modifications = $this->deliveryOptions = TRUE;
 
 		$this->type = 'offer';
-		$this->onStep = 100;
+		$this->onStep = 10;
 
 		$this->_Shop_Item_Controller = new Shop_Item_Controller();
 	}
@@ -374,7 +374,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
 		$oCore_QueryBuilder_Select
 			->from('shop_groups')
-			->where('shop_id', '=', $oShop->id);
+			->where('shop_groups.shop_id', '=', $oShop->id)
+			->where('shop_groups.deleted', '=', 0);
 
 		$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
 
@@ -434,7 +435,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			$iFrom += $this->onStep;
 		}
-		while ($iFrom - $this->onStep < $maxId);
+		while ($iFrom < $maxId);
 
 		echo "</categories>\n";
 
@@ -460,7 +461,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
 		$oCore_QueryBuilder_Select
 			->from('shop_items')
-			->where('shop_id', '=', $oShop->id);
+			->where('shop_items.shop_id', '=', $oShop->id)
+			->where('shop_items.deleted', '=', 0);
 
 		$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
 
@@ -491,10 +493,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		do {
 			$this->_setShopItems();
 			$this->_Shop_Items->queryBuilder()
-				->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->onStep))
-				//->offset($offset)
-				//->limit($this->onStep)
-				;
+				->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->onStep));
 
 			$aShop_Items = $this->_Shop_Items->findAll(FALSE);
 
@@ -520,10 +519,9 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			}
 
 			Core_File::flush();
-			//$offset += $this->onStep;
 			$iFrom += $this->onStep;
 		}
-		while ($iFrom - $this->onStep < $maxId);
+		while ($iFrom < $maxId);
 
 		echo '</offers>'. "\n";
 
@@ -688,7 +686,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			foreach ($aShop_Item_Delivery_Options as $oShop_Item_Delivery_Option)
 			{
-				echo '<option cost="' . $oShop_Item_Delivery_Option->cost . '" days=" ' . $oShop_Item_Delivery_Option->day . '" order-before="' . $oShop_Item_Delivery_Option->order_before . '"/>' . "\n";
+				echo '<option cost="' . $oShop_Item_Delivery_Option->cost . '" days="' . $oShop_Item_Delivery_Option->day . '" order-before="' . $oShop_Item_Delivery_Option->order_before . '"/>' . "\n";
 			}
 
 			echo '</delivery-options>';

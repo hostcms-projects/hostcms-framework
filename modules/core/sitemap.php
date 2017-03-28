@@ -542,11 +542,15 @@ class Core_Sitemap extends Core_Servant_Properties
 
 				$oSite_Alias = $this->_oSite->getCurrentAlias();
 
+				$sProtocol = Core::httpsUses()
+					? 'https://'
+					: 'http://';
+				
 				$sIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 				foreach ($this->_aIndexedFiles as $filename)
 				{
 					$sIndex .= "<sitemap>\n";
-					$sIndex .= "<loc>http://{$oSite_Alias->name}{$this->getSitemapHref()}{$filename}</loc>\n";
+					$sIndex .= "<loc>{$sProtocol}{$oSite_Alias->name}{$this->getSitemapHref()}{$filename}</loc>\n";
 					$sIndex .= "<lastmod>" . date('Y-m-d') . "</lastmod>\n";
 					$sIndex .= "</sitemap>\n";
 				}

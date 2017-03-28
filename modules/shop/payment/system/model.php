@@ -132,6 +132,95 @@ class Shop_Payment_System_Model extends Core_Entity
 	}
 
 	/**
+	 * Get the path to the payment system`s image
+	 * @return string
+	 */
+	public function getPaymentSystemImageFilePath()
+	{
+		return $this->getPath() . $this->image;
+	}
+
+	/**
+	 * Get delivery file href
+	 * @return string
+	 */
+	public function getPaymentSystemImageFileHref()
+	{
+		return $this->getHref() . rawurlencode($this->image);
+	}
+
+	/**
+	 * Get delivery path
+	 * @return string
+	 */
+	public function getPath()
+	{
+		return $this->Shop->getPath() . '/payments/';
+	}
+
+	/**
+	 * Get delivery href
+	 * @return string
+	 */
+	public function getHref()
+	{
+		return '/' . $this->Shop->getHref() . '/payments/';
+	}
+
+	/**
+	 * Delete delivery image
+	 */
+	public function deleteImage()
+	{
+		try
+		{
+			Core_File::delete($this->getPaymentSystemImageFilePath());
+		} catch (Exception $e) {}
+
+		$this->image = '';
+		$this->save();
+	}
+
+	/**
+	 * Create directory for delivery files
+	 * @return self
+	 */
+	public function createDir()
+	{
+		if (!is_dir($this->getPath()))
+		{
+			try
+			{
+				Core_File::mkdir($this->getPath(), CHMOD, TRUE);
+			} catch (Exception $e) {}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set image size
+	 * @return self
+	 */
+	public function setImageSizes()
+	{
+		$path = $this->getPaymentSystemImageFilePath();
+
+		if (is_file($path))
+		{
+			$aSizes = Core_Image::instance()->getImageSize($path);
+			if ($aSizes)
+			{
+				$this->image_width = $aSizes['width'];
+				$this->image_height = $aSizes['height'];
+				$this->save();
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Copy object
 	 * @return Core_Entity
 	 */
@@ -145,5 +234,19 @@ class Shop_Payment_System_Model extends Core_Entity
 		} catch (Exception $e) {}
 
 		return $newObject;
+	}
+
+	/**
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_payment_system.onBeforeRedeclaredGetXml
+	 */
+	public function getXml()
+	{
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
+
+		$this->addXmlTag('dir', $this->getHref());
+
+		return parent::getXml();
 	}
 }

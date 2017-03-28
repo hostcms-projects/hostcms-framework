@@ -658,7 +658,11 @@
 			$("#chatbar").data("refreshMessagesListIntervalId", refreshMessagesListIntervalId);
 		},
 		refreshChat: function(settings) {
-			setInterval(function () {
+			var timeout = 5000;
+
+			var myFunction = function() {
+				clearInterval(interval);
+
 				// add ajax '_'
 				var data = $.getData({});
 					data['alert'] = 1;
@@ -673,6 +677,9 @@
 					success: function (data) {
 						if (data["info"])
 						{
+							// Reset timeout
+							timeout = 5000;
+
 							Notify('<img width="24px" height="24px" src="' + data["info"].avatar + '"><span style="padding-left:10px">' + data["info"].text + '</span>', 'bottom-left', '5000', 'blueberry', 'fa-comment-o', true, !!data["info"].sound);
 
 							var user_id = data["info"]['user_id'],
@@ -683,6 +690,11 @@
 						}
 						else
 						{
+							if (timeout < 30000)
+							{
+								timeout += 5000;
+							}
+
 							$("#chat-link .badge").addClass("hidden").text(data["count"]);
 							$("#chat-link").removeClass("wave in");
 						}
@@ -694,7 +706,11 @@
 						}
 					},
 				});
-			}, 5000);
+
+				interval = setInterval(myFunction, timeout);
+			}
+
+			var interval = setInterval(myFunction, timeout);
 		},
 		refreshUserStatuses: function() {
 			setInterval(function () {

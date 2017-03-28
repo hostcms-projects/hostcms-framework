@@ -539,42 +539,45 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oMainTab->addAfter($oModificationPrice, $oShopTaxSelect);
 				}
 
-				$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
-				foreach($aShopPrices as $oShopPrice)
+				if (Core::moduleIsActive('siteuser'))
 				{
-					$oPriceBlock->add($oPricesRowN = Admin_Form_Entity::factory('Div')->class('row'));
+					$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
+					foreach($aShopPrices as $oShopPrice)
+					{
+						$oPriceBlock->add($oPricesRowN = Admin_Form_Entity::factory('Div')->class('row'));
 
-					// Получаем значение специальной цены для товара
-					$oShop_Item_Price = $this->_object->Shop_Item_Prices->getByPriceId($oShopPrice->id);
+						// Получаем значение специальной цены для товара
+						$oShop_Item_Price = $this->_object->Shop_Item_Prices->getByPriceId($oShopPrice->id);
 
-					$value = is_null($oShop_Item_Price)
-						? 0
-						: $oShop_Item_Price->value;
+						$value = is_null($oShop_Item_Price)
+							? 0
+							: $oShop_Item_Price->value;
 
-					$oItemPriceCheckBox = Admin_Form_Entity::factory('Checkbox')
-						->caption($oShopPrice->name)
-						->id("item_price_id_{$oShopPrice->id}")
-						->value($value)
-						->name("item_price_id_{$oShopPrice->id}")
-						->divAttr(array('class' => 'form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9'))
-						->onclick("document.getElementById('item_price_value_{$oShopPrice->id}').disabled
-					= !this.checked; if (this.checked)
-					{document.getElementById('item_price_value_{$oShopPrice->id}').value
-					= (document.getElementById('price').value
-					* {$oShopPrice->percent} / 100).toFixed(2); }");
+						$oItemPriceCheckBox = Admin_Form_Entity::factory('Checkbox')
+							->caption($oShopPrice->name)
+							->id("item_price_id_{$oShopPrice->id}")
+							->value($value)
+							->name("item_price_id_{$oShopPrice->id}")
+							->divAttr(array('class' => 'form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9'))
+							->onclick("document.getElementById('item_price_value_{$oShopPrice->id}').disabled
+						= !this.checked; if (this.checked)
+						{document.getElementById('item_price_value_{$oShopPrice->id}').value
+						= (document.getElementById('price').value
+						* {$oShopPrice->percent} / 100).toFixed(2); }");
 
-					$oItemPriceTextBox = Admin_Form_Entity::factory('Input')
-						->id("item_price_value_{$oShopPrice->id}")
-						->name("item_price_value_{$oShopPrice->id}")
-						->value($value)
-						->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
-					;
+						$oItemPriceTextBox = Admin_Form_Entity::factory('Input')
+							->id("item_price_value_{$oShopPrice->id}")
+							->name("item_price_value_{$oShopPrice->id}")
+							->value($value)
+							->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
+						;
 
-					$value == 0 && $oItemPriceTextBox->disabled('disabled');
+						$value == 0 && $oItemPriceTextBox->disabled('disabled');
 
-					$oPricesRowN
-						->add($oItemPriceCheckBox)
-						->add($oItemPriceTextBox);
+						$oPricesRowN
+							->add($oItemPriceCheckBox)
+							->add($oItemPriceTextBox);
+					}
 				}
 
 				// Получаем список складов магазина
@@ -1175,26 +1178,29 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				// Дополнительные цены для групп пользователей
-				$aAdditionalPrices = $this->_object->Shop->Shop_Prices->findAll();
-				foreach($aAdditionalPrices as $oAdditionalPrice)
+				if (Core::moduleIsActive('siteuser'))
 				{
-					$oAdditionalPriceValue = $this->_object->Shop_Item_Prices->getByPriceId($oAdditionalPrice->id);
+					$aAdditionalPrices = $this->_object->Shop->Shop_Prices->findAll();
+					foreach($aAdditionalPrices as $oAdditionalPrice)
+					{
+						$oAdditionalPriceValue = $this->_object->Shop_Item_Prices->getByPriceId($oAdditionalPrice->id);
 
-					if (is_null($oAdditionalPriceValue))
-					{
-						$oAdditionalPriceValue = Core_Entity::factory('Shop_Item_Price');
-						$oAdditionalPriceValue->shop_item_id = $this->_object->id;
-						$oAdditionalPriceValue->shop_price_id = $oAdditionalPrice->id;
-					}
+						if (is_null($oAdditionalPriceValue))
+						{
+							$oAdditionalPriceValue = Core_Entity::factory('Shop_Item_Price');
+							$oAdditionalPriceValue->shop_item_id = $this->_object->id;
+							$oAdditionalPriceValue->shop_price_id = $oAdditionalPrice->id;
+						}
 
-					if(!is_null(Core_Array::getPost("item_price_id_{$oAdditionalPrice->id}")))
-					{
-						$oAdditionalPriceValue->value = Core_Array::getPost("item_price_value_{$oAdditionalPrice->id}", 0);
-						$oAdditionalPriceValue->save();
-					}
-					else
-					{
-						!is_null($oAdditionalPriceValue) && $oAdditionalPriceValue->delete();
+						if(!is_null(Core_Array::getPost("item_price_id_{$oAdditionalPrice->id}")))
+						{
+							$oAdditionalPriceValue->value = Core_Array::getPost("item_price_value_{$oAdditionalPrice->id}", 0);
+							$oAdditionalPriceValue->save();
+						}
+						else
+						{
+							!is_null($oAdditionalPriceValue) && $oAdditionalPriceValue->delete();
+						}
 					}
 				}
 

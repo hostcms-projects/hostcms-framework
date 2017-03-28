@@ -32,9 +32,10 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		$allow_filter = FALSE;
 
 		// div class="table-scrollable"
+		// table-bordered
 		?>
 		<div>
-			<table class="admin-table table table-bordered table-hover table-striped">
+			<table class="admin-table table table-hover table-striped">
 				<thead>
 				<tr>
 					<?php
@@ -653,7 +654,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											)
 											{
 												// Выполним функцию обратного вызова
-												echo $oEntity->$fieldName($oAdmin_Form_Field, $this);
+												echo $oEntity->$fieldName($oAdmin_Form_Field_Changed, $this);
 											}
 											elseif (property_exists($oEntity, $fieldName))
 											{
@@ -707,10 +708,10 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 								// Подмена массива действий через событие
 								$aActions = Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
-								
+
 								!is_array($aActions)
 									&& $aActions = $aAllowed_Admin_Form_Actions;
-								
+
 								foreach ($aActions as $key => $o_Admin_Form_Action)
 								{
 									// Отображаем действие, только если разрешено.
@@ -958,18 +959,24 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 	 */
 	public function showFooter()
 	{
-		?>
-		<div class="DTTTFooter">
+		$sShowNavigation = $this->getTotalCount() > $this->_limit;
+
+		?><div class="DTTTFooter">
 			<div class="row">
-				<div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+				<div class="col-xs-12 <?php echo $sShowNavigation ? 'col-sm-6 col-md-8' : ''?>">
 					<?php $this->bottomActions()?>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-					<?php $this->pageNavigation()?>
-				</div>
+				<?php
+				if ($sShowNavigation)
+				{
+					?><div class="col-xs-12 col-sm-6 col-md-4">
+						<?php $this->pageNavigation()?>
+					</div><?php
+				}
+				?>
 			</div>
-		</div>
-		<?php
+		</div><?php
+
 		return $this;
 	}
 

@@ -40,7 +40,7 @@ class Xsl_Processor_Xslt extends Xsl_Processor
 		{
 			$inputdom = new DomDocument();
 
-			if ($inputdom->loadXML($this->_xml))
+			if ($inputdom->loadXML($this->_xml, defined('LIBXML_PARSEHUGE') ? LIBXML_PARSEHUGE : 0))
 			{
 				// Create the processor and import the stylesheet
 				$XsltProcessor = new XsltProcessor();

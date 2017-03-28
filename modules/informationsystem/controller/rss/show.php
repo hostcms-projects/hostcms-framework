@@ -7,9 +7,11 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
+ * - channelEntities(array) массив дополнительных элементов, добавляемых в channel
  * - group($id) идентификатор информационной группы, если FALSE, то вывод инофрмационных элементов
  * осуществляется из всех групп
  * - yandex(TRUE|FALSE) экспорт в Яндекс.Новости, по умолчанию FALSE
+ * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  * - tag($path) путь тега, с использованием которого ведется отбор информационных элементов
  * - offset($offset) смещение, с которого выводить информационные элементы. По умолчанию 0
  * - limit($limit) количество выводимых элементов
@@ -41,6 +43,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		'description',
 		'link',
 		'image',
+		'channelEntities',
 		'group',
 		'tag',
 		'offset',
@@ -215,11 +218,11 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 		$oInformationsystem = $this->getEntity();
 
+		$sProtocol = $oInformationsystem->Structure->https ? 'https://' : 'http://';
+
 		$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();
-		if ($oSiteAlias)
-		{
-			$this->_path = 'http://' . $oSiteAlias->name . $oInformationsystem->Structure->getPath();
-		}
+		$oSiteAlias
+			&& $this->_path = $sProtocol . $oSiteAlias->name . $oInformationsystem->Structure->getPath();
 
 		$this->_Core_Rss
 			->add('title', !is_null($this->title) ? $this->title : $oInformationsystem->name)
@@ -235,6 +238,20 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		if (is_array($this->image) && count($this->image))
 		{
 			$this->_Core_Rss->add('image', $this->image);
+		}
+
+		// Additional entities
+		if (is_array($this->channelEntities))
+		{
+			foreach ($this->channelEntities as $aEntity)
+			{
+				// еще foreach по $entityValue
+				$this->_Core_Rss->add(
+					Core_Array::get($aEntity, 'name'),
+					Core_Array::get($aEntity, 'value'),
+					Core_Array::get($aEntity, 'attributes', array())
+				);
+			}
 		}
 
 		if ($this->cache && Core::moduleIsActive('cache'))
@@ -292,7 +309,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 		$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();
 		$sitePath = $oSiteAlias
-			? 'http://' . $oSiteAlias->name
+			? $sProtocol . $oSiteAlias->name
 			: NULL;
 
 		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
@@ -332,13 +349,21 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			{
 				$file_enclosure = $oInformationsystem_Item->getLargeFilePath();
 
-				$this->_currentItem['enclosure'][0]['url'] = $sitePath . $oInformationsystem_Item->getLargeFileHref();
-				$this->_currentItem['enclosure'][0]['type'] = Core_Mime::getFileMime($this->_currentItem['enclosure'][0]['url']);
+				$enclosure = array(
+					'name' => 'enclosure',
+					'value' => NULL,
+					'attributes' => array(
+						'url' => $sitePath . $oInformationsystem_Item->getLargeFileHref(),
+						'type' => Core_Mime::getFileMime($file_enclosure)
+					)
+				);
 
 				if (is_file($file_enclosure))
 				{
-					$this->_currentItem['enclosure'][0]['length'] = filesize($file_enclosure);
+					$enclosure['attributes']['length'] = filesize($file_enclosure);
 				}
+
+				$this->_currentItem[] = $enclosure;
 			}
 
 			Core_Event::notify(get_class($this) . '.onBeforeAddItem', $this, array($oInformationsystem_Item, $this->_currentItem));

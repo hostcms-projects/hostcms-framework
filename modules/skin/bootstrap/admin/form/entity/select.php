@@ -35,17 +35,17 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 		if ($this->filter)
 		{
 			?><div class="row">
-				<?php 
-					if ($this->caseSensitive) 
+				<?php
+					if ($this->caseSensitive)
 					{
 				?>
-						<div class="col-lg-6 col-md-5 col-sm-5 col-xs-5">						
+						<div class="col-lg-6 col-md-5 col-sm-5 col-xs-5">
 				<?php
 					}
 					else
-					{				
+					{
 				?>
-						<div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">					
+						<div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
 				<?php
 					}
 		}
@@ -64,30 +64,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 		?><select <?php echo implode(' ', $aAttr) ?>><?php
 		if (is_array($this->options))
 		{
-			foreach ($this->options as $key => $xValue)
-			{
-				$sAttr = '';
-
-				if (is_array($xValue))
-				{
-					$value = Core_Array::get($xValue, 'value');
-					$attr = Core_Array::get($xValue, 'attr', array());
-
-					!empty($attr) && $sAttr = ' ';
-					foreach($attr as $attrKey => $attrValue)
-					{
-						$sAttr .= Core_Str::xml($attrKey) . '="' . Core_Str::xml($attrValue) . '"';
-					}
-				}
-				else
-				{
-					$value = $xValue;
-				}
-
-				?><option value="<?php echo htmlspecialchars($key)?>"<?php echo ($this->value == $key) ? ' selected="selected"' : ''?><?php echo $sAttr?>><?php
-				?><?php echo htmlspecialchars($value, ENT_COMPAT, 'UTF-8')?><?php
-				?></option><?php
-			}
+			$this->_showOptions($this->options);
 		}
 		?></select><?php
 
@@ -151,7 +128,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 					->add(
 						Admin_Form_Entity::factory('Code')
 							->html('<span class="input-group-addon"><i class="fa fa-search"></i></span>
-								<input class="form-control" type="text" id="filer_' . $this->id . '" onkeyup="clearTimeout(oSelectFilter' . $iFilterCount . '.timeout); oSelectFilter' . $iFilterCount . '.timeout = setTimeout(function(){oSelectFilter' . $iFilterCount . ".Set($(event.target).val()); oSelectFilter{$iFilterCount}.Filter(); }, 500)". '" onkeypress="if (event.keyCode == 13) return false;" />' .
+								<input class="form-control" type="text" id="filter_' . $this->id . '" onkeyup="clearTimeout(oSelectFilter' . $iFilterCount . '.timeout); oSelectFilter' . $iFilterCount . '.timeout = setTimeout(function(){oSelectFilter' . $iFilterCount . ".Set($(event.target).val()); oSelectFilter{$iFilterCount}.Filter(); }, 500)". '" onkeypress="if (event.keyCode == 13) return false;" />' .
 								'<span class="input-group-addon" onclick="' . " $(this).prev('input').val(''); oSelectFilter{$iFilterCount}.Set(''); oSelectFilter{$iFilterCount}.Filter();" . '"><i class="fa fa-times-circle no-margin"></i></span>'
 							)
 					)
@@ -165,7 +142,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 					->add(
 						Admin_Form_Entity::factory('Code')
 							->html('<label class="checkbox-inline">' .
-							'<input id="IgnoreCase_' . $this->id . '" class="form-control" type="checkbox" value="1" checked="checked" onclick="oSelectFilter' . $iFilterCount . '.SetIgnoreCase(!this.checked); oSelectFilter' . $iFilterCount . '.Filter()" />' .
+							'<input id="filter_ignorecase_' . $this->id . '" class="form-control" type="checkbox" value="1" checked="checked" onclick="oSelectFilter' . $iFilterCount . '.SetIgnoreCase(!this.checked); oSelectFilter' . $iFilterCount . '.Filter()" />' .
 							'<span class="text"> ' . Core::_('Admin_Form.input_case_sensitive') . '</span></label>')
 					)
 					->execute();

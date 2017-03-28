@@ -11,12 +11,20 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Structure_Property_Dir_Model extends Core_Entity{
+class Structure_Property_Dir_Model extends Core_Entity
+{
 	/**
 	 * Disable markDeleted()
 	 * @var mixed
-	 */	protected $_marksDeleted = NULL;
+	 */
+	protected $_marksDeleted = NULL;
+
 	/**
 	 * Belongs to relations
 	 * @var array
-	 */	protected $_belongsTo = array(		'site' => array(),		'property_dir' => array(),	);}
+	 */
+	protected $_belongsTo = array(
+		'site' => array(),
+		'property_dir' => array(),
+	);
+}

@@ -11,7 +11,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Wysiwyg_Module extends Core_Module{	/**
+class Wysiwyg_Module extends Core_Module
+{
+	/**
 	 * Module version
 	 * @var string
 	 */
@@ -21,7 +23,7 @@ class Wysiwyg_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-03-03';
+	public $date = '2016-05-06';
 	
 	/**
 	 * Module name
@@ -43,4 +45,5 @@ class Wysiwyg_Module extends Core_Module{	/**
 				'ico' => 'fa fa-file-code-o',
 			)
 		);
-	}}
+	}
+}

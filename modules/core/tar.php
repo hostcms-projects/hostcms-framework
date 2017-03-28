@@ -1214,6 +1214,11 @@ class Core_Tar
 		{
 			$v_header['filename'] = '';
 			$this->_error('Неправильный размер блока : '.strlen($v_binary_data));
+
+			Core_Log::instance()->clear()
+				->status(Core_Log::$ERROR)
+				->write($v_binary_data);
+
 			return false;
 		}
 
@@ -1787,7 +1792,7 @@ class Core_Tar
 		}
 		return $p_path;
 	}
-	
+
 	/**
 	 * Fix bug gzopen -> gzopen64
 	 * http://www.hostcms.ru/forums/2/10759/

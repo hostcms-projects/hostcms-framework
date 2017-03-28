@@ -3,7 +3,28 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Admin forms.
+ * Admin forms. Select.
+ *
+ * - options(array()) Массив значений
+ * - value(string|array()) Значение или массив значений
+ *
+ * <code>
+ * $oOptgroup = new stdClass();
+ * $oOptgroup->attributes = array('label' => 'Первая группа', 'class' => 'my-optgroup');
+ * $oOptgroup->children = array(
+ * 		17 => 'Подэлемент 1',
+ * 		18 => 'Подэлемент 2',
+ * );
+ *
+ * $oController->options(
+ * 	array(
+ * 		0 => 'default',
+ * 		2 => 'Second',
+ * 		'sub1' => $oOptgroup,
+ *		3 => 'Third',
+ * )
+ * );
+ * </code>
  *
  * @package HostCMS
  * @subpackage Skin
@@ -104,30 +125,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		?><select <?php echo implode(' ', $aAttr) ?>><?php
 		if (is_array($this->options))
 		{
-			foreach ($this->options as $key => $xValue)
-			{
-				$sAttr = '';
-
-				if (is_array($xValue))
-				{
-					$value = Core_Array::get($xValue, 'value');
-					$attr = Core_Array::get($xValue, 'attr', array());
-
-					!empty($attr) && $sAttr = ' ';
-					foreach($attr as $attrKey => $attrValue)
-					{
-						$sAttr .= Core_Str::xml($attrKey) . '="' . Core_Str::xml($attrValue) . '"';
-					}
-				}
-				else
-				{
-					$value = $xValue;
-				}
-
-				?><option value="<?php echo htmlspecialchars($key)?>"<?php echo ($this->value == $key) ? ' selected="selected"' : ''?><?php echo $sAttr?>><?php
-				?><?php echo htmlspecialchars($value, ENT_COMPAT, 'UTF-8')?><?php
-				?></option><?php
-			}
+			$this->_showOptions($this->options);
 		}
 		?></select><?php
 
@@ -141,6 +139,73 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		}
 
 		?></div><?php
+	}
+
+	protected function _showOptions($aOptions)
+	{
+		foreach ($aOptions as $key => $aValue)
+		{
+			if (is_object($aValue))
+			{
+				$this->_showOptgroup($aValue);
+			}
+			else
+			{
+				if (is_array($aValue))
+				{
+					$value = Core_Array::get($aValue, 'value');
+					$attr = Core_Array::get($aValue, 'attr', array());
+				}
+				else
+				{
+					$value = $aValue;
+					$attr = array();
+				}
+
+				(!is_array($this->value) && $this->value == $key
+					|| is_array($this->value) && in_array($key, $this->value))
+				&& $attr['selected'] = 'selected';
+
+				$this->_showOption($key, $value, $attr);
+			}
+		}
+	}
+
+	/**
+	 * Show optgroup.
+	 */
+	protected function _showOptgroup(stdClass $oOptgroup)
+	{
+		?><optgroup<?php
+		if (isset($oOptgroup->attributes) && is_array($oOptgroup->attributes))
+		{
+			foreach ($oOptgroup->attributes as $attrKey => $attrValue)
+			{
+				echo ' ', $attrKey, '=', '"', htmlspecialchars($attrValue, ENT_COMPAT, 'UTF-8'), '"';
+			}
+		}
+		?>><?php
+		if (isset($oOptgroup->children) && is_array($oOptgroup->children))
+		{
+			$this->_showOptions($oOptgroup->children);
+		}
+		?></optgroup><?php
+	}
+
+	/**
+	 * Show option
+	 * @param string $key key
+	 * @param string $value value
+	 * @param array $aAttr attributes
+	 */
+	protected function _showOption($key, $value, array $aAttr = array())
+	{
+		?><option value="<?php echo htmlspecialchars($key)?>"<?php
+		foreach ($aAttr as $attrKey => $attrValue)
+		{
+			echo ' ', $attrKey, '=', '"', htmlspecialchars($attrValue, ENT_COMPAT, 'UTF-8'), '"';
+		}
+		?>><?php echo htmlspecialchars($value, ENT_COMPAT, 'UTF-8')?></option><?php
 	}
 
 	/**
@@ -163,26 +228,26 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 			->add(
 				Core::factory('Core_Html_Entity_Input')
 					->size(15)
-					->id("filer_{$this->id}")
-					->onkeyup("clearTimeout(oSelectFilter{$iFilterCount}.timeout); oSelectFilter{$iFilterCount}.timeout = setTimeout(function(){oSelectFilter{$iFilterCount}.Set(document.getElementById('filer_{$this->id}').value); oSelectFilter{$iFilterCount}.Filter();}, 500)")
+					->id("filter_{$this->id}")
+					->onkeyup("clearTimeout(oSelectFilter{$iFilterCount}.timeout); oSelectFilter{$iFilterCount}.timeout = setTimeout(function(){oSelectFilter{$iFilterCount}.Set(document.getElementById('filter_{$this->id}').value); oSelectFilter{$iFilterCount}.Filter();}, 500)")
 					->onkeypress("if (event.keyCode == 13) return false;")
 			)
 			->add(
 				Core::factory('Core_Html_Entity_Input')
 					->type("button")
-					->onclick("this.form.filer_{$this->id}.value = '';oSelectFilter{$iFilterCount}.Set('');oSelectFilter{$iFilterCount}.Filter();")
+					->onclick("this.form.filter_{$this->id}.value = '';oSelectFilter{$iFilterCount}.Set('');oSelectFilter{$iFilterCount}.Filter();")
 					->value(Core::_('Admin_Form.input_clear_filter'))
 					->class('saveButton')
 			)
 			->add(
 				Core::factory('Core_Html_Entity_Input')
-					->id("IgnoreCase_{$this->id}")
+					->id("filter_ignorecase_{$this->id}")
 					->type("checkbox")
 					->onclick("oSelectFilter{$iFilterCount}.SetIgnoreCase(!this.checked);oSelectFilter{$iFilterCount}.Filter()")
 			)
 			->add(
 				Core::factory('Core_Html_Entity_Label')
-					->for("IgnoreCase_{$this->id}")
+					->for("filter_ignorecase_{$this->id}")
 					->value(Core::_('Admin_Form.input_case_sensitive'))
 			)
 			->add(

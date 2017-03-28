@@ -258,4 +258,18 @@ class Shop_Delivery_Model extends Core_Entity
 		$this->active = 1 - $this->active;
 		return $this->save();
 	}
+
+	/**
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_delivery.onBeforeRedeclaredGetXml
+	 */
+	public function getXml()
+	{
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
+
+		$this->addXmlTag('dir', $this->getHref());
+
+		return parent::getXml();
+	}
 }

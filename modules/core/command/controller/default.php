@@ -185,7 +185,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		}
 
 		// Openstat, UTM and From
-		if (Core_Array::getGet('_openstat'))
+		if (!is_null(Core_Array::getGet('_openstat')))
 		{
 			$aOpenstat = explode(';', base64_decode(Core_Array::getGet('_openstat')));
 
@@ -198,7 +198,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				->source(Core_Array::get($aOpenstat, 3))
 				->apply();
 		}
-		elseif (Core_Array::getGet('utm_source'))
+		elseif (!is_null(Core_Array::getGet('utm_source')))
 		{
 			$oSource_Controller = new Source_Controller();
 			$oSource_Controller
@@ -210,7 +210,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				->term(Core_Array::getGet('utm_term'))
 				->apply();
 		}
-		elseif (Core_Array::getGet('from'))
+		elseif (!is_null(Core_Array::getGet('from')))
 		{
 			$oSource_Controller = new Source_Controller();
 			$oSource_Controller
@@ -605,9 +605,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			</script>
 			<?php
 
-			$sContent = ob_get_clean();
-
-			$oCore_Response->body($sContent);
+			$oCore_Response->body(ob_get_clean());
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterShowAction', $this, array($oCore_Response));

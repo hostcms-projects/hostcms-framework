@@ -44,28 +44,21 @@ class Core_Rss
 	protected $_entities = array();
 
 	/**
-	 * Add entity
+	 * Add entity.
+	 *
 	 * @param string $name entity name
 	 * @param string $value entity value
+	 * @param string $attributes array attributes
 	 * @return self
 	 */
-	public function add($name, $value)
+	public function add($name, $value, array $attributes = array())
 	{
-		$this->_entities[$name][] = $value;
-		return $this;
-	}
+		$this->_entities[] = array(
+			'name' => $name,
+			'value' => $value,
+			'attributes' => $attributes
+		);
 
-	/**
-	 * Delete entity by name
-	 * @param string $name entity name
-	 * @return self
-	 */
-	public function delete($name)
-	{
-		if (isset($this->_entities[$name]))
-		{
-			unset($this->_entities[$name]);
-		}
 		return $this;
 	}
 
@@ -80,52 +73,46 @@ class Core_Rss
 	}
 
 	/**
-	 * Add child node
+	 * Add children nodes
 	 * @param object $object object
-	 * @param string $name node name
-	 * @param string $value node value
+	 * @param array $children children nodes
 	 * @return self
 	 */
-	protected function __addChild($object, $name, $value)
+	protected function _addChild($object, array $children)
 	{
-		if ($object->getName() == 'enclosure')
+		foreach ($children as $aSubitem)
 		{
-			$object->addAttribute($name, $value);
-		}
-		else
-		{
+			$name = $aSubitem['name'];
+
 			$aTmp = explode(':', $name);
 
-			isset($aTmp[1])
-				? $object->addChild($name, $value, $aTmp[0])
-				: $object->addChild($name, $value);
-		}
+			// if isset namespace
+			$newChild = isset($aTmp[1])
+				? $object->addChild($name, !is_array($aSubitem['value']) ? $aSubitem['value'] : NULL, $aTmp[0])
+				: $object->addChild($name, !is_array($aSubitem['value']) ? $aSubitem['value'] : NULL);
 
-		return $this;
-	}
-
-	/**
-	 * Add child nodes
-	 * @param object $object object
-	 * @param array $array nodes
-	 * @return self
-	 */
-	protected function _addChild($object, $array)
-	{
-		foreach ($array as $name => $aValues)
-		{
-			if (is_array($aValues))
+			if (isset($aSubitem['attributes']))
 			{
-				foreach ($aValues as $value)
+				foreach ($aSubitem['attributes'] as $attrName => $attrValue)
 				{
-					is_array($value)
-						? $this->_addChild($object->addChild($name), $value)
-						: $this->__addChild($object, $name, $value);
+					$newChild->addAttribute($attrName, $attrValue);
 				}
 			}
-			else
+
+			if (isset($aSubitem['value']) && is_array($aSubitem['value']))
 			{
-				$this->__addChild($object, $name, $aValues);
+				foreach ($aSubitem['value'] as $key => $value)
+				{
+					$this->_addChild($newChild, array(
+						is_array($value) && isset($value['name'])
+							? $value + array('value' => NULL, 'attributes' => array())
+							: array(
+								'name' => $key,
+								'value' => $value,
+								'attributes' => array()
+							)
+					));
+				}
 			}
 		}
 
