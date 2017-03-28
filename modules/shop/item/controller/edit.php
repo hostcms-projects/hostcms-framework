@@ -115,6 +115,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
 
 				$oShopItemTabDescription
@@ -301,6 +302,51 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oShopItemTabDescriptionRow4->add($oOpticalAlignCheckBox);
 				}
 
+				// Группы ярлыков
+				$oAdditionalGroupsSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Shop_Item.shortcut_group_tags'))
+					->options($this->_fillShortcutGroupList($this->_object))
+					->name('shortcut_group_id[]')
+					->class('shortcut-group-tags')
+					->style('width: 100%')
+					->multiple('multiple')
+					->divAttr(array('class' => 'form-group col-xs-12'));
+
+				$oMainRow3->add($oAdditionalGroupsSelect);
+
+				$html2 = '
+					<script type="text/javascript">
+						$(function(){
+							$(".shortcut-group-tags").select2({
+								language: "' . Core_i18n::instance()->getLng() . '",
+								minimumInputLength: 2,
+								placeholder: "' . Core::_('Shop_Item.select_group') . '",
+								tags: true,
+								allowClear: true,
+								multiple: true,
+								ajax: {
+									url: "/admin/shop/item/index.php?shortcuts&shop_id=' . $this->_object->shop_id .'",
+									dataType: "json",
+									type: "GET",
+									processResults: function (data) {
+										var aResults = [];
+										$.each(data, function (index, item) {
+											aResults.push({
+												"id": item.id,
+												"text": item.text
+											});
+										});
+										return {
+											results: aResults
+										};
+									}
+								},
+							});
+						})</script>
+					';
+
+				$oMainRow3->add(Admin_Form_Entity::factory('Code')->html($html2));
+
 				// Удаляем тип товара
 				$oMainTab->delete($this->getField('type'));
 
@@ -325,7 +371,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					));
 
 				// Добавляем тип товара
-				$oMainRow3->add($oRadioType);
+				$oMainRow4->add($oRadioType);
 
 				// Удаляем модификацию
 				$oAdditionalTab->delete($this->getField('modification_id'));
@@ -339,7 +385,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->modification_id)
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-12 col-sm-12'));
 
-				$oMainRow3->add($oModificationSelect);
+				$oMainRow4->add($oModificationSelect);
 
 				if (!$object->modification_id)
 				{
@@ -359,10 +405,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$oMainTab
-					->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow4)
-					->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow4)
-					->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow4)
-					->move($this->getField('showed')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow4)
+					->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow5)
+					->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow5)
+					->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow5)
+					->move($this->getField('showed')->divAttr(array('class' => 'form-group col-lg-3 col-md-6 col-sm-6 col-xs-12')), $oMainRow5)
 				;
 
 				// Добавляем новое поле типа файл
@@ -392,11 +438,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1', action: 'deleteSmallImage', windowId: '{$windowId}'}); return false", 'caption' => Core::_('Shop_Item.items_catalog_image_small'), 'show_params' => TRUE, 'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small)
 					);
 
-				$oMainRow5->add($oImageField);
+				$oMainRow6->add($oImageField);
 
 				$oMainTab
-					->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow6)
-					->move($this->getField('weight')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oMainRow6);
+					->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow7)
+					->move($this->getField('weight')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oMainRow7);
 
 				// Удаляем единицы измерения
 				$oAdditionalTab->delete($this->getField('shop_measure_id'));
@@ -404,7 +450,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
 				// Единицы измерения
-				$oMainRow6->add(
+				$oMainRow7->add(
 					Admin_Form_Entity::factory('Select')
 						->caption(Core::_('Shop_Item.shop_measure_id'))
 						->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'))
@@ -414,9 +460,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				);
 
 				$oMainTab
-					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
 					//->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oPriceBlock = Admin_Form_Entity::factory('Div')->class('well with-header'))
 				;
@@ -623,10 +669,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$oMainTab
-					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
-					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7)
-					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
-					->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8);
+					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
+					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
+					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow9)
+					->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow9);
 
 				// Заполняем вкладку специальных цен
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();
@@ -721,30 +767,53 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->add($oDivClose);
 				}
 
+				//oShopItemTabTagsRow1
 				if (Core::moduleIsActive('tag'))
 				{
-					// Добавляем метки на вкладку меток
-					$html = '<label class="tags_label" for="form-field-tags">' . Core::_('Shop_Item.items_catalog_tags') . '</label>
-							<div class="item_div">
-								<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="' . Core::_('Shop_Item.type_tag') . '" />
-							</div>
-							<script type="text/javascript">
-								jQuery(function($){
-									//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
-									var tag_input = $(\'#form-field-tags\');
-									if (! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
-									{
-										tag_input.tag( { placeholder:tag_input.attr(\'placeholder\') } );
-									}
-									else {
-										tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
-									}
-								})</script>
-							';
-					$oShopItemTabTags->add(Admin_Form_Entity::factory('Code')->html($html));
-				}
+					$oAdditionalGroupsSelect = Admin_Form_Entity::factory('Select')
+						->caption(Core::_('Shop_Item.items_catalog_tags'))
+						->options($this->_fillTagsList($this->_object))
+						->name('tags[]')
+						->class('shop-item-tags')
+						->style('width: 100%')
+						->multiple('multiple')
+						->divAttr(array('class' => 'form-group col-xs-12'));
 
-				$oMainTab->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'));
+					$oShopItemTabTagsRow1->add($oAdditionalGroupsSelect);
+
+					$html = '
+						<script type="text/javascript">
+							$(function(){
+								$(".shop-item-tags").select2({
+									language: "' . Core_i18n::instance()->getLng() . '",
+									minimumInputLength: 2,
+									placeholder: "' . Core::_('Shop_Item.type_tag') . '",
+									tags: true,
+									allowClear: true,
+									multiple: true,
+									ajax: {
+										url: "/admin/tag/index.php?hostcms[action]=loadTagsList&hostcms[checked][0][0]=1",
+										dataType: "json",
+										type: "GET",
+										processResults: function (data) {
+											var aResults = [];
+											$.each(data, function (index, item) {
+												aResults.push({
+													"id": item.id,
+													"text": item.text
+												});
+											});
+											return {
+												results: aResults
+											};
+										}
+									},
+								});
+							})</script>
+						';
+
+					$oShopItemTabTagsRow1->add(Admin_Form_Entity::factory('Code')->html($html));
+				}
 
 				$this->getField('length')
 					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-4 no-padding-right'))
@@ -755,7 +824,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					->caption(Core::_('Shop_Item.item_length'));
 
-				$oMainTab->move($this->getField('length'), $oMainRow9);
+				$oMainTab->move($this->getField('length'), $oMainRow10);
 
 				$this->getField('width')
 					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-4 no-padding'))
@@ -766,7 +835,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value('×')
 					);
 
-				$oMainTab->move($this->getField('width'), $oMainRow9);
+				$oMainTab->move($this->getField('width'), $oMainRow10);
 
 				$this->getField('height')
 					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-4 no-padding'))
@@ -776,7 +845,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							->class('input-group-addon dimension_patch')
 							->value(Core::_('Shop.size_measure_'.$oShop->size_measure))
 					);
-				$oMainTab->move($this->getField('height'), $oMainRow9);
+				$oMainTab->move($this->getField('height'), $oMainRow10);
 			break;
 
 			case 'shop_group':
@@ -1086,10 +1155,13 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Обработка меток
 				if (Core::moduleIsActive('tag'))
 				{
-					$item_tags = trim(Core_Array::getPost('tags'));
+					$aRecievedTags = Core_Array::getPost('tags', array());
+					!is_array($aRecievedTags) && $aRecievedTags = array();
 
-					if ($item_tags == '' && $oShop->apply_tags_automatically ||
-						$oShop->apply_keywords_automatically && $this->_object->seo_keywords == '')
+					if (count($aRecievedTags) == 0
+						&& $oShop->apply_tags_automatically
+						|| $oShop->apply_keywords_automatically && $this->_object->seo_keywords == ''
+					)
 					{
 						// Получаем хэш названия, описания и текста товара
 						$array_text = Core_Str::getHashes(Core_Array::getPost('name') .
@@ -1159,7 +1231,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							$this->_object->seo_keywords = implode(',', $aTmp);
 						}
 					}
-					if ($item_tags == '' && $oShop->apply_tags_automatically && count($coeff_intersect))
+					if (count($aRecievedTags) == 0 && $oShop->apply_tags_automatically && count($coeff_intersect))
 					{
 						// Получаем список связей меток с товаром
 						$this->_object->Tag_Shop_Items->deleteAll();
@@ -1176,7 +1248,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					}
 					else
 					{
-						$this->_object->applyTags($item_tags);
+						$this->_object->applyTagsArray($aRecievedTags);
 					}
 				}
 
@@ -1313,6 +1385,41 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						$oModification->price = $this->_object->price;
 						$oModification->shop_currency_id = $this->_object->shop_currency_id;
 						$oModification->save();
+					}
+				}
+
+				$aShortcutGroupIds = Core_Array::getPost('shortcut_group_id', array());
+				!is_array($aShortcutGroupIds) && $aShortcutGroupIds = array();
+
+				$aTmp = array();
+
+				// Выбранные группы
+				$aShortcuts = $oShop->Shop_Items->getAllByShortcut_id($this->_object->id, FALSE);
+				foreach ($aShortcuts as $oShortcut)
+				{
+					!in_array($oShortcut->shop_group_id, $aShortcutGroupIds)
+						? $oShortcut->markDeleted()
+						: $aTmp[] = $oShortcut->shop_group_id;
+				}
+
+				$aNewShortcutGroupIDs = array_diff($aShortcutGroupIds, $aTmp);
+				foreach ($aNewShortcutGroupIDs as $iShortcutGroupId)
+				{
+					$oShop_Group = $oShop->Shop_Groups->getById($iShortcutGroupId);
+					if (!is_null($oShop_Group))
+					{
+						$oShop_ItemShortcut = Core_Entity::factory('Shop_Item');
+
+						$oShop_ItemShortcut->shop_id = $this->_object->shop_id;
+						$oShop_ItemShortcut->shortcut_id = $this->_object->id;
+						$oShop_ItemShortcut->shop_group_id = $iShortcutGroupId;
+						$oShop_ItemShortcut->datetime = $this->_object->datetime;
+						$oShop_ItemShortcut->name = '';
+						$oShop_ItemShortcut->type = $this->_object->type;
+						$oShop_ItemShortcut->path = '';
+						$oShop_ItemShortcut->indexing = 0;
+
+						$oShop_ItemShortcut->save()->clearCache();
 					}
 				}
 			break;
@@ -1877,6 +1984,74 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		return $aReturn;
+	}
+
+	/**
+	 * Fill shortcut groups list
+	 * @param Shop_Item_Model $oShop_Item item
+	 * @return array
+	 */
+	protected function _fillShortcutGroupList($oShop_Item)
+	{
+		$aReturnArray = array();
+
+		$oShop = $oShop_Item->Shop;
+
+		$aShortcuts = $oShop->Shop_Items->getAllByShortcut_id($oShop_Item->id, FALSE);
+		foreach ($aShortcuts as $oShortcut)
+		{
+			$oShop_Group = $oShortcut->Shop_Group;
+
+			$aParentGroups = array();
+
+			$aTmpGroup = $oShop_Group;
+
+			// Добавляем все директории от текущей до родителя.
+			do {
+				$aParentGroups[] = $aTmpGroup->name;
+			} while($aTmpGroup = $aTmpGroup->getParent());
+
+			$sParents = implode(' → ', array_reverse($aParentGroups));
+
+			if (!is_null($oShop_Group->id))
+			{
+				$aReturnArray[$oShop_Group->id] = array(
+					'value' => $sParents . ' [' . $oShop_Group->id . ']',
+					'attr' => array('selected' => 'selected')
+				);
+			}
+			else
+			{
+				$aReturnArray[0] = array(
+					'value' => Core::_('Shop_Item.root') . ' [0]',
+					'attr' => array('selected' => 'selected')
+				);
+			}
+		}
+
+		return $aReturnArray;
+	}
+
+	/**
+	 * Fill tags list
+	 * @param Informationsystem_Item_Model $oInformationsystem_Item item
+	 * @return array
+	 */
+	protected function _fillTagsList($oShop_Item)
+	{
+		$aReturnArray = array();
+
+		$aTags = $oShop_Item->Tags->findAll(FALSE);
+
+		foreach ($aTags as $oTag)
+		{
+			$aReturnArray[$oTag->name] = array(
+				'value' => $oTag->name,
+				'attr' => array('selected' => 'selected')
+			);
+		}
+
+		return $aReturnArray;
 	}
 
 	/**

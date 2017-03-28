@@ -644,7 +644,7 @@ function isEmpty(str) {
 			}
 			return jWin;
 		},
-		loadTagsListCallback: function(data, status, jqXHR)
+		/*loadTagsListCallback: function(data, status, jqXHR)
 		{
 			$.loadingScreen('hide');
 
@@ -659,10 +659,7 @@ function isEmpty(str) {
 
 			that.input.data('typeahead').source = data;
 			that.input.data('typeahead').process(data);
-
-			// Добавить удаление that после реализации прерывания AJAX-запроса с помощью Prefilter
-			//$('#'+ windowId).removeData('that');
-		},
+		},*/
 		// Изменение статуса заказа товара
 		changeOrderStatus: function(windowId)
 		{

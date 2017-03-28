@@ -234,6 +234,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->onStep = 10;
 
 		$this->_Shop_Item_Controller = new Shop_Item_Controller();
+		
+		Core_Session::close();
 	}
 
 	/**

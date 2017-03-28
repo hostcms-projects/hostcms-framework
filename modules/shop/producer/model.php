@@ -237,7 +237,10 @@ class Shop_Producer_Model extends Core_Entity
 
 		parent::save();
 
-		$this->path == '' && !$this->deleted && $this->makePath()->save();
+		if ($this->path == '' && !$this->deleted && $this->makePath())
+		{
+			$this->path != '' && $this->save();
+		}
 
 		return $this;
 	}

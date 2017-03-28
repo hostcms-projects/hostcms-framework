@@ -351,39 +351,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 					$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop->id);
 
-					/*$sTmp = explode('_', basename($PictureData));
-					$sTmp[1] = basename($sTmp[1], '.'.Core_File::getExtension($sTmp[1]));
-
-					$sPictureData = strval($PictureData);
-					$oNewPropertyGUID = $this->xpath($oItem, "ЗначенияРеквизитов/ЗначениеРеквизита[starts-with(Значение, '{$sPictureData}')]/Значение");
-
-					$sPropertyDescription = '';
-					if ($oNewPropertyGUID !== FALSE && count($oNewPropertyGUID) > 0)
-					{
-						$oNewPropertyGUID = strval($oNewPropertyGUID[0]);
-
-						$oNewPropertyGUID = explode('#', $oNewPropertyGUID);
-						if (count($oNewPropertyGUID) == 2)
-						{
-							//$sTmp[1] = $oNewPropertyGUID[1];
-							$sTmp[1] = md5($oNewPropertyGUID[0]);
-							$sPropertyDescription = $oNewPropertyGUID[1];
-						}
-					}
-
-					$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sTmp[1], FALSE);*/
-
 					$oProperty = $oShop_Item_Property_List->Properties->getByGuid($sGUID, FALSE);
 
 					if (is_null($oProperty))
 					{
-						/*$oProperty = Core_Entity::factory('Property');
-						$oProperty->name = $sTmp[1];
-						$oProperty->type = 2;
-						$oProperty->description = $sPropertyDescription;
-						$oProperty->tag_name = $sTmp[1];
-						$oProperty->guid = $sTmp[1];*/
-
 						$oProperty = Core_Entity::factory('Property');
 						$oProperty->name = 'Images';
 						$oProperty->type = 2;
@@ -608,29 +579,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			? $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE)
 			// В версии 2.0.5 для ХарактеристикиТовара/ХарактеристикаТовара не передается ИД, только Наименование
 			: $oShop_Item_Property_List->Properties->getByName($sPropertyName, FALSE);
-
-		if (is_null($oProperty) && strlen($sPropertyGUID))
-		{
-			$oProperty = Core_Entity::factory('Property');
-			$oProperty->name = isset($this->aAdditionalProperties[$sPropertyGUID])
-				? $this->aAdditionalProperties[$sPropertyGUID]
-				: $sPropertyName;
-			$oProperty->type = 1;
-			$oProperty->tag_name = Core_Str::transliteration($oProperty->name);
-			$oProperty->guid = strlen($sPropertyGUID)
-				? $sPropertyGUID
-				: Core_Guid::get();
-
-			$oShop = Core_Entity::factory('Shop', $this->iShopId);
-
-			// Для вновь создаваемого допсвойства размеры берем из магазина
-			$oProperty->image_large_max_width = $oShop->image_large_max_width;
-			$oProperty->image_large_max_height = $oShop->image_large_max_height;
-			$oProperty->image_small_max_width = $oShop->image_small_max_width;
-			$oProperty->image_small_max_height = $oShop->image_small_max_height;
-
-			$oShop_Item_Property_List->add($oProperty);
-		}
 
 		if (strlen($sPropertyGUID))
 		{
@@ -870,13 +818,77 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			}
 
 			// Импортируем дополнительные свойства товаров
+			$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
 			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
 			{
+				$sPropertyGUID = strval($oItemProperty->Ид);
 				$sPropertyName = strval($oItemProperty->Наименование);
+
+				$oProperty = strlen($sPropertyGUID)
+					? $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE)
+					// В версии 2.0.5 для ХарактеристикиТовара/ХарактеристикаТовара не передается ИД, только Наименование
+					: $oShop_Item_Property_List->Properties->getByName($sPropertyName, FALSE);
+
+				if (is_null($oProperty) && strlen($sPropertyGUID))
+				{
+					$oProperty = Core_Entity::factory('Property');
+					$oProperty->name = $sPropertyName;
+					$oProperty->guid = $sPropertyGUID;
+
+					if (strval($oItemProperty->ТипЗначений) == 'Справочник' && Core::moduleIsActive('list'))
+					{
+						$oProperty->type = 3;
+
+						// Check if list exists
+						$oList = $oShop->Site->Lists->getByName($sPropertyName, FALSE);
+
+						// Create new List
+						if (is_null($oList))
+						{
+							$oList = Core_Entity::factory('List');
+							$oList->name = $sPropertyName;
+							$oList->list_dir_id = 0;
+							$oList->site_id = $oShop->site_id;
+							$oList->save();
+						}
+
+						$oProperty->list_id = $oList->id;
+					}
+					else
+					{
+						$oProperty->type = 1;
+					}
+
+					$oProperty->tag_name = Core_Str::transliteration($oProperty->name);
+
+					// Для вновь создаваемого допсвойства размеры берем из магазина
+					$oProperty->image_large_max_width = $oShop->image_large_max_width;
+					$oProperty->image_large_max_height = $oShop->image_large_max_height;
+					$oProperty->image_small_max_width = $oShop->image_small_max_width;
+					$oProperty->image_small_max_height = $oShop->image_small_max_height;
+
+					$oShop_Item_Property_List->add($oProperty);
+				}
+
+				$this->_cacheProperty[$sPropertyGUID] = $oProperty;
 
 				foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
 				{
-					$this->_aPropertyValues[strval($oValue->ИдЗначения)] = strval($oValue->Значение);
+					$listValue = strval($oValue->Значение);
+					$this->_aPropertyValues[strval($oValue->ИдЗначения)] = $listValue;
+
+					if ($oProperty->type == 3 && $oProperty->list_id && Core::moduleIsActive('list'))
+					{
+						$oList_Item = $oProperty->List->List_Items->getByValue($listValue, FALSE);
+
+						if (is_null($oList_Item))
+						{
+							$oList_Item = Core_Entity::factory('List_Item');
+							$oList_Item->value = $listValue;
+							$oList_Item->list_id = $oProperty->list_id;
+							$oList_Item->save();
+						}
+					}
 				}
 
 				if (in_array(mb_strtoupper($sPropertyName), $this->_aPredefinedBaseProperties))
@@ -975,6 +987,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$sGUIDmod === FALSE
 							? $oShopItem->shop_group_id = $oShop_Group->id
 							: $oShopItem->Modification->shop_group_id($oShop_Group->id)->save();
+							
+						$this->_bNewShopItem && $oShop_Group->incCountItems();
 					}
 					else
 					{
@@ -1301,7 +1315,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 								{
 									$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='{$this->sShopDefaultPriceGUID}']");
 
-									$sCurrency = strval($topCurrencyNode->Валюта);
+									is_object($topCurrencyNode)
+										&& $sCurrency = strval($topCurrencyNode->Валюта);
 								}
 
 								// Указан числовой код валюты, получаем по нему
@@ -1321,7 +1336,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 								{
 									$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='" . strval($oPrice->ИдТипаЦены) . "']");
 
-									$sCurrency = strval($topCurrencyNode->Валюта);
+									is_object($topCurrencyNode)
+										&& $sCurrency = strval($topCurrencyNode->Валюта);
 								}
 
 								// Указан числовой код валюты, получаем по нему
@@ -1358,7 +1374,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							{
 								$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='" . strval($oPrice->ИдТипаЦены) . "']");
 
-								$sCurrency = strval($topCurrencyNode->Валюта);
+								is_object($topCurrencyNode)
+									&& $sCurrency = strval($topCurrencyNode->Валюта);
 							}
 
 							// Указан числовой код валюты, получаем по нему
@@ -1676,29 +1693,35 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * Set Producer
 	 * @param string $producerName
 	 * @param Shop_Item_Model $shopItem
+	 * @return self
 	 */
 	protected function _setProducer($producerName, Shop_Item_Model $shopItem)
 	{
-		$oProducer = Core_Entity::factory('Shop', $this->iShopId)
-			->Shop_Producers
-			->getByName($producerName, FALSE);
-
-		if (is_null($oProducer))
+		if (strlen($producerName))
 		{
-			$oProducer = Core_Entity::factory('Shop_Producer')
-				->shop_id($this->iShopId)
-				->name($producerName)
-				->save();
-		}
+			$oProducer = Core_Entity::factory('Shop', $this->iShopId)
+				->Shop_Producers
+				->getByName($producerName, FALSE);
 
-		$shopItem->shop_producer_id = $oProducer->id;
-		$shopItem->save();
+			if (is_null($oProducer))
+			{
+				$oProducer = Core_Entity::factory('Shop_Producer')
+					->shop_id($this->iShopId)
+					->name($producerName)
+					->save();
+			}
 
-		if ($shopItem->modification_id)
-		{
-			$shopItem->Modification->shop_producer_id = $oProducer->id;
-			$shopItem->Modification->save();
+			$shopItem->shop_producer_id = $oProducer->id;
+			$shopItem->save();
+
+			if ($shopItem->modification_id)
+			{
+				$shopItem->Modification->shop_producer_id = $oProducer->id;
+				$shopItem->Modification->save();
+			}
 		}
+		
+		return $this;
 	}
 
 	/**

@@ -72,8 +72,10 @@ class Skin_Bootstrap extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/dialog/dialog.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/star-rating.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/typeahead-bs2.min.js')
-			->addJs('/modules/skin/' . $this->_skinName . '/js/bootstrap-tag.js')
+			// ->addJs('/modules/skin/' . $this->_skinName . '/js/bootstrap-tag.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/ui/jquery-ui.min.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/select2/select2.min.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/select2/i18n/' . $lng . '.js')
 			//->addJs('/modules/skin/' . $this->_skinName . '/js/ace.js')
 			;
 

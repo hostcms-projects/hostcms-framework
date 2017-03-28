@@ -482,11 +482,10 @@ class Informationsystem_Model extends Core_Entity
 			->where('informationsystem_items.active', '=', 1)
 			->where('informationsystem_items.start_datetime', '<=', $current_date)
 			->open()
-			->where('informationsystem_items.end_datetime', '>=', $current_date)
-			->setOr()
-			->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
+				->where('informationsystem_items.end_datetime', '>=', $current_date)
+				->setOr()
+				->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-			//->where('siteuser_group_id', 'IN', $mas_result)
 			->where('informationsystem_items.deleted', '=', 0)
 			->groupBy('informationsystem_group_id');
 

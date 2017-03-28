@@ -642,11 +642,10 @@ class Shop_Model extends Core_Entity
 			->where('shop_items.active', '=', 1)
 			->where('shop_items.start_datetime', '<=', $current_date)
 			->open()
-			->where('shop_items.end_datetime', '>=', $current_date)
-			->setOr()
-			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+				->where('shop_items.end_datetime', '>=', $current_date)
+				->setOr()
+				->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-			//->where('siteuser_group_id', 'IN', $mas_result)
 			->where('shop_items.deleted', '=', 0)
 			->groupBy('shop_group_id');
 

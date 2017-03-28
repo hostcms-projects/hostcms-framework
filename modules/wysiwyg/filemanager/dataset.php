@@ -18,19 +18,19 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 	 * @var int
 	 */
 	protected $_count = NULL;
-	
+
 	/**
 	 * Directory path
 	 * @var string
 	 */
 	protected $_path = NULL;
-	
+
 	/**
 	 * File type
 	 * @var string
 	 */
 	protected $_type = NULL;
-	
+
 	/**
 	 * Name of the model
 	 * @var string
@@ -49,7 +49,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 
 	/**
 	 * Set model name
-	 * @param string $modelName 
+	 * @param string $modelName
 	 * @return self
 	 */
 	public function modelName($modelName)
@@ -57,9 +57,9 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 		$this->_modelName = $modelName;
 		return $this;
 	}
-	
+
 	/**
-	 * Set path 
+	 * Set path
 	 * @param string $path path
 	 */
 	public function setPath($path)
@@ -74,10 +74,9 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 	 */
 	public function getCount()
 	{
-		if (is_null($this->_count))
+		if (!count($this->_count))
 		{
 			$this->_loadFiles();
-
 			$this->_count = count($this->_objects);
 		}
 
@@ -86,7 +85,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 
 	/**
 	 * Dataset objects list
-	 * @var array
+	 * @var array|NULL
 	 */
 	protected $_objects = array();
 
@@ -142,7 +141,8 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 							$Wysiwyg_Filemanager_File = $this->_newObject();
 							$Wysiwyg_Filemanager_File->setSortField($sortField);
 							$Wysiwyg_Filemanager_File->path = $this->_path;
-							$Wysiwyg_Filemanager_File->name = Core_File::convertfileNameFromLocalEncoding($file);
+							//$Wysiwyg_Filemanager_File->name = mb_convert_encoding($file, 'UTF-8');
+							$Wysiwyg_Filemanager_File->name = iconv(mb_detect_encoding($file, mb_detect_order(), TRUE), "UTF-8", $file);
 							$Wysiwyg_Filemanager_File->datetime = Core_Date::timestamp2sql($stat[9]);
 							$Wysiwyg_Filemanager_File->type = $this->_type;
 							$Wysiwyg_Filemanager_File->size = $isDir
@@ -177,7 +177,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 		$modelName = $this->_modelName;
 		return new $modelName();
 	}
-	
+
 	/**
 	 * Get entity
 	 * @return object
@@ -186,7 +186,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 	{
 		return $this->_newObject();
 	}
-	
+
 	/**
 	 * Get object
 	 * @param int $primaryKey ID
@@ -204,7 +204,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 		{
 			return $this->_newObject();
 		}
-		
+
 		return NULL;
 	}
 }

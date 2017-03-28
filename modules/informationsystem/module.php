@@ -23,7 +23,7 @@ class Informationsystem_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-08-01';
+	public $date = '2016-08-18';
 
 	/**
 	 * Module name
@@ -164,7 +164,7 @@ class Informationsystem_Module extends Core_Module
 
 		Core_Event::notify(get_class($this) . '.indexingInformationsystemGroups', $this, array($oInformationsystemGroup));
 
-		$aInformationsystemGroups = $oInformationsystemGroup->findAll();
+		$aInformationsystemGroups = $oInformationsystemGroup->findAll(FALSE);
 
 		$result = array();
 		foreach($aInformationsystemGroups as $oInformationsystemGroup)
@@ -206,22 +206,22 @@ class Informationsystem_Module extends Core_Module
 			->where('informationsystem_items.deleted', '=', 0)
 
 			->open()
-			->where('informationsystem_items.start_datetime', '<', $dateTime)
-			->setOr()
-			->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
+				->where('informationsystem_items.start_datetime', '<', $dateTime)
+				->setOr()
+				->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->setAnd()
 			->open()
-			->where('informationsystem_items.end_datetime', '>', $dateTime)
-			->setOr()
-			->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
+				->where('informationsystem_items.end_datetime', '>', $dateTime)
+				->setOr()
+				->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 
 			->open()
-			->where('informationsystem_groups.id', 'IS', NULL)
-			->setOr()
-			->where('informationsystem_groups.active', '=', 1)
-			->where('informationsystem_groups.indexing', '=', 1)
+				->where('informationsystem_groups.id', 'IS', NULL)
+				->setOr()
+				->where('informationsystem_groups.active', '=', 1)
+				->where('informationsystem_groups.indexing', '=', 1)
 			->close()
 			->where('informationsystems.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)

@@ -84,7 +84,7 @@ class Schedule_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('action')
 			->caption(Core::_('Schedule.action'))
 			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
-			->options($aModuleActions ? $aModuleActions : array(' … '))
+			->options(count($aModuleActions) ? $aModuleActions : array(' … '))
 			->value($this->_object->action));
 
 		$oMainTab->move($this->getField('description'), $oMainRow3);

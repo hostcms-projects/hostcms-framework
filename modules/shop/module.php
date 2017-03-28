@@ -23,7 +23,7 @@ class Shop_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-08-01';
+	public $date = '2016-08-18';
 
 	/**
 	 * Module name
@@ -188,7 +188,7 @@ class Shop_Module extends Core_Module
 
 		Core_Event::notify(get_class($this) . '.indexingShopGroups', $this, array($oShopGroup));
 
-		$aShopGroups = $oShopGroup->findAll();
+		$aShopGroups = $oShopGroup->findAll(FALSE);
 
 		$result = array();
 		foreach($aShopGroups as $oShopGroup)
@@ -230,22 +230,22 @@ class Shop_Module extends Core_Module
 			->where('shop_items.deleted', '=', 0)
 
 			->open()
-			->where('shop_items.start_datetime', '<', $dateTime)
-			->setOr()
-			->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+				->where('shop_items.start_datetime', '<', $dateTime)
+				->setOr()
+				->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->setAnd()
 			->open()
-			->where('shop_items.end_datetime', '>', $dateTime)
-			->setOr()
-			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+				->where('shop_items.end_datetime', '>', $dateTime)
+				->setOr()
+				->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 
 			->open()
-			->where('shop_groups.id', 'IS', NULL)
-			->setOr()
-			->where('shop_groups.active', '=', 1)
-			->where('shop_groups.indexing', '=', 1)
+				->where('shop_groups.id', 'IS', NULL)
+				->setOr()
+				->where('shop_groups.active', '=', 1)
+				->where('shop_groups.indexing', '=', 1)
 			->close()
 			->where('shops.deleted', '=', 0)
 			->where('structures.deleted', '=', 0)
@@ -254,7 +254,7 @@ class Shop_Module extends Core_Module
 
 		Core_Event::notify(get_class($this) . '.indexingShopItems', $this, array($oShopItem));
 
-		$aShopItems = $oShopItem->findAll();
+		$aShopItems = $oShopItem->findAll(FALSE);
 
 		$result = array();
 
@@ -307,6 +307,12 @@ class Shop_Module extends Core_Module
 	}
 
 	/**
+	 * Cache
+	 * @var array
+	 */
+	protected $_cacheSearchCallbackGroupProperties = array();
+
+	/**
 	 * Search callback function
 	 * @param Search_Page_Model $oSearch_Page
 	 * @return self
@@ -330,9 +336,33 @@ class Shop_Module extends Core_Module
 
 					if (!is_null($oShop_Item->id))
 					{
+						if ($oShop_Item->shop_group_id)
+						{
+							if (!isset($this->_cacheSearchCallbackGroupProperties[$oShop_Item->shop_group_id]))
+							{
+								$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $oShop_Item->Shop->id);
+
+								$showXmlProperties = array();
+
+								$aProperties = $oShop_Item_Property_List->getPropertiesForGroup($oShop_Item->shop_group_id);
+								foreach ($aProperties as $oProperty)
+								{
+									$showXmlProperties[] = $oProperty->id;
+								}
+
+								$this->_cacheSearchCallbackGroupProperties[$oShop_Item->shop_group_id] = count($showXmlProperties) ? $showXmlProperties : FALSE;
+							}
+
+							$showXmlProperties = $this->_cacheSearchCallbackGroupProperties[$oShop_Item->shop_group_id];
+						}
+						else
+						{
+							$showXmlProperties = TRUE;
+						}
+
 						$oShop_Item
 							->showXmlComments(TRUE)
-							->showXmlProperties(TRUE)
+							->showXmlProperties($showXmlProperties)
 							->showXmlSpecialprices(TRUE);
 
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oShop_Item));

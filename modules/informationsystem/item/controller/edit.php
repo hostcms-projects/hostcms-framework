@@ -126,7 +126,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'));
+					->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$oAdditionalTab->delete($this->getField('informationsystem_group_id'));
 
@@ -147,6 +148,51 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$oMainRow2->add($resultItem);
 				}
 
+				// Группы ярлыков
+				$oAdditionalGroupsSelect = Admin_Form_Entity::factory('Select')
+					->caption(Core::_('Informationsystem_Item.shortcut_group_tags'))
+					->options($this->_fillShortcutGroupList($this->_object))
+					->name('shortcut_group_id[]')
+					->class('shortcut-group-tags')
+					->style('width: 100%')
+					->multiple('multiple')
+					->divAttr(array('class' => 'form-group col-xs-12'));
+
+				$oMainRow3->add($oAdditionalGroupsSelect);
+
+				$html2 = '
+					<script type="text/javascript">
+						$(function(){
+							$(".shortcut-group-tags").select2({
+								language: "' . Core_i18n::instance()->getLng() . '",
+								minimumInputLength: 2,
+								placeholder: "' . Core::_('Informationsystem_Item.select_group') . '",
+								tags: true,
+								allowClear: true,
+								multiple: true,
+								ajax: {
+									url: "/admin/informationsystem/item/index.php?shortcuts&informationsystem_id=' . $this->_object->informationsystem_id .'",
+									dataType: "json",
+									type: "GET",
+									processResults: function (data) {
+										var aResults = [];
+										$.each(data, function (index, item) {
+											aResults.push({
+												"id": item.id,
+												"text": item.text
+											});
+										});
+										return {
+											results: aResults
+										};
+									}
+								},
+							});
+						})</script>
+					';
+
+				$oMainRow3->add(Admin_Form_Entity::factory('Code')->html($html2));
+
 				$this->getField('datetime')
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
 				$this->getField('start_datetime')
@@ -161,17 +207,17 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					&& $this->getField('end_datetime')->value('');
 
 				$oMainTab
-					->move($this->getField('datetime'), $oMainRow3)
-					->move($this->getField('start_datetime'), $oMainRow3)
-					->move($this->getField('end_datetime'), $oMainRow3);
+					->move($this->getField('datetime'), $oMainRow4)
+					->move($this->getField('start_datetime'), $oMainRow4)
+					->move($this->getField('end_datetime'), $oMainRow4);
 
 				$this->getField('active')
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
 				$this->getField('indexing')
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
 
-				$oMainTab->move($this->getField('active'), $oMainRow4);
-				$oMainTab->move($this->getField('indexing'), $oMainRow4);
+				$oMainTab->move($this->getField('active'), $oMainRow5);
+				$oMainTab->move($this->getField('indexing'), $oMainRow5);
 
 				$this->getField('sorting')
 					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
@@ -181,9 +227,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
 
 				$oMainTab
-					->move($this->getField('sorting'), $oMainRow5)
-					->move($this->getField('ip'), $oMainRow5)
-					->move($this->getField('showed'), $oMainRow5);
+					->move($this->getField('sorting'), $oMainRow6)
+					->move($this->getField('ip'), $oMainRow6)
+					->move($this->getField('showed'), $oMainRow6);
 
 				$oAdditionalTab->delete($this->getField('siteuser_id'));
 
@@ -193,7 +239,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('siteuser_id')
 					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
 
-				$oMainRow5->add($oSiteuser);
+				$oMainRow6->add($oSiteuser);
 
 				// Добавляем новое поле типа файл
 				$oImageField = Admin_Form_Entity::factory('File');
@@ -274,12 +320,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						)
 					);
 
-				$oMainRow6->add($oImageField);
+				$oMainRow7->add($oImageField);
 
 				$this->getField('path')
 					->format(array('maxlen' => array('value' => 255)));
 
-				$oMainTab->move($this->getField('path'), $oMainRow7);
+				$oMainTab->move($this->getField('path'), $oMainRow8);
 
 				if (Core::moduleIsActive('maillist'))
 				{
@@ -321,7 +367,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->caption(Core::_('Informationsystem_Item.siteuser_group_id'))
 					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
 
-				$oMainRow8->add($oSelect_SiteuserGroups);
+				$oMainRow9->add($oSelect_SiteuserGroups);
 
 				$oAdditionalTab = $this->getTab('additional');
 				$oAdditionalTab->delete($this->getField('siteuser_group_id'));
@@ -430,28 +476,52 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name('Tags');
 					$this->addTabAfter($oTagsTab, $oInformationsystemTabSeo);
 
-					$html = '<label class="tags_label" for="form-field-tags">' . Core::_('Informationsystem_Item.tags') . '</label>
-						<div class="item_div">
-							<input type="text" name="tags" id="form-field-tags" value="' . implode(", ", $this->_object->Tags->findAll()) . '" placeholder="' . Core::_('Informationsystem_Item.type_tag') . '" />
-						</div>
-						<script type="text/javascript">
-							jQuery(function($){
-								//we could just set the data-provide="tag" of the element inside HTML, but IE8 fails!
-								var tag_input = $(\'#form-field-tags\');
-								if(! ( /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase())) )
-								{
-									tag_input.tag( { placeholder:tag_input.attr(\'placeholder\') } );
-								}
-								else {
-									//display a textarea for old IE, because it doesnt support this plugin or another one I tried!
-									tag_input.after(\'<textarea id="\'+ tag_input.attr(\'id\')+\'" name="\'+tag_input.attr(\'name\')+\'" rows=\"3\">\'+tag_input.val()+\'</textarea>\').remove();
-									//$(\'#form-field-tags\').autosize({append: "n"});
-								}
+					$oTagsTab
+						->add($oTagRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
-							})
-						</script>
-							';
-					$oTagsTab->add(Admin_Form_Entity::factory('Code')->html($html));
+					$oAdditionalGroupsSelect = Admin_Form_Entity::factory('Select')
+						->caption(Core::_('Informationsystem_Item.tags'))
+						->options($this->_fillTagsList($this->_object))
+						->name('tags[]')
+						->class('informationsystem-item-tags')
+						->style('width: 100%')
+						->multiple('multiple')
+						->divAttr(array('class' => 'form-group col-xs-12'));
+
+					$oTagRow1->add($oAdditionalGroupsSelect);
+
+					$html = '
+						<script type="text/javascript">
+							$(function(){
+								$(".informationsystem-item-tags").select2({
+									language: "' . Core_i18n::instance()->getLng() . '",
+									minimumInputLength: 2,
+									placeholder: "' . Core::_('Informationsystem_Item.type_tag') . '",
+									tags: true,
+									allowClear: true,
+									multiple: true,
+									ajax: {
+										url: "/admin/tag/index.php?hostcms[action]=loadTagsList&hostcms[checked][0][0]=1",
+										dataType: "json",
+										type: "GET",
+										processResults: function (data) {
+											var aResults = [];
+											$.each(data, function (index, item) {
+												aResults.push({
+													"id": item.id,
+													"text": item.text
+												});
+											});
+											return {
+												results: aResults
+											};
+										}
+									},
+								});
+							})</script>
+						';
+
+					$oTagRow1->add(Admin_Form_Entity::factory('Code')->html($html));
 				}
 
 			break;
@@ -866,16 +936,22 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 		// Обработка ключевых слов группы
 		if (Core::moduleIsActive('tag') && $modelName == 'informationsystem_item')
 		{
-			$item_tags = trim(Core_Array::getPost('tags'));
+			$aRecievedTags = Core_Array::getPost('tags', array());
+			!is_array($aRecievedTags) && $aRecievedTags = array();
 
-			if ($item_tags == '' && $oInformationsystem->apply_tags_automatically ||
-				$oInformationsystem->apply_keywords_automatically && $this->_object->seo_keywords == '')
+			//$item_tags = trim(Core_Array::getPost('tags'));
+
+			if (count($aRecievedTags) == 0
+				&& $oInformationsystem->apply_tags_automatically
+				|| $oInformationsystem->apply_keywords_automatically && $this->_object->seo_keywords == '')
 			{
 				// Получаем хэш названия, описания и текста инфоэлемента
-				$array_text = Core_Str::getHashes(Core_Array::getPost('name') . Core_Array::getPost('description') . ' ' . Core_Array::getPost('text', ''), array('hash_function' => 'crc32'));
+				$array_text = Core_Str::getHashes(
+					Core_Array::getPost('name') . Core_Array::getPost('description') . ' ' . Core_Array::getPost('text', ''), array('hash_function' => 'crc32')
+				);
 				$array_text = array_unique($array_text);
 
-				$coeff_intersect = array ();
+				$coeff_intersect = array();
 
 				$offset = 0;
 				$limit = 100;
@@ -937,7 +1013,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				}
 			}
 
-			if ($item_tags == '' && $oInformationsystem->apply_tags_automatically && count($coeff_intersect))
+			if (count($aRecievedTags) == 0
+				&& $oInformationsystem->apply_tags_automatically && count($coeff_intersect)
+			)
 			{
 				// Удаляем связь с метками
 				$this->_object->Tag_Informationsystem_Items->deleteAll();
@@ -950,7 +1028,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			}
 			else
 			{
-				$this->_object->applyTags($item_tags);
+				$this->_object->applyTagsArray($aRecievedTags);
 			}
 		}
 
@@ -969,9 +1047,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					// Проверяем, нужно ли применять типографику к информационного элемента тексту.
 					if (Core_Array::getPost('use_typograph_text', 0))
 					{
-						// Создаем объект типографа и типографируем текст.
-
-
 						$this->_object->text = Typograph_Controller::instance()->process($this->_object->text, Core_Array::getPost('use_trailing_punctuation_text', 0));
 					}
 				}
@@ -991,6 +1066,40 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->setObject($this->_object)
 					->linkedObject(Core_Entity::factory('Informationsystem_Item_Property_List', $oInformationsystem->id))
 					->applyObjectProperty();
+
+				$aShortcutGroupIds = Core_Array::getPost('shortcut_group_id', array());
+				!is_array($aShortcutGroupIds) && $aShortcutGroupIds = array();
+
+				$aTmp = array();
+
+				// Выбранные группы
+				$aShortcuts = $oInformationsystem->Informationsystem_Items->getAllByShortcut_id($this->_object->id, FALSE);
+				foreach ($aShortcuts as $oShortcut)
+				{
+					!in_array($oShortcut->informationsystem_group_id, $aShortcutGroupIds)
+						? $oShortcut->markDeleted()
+						: $aTmp[] = $oShortcut->informationsystem_group_id;
+				}
+
+				$aNewShortcutGroupIDs = array_diff($aShortcutGroupIds, $aTmp);
+				foreach ($aNewShortcutGroupIDs as $iShortcutGroupId)
+				{
+					$oInformationsystem_Group = $oInformationsystem->Informationsystem_Groups->getById($iShortcutGroupId);
+					if (!is_null($oInformationsystem_Group))
+					{
+						$oInformationsystem_ItemShortcut = Core_Entity::factory('Informationsystem_Item');
+
+						$oInformationsystem_ItemShortcut->informationsystem_id = $this->_object->informationsystem_id;
+						$oInformationsystem_ItemShortcut->shortcut_id = $this->_object->id;
+						$oInformationsystem_ItemShortcut->informationsystem_group_id = $iShortcutGroupId;
+						$oInformationsystem_ItemShortcut->datetime = $this->_object->datetime;
+						$oInformationsystem_ItemShortcut->name = '';
+						$oInformationsystem_ItemShortcut->path = '';
+						$oInformationsystem_ItemShortcut->indexing = 0;
+
+						$oInformationsystem_ItemShortcut->save()->clearCache();
+					}
+				}
 
 				break;
 			case 'informationsystem_group':
@@ -1312,6 +1421,74 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
+	}
+
+	/**
+	 * Fill shortcut groups list
+	 * @param Informationsystem_Item_Model $oInformationsystem_Item item
+	 * @return array
+	 */
+	protected function _fillShortcutGroupList($oInformationsystem_Item)
+	{
+		$aReturnArray = array();
+
+		$oInformationsystem = $oInformationsystem_Item->Informationsystem;
+
+		$aShortcuts = $oInformationsystem->Informationsystem_Items->getAllByShortcut_id($oInformationsystem_Item->id, FALSE);
+		foreach ($aShortcuts as $oShortcut)
+		{
+			$oInformationsystem_Group = $oShortcut->Informationsystem_Group;
+
+			$aParentGroups = array();
+
+			$aTmpGroup = $oInformationsystem_Group;
+
+			// Добавляем все директории от текущей до родителя.
+			do {
+				$aParentGroups[] = $aTmpGroup->name;
+			} while($aTmpGroup = $aTmpGroup->getParent());
+
+			$sParents = implode(' → ', array_reverse($aParentGroups));
+
+			if (!is_null($oInformationsystem_Group->id))
+			{
+				$aReturnArray[$oInformationsystem_Group->id] = array(
+					'value' => $sParents . ' [' . $oInformationsystem_Group->id . ']',
+					'attr' => array('selected' => 'selected')
+				);
+			}
+			else
+			{
+				$aReturnArray[0] = array(
+					'value' => Core::_('Informationsystem_Item.root') . ' [0]',
+					'attr' => array('selected' => 'selected')
+				);
+			}
+		}
+
+		return $aReturnArray;
+	}
+
+	/**
+	 * Fill tags list
+	 * @param Informationsystem_Item_Model $oInformationsystem_Item item
+	 * @return array
+	 */
+	protected function _fillTagsList($oInformationsystem_Item)
+	{
+		$aReturnArray = array();
+
+		$aTags = $oInformationsystem_Item->Tags->findAll(FALSE);
+
+		foreach ($aTags as $oTag)
+		{
+			$aReturnArray[$oTag->name] = array(
+				'value' => $oTag->name,
+				'attr' => array('selected' => 'selected')
+			);
+		}
+
+		return $aReturnArray;
 	}
 
 	/**

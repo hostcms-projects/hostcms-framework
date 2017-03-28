@@ -1228,6 +1228,17 @@ abstract class Shop_Payment_System_Handler
 	protected $_notificationModes = array('changeStatusPaid', 'edit');
 
 	/**
+	 * Set $this->_notificationModes
+	 * @param array array of modes, e.g. array('changeStatusPaid', 'edit', 'changeStatusPaid')
+	 * @return self
+	 */
+	public function setNotificationModes(array $notificationModes)
+	{
+		$this->_notificationModes = $notificationModes;
+		return $this;
+	}
+	
+	/**
 	 * Уведомление об операциях с заказом
 	 * @param string $mode режим изменения:
 	 * - apply - применение изменений заказа из списка заказа, включая изменение статуса

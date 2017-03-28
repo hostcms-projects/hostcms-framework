@@ -701,12 +701,17 @@ class Informationsystem_Controller_Show extends Core_Controller
 	 */
 	protected function _incShowed()
 	{
-		$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item')->find($this->item);
+		Core_QueryBuilder::update('informationsystem_items')
+			->set('showed', Core_QueryBuilder::expression('`showed` + 1'))
+			->where('id', '=', $this->item)
+			->execute();
+
+		/*$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item')->find($this->item);
 		if (!is_null($oInformationsystem_Item->id))
 		{
 			$oInformationsystem_Item->showed += 1;
 			$oInformationsystem_Item->save();
-		}
+		}*/
 
 		return $this;
 	}

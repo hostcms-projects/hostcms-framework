@@ -283,5 +283,7 @@ return array(
 	'start_order_date'=>'Start date',
 	'stop_order_date' => 'End date',
 	'empty_shop' => 'Are you sure you want to permanently delete all of the items in the store?',
-
+	'root' => 'Root dir',
+	'shortcut_group_tags' => "<acronym title=\"Another groups with shortcuts\">Additional groups</acronym>",
+	'select_group' => 'Select a group',
 );

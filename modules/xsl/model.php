@@ -182,10 +182,13 @@ class Xsl_Model extends Core_Entity
 		$this->queryBuilder()
 			->clear()
 			->where('name', '=', $name)
+			->clearOrderBy()
 			->limit(1);
 
 		$aXsls = $this->findAll();
 
-		return isset($aXsls[0]) ? $aXsls[0] : NULL;
+		return isset($aXsls[0])
+			? $aXsls[0]
+			: NULL;
 	}
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Information systems.
  *
@@ -91,4 +91,7 @@ return array(
 	'show_information_propertys_title' => 'Additional properties of information system items "%s"',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	'root' => 'Root dir',
+	'shortcut_group_tags' => "<acronym title=\"Another groups with shortcuts\">Additional groups</acronym>",
+	'select_group' => 'Select a group',
 );

@@ -604,9 +604,9 @@ body.hostcms-bootstrap1:before {
 .hostcms-bootstrap1 .dropdown-menu {
 	background-color: rgba(255,255,255,.95)
 }
-.hostcms-bootstrap1 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu li {
+/*.hostcms-bootstrap1 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu li {
     background: none !important;
-}
+}*/
 .page-body .databox-piechart .easyPieChart {
 	width: 47px; height: 47px; line-height: 47px;
 }
@@ -1711,6 +1711,12 @@ text-align: center; border-radius: 9px 9px 0 0; box-sizing: border-box; }
     padding: 3px;
 }
 
+.badge-max-width {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* --- Notes --- */
 #user-notes { padding: 0 10px }
 #default-user-note { display: none }
@@ -1791,7 +1797,7 @@ td.td-badge .badge-ico {
 /* --- /Badge --- */
 
 /* --- Chat --- */
-.page-chatbar {
+/*.page-chatbar {
     bottom: 0;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     height: calc(100vh - 45px);
@@ -1811,12 +1817,17 @@ td.td-badge .badge-ico {
     position: absolute;
     right: 0;
     width: 100%;
-}
+}*/
 .page-chatbar .chatbar-messages .messages-list  .message.unread .message-body::before
 {
 	border-left-color: transparent;
     border-right-color: transparent;
     border-top-color: transparent;
+}
+
+.page-chatbar::before{
+	position: absolute;
+	top: 0;
 }
 
 .opacity { opacity: 0.5 }
@@ -1831,11 +1842,18 @@ td.td-badge .badge-ico {
     position: absolute;
     width: 100%;
 }
-#new_messages{ bottom: 115px }
-#unread_messages{ top: 0px; z-index:100 }
+#new_messages{ bottom: 106px;/*115px*/ }
+#unread_messages{ top: 0; z-index:100 }
 
 i.chatbar-message-spinner { position: absolute; top: 350px; left: 130px }
 #chatbar { position: fixed; top: 45px }
+
+@media only screen and (max-width: 530px) {
+	#chatbar {
+		top: 90px;
+	}
+}
+
 div.message-info div.contact-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100px; }
 /* --- /Chat --- */
 

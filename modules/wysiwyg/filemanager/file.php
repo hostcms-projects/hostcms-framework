@@ -121,7 +121,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 */
 	protected function _getFullPath()
 	{
-		return $this->path . DIRECTORY_SEPARATOR . Core_File::convertfileNameToLocalEncoding($this->name);
+		return $this->path . DIRECTORY_SEPARATOR . /*Core_File::convertfileNameToLocalEncoding(*/$this->name/*)*/;
 	}
 
 	/**

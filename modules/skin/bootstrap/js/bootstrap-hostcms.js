@@ -89,8 +89,7 @@
 				.addClass("hostcmsWindow")
 				.attr("id", "Window" + windowCounter)
 				.appendTo($(document.body))
-				.dialog(settings)/*
-				.dialog('open')*/;
+				.dialog(settings);
 
 			var data = jQuery.getData(settings);
 			// Change window id
@@ -220,6 +219,22 @@
 			});
 
 			jDiv.remove();
+		},
+		soundSwitch: function(event) {
+			$.ajax({
+				url: event.data.path,
+				type: "POST",
+				data: {'sound_switch_status':1},
+				dataType: 'json',
+				error: function(){},
+				success: function (result) {
+					var jSoundSwitch = $("#sound-switch");
+
+					result['answer'] == 0
+						? jSoundSwitch.html('<i class="icon fa fa-bell-slash"></i>')
+						: jSoundSwitch.html('<i class="icon fa fa-bell"></i>');
+				},
+			});
 		},
 		/* -- CHAT -- */
 		chatGetUsersList: function(event)
@@ -434,7 +449,7 @@
 
 				jClone.find(".message-info div").eq(1).text(object.user_id != recipientUserInfo.id ? currentName : recipientName);
 				jClone.find(".message-info div").eq(2).text(object.datetime);
-				jClone.find(".message-body").html(object.text.replace(/\n/g, "<br />"));
+				jClone.find(".message-body").html(object.text/*.replace(/\n/g, "<br />")*/);
 
 				jClone.removeClass("hidden").show();
 
@@ -443,17 +458,30 @@
 					: jMessagesList.prepend(jClone);
 			}
 		},
+
+		setSlimScrollBarHeight: function (jList) {
+
+			var //jMessagesList = $('.chatbar-messages .messages-list'),
+				jSlimScrollBar = jList.next(".slimScrollBar"),
+				minSlimScrollBarHeight = 30,
+				barHeight = Math.max((jList.outerHeight() / jList[0].scrollHeight) * jList.outerHeight(), minSlimScrollBarHeight);
+
+			jSlimScrollBar.css('height', barHeight);
+		},
+
 		chatMessagesListScrollDown: function() {
 			var jMessagesList = $('.chatbar-messages .messages-list'),
 				jSlimScrollBar = jMessagesList.next(".slimScrollBar");
 
+			$.setSlimScrollBarHeight(jMessagesList);
 			jMessagesList.scrollTop(jMessagesList[0].scrollHeight);
-			jSlimScrollBar.css('top', jMessagesList.height() - jSlimScrollBar.height() + 20);
 
+			jSlimScrollBar.css('top', jMessagesList.outerHeight() - jSlimScrollBar.outerHeight() + 'px');
 		},
 		chatSendMessage: function(event) {
 			if (event.keyCode == 13 && !event.shiftKey)
 			{
+				// Перевод строки
 				if(event.ctrlKey)
 				{
 					var $this = $(this);
@@ -467,15 +495,18 @@
 						jTextarea = $(".send-message textarea"),
 						message = $.trim(jTextarea.val());
 
+
 					if (message == '')
 						return;
+
 
 					data['message'] = message;
 					data['recipient-user-id'] = $(".messages-contact").data('recipientUserId');
 
-					var jClone = $(".message.hidden").clone();
+					var jClone = $(".message.hidden").clone(),
+						messageBox = $(".message-body", jClone);
 
-					jClone.find(".message-body").html(message.replace(/\n/g, "<br />"));
+					messageBox.html(messageBox.text(message).html().replace(/\n/g, "<br />"));
 
 					jMessagesList.append(jClone.removeClass("hidden").addClass("opacity").show());
 
@@ -559,6 +590,9 @@
 						}
 
 						$("li.message", jMessagesList).delay(3000).toggleClass("unread", false, 2000, "easeOutSine");
+
+						// Меняем высоту полосы прокрутки
+						$.setSlimScrollBarHeight(jMessagesList);
 					}
 					else
 					{
@@ -604,7 +638,7 @@
 							$(".chatbar-messages #messages-none").addClass("hidden");
 
 							// Последнее прочитанное сообщение находится выше области ввода сообщений, т.е. скрол находится в нижнем положении
-							if ($(".chatbar-messages .send-message").offset().top > $("li.message:not(.unread):last", jMessagesList).offset().top)
+							if ($(".chatbar-messages .send-message").offset().top > $("li.message:not(.unread):not(.hidden):last", jMessagesList).offset().top)
 							{
 
 								$("li.message.hidden ~ li.message.unread", jMessagesList).each(function(){
@@ -641,6 +675,7 @@
 									});
 								});
 
+
 								// Scroll
 								$.chatMessagesListScrollDown();
 							}
@@ -658,11 +693,7 @@
 			$("#chatbar").data("refreshMessagesListIntervalId", refreshMessagesListIntervalId);
 		},
 		refreshChat: function(settings) {
-			var timeout = 5000;
-
-			var myFunction = function() {
-				clearInterval(interval);
-
+			setInterval(function () {
 				// add ajax '_'
 				var data = $.getData({});
 					data['alert'] = 1;
@@ -677,9 +708,6 @@
 					success: function (data) {
 						if (data["info"])
 						{
-							// Reset timeout
-							timeout = 5000;
-
 							Notify('<img width="24px" height="24px" src="' + data["info"].avatar + '"><span style="padding-left:10px">' + data["info"].text + '</span>', 'bottom-left', '5000', 'blueberry', 'fa-comment-o', true, !!data["info"].sound);
 
 							var user_id = data["info"]['user_id'],
@@ -690,11 +718,6 @@
 						}
 						else
 						{
-							if (timeout < 30000)
-							{
-								timeout += 5000;
-							}
-
 							$("#chat-link .badge").addClass("hidden").text(data["count"]);
 							$("#chat-link").removeClass("wave in");
 						}
@@ -706,11 +729,7 @@
 						}
 					},
 				});
-
-				interval = setInterval(myFunction, timeout);
-			}
-
-			var interval = setInterval(myFunction, timeout);
+			}, 5000);
 		},
 		refreshUserStatuses: function() {
 			setInterval(function () {
@@ -748,21 +767,355 @@
 				});
 			}, 60000);
 		},
-		soundSwitch: function(event) {
-			$.ajax({
-				url: event.data.path,
-				type: "POST",
-				data: {'sound_switch_status':1},
-				dataType: 'json',
-				error: function(){},
-				success: function (result) {
-					var jSoundSwitch = $("#sound-switch");
+		chatPrepare: function() {
+			// Обновление статусов
+			$.refreshUserStatuses();
 
-					result['answer'] == 0
-						? jSoundSwitch.html('<i class="icon fa fa-bell-slash"></i>')
-						: jSoundSwitch.html('<i class="icon fa fa-bell"></i>');
-				},
+			var position = readCookie("rtl-support") ? 'right' : 'left',
+				jMessagesList = $('.chatbar-messages .messages-list'),
+				messagesListSlimscrollOptions = {
+					position: position,
+					size: '4px',
+					start: 'bottom',
+					color: themeprimary,
+					wheelStep: 1,
+					//height: $(window).height() - 250,
+					height: $(window).height() - $('body > .navbar').outerHeight() - $('#chatbar .messages-contact').outerHeight() - $('#chatbar .send-message').outerHeight(),
+					alwaysVisible: true,
+					disableFadeOut: true
+				};
+
+			jMessagesList.slimscroll(messagesListSlimscrollOptions);
+
+			$('.chatbar-contacts .contacts-list').slimscroll({
+				position: position,
+				size: messagesListSlimscrollOptions.size,//'4px',
+				color: themeprimary,
+				//height: $(window).height() - 50,
+				height: $(window).height() - $('body > .navbar').outerHeight()
 			});
+
+			$("#chat-link").click(function () {
+				$('.page-chatbar').toggleClass('open');
+				$("#chat-link").toggleClass('open');
+			});
+
+			$('.page-chatbar .chatbar-contacts .contact').on('click', function(e) {
+				$('.page-chatbar .chatbar-contacts').hide();
+				$('.page-chatbar .chatbar-messages').show();
+			});
+
+			$('.page-chatbar .chatbar-messages .back').on('click', function (e) {
+				$('.page-chatbar .chatbar-contacts').show();
+				$('.page-chatbar .chatbar-messages').hide();
+				$('.chatbar-messages .messages-list').removeData('disableUploadingMessagesList');
+				$.chatClearMessagesList();
+			});
+
+			// Отключение refreshMessagesList
+			$("#chat-link, div.back").on('click', function() {
+				$("#chatbar").data("refreshMessagesListIntervalId") && clearInterval($("#chatbar").data("refreshMessagesListIntervalId"))
+			});
+
+			function onWheel(event)
+			{
+				var jMessagesList = $('.chatbar-messages .messages-list'),
+					slimScrollBar = $('.chatbar-messages .slimScrollBar'),
+					maxTop = jMessagesList.outerHeight() - slimScrollBar.outerHeight(),
+					delta = 0, newTopScroll = 0, percentScroll;
+
+				if (event.wheelDelta)
+				{
+					delta = -event.wheelDelta / 120;
+				}
+
+				if (event.detail)
+				{
+					delta = event.detail / 3;
+				}
+
+				// Прокрутили вверх, уже находясь вверху
+				if (delta < 0 && $(this).next(".slimScrollBar").length && $(this).next(".slimScrollBar").position().top == 0 && !jMessagesList.data('disableUploadingMessagesList'))
+				{
+					$.uploadingMessagesList();
+					return;
+				}
+
+				// Прокрутили вниз, не находясь при этом в самом низу
+				if (delta > 0 && (jMessagesList[0].scrollHeight > jMessagesList.scrollTop() + jMessagesList.outerHeight()))
+				{
+					delta = parseInt(slimScrollBar.css('top')) + delta * parseInt(messagesListSlimscrollOptions.wheelStep) / 100 * slimScrollBar.outerHeight();
+					delta = Math.min(Math.max(delta, 0), maxTop);
+					delta = Math.ceil(delta);
+
+					percentScroll = delta / (jMessagesList.outerHeight() - slimScrollBar.outerHeight());
+					newTopScroll = percentScroll * (jMessagesList[0].scrollHeight - jMessagesList.outerHeight());
+
+					delta = newTopScroll - jMessagesList.scrollTop();
+
+					// Список новых сообщений
+					$("li.message.hidden ~ li.message.unread:not(.mark-read)", jMessagesList).each(function(index){
+						var $this = $(this);
+
+						// Показываем новое сообщение
+						if ($(".chatbar-messages .send-message").offset().top > (($this.offset().top - delta + 30)) )
+						{
+							$.readChatMessage($this);
+						}
+					});
+				}
+			}
+
+			if (jMessagesList[0])
+			{
+				if (jMessagesList[0].addEventListener)
+				{
+					jMessagesList[0].addEventListener('DOMMouseScroll', onWheel, false);
+					jMessagesList[0].addEventListener('mousewheel', onWheel, false);
+					jMessagesList[0].addEventListener('MozMousePixelScroll', onWheel, false);
+				}
+				else
+				{
+					jMessagesList[0].attachEvent("onmousewheel", onWheel);
+				}
+			}
+
+			jMessagesList.on({
+				'slimscroll': function (e, pos) {
+					var jMessagesList = $('.chatbar-messages .messages-list');
+
+					if (pos == 'top' && !jMessagesList.data('disableUploadingMessagesList'))
+					{
+						$.uploadingMessagesList();
+					}
+
+					// Достигли нижнего края чата - убираем маркер числа новых сообщений, сбрасываем счетчик новых сообщений
+					if (pos == 'bottom')
+					{
+						!$(".chatbar-messages #new_messages").hasClass('hidden') && $(".chatbar-messages #new_messages").addClass('hidden');
+					}
+				},
+
+				'touchstart': function (event) {
+
+					$(this).data(
+						{
+							'isTouchStart': true,
+							'touchPositionY': event.originalEvent.touches[0].pageY
+						}
+					);
+				}
+			});
+
+			$('#chatbar .slimScrollBar').each(function() {
+
+				$(this)
+					.data('isMousedown', false)
+					.mousedown(function () {
+						$(this).data('isMousedown', true);
+						$(this).css('width', '8px')
+					})
+					.mouseenter(function () {
+						$(this).css('width', '8px')
+					})
+					.mouseout(function () {
+						!$(this).data('isMousedown') &&	$(this).css('width', messagesListSlimscrollOptions.size);
+					});
+			});
+
+			$(document).on({
+
+				'mousemove': function () {
+					var slimScrollBar = $('.chatbar-messages .slimScrollBar'),
+						jMessagesList = $('.chatbar-messages .messages-list');
+
+					if (slimScrollBar.data('isMousedown'))
+					{
+						//var deltaY = slimScrollBar.position().top - slimScrollBar.data('top');
+
+						slimScrollBar.data('top', slimScrollBar.position().top);
+
+						// Список новых сообщений
+						$("li.message.hidden ~ li.message.unread:not(.mark-read)", jMessagesList).each(function(index){
+							var $this = $(this);
+
+							// Показываем новое сообщение
+							if ($(".chatbar-messages .send-message").offset().top > ($this.offset().top + 30))
+							{
+								$.readChatMessage($this);
+							}
+						});
+					}
+				},
+
+				'mouseup': function (event) {
+
+					$('#chatbar .slimScrollBar').each(function() {
+
+						var slimScrollBar = $(this);
+						// Кнопка мыши была нажата, когда указатель мыши находился над полосой прокрутки
+						if (slimScrollBar.data('isMousedown'))
+						{
+							slimScrollBar.data({'isMousedown': false, 'top': 0});
+
+							// Указатель мыши находится вне полосы прокрутки
+							if (event.target != slimScrollBar[0])
+							{
+								slimScrollBar.css('width', messagesListSlimscrollOptions.size);
+							}
+						}
+					})
+				},
+
+				'touchend': function () {
+
+					var jMessagesList = $('.chatbar-messages .messages-list');
+
+					jMessagesList.data('isTouchStart') && jMessagesList.data('isTouchStart', false);
+				},
+
+				'touchmove': function (event) {
+
+					var jMessagesList = $('.chatbar-messages .messages-list');
+					if (jMessagesList.data('isTouchStart'))
+					{
+						var lastY = jMessagesList.data('touchPositionY'),
+							currentY = event.originalEvent.touches[0].pageY;
+
+						if (jMessagesList.scrollTop() == 0 && !jMessagesList.data('disableUploadingMessagesList'))
+						{
+							$.uploadingMessagesList();
+						}
+
+						// Пролистываем вверх
+						if (currentY < lastY)
+						{
+							// Список новых сообщений
+							$("li.message.hidden ~ li.message.unread:not(.mark-read)", jMessagesList).each(function(index){
+								var $this = $(this);
+
+								// Показываем новое сообщение
+								if ($(".chatbar-messages .send-message").offset().top > ($this.offset().top + 30))
+								{
+									$.readChatMessage($this);
+								}
+							});
+						}
+
+						jMessagesList.data('touchPositionY', currentY);
+					}
+				},
+
+				'scroll': function() {
+
+					if (!$('#checkbox_fixednavbar').prop('checked'))
+					{
+
+						var documentScrollTop = $(document).scrollTop(),
+							navbarHeight = $('body > div.navbar').outerHeight(),
+							chatBar = $('div#chatbar'),
+							deltaHeight = (documentScrollTop > navbarHeight ? 0 : navbarHeight - documentScrollTop),
+							deltaY = parseInt(chatBar.css('top')) - deltaHeight,
+							//sendMessageBlock = $('#chatbar .send-message'),
+
+							// Полоса прокрутки списка контактов
+							chatbarContactsSlimScrollDiv = $('div#chatbar .chatbar-contacts .slimScrollDiv'),
+							// Список контактов
+							contactsList = $('div#chatbar .chatbar-contacts .contacts-list'),
+
+							// Полоса прокрутки списка сообщений
+							chatbarMessagesSlimScrollDiv = $('div#chatbar .chatbar-messages .slimScrollDiv');
+							// Список сообщений
+							messagesList = $('div#chatbar .chatbar-messages .messages-list');
+
+						if (deltaY)
+						{
+							chatBar.css({'top': deltaHeight + 'px', 'height': chatBar.height() + deltaY + 'px'});
+
+							contactsList.css('height', parseInt(contactsList.css('height')) + deltaY + 'px');
+							chatbarContactsSlimScrollDiv.css('height', chatbarContactsSlimScrollDiv.outerHeight() + deltaY + 'px');
+
+							messagesList.css('height', parseInt(messagesList.css('height')) + deltaY + 'px');
+							chatbarMessagesSlimScrollDiv.css('height', chatbarMessagesSlimScrollDiv.outerHeight() + deltaY + 'px');
+
+							// Изменяем высоту полосы прокрутки списка контактов
+							$.setSlimScrollBarHeight(contactsList);
+
+							// Изменяем высоту полосы прокрутки списка сообщений
+							$.setSlimScrollBarHeight(messagesList);
+						}
+					}
+				}
+			});
+
+			$(window).on({
+				'resize': function(event) {
+
+					var documentScrollTop = $(document).scrollTop(),
+						navbarHeight = $('body > div.navbar').outerHeight(),
+						chatBar = $('div#chatbar'),
+
+						// Меняем позицию чата в зависимости от того зафиксирована полоса навигации или нет
+						deltaScrollHeight = $('#checkbox_fixednavbar').prop('checked')
+							? navbarHeight
+							: ( documentScrollTop > navbarHeight ? 0 : navbarHeight - documentScrollTop),
+
+						chatbarContactsSlimScrollDiv = $('div#chatbar .chatbar-contacts .slimScrollDiv'),
+						contactsList = $('div#chatbar .chatbar-contacts .contacts-list'),
+
+						chatbarMessagesSlimScrollDiv = $('div#chatbar .chatbar-messages .slimScrollDiv'),
+						messagesList = $('div#chatbar .chatbar-messages .messages-list'),
+						sendMessageBlock = $('#chatbar .send-message'),
+
+						chatbarMessagesDeltaHeight = deltaScrollHeight + $('#chatbar .messages-contact').outerHeight() + sendMessageBlock.outerHeight();
+
+					chatBar.css({'height': $(this).height() - deltaScrollHeight + 'px', 'top': deltaScrollHeight + 'px'});
+
+					chatbarContactsSlimScrollDiv.css('height', $(this).height() - deltaScrollHeight + 'px');
+					contactsList.css('height', chatbarContactsSlimScrollDiv.outerHeight() + 'px');
+
+					chatbarMessagesSlimScrollDiv.css('height', $(this).height() - chatbarMessagesDeltaHeight + 'px');
+					messagesList.css('height', chatbarMessagesSlimScrollDiv.outerHeight() + 'px');
+
+					// Изменяем высоту полосы прокрутки списка контактов
+					$.setSlimScrollBarHeight(contactsList);
+					// Изменяем высоту полосы прокрутки списка сообщений
+					$.setSlimScrollBarHeight(messagesList);
+				}
+			});
+
+			// Обработчик клика на чекбосе-фиксаторе полосы навигации
+			function clickFixedNavbarHandler() {
+
+				var documentScrollTop = $(document).scrollTop(),
+					navbarHeight = $('body > div.navbar').outerHeight(),
+					chatBar = $('div#chatbar'),
+
+					// Меняем позицию чата в зависимости от того зафиксирована полоса навигации или нет
+					deltaScrollHeight = $('#checkbox_fixednavbar').prop('checked')
+						? navbarHeight
+						: ( documentScrollTop > navbarHeight ? 0 : navbarHeight - documentScrollTop),
+
+					slimScrollDiv = $('div#chatbar .chatbar-messages .slimScrollDiv'),
+					messagesList = $('div#chatbar .chatbar-messages .messages-list'),
+					sendMessageBlock = $('#chatbar .send-message'),
+
+					deltaHeight = deltaScrollHeight + $('#chatbar .messages-contact').outerHeight() + sendMessageBlock.outerHeight();
+
+					chatBar.css({'height': $(window).height() - deltaScrollHeight + 'px', 'top': deltaScrollHeight + 'px'});
+
+					slimScrollDiv.css('height', $(window).height() - deltaHeight + 'px');
+					messagesList.css('height', slimScrollDiv.outerHeight() + 'px');
+
+				$.setSlimScrollBarHeight(messagesList);
+			}
+
+			$('#checkbox_fixednavbar').on('click', clickFixedNavbarHandler);
+				/*
+				.on('click', function () {
+
+					$(this).prop('checked') && !$('#checkbox_fixednavbar').prop('checked') && clickFixedNavbarHandler();
+				});*/
 		},
 		/* -- /CHAT -- */
 		loadSiteList: function() {
@@ -962,150 +1315,7 @@
 
 $(function(){
 	/* --- CHAT --- */
-	$("#chat-link").click(function () {
-		$('.page-chatbar').toggleClass('open');
-		$("#chat-link").toggleClass('open');
-	});
-	$('.page-chatbar .chatbar-contacts .contact').on('click', function(e) {
-		$('.page-chatbar .chatbar-contacts').hide();
-		$('.page-chatbar .chatbar-messages').show();
-	});
-
-	$('.page-chatbar .chatbar-messages .back').on('click', function (e) {
-		$('.page-chatbar .chatbar-contacts').show();
-		$('.page-chatbar .chatbar-messages').hide();
-		$('.chatbar-messages .messages-list').removeData('disableUploadingMessagesList');
-		$.chatClearMessagesList();
-
-	});
-
-	// Отключение refreshMessagesList
-	$("#chat-link, div.back").on('click', function() {
-		$("#chatbar").data("refreshMessagesListIntervalId") && clearInterval($("#chatbar").data("refreshMessagesListIntervalId"))
-	});
-
-	// Обновление статусов
-	$.refreshUserStatuses();
-
-	var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left',
-		jMessagesList = $('.chatbar-messages .messages-list'),
-		messagesListSlimscrollOptions = {
-			position: position,
-			size: '4px',
-			start: 'bottom',
-			color: themeprimary,
-			wheelStep: 1,
-			height: $(window).height() - 250,
-			alwaysVisible: true,
-			disableFadeOut: true
-		};
-
-	jMessagesList.slimscroll(messagesListSlimscrollOptions);
-
-	$('.chatbar-contacts .contacts-list').slimscroll({
-		position: position,
-		size: '4px',
-		color: themeprimary,
-		height: $(window).height() - 86,
-	});
-
-	jMessagesList.on('mousewheel', function(event){
-
-		var jMessagesList = $('.chatbar-messages .messages-list');
-
-		// Прокрутили вверх, уже находясь вверху
-		if (event.deltaY == 1 && $(this).next(".slimScrollBar").length && $(this).next(".slimScrollBar").position().top == 0 && !jMessagesList.data('disableUploadingMessagesList'))
-		{
-			$.uploadingMessagesList();
-		}
-
-		// Список новых сообщений
-		$("li.message.hidden ~ li.message.unread:not(.mark-read)", jMessagesList).each(function(index){
-			var $this = $(this),
-				jMessagesList = $('.chatbar-messages .messages-list'),
-				slimScrollBar = $('.chatbar-messages .slimScrollBar'),
-				wheelDelta = jMessagesList.scrollTop() / parseInt(slimScrollBar.css('top')) * 3.3;
-
-			// Показываем новое сообщение
-			if ($(".chatbar-messages .send-message").offset().top > (($this.offset().top - wheelDelta)) )
-			{
-				$.readChatMessage($this);
-			}
-		});
-	});
-
-	jMessagesList.on('slimscroll', function(e, pos){
-		var jMessagesList = $('.chatbar-messages .messages-list');
-
-		if (pos == 'top' && !jMessagesList.data('disableUploadingMessagesList'))
-		{
-			$.uploadingMessagesList();
-		}
-
-		// Достигли нижнего края чата - убираем маркер числа новых сообщений, сбрасываем счетчик новых сообщений
-		if (pos == 'bottom')
-		{
-			!$(".chatbar-messages #new_messages").hasClass('hidden') && $(".chatbar-messages #new_messages").addClass('hidden');
-		}
-	});
-
-	$('.chatbar-messages .slimScrollBar')
-		.data({'isMousedown': false, 'top': 0})
-		.mousedown(function() {
-			$(this).data({'isMousedown': true, 'top': $(this).position().top})
-		})
-
-	$(this)
-		.mousemove(function() {
-			var slimScrollBar = $('.chatbar-messages .slimScrollBar'),
-				jMessagesList = $('.chatbar-messages .messages-list');
-
-			if (slimScrollBar.data('isMousedown'))
-			{
-				var deltaY = slimScrollBar.position().top - slimScrollBar.data('top');
-
-				slimScrollBar.data('top', slimScrollBar.position().top);
-
-				// Список новых сообщений
-				$("li.message.hidden ~ li.message.unread:not(.mark-read)", jMessagesList).each(function(index){
-					var $this = $(this);
-
-					// Показываем новое сообщение
-					if ($(".chatbar-messages .send-message").offset().top > ($this.offset().top + 30))
-					{
-						$.readChatMessage($this);
-					}
-				});
-			}
-		})
-		.mouseup(function() {
-			var slimScrollBar = $('.chatbar-messages .slimScrollBar');
-			if (slimScrollBar.data('isMousedown'))
-			{
-				slimScrollBar.data({'isMousedown': false, 'top': 0});
-			}
-		});
-
-	function updateChatbarPosition()
-	{
-		var documentScrollTop = $(document).scrollTop(),
-			navbarHeight = $('body > div.navbar').height(),
-			deltaHeight = (documentScrollTop > navbarHeight ? 0 : navbarHeight - documentScrollTop) + 'px',
-			chatbar = $('div#chatbar');
-
-		if (deltaHeight != chatbar.css('top'))
-		{
-			chatbar.css('top', deltaHeight);
-		}
-	}
-
-	$(this)
-		.on('scroll', function() {
-			updateChatbarPosition();
-		})
-		.on('resize', function() {
-			updateChatbarPosition();
-		});
+	$('#chatbar').length && $.chatPrepare();
 	/* --- /CHAT --- */
 
 	$('body').on('click', '[id ^= \'file_\'][id *= \'_settings_\']', function() {

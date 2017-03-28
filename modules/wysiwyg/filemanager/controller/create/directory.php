@@ -48,7 +48,7 @@ class Wysiwyg_Filemanager_Controller_Create_Directory extends Admin_Form_Action_
 			throw new Core_Exception('name is NULL.');
 		}
 
-		$dirName = Core_File::pathCorrection(Core_File::convertfileNameToLocalEncoding($this->name));
+		$dirName = Core_File::pathCorrection(/*Core_File::convertfileNameToLocalEncoding(*/$this->name/*)*/);
 		$newDir = CMS_FOLDER . $this->cdir . $dirName;
 
 		if (!file_exists($newDir) && !is_dir($newDir))

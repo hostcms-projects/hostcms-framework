@@ -77,6 +77,7 @@ class Schedule_Load_Select_Options extends Admin_Form_Action_Controller
 		$oSchedule_Controller = new Schedule_Controller();
 
 		$aActions = $oSchedule_Controller->getModuleActions($this->_moduleId);
+
 		count($aActions) && $this->_values = $aActions;
 
 		return $this;

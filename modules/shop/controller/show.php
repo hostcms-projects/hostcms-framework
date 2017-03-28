@@ -571,7 +571,7 @@ class Shop_Controller_Show extends Core_Controller
 
 			foreach ($hostcmsViewed as $view_item_id)
 			{
-				$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id);
+				$oShop_Item = Core_Entity::factory('Shop_Item')->find($view_item_id, FALSE);
 
 				if (!is_null($oShop_Item->id) && $oShop_Item->id != $this->item && $oShop_Item->active)
 				{
@@ -944,7 +944,7 @@ class Shop_Controller_Show extends Core_Controller
 					$oShop_Item->showXmlSpecialprices($this->specialprices);
 					$oShop_Item->showXmlTags($this->tags);
 					$oShop_Item->showXmlVotes($this->votes);
-					
+
 					$oShop_Item->showXmlProperties($mShowPropertyIDs);
 
 					// Siteuser
@@ -1063,12 +1063,17 @@ class Shop_Controller_Show extends Core_Controller
 	 */
 	protected function _incShowed()
 	{
-		$oShop_Item = Core_Entity::factory('Shop_Item')->find($this->item);
+		Core_QueryBuilder::update('shop_items')
+			->set('showed', Core_QueryBuilder::expression('`showed` + 1'))
+			->where('id', '=', $this->item)
+			->execute();
+
+		/*$oShop_Item = Core_Entity::factory('Shop_Item')->find($this->item);
 		if (!is_null($oShop_Item->id))
 		{
 			$oShop_Item->showed += 1;
 			$oShop_Item->save();
-		}
+		}*/
 
 		return $this;
 	}

@@ -388,7 +388,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		// Проверка на передачу GET-параметров для статичного документа
 		if (defined('ERROR_404_GET_REQUESTS') && ERROR_404_GET_REQUESTS
-			&& $oStructure->type == 0 && count($_GET))
+			&& $oStructure->type == 0 && count($_GET) && !($bLogged && isset($_GET['hostcmsAction'])))
 		{
 			$oCore_Page->error404();
 		}
@@ -426,14 +426,14 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 					include $LibConfig;
 				}
 			}
-			
+
 			$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
 				Core::_('Core.time_page_config', Core::getmicrotime() - $fBeginTimeConfig)
 			);
 		}
 
 		$bLogged && $fBeginTime = Core::getmicrotime();
-		
+
 		// Headers
 		$iExpires = time() + (defined('EXPIRES_TIME')
 			? EXPIRES_TIME

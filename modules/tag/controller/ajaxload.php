@@ -34,18 +34,29 @@ class Tag_Controller_Ajaxload extends Admin_Form_Action_Controller
 	 * @param string $operation operation
 	 */
 	public function execute($operation = NULL)
-	{		
-		$aReturn = array();
-				
-		$oTag = Core_Entity::factory('Tag');
-		$oTag->queryBuilder()->orderBy('name');
-		$aTags = $oTag->getAllByName('%' . $this->_tagFilter . '%', FALSE, 'LIKE');
-		
-		foreach ($aTags as $oTag)
+	{
+		$aJSON = array();
+
+		if (strlen($this->_tagFilter))
 		{
-			$aReturn[] = $oTag->name;
+			$oTags = Core_Entity::factory('Tag');
+			$oTags->queryBuilder()
+				->where('tags.name', 'LIKE', '%' . $this->_tagFilter . '%')
+				->limit(10)
+				->clearOrderBy()
+				->orderBy('tags.name', 'ASC');
+
+			$aTags = $oTags->findAll(FALSE);
+
+			foreach ($aTags as $oTag)
+			{
+				$aJSON[] = array(
+					'id' => $oTag->name,
+					'text' => $oTag->name,
+				);
+			}
 		}
 
-		Core::showJson($aReturn);
+		Core::showJson($aJSON);
 	}
 }

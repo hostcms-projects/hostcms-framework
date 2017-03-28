@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Information systems.
  *
@@ -93,4 +93,7 @@ return array(
 	'show_information_propertys_title' => 'Дополнительные свойства элементов информационной системы "%s"',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	'root' => 'Корень информационной системы',
+	'shortcut_group_tags' => "<acronym title=\"Группы в которых располагаются ярлыки текущего элемента\">Дополнительные группы</acronym>",
+	'select_group' => 'Выберите группу',
 );

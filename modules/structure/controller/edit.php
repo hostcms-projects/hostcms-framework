@@ -331,6 +331,17 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")
 			;
 
+		$Select_Lib
+			->add(
+				Admin_Form_Entity::factory('A')
+					->target('_blank')
+					->href(
+						$this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/lib/index.php', 'edit', NULL, 1, $this->_object->lib_id, 'lib_dir_id=' . intval($oLib->lib_dir_id))
+					)
+					->class('input-group-addon bg-blue bordered-blue')
+					->value('<i class="fa fa-pencil"></i>')
+			);
+
 		$Div_Lib_Properies = Admin_Form_Entity::factory('Code');
 
 		ob_start();
@@ -447,7 +458,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$template_id = $this->_object->template_id;
 		}
-		
+
 		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->setDatasetId($this->getDatasetId())
@@ -497,6 +508,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$LA = array();
 
 			$oLib = $this->_object->Lib;
+			
 			$aLib_Properties = $oLib->Lib_Properties->findAll();
 
 			foreach ($aLib_Properties as $oLib_Property)

@@ -74,7 +74,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 				}
 				else
 				{
-					?><div class="row" id="shopOrdersAdminPage">
+					?><div id="shopOrdersAdminPage">
 						<script type="text/javascript">
 						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopOrdersAdminPage') });
 						</script>
@@ -237,7 +237,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 
 		if (count($aLast_Shop_Orders))
 		{
-		?><div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		?><div class="no-padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
 				<?php
 				$iBeginTimestamp = strtotime('-1 month');

@@ -131,7 +131,7 @@ class Core_Array
 	static public function getSession($key, $defaultValue = NULL)
 	{
 		return isset($_SESSION)
-			? self::get($_GET, $key, $defaultValue)
+			? self::get($_SESSION, $key, $defaultValue)
 			: $defaultValue;
 	}
 

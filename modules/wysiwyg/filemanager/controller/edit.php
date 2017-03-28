@@ -21,7 +21,7 @@ class Wysiwyg_Filemanager_Controller_Edit extends Admin_Form_Action_Controller_T
 	{
 		return CMS_FOLDER . Core_File::pathCorrection(
 			Core_Array::getRequest('cdir') . (!is_null(Core_Array::getRequest('dir')) ? Core_Array::getRequest('dir') . DIRECTORY_SEPARATOR : '')
-			. Core_File::convertfileNameToLocalEncoding($this->_object->name));
+			. /*Core_File::convertfileNameToLocalEncoding(*/$this->_object->name/*)*/);
 	}
 
 	/**
