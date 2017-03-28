@@ -59,7 +59,7 @@ class Core_Session
 	 * @var boolean
 	 */
 	protected $_read = FALSE;
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -181,6 +181,15 @@ class Core_Session
 	}
 
 	/**
+	 * Checks if the session was started
+	 * @return boolean
+	 */
+	static public function isStarted()
+	{
+		return self::$_started;
+	}
+
+	/**
 	 * The open callback works like a constructor in classes and is executed when the session is being opened.
 	 * @param string $save_path save path
 	 * @param string $session_name session name
@@ -290,7 +299,7 @@ class Core_Session
 			$row = $queryBuilder->execute()->asAssoc()->current();
 
 			$this->_read = TRUE;
-			
+
 			if ($row)
 			{
 				// Update last change time

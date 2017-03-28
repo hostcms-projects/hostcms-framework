@@ -104,7 +104,7 @@ abstract class Core_Mail
 		$this->_headers = $this->_files = array();
 
 		$this->_to = $this->_from = $this->_subject = $this->_message
-			= $this->_senderName = NULL;
+			= $this->_senderName = $this->_recipientName = NULL;
 
 		$this->_multipartRelated = FALSE;
 
@@ -265,6 +265,23 @@ abstract class Core_Mail
 	}
 
 	/**
+	 * Recipient name
+	 * @var string
+	 */
+	protected $_recipientName = NULL;
+
+	/**
+	 * Set recipient name
+	 * @param string $recipientName name
+	 * @return self
+	 */
+	public function recipientName($recipientName)
+	{
+		$this->_recipientName = $recipientName;
+		return $this;
+	}
+
+	/**
 	 * Boundary
 	 * @var string
 	 */
@@ -367,12 +384,17 @@ abstract class Core_Mail
 	public function send()
 	{
 		$sFrom = !is_null($this->_senderName)
-			? '=?UTF-8?B?' . base64_encode($this->_senderName)."?= <{$this->_from}>"
+			? '=?UTF-8?B?' . base64_encode($this->_senderName) . "?= <{$this->_from}>"
 			: $this->_from;
 
-		$this->header('From', $sFrom)
+		$this
+			->header('From', $sFrom)
 			->header('X-Mailer', 'HostCMS');
 
+		$sTo = !is_null($this->_recipientName)
+			? '=?UTF-8?B?' . base64_encode($this->_recipientName) . "?= <{$this->_to}>"
+			: $this->_to;
+			
 		if (!isset($this->_headers['Reply-To']))
 		{
 			$this->header('Reply-To', "<{$this->_from}>");
@@ -385,8 +407,7 @@ abstract class Core_Mail
 
 		$this
 			->header('MIME-Version', '1.0')
-			->header('Content-Type', "multipart/mixed; boundary=\"{$this->_bound}\"")
-			;
+			->header('Content-Type', "multipart/mixed; boundary=\"{$this->_bound}\"");
 
 		$sSingleSeparator = $this->_separator;
 		$sDoubleSeparators = $sSingleSeparator . $sSingleSeparator;
@@ -469,6 +490,6 @@ abstract class Core_Mail
 
 		$header = implode($sSingleSeparator, $aHeaders);
 
-		return $this->_send($this->_to, $subject, $content, $header);
+		return $this->_send($sTo, $subject, $content, $header);
 	}
 }

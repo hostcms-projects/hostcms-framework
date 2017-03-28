@@ -1866,3 +1866,6 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 .ui-autocomplete .ui-menu-item a { color: #838383; display: table-cell; width: 50%; padding: 5px 5px 5px 10px; text-decoration: none; }
 .ui-autocomplete .ui-menu-item span { color: #838383; display: table-cell; width: 25%; }
 /* --- /Autocomplete --- */
+
+.searchhelper.ui-autocomplete .ui-menu-item { padding: 5px; }
+.searchhelper.ui-autocomplete .ui-menu-item a { display: inline !important; width: 100% !important; }

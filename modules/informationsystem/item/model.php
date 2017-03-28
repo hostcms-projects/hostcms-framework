@@ -124,6 +124,16 @@ class Informationsystem_Item_Model extends Core_Entity
 	{
 		$aTags = explode(',', $sTags);
 
+		return $this->applyTagsArray($aTags);
+	}
+	
+	/**
+	 * Apply array tags for item
+	 * @param array $aTags array of tags
+	 * @return self
+	 */
+	public function applyTagsArray(array $aTags)
+	{
 		// Удаляем связь метками
 		$this->Tag_Informationsystem_Items->deleteAll(FALSE);
 
@@ -276,11 +286,14 @@ class Informationsystem_Item_Model extends Core_Entity
 			->where('informationsystem_items.path', '=', $path)
 			->where('informationsystem_items.informationsystem_group_id', '=', $group_id)
 			->where('informationsystem_items.shortcut_id', '=', 0)
+			->clearOrderBy()
 			->limit(1);
 
 		$aInformationsystem_Items = $this->findAll();
 
-		return isset($aInformationsystem_Items[0]) ? $aInformationsystem_Items[0] : NULL;
+		return isset($aInformationsystem_Items[0])
+			? $aInformationsystem_Items[0]
+			: NULL;
 	}
 
 	/**

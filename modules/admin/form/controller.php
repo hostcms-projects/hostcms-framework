@@ -84,7 +84,7 @@ class Admin_Form_Controller
 		$this->_additionalParams .= '&' . htmlspecialchars($key) . '=' . rawurlencode($value);
 		return $this;
 	}
-	
+
 	/**
 	 * Set additional param
 	 * @param string $key param name
@@ -174,12 +174,12 @@ class Admin_Form_Controller
 			);
 
 		$this
-			->limit($formSettings['limit'])
-			->current($formSettings['current'])
-			->sortingDirection($formSettings['sortingdirection'])
-			->sortingFieldId($formSettings['sortingfield'])
-			->action($formSettings['action'])
-			->operation($formSettings['operation'])
+			->limit($formSettings['limit'] !== '' ? $formSettings['limit'] : NULL)
+			->current($formSettings['current'] !== '' ? $formSettings['current'] : NULL)
+			->sortingDirection($formSettings['sortingdirection'] !== '' ? $formSettings['sortingdirection'] : NULL)
+			->sortingFieldId($formSettings['sortingfield'] !== '' ? $formSettings['sortingfield'] : NULL)
+			->action($formSettings['action'] !== '' ? $formSettings['action'] : NULL)
+			->operation($formSettings['operation'] !== '' ? $formSettings['operation'] : NULL)
 			->checked($formSettings['checked'])
 			->window($formSettings['window'])
 			->ajax(Core_Array::get($this->request, '_', FALSE));
@@ -635,7 +635,7 @@ class Admin_Form_Controller
 
 		return $this;
 	}
-	
+
 	/**
 	 * Get current page
 	 * @return int
@@ -736,9 +736,9 @@ class Admin_Form_Controller
 	public function addDataset(Admin_Form_Dataset $oAdmin_Form_Dataset)
 	{
 		$oAdmin_Form_Dataset->controller($this);
-		
+
 		Core_Event::notify('Admin_Form_Controller.onBeforeAddDataset', $this, array($oAdmin_Form_Dataset));
-		
+
 		$this->_datasets[] = $oAdmin_Form_Dataset;
 		return $this;
 	}
@@ -990,12 +990,12 @@ class Admin_Form_Controller
 								else
 								{
 									Core_Event::notify('Admin_Form_Controller.onCall' . $actionName, $this, array($datasetKey, $oObject, $this->_operation));
-									
+
 									$eventResult = Core_Event::getLastReturn();
 									if (is_array($eventResult))
 									{
 										list($actionResult, $message, $content) = $eventResult;
-										
+
 										$this
 											->addMessage($message)
 											->addContent($content);

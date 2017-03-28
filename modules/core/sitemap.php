@@ -322,8 +322,34 @@ class Core_Sitemap extends Core_Servant_Properties
 	protected $_bRebuild = TRUE;
 
 	/**
+	 * Add Informationsystem
+	 * @param int $structure_id
+	 * @param Informationsystem_Model $oInformationsystem
+	 */
+	public function addInformationsystem($structure_id, Informationsystem_Model $oInformationsystem)
+	{
+		$this->_Informationsystems[$structure_id] = $oInformationsystem;
+		return $this;
+	}
+
+	/**
+	 * Add Shop
+	 * @param int $structure_id
+	 * @param Shop_Model $oShop
+	 */
+	public function addShop($structure_id, Shop_Model $oShop)
+	{
+		$this->_Shops[$structure_id] = $oShop;
+		return $this;
+	}
+
+	/**
 	 * Fill nodes of structure
 	 * @return self
+	 * @hostcms-event Core_Sitemap.onBeforeFillNodeInformationsystems
+	 * @hostcms-event Core_Sitemap.onAfterFillNodeInformationsystems
+	 * @hostcms-event Core_Sitemap.onBeforeFillNodeShops
+	 * @hostcms-event Core_Sitemap.onAfterFillNodeShops
 	 */
 	public function fillNodes()
 	{
@@ -341,20 +367,28 @@ class Core_Sitemap extends Core_Servant_Properties
 
 			if ($this->showInformationsystemGroups || $this->showInformationsystemItems)
 			{
+				Core_Event::notify('Core_Sitemap.onBeforeFillNodeInformationsystems', $this);
+
 				$aInformationsystems = $oSite->Informationsystems->findAll();
 				foreach ($aInformationsystems as $oInformationsystem)
 				{
-					$this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
+					$this->addInformationsystem($oInformationsystem->structure_id, $oInformationsystem);
 				}
+
+				Core_Event::notify('Core_Sitemap.onAfterFillNodeInformationsystems', $this);
 			}
 
 			if ($this->showShopGroups || $this->showShopItems)
 			{
+				Core_Event::notify('Core_Sitemap.onBeforeFillNodeShops', $this);
+
 				$aShops = $oSite->Shops->findAll();
 				foreach ($aShops as $oShop)
 				{
-					$this->_Shops[$oShop->structure_id] = $oShop;
+					$this->addShop($oShop->structure_id, $oShop);
 				}
+
+				Core_Event::notify('Core_Sitemap.onAfterFillNodeShops', $this);
 			}
 
 			$this->_structure(0);
@@ -545,7 +579,7 @@ class Core_Sitemap extends Core_Servant_Properties
 				$sProtocol = Core::httpsUses()
 					? 'https://'
 					: 'http://';
-				
+
 				$sIndex .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 				foreach ($this->_aIndexedFiles as $filename)
 				{

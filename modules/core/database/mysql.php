@@ -250,13 +250,13 @@ class Core_DataBase_Mysql extends Core_DataBase
 				$min = 0;
 				$max = 65535;
 				break;
-				
+
 			case 'tinyint unsigned':
 				$type = 'int';
 				$min = 0;
 				$max = 255;
 				break;
-				
+
 			case 'mediumint':
 				$type = 'int';
 				$min = -8388608;
@@ -824,6 +824,17 @@ class Core_DataBase_Mysql extends Core_DataBase
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Returns the number of columns in the result set
+	 * @return integer|null number of columns in the result set
+	 */
+	public function getColumnCount()
+	{
+		return is_resource($this->_result)
+			? mysql_num_fields($this->_result)
+			: NULL;
 	}
 
 	/**

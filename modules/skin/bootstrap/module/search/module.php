@@ -14,6 +14,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Skin_Bootstrap_Module_Search_Module extends Search_Module
 {
 	/**
+	 * Name of the skin
+	 * @var string
+	 */
+	protected $_skinName = 'bootstrap';
+
+	/**
+	 * Name of the module
+	 * @var string
+	 */
+	protected $_moduleName = 'search';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct()
@@ -23,6 +35,73 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module
 		$this->_adminPages = array(
 			1 => array('title' => Core::_('Search.title'))
 		);
+	}
+
+	/**
+	 * Show admin widget
+	 * @param int $type
+	 * @param boolean $ajax
+	 * @return self
+	 */
+	public function adminPage($type = 0, $ajax = FALSE)
+	{
+		$type = intval($type);
+
+		switch ($type)
+		{
+			case 1:
+				if (!is_null(Core_Array::getGet('autocomplete')) && !is_null(Core_Array::getGet('queryString')))
+				{
+					$sQuery = trim(Core_Str::stripTags(strval(Core_Array::getGet('queryString'))));
+					$oSite = Core_Entity::factory('Site', CURRENT_SITE);
+
+					$aConfig = Core::$config->get('search_config') + array(
+						'modules' => array()
+					);
+
+					$aJson = array();
+
+					if (strlen($sQuery))
+					{
+						$Search_Controller = Search_Controller::instance();
+
+						$Search_Controller
+							->site($oSite)
+							->offset(0)
+							->page(1)
+							->limit(10)
+							->inner('all');
+
+						$aSearch_Pages = $Search_Controller->find($sQuery);
+
+						foreach ($aSearch_Pages as $oSearch_Page)
+						{
+							$aReturn = array();
+
+							if (isset($aConfig['modules'][$oSearch_Page->module]))
+							{
+								$oCore_Module = Core_Module::factory($aConfig['modules'][$oSearch_Page->module]);
+
+								if ($oCore_Module && method_exists($oCore_Module, 'backendSearchCallback'))
+								{
+									$aReturn = $oCore_Module->backendSearchCallback($oSearch_Page);
+								}
+							}
+
+							$aJson[] = array(
+								'id' => $oSearch_Page->id,
+								'label' => $oSearch_Page->title,
+								'href' => Core_Array::get($aReturn, 'href'),
+								'onclick' => Core_Array::get($aReturn, 'onclick'),
+								'icon' => 'fa ' . Core_Array::get($aReturn, 'icon')
+							);
+						}
+					}
+
+					Core::showJson($aJson);
+				}
+			break;
+		}
 	}
 
 	public function widget()
@@ -54,34 +133,6 @@ class Skin_Bootstrap_Module_Search_Module extends Search_Module
 				</div>
 			</div>
 		</div>
-		
-		<script>
-		/*$(function() {
-			setTimeout(function() {
-
-					var searchWidget = $('#searchWidget');
-				
-					var barColor = getcolor(searchWidget.data('barcolor')) || themeprimary,
-						trackColor = getcolor(searchWidget.data('trackcolor')) || false,
-						scaleColor = getcolor(searchWidget.data('scalecolor')) || false,
-						lineCap = searchWidget.data('linecap') || "round",
-						lineWidth = searchWidget.data('linewidth') || 3,
-						size = searchWidget.data('size') || 110,
-						animate = searchWidget.data('animate') || false;
-
-					searchWidget.easyPieChart({
-						barColor: barColor,
-						trackColor: trackColor,
-						scaleColor: scaleColor,
-						lineCap: lineCap,
-						lineWidth: lineWidth,
-						size: size,
-						animate : animate
-					});
-
-			}, 500);
-		});*/
-		</script>
 		<?php
 	}
 }

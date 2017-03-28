@@ -371,16 +371,14 @@ class Informationsystem_Group_Model extends Core_Entity
 			//->clear()
 			->where('path', '=', $path)
 			->where('parent_id', '=', $parent_id)
-			->limit(1);
+			->limit(1)
+			->clearOrderBy();
 
 		$aInformationsystem_Groups = $this->findAll();
 
-		if (isset($aInformationsystem_Groups[0]))
-		{
-			return $aInformationsystem_Groups[0];
-		}
-
-		return NULL;
+		return isset($aInformationsystem_Groups[0])
+			? $aInformationsystem_Groups[0]
+			: NULL;
 	}
 
 	/**

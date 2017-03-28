@@ -35,7 +35,7 @@ class Core_Exception extends Exception
 		{
 			$aDebugTrace = $this->getDebugTrace();
 
-			foreach ($aDebugTrace AS $aTrace)
+			foreach ($aDebugTrace as $aTrace)
 			{
 				$message .= "\n<br />{$aTrace['line']} {$aTrace['file']}";
 			}
@@ -55,7 +55,7 @@ class Core_Exception extends Exception
 	 * Get debug trace
 	 * @return array
 	 */
-	protected function getDebugTrace()
+	public function getDebugTrace()
 	{
 		$debug_backtrace = debug_backtrace();
 

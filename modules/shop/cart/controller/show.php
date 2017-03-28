@@ -181,6 +181,19 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		// Массив цен для расчета скидок каждый N-й со скидкой N%
 		$aDiscountPrices = array();
 
+		// Извлекаем все активные скидки с ценами на N-й товар, доступные для текущей даты
+		$oShop_Purchase_Discounts = $oShop->Shop_Purchase_Discounts;
+		$oShop_Purchase_Discounts->queryBuilder()
+			->where('active', '=', 1)
+			->where('position', '>', 0)
+			->where('start_datetime', '<=', Core_Date::timestamp2sql(time()))
+			->where('end_datetime', '>=', Core_Date::timestamp2sql(time()))
+			->clearOrderBy()
+			->limit(1);
+		
+		// Есть скидки на N-й товар
+		$bPositionDiscount = $oShop_Purchase_Discounts->getCount() > 0;
+		
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
@@ -210,10 +223,13 @@ class Shop_Cart_Controller_Show extends Core_Controller
 					$aPrices = $oShop_Item_Controller->getPrices($oShop_Cart->Shop_Item);
 					$amount += $aPrices['price_discount'] * $oShop_Cart->quantity;
 
-					// По каждой единице товара добавляем цену в массив, т.к. может быть N единиц одого товара
-					for ($i = 0; $i < $oShop_Cart->quantity; $i++)
+					if ($bPositionDiscount)
 					{
-						$aDiscountPrices[] = $aPrices['price_discount'];
+						// По каждой единице товара добавляем цену в массив, т.к. может быть N единиц одого товара
+						for ($i = 0; $i < $oShop_Cart->quantity; $i++)
+						{
+							$aDiscountPrices[] = $aPrices['price_discount'];
+						}
 					}
 
 					// Сумма для скидок от суммы заказа рассчитывается отдельно

@@ -449,10 +449,50 @@ function isEmpty(str) {
 		{
 			$.loadingScreen('hide');
 
-			jQuery(this).empty();
-			for (var key in data)
+			var jTopParentDiv = jQuery(this).parents('[id ^= property]'),
+				jInput = jTopParentDiv.find('[id ^= input_]'),
+				jSelectTopParentDiv = jQuery(this).parents('div[class ^= form-group]'),
+				jInputTopParentDiv = jInput.parents('div[class ^= form-group]');
+
+			if ('mode' in data)
 			{
-				jQuery(this).append(jQuery('<option>').attr('value', key).text(data[key]));
+				if (data['mode'] == 'select')
+				{
+					jInputTopParentDiv.addClass('hidden');
+					jSelectTopParentDiv.removeClass('hidden');
+
+					jQuery(this).empty();
+					for (var key in data['values'])
+					{
+						if (typeof data['values'][key] == 'object')
+						{
+							jQuery(this)
+								.append(jQuery('<option>')
+								.attr('value', data['values'][key].value)
+								.text(data['values'][key].name));
+						}
+						else
+						{
+							jQuery(this)
+								.append(jQuery('<option>')
+								.attr('value', key)
+								.text(data['values'][key]));
+						}
+					}
+				}
+				else if(data['mode'] == 'input')
+				{
+					jSelectTopParentDiv.addClass('hidden');
+					jInputTopParentDiv.removeClass('hidden');
+				}
+			}
+			else
+			{
+				jQuery(this).empty();
+				for (var key in data)
+				{
+					jQuery(this).append(jQuery('<option>').attr('value', key).text(data[key]));
+				}
 			}
 		},
 		loadDivContentAjaxCallback: function(data, status, jqXHR)
@@ -558,7 +598,9 @@ function isEmpty(str) {
 		clonePropertyInfSys: function(windowId, index)
 		{
 			var jProperies = jQuery('#' + windowId + ' #property_' + index),
-			jNewObject = jProperies.eq(0).clone(),
+			//jNewObject = jProperies.eq(0).clone(),
+			html = jProperies[0].outerHTML; // clone with parent
+			var jNewObject = jQuery(jQuery.parseHTML(html, document, true)),
 			iNewId = index + 'group' + Math.floor(Math.random() * 999999),
 			jDir = jNewObject.find("select[onchange]"),
 			jItem = jNewObject.find("select:not([onchange])");
@@ -816,11 +858,10 @@ function isEmpty(str) {
 	});
 })(jQuery);
 
-
 function cSelectFilter(windowId, sObjectId)
 {
 	this.windowId = $.getWindowId(windowId);
-	this.sObjectId = sObjectId;
+	this.sObjectId = sObjectId.replace( /(:|\.|\[|\]|,)/g, "\\$1" );
 
 	// Игнорировать регистр
 	this.ignoreCase = true;
@@ -904,6 +945,8 @@ function cSelectFilter(windowId, sObjectId)
 							);
 						}
 					}
+
+					self.oCurrentSelectObject.trigger('change');
 				}
 				else {
 					// restore all values

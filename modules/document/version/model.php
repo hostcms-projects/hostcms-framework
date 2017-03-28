@@ -149,12 +149,9 @@ class Document_Version_Model extends Core_Entity
 	{
 		$path = $this->getPath();
 
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
-
-		return NULL;
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**

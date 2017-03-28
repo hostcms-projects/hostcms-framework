@@ -42,7 +42,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	{
 		return $this->_Admin_Form_Controller;
 	}
-	
+
 	/**
 	 * Constructor.
 	 * @param Admin_Form_Controller $Admin_Form_Controller controller
@@ -209,6 +209,12 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	}
 
 	/**
+	 * List Options Cache
+	 * @var array
+	 */
+	protected $_cacheListOptions = array();
+
+	/**
 	 * Add external properties container to $parentObject
 	 * @param int $parent_id ID of parent directory of properties
 	 * @param object $parentObject
@@ -314,20 +320,23 @@ class Property_Controller_Tab extends Core_Servant_Properties
 						case 3: // List
 							if (Core::moduleIsActive('list'))
 							{
-								$aListItems = $oProperty->List->List_Items->getAllByActive(1, FALSE);
-
-								$aOptions = array(' … ');
-								foreach ($aListItems as $oListItem)
+								if (!isset($this->_cacheListOptions[$oProperty->list_id]))
 								{
-									$aOptions[$oListItem->id] = $oListItem->value;
+									$this->_cacheListOptions[$oProperty->list_id] = array(' … ');
+									
+									$aListItems = $oProperty->List->List_Items->getAllByActive(1, FALSE);
+									foreach ($aListItems as $oListItem)
+									{
+										$this->_cacheListOptions[$oProperty->list_id][$oListItem->id] = $oListItem->value;
+									}
 								}
 
 								$oAdmin_Form_Entity = Admin_Form_Entity::factory('Select')
-									->options($aOptions);
+									->options($this->_cacheListOptions[$oProperty->list_id]);
 
 								Core_Event::notify('Property_Controller_Tab.onAfterCreatePropertyListValues', $this, array($oProperty, $oAdmin_Form_Entity));
 
-								unset($aOptions);
+								//unset($aOptions);
 							}
 						break;
 
@@ -367,7 +376,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								'class' => ($oProperty->type != 2 ? 'form-group' : '') . (
 									($oProperty->type == 7 || $oProperty->type == 8 || $oProperty->type == 9)
 									? ' col-sm-7 col-md-6 col-lg-5'
-									: ' col-sm-12 col-md-12 col-lg-12')
+									: ' col-sm-12')
 							));
 
 						//$oProperty->multiple && $oAdmin_Form_Entity->add($this->getImgAdd($oProperty));
@@ -482,22 +491,26 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					// Директории
 					$oAdmin_Form_Entity_InfGroups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
-						->divAttr(array(
-							'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'
-						))
+						->divAttr(array('class' => 'form-group col-xs-12'))
+						->id("group_{$oProperty->id}[]")
 						->filter(TRUE);
 
 					// Элементы
 					$oAdmin_Form_Entity_InfItems = Admin_Form_Entity::factory('Select')
 						->name("property_{$oProperty->id}[]")
 						->value(NULL)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->divAttr(array('class' => 'form-group col-xs-12'))
 						->filter(TRUE);
+
+					$oAdmin_Form_Entity_InfItemsInput = Admin_Form_Entity::factory('Input')
+						->divAttr(array('class' => 'form-group col-xs-12'))
+						->id("input_property_{$oProperty->id}[]")
+						->name("input_property_{$oProperty->id}[]");
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
 					{
-						$this->_fillInformationSystem($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems);
+						$this->_fillInformationSystem($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems, $oAdmin_Form_Entity_InfItemsInput);
 					}
 					else
 					{
@@ -506,6 +519,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 							$value = $oProperty_Value->value;
 
 							$oNewAdmin_Form_Entity_InfGroups = clone $oAdmin_Form_Entity_InfGroups;
+							$oNewAdmin_Form_Entity_InfGroups
+								->id("group_{$oProperty->id}_{$oProperty_Value->id}");
 
 							$oNewAdmin_Form_Entity_InfItems = clone $oAdmin_Form_Entity_InfItems;
 							$oNewAdmin_Form_Entity_InfItems
@@ -513,31 +528,41 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 								->value($value);
 
-							$this->_fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_InfGroups, $oNewAdmin_Form_Entity_InfItems);
+							$oNewAdmin_Form_Entity_InfItemsInput = clone $oAdmin_Form_Entity_InfItemsInput;
+							$oNewAdmin_Form_Entity_InfItemsInput
+								->id("input_property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
+								->name("input_property_{$oProperty->id}_{$oProperty_Value->id}");
+
+							$this->_fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_InfGroups, $oNewAdmin_Form_Entity_InfItems, $oNewAdmin_Form_Entity_InfItemsInput);
 						}
 					}
 
 				break;
 
 				case 12: // Интернет-магазин
-
 					// Директории
 					$oAdmin_Form_Entity_Shop_Groups = Admin_Form_Entity::factory('Select')
 						->caption($oProperty->name)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->divAttr(array('class' => 'form-group col-xs-12'))
+						->id("group_{$oProperty->id}[]")
 						->filter(TRUE);
 
 					// Элементы
 					$oAdmin_Form_Entity_Shop_Items = Admin_Form_Entity::factory('Select')
 						->name("property_{$oProperty->id}[]")
 						->value(NULL)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+						->divAttr(array('class' => 'form-group col-xs-12'))
 						->filter(TRUE);
+
+					$oAdmin_Form_Entity_Shop_Items_Input = Admin_Form_Entity::factory('Input')
+						->divAttr(array('class' => 'form-group col-xs-12'))
+						->id("input_property_{$oProperty->id}[]")
+						->name("input_property_{$oProperty->id}[]");
 
 					// Значений св-в нет для объекта
 					if (count($aProperty_Values) == 0)
 					{
-						$this->_fillShop($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items);
+						$this->_fillShop($oProperty->default_value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items, $oAdmin_Form_Entity_Shop_Items_Input);
 					}
 					else
 					{
@@ -547,13 +572,18 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 							$oNewAdmin_Form_Entity_Shop_Groups = clone $oAdmin_Form_Entity_Shop_Groups;
 
-							$oNewAdmin_Form_Entity_InfItems = clone $oAdmin_Form_Entity_Shop_Items;
-							$oNewAdmin_Form_Entity_InfItems
+							$oNewAdmin_Form_Entity_Shop_Items = clone $oAdmin_Form_Entity_Shop_Items;
+							$oNewAdmin_Form_Entity_Shop_Items
 								->id("property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
 								->name("property_{$oProperty->id}_{$oProperty_Value->id}")
 								->value($value);
 
-							$this->_fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_Shop_Groups, $oNewAdmin_Form_Entity_InfItems);
+							$oNewAdmin_Form_Entity_Shop_Items_Input = clone $oAdmin_Form_Entity_Shop_Items_Input;
+							$oNewAdmin_Form_Entity_Shop_Items_Input
+								->id("input_property_{$oProperty->id}_{$oProperty_Value->id}_{$key}")
+								->name("input_property_{$oProperty->id}_{$oProperty_Value->id}");
+
+							$this->_fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oNewAdmin_Form_Entity_Shop_Groups, $oNewAdmin_Form_Entity_Shop_Items, $oNewAdmin_Form_Entity_Shop_Items_Input);
 						}
 					}
 				break;
@@ -588,9 +618,9 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param int $value informationsystem_item_id
 	 * @param Property_Model $oProperty property
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfGroups
-	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfItems
+	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_InfItemsSelect
 	 */
-	protected function _fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItems)
+	protected function _fillInformationSystem($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_InfGroups, $oAdmin_Form_Entity_InfItemsSelect, $oAdmin_Form_Entity_InfItemsInput)
 	{
 		$Informationsystem_Item = Core_Entity::factory('Informationsystem_Item', $value);
 
@@ -604,71 +634,143 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oInformationsystem = $oProperty->Informationsystem;
-		$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
-
-		switch ($oInformationsystem->items_sorting_direction)
-		{
-			case 1:
-				$items_sorting_direction = 'DESC';
-			break;
-			case 0:
-			default:
-				$items_sorting_direction = 'ASC';
-		}
-
-		$oInformationsystem_Items
-			->queryBuilder()
-			->clearOrderBy();
-
-		// Определяем поле сортировки информационных элементов
-		switch ($oInformationsystem->items_sorting_field)
-		{
-			case 1:
-				$oInformationsystem_Items
-					->queryBuilder()
-					->orderBy('informationsystem_items.name', $items_sorting_direction)
-					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
-				break;
-			case 2:
-				$oInformationsystem_Items
-					->queryBuilder()
-					->orderBy('informationsystem_items.sorting', $items_sorting_direction)
-					->orderBy('informationsystem_items.name', $items_sorting_direction);
-				break;
-			case 0:
-			default:
-				$oInformationsystem_Items
-					->queryBuilder()
-					->orderBy('informationsystem_items.datetime', $items_sorting_direction)
-					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
-		}
-
-		// Items
-		$aInformationsystem_Items = $oInformationsystem_Items->getAllByinformationsystem_group_id($group_id);
-
-		$aOptions = array(' … ');
-		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
-		{
-			$aOptions[$oInformationsystem_Item->id] = !$oInformationsystem_Item->shortcut_id
-				? $oInformationsystem_Item->name
-				: $oInformationsystem_Item->Informationsystem_Item->name;
-		}
-		$oAdmin_Form_Entity_InfItems->options($aOptions);
 
 		// Groups
 		$aOptions = Informationsystem_Item_Controller_Edit::fillInformationsystemGroup($oProperty->informationsystem_id, 0);
 		$oAdmin_Form_Entity_InfGroups
 			->value($Informationsystem_Item->informationsystem_group_id)
 			->options(array(' … ') + $aOptions)
-			->onchange("$.ajaxRequest({path: '/admin/informationsystem/item/index.php', context: '{$oAdmin_Form_Entity_InfItems->id}', callBack: $.loadSelectOptionsCallback, action: 'loadInformationItemList',additionalParams: 'informationsystem_group_id=' + this.value + '&informationsystem_id={$oProperty->informationsystem_id}',windowId: '{$windowId}'}); return false")
-			;
+			->onchange("$.ajaxRequest({path: '/admin/informationsystem/item/index.php', context: '{$oAdmin_Form_Entity_InfItemsSelect->id}', callBack: $.loadSelectOptionsCallback, action: 'loadInformationItemList',additionalParams: 'informationsystem_group_id=' + this.value + '&informationsystem_id={$oProperty->informationsystem_id}',windowId: '{$windowId}'}); return false");
 
-		//$oAdmin_Form_Entity_InfGroups->add($oAdmin_Form_Entity_InfItems);
+		// Items
+		$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
+
+		$oInformationsystem_Items
+			->queryBuilder()
+			->clearOrderBy()
+			->where('informationsystem_items.informationsystem_group_id', '=', $group_id);
+
+		$iCountItems = $oInformationsystem_Items->getCount();
+
+		if ($iCountItems < Core::$mainConfig['switchSelectToAutocomplete'])
+		{
+			// Remove `count` from select list
+			$oInformationsystem_Items->queryBuilder()
+				->clearSelect()
+				->select('informationsystem_items.*');
+
+			switch ($oInformationsystem->items_sorting_direction)
+			{
+				case 1:
+					$items_sorting_direction = 'DESC';
+				break;
+				case 0:
+				default:
+					$items_sorting_direction = 'ASC';
+			}
+
+			// Определяем поле сортировки информационных элементов
+			switch ($oInformationsystem->items_sorting_field)
+			{
+				case 1:
+					$oInformationsystem_Items
+						->queryBuilder()
+						->orderBy('informationsystem_items.name', $items_sorting_direction)
+						->orderBy('informationsystem_items.sorting', $items_sorting_direction);
+				break;
+				case 2:
+					$oInformationsystem_Items
+						->queryBuilder()
+						->orderBy('informationsystem_items.sorting', $items_sorting_direction)
+						->orderBy('informationsystem_items.name', $items_sorting_direction);
+				break;
+				case 0:
+				default:
+					$oInformationsystem_Items
+						->queryBuilder()
+						->orderBy('informationsystem_items.datetime', $items_sorting_direction)
+						->orderBy('informationsystem_items.sorting', $items_sorting_direction);
+			}
+
+			$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
+
+			$aOptions = array(' … ');
+			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
+			{
+				$aOptions[$oInformationsystem_Item->id] = !$oInformationsystem_Item->shortcut_id
+					? $oInformationsystem_Item->name
+					: $oInformationsystem_Item->Informationsystem_Item->name;
+			}
+
+			$oAdmin_Form_Entity_InfItemsSelect->options($aOptions);
+
+			$oAdmin_Form_Entity_InfItemsInput
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'));
+		}
+		else
+		{
+			$oAdmin_Form_Entity_InfItemsSelect
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'))
+				->options(array($value => $Informationsystem_Item->name));
+
+			$oAdmin_Form_Entity_InfItemsInput->value($Informationsystem_Item->name);
+		}
+
+		$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
+		->type("text/javascript")
+		->value("
+			$('[id ^= input_property_{$oProperty->id}]').autocomplete({
+				  source: function(request, response) {
+
+					var jInput = $(this.element),
+						jTopParentDiv = jInput.parents('[id ^= property]'),
+						jInfGroupDiv = jTopParentDiv.find('[id ^= group_]'),
+						selectedVal = $(':selected', jInfGroupDiv).val();
+
+					$.ajax({
+					  url: '/admin/informationsystem/item/index.php?autocomplete=1&informationsystem_id={$oInformationsystem->id}&informationsystem_group_id=' + selectedVal + '',
+					  dataType: 'json',
+					  data: {
+						queryString: request.term
+					  },
+					  success: function( data ) {
+						response( data );
+					  }
+					});
+				  },
+				  minLength: 1,
+				  create: function() {
+					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+						return $('<li></li>')
+							.data('item.autocomplete', item)
+							.append('<a>' + item.label + '</a>')
+							.appendTo(ul);
+					}
+
+					 $(this).prev('.ui-helper-hidden-accessible').remove();
+				  },
+				  select: function( event, ui ) {
+					var jInput = $(this),
+						jTopParentDiv = jInput.parents('[id ^= property]'),
+						jInfItemDiv = jTopParentDiv.find('select[name ^= property_]');
+
+						jInfItemDiv.empty().append($('<option>', { value: ui.item.id, text: ui.item.label }).attr('selected', 'selected'));
+				  },
+				  open: function() {
+					$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+				  },
+				  close: function() {
+					$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+				  }
+			});
+		");
 
 		$oDiv_Group = Admin_Form_Entity::factory('Div')
 			->class('input-group')
 			->add($oAdmin_Form_Entity_InfGroups)
-			->add($oAdmin_Form_Entity_InfItems);
+			->add($oAdmin_Form_Entity_InfItemsSelect)
+			->add($oAdmin_Form_Entity_InfItemsInput)
+			->add($oCore_Html_Entity_Script);
 
 		$oProperty->multiple && $this->imgBox(
 			$oDiv_Group,
@@ -695,7 +797,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Groups
 	 * @param Admin_Form_Entity_Select $oAdmin_Form_Entity_Shop_Items
 	 */
-	protected function _fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items)
+	protected function _fillShop($value, $oProperty, $oAdmin_Form_Entity_Section, $oAdmin_Form_Entity_Shop_Groups, $oAdmin_Form_Entity_Shop_Items, $oAdmin_Form_Entity_Shop_Items_Input)
 	{
 		$Shop_Item = Core_Entity::factory('Shop_Item', $value);
 
@@ -709,72 +811,144 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oShop = $oProperty->Shop;
-		$oShop_Items = $oShop->Shop_Items;
-
-		switch ($oShop->items_sorting_direction)
-		{
-			case 1:
-				$items_sorting_direction = 'DESC';
-			break;
-			case 0:
-			default:
-				$items_sorting_direction = 'ASC';
-		}
-
-		$oShop_Items
-			->queryBuilder()
-			->clearOrderBy()
-			->where('shop_items.modification_id', '=', 0);
-
-		// Определяем поле сортировки информационных элементов
-		switch ($oShop->items_sorting_field)
-		{
-			case 1:
-				$oShop_Items
-					->queryBuilder()
-					->orderBy('shop_items.name', $items_sorting_direction)
-					->orderBy('shop_items.sorting', $items_sorting_direction);
-				break;
-			case 2:
-				$oShop_Items
-					->queryBuilder()
-					->orderBy('shop_items.sorting', $items_sorting_direction)
-					->orderBy('shop_items.name', $items_sorting_direction);
-				break;
-			case 0:
-			default:
-				$oShop_Items
-					->queryBuilder()
-					->orderBy('shop_items.datetime', $items_sorting_direction)
-					->orderBy('shop_items.sorting', $items_sorting_direction);
-		}
-
-		// Items
-		$aShop_Items = $oShop_Items->getAllByShop_group_id($group_id);
-
-		$aOptions = array(' … ');
-		foreach ($aShop_Items as $oShop_Item)
-		{
-			$aOptions[$oShop_Item->id] = !$oShop_Item->shortcut_id
-				? $oShop_Item->name
-				: $oShop_Item->Shop_Item->name;
-		}
-		$oAdmin_Form_Entity_Shop_Items->options($aOptions);
 
 		// Groups
 		$aOptions = Shop_Item_Controller_Edit::fillShopGroup($oProperty->shop_id, 0);
 		$oAdmin_Form_Entity_Shop_Groups
 			->value($Shop_Item->shop_group_id)
 			->options(array(' … ') + $aOptions)
-			->onchange("$.ajaxRequest({path: '/admin/shop/item/index.php', context: '{$oAdmin_Form_Entity_Shop_Items->id}', callBack: $.loadSelectOptionsCallback, action: 'loadShopItemList',additionalParams: 'shop_group_id=' + this.value + '&shop_id={$oProperty->shop_id}',windowId: '{$windowId}'}); return false")
-			;
+			->onchange("$.ajaxRequest({path: '/admin/shop/item/index.php', context: '{$oAdmin_Form_Entity_Shop_Items->id}', callBack: $.loadSelectOptionsCallback, action: 'loadShopItemList',additionalParams: 'shop_group_id=' + this.value + '&shop_id={$oProperty->shop_id}',windowId: '{$windowId}'}); return false");
 
-		//$oAdmin_Form_Entity_Shop_Groups->add($oAdmin_Form_Entity_Shop_Items);
+		// Items
+		$oShop_Items = $oShop->Shop_Items;
+
+		$oShop_Items
+			->queryBuilder()
+			->clearOrderBy()
+			->where('shop_items.shop_group_id', '=', $group_id)
+			->where('shop_items.modification_id', '=', 0);
+
+		$iCountItems = $oShop_Items->getCount();
+
+		if ($iCountItems < Core::$mainConfig['switchSelectToAutocomplete'])
+		{
+			// Remove `count` from select list
+			$oShop_Items->queryBuilder()
+				->clearSelect()
+				->select('shop_items.*');
+
+			switch ($oShop->items_sorting_direction)
+			{
+				case 1:
+					$items_sorting_direction = 'DESC';
+				break;
+				case 0:
+				default:
+					$items_sorting_direction = 'ASC';
+			}
+
+			// Определяем поле сортировки информационных элементов
+			switch ($oShop->items_sorting_field)
+			{
+				case 1:
+					$oShop_Items
+						->queryBuilder()
+						->orderBy('shop_items.name', $items_sorting_direction)
+						->orderBy('shop_items.sorting', $items_sorting_direction);
+					break;
+				case 2:
+					$oShop_Items
+						->queryBuilder()
+						->orderBy('shop_items.sorting', $items_sorting_direction)
+						->orderBy('shop_items.name', $items_sorting_direction);
+					break;
+				case 0:
+				default:
+					$oShop_Items
+						->queryBuilder()
+						->orderBy('shop_items.datetime', $items_sorting_direction)
+						->orderBy('shop_items.sorting', $items_sorting_direction);
+			}
+
+			$aShop_Items = $oShop_Items->findAll(FALSE);
+
+			$aOptions = array(' … ');
+			foreach ($aShop_Items as $oShop_Item)
+			{
+				$aOptions[$oShop_Item->id] = !$oShop_Item->shortcut_id
+					? $oShop_Item->name
+					: $oShop_Item->Shop_Item->name;
+			}
+
+			$oAdmin_Form_Entity_Shop_Items->options($aOptions);
+
+			$oAdmin_Form_Entity_Shop_Items_Input
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'));
+		}
+		else
+		{
+			$oAdmin_Form_Entity_Shop_Items
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'))
+				->options(array($value => $Shop_Item->name));
+
+			$oAdmin_Form_Entity_Shop_Items_Input->value($Shop_Item->name);
+		}
+
+		$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
+		->type("text/javascript")
+		->value("
+			$('[id ^= input_property_{$oProperty->id}]').autocomplete({
+				  source: function(request, response) {
+
+					var jInput = $(this.element),
+						jTopParentDiv = jInput.parents('[id ^= property]'),
+						jInfGroupDiv = jTopParentDiv.find('[id ^= group_]'),
+						selectedVal = $(':selected', jInfGroupDiv).val();
+
+					$.ajax({
+					  url: '/admin/shop/item/index.php?autocomplete=1&shop_id={$oShop->id}&shop_group_id=' + selectedVal + '',
+					  dataType: 'json',
+					  data: {
+						queryString: request.term
+					  },
+					  success: function( data ) {
+						response( data );
+					  }
+					});
+				  },
+				  minLength: 1,
+				  create: function() {
+					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+						return $('<li></li>')
+							.data('item.autocomplete', item)
+							.append('<a>' + item.label + '</a>')
+							.appendTo(ul);
+					}
+
+					 $(this).prev('.ui-helper-hidden-accessible').remove();
+				  },
+				  select: function( event, ui ) {
+					var jInput = $(this),
+						jTopParentDiv = jInput.parents('[id ^= property]'),
+						jInfItemDiv = jTopParentDiv.find('select[name ^= property_]');
+
+						jInfItemDiv.empty().append($('<option>', { value: ui.item.id, text: ui.item.label }).attr('selected', 'selected'));
+				  },
+				  open: function() {
+					$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+				  },
+				  close: function() {
+					$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+				  }
+			});
+		");
 
 		$oDiv_Group = Admin_Form_Entity::factory('Div')
 			->class('input-group')
 			->add($oAdmin_Form_Entity_Shop_Groups)
-			->add($oAdmin_Form_Entity_Shop_Items);
+			->add($oAdmin_Form_Entity_Shop_Items)
+			->add($oAdmin_Form_Entity_Shop_Items_Input)
+			->add($oCore_Html_Entity_Script);
 
 		$oProperty->multiple && $this->imgBox(
 			$oDiv_Group,

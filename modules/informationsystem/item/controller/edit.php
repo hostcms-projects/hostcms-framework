@@ -140,16 +140,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oMainRow1->add($oName);
 
-				$oSelect_Group = Admin_Form_Entity::factory('Select')
-					->name('informationsystem_group_id')
-					->caption(Core::_('Informationsystem_Item.informationsystem_group_id'))
-					->options(
-						array(' … ') + self::fillInformationsystemGroup($object->informationsystem_id, 0)
-					)
-					->value($this->_object->informationsystem_group_id)					
-					->filter(TRUE);
-
-				$oMainRow2->add($oSelect_Group);
+				// Добавляем группу товаров
+				$aResult = $this->informationsystemGroupShow('informationsystem_group_id');
+				foreach ($aResult as $resultItem)
+				{
+					$oMainRow2->add($resultItem);
+				}
 
 				$this->getField('datetime')
 					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
@@ -501,16 +497,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				// parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oSelect_Group = Admin_Form_Entity::factory('Select')
-					->name('parent_id')
-					->caption(Core::_('Informationsystem_Group.parent_id'))
-					->options(
-						array(' … ') + self::fillInformationsystemGroup($object->informationsystem_id, 0, array($this->_object->id))
-					)
-					->value($this->_object->parent_id)
-					->filter(TRUE);
-
-				$oMainRow2->add($oSelect_Group);
+				// Добавляем группу товаров
+				$aResult = $this->informationsystemGroupShow('parent_id');
+				foreach ($aResult as $resultItem)
+				{
+					$oMainRow2->add($resultItem);
+				}
 
 				// Description
 				$oMainTab->move($this->getField('description'), $oMainRow3);
@@ -699,6 +691,104 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 		$this->title($title);
 
 		return $this;
+	}
+
+	/**
+	 * Показ списка групп или поле ввода с autocomplete для большого количества групп
+	 * @param string $fieldName имя поля группы
+	 * @return array  массив элементов, для доабвления в строку
+	 */
+	public function informationsystemGroupShow($fieldName)
+	{
+		$return = array();
+
+		$iCountGroups = $this->_object->Informationsystem->Informationsystem_Groups->getCount();
+
+		switch (get_class($this->_object))
+		{
+			case 'Informationsystem_Item_Model':
+				$i18n = 'Informationsystem_Item';
+			break;
+			case 'Informationsystem_Group_Model':
+			default:
+				$i18n = 'Informationsystem_Group';
+		}
+
+		if ($iCountGroups < Core::$mainConfig['switchSelectToAutocomplete'])
+		{
+			$oInformationsystemGroupSelect = Admin_Form_Entity::factory('Select');
+			$oInformationsystemGroupSelect
+				->caption(Core::_($i18n . '.' . $fieldName))
+				->options(array(' … ') + self::fillInformationsystemGroup($this->_object->informationsystem_id, 0))
+				->name($fieldName)
+				->value($this->_object->$fieldName)
+				->divAttr(array('class' => 'form-group col-xs-12'))
+				->filter(TRUE);
+
+			$return = array($oInformationsystemGroupSelect);
+		}
+		else
+		{
+			$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group', $this->_object->$fieldName);
+
+			$oInformationsystemGroupInput = Admin_Form_Entity::factory('Input')
+				->caption(Core::_($i18n . '.' . $fieldName))
+				->divAttr(array('class' => 'form-group col-xs-12'))
+				->name('informationsystem_group_name');
+
+			$this->_object->$fieldName
+				&& $oInformationsystemGroupInput->value($oInformationsystem_Group->name . ' [' . $oInformationsystem_Group->id . ']');
+
+			$oInformationsystemGroupInputHidden = Admin_Form_Entity::factory('Input')
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'))
+				->name($fieldName)
+				->value($this->_object->$fieldName)
+				->type('hidden');
+
+			$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
+			->type("text/javascript")
+			->value("
+				$('[name = informationsystem_group_name]').autocomplete({
+					  source: function(request, response) {
+
+						$.ajax({
+						  url: '/admin/informationsystem/item/index.php?autocomplete=1&show_group=1&informationsystem_id={$this->_object->informationsystem_id}',
+						  dataType: 'json',
+						  data: {
+							queryString: request.term
+						  },
+						  success: function( data ) {
+							response( data );
+						  }
+						});
+					  },
+					  minLength: 1,
+					  create: function() {
+						$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+							return $('<li></li>')
+								.data('item.autocomplete', item)
+								.append('<a>' + item.label + '</a>')
+								.appendTo(ul);
+						}
+
+						 $(this).prev('.ui-helper-hidden-accessible').remove();
+					  },
+					  select: function( event, ui ) {
+						$('[name = {$fieldName}]').val(ui.item.id);
+					  },
+					  open: function() {
+						$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+					  },
+					  close: function() {
+						$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+					  }
+				});
+			");
+
+			$return = array($oInformationsystemGroupInput, $oInformationsystemGroupInputHidden, $oCore_Html_Entity_Script);
+		}
+
+		return $return;
 	}
 
 	/**
@@ -1259,7 +1349,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 					if (!is_null($oSameInformationsystemItem) && $oSameInformationsystemItem->id != Core_Array::getPost('id'))
 					{
-						$this->addMessage(Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item'), 'error')
+						$this->addMessage(
+							Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item'), 'error')
 						);
 						return TRUE;
 					}
@@ -1268,7 +1359,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 					if (!is_null($oSameInformationsystemGroup))
 					{
-						$this->addMessage(Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item_URL') , 'error')
+						$this->addMessage(
+							Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item_URL') , 'error')
 						);
 						return TRUE;
 					}

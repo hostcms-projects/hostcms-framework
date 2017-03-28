@@ -60,7 +60,7 @@ return array(
 	'menu' => 'Websites',
 	'save_notes' => 'Save',
 	'site_show_site_title_list' => 'Websites',
-	'site_show_site_title' => 'Websites',
+	'site_show_site_title' => 'Website',
 	'site_link_add' => 'Add',
 	'copy_success' => 'Website information copied successfully',
 	'copy_error' => 'Error while copying website information',

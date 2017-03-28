@@ -82,8 +82,8 @@ class Core_Router_Route
 		// Subpattern will be indexed in the matches array by its normal numeric position and also by name
 		$expression = str_replace(
 			array('\{', '\}', '\(', '\)', '(?:)'), // (?:) - any question => (?:[^\)]*)
-			//array("(?'", "'.*?)", '(?:', ')?', '(?:[^\)]*)'), // .*? - гасим жадность квантификатора точка
-			array("(?'", "'.*?)", '(?:', ')?', '(?:.*?)'), // .*? - гасим жадность квантификатора точка
+			//array("(?'", "'.*?)", '(?:', ')?', '(?:[^\)]*)'),
+			array("(?'", "'.*?)", '(?:', ')?', '(?:.*?)'),
 			preg_quote($this->_uriPattern, '/')
 		);
 

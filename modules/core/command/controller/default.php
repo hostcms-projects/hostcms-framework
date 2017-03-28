@@ -375,7 +375,9 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				->buildCounter();
 		}
 
-		if (Core_Auth::logged())
+		$bLogged = Core_Auth::logged();
+
+		if ($bLogged)
 		{
 			$hostcmsAction = Core_Array::getGet('hostcmsAction');
 			if ($hostcmsAction)
@@ -384,8 +386,6 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			}
 		}
 
-		$fBeginTime = Core::getmicrotime();
-
 		// Проверка на передачу GET-параметров для статичного документа
 		if (defined('ERROR_404_GET_REQUESTS') && ERROR_404_GET_REQUESTS
 			&& $oStructure->type == 0 && count($_GET))
@@ -393,35 +393,47 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$oCore_Page->error404();
 		}
 
-		// Динамическая страница
-		if ($oStructure->type == 1)
+		// isn't document
+		if ($oStructure->type != 0)
 		{
-			$StructureConfig = $oStructure->getStructureConfigFilePath();
+			$bLogged && $fBeginTimeConfig = Core::getmicrotime();
 
-			if (is_file($StructureConfig) && is_readable($StructureConfig))
+			// Динамическая страница
+			if ($oStructure->type == 1)
 			{
-				include $StructureConfig;
+				$StructureConfig = $oStructure->getStructureConfigFilePath();
+
+				if (is_file($StructureConfig) && is_readable($StructureConfig))
+				{
+					include $StructureConfig;
+				}
 			}
+			elseif ($oStructure->type == 2)
+			{
+				$oCore_Page->libParams
+					= $oStructure->Lib->getDat($oStructure->id);
+
+				// Совместимость с HostCMS 5
+				if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
+				{
+					$this->_setLibParams();
+				}
+
+				$LibConfig = $oStructure->Lib->getLibConfigFilePath();
+
+				if (is_file($LibConfig) && is_readable($LibConfig))
+				{
+					include $LibConfig;
+				}
+			}
+			
+			$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
+				Core::_('Core.time_page_config', Core::getmicrotime() - $fBeginTimeConfig)
+			);
 		}
-		elseif ($oStructure->type == 2)
-		{
-			$oCore_Page->libParams
-				= $oStructure->Lib->getDat($oStructure->id);
 
-			// Совместимость с HostCMS 5
-			if (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
-			{
-				$this->_setLibParams();
-			}
-
-			$LibConfig = $oStructure->Lib->getLibConfigFilePath();
-
-			if (is_file($LibConfig) && is_readable($LibConfig))
-			{
-				include $LibConfig;
-			}
-		}
-
+		$bLogged && $fBeginTime = Core::getmicrotime();
+		
 		// Headers
 		$iExpires = time() + (defined('EXPIRES_TIME')
 			? EXPIRES_TIME
@@ -468,8 +480,9 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			->buildingPage(TRUE)
 			->execute();
 
-		$oCore_Registry = Core_Registry::instance();
-		$oCore_Registry->set('Core_Statistics.pageGenerationTime', Core::getmicrotime() - $fBeginTime);
+		$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
+			Core::_('Core.time_page', Core::getmicrotime() - $fBeginTime)
+		);
 
 		!defined('CURRENT_VERSION') && define('CURRENT_VERSION', '6.0');
 
@@ -573,7 +586,9 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		$oCore_Response->body($sContent);
 
-		$oCore_Registry->set('Core_Statistics.totalTime', Core::getmicrotime() - $fBeginTime);
+		$bLogged && Core_Registry::instance()->set('Core_Statistics.totalTime',
+			Core::getmicrotime() - Core_Registry::instance()->get('Core_Statistics.totalTimeBegin')
+		);
 
 		// Top panel
 		if (Core::checkPanel())
@@ -621,7 +636,8 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 	 */
 	public function getStructure($path, $site_id)
 	{
-		$aPath = explode('/', trim($path, '/'));
+		//$aPath = explode('/', trim($path, '/'));
+		$aPath = explode('/', Core_Str::rtrimUri(Core_Str::ltrimUri($path)));
 
 		// Index page
 		if (count($aPath) == 1 && $aPath[0] == '')
@@ -664,8 +680,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 				// Parent node is static page
 				if (is_null($oStructure)
-						|| !is_null($oStructure->id) && $oStructure->type == 0
-				)
+					|| !is_null($oStructure->id) && $oStructure->type == 0)
 				{
 					// structure node not found
 					return NULL;

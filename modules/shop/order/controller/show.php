@@ -89,7 +89,7 @@ class Shop_Order_Controller_Show extends Core_Controller
 				->value($sPath)
 		);
 
-		$this->pattern = rawurldecode(trim($sPath, '/')) . '/(page-{page}/)';
+		$this->pattern = rawurldecode($sPath) . '(page-{page}/)';
 		$this->patternExpressions = array(
 			'page' => '\d+',
 		);

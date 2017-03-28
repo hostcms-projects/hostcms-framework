@@ -44,7 +44,7 @@ class Core_I18n
 	 */
 	public function setLng($lng)
 	{
-		$this->_lng = strtolower($lng);
+		$this->_lng = basename(strtolower($lng));
 		return $this;
 	}
 
@@ -99,8 +99,10 @@ class Core_I18n
 	 */
 	public function expandLng($className, array $value, $lng = NULL)
 	{
-		is_null($lng) && $lng = $this->getLng();
-		$lng = basename($lng);
+		$lng = is_null($lng)
+			? $this->getLng()
+			: basename($lng);
+
 		$className = basename(strtolower($className));
 
 		if ($className == '')
@@ -159,8 +161,9 @@ class Core_I18n
 		{
 			list($className, $textName) = $aKey;
 
-			is_null($lng) && $lng = $this->getLng();
-			$lng = basename($lng);
+			$lng = is_null($lng)
+				? $this->getLng()
+				: basename($lng);
 
 			$className = basename(strtolower($className));
 
@@ -169,8 +172,6 @@ class Core_I18n
 				//throw new Core_Exception(, array('%key' => $textName, '%language' => $lng));
 				return "Error! model name is empty.";
 			}
-
-			$textName = basename($textName);
 
 			$this->loadLng($lng, $className);
 
@@ -208,17 +209,16 @@ class Core_I18n
 	 */
 	public function getLngFile($className, $lng)
 	{
-		$className = strtolower($className);
+		$className = basename(
+			strtolower($className)
+		);
 
-		$className = basename($className);
 		$lng = basename($lng);
 
 		$aPath = explode('_', $className);
 
 		$path = Core::$modulesPath;
-
 		$path .= implode(DIRECTORY_SEPARATOR, $aPath) . DIRECTORY_SEPARATOR;
-
 		$path .= 'i18n' . DIRECTORY_SEPARATOR . $lng . '.php';
 
 		$path = Core_File::pathCorrection($path);

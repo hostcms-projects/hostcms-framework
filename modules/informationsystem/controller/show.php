@@ -35,6 +35,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsActivity('active'|'inactive'|'all') отображать элементы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - groupsActivity('active'|'inactive'|'all') отображать группы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - commentsActivity('active'|'inactive'|'all') отображать комментарии: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
+ * - calculateTotal(TRUE|FALSE) вычислять общее количество найденных, по умолчанию TRUE
  * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
  *
  * Доступные свойства:
@@ -96,6 +97,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		'itemsActivity',
 		'groupsActivity',
 		'commentsActivity',
+		'calculateTotal',
 		'showPanel',
 	);
 
@@ -183,7 +185,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$this->item = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->siteuserProperties = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = $this->showPanel = TRUE;
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = $this->showPanel = $this->calculateTotal = TRUE;
 
 		$this->groupsMode = 'tree';
 		$this->part = 1;
@@ -400,9 +402,12 @@ class Informationsystem_Controller_Show extends Core_Controller
 		// Load user BEFORE FOUND_ROWS()
 		Core_Entity::factory('User', 0)->getCurrent();
 
+		$this->calculateTotal && $this->_Informationsystem_Items
+			->queryBuilder()
+			->sqlCalcFoundRows();
+
 		$this->_Informationsystem_Items
 			->queryBuilder()
-			->sqlCalcFoundRows()
 			->offset(intval($this->offset))
 			->limit(intval($this->limit));
 
@@ -467,10 +472,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			// Group's conditions for information system item
 			$this->group !== FALSE && $this->_groupCondition();
 
-			if (!$this->item)
-			{
-				$this->_setLimits();
-			}
+			!$this->item && $this->_setLimits();
 
 			$aInformationsystem_Items = $this->_Informationsystem_Items->findAll();
 
@@ -481,14 +483,17 @@ class Informationsystem_Controller_Show extends Core_Controller
 					return $this->error404();
 				}
 
-				$row = Core_QueryBuilder::select(array('FOUND_ROWS()', 'count'))->execute()->asAssoc()->current();
-				$this->total = $row['count'];
+				if ($this->calculateTotal)
+				{
+					$row = Core_QueryBuilder::select(array('FOUND_ROWS()', 'count'))->execute()->asAssoc()->current();
+					$this->total = $row['count'];
 
-				$this->addEntity(
-					Core::factory('Core_Xml_Entity')
-						->name('total')
-						->value(intval($this->total))
-				);
+					$this->addEntity(
+						Core::factory('Core_Xml_Entity')
+							->name('total')
+							->value(intval($this->total))
+					);
+				}
 			}
 		}
 
@@ -645,20 +650,22 @@ class Informationsystem_Controller_Show extends Core_Controller
 					$this->applyItemsForbiddenTags($oInformationsystem_Item);
 
 					// Comments
-					$this->comments && $oInformationsystem_Item->showXmlComments(TRUE)->commentsActivity($this->commentsActivity);
+					$oInformationsystem_Item
+						->showXmlComments($this->comments)
+						->commentsActivity($this->commentsActivity);
 
 					// Properties for informationsystem's item entity
-					$this->itemsProperties && $oInformationsystem_Item->showXmlProperties($this->itemsProperties);
+					$oInformationsystem_Item->showXmlProperties($this->itemsProperties);
 
 					// Tags
-					$this->tags && $oInformationsystem_Item->showXmlTags(TRUE);
+					$oInformationsystem_Item->showXmlTags($this->tags);
 
 					// votes
-					$this->votes && $oInformationsystem_Item->showXmlVotes(TRUE);
+					$oInformationsystem_Item->showXmlVotes($this->votes);
 
 					// Siteuser
-					$this->siteuser && $oInformationsystem_Item
-						->showXmlSiteuser(TRUE)
+					$oInformationsystem_Item
+						->showXmlSiteuser($this->siteuser)
 						->showXmlSiteuserProperties($this->siteuserProperties);
 
 					// <!-- pagebreak -->
@@ -795,7 +802,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		}
 
 		$path = isset($matches['path'])
-			? trim($matches['path'], '/')
+			? Core_Str::rtrimUri($matches['path'])
 			: NULL;
 
 		$this->group = 0;
@@ -860,6 +867,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 					}
 					else
 					{
+						$this->group = FALSE;
 						$this->item = FALSE;
 						return $this->error404();
 					}
@@ -900,7 +908,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 
 	/**
 	 * Apply forbidden tags
-	 * 
+	 *
 	 * @param Informationsystem_Group $oInformationsystem_Group
 	 * @return self
 	 */
@@ -1097,7 +1105,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 			->class('hostcmsPanel');
 
 		$oXslSubPanel = Core::factory('Core_Html_Entity_Div')
-			->class('hostcmsSubPanel hostcmsWindow hostcmsXsl')
+			->class('hostcmsSubPanel hostcmsXsl')
 			->add(
 				Core::factory('Core_Html_Entity_Img')
 					->width(3)->height(16)

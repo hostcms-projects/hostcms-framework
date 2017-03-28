@@ -17,13 +17,13 @@ class Shop_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.5';
+	public $version = '6.6';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-06-09';
+	public $date = '2016-08-01';
 
 	/**
 	 * Module name
@@ -346,6 +346,55 @@ class Shop_Module extends Core_Module
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend search callback function
+	 * @param Search_Page_Model $oSearch_Page
+	 * @return array 'href' and 'onclick'
+	 */
+	public function backendSearchCallback($oSearch_Page)
+	{
+		$href = $onclick = NULL;
+
+		$iAdmin_Form_Id = 65;
+		$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
+		$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form)->formSettings();
+
+		$sPath = '/admin/shop/item/index.php';
+
+		if ($oSearch_Page->module_value_id)
+		{
+			switch ($oSearch_Page->module_value_type)
+			{
+				case 1: // Группы магазина
+					$oShop_Group = Core_Entity::factory('Shop_Group')->find($oSearch_Page->module_value_id);
+
+					if (!is_null($oShop_Group->id))
+					{
+						$additionalParams = "shop_id={$oShop_Group->Shop->id}&shop_group_id={$oShop_Group->id}";
+						$href = $oAdmin_Form_Controller->getAdminLoadHref($sPath, NULL, NULL, $additionalParams);
+						$onclick = $oAdmin_Form_Controller->getAdminLoadAjax($sPath, NULL, NULL, $additionalParams);
+					}
+				break;
+				case 2: // Товары магазина
+					$oShop_Item = Core_Entity::factory('Shop_Item')->find($oSearch_Page->module_value_id);
+
+					if (!is_null($oShop_Item->id))
+					{
+						$additionalParams = "shop_id={$oShop_Item->Shop->id}&shop_group_id={$oShop_Item->shop_group_id}";
+						$href = $oAdmin_Form_Controller->getAdminActionLoadHref($sPath, 'edit', NULL, 1, $oShop_Item->id, $additionalParams);
+						$onclick = $oAdmin_Form_Controller->getAdminActionLoadAjax($sPath, 'edit', NULL, 1, $oShop_Item->id, $additionalParams);
+					}
+				break;
+			}
+		}
+
+		return array(
+			'icon' => 'fa-shopping-cart',
+			'href' => $href,
+			'onclick' => $onclick
+		);
 	}
 
 	/**

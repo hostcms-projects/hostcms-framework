@@ -152,7 +152,7 @@ class Core_Auth
 			}
 
 			$oUser->updateLastActivity();
-			
+
 			$aHostCMS = Core_Array::getRequest('hostcms', array());
 
 		}
@@ -211,32 +211,32 @@ class Core_Auth
 
 		define('IS_ADMIN_PART', TRUE);
 
-		$lng = Core_Array::get($_SESSION, 'current_lng');
-
-		// если получен язык - пишем в сессию
-		isset($_REQUEST['lng_value']) && $lng = strval($_REQUEST['lng_value']);
-
-		// Выбираем
-		empty($lng) && $lng = strtolower(htmlspecialchars(
-			substr(Core_Array::get($_SERVER, 'HTTP_ACCEPT_LANGUAGE'), 0, 2)
-		));
-
-		$oAdmin_Language = Core_Entity::factory('Admin_Language')->getByShortname($lng);
-		!$oAdmin_Language && $lng = NULL;
+		self::setCurrentLng(Core_Array::get($_SESSION, 'current_lng'));
 
 		// Записываем в сессию язык, содержащийся в константе
-		$_SESSION['current_lng'] = !is_null($lng) ? $lng : DEFAULT_LNG;
-
-		// Устанавливаем полученный язык
-		Core_I18n::instance()->setLng($_SESSION['current_lng']);
-		define('CURRENT_LNG', $_SESSION['current_lng']);
-
-		$oAdmin_Language = Core_Entity::factory('Admin_Language')->getByShortname(CURRENT_LNG);
-		$cur_lng_id = ($oAdmin_Language->active == 1) ? $oAdmin_Language->id : 0;
-
-		define("CURRENT_LANGUAGE_ID", $cur_lng_id);
+		$_SESSION['current_lng'] = CURRENT_LNG;
 
 		Core_Event::notify('Core_Auth.onAfterSystemInit');
+	}
+
+	static public function setCurrentLng($lng)
+	{
+		if (!defined('CURRENT_LNG'))
+		{
+			// Выбираем
+			empty($lng) && $lng = strtolower(htmlspecialchars(
+				substr(Core_Array::get($_SERVER, 'HTTP_ACCEPT_LANGUAGE'), 0, 2)
+			));
+			$oAdmin_Language = Core_Entity::factory('Admin_Language')->getByShortname($lng);
+			!$oAdmin_Language && $lng = NULL;
+
+			// Устанавливаем полученный язык
+			define('CURRENT_LNG', !is_null($lng) ? $lng : DEFAULT_LNG);
+			Core_I18n::instance()->setLng(CURRENT_LNG);
+
+			$oAdmin_Language = Core_Entity::factory('Admin_Language')->getByShortname(CURRENT_LNG);
+			define('CURRENT_LANGUAGE_ID', $oAdmin_Language->active ? $oAdmin_Language->id : 0);
+		}
 	}
 
 	/**
@@ -255,15 +255,14 @@ class Core_Auth
 	 */
 	static public function logged()
 	{
-		return
-			(
-				// Привязки к IP не было или IP совпадают
-				!isset($_SESSION['current_user_ip']) || $_SESSION['current_user_ip'] == Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1')
-			)
-			&& isset($_SESSION['valid_user']) && strlen($_SESSION['valid_user']) > 0
+		return isset($_SESSION['valid_user']) && strlen($_SESSION['valid_user']) > 0
 			&& isset($_SESSION['date_user']) && strlen($_SESSION['date_user']) > 0
 			&& isset($_SESSION['current_users_id']) && $_SESSION['current_users_id'] > 0
-			&& isset($_SESSION['is_superuser']);
+			&& isset($_SESSION['is_superuser'])
+			&& (
+				// Привязки к IP не было или IP совпадают
+				!isset($_SESSION['current_user_ip']) || $_SESSION['current_user_ip'] == Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1')
+			);
 	}
 
 	/**
@@ -472,7 +471,7 @@ class Core_Auth
 
 		return TRUE;
 	}
-	
+
 	/**
 	 * Logout current user
 	 */

@@ -205,7 +205,7 @@ class Core_Page extends Core_Servant_Properties
 		$this->css = array();
 		return $this;
 	}
-	
+
 	/**
 	 * Link $css to the beginning of list
 	 * @param string $css path
@@ -270,6 +270,7 @@ class Core_Page extends Core_Servant_Properties
 			$sReturn = '';
 
 			$oCompression_Controller = Compression_Controller::instance('css');
+			$oCompression_Controller->clear();
 
 			foreach ($this->css as $css)
 			{
@@ -335,7 +336,7 @@ class Core_Page extends Core_Servant_Properties
 		$this->js = array();
 		return $this;
 	}
-	
+
 	/**
 	 * Link js
 	 * @param string $js path
@@ -380,6 +381,7 @@ class Core_Page extends Core_Servant_Properties
 			$sReturn = '';
 
 			$oCompression_Controller = Compression_Controller::instance('js');
+			$oCompression_Controller->clear();
 
 			foreach ($this->js as $aJs)
 			{
@@ -602,5 +604,31 @@ class Core_Page extends Core_Servant_Properties
 		}
 
 		return $this;
+	}
+	
+	/**
+	 * frontentExecutionTimes
+	 * @var array
+	 */
+	protected $_frontentExecutionTimes = array();
+	
+	/**
+	 * Add Frontent Execution Time
+	 * @var string $value
+	 * @return self
+	 */
+	public function addFrontentExecutionTimes($value)
+	{
+		$this->_frontentExecutionTimes[] = $value;
+		return $this;
+	}
+	
+	/**
+	 * Get array of Frontent Execution Time
+	 * @return array
+	 */
+	public function getFrontentExecutionTimes()
+	{
+		return $this->_frontentExecutionTimes;
 	}
 }

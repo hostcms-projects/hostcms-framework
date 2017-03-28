@@ -847,7 +847,7 @@ class Structure_Controller_Show extends Core_Controller
 			->class('hostcmsPanel');
 
 		$oXslSubPanel = Core::factory('Core_Html_Entity_Div')
-			->class('hostcmsSubPanel hostcmsWindow hostcmsXsl')
+			->class('hostcmsSubPanel hostcmsXsl')
 			->add(
 				Core::factory('Core_Html_Entity_Img')
 					->width(3)->height(16)

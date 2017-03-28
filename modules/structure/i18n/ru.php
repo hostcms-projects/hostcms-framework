@@ -45,7 +45,7 @@ return array(
 	'seo_keywords' => '<acronym title="Значение мета-тега <keywords> для страницы">Ключевые слова [Keywords]</acronym>',
 	'url' => '<acronym title="Раздел сайта может являться внешней ссылкой">Ссылка на другой файл</acronym>',
 	'sorting' => '<acronym title="Поле, по которому производится сортировка страницы">Сортировка для текущего уровня</acronym>',
-	'path' => '<acronym title="Элемент пути к данной странице от родительского раздела, например, «about_company»">Название раздела</acronym>',
+	'path' => '<acronym title="Фрагмент пути относительно родительского раздела, например, about-company">Путь</acronym>',
 	'type' => '<acronym title="Выберите тип раздела">Тип раздела</acronym>',
 	'static_page' => 'Страница',
 	'typical_dynamic_page' => 'Типовая динамическая страница',

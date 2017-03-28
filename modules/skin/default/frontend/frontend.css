@@ -1,15 +1,15 @@
 @charset "UTF-8";
 
 /* Панель в клиентском разделе */
-.hostcmsPanel{padding: 10px 10px; box-shadow: 0 0 5px rgba(100, 100, 100, 0.60); border-radius: 10px; zoom: 1; z-index: 10001; position: absolute; margin-top: 10px; background-color: #FFF; cursor: move; opacity: .9; line-height: normal }
+.hostcmsPanel{padding: 10px; box-shadow: 0 0 5px rgba(100, 100, 100, 0.60); border-radius: 10px; zoom: 1; z-index: 10001; position: absolute; margin-top: 5px; background-color: #FFF; cursor: move; opacity: .9; line-height: normal }
 .hostcmsPanel a:link,.hostcmsPanel a:visited,.hostcmsPanel a:hover{color:#0070BD;text-decoration:underline}
-.hostcmsPanel .hostcmsSubPanel{margin-bottom:-3px; white-space: nowrap}
+.hostcmsPanel .hostcmsSubPanel{ margin-bottom: -4px; white-space: nowrap}
 .hostcmsPanel .hostcmsSubPanel a img{margin: 0 2px; cursor: pointer; }
 .hostcmsTopPanel{left:50%;margin-left:-110px;top:0}
 /* Панель для XSL */
 .hostcmsXsl {margin: 3px 0}
 .hostcmsXsl div.hostcmsButton {border-top: 1px solid #DFDDD8; border-right: 1px solid #D1D0CB;
-	border-bottom: 1px solid #ACAAA6; border-left: 1px solid #D1D0CB; 
+	border-bottom: 1px solid #ACAAA6; border-left: 1px solid #D1D0CB;
 	color: #5A6973; font-size: 8pt; text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7);
 	border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
 	background: -moz-linear-gradient(90deg, #EFEEEA, #F6F5F3) repeat scroll 0 0 transparent;
@@ -19,10 +19,12 @@
 .hostcmsXsl div.hostcmsButton div {margin-top: 1px; font-weight: bold; vertical-align: top; display: inline-block; }
 
 /*.hostcmsWindowUI {position: absolute; z-index: 999;}*/
+.hostcmsWindow { -webkit-overflow-scrolling: touch; overflow-y: scroll } /* Scroll IFRAMEs on iOS */
 .hostcmsWindow, .hostcmsWindow textarea {font-family:Arial,Verdana,'MS Sans Serif'; line-height: normal }
 .hostcmsWindow iframe { box-sizing: border-box; width: 100%; height: 100%; border: 0 }
 .hostcmsWindow .hostcmsModalWindow { line-height: 110%; font-size: 10pt; color:#000; padding: 5px 10px }
-.hostcmsWindow .hostcmsModalWindow ul {margin: 2px 0}
+.hostcmsWindow .hostcmsModalWindow ul { margin: 0; padding: 0 0 0 3em }
+.hostcmsWindow .hostcmsModalWindow ul li {list-style: initial; width: initial; }
 .hostcmsWindow textarea { box-sizing: border-box; resize: none; white-space:pre; font-size: 10pt !important; margin: 0; padding: 2px; overflow: auto; width: 99%; height: 99%; border: 0}
 
 /* SQL */
@@ -368,7 +370,7 @@ button.backendBody .ui-button::-moz-focus-inner {
 }
 
 /* -- Added -- */
-.backendBody .ui-dialog {background-color: #FFF; border: 1px solid #D8D8D8; border-radius: 9px; box-shadow: 0 2px 2px rgba(204, 204, 204, 0.7); padding: 0; z-index: 999 }
+.backendBody .ui-dialog {background-color: #FFF; border: 1px solid #D8D8D8; border-radius: 9px; box-shadow: 0 2px 2px rgba(204, 204, 204, 0.7); padding: 0; z-index: 11000 }
 .backendBody .ui-dialog-content-transparent{ background: #FFF; padding-top: 2px; background: url("images/transparent_bg_white.png") repeat scroll 0 0 transparent
 }
 .backendBody .ui-dialog .ui-dialog-titlebar {  box-sizing: border-box; user-select: none; padding: .4em .5em;

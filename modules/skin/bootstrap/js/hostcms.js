@@ -108,51 +108,33 @@ $('.page-content')
         }
     });
 
-/*Handles Popovers*/
-/*$('.page-content').popover({
-	html: true,
-	title: function(){console.log($(this).find('div[id ^= "popover"]')); return 1111;},
-	selector: '[data-toggle=popover]',
-	template: '<div class="popover ' + $(this)
-		.data("class") +
+/* Handles Popovers and Tooltip */
+$('body').popover({
+    html: true,
+    selector: '[data-toggle=popover]',
+	template: '<div class="popover ' + $(this).data("class") +
 		'"><div class="arrow"></div><h3 class="popover-title ' +
-		$(this)
-		.data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>'
-});*/
-
-var popovers = $('[data-toggle=popover]');
-$.each(popovers, function () {
-    $(this)
-        .popover({
-            html: true,
-            template: '<div class="popover ' + $(this)
-                .data("class") +
-                '"><div class="arrow"></div><h3 class="popover-title ' +
-                $(this)
-                .data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>'
-        });
+		$(this).data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>'
 });
 
-var hoverpopovers = $('[data-toggle=popover-hover]');
-$.each(hoverpopovers, function () {
-    $(this)
-        .popover({
-            html: true,
-            template: '<div class="popover ' + $(this)
-                .data("class") +
-                '"><div class="arrow"></div><h3 class="popover-title ' +
-                $(this)
-                .data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>',
-            trigger: "hover"
-        });
+$('body').popover({
+	html: true,
+    selector: '[data-toggle=popover-hover]',
+	template: '<div class="popover ' + $(this).data("class") +
+		'"><div class="arrow"></div><h3 class="popover-title ' +
+		$(this).data("titleclass") + '">Popover right</h3><div class="popover-content"></div></div>',
+	trigger: "hover"
 });
 
+$('body').tooltip({
+	selector: 'acronym',
+	template: '<div class="tooltip-magenta tooltip" role="tooltip"><div class="tooltip-inner"></div><div class="tooltip-arrow"></div></div>'
+});
 
 /*Handles ToolTips*/
-$("[data-toggle=tooltip]")
-    .tooltip({
-        html: true
-    });
+/*$("[data-toggle=tooltip]").tooltip({
+	html: true
+});*/
 
 InitiateSideMenu();
 InitiateSettings();

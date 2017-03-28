@@ -1828,22 +1828,18 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 			{
 				if ($this->_sAssociatedItemMark)
 				{
-					$aShopItems = $this->_oCurrentShop->Shop_Items;
-					$aShopItems->queryBuilder()->where('marking', '=', $this->_sAssociatedItemMark);
-					$aShopItems = $aShopItems->findAll(FALSE);
+					$oShop_Item = $this->_oCurrentShop->Shop_Items->getByMarking($this->_sAssociatedItemMark, FALSE);
 
-					if (count($aShopItems))
+					if (!is_null($oShop_Item)
+						// Ранее не было связи с ассоциированным
+						&& is_null($oShop_Item->Shop_Item_Associateds->getByAssociatedId($this->_oCurrentItem->id, FALSE))
+					)
 					{
-						if (is_null($aShopItems[0]
-							->Shop_Item_Associateds
-							->getByAssociatedId($this->_oCurrentItem->id)))
-						{
-							Core_Entity::factory('Shop_Item_Associated')
-								->shop_item_id($aShopItems[0]->id)
-								->shop_item_associated_id($this->_oCurrentItem->id)
-								->count(1)
-								->save();
-						}
+						Core_Entity::factory('Shop_Item_Associated')
+							->shop_item_id($oShop_Item->id) // Кому
+							->shop_item_associated_id($this->_oCurrentItem->id) // Кто
+							->count(1)
+							->save();
 					}
 				}
 

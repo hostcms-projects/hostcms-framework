@@ -201,6 +201,12 @@ abstract class Core_DataBase
 	abstract public function getAffectedRows();
 
 	/**
+	 * Returns the number of columns in the result set 
+	 * @return integer|null number of columns in the result set
+	 */
+	abstract public function getColumnCount();
+	
+	/**
 	 * Free last result memory
 	 * @return self
 	 */

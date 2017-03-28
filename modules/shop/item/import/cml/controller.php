@@ -11,7 +11,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - importGroups(TRUE|FALSE) импортировать группы товаров, по умолчанию TRUE
  * - createShopItems(TRUE|FALSE) создавать новые товары, по умолчанию TRUE
  * - updateFields(array()) массив полей товара, которые необходимо обновлять при импорте CML товара, если не заполнен, то обновляются все поля. Пример массива array('marking', 'name', 'shop_group_id', 'text', 'description', 'images', 'taxes', 'shop_producer_id')
- *
+ * - itemDescription() имя поля товара, в которое загружать описание товаров, может принимать значения description, text. По умолчанию text.
  *
  * @package HostCMS
  * @subpackage Shop
@@ -1268,7 +1268,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					foreach ($this->xpath($oProposal, 'Цены/Цена') as $oPrice)
 					{
 						// Ищем цену
-						$oShopPrice = Core_Entity::factory('Shop', $this->iShopId)->Shop_Prices->getByGuid(strval($oPrice->ИдТипаЦены), FALSE);
+						$oShopPrice = Core_Entity::factory('Shop', $this->iShopId)
+							->Shop_Prices
+							->getByGuid(strval($oPrice->ИдТипаЦены), FALSE);
 
 						if (!is_null($oShopPrice)
 							&& $this->sShopDefaultPriceGUID != strval($oPrice->ИдТипаЦены))
@@ -1286,29 +1288,51 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 							$itemPrice = strval($oPrice->ЦенаЗаЕдиницу);
 
-							// Валюта товара
+							// Валюта товара в основной цене
 							$baseCurrencyNode = $this->xpath($oProposal, "Цены/Цена[ИдТипаЦены='{$this->sShopDefaultPriceGUID}']");
 
 							if (isset($baseCurrencyNode[0]))
 							{
+								// Валюта у цены по умолчанию
 								$sCurrency = strval($baseCurrencyNode[0]->Валюта);
 
+								// Валюта не указана у самого предложения, смотрим в ТипыЦен/ТипЦены
+								if (!strlen($sCurrency))
+								{
+									$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='{$this->sShopDefaultPriceGUID}']");
+
+									$sCurrency = strval($topCurrencyNode->Валюта);
+								}
+
+								// Указан числовой код валюты, получаем по нему
 								if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 								{
 									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
 								}
 
-								$oItem_Shop_Currency = Core_Entity::factory('Shop_Currency')->getByLike($sCurrency, FALSE);
+								$oItem_Shop_Currency = Core_Entity::factory('Shop_Currency')
+									->getByLike($sCurrency, FALSE);
 
+								// Валюта у самого товара
 								$sCurrency = strval($oPrice->Валюта);
 
+								// Валюта не указана у самого предложения, смотрим в ТипыЦен/ТипЦены
+								if (!strlen($sCurrency))
+								{
+									$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='" . strval($oPrice->ИдТипаЦены) . "']");
+
+									$sCurrency = strval($topCurrencyNode->Валюта);
+								}
+
+								// Указан числовой код валюты, получаем по нему
 								if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 								{
 									$sCurrency = $this->_aCurrencyCodes[$sCurrency];
 								}
 
 								// Валюта спеццены
-								$oPrice_Currency = Core_Entity::factory('Shop_Currency')->getByLike($sCurrency, FALSE);
+								$oPrice_Currency = Core_Entity::factory('Shop_Currency')
+									->getByLike($sCurrency, FALSE);
 
 								if (!is_null($oItem_Shop_Currency)
 									&& !is_null($oPrice_Currency)
@@ -1328,6 +1352,16 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						elseif ($this->sShopDefaultPriceGUID == strval($oPrice->ИдТипаЦены))
 						{
 							$sCurrency = strval($oPrice->Валюта);
+
+							// Валюта не указана у самого предложения, смотрим в ТипыЦен/ТипЦены
+							if (!strlen($sCurrency))
+							{
+								$topCurrencyNode = $this->xpath($packageOfProposals, "ТипыЦен/ТипЦены[Ид='" . strval($oPrice->ИдТипаЦены) . "']");
+
+								$sCurrency = strval($topCurrencyNode->Валюта);
+							}
+
+							// Указан числовой код валюты, получаем по нему
 							if (is_numeric($sCurrency) && isset($this->_aCurrencyCodes[$sCurrency]))
 							{
 								$sCurrency = $this->_aCurrencyCodes[$sCurrency];
@@ -1344,6 +1378,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							}
 
 							$oShopItem->price = Shop_Controller::instance()->convertPrice(strval($oPrice->ЦенаЗаЕдиницу));
+
 							$oShopItem->add($oShop_Currency);
 
 							if (!is_null($this->_oTaxForBasePrice))
@@ -1679,7 +1714,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		{
 			// целое число
 			case 0:
-				$oProperty_Value->setValue(Shop_Controller::convertPrice($value));
+				$oProperty_Value->setValue(Shop_Controller::instance()->convertPrice($value));
 			break;
 			// Файл
 			case 2:

@@ -38,31 +38,19 @@ class Skin_Bootstrap_Module_Trash_Module extends Trash_Module
 				<?php
 				$iDeleted = 0;
 
-				$oDataBase = Core_DataBase::instance();
-				$aTables = $oDataBase->getTables();
-				$queryBuilder = Core_QueryBuilder::select();
+				$oTrash_Dataset = new Trash_Dataset();
+				$aObjects = $oTrash_Dataset
+					->fillTables()
+					->getObjects();
 
-				foreach ($aTables as $key => $name)
+				foreach ($aObjects as $oObject)
 				{
-					$aColumns = $oDataBase->getColumns($name);
-
-					if (isset($aColumns['deleted']))
+					if (is_numeric($oObject->count))
 					{
-						$row = $queryBuilder
-							->clear()
-							->select(array('COUNT(*)', 'count'))
-							->from($name)
-							->where('deleted', '=', 1)
-							->execute()
-							->asAssoc()
-							->current();
-
-						if ($row['count'])
-						{
-							$iDeleted += $row['count'];
-						}
+						$iDeleted += $oObject->count;
 					}
 				}
+
 				?>
 				<div class="databox-right">
 					<span class="databox-number themesecondary"><?php echo number_format($iDeleted, 0, '.', ' ')?></span>

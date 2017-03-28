@@ -210,6 +210,12 @@ class Core_QueryBuilder_Update extends Core_QueryBuilder_Selection
 		}
 
 		$sql .= ' ' . implode(', ', $this->quoteColumns($this->_tableName));
+		
+		if (!empty($this->_join))
+		{
+			$sql .= ' ' . $this->_buildJoin($this->_join);
+		}
+		
 		$sql .= ' SET ' . $this->_buildSet($this->_columns);
 
 		if (!empty($this->_where))

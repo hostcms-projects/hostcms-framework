@@ -60,7 +60,7 @@ return array(
 	'menu' => 'Сайты',
 	'save_notes' => 'Сохранить',
 	'site_show_site_title_list' => 'Список сайтов',
-	'site_show_site_title' => 'Сайты',
+	'site_show_site_title' => 'Сайт',
 	'site_link_add' => 'Добавить',
 	'copy_success' => 'Информация о сайте успешно скопирована',
 	'copy_error' => 'Ошибка копирования информации о сайте',

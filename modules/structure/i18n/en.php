@@ -45,7 +45,7 @@ return array(
 	'seo_keywords' => '<acronym title="Meta element keywords">Keywords</acronym>',
 	'url' => '<acronym title="Website section can be an external link">Link to another file</acronym>',
 	'sorting' => '<acronym title="Field according to which page should be sorted">Sorting for the current level</acronym>',
-	'path' => '<acronym title="Element of path to this page from the parent section. E.g., «about_company»">Section name</acronym>',
+	'path' => '<acronym title="Part of path from the parent structure,  e.g. about-company">Path</acronym>',
 	'type' => '<acronym title="Select section type">Section type</acronym>',
 	'static_page' => 'Page',
 	'typical_dynamic_page' => 'Sample dynamic page',

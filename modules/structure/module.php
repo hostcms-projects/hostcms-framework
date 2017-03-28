@@ -17,13 +17,13 @@ class Structure_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.5';
+	public $version = '6.6';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-06-09';
+	public $date = '2016-08-01';
 
 	/**
 	 * Module name
@@ -108,5 +108,38 @@ class Structure_Module extends Core_Module
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend search callback function
+	 * @param Search_Page_Model $oSearch_Page
+	 * @return array 'href' and 'onclick'
+	 */
+	public function backendSearchCallback($oSearch_Page)
+	{
+		$href = $onclick = NULL;
+
+		$iAdmin_Form_Id = 82;
+		$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
+		$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form)->formSettings();
+
+		$sPath = '/admin/structure/index.php';
+
+		if ($oSearch_Page->module_value_id)
+		{
+			$oStructure = Core_Entity::factory('Structure')->find($oSearch_Page->module_value_id);
+
+			if (!is_null($oStructure->id))
+			{
+				$href = $oAdmin_Form_Controller->getAdminActionLoadHref($sPath, 'edit', NULL, 0, $oStructure->id);
+				$onclick = $oAdmin_Form_Controller->getAdminActionLoadAjax($sPath, 'edit', NULL, 0, $oStructure->id);
+			}
+		}
+
+		return array(
+			'icon' => 'fa-sitemap',
+			'href' => $href,
+			'onclick' => $onclick
+		);
 	}
 }

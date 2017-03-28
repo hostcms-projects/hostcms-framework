@@ -23,14 +23,12 @@ class Core_Mail_Smtp extends Core_Mail
 	 */
 	protected function _send($to, $subject, $message, $additional_headers)
 	{
-		$sSingleSeparator = $this->_separator;
+		$header = "Date: " . date("D, d M Y H:i:s O") . $this->_separator;
+		$header .= "Subject: {$subject}{$this->_separator}";
+		$header .= "To: {$to}{$this->_separator}";
+		$header .= $additional_headers . $this->_separator . $this->_separator;
 
-		$header = "Date: " . date("D, d M Y H:i:s O") . $sSingleSeparator;
-		$header .= "Subject: {$subject}{$sSingleSeparator}";
-		$header .= "To: <{$to}>{$sSingleSeparator}";
-		$header .= $additional_headers . $sSingleSeparator . $sSingleSeparator;
-
-		$header .= $message . $sSingleSeparator;
+		$header .= $message . $this->_separator;
 		$timeout = 5;
 
 		$fp = function_exists('stream_socket_client')

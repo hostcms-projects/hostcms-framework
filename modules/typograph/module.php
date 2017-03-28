@@ -17,13 +17,13 @@ class Typograph_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.5';
+	public $version = '6.6';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-06-09';
+	public $date = '2016-08-01';
 
 	/**
 	 * Module name

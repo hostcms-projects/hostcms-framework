@@ -224,11 +224,14 @@ class Shop_Group_Model extends Core_Entity
 			//->clear()
 			->where('path', '=', $path)
 			->where('parent_id', '=', $parent_id)
+			->clearOrderBy()
 			->limit(1);
 
 		$aShop_Groups = $this->findAll();
 
-		return isset($aShop_Groups[0]) ? $aShop_Groups[0] : NULL;
+		return isset($aShop_Groups[0])
+			? $aShop_Groups[0]
+			: NULL;
 	}
 
 	/**

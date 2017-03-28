@@ -115,12 +115,36 @@ class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_A
 
 		!is_null($this->_defaultValue) && $this->_values[] = $this->_defaultValue;
 
-		$this->_findObjects();
+		$countItems = $this->_getCount();
+		
+		if ($countItems < Core::$mainConfig['switchSelectToAutocomplete'])
+		{
+			$this->_findObjects();
 
-		// Add objects
-		$this->addValues();
+			// Add objects
+			$this->addValues();
 
-		Core::showJson($this->_values);
+			$mode = 'select';
+		}
+		else
+		{
+			$mode = 'input';
+		}
+
+		Core::showJson(array(
+			'mode' => $mode,
+			'count' => $countItems,
+			'values' => $this->_values
+		));
+	}
+
+	/**
+	 * Get count of objects
+	 * @return self
+	 */
+	protected function _getCount()
+	{
+		return NULL;
 	}
 
 	/**
@@ -143,7 +167,7 @@ class Admin_Form_Action_Controller_Type_Load_Select_Options extends Admin_Form_A
 	{
 		foreach ($this->_objects as $Object)
 		{
-			$this->_values[$Object->id] = 
+			$this->_values[$Object->id] =
 				$this->_addIDs
 					? '[' . $Object->id . '] ' . $Object->name
 					: $Object->name;

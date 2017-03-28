@@ -339,6 +339,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			'RUB',
 			'USD',
 			'BYR',
+			'BYN',
 			'KZT',
 			'EUR',
 			'UAH',
@@ -630,9 +631,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		}
 
 		/* DESCRIPTION */
-		if (!empty($oShop_Item->description))
+		$description = !empty($oShop_Item->description)
+			? $oShop_Item->description
+			: $oShop_Item->text;
+
+		if (strlen($description))
 		{
-			echo '<description>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->description), ENT_COMPAT, 'UTF-8')) . '</description>'. "\n";
+			$description = Core_Str::cutSentences(
+				html_entity_decode(strip_tags($description), ENT_COMPAT, 'UTF-8'), 175
+			);
+
+			echo '<description>' . Core_Str::xml($description) . '</description>'. "\n";
 		}
 
 		/* sales_notes */

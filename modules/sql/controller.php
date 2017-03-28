@@ -65,13 +65,13 @@ class Sql_Controller
 			$count_query = 0;
 
 			$i = 0;
-			
+
 			$oCore_DataBase = Core_DataBase::instance();
-			
+
 			while ($i < count($aSql))
 			{
 				$sql = trim($aSql[$i]);
-				
+
 				if (strlen($sql))
 				{
 					// Собираем запрос разделенный на несколько строк
@@ -84,13 +84,13 @@ class Sql_Controller
 					}
 
 					$sql = trim($sql);
-					
+
 					// Если не комментарии
 					if (mb_substr($sql, 0, 1) != '#' && mb_substr($sql, 0, 2) != '--' && $sql != '')
 					{
 						try
 						{
-							$oCore_DataBase->setQueryType(NULL)->query($sql);
+							$oCore_DataBase->setQueryType(1)->query($sql);
 							$count_query++;
 						}
 						catch (Exception $e)
@@ -99,10 +99,10 @@ class Sql_Controller
 						}
 					}
 				}
-				
+
 				$i++;
 			}
-			
+
 			return $count_query;
 		}
 

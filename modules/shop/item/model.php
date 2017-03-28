@@ -232,6 +232,16 @@ class Shop_Item_Model extends Core_Entity
 	{
 		$aTags = explode(',', $sTags);
 
+		return $this->applyTagsArray($aTags);
+	}
+
+	/**
+	 * Apply array tags for item
+	 * @param array $aTags array of tags
+	 * @return self
+	 */
+	public function applyTagsArray(array $aTags)
+	{
 		// Удаляем связь метками
 		$this->Tag_Shop_Items->deleteAll(FALSE);
 
@@ -1313,7 +1323,7 @@ class Shop_Item_Model extends Core_Entity
 
 		// Remove from search index
 		$this->unindex();
-		
+
 		return parent::delete($primaryKey);
 	}
 
@@ -1345,6 +1355,7 @@ class Shop_Item_Model extends Core_Entity
 			->where('path', '=', $path)
 			->where('shop_group_id', '=', $group_id)
 			->where('shortcut_id', '=', 0)
+			->clearOrderBy()
 			->limit(1);
 
 		$aShop_Items = $this->findAll(FALSE);
@@ -2099,7 +2110,7 @@ class Shop_Item_Model extends Core_Entity
 				? $this->Shop_Group->clearCache()
 				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
 					->deleteByTag('shop_group_0');
-					
+
 			// Static cache
 			$oSite = $this->Shop->Site;
 			if ($oSite->html_cache_use)
@@ -2110,7 +2121,7 @@ class Shop_Item_Model extends Core_Entity
 					$url = $oSiteAlias->name
 						. $this->Shop->Structure->getPath()
 						. $this->getPath();
-					
+
 					$oCache_Static = Core_Cache::instance('static');
 					$oCache_Static->delete($url);
 				}

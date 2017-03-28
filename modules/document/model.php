@@ -158,4 +158,72 @@ class Document_Model extends Core_Entity
 
 		return $this;
 	}
+	
+	/**
+	 * Add message into search index
+	 * @return self
+	 */
+	public function index()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::indexingSearchPages(array($this->indexing()));
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Remove message from search index
+	 * @return self
+	 */
+	public function unindex()
+	{
+		if (Core::moduleIsActive('search'))
+		{
+			Search_Controller::deleteSearchPage(6, 0, $this->id);
+		}
+
+		return $this;
+	}
+	
+	/**
+	 * Search indexation
+	 * @return Search_Page
+	 * @hostcms-event document.onBeforeIndexing
+	 * @hostcms-event document.onAfterIndexing
+	 */
+	public function indexing()
+	{
+		$oSearch_Page = new stdClass();
+
+		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
+
+		$oSearch_Page->text = htmlspecialchars($this->name) . ' ';
+
+		$oDocument_Version_Current = $this->Document_Versions->getCurrent(FALSE);
+		
+		if ($oDocument_Version_Current)
+		{
+			$oSearch_Page->text .= $oDocument_Version_Current->loadFile();
+		
+			$oSearch_Page->title = $this->name;
+
+			$oSearch_Page->size = mb_strlen($oSearch_Page->text);
+			$oSearch_Page->site_id = $this->site_id;
+			$oSearch_Page->datetime = $oDocument_Version_Current->datetime;
+			$oSearch_Page->module = 6;
+			$oSearch_Page->module_id = $this->id;
+			$oSearch_Page->inner = 1;
+			$oSearch_Page->module_value_type = 0; // search_page_module_value_type
+			$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+			$oSearch_Page->url = 'document-' . $this->id; // Уникальный номер
+
+			$oSearch_Page->siteuser_groups = array(0);
+		}
+
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+
+		return $oSearch_Page;
+	}
 }

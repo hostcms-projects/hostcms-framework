@@ -113,6 +113,29 @@ class Core_Array
 	}
 
 	/**
+	 * Get value for $key in array $_SESSION. If value does not exist will return defaultValue.
+	 *
+	 * <code>
+	 * // Return value for 'foo' or NULL if $key does not exist
+	 * $value = Core_Array::getSession('foo');
+	 * </code>
+	 * <code>
+	 * // Return value for 'foo' or 'bar' if $key does not exist
+	 * $value = Core_Array::getSession('foo', 'bar');
+	 * </code>
+	 *
+	 * @param string $key key
+	 * @param mixed $defaultValue default value
+	 * @return mixed
+	 */
+	static public function getSession($key, $defaultValue = NULL)
+	{
+		return isset($_SESSION)
+			? self::get($_GET, $key, $defaultValue)
+			: $defaultValue;
+	}
+
+	/**
 	 * Get value for $key in array $_FILES. If value does not exist will return defaultValue.
 	 * @param $key key
 	 * @param $defaultValue default value

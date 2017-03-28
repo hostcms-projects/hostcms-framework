@@ -541,6 +541,30 @@ class Core_Str
 	}
 
 	/**
+	 * Cut first slash
+	 * @param string URI
+	 * @return string
+	 */
+	static public function ltrimUri($uri)
+	{
+		$uri !== '' && substr($uri, 0, 1) == '/' && $uri = substr($uri, 1);
+
+		return $uri;
+	}
+
+	/**
+	 * Cut last slash
+	 * @param string URI
+	 * @return string
+	 */
+	static public function rtrimUri($uri)
+	{
+		$uri !== '' && substr($uri, -1, 1) == '/' && $uri = substr($uri, 0, -1);
+
+		return $uri;
+	}
+	
+	/**
 	 * ucfirst for utf-8 string
 	 * @param string $str source string
 	 * @return string

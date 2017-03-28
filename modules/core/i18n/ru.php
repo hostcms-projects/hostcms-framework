@@ -36,15 +36,15 @@ return array(
 	'logout' => 'Выход',
 
 	'total_time' => 'Время выполнения: <strong>%.3f</strong> с, из них',
-	'time_load_modules' => "время загрузки модулей: <strong>%.3f</strong> с",
-	'time_page_generation' => "время генерации содержания страницы: <strong>%.3f</strong> с",
-	'time_database_connection' => "время соединения с СУБД: <strong>%.3f</strong> с",
-	'time_database_select' => "время выбора БД: <strong>%.3f</strong> с",
-	'time_sql_execution' => "время выполнения запросов: <strong>%.3f</strong> с",
-	'time_xml_execution' => "время обработки XML: <strong>%.3f</strong> с",
+	'time_load_modules' => "загрузки модулей: <strong>%.3f</strong> с",
+	'time_page' => "макета и страницы: <strong>%.3f</strong> с",
+	'time_page_config' => "настроек страницы: <strong>%.3f</strong> с",
+	'time_database_connection' => "соединения с СУБД: <strong>%.3f</strong> с",
+	'time_database_select' => "выбора БД: <strong>%.3f</strong> с",
+	'time_sql_execution' => "выполнения запросов: <strong>%.3f</strong> с",
+	'time_xml_execution' => "обработки XML: <strong>%.3f</strong> с",
 	'memory_usage' => "Использовано памяти: <strong>%.2f</strong> Мб.",
 	'number_of_queries' => "Количество запросов: <strong>%d</strong>.",
-
 	'compression' => 'Компрессия: <strong>%s</strong>.',
 	'cache' => 'Кэширование: <strong>%s</strong>.',
 

@@ -43,7 +43,7 @@ class Core_Config
 	 * @param string $name
 	 * @return string
 	 */
-	protected function _getPath($name)
+	public function getPath($name)
 	{
 		$aConfig = explode('_', $name);
 		$sFileName = array_pop($aConfig);
@@ -63,10 +63,7 @@ class Core_Config
 	 */
 	protected function _correctName($name)
 	{
-		$name = strtolower($name);
-		$name = basename($name);
-
-		return $name;
+		return basename(strtolower($name));
 	}
 
 	/**
@@ -81,7 +78,7 @@ class Core_Config
 
 		if (!isset($this->_values[$name]))
 		{
-			$path = $this->_getPath($name);
+			$path = $this->getPath($name);
 
 			$this->_values[$name] = is_file($path)
 				? require_once($path)
@@ -129,7 +126,7 @@ class Core_Config
 	{
 		$this->_values[$name] = $value;
 
-		$path = $this->_getPath($name);
+		$path = $this->getPath($name);
 
 		// Create destination dir
 		Core_File::mkdir(dirname($path), CHMOD, TRUE);

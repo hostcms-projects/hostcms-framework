@@ -20,6 +20,14 @@ class Admin_Word_Value_Model extends Core_Entity
 	protected $_nameColumn = 'id';
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'admin_language' => array()
+	);
+	
+	/**
 	 * Disable markDeleted()
 	 * @var mixed
 	 */

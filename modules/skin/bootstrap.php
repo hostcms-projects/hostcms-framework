@@ -120,9 +120,6 @@ class Skin_Bootstrap extends Core_Skin
 		<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,300,400,600,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
 
 		<script type="text/javascript">
-		$(function() {
-		$('body').tooltip({ selector: 'acronym', template: '<div class="tooltip-magenta tooltip" role="tooltip"><div class="tooltip-inner"></div><div class="tooltip-arrow"></div></div>' });
-		});
 		<?php
 		if (Core_Auth::logged())
 		{
@@ -344,6 +341,7 @@ class Skin_Bootstrap extends Core_Skin
 									</div>
 									<script type="text/javascript">
 										$(function(){
+											// Chat
 											$('.page-container').append($('#chatbar'));
 											$("#chat-link, div.back").on('click', {path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=77', context: $('#chatbar .contacts-list') }, $.chatGetUsersList );
 
@@ -351,11 +349,54 @@ class Skin_Bootstrap extends Core_Skin
 												.on('click', 'li.contact', $.chatClearMessagesList)
 												.on('click', 'li.contact', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=78' }, $.chatGetUserMessages);
 
-												$('.send-message textarea').on('keyup', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=79' }, $.chatSendMessage);
+											$('.send-message textarea').on('keyup', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=79' }, $.chatSendMessage);
 
-												$(document).ready(function() {
-													$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'});
-												});
+											$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'});
+
+											<?php if (Core::moduleIsActive('search'))
+											{
+												$oSearchModule = Core_Entity::factory('Module')->getByPath('search');
+											?>
+											// Search
+											$('[class = searchinput]').autocomplete({
+												appendTo: '.sidebar-header-wrapper',
+												source: function(request, response) {
+
+													$.ajax({
+													  url: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oSearchModule->id?>&type=1&autocomplete=1',
+													  dataType: 'json',
+													  data: {
+														queryString: request.term
+													  },
+													  success: function( data ) {
+														response( data );
+													  }
+													});
+												},
+												minLength: 1,
+												create: function() {
+													$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+														return $('<li></li>')
+															.data('item.autocomplete', item)
+															.append('<i class="' + item.icon + '"></i><a href="' + item.href + '" onclick="' + item.onclick + '">' + item.label + '</a>')
+															.appendTo(ul.addClass('searchhelper'));
+													}
+
+													$(this).prev('.ui-helper-hidden-accessible').remove();
+												},
+												select: function( event, ui ) {
+													var myClick = new Function(ui.item.onclick);
+													myClick();
+												},
+												open: function() {
+													$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+												},
+												close: function() {
+													$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+												}
+											});
+
+											<?php } ?>
 										});
 									</script>
 								</li>
@@ -382,7 +423,7 @@ class Skin_Bootstrap extends Core_Skin
 											</div>
 										</li>
 										<li class="dropdown-footer">
-											<a href="/admin/logout.php"onmousedown="$(window).off('beforeunload')"><?php echo Core::_('Admin.exit')?></a>
+											<a href="/admin/logout.php" onmousedown="$(window).off('beforeunload')"><?php echo Core::_('Admin.exit')?></a>
 										</li>
 									</ul>
 									<!--/Login Area Dropdown-->
@@ -435,11 +476,11 @@ class Skin_Bootstrap extends Core_Skin
 		<div class="page-sidebar" id="sidebar">
 			<!-- Page Sidebar Header-->
 			<div class="sidebar-header-wrapper">
-				<input type="text" class="searchinput" disabled="disabled" />
+				<input type="text" class="searchinput" />
 				<i class="searchicon fa fa-search"></i>
-				<div class="searchhelper">
+
 				<!-- Search Reports, Charts, Emails or Notifications -->
-				</div>
+				<!-- <div class="searchhelper"></div>-->
 			</div>
 			<!-- /Page Sidebar Header -->
 			<!-- Sidebar Menu -->

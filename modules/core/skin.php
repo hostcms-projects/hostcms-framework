@@ -203,7 +203,7 @@ abstract class Core_Skin
 	 * @var mixed
 	 */
 	protected $_config = array();
-	
+
 	/**
 	 * Get skin config
 	 * @return mixed
@@ -212,7 +212,7 @@ abstract class Core_Skin
 	{
 		return $this->_config;
 	}
-	
+
 	/**
 	 * Set skin config
 	 * @param mixed $config
@@ -221,10 +221,10 @@ abstract class Core_Skin
 	public function setConfig($config)
 	{
 		$this->_config = $config;
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Set answer
 	 * @return string
@@ -249,7 +249,7 @@ abstract class Core_Skin
 	 * @var array
 	 */
 	static public $skinModuleInstance = array();
-	
+
 	/**
 	 * Get skin's module
 	 * @param string $modulePath module path
@@ -261,17 +261,17 @@ abstract class Core_Skin
 		{
 			return self::$skinModuleInstance[$modulePath];
 		}
-		
+
 		$sSkinModuleName = $this->getSkinModuleName($modulePath);
 
 		if (class_exists($sSkinModuleName))
 		{
 			return self::$skinModuleInstance[$modulePath] = new $sSkinModuleName();
 		}
-		
+
 		return NULL;
 	}
-	
+
 	/**
 	 * Get skin's module name
 	 * @param string $modulePath module path
@@ -378,7 +378,7 @@ abstract class Core_Skin
 			->class('hostcmsPanel hostcmsTopPanel');
 
 		$oHostcmsSubPanel = Core::factory('Core_Html_Entity_Div')
-			->class('hostcmsSubPanel hostcmsWindow')
+			->class('hostcmsSubPanel')
 			->add(
 				Core::factory('Core_Html_Entity_Img')
 					->width(3)->height(16)
@@ -551,33 +551,36 @@ abstract class Core_Skin
 					->value(Core::_('Core.total_time', $oCore_Registry->get('Core_Statistics.totalTime')))
 			);
 
-		$oDebugWindow->add(
-			Core::factory('Core_Html_Entity_Ul')
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_load_modules', Core_Type_Conversion::toStr($GLOBALS['MTime'])))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_page_generation', $oCore_Registry->get('Core_Statistics.pageGenerationTime', 0)))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_database_connection', $oCore_Registry->get('Core_DataBase.connectTime', 0)))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_database_select', $oCore_Registry->get('Core_DataBase.selectDbTime', 0)))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_sql_execution', $oCore_Registry->get('Core_DataBase.queryTime', 0)))
-				)
-				->add(
-					Core::factory('Core_Html_Entity_Li')
-						->liValue(Core::_('Core.time_xml_execution',$oCore_Registry->get('Xsl_Processor.process', 0)))
-				)
-		);
+		$oDebugWindowUl = Core::factory('Core_Html_Entity_Ul');
+		$oDebugWindow->add($oDebugWindowUl);
+		
+		$aFrontentExecutionTimes = Core_Page::instance()->getFrontentExecutionTimes();
+		foreach ($aFrontentExecutionTimes as $sFrontentExecutionTimes)
+		{
+			$oDebugWindowUl->add(
+				Core::factory('Core_Html_Entity_Li')
+					->liValue($sFrontentExecutionTimes)
+			);
+		}
+
+		// Fixed Options
+		$oDebugWindowUl
+			->add(
+				Core::factory('Core_Html_Entity_Li')
+					->liValue(Core::_('Core.time_database_connection', $oCore_Registry->get('Core_DataBase.connectTime', 0)))
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Li')
+					->liValue(Core::_('Core.time_database_select', $oCore_Registry->get('Core_DataBase.selectDbTime', 0)))
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Li')
+					->liValue(Core::_('Core.time_sql_execution', $oCore_Registry->get('Core_DataBase.queryTime', 0)))
+			)
+			->add(
+				Core::factory('Core_Html_Entity_Li')
+					->liValue(Core::_('Core.time_xml_execution',$oCore_Registry->get('Xsl_Processor.process', 0)))
+			);
 
 		if (function_exists('memory_get_usage') && substr(PHP_OS, 0, 3) != 'WIN')
 		{

@@ -99,8 +99,7 @@ class Module_Model extends Core_Entity
 	 */
 	public function getConfigFilePath()
 	{
-		$classPath = Core::getClassPath($this->path);
-		return Core::$modulesPath . dirname($classPath) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php';
+		return Core_Config::instance()->getPath($this->path . '_config');
 	}
 
 	/**
@@ -110,16 +109,24 @@ class Module_Model extends Core_Entity
 	public function saveConfigFile($content)
 	{
 		$this->save();
-
 		$configFilePath = $this->getConfigFilePath();
-		$dir = dirname($configFilePath);
-		if (!is_dir($dir))
-		{
-			Core_File::mkdir($dir, CHMOD, $recursive = TRUE);
-		}
 
 		$content = trim($content);
-		Core_File::write($configFilePath, $content);
+		if (strlen($content))
+		{
+			$dir = dirname($configFilePath);
+			if (!is_dir($dir))
+			{
+				Core_File::mkdir($dir, CHMOD, $recursive = TRUE);
+			}
+
+
+			Core_File::write($configFilePath, $content);
+		}
+		elseif (is_file($configFilePath))
+		{
+			Core_File::delete($configFilePath);
+		}
 	}
 
 	/**
@@ -149,14 +156,14 @@ class Module_Model extends Core_Entity
 	public function changeActive()
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeChangeActive', $this);
-		
+
 		$this->active = 1 - $this->active;
 		$this->save();
 
 		$this->setupModule();
-		
+
 		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
-		
+
 		return $this;
 	}
 

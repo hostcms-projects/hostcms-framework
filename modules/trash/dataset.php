@@ -41,7 +41,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 	{
 		if (is_null($this->_count))
 		{
-			$this->_getTables();
+			$this->fillTables();
 			$this->_count = count($this->_objects);
 		}
 
@@ -53,6 +53,15 @@ class Trash_Dataset extends Admin_Form_Dataset
 	 * @var array
 	 */
 	protected $_objects = array();
+
+	/**
+	 * Get Objects
+	 * @return array
+	 */
+	public function getObjects()
+	{
+		return $this->_objects;
+	}
 
 	/**
 	 * Get new object
@@ -76,31 +85,46 @@ class Trash_Dataset extends Admin_Form_Dataset
 	 * Load data
 	 * @return self
 	 */
-	protected function _getTables()
+	public function fillTables()
 	{
 		$this->_objects = array();
-		$aTables = $this->_dataBase->getTables();
+
+		//$aTables = $this->_dataBase->getTables();
+		$aTables = $this->_dataBase->query('SHOW TABLE STATUS')->asAssoc()->result();
 
 		$queryBuilder = Core_QueryBuilder::select();
 
-		foreach ($aTables as $key => $name)
+		foreach ($aTables as $key => $aTableRow)
 		{
+			$name = Core_Array::get($aTableRow, 'Name');
+			$iRows = Core_Array::get($aTableRow, 'Rows');
+			$sEngine = strtoupper(Core_Array::get($aTableRow, 'Engine'));
+
 			$aColumns = $this->_dataBase->getColumns($name);
 
 			$id = $key + 1;
 
 			if (isset($aColumns['deleted']))
 			{
-				$row = $queryBuilder
-					->clear()
-					->select(array('COUNT(*)', 'count'))
-					->from($name)
-					->where('deleted', '=', 1)
-					->execute()
-					->asAssoc()
-					->current();
+				if ($iRows < 100000 || $sEngine == 'MYISAM')
+				{
+					$row = $queryBuilder
+						->clear()
+						->select(array('COUNT(*)', 'count'))
+						->from($name)
+						->where('deleted', '=', 1)
+						->execute()
+						->asAssoc()
+						->current();
 
-				if ($row['count'])
+					$count = $row['count'];
+				}
+				else
+				{
+					$count = '???';
+				}
+
+				if ($count)
 				{
 					$oTrash_Entity = $this->_objects[$id] = $this->_newObject();
 
@@ -115,7 +139,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 
 					$oTrash_Entity->id = $id;
 					$oTrash_Entity->table_name = $name;
-					
+
 					try {
 						$oTrash_Entity->name = Core::_($singular . '.model_name');
 					}
@@ -123,7 +147,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 						$oTrash_Entity->name = 'Unknown';
 					}
 
-					$oTrash_Entity->count = $row['count'];
+					$oTrash_Entity->count = $count;
 				}
 			}
 		}
@@ -147,7 +171,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 	 */
 	public function getObject($primaryKey)
 	{
-		!count($this->_objects) && $this->_getTables();
+		!count($this->_objects) && $this->fillTables();
 		return isset($this->_objects[$primaryKey])
 			? $this->_objects[$primaryKey]
 			: $this->_newObject();

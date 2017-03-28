@@ -346,16 +346,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					// Удаляем группу товаров
 					$oAdditionalTab->delete($this->getField('shop_group_id'));
 
-					$oShopGroupSelect = Admin_Form_Entity::factory('Select');
-					$oShopGroupSelect->caption(Core::_('Shop_Item.shop_group_id'))
-						->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
-						->name('shop_group_id')
-						->value($this->_object->shop_group_id)
-						->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
-						->filter(TRUE);
-
 					// Добавляем группу товаров
-					$oMainRow1->add($oShopGroupSelect);
+					$aResult = $this->shopGroupShow('shop_group_id');
+					foreach ($aResult as $resultItem)
+					{
+						$oMainRow1->add($resultItem);
+					}
 				}
 				else
 				{
@@ -881,7 +877,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Удаляем поле parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
-				$oShopGroupParentSelect = Admin_Form_Entity::factory('Select')
+				/*$oShopGroupParentSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Group.parent_id'))
 					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
@@ -889,7 +885,14 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->filter(TRUE);
 
 				// Добавляем поле parent_id
-				$oMainRow1->add($oShopGroupParentSelect);
+				$oMainRow1->add($oShopGroupParentSelect);*/
+
+				// Добавляем группу товаров
+				$aResult = $this->shopGroupShow('parent_id');
+				foreach ($aResult as $resultItem)
+				{
+					$oMainRow1->add($resultItem);
+				}
 
 				// Добавляем новое поле типа файл
 				$oImageField = Admin_Form_Entity::factory('File');
@@ -1704,6 +1707,104 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	}
 
 	/**
+	 * Показ списка групп или поле ввода с autocomplete для большого количества групп
+	 * @param string $fieldName имя поля группы
+	 * @return array  массив элементов, для доабвления в строку
+	 */
+	public function shopGroupShow($fieldName)
+	{
+		$return = array();
+
+		$iCountGroups = $this->_object->Shop->Shop_Groups->getCount();
+
+		switch (get_class($this->_object))
+		{
+			case 'Shop_Item_Model':
+				$i18n = 'Shop_Item';
+			break;
+			case 'Shop_Group_Model':
+			default:
+				$i18n = 'Shop_Group';
+		}
+
+		if ($iCountGroups < Core::$mainConfig['switchSelectToAutocomplete'])
+		{
+			$oShopGroupSelect = Admin_Form_Entity::factory('Select');
+			$oShopGroupSelect
+				->caption(Core::_($i18n . '.' . $fieldName))
+				->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
+				->name($fieldName)
+				->value($this->_object->$fieldName)
+				->divAttr(array('class' => 'form-group col-xs-12'))
+				->filter(TRUE);
+
+			$return = array($oShopGroupSelect);
+		}
+		else
+		{
+			$oShop_Group = Core_Entity::factory('Shop_Group', $this->_object->$fieldName);
+
+			$oShopGroupInput = Admin_Form_Entity::factory('Input')
+				->caption(Core::_($i18n . '.' . $fieldName))
+				->divAttr(array('class' => 'form-group col-xs-12'))
+				->name('shop_group_name');
+
+			$this->_object->$fieldName
+				&& $oShopGroupInput->value($oShop_Group->name . ' [' . $oShop_Group->id . ']');
+
+			$oShopGroupInputHidden = Admin_Form_Entity::factory('Input')
+				->divAttr(array('class' => 'form-group col-xs-12 hidden'))
+				->name($fieldName)
+				->value($this->_object->$fieldName)
+				->type('hidden');
+
+			$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
+			->type("text/javascript")
+			->value("
+				$('[name = shop_group_name]').autocomplete({
+					  source: function(request, response) {
+
+						$.ajax({
+						  url: '/admin/shop/item/index.php?autocomplete=1&show_group=1&shop_id={$this->_object->shop_id}',
+						  dataType: 'json',
+						  data: {
+							queryString: request.term
+						  },
+						  success: function( data ) {
+							response( data );
+						  }
+						});
+					  },
+					  minLength: 1,
+					  create: function() {
+						$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+							return $('<li></li>')
+								.data('item.autocomplete', item)
+								.append('<a>' + item.label + '</a>')
+								.appendTo(ul);
+						}
+
+						 $(this).prev('.ui-helper-hidden-accessible').remove();
+					  },
+					  select: function( event, ui ) {
+						$('[name = {$fieldName}]').val(ui.item.id);
+					  },
+					  open: function() {
+						$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+					  },
+					  close: function() {
+						$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+					  }
+				});
+			");
+
+			$return = array($oShopGroupInput, $oShopGroupInputHidden, $oCore_Html_Entity_Script);
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Fill producers list
 	 * @param int $iShopId shop ID
 	 * @return array
@@ -1887,7 +1988,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			{
 				if ($countExclude == 0 || !in_array($childrenGroup['id'], $aExclude))
 				{
-					$aReturn[$childrenGroup['id']] = str_repeat('  ', $iLevel) . $childrenGroup['name'];
+					$aReturn[$childrenGroup['id']] = str_repeat('  ', $iLevel) . $childrenGroup['name'] . ' [' . $childrenGroup['id'] . ']' ;
 					$aReturn += self::fillShopGroup($iShopId, $childrenGroup['id'], $aExclude, $iLevel + 1);
 				}
 			}

@@ -22,12 +22,28 @@ class Informationsystem_Controller_Load_Select_Options extends Admin_Form_Action
 	{
 		foreach ($this->_objects as $Object)
 		{
-			$this->_values[$Object->id] = !$Object->shortcut_id
+			$oTmp = new stdClass();
+			$oTmp->value = $Object->id;
+			$oTmp->name = !$Object->shortcut_id
 				? $Object->name
 				: $Object->Informationsystem_Item->name;
+
+			/*$this->_values[$Object->id] = !$Object->shortcut_id
+				? $Object->name
+				: $Object->Informationsystem_Item->name;*/
+			$this->_values[] = $oTmp;
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get count of objects
+	 * @return self
+	 */
+	protected function _getCount()
+	{
+		return $this->_model->getCount();
 	}
 
 	/**
@@ -38,6 +54,15 @@ class Informationsystem_Controller_Load_Select_Options extends Admin_Form_Action
 	{
 		$oInformationsystem = $this->_model->Informationsystem;
 
+		$offset = 0;
+		$limit = 1000;
+
+		$this->_model
+			->queryBuilder()
+			->clearOrderBy()
+			->clearSelect()
+			->select('id', 'shortcut_id', 'name');
+
 		switch ($oInformationsystem->items_sorting_direction)
 		{
 			case 1:
@@ -47,10 +72,6 @@ class Informationsystem_Controller_Load_Select_Options extends Admin_Form_Action
 			default:
 				$items_sorting_direction = 'ASC';
 		}
-
-		$this->_model
-			->queryBuilder()
-			->clearOrderBy();
 
 		// Определяем поле сортировки информационных элементов
 		switch ($oInformationsystem->items_sorting_field)
@@ -75,8 +96,22 @@ class Informationsystem_Controller_Load_Select_Options extends Admin_Form_Action
 					->orderBy('informationsystem_items.sorting', $items_sorting_direction);
 		}
 
-		// Find all objects
-		$this->_objects = $this->_model->findAll();
+		$this->_objects = array();
+
+		do {
+			$this->_model
+				->queryBuilder()
+				->offset($offset)
+				->limit($limit);
+
+			$aTmpObjects = $this->_model->findAll(FALSE);
+
+			count($aTmpObjects)
+				&& $this->_objects = array_merge($this->_objects, $aTmpObjects);
+
+			$offset += $limit;
+		}
+		while (count($aTmpObjects));
 
 		return $this;
 	}

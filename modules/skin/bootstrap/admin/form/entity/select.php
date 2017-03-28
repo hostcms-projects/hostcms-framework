@@ -38,15 +38,11 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 				<?php
 					if ($this->caseSensitive)
 					{
-				?>
-						<div class="col-lg-6 col-md-5 col-sm-5 col-xs-5">
-				<?php
+						?><div class="col-xs-5 col-lg-6"><?php
 					}
 					else
 					{
-				?>
-						<div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
-				<?php
+						?><div class="col-xs-7 col-sm-8"><?php
 					}
 		}
 

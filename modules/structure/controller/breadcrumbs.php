@@ -40,11 +40,14 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 		'showProperties',
 		'showInformationsystem',
 		'showShop',
+		'showForum',
 		'cache',
 		'informationsystem_item_id',
 		'informationsystem_group_id',
 		'shop_item_id',
 		'shop_group_id',
+		'forum_category_id',
+		'forum_topic_id',
 		'forbiddenTags',
 	);
 
@@ -77,7 +80,7 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 
 		$this->current = Core_Page::instance()->structure->id;
 
-		$this->showInformationsystem = $this->showShop = TRUE;
+		$this->showInformationsystem = $this->showShop = $this->showForum = TRUE;
 
 		$this->cache = TRUE;
 	}
@@ -155,6 +158,19 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 				if (Core_Page::instance()->object->group)
 				{
 					$this->shop_group_id = Core_Page::instance()->object->group;
+				}
+			}
+
+			if ($this->showForum && Core_Page::instance()->object instanceof Forum_Controller_Show)
+			{
+				if (Core_Page::instance()->object->category)
+				{
+					$this->forum_category_id = Core_Page::instance()->object->category;
+				}
+
+				if (Core_Page::instance()->object->topic)
+				{
+					$this->forum_topic_id = Core_Page::instance()->object->topic;
 				}
 			}
 		}
@@ -318,6 +334,73 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 					Core_Event::notify(get_class($this) . '.onAfterAddShopGroups', $this, array($aShop_Groups));
 				}
 			}
+
+			if ($this->showForum && Core_Page::instance()->object instanceof Forum_Controller_Show)
+			{
+				if ($this->forum_topic_id)
+				{
+					$oForum_Topic = Core_Entity::factory('Forum_Topic', $this->forum_topic_id);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddForumTopic', $this, array($oForum_Topic));
+
+					$oForum_Topic_Post = $oForum_Topic->Forum_Topic_Posts->getFirstPost();
+
+					if (!is_null($oForum_Topic_Post))
+					{
+						$oForum_Topic
+							->clearEntities()
+							->addForbiddenTag('url')
+							->addEntity(
+								Core::factory('Core_Xml_Entity')
+									->name('name')
+									->value(
+										$oForum_Topic_Post->subject
+									)
+							)
+							->addEntity(
+								Core::factory('Core_Xml_Entity')
+									->name('link')
+									->value(
+										$oForum_Topic->getPath()
+									)
+							)->addEntity(
+								Core::factory('Core_Xml_Entity')
+									->name('show')
+									->value(1)
+							);
+
+						$this->addBreadcrumb($oForum_Topic);
+
+						Core_Event::notify(get_class($this) . '.onAfterAddForumTopic', $this, array($oForum_Topic));
+					}
+				}
+
+				if ($this->forum_category_id)
+				{
+					$oForum_Category = Core_Entity::factory('Forum_Category', $this->forum_category_id);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddForumCategory', $this, array($oForum_Category));
+
+					$oForum_Category
+						->clearEntities()
+						->addForbiddenTag('url')
+						->addEntity(
+							Core::factory('Core_Xml_Entity')
+								->name('link')
+								->value(
+									$oForum_Category->getPath()
+								)
+						)->addEntity(
+							Core::factory('Core_Xml_Entity')
+								->name('show')
+								->value(1)
+						);
+
+					$this->addBreadcrumb($oForum_Category);
+
+					Core_Event::notify(get_class($this) . '.onAfterAddForumCategory', $this, array($oForum_Category));
+				}
+			}
 		}
 
 		$oStructure = Core_Entity::factory('Structure', $this->current)
@@ -337,9 +420,11 @@ class Structure_Controller_Breadcrumbs extends Core_Controller
 		foreach ($this->_breadcrumbs as $oStructure)
 		{
 			$this->applyForbiddenTags($oStructure);
-			$object->addEntity(
-				$oStructure->showXmlProperties($this->showProperties)
-			);
+
+			method_exists($oStructure, 'showXmlProperties')
+				&& $oStructure->showXmlProperties($this->showProperties);
+
+			$object->addEntity($oStructure);
 			$object = $oStructure;
 		}
 

@@ -224,7 +224,7 @@ class Shop_Producer_Controller_Show extends Core_Controller
 		}
 
 		$path = isset($matches['path'])
-			? trim($matches['path'], '/')
+			? Core_Str::rtrimUri($matches['path'])
 			: NULL;
 
 		if ($path != '')

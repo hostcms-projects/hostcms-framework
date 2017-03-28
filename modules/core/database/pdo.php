@@ -60,13 +60,25 @@ class Core_DataBase_Pdo extends Core_DataBase
 		// Trying to open connection. Prior to PHP 5.3.6 charset option is ignored
 		try
 		{
+			$aHost = explode(':', $this->_config['host']);
+
+			$dsn = "{$this->_config['driverName']}:host={$aHost[0]}";
+
+			isset($aHost[1])
+				&& $dsn .= ";port={$aHost[1]}";
+			
+			!is_null($this->_config['database'])
+				&& $dsn .= ";dbname={$this->_config['database']}";
+
+			$dsn .= ";charset={$this->_config['charset']}";
+
 			$this->_connection = new PDO(
-				"{$this->_config['driverName']}:host={$this->_config['host']};dbname={$this->_config['database']};charset={$this->_config['charset']}",
+				$dsn,
 				$this->_config['username'],
 				$this->_config['password'],
 				$this->_config['attr']
 			);
-			
+
 			$this->_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 		catch (PDOException $e)
@@ -756,6 +768,17 @@ class Core_DataBase_Pdo extends Core_DataBase
 		return NULL;
 	}
 
+	/**
+	 * Returns the number of columns in the result set 
+	 * @return integer|null number of columns in the result set
+	 */
+	public function getColumnCount()
+	{
+		return $this->_result
+			? $this->_result->columnCount()
+			: NULL;
+	}
+	
 	/**
 	 * Free last result memory
 	 * @return self

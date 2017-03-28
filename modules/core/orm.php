@@ -466,7 +466,10 @@ class Core_ORM
 			->asObject(get_class($this));
 
 		// Sets ORDER BY
-		if (!empty($this->_sorting) && !count($oSelect->getOrderBy()))
+		if (!empty($this->_sorting)
+			&& !is_null($oSelect->getOrderBy())
+			&& !count($oSelect->getOrderBy())
+		)
 		{
 			foreach ($this->_sorting as $column => $direction)
 			{

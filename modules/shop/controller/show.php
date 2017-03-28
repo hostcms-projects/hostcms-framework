@@ -53,6 +53,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsActivity('active'|'inactive'|'all') отображать элементы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - groupsActivity('active'|'inactive'|'all') отображать группы: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
  * - commentsActivity('active'|'inactive'|'all') отображать комментарии: active - только активные, inactive - только неактивные, all - все, по умолчанию - active
+ * - calculateTotal(TRUE|FALSE) вычислять общее количество найденных, по умолчанию TRUE
  * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
  *
  * Доступные свойства:
@@ -132,6 +133,7 @@ class Shop_Controller_Show extends Core_Controller
 		'itemsActivity',
 		'groupsActivity',
 		'commentsActivity',
+		'calculateTotal',
 		'showPanel',
 	);
 
@@ -228,7 +230,7 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
 			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed
-			= $this->votes = $this->showPanel = TRUE;
+			= $this->votes = $this->showPanel = $this->calculateTotal = TRUE;
 
 		$this->viewedLimit = $this->comparingLimit = $this->favoriteLimit = 10;
 
@@ -239,7 +241,7 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
-		$this->pattern = rawurldecode(trim($this->getEntity()->Structure->getPath(), '/')) . '({path})(/user-{user}/)(page-{page}/)(tag/{tag}/)(producer-{producer}/)';
+		$this->pattern = rawurldecode($this->getEntity()->Structure->getPath()) . '({path})(/user-{user}/)(page-{page}/)(tag/{tag}/)(producer-{producer}/)';
 		$this->patternExpressions = array(
 			'page' => '\d+',
 			'producer' => '\d+',
@@ -553,10 +555,10 @@ class Shop_Controller_Show extends Core_Controller
 					shuffle($hostcmsViewed);
 				break;
 				case 'ASC':
-					asort($hostcmsViewed);
+					ksort($hostcmsViewed);
 				break;
 				case 'DESC':
-					arsort($hostcmsViewed);
+					krsort($hostcmsViewed);
 				break;
 				default:
 					throw new Core_Exception("The viewedOrder direction '%direction' doesn't allow",
@@ -575,10 +577,10 @@ class Shop_Controller_Show extends Core_Controller
 				{
 					$this->applyItemsForbiddenTags($oShop_Item);
 
-					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
-					$this->comments && $oShop_Item->showXmlComments($this->comments);
-					$this->bonuses && $oShop_Item->showXmlBonuses($this->bonuses);
-					$this->specialprices && $oShop_Item->showXmlSpecialprices($this->specialprices);
+					$oShop_Item->showXmlProperties($this->itemsProperties);
+					$oShop_Item->showXmlComments($this->comments);
+					$oShop_Item->showXmlBonuses($this->bonuses);
+					$oShop_Item->showXmlSpecialprices($this->specialprices);
 
 					$oViewedEntity->addEntity($oShop_Item);
 				}
@@ -586,6 +588,45 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		return $this;
+	}
+
+
+	/**
+	 * Add into viewed list
+	 * @return self
+	 */
+	public function addIntoViewed()
+	{
+		if ($this->item)
+		{
+			$oShop = $this->getEntity();
+
+			if (Core_Entity::factory('Shop_Item', $this->item)->shop_id == $oShop->id)
+			{
+				Core_Session::start();
+
+				// Добавляем если такой товар еще не был просмотрен
+				if (!isset($_SESSION['hostcmsViewed'][$oShop->id])
+					|| !in_array($this->item, $_SESSION['hostcmsViewed'][$oShop->id]))
+				{
+					// Cut array
+					if (isset($_SESSION['hostcmsViewed'][$oShop->id])
+						&& count($_SESSION['hostcmsViewed'][$oShop->id]) > $this->viewedLimit)
+					{
+						$_SESSION['hostcmsViewed'][$oShop->id] = array_slice($x, -$this->viewedLimit, $this->viewedLimit);
+					}
+
+					$_SESSION['hostcmsViewed'][$oShop->id][] = $this->item;
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	public function addIntoViwed()
+	{
+		return $this->addIntoViewed();
 	}
 
 	/**
@@ -615,9 +656,12 @@ class Shop_Controller_Show extends Core_Controller
 		// Load user BEFORE FOUND_ROWS()
 		Core_Entity::factory('User', 0)->getCurrent();
 
+		$this->calculateTotal && $this->_Shop_Items
+			->queryBuilder()
+			->sqlCalcFoundRows();
+
 		$this->_Shop_Items
 			->queryBuilder()
-			->sqlCalcFoundRows()
 			->offset(intval($this->offset))
 			->limit(intval($this->limit));
 
@@ -721,10 +765,7 @@ class Shop_Controller_Show extends Core_Controller
 			// Group condition for shop item
 			$this->group !== FALSE && $this->_groupCondition();
 
-			if (!$this->item)
-			{
-				$this->_setLimits();
-			}
+			!$this->item && $this->_setLimits();
 
 			$aShop_Items = $this->_Shop_Items->findAll();
 
@@ -735,14 +776,17 @@ class Shop_Controller_Show extends Core_Controller
 					return $this->error404();
 				}
 
-				$row = Core_QueryBuilder::select(array('FOUND_ROWS()', 'count'))->execute()->asAssoc()->current();
-				$this->total = $row['count'];
+				if ($this->calculateTotal)
+				{
+					$row = Core_QueryBuilder::select(array('FOUND_ROWS()', 'count'))->execute()->asAssoc()->current();
+					$this->total = $row['count'];
 
-				$this->addEntity(
-					Core::factory('Core_Xml_Entity')
-						->name('total')
-						->value(intval($this->total))
-				);
+					$this->addEntity(
+						Core::factory('Core_Xml_Entity')
+							->name('total')
+							->value(intval($this->total))
+					);
+				}
 			}
 		}
 
@@ -889,21 +933,22 @@ class Shop_Controller_Show extends Core_Controller
 					$this->applyItemsForbiddenTags($oShop_Item);
 
 					// Comments
-					$this->comments && $oShop_Item->showXmlComments(TRUE)->commentsActivity($this->commentsActivity);
+					$oShop_Item
+						->showXmlComments($this->comments)
+						->commentsActivity($this->commentsActivity);
 
-					$this->bonuses && $oShop_Item->showXmlBonuses(TRUE);
-					$this->warehousesItems && $oShop_Item->showXmlWarehousesItems(TRUE);
-					$this->associatedItems && $oShop_Item->showXmlAssociatedItems(TRUE);
-					$this->modifications && $oShop_Item->showXmlModifications(TRUE);
-					$this->specialprices && $oShop_Item->showXmlSpecialprices(TRUE);
-					$this->tags && $oShop_Item->showXmlTags(TRUE);
-					$this->votes && $oShop_Item->showXmlVotes(TRUE);
-
-					// Properties for shop's item entity
-					$this->itemsProperties && $oShop_Item->showXmlProperties($mShowPropertyIDs);
+					$oShop_Item->showXmlBonuses($this->bonuses);
+					$oShop_Item->showXmlWarehousesItems($this->warehousesItems);
+					$oShop_Item->showXmlAssociatedItems($this->associatedItems);
+					$oShop_Item->showXmlModifications($this->modifications);
+					$oShop_Item->showXmlSpecialprices($this->specialprices);
+					$oShop_Item->showXmlTags($this->tags);
+					$oShop_Item->showXmlVotes($this->votes);
+					
+					$oShop_Item->showXmlProperties($mShowPropertyIDs);
 
 					// Siteuser
-					$this->siteuser && $oShop_Item->showXmlSiteuser(TRUE)
+					$oShop_Item->showXmlSiteuser($this->siteuser)
 						->showXmlSiteuserProperties($this->siteuserProperties);
 
 					$this->addEntity($oShop_Item);
@@ -1229,7 +1274,7 @@ class Shop_Controller_Show extends Core_Controller
 		}
 
 		$path = isset($matches['path'])
-			? trim($matches['path'], '/')
+			? Core_Str::rtrimUri($matches['path'])
 			: NULL;
 
 		$this->group = 0;
@@ -1317,12 +1362,14 @@ class Shop_Controller_Show extends Core_Controller
 							}
 							else
 							{
+								$this->group = FALSE;
 								$this->item = FALSE;
 								return $this->error404();
 							}
 						}
 						else
 						{
+							$this->group = FALSE;
 							return $this->error404();
 						}
 					}
@@ -1567,7 +1614,7 @@ class Shop_Controller_Show extends Core_Controller
 			->class('hostcmsPanel');
 
 		$oXslSubPanel = Core::factory('Core_Html_Entity_Div')
-			->class('hostcmsSubPanel hostcmsWindow hostcmsXsl')
+			->class('hostcmsSubPanel hostcmsXsl')
 			->add(
 				Core::factory('Core_Html_Entity_Img')
 					->width(3)->height(16)

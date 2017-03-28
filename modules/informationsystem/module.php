@@ -17,13 +17,13 @@ class Informationsystem_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.5';
+	public $version = '6.6';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-06-09';
+	public $date = '2016-08-01';
 
 	/**
 	 * Module name
@@ -38,9 +38,9 @@ class Informationsystem_Module extends Core_Module
 	protected $_scheduleActions = array(
 		0 => 'searchIndexItem',
 		1 => 'searchIndexGroup',
-		2 => 'searchUnindexItem',		
+		2 => 'searchUnindexItem',
 	);
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -281,7 +281,58 @@ class Informationsystem_Module extends Core_Module
 
 		return $this;
 	}
+
+	/**
+	 * Backend search callback function
+	 * @param Search_Page_Model $oSearch_Page
+	 * @return array 'href' and 'onclick'
+	 */
+	public function backendSearchCallback($oSearch_Page)
+	{
+		$href = $onclick = NULL;
+
+		$iAdmin_Form_Id = 12;
+		$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
+		$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form)->formSettings();
+
+		$sPath = '/admin/informationsystem/item/index.php';
+
+		if ($oSearch_Page->module_value_id)
+		{
+			switch ($oSearch_Page->module_value_type)
+			{
+				case 1: // Информационые группы
+					$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group')->find($oSearch_Page->module_value_id);
+
+					if (!is_null($oInformationsystem_Group->id))
+					{
+						$additionalParams = "informationsystem_id={$oInformationsystem_Group->Informationsystem->id}&informationsystem_group_id={$oInformationsystem_Group->id}";
+						$href = $oAdmin_Form_Controller->getAdminLoadHref($sPath, NULL, NULL, $additionalParams);
+						$onclick = $oAdmin_Form_Controller->getAdminLoadAjax($sPath, NULL, NULL, $additionalParams);
+					}
+				break;
+				case 2: // Информационые элементы
+					$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item')->find($oSearch_Page->module_value_id);
+
+					if (!is_null($oInformationsystem_Item->id))
+					{
+						$additionalParams = "informationsystem_id={$oInformationsystem_Item->Informationsystem->id}&informationsystem_group_id={$oInformationsystem_Item->informationsystem_group_id}";
+						
+						$href = $oAdmin_Form_Controller->getAdminActionLoadHref($sPath, 'edit', NULL, 1, $oInformationsystem_Item->id, $additionalParams);
 	
+						$onclick = $oAdmin_Form_Controller->getAdminActionLoadAjax($sPath, 'edit', NULL, 1, $oInformationsystem_Item->id, $additionalParams);
+					}
+				break;
+			}
+		}
+
+		return array(
+			'icon' => 'fa-tasks',
+			'href' => $href,
+			'onclick' => $onclick
+		);
+	}
+
 	/**
 	 * Notify module on the action on schedule
 	 * @param int $action action number

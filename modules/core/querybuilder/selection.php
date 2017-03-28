@@ -593,7 +593,7 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 	 */
 	public function clearOrderBy()
 	{
-		$this->_orderBy = array();
+		$this->_orderBy = NULL;
 		return $this;
 	}
 

@@ -46,7 +46,7 @@ class Xsl_Processor_Observer
 				->class('hostcmsPanel');
 
 			$oXslSubPanel = Core::factory('Core_Html_Entity_Div')
-				->class('hostcmsSubPanel hostcmsWindow hostcmsXsl')
+				->class('hostcmsSubPanel hostcmsXsl')
 				->add(
 					Core::factory('Core_Html_Entity_Img')
 						->width(3)->height(16)
