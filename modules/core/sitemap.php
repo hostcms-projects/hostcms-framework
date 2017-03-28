@@ -132,6 +132,10 @@ class Core_Sitemap extends Core_Servant_Properties
 	 * Add structure nodes by parent
 	 * @param int $structure_id structure ID
 	 * @return self
+	 * @hostcms-event Core_Sitemap.onBeforeSelectInformationsystemGroups
+	 * @hostcms-event Core_Sitemap.onBeforeSelectInformationsystemItems
+	 * @hostcms-event Core_Sitemap.onBeforeSelectShopGroups
+	 * @hostcms-event Core_Sitemap.onBeforeSelectShopItems
 	 */
 	protected function _structure($structure_id = 0)
 	{
@@ -156,7 +160,17 @@ class Core_Sitemap extends Core_Servant_Properties
 			{
 				$oInformationsystem = $this->_Informationsystems[$oStructure->id];
 
-				$offset = 0;
+				$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+				$oCore_QueryBuilder_Select
+					->from('informationsystem_groups')
+					->where('informationsystem_groups.informationsystem_id', '=', $oInformationsystem->id)
+					->where('informationsystem_groups.deleted', '=', 0);
+				$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+				$maxId = $aRow['max_id'];
+
+				$iFrom = 0;
+
+				$path = $sProtocol . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
 
 				do {
 					$oInformationsystem_Groups = $oInformationsystem->Informationsystem_Groups;
@@ -166,27 +180,35 @@ class Core_Sitemap extends Core_Servant_Properties
 							'informationsystem_groups.parent_id',
 							'informationsystem_groups.path'
 							)
+						->where('informationsystem_groups.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 						->where('informationsystem_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 						->where('informationsystem_groups.active', '=', 1)
-						->where('informationsystem_groups.indexing', '=', 1)
-						->offset($offset)->limit($this->limit);
+						->where('informationsystem_groups.indexing', '=', 1);
+
+					Core_Event::notify('Core_Sitemap.onBeforeSelectInformationsystemGroups', $this, array($oInformationsystem_Groups));
 
 					$aInformationsystem_Groups = $oInformationsystem_Groups->findAll(FALSE);
-
-					$path = $sProtocol . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
 
 					foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
 					{
 						$this->addNode($path . $oInformationsystem_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
 					}
-					$offset += $this->limit;
+					$iFrom += $this->limit;
 				}
-				while (count($aInformationsystem_Groups));
+				while ($iFrom < $maxId);
 
 				// Informationsystem's items
 				if ($this->showInformationsystemItems)
 				{
-					$offset = 0;
+					$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+					$oCore_QueryBuilder_Select
+						->from('informationsystem_items')
+						->where('informationsystem_items.informationsystem_id', '=', $oInformationsystem->id)
+						->where('informationsystem_items.deleted', '=', 0);
+					$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+					$maxId = $aRow['max_id'];
+
+					$iFrom = 0;
 
 					do {
 						$oInformationsystem_Items = $oInformationsystem->Informationsystem_Items;
@@ -197,6 +219,7 @@ class Core_Sitemap extends Core_Servant_Properties
 								'informationsystem_items.shortcut_id',
 								'informationsystem_items.path'
 								)
+							->where('informationsystem_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 							->open()
 							->where('informationsystem_items.start_datetime', '<', $dateTime)
 							->setOr()
@@ -211,8 +234,9 @@ class Core_Sitemap extends Core_Servant_Properties
 							->where('informationsystem_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 							->where('informationsystem_items.active', '=', 1)
 							->where('informationsystem_items.shortcut_id', '=', 0)
-							->where('informationsystem_items.indexing', '=', 1)
-							->offset($offset)->limit($this->limit);
+							->where('informationsystem_items.indexing', '=', 1);
+
+						Core_Event::notify('Core_Sitemap.onBeforeSelectInformationsystemItems', $this, array($oInformationsystem_Items));
 
 						$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
 						foreach ($aInformationsystem_Items as $oInformationsystem_Item)
@@ -220,9 +244,9 @@ class Core_Sitemap extends Core_Servant_Properties
 							$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
 						}
 
-						$offset += $this->limit;
+						$iFrom += $this->limit;
 					}
-					while (count($aInformationsystem_Items));
+					while ($iFrom < $maxId);
 				}
 			}
 
@@ -231,7 +255,17 @@ class Core_Sitemap extends Core_Servant_Properties
 			{
 				$oShop = $this->_Shops[$oStructure->id];
 
-				$offset = 0;
+				$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+				$oCore_QueryBuilder_Select
+					->from('shop_groups')
+					->where('shop_groups.shop_id', '=', $oShop->id)
+					->where('shop_groups.deleted', '=', 0);
+				$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+				$maxId = $aRow['max_id'];
+
+				$iFrom = 0;
+
+				$path = $sProtocol . $oSite_Alias->name . $oShop->Structure->getPath();
 
 				do {
 					$oShop_Groups = $oShop->Shop_Groups;
@@ -241,27 +275,36 @@ class Core_Sitemap extends Core_Servant_Properties
 							'shop_groups.parent_id',
 							'shop_groups.path'
 							)
+						->where('shop_groups.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 						->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 						->where('shop_groups.active', '=', 1)
-						->where('shop_groups.indexing', '=', 1)
-						->offset($offset)->limit($this->limit);
+						->where('shop_groups.indexing', '=', 1);
+
+					Core_Event::notify('Core_Sitemap.onBeforeSelectShopGroups', $this, array($oShop_Groups));
 
 					$aShop_Groups = $oShop_Groups->findAll(FALSE);
 
-					$path = $sProtocol . $oSite_Alias->name . $oShop->Structure->getPath();
 					foreach ($aShop_Groups as $oShop_Group)
 					{
 						$this->addNode($path . $oShop_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
 					}
 
-					$offset += $this->limit;
+					$iFrom += $this->limit;
 				}
-				while (count($aShop_Groups));
+				while ($iFrom < $maxId);
 
 				// Shop's items
 				if ($this->showShopItems)
 				{
-					$offset = 0;
+					$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+					$oCore_QueryBuilder_Select
+						->from('shop_items')
+						->where('shop_items.shop_id', '=', $oShop->id)
+						->where('shop_items.deleted', '=', 0);
+					$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
+					$maxId = $aRow['max_id'];
+
+					$iFrom = 0;
 
 					do {
 						$oShop_Items = $oShop->Shop_Items;
@@ -273,6 +316,7 @@ class Core_Sitemap extends Core_Servant_Properties
 								'shop_items.modification_id',
 								'shop_items.path'
 								)
+							->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))	
 							->open()
 							->where('shop_items.start_datetime', '<', $dateTime)
 							->setOr()
@@ -287,25 +331,23 @@ class Core_Sitemap extends Core_Servant_Properties
 							->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 							->where('shop_items.active', '=', 1)
 							->where('shop_items.shortcut_id', '=', 0)
-							->where('shop_items.indexing', '=', 1)
-							->offset($offset)->limit($this->limit);
+							->where('shop_items.indexing', '=', 1);
 
 						// Modifications
-						if (!$this->showModifications)
-						{
-							$oShop_Items->queryBuilder()
-								->where('shop_items.modification_id', '=', 0);
-						}
+						!$this->showModifications
+							&& $oShop_Items->queryBuilder()->where('shop_items.modification_id', '=', 0);
 
+						Core_Event::notify('Core_Sitemap.onBeforeSelectShopItems', $this, array($oShop_Items));
+						
 						$aShop_Items = $oShop_Items->findAll(FALSE);
 						foreach ($aShop_Items as $oShop_Item)
 						{
 							$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
 						}
 
-						$offset += $this->limit;
+						$iFrom += $this->limit;
 					}
-					while (count($aShop_Items));
+					while ($iFrom < $maxId);
 				}
 			}
 

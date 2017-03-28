@@ -142,7 +142,7 @@ class Wysiwyg_Filemanager_Dataset extends Admin_Form_Dataset
 							$Wysiwyg_Filemanager_File->setSortField($sortField);
 							$Wysiwyg_Filemanager_File->path = $this->_path;
 							//$Wysiwyg_Filemanager_File->name = mb_convert_encoding($file, 'UTF-8');
-							$Wysiwyg_Filemanager_File->name = iconv(mb_detect_encoding($file, mb_detect_order(), TRUE), "UTF-8", $file);
+							$Wysiwyg_Filemanager_File->name = @iconv(mb_detect_encoding($file, mb_detect_order(), TRUE), "UTF-8", $file);
 							$Wysiwyg_Filemanager_File->datetime = Core_Date::timestamp2sql($stat[9]);
 							$Wysiwyg_Filemanager_File->type = $this->_type;
 							$Wysiwyg_Filemanager_File->size = $isDir

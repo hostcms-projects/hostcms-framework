@@ -96,6 +96,7 @@ class Core_Page extends Core_Servant_Properties
 		'structure',
 		'response',
 		'libParams',
+		'widgetParams',
 		'object',
 		'buildingPage',
 		'fileTimestamp',
@@ -136,14 +137,28 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
+	 * Current executing object
+	 */
+	protected $_currentObject = NULL;
+
+	/**
+	 * Get current executing object
+	 * @return mixed
+	 */
+	public function getCurrentObject()
+	{
+		return $this->_currentObject;
+	}
+
+	/**
 	 * Executes the business logic.
 	 */
 	public function execute()
 	{
 		if (count($this->_children))
 		{
-			$object = array_shift($this->_children);
-			return $object->execute();
+			$this->_currentObject = array_shift($this->_children);
+			return $this->_currentObject->execute();
 		}
 
 		return $this;
@@ -338,6 +353,18 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
+	 * Link $js to the beginning of list
+	 * @param string $js path
+	 * @param boolean $async Run asynchronously, default FALSE
+	 * @return Core_Page
+	 */
+	public function prependJs($js, $async = FALSE)
+	{
+		array_unshift($this->js, array($js, $async));
+		return $this;
+	}
+
+	/**
 	 * Link js
 	 * @param string $js path
 	 * @param boolean $async Run asynchronously, default FALSE
@@ -471,7 +498,7 @@ class Core_Page extends Core_Servant_Properties
 	 */
 	public function addTemplates(Template_Model $oTemplate)
 	{
-		$aCss = array();
+		$aCss = $aJs = array();
 
 		do {
 			$this
@@ -479,10 +506,13 @@ class Core_Page extends Core_Servant_Properties
 				->addChild($oTemplate);
 
 			$aCss[] = $oTemplate->getTemplateCssFileHref();
+			$aJs[] = array($oTemplate->getTemplateJsFileHref(), FALSE);
 
 		} while($oTemplate = $oTemplate->getParent());
 
 		$this->css = array_merge($this->css, array_reverse($aCss));
+
+		$this->js = array_merge($this->js, array_reverse($aJs));
 
 		return $this;
 	}
@@ -605,13 +635,13 @@ class Core_Page extends Core_Servant_Properties
 
 		return $this;
 	}
-	
+
 	/**
 	 * frontentExecutionTimes
 	 * @var array
 	 */
 	protected $_frontentExecutionTimes = array();
-	
+
 	/**
 	 * Add Frontent Execution Time
 	 * @var string $value
@@ -622,7 +652,7 @@ class Core_Page extends Core_Servant_Properties
 		$this->_frontentExecutionTimes[] = $value;
 		return $this;
 	}
-	
+
 	/**
 	 * Get array of Frontent Execution Time
 	 * @return array

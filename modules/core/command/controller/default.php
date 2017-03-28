@@ -493,7 +493,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		$sContent = ob_get_clean();
 
 		// PHP Bug: pcre.recursion_limit too large.
-		substr(PHP_OS, 0, 3) == 'WIN' && ini_set("pcre.recursion_limit", "524");
+		substr(PHP_OS, 0, 3) == 'WIN' && ini_set('pcre.recursion_limit', '524');
 
 		// Если необходимо защищать электронные адреса, опубликованные на сайте
 		if ($oSite->safe_email && strlen($sContent) < 204800)
@@ -537,7 +537,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			strlen($sTmpContent) && $sContent = $sTmpContent;
 		}
 
-		if (Core_Array::get($_SERVER, 'REQUEST_URI') == '/' && !((~Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms')) & (~1835217467)) && strlen($sContent) < 204800)
+		if (Core_Array::get($_SERVER, 'REQUEST_URI') == '/' && !((~Core::convert64b32(Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms'))) & (~1835217467)) && strlen($sContent) < 204800)
 		{
 			$search = array (
 				"'<script[^>]*?>.*?</script>'siu",
@@ -548,16 +548,16 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				"'<!--.*?-->'siu"
 			);
 
-			$sTmpContent = preg_replace($search, ' ', str_replace(array("\r", "\n"), " ", $sContent));
+			$sTmpContent = preg_replace($search, ' ', str_replace(array("\r", "\n"), ' ', $sContent));
 
 			$pattern_index = "(?<!noindex)(?<!display)(?<!visible)";
 			$pat = "#<a([^>]{$pattern_index})*href=((\"http://(www.|)hostcms.ru(/|)\")|(http://(www.|)hostcms.ru(/|)))([^>]{$pattern_index})*>(.{3,})</a>#u";
 
 			if (!Core_Auth::logged() && !preg_match_all($pat, $sTmpContent, $matches))
 			{
-				$sContent = '<div style="border: 1px solid #E83531; border-radius: 5px; background: #FEEFDA; text-align: center; clear: both; height: 100px; position: relative;' . (Core::checkPanel() ? 'margin-top: 38px;' : '') . '">
-					<div style="position: absolute; right: 3px; top: 3px; font-family: courier new; font-weight: bold;"><a href="#" onclick="javascript:this.parentNode.parentNode.style.display=\"none\"; return false;"><img src="/admin/images/wclose.gif" style="border: none;" alt="Close this notice"/></a></div>
-					<div style="width: 740px; margin: 0 auto; text-align: left; padding: 0; overflow: hidden; color: black;"><div style="width: 75px; float: left"><img src="http://www.ie6nomore.com/files/theme/ie6nomore-warning.jpg" alt="Warning!"/></div>
+				$sContent = '<div style="box-sizing: border-box; border: 1px solid #E83531; z-index: 999999; border-radius: 5px; background: #FEEFDA; text-align: center; clear: both; height: 120px; position: relative;' . (Core::checkPanel() ? 'margin-top: 38px;' : '') . '">
+					<div style="position: absolute; right: 3px; top: 3px; font-family: courier new; font-weight: bold;"><a href="#" onclick="javascript:this.parentNode.parentNode.style.display=\'none\'; return false;"><img src="/admin/images/wclose.gif" style="border: none;" alt="Close this notice"/></a></div>
+					<div style="box-sizing: border-box; width: 740px; margin: 0 auto; text-align: left; padding: 0; overflow: hidden; color: black;"><div style="width: 75px; float: left"><img src="http://www.ie6nomore.com/files/theme/ie6nomore-warning.jpg" alt="Warning!"/></div>
 					<div style="width: 600px; float: left; font-family: Arial, sans-serif"><div style="font-size: 14px; font-weight: bold; margin-top: 12px;">Нарушение п. 3.4 лицензионого договора присоединения</div>
 					<div style="font-size: 12px; margin-top: 6px; line-height: 12px">Пользователь бесплатной редакции HostCMS.Халява обязуется разместить на каждом сайте, работающем с использованием Программного продукта, активную, индексируемую и видимую при просмотре сайта ссылку
 					<div><b>' . htmlspecialchars('<a href="http://www.hostcms.ru" target="_blank">Система управления сайтом Host CMS</a>') . '</b></div> на сайт производителя <a href="http://www.hostcms.ru" target="_blank">http://www.hostcms.ru</a>.</div>

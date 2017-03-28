@@ -613,7 +613,7 @@ class Shop_Controller_Show extends Core_Controller
 					if (isset($_SESSION['hostcmsViewed'][$oShop->id])
 						&& count($_SESSION['hostcmsViewed'][$oShop->id]) > $this->viewedLimit)
 					{
-						$_SESSION['hostcmsViewed'][$oShop->id] = array_slice($x, -$this->viewedLimit, $this->viewedLimit);
+						$_SESSION['hostcmsViewed'][$oShop->id] = array_slice($_SESSION['hostcmsViewed'][$oShop->id], -$this->viewedLimit, $this->viewedLimit);
 					}
 
 					$_SESSION['hostcmsViewed'][$oShop->id][] = $this->item;

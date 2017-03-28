@@ -18,7 +18,13 @@ class Template_Dir_Model extends Core_Entity
 	 * @var int
 	 */
 	public $img = 0;
-
+	
+	/**
+	 * Backend property
+	 * @var int
+	 */
+	public $tempalte_sections = 0;
+	
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array

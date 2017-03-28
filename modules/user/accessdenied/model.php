@@ -37,11 +37,11 @@ class User_Accessdenied_Model extends Core_Entity
 	}
 
 	/**
-	 * Get element by IP
+	 * Get last by IP
 	 * @param string $ip IP
-	 * @return array
+	 * @return User_Accessdenied_Model|NULL
 	 */
-	public function getByIp($ip)
+	public function getLastByIp($ip)
 	{
 		$date = Core_Date::timestamp2sql(time() - $this->_deltaTime);
 
@@ -49,8 +49,30 @@ class User_Accessdenied_Model extends Core_Entity
 			->clear()
 			->where('datetime', '>=', $date)
 			->where('ip', '=', $ip)
-			->orderBy('datetime', 'DESC');
+			->orderBy('datetime', 'DESC')
+			->limit(1);
 
-		return $this->findAll();
+		$aUser_Accessdenied = $this->findAll(FALSE);
+
+		return isset($aUser_Accessdenied[0])
+			? $aUser_Accessdenied[0]
+			: NULL;
+	}
+
+	/**
+	 * Get by IP and datetime
+	 * @param string $ip IP
+	 * @return int
+	 */
+	public function getCountByIp($ip)
+	{
+		$date = Core_Date::timestamp2sql(time() - $this->_deltaTime);
+
+		$this->queryBuilder()
+			->clear()
+			->where('datetime', '>=', $date)
+			->where('ip', '=', $ip);
+
+		return $this->getCount(FALSE);
 	}
 }

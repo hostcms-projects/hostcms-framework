@@ -63,7 +63,7 @@ class Core_Str
 	static public function deleteIllegalCharacters($string)
 	{
 		$string = strtr($string, self::getXmlIllegalCharacters());
-		return iconv("UTF-8", "UTF-8//IGNORE//TRANSLIT",
+		return @iconv("UTF-8", "UTF-8//IGNORE//TRANSLIT",
 			//str_replace(self::getXmlIllegalCharacters(), '', $string)
 			$string
 		);
@@ -143,11 +143,11 @@ class Core_Str
 		{
 			$text = mb_substr($text, 0, $maxLen);
 
-			$last_point = mb_strrpos($text, '. ');
+			preg_match('/^((?:.*?[.!?。])*)/su', $text, $matches);
 
-			$text = $last_point === FALSE
-				? mb_substr($text, 0, mb_strrpos($text, ' '))
-				: mb_substr($text, 0, $last_point + 1);
+			$text = isset($matches[1])
+				? $matches[1]
+				: mb_substr($text, 0, mb_strrpos($text, ' '));
 		}
 
 		return $text;
@@ -563,7 +563,7 @@ class Core_Str
 
 		return $uri;
 	}
-	
+
 	/**
 	 * ucfirst for utf-8 string
 	 * @param string $str source string
@@ -576,5 +576,53 @@ class Core_Str
 			$str = mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
 		}
 		return $str;
+	}
+
+	/**
+	 * Conveert HEX color to RGB or RGBA
+	 * @param string $hex HEX color, e.g. #B781AF or #FF0
+	 * @param float|NULL opacity between 0 and 1, e.g. 0.85
+	 */
+	static public function hex2rgba($hex, $opacity = NULL)
+	{
+		$default = 'rgb(0,0,0)';
+
+		if (empty($hex))
+		{
+			return $default;
+		}
+
+		$hex = ltrim($hex, '#');
+
+		//Check if color has 6 or 3 characters and get values
+		if (strlen($hex) == 6)
+		{
+			$hex = str_split($hex, 2);
+		}
+		elseif(strlen($hex) == 3)
+		{
+			$hex = array($hex[0] . $hex[0], $hex[1] . $hex[1], $hex[2] . $hex[2]);
+		}
+		else
+		{
+			return $default;
+		}
+
+		// Convert hexadec to rgb
+		$rgb = array_map('hexdec', $hex);
+
+		//Check if opacity is set(rgba or rgb)
+		if ($opacity)
+		{
+			abs($opacity) > 1 && $opacity = 1;
+
+			$return = 'rgba(' . implode(',', $rgb) . ',' . $opacity . ')';
+		}
+		else
+		{
+			$return = 'rgb(' . implode(',', $rgb) . ')';
+		}
+
+		return $return;
 	}
 }

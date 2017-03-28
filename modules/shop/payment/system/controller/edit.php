@@ -89,11 +89,10 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 			: '';
 
 		$sFormPath = $this->_Admin_Form_Controller->getPath();
-
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oImageField
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
 			->name("image")
 			->id("image")
 			->largeImage(array(
@@ -104,10 +103,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 				'watermark_position_x' => $oShop->watermark_default_position_x,
 				'watermark_position_y' => $oShop->watermark_default_position_y,
 				'place_watermark_checkbox_checked' => 0,
-				'delete_onclick' =>
-				"$.adminLoad({path: '{$sFormPath}', additionalParams:
-				'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1',
-				action: 'deleteImage', windowId: '{$windowId}'}); return false",
+				'delete_onclick' => "$.adminLoad({path: '{$sFormPath}', additionalParams: 'hostcms[checked][{$this->_datasetId}][{$this->_object->id}]=1&shop_id={$oShop->id}', action: 'deleteImage', windowId: '{$windowId}'}); return false",
 				'caption' => Core::_('Shop_Delivery.image'),
 				'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio
 			))

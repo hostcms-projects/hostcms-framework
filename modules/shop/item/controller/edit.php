@@ -668,6 +668,24 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					}
 				}
 
+				$oSiteAlias = $oShop->Site->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$sItemUrl = ($oShop->Structure->https ? 'https://' : 'http://')
+						. $oSiteAlias->name
+						. $oShop->Structure->getPath()
+						. $this->_object->getPath();
+
+					$this->getField('path')
+						->add(
+							Admin_Form_Entity::factory('A')
+								->target('_blank')
+								->href($sItemUrl)
+								->class('input-group-addon bg-blue bordered-blue')
+								->value('<i class="fa fa-external-link"></i>')
+						);
+				}
+
 				$oMainTab
 					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
 					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
@@ -1031,14 +1049,32 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Добавляем группы пользователей сайта
 				$oMainRow5->add($oSiteUserGroupSelect);
 
-				$oMainTab->move($this->getField("path"), $oMainRow3);
+				$oSiteAlias = $oShop->Site->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$sGroupUrl = ($oShop->Structure->https ? 'https://' : 'http://')
+						. $oSiteAlias->name
+						. $oShop->Structure->getPath()
+						. $this->_object->getPath();
+				}
 
-				$oDescriptionField = $this->getField("description")
+				$this->getField('path')
+					->add(
+						Admin_Form_Entity::factory('A')
+							->target('_blank')
+							->href($sGroupUrl)
+							->class('input-group-addon bg-blue bordered-blue')
+							->value('<i class="fa fa-external-link"></i>')
+				);
+
+				$oMainTab->move($this->getField('path'), $oMainRow3);
+
+				$oDescriptionField = $this->getField('description')
 					->wysiwyg(TRUE)
 					->template_id($template_id);
 
 				$oShopGroupDescriptionTab
-					->move($this->getField("description"), $oShopGroupDescriptionTabRow1)
+					->move($this->getField('description'), $oShopGroupDescriptionTabRow1)
 				;
 
 				if (Core::moduleIsActive('typograph'))
@@ -1745,7 +1781,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$shop_id = Core_Array::getPost('shop_id');
 			$path = Core_Array::getPost('path');
 
-			if ($path == '')
+			/*if ($path == '')
 			{
 				$this->_object->name = Core_Array::getPost('name');
 				$this->_object->path = Core_Array::getPost('path');
@@ -1755,7 +1791,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$path = $this->_object->path;
 
 				$this->addSkipColumn('path');
-			}
+			}*/
 
 			$modelName = $this->_object->getModelName();
 

@@ -106,7 +106,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab->move($this->getField('description'), $oMainRow6);
 
 				// DTD для всех языков
-				$aRows = $this->_getLngList();
+				$aRows = Site_Controller::instance()->getLngList();
 
 				foreach ($aRows as $aRow)
 				{
@@ -179,22 +179,6 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	}
 
 	/**
-	 * Get list of languages
-	 * @return array
-	 */
-	protected function _getLngList()
-	{
-		$queryBuilder = Core_QueryBuilder::select('lng')
-			->from('sites')
-			->where('lng', '!=', '')
-			->groupBY('lng');
-
-		$aRows = $queryBuilder->execute()->asAssoc()->result();
-
-		return $aRows;
-	}
-
-	/**
 	 * Create visual tree of the directories
 	 * @param int $iXslDirParentId parent directory ID
 	 * @param boolean $bExclude exclude group ID
@@ -251,7 +235,7 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->_object->saveXslFile($xsl_value);
 
 				// DTD для всех языков
-				$aRows = $this->_getLngList();
+				$aRows = Site_Controller::instance()->getLngList();
 
 				foreach ($aRows as $aRow)
 				{

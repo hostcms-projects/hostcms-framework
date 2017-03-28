@@ -100,13 +100,14 @@ class Core_Http_Curl extends Core_Http
 
 		if (ini_get('open_basedir') == '' && ini_get('safe_mode') != 1 && strtolower(ini_get('safe_mode')) != 'off')
 		{
+			// When CURLOPT_FOLLOWLOCATION and CURLOPT_HEADER are both true and redirects have happened then the header returned by curl_exec() will contain all the headers in the redirect chain in the order they were encountered.
 			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
 		}
 		else
 		{
 			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
 
-			$mr = 5;
+			$mr = $maxredirect = 5;
 
 			if ($mr > 0)
 			{
@@ -142,14 +143,6 @@ class Core_Http_Curl extends Core_Http
 
 				if (!$mr)
 				{
-					if (is_null($maxredirect))
-					{
-						trigger_error('Too many redirects. When following redirects, libcurl hit the maximum amount.', E_USER_WARNING);
-					}
-					else
-					{
-						$maxredirect = 0;
-					}
 					return false;
 				}
 				curl_setopt($curl, CURLOPT_URL, $newurl);

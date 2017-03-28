@@ -50,7 +50,8 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 				Core::_('Lib_Property.lib_property_type_2'),
 				Core::_('Lib_Property.lib_property_type_3'),
 				Core::_('Lib_Property.lib_property_type_4'),
-				Core::_('Lib_Property.lib_property_type_5')
+				Core::_('Lib_Property.lib_property_type_5'),
+				Core::_('Lib_Property.lib_property_type_6')
 			))
 			->name('type')
 			->value($this->_object->type)
@@ -79,29 +80,27 @@ class Lib_Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
 			;
 
-		$this->getField('sql_request')->divAttr(array('id' => 'sql_request', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
-		$this->getField('sql_caption_field')->divAttr(array('id' => 'sql_caption_field', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
-		$this->getField('sql_value_field')->divAttr(array('id' => 'sql_value_field', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+		$this->getField('sql_request')->divAttr(array('id' => 'sql_request', 'class' => 'form-group col-xs-12'));
+		$this->getField('sql_caption_field')->divAttr(array('id' => 'sql_caption_field', 'class' => 'form-group col-md-6 col-xs-12'));
+		$this->getField('sql_value_field')->divAttr(array('id' => 'sql_value_field', 'class' => 'form-group col-md-6 col-xs-12'));
 
 		$oMainTab
 			->move($this->getField('name'), $oMainRow1)
 			->move($this->getField('description'), $oMainRow2)
-			->move($this->getField('varible_name'), $oMainRow3)
-			->move($this->getField('default_value'), $oMainRow5)
-			->move($this->getField('sorting'), $oMainRow6)
-			->move($this->getField('sql_request'), $oMainRow7)
-			->move($this->getField('sql_caption_field'), $oMainRow8)
-			->move($this->getField('sql_value_field'), $oMainRow9);
+			->move($this->getField('varible_name')->divAttr(array('class' => 'form-group col-md-6 col-xs-12')), $oMainRow3)
+			->move($this->getField('default_value')->divAttr(array('class' => 'form-group col-md-6 col-xs-12')), $oMainRow5)
+			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-md-3 col-xs-12')), $oMainRow5)
+			->move($this->getField('sql_request'), $oMainRow6)
+			->move($this->getField('sql_caption_field'), $oMainRow7)
+			->move($this->getField('sql_value_field'), $oMainRow7);
 
 		// Удаляем стандартный <input>
 		$oMainTab->delete($this->getField('type'));
 
 		//$oMainTab->addAfter($oHtmlFormSelect, $this->getField('varible_name'));
-		$oMainRow4->add($oHtmlFormSelect);
+		$oMainRow3->add($oHtmlFormSelect->divAttr(array('class' => 'form-group col-md-6 col-xs-12')));
 
 		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 		$oAdmin_Form_Entity_Code->html(

@@ -440,6 +440,8 @@ class Shop_Cart_Controller_Onestep extends Core_Controller
 
 		foreach ($aShop_Deliveries as $oShop_Delivery)
 		{
+			$aShop_Delivery_Condition = array();
+					
 			if ($oShop_Delivery->type == 0)
 			{
 				$oShop_Delivery_Condition_Controller = new Shop_Delivery_Condition_Controller();

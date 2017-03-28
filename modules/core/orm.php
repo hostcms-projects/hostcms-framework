@@ -1015,7 +1015,7 @@ class Core_ORM
 		self::$_columnCacheDefaultValues[$this->_modelName] = array();
 		foreach (self::$_columnCache[$this->_modelName] as $key => $aColumn)
 		{
-			!is_null($aColumn['default'])
+			!is_null($aColumn['default']) && $aColumn['default'] != 'CURRENT_TIMESTAMP'
 				&& self::$_columnCacheDefaultValues[$this->_modelName][$key] = $aColumn['default'];
 		}
 

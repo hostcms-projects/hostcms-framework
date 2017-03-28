@@ -14,6 +14,31 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Core_Command_Controller_Robots extends Core_Command_Controller
 {
 	/**
+	 * Robots
+	 */
+	protected $_robots = NULL;
+
+	/**
+	 * Get robots.txt content
+	 * @return string|NULL
+	 */
+	public function getRobots()
+	{
+		return $this->_robots;
+	}
+
+	/**
+	 * Set robots.txt content
+	 * @param string
+	 * @return self
+	 */
+	public function setRobots($robots)
+	{
+		$this->_robots = $robots;
+		return $this;
+	}
+
+	/**
 	 * Default controller action
 	 * @return Core_Response
 	 * @hostcms-event Core_Command_Controller_Robots.onBeforeShowAction
@@ -21,25 +46,29 @@ class Core_Command_Controller_Robots extends Core_Command_Controller
 	 */
 	public function showAction()
 	{
+		$oSite = Core_Entity::factory('Site')->getByAlias(Core::$url['host']);
+
+		!is_null($oSite)
+			&& $this->setRobots($oSite->robots);
+
 		Core_Event::notify(get_class($this) . '.onBeforeShowAction', $this);
 
 		$oCore_Response = new Core_Response();
+		$oCore_Response->header('X-Powered-By', 'HostCMS');
 
-		$oSite = Core_Entity::factory('Site')->getByAlias(Core::$url['host']);
+		$content = $this->getRobots();
 
-		if ($oSite)
+		if (!is_null($content))
 		{
 			$oCore_Response
 				->status(200)
 				->header('Content-Type', "text/plain; charset={$oSite->coding}")
 				->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . ' GMT')
-				->header('X-Powered-By', 'HostCMS')
-				->body($oSite->robots);
+				->body($content);
 		}
 		else
 		{
-			$oCore_Response
-				->status(404);
+			$oCore_Response->status(404);
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterShowAction', $this, array($oCore_Response));

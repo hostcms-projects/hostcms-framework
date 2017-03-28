@@ -117,6 +117,9 @@ class Shop_Payment_System_Model extends Core_Entity
 		} catch (Exception $e) {}
 
 		$this->Shop_Delivery_Payment_Systems->deleteAll(FALSE);
+		
+		// Удаляем файл изображения
+		$this->deleteImage();		
 
 		return parent::delete($primaryKey);
 	}

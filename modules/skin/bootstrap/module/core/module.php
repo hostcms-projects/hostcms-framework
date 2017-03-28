@@ -76,7 +76,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				}
 				else
 				{
-					?><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="notesAdminPage">
+					?><div class="col-xs-12" id="notesAdminPage">
 						<script type="text/javascript">
 						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#notesAdminPage') });
 						</script>
@@ -91,9 +91,9 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				}
 				else
 				{
-					?><div class="col-xs-12 col-sm-8 col-md-8 col-lg-8" id="eventsAdminPage">
+					?><div class="col-xs-12 col-sm-8" id="coreEventsAdminPage">
 						<script type="text/javascript">
-						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#eventsAdminPage') });
+						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#coreEventsAdminPage') });
 						</script>
 					</div><?php
 				}
@@ -135,7 +135,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 					<a data-toggle="maximize">
 						<i class="fa fa-expand gray"></i>
 					</a>
-					<a onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#eventsAdminPage'), 'button': $(this).find('i') });">
+					<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#coreEventsAdminPage'), 'button': $(this).find('i') });">
 						<i class="fa fa-refresh gray"></i>
 					</a>
 				</div>
@@ -275,7 +275,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 					<a data-toggle="maximize">
 						<i class="fa fa-expand gray"></i>
 					</a>
-					<a onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#characteristicsAdminPage'), 'button': $(this).find('i') });">
+					<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#characteristicsAdminPage'), 'button': $(this).find('i') });">
 						<i class="fa fa-refresh gray"></i>
 					</a>
 				</div>

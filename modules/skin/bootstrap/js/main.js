@@ -213,6 +213,9 @@ function isEmpty(str) {
 				ALimit = '&limit=' + ALimit;
 			}*/
 
+			// Очистим поле для сообщений
+			jQuery("#"+settings.windowId+" #id_message").empty();
+
 			$.loadingScreen('show');
 
 			jQuery.ajax({
@@ -380,18 +383,20 @@ function isEmpty(str) {
 				jQuery.afterContentLoad(jObject, data);
 			}
 
-			var jMessage = jObject.find('#id_message');
-
-			if (jMessage.length === 0)
+			if (data.error != '')
 			{
-				jMessage = jQuery('<div>').attr('id', 'id_message');
-				jObject.prepend(jMessage);
+				var jMessage = jObject.find('#id_message');
+
+				/*if (jMessage.length === 0)
+				{
+					jMessage = jQuery('<div>').attr('id', 'id_message');
+					jObject.prepend(jMessage);
+				}*/
+
+				jMessage.empty().html(data.error);
 			}
 
-			jMessage.empty().html(data.error);
-
-			if (typeof data.title != 'undefined' && !isEmpty(data.title) && jObject.attr('id') == 'id_content'
-			)
+			if (typeof data.title != 'undefined' && !isEmpty(data.title) && jObject.attr('id') == 'id_content')
 			{
 				document.title = data.title;
 			}
@@ -594,6 +599,25 @@ function isEmpty(str) {
 		deleteNewDeliveryOption: function(object)
 		{
 			var jObject = jQuery(object).closest('.delivery_options').remove();
+		},
+		cloneMultipleValue: function(windowId, cloneDelete)
+		{
+			var jMultipleValue = jQuery(cloneDelete).closest('.multiple_value'),
+			jNewObject = jMultipleValue.clone();
+
+			// Change input name
+			jNewObject.find(':regex(name, ^\\S+_\\d+$)').each(function(index, object){
+				var reg = /^(\S+)_(\d+)$/;
+				var arr = reg.exec(object.name);
+				jQuery(object).prop('name', arr[1] + '_' + '[]');
+			});
+			jNewObject.find("input,select").val('');
+
+			jNewObject.insertAfter(jMultipleValue);
+		},
+		deleteNewMultipleValue: function(object)
+		{
+			var jObject = jQuery(object).closest('.multiple_value').remove();
 		},
 		clonePropertyInfSys: function(windowId, index)
 		{

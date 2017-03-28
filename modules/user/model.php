@@ -171,11 +171,11 @@ class User_Model extends Core_Entity
 
 	/**
 	 * Check if user has access to module
-	 * @param string $aModuleNames module name
+	 * @param array $aModuleNames module name
 	 * @param Site_Model $oSite
 	 * @return boolean
 	 */
-	public function checkModuleAccess($aModuleNames, Site_Model $oSite)
+	public function checkModuleAccess(array $aModuleNames, Site_Model $oSite)
 	{
 		foreach ($aModuleNames as $sModuleName)
 		{

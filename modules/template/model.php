@@ -20,6 +20,12 @@ class Template_Model extends Core_Entity
 	public $img = 1;
 
 	/**
+	 * Backend property
+	 * @var int
+	 */
+	public $template_sections = 1;
+
+	/**
 	 * Belongs to relations
 	 * @var array
 	 */
@@ -34,7 +40,8 @@ class Template_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_hasMany = array(
-		'template' => array()
+		'template' => array(),
+		'template_section' => array()
 	);
 
 	/**
@@ -42,6 +49,7 @@ class Template_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_preloadValues = array(
+		'less' => 0,
 		'sorting' => 0,
 		'data_template_id' => 0
 	);
@@ -124,20 +132,26 @@ class Template_Model extends Core_Entity
 	{
 		$this->save();
 		$this->_createDir();
-		$content = trim($content);
-		Core_File::write($this->getTemplateFilePath(), $content);
+		Core_File::write($this->getTemplateFilePath(), trim($content));
 		return $this;
 	}
 
 	/**
-	 * Save object.
-	 *
-	 * @return Core_Entity
+	 * Update Timestamp
+	 * @return self
 	 */
-	public function save()
+	public function updateTimestamp()
 	{
 		$this->timestamp = Core_Date::timestamp2sql(time());
-		return parent::save();
+		$this->save();
+
+		$aTemplates = $this->Templates->findAll(FALSE);
+		foreach ($aTemplates as $oTemplate)
+		{
+			$oTemplate->updateTimestamp();
+		}
+
+		return $this;
 	}
 
 	/**
@@ -148,12 +162,9 @@ class Template_Model extends Core_Entity
 	{
 		$path = $this->getTemplateFilePath();
 
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
-
-		return NULL;
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**
@@ -186,13 +197,16 @@ class Template_Model extends Core_Entity
 	/**
 	 * Specify CSS for template
 	 * @param string $content CSS
+	 * @return self
 	 */
 	public function saveTemplateCssFile($content)
 	{
 		$this->save();
 		$this->_createDir();
-		$content = trim($content);
-		Core_File::write($this->getTemplateCssFilePath(), $content);
+
+		Core_File::write($this->getTemplateCssFilePath(), trim($content));
+
+		return $this;
 	}
 
 	/**
@@ -203,12 +217,138 @@ class Template_Model extends Core_Entity
 	{
 		$path = $this->getTemplateCssFilePath();
 
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
+	}
 
-		return NULL;
+	/**
+	 * Get href to template's LESS file
+	 * @return string
+	 */
+	public function getTemplateLessFileHref()
+	{
+		return '/' . $this->_getDir() . '/style.less';
+	}
+
+	/**
+	 * Get path to template's LESS file
+	 * @return string
+	 */
+	public function getTemplateLessFilePath()
+	{
+		return CMS_FOLDER . $this->_getDir() . '/style.less';
+	}
+
+	/**
+	 * Specify LESS for template and rebuild CSS
+	 * @param string $content LESS
+	 * @return self
+	 */
+	public function saveTemplateLessFile($content)
+	{
+		$this->save();
+		$this->_createDir();
+
+		Core_File::write($this->getTemplateLessFilePath(), trim($content));
+
+		// Rebuild CSS
+		$oTemplate_Less = $this->_getTemplateLess();
+		$css = $oTemplate_Less->compile($content);
+		$this->saveTemplateCssFile($css);
+
+		return $this;
+	}
+
+	/**
+	 * Get LESS for template
+	 * @return string|NULL
+	 */
+	public function loadTemplateLessFile()
+	{
+		$path = $this->getTemplateLessFilePath();
+
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
+	}
+
+	/**
+	 * Get href to template's JS file
+	 * @return string
+	 */
+	public function getTemplateJsFileHref()
+	{
+		return '/' . $this->_getDir() . '/script.js';
+	}
+
+	/**
+	 * Get path to template's JS file
+	 * @return string
+	 */
+	public function getTemplateJsFilePath()
+	{
+		return CMS_FOLDER . $this->_getDir() . '/script.js';
+	}
+
+	/**
+	 * Specify JS for template
+	 * @param string $content JS
+	 * @return self
+	 */
+	public function saveTemplateJsFile($content)
+	{
+		$this->save();
+		$this->_createDir();
+		Core_File::write($this->getTemplateJsFilePath(), trim($content));
+		return $this;
+	}
+
+	/**
+	 * Get JS for template
+	 * @return string|NULL
+	 */
+	public function loadTemplateJsFile()
+	{
+		$path = $this->getTemplateJsFilePath();
+
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
+	}
+
+	/**
+	 * Get manifest path
+	 * @return string
+	 */
+	public function getManifestPath()
+	{
+		return CMS_FOLDER . $this->_getDir() . '/manifest.xml';
+	}
+
+	/**
+	 * Get manifest file content
+	 * @return string|NULL
+	 */
+	public function loadManifestFile()
+	{
+		$path = $this->getManifestPath();
+
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
+	}
+
+	/**
+	 * Specify manifest file content
+	 * @param string $content content
+	 */
+	public function saveManifestFile($content)
+	{
+		$this->save();
+
+		$content = trim($content);
+		Core_File::write($this->getManifestPath(), $content);
 	}
 
 	/**
@@ -231,7 +371,7 @@ class Template_Model extends Core_Entity
 	}
 
 	/**
-	 * Get parent comment
+	 * Get parent template
 	 * @return Template_Model|NULL
 	 */
 	public function getParent()
@@ -299,11 +439,8 @@ class Template_Model extends Core_Entity
 		}
 		catch (Exception $e) {}
 
-		$aTemplates = $this->Templates->findAll(FALSE);
-		foreach ($aTemplates as $oTemplate)
-		{
-			$oTemplate->delete();
-		}
+		$this->Templates->deleteAll(FALSE);
+		$this->Template_Sections->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}
@@ -345,5 +482,278 @@ class Template_Model extends Core_Entity
 			->class('badge badge-hostcms badge-square')
 			->value($count)
 			->execute();
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function template_sectionsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Template_Sections->getCount();
+
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-darkorange white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
+	}
+
+	/**
+	 * Rebuild Compression Css
+	 * @return self
+	 */
+	public function rebuildCompressionCss()
+	{
+		// Обновляем сохраненные минимизированные CSS
+		if (Core::moduleIsActive('compression'))
+		{
+			$oCompression_Controller = Compression_Controller::instance('css');
+
+			$sTemplatePath = $this->getTemplateCssFileHref();
+
+			$oCompression_Css = Core_Entity::factory('Compression_Css');
+			$oCompression_Css
+				->queryBuilder()
+				->where('path', 'LIKE', $sTemplatePath)
+				->groupBy('filename');
+
+			$aCompression_Css_With_Path = $oCompression_Css->findAll(FALSE);
+
+			foreach ($aCompression_Css_With_Path as $oCompression_Css)
+			{
+				$oCompression_Controller->clear();
+
+				$aCompression_Css = Core_Entity::factory('Compression_Css')->getAllByFilename(
+					$oCompression_Css->filename
+				);
+
+				// Все файлы, использованные при создании этого CSS
+				foreach ($aCompression_Css as $oTmpCompression_Css)
+				{
+					$oCompression_Controller->addCss(
+						$oTmpCompression_Css->path
+					);
+				}
+
+				$oCompression_Controller->buildCss($oCompression_Css->filename, TRUE);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * checkUserAccess cache
+	 * @var boolean
+	 */
+	protected $_checkUserAccess = NULL;
+
+	/**
+	 * Check current user acccess
+	 * @return boolean
+	 */
+	public function checkUserAccess()
+	{
+		if (is_null($this->_checkUserAccess))
+		{
+			if (Core::checkPanel() && Core_Auth::logged())
+			{
+				$oUser = Core_Entity::factory('User')->getCurrent();
+				$this->_checkUserAccess = $oUser->checkModuleAccess(array('template'), $this->Site)
+					&& $oUser->checkObjectAccess($this);
+			}
+			else
+			{
+				$this->_checkUserAccess = FALSE;
+			}
+		}
+
+		return $this->_checkUserAccess;
+	}
+
+	/**
+	 * Show Section by Name
+	 * @param string $sectionName
+	 * @return self
+	 */
+	public function showSection($sectionName)
+	{
+		$oTemplate_Section = $this->Template_Sections->getByAlias($sectionName);
+
+		if (!is_null($oTemplate_Section))
+		{
+			//$bUserAccess = $this->checkUserAccess();
+			$bUserAccess = Core::checkPanel() && Core_Auth::logged();
+
+			if ($bUserAccess)
+			{
+				// Настройки секции
+				$sPath = '/admin/template/section/index.php';
+				$sAdditionalSectionSettings = "hostcms[action]=edit&template_id={$this->id}&template_dir_id={$this->Template_Dir->id}&hostcms[checked][0][{$oTemplate_Section->id}]=1";
+				$sOnclickSectionSettings = "hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditionalSectionSettings}', dialogClass: 'hostcms6'}); return false";
+				$sTitleSectionSettings = htmlspecialchars(Core::_('Template_Section.section_settings', $oTemplate_Section->name));
+
+				// Добавление виджета в секцию
+				$sPathAddWidget = '/admin/template/section/lib/index.php';
+				$sAdditionalAddWidget = "hostcms[action]=edit&template_section_id={$oTemplate_Section->id}&hostcms[checked][0][0]=1";
+				$sOnclickAddWidget = "hQuery.openWindow({path: '{$sPathAddWidget}', additionalParams: '{$sAdditionalAddWidget}', dialogClass: 'hostcms6'}); return false";
+				$sTitleAddWidget = Core::_('Template_Section.add_widget');
+				?>
+
+				<div class="hostcmsSection" id="hostcmsSection<?php echo $oTemplate_Section->id?>" style="border-color: <?php echo Core_Str::hex2rgba($oTemplate_Section->color, 0.8)?>">
+					<div class="hostcmsSectionPanel">
+						<div class="draggable-indicator">
+							<svg width="16px" height="16px" viewBox="0 0 32 32">
+								<rect height="4" width="4" y="4" x="4" />
+								<rect height="4" width="4" y="12" x="4" />
+								<rect height="4" width="4" y="4" x="12"/>
+								<rect height="4" width="4" y="12" x="12"/>
+								<rect height="4" width="4" y="4" x="20"/>
+								<rect height="4" width="4" y="12" x="20"/>
+								<rect height="4" width="4" y="4" x="28"/>
+								<rect height="4" width="4" y="12" x="28"/>
+							</svg>
+						</div>
+						<div><a href="<?php echo "{$sPathAddWidget}?{$sAdditionalAddWidget}"?>" onclick="<?php echo $sOnclickAddWidget ?>" alt="<?php echo $sTitleAddWidget ?>" title="<?php echo $sTitleAddWidget ?>"><i class="fa fa-fw fa-plus"></i></a></div>
+
+						<div><a href="<?php echo "{$sPath}?{$sAdditionalSectionSettings}"?>" onclick="<?php echo $sOnclickSectionSettings ?>" alt="<?php echo $sTitleSectionSettings ?>" title="<?php echo $sTitleSectionSettings ?>"><i class="fa fa-fw fa-cog"></i></a></div>
+					</div>
+				<?php
+			}
+
+			$oTemplate_Section_Libs = $oTemplate_Section->Template_Section_Libs;
+			$oTemplate_Section_Libs->queryBuilder()
+				//->where('template_section_libs.active', '=', 1)
+				->clearOrderBy()
+				->orderBy('template_section_libs.sorting', 'ASC');
+
+			$aTemplate_Section_Libs = $oTemplate_Section_Libs->findAll(FALSE);
+
+			foreach ($aTemplate_Section_Libs as $oTemplate_Section_Lib)
+			{
+				$oTemplate_Section_Lib->execute();
+			}
+
+			if ($bUserAccess)
+			{
+				?></div><?php
+			}
+		}
+		else
+		{
+			throw new Core_Exception('Section %name does not exist!', array('%name' => $sectionName));
+		}
+	}
+
+	protected $_lessVariables = NULL;
+
+	/**
+	 * Get Template_Less
+	 * @return Template_Less
+	 */
+	protected function _getTemplateLess()
+	{
+		$oTemplate_Less = new Template_Less();
+		$oTemplate_Less->setImportDir(array(CMS_FOLDER));
+		return $oTemplate_Less;
+	}
+
+	public function showManifest()
+	{
+		if ($this->less)
+		{
+			$manifest = $this->loadManifestFile();
+
+			if (strlen($manifest))
+			{
+				$less = $this->loadTemplateLessFile();
+
+				if (strlen($less))
+				{
+					try
+					{
+						$oTemplate_Less = $this->_getTemplateLess();
+						$oTemplate_Less->compile($less);
+						$this->_lessVariables = $oTemplate_Less->getVariables();
+					}
+					catch (Exception $e)
+					{
+						Core_Message::show($e->getMessage(), 'error');
+					}
+
+					// print_r($this->_lessVariables);
+
+					?><div class="row panel-heading">
+						<div class="col-xs-12"><?php echo htmlspecialchars($this->name)?></div>
+					</div><?php
+
+					$oXml = @simplexml_load_string($manifest);
+
+					if (is_object($oXml))
+					{
+						$this->_parseManifest($oXml);
+					}
+				}
+			}
+		}
+	}
+
+	protected function _parseManifest($oXml)
+	{
+		$aSections = $oXml->xpath('section');
+
+		foreach ($aSections as $oSection)
+		{
+			// Отображение секции только при наличии в ней опций
+			if (count($oSection->xpath('option')))
+			{
+				$oSectionName = $oSection->xpath('caption[@lng="' . 'ru' .'"]');
+				if (isset($oSectionName[0]))
+				{
+					?><div class="row panel-section-heading">
+						<div class="col-xs-12">
+							<?php echo strval($oSectionName[0])?>
+						</div>
+					</div>
+					<?php
+				}
+
+				$this->_parseManifest($oSection);
+			}
+		}
+
+		$aOptions = $oXml->xpath('option');
+
+		foreach ($aOptions as $oOption)
+		{
+			$oOptionName = $oOption->xpath('caption[@lng="' . 'ru' .'"]');
+
+			if (isset($oOptionName[0]))
+			{
+				$fieldName = strval($oOption->attributes()->name);
+				$fieldType = strval($oOption->attributes()->type);
+
+				if (isset($this->_lessVariables[$fieldName]))
+				{
+					$lessFieldValue = $this->_lessVariables[$fieldName]['value'];
+					$lessFieldType = $this->_lessVariables[$fieldName]['type'];
+				}
+				else
+				{
+					$lessFieldValue = $lessFieldType = NULL;
+				}
+
+				?><div class="row panel-item">
+					<div class="col-xs-12">
+						<label for="<?php echo $fieldName?>"><?php echo strval($oOptionName[0])?></label>
+						<input type="text" class="form-control <?php echo $fieldType == 'color' ? 'colorpicker' : ''?>" name="<?php echo $fieldName?>" value="<?php echo htmlspecialchars($lessFieldValue)?>" <?php echo $fieldType == 'color' && ($lessFieldType == 'rgb' || $lessFieldType == 'rgba') ? 'data-format="rgb"' : '' ?> <?php echo $fieldType == 'color' && $lessFieldType == 'rgba' ? 'data-rgba="true"' : '' ?> data-template="<?php echo $this->id ?>" />
+					</div>
+				</div>
+				<?php
+			}
+		}
 	}
 }

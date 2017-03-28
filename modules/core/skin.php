@@ -328,14 +328,12 @@ abstract class Core_Skin
 		{
 			if (Core::isInit())
 			{
-				$this->_lng = htmlspecialchars(
-					Core_Entity::factory('Admin_Language')->getCurrent()->shortname
-				);
+				$oAdmin_Language = Core_Entity::factory('Admin_Language')->getCurrent();
+				!is_null($oAdmin_Language) && $this->_lng = htmlspecialchars($oAdmin_Language->shortname);
 			}
-			else
-			{
-				$this->_lng = Core_I18n::instance()->getLng();
-			}
+			
+			is_null($this->_lng)
+				&& $this->_lng = Core_I18n::instance()->getLng();
 		}
 		return $this->_lng;
 	}
@@ -367,12 +365,84 @@ abstract class Core_Skin
 	{
 		$iTimestamp = abs(Core::crc32(defined('CURRENT_VERSION') ? CURRENT_VERSION : '6.0'));
 
+		?><link rel="stylesheet" type="text/css" href="/modules/skin/default/frontend/bootstrap-iso.css?<?php echo $iTimestamp?>" /><?php
 		?><link rel="stylesheet" type="text/css" href="/modules/skin/default/frontend/frontend.css?<?php echo $iTimestamp?>" /><?php
+		?><link rel="stylesheet" type="text/css" href="/modules/skin/bootstrap/js/toastr/toastr.css?<?php echo $iTimestamp?>" /><?php
+		?><link rel="stylesheet" type="text/css" href="/modules/skin/default/frontend/fontawesome/css/font-awesome.min.css?<?php echo $iTimestamp?>" /><?php
 		?><script src="/modules/skin/default/frontend/jquery.min.js"></script><?php
 		?><script src="/modules/skin/default/frontend/jquery-ui.min.js" type="text/javascript"></script><?php
 		?><script src="/admin/wysiwyg/jquery.tinymce.js" type="text/javascript"></script><?php
+		?><script src="/modules/skin/bootstrap/js/colorpicker/jquery.minicolors.min.js" type="text/javascript"></script><?php
+		?><script src="/modules/skin/bootstrap/js/jquery.slimscroll.min.js" type="text/javascript"></script><?php
+		?><script src="/modules/skin/bootstrap/js/toastr/toastr.js" type="text/javascript"></script><?php
 		?><script type="text/javascript">var hQuery = $.noConflict(true);</script><?php
-		?><script src="/modules/skin/default/frontend/frontend.js" type="text/javascript"></script><?php
+		?><script src="/modules/skin/default/frontend/frontend.js" type="text/javascript"></script>
+
+		<?php
+		$oTemplate = Core_Page::instance()->template;
+		$aTemplates = array();
+		$bLess = FALSE;
+		do {
+			$aTemplates[] = $oTemplate;
+
+			$oTemplate->less && $bLess = TRUE;
+		} while($oTemplate = $oTemplate->getParent());
+
+		$aTemplates = array_reverse($aTemplates);
+
+		if ($bLess)
+		{
+			?><div class="bootstrap-iso">
+				<div class="template-settings">
+					<span id="slidepanel-settings" onclick="hQuery.toggleSlidePanel()"><i class="fa fa-fw fa-cog"></i></span>
+					<div class="slidepanel">
+						<div class="container scroll-template-settings">
+							<?php
+							foreach ($aTemplates as $oTemplate)
+							{
+								$oTemplate->showManifest();
+							}
+							?>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<script type="text/javascript">
+			hQuery('.bootstrap-iso .colorpicker').each(function () {
+				hQuery(this).minicolors({
+					control: $(this).attr('data-control') || 'hue',
+					defaultValue: $(this).attr('data-defaultValue') || '',
+					inline: $(this).attr('data-inline') === 'true',
+					letterCase: $(this).attr('data-letterCase') || 'lowercase',
+					opacity: $(this).attr('data-rgba'),
+					position: $(this).attr('data-position') || 'bottom right',
+					format: $(this).attr('data-format') || 'hex',
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (opacity) hex += ', ' + opacity;
+						try {
+						} catch (e) { }
+					},
+					hide: /*function() {*/
+						hQuery.sendLessVariable
+					/*}*/,
+					theme: 'bootstrap'
+				});
+			});
+
+			hQuery('.bootstrap-iso input:not(.colorpicker)').on('change', hQuery.sendLessVariable);
+
+			hQuery('.scroll-template-settings').slimscroll({
+				height: '100%',
+				color: '#fff',
+				size: '5px',
+				railOpacity: 1,
+				opacity: 1,
+			});
+			</script>
+			<?php
+		}
 
 		$oHostcmsTopPanel = Core::factory('Core_Html_Entity_Div')
 			->class('hostcmsPanel hostcmsTopPanel');
@@ -553,7 +623,7 @@ abstract class Core_Skin
 
 		$oDebugWindowUl = Core::factory('Core_Html_Entity_Ul');
 		$oDebugWindow->add($oDebugWindowUl);
-		
+
 		$aFrontentExecutionTimes = Core_Page::instance()->getFrontentExecutionTimes();
 		foreach ($aFrontentExecutionTimes as $sFrontentExecutionTimes)
 		{
@@ -840,7 +910,8 @@ abstract class Core_Skin
 					->value(
 						'(function($){' .
 						'$("body").addClass("backendBody");' .
-						'$(".hostcmsPanel").draggable({containment: "document"});' .
+						'$(".hostcmsPanel,.hostcmsSectionPanel,.hostcmsSectionWidgetPanel").draggable({containment: "document"});' .
+						'$.sortWidget();' .
 						'$("*[hostcms\\\\:id]").hostcmsEditable({path: "/edit-in-place.php"});'.
 						'})(hQuery);'
 					)

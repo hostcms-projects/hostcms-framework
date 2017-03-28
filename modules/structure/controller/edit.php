@@ -77,6 +77,8 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oMainRow12 = Admin_Form_Entity::factory('Div')->class('row'))
 			;
 
+		$oMainTab->delete($this->getField('options'));
+
 		// -!- Row --
 		$this->getField('name')
 			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
@@ -492,64 +494,31 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		parent::_applyObjectProperty();
 
-		// Path transliteration
-		/*if ($this->_object->path == '')
-		{
-			$this->_object->path = Core_Str::transliteration($this->_object->name);
-			$this->_object->save();
-		}*/
-
 		$this->_object->saveStructureFile(Core_Array::getPost('structure_source'));
 		$this->_object->saveStructureConfigFile(Core_Array::getPost('structure_config_source'));
 
 		// Lib properies
 		if ($this->_object->type == 2 && $this->_object->lib_id)
 		{
-			$LA = array();
-
 			$oLib = $this->_object->Lib;
-			
-			$aLib_Properties = $oLib->Lib_Properties->findAll();
 
-			foreach ($aLib_Properties as $oLib_Property)
-			{
-				$propertyName = 'lib_property_id_' . $oLib_Property->id;
-
-				$propertyValue = Core_Array::getPost($propertyName);
-
-				switch ($oLib_Property->type)
-				{
-					case 1: // Флажок
-					$propertyValue = !is_null($propertyValue);
-					break;
-
-					case 2: // XSL шаблон
-					$propertyValue = Core_Entity::factory('Xsl', $propertyValue)->name;
-					break;
-
-					case 0: // Поле ввода
-					case 3: // Список
-					case 4: // SQL-запрос
-					default:
-
-					$propertyValue = strval($propertyValue);
-					break;
-				}
-
-				$LA[$oLib_Property->varible_name] = $propertyValue;
-			}
+			$JSON = Structure_Controller_Libproperties::getJson($oLib);
 
 			// Сохраняем настройки
-			if (count($LA) > 0)
+			$this->_object->options = $JSON;
+			$this->_object->save();
+
+			// Backward compatibility
+			$datFile = $oLib->getLibDatFilePath($this->_object->id);
+			if (is_file($datFile))
 			{
 				try
 				{
-					$oLib->saveDatFile($LA, $this->_object->id);
+					Core_File::delete($datFile);
 				}
 				catch (Exception $e)
 				{
 					Core_Message::show($e->getMessage(), 'error');
-					Core_Message::show(Core::_('Structure.save_lib_file_error'), 'error');
 				}
 			}
 		}

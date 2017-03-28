@@ -34,4 +34,5 @@ return array(
 	'edit_success' => 'File modified successfully!',
 	'root' => 'Root',
 	'chmod' => 'Permissions',
+	'upload_message' => 'Drop files here or click to upload',
 );

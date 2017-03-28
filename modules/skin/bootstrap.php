@@ -72,11 +72,11 @@ class Skin_Bootstrap extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/dialog/dialog.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/star-rating.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/typeahead-bs2.min.js')
-			// ->addJs('/modules/skin/' . $this->_skinName . '/js/bootstrap-tag.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/ui/jquery-ui.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/select2/select2.min.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/select2/i18n/' . $lng . '.js')
-			//->addJs('/modules/skin/' . $this->_skinName . '/js/ace.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/dropzone/dropzone.min.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/colorpicker/jquery.minicolors.min.js')
 			;
 
 		$this
@@ -90,6 +90,7 @@ class Skin_Bootstrap extends Core_Skin
 			->addCss('/modules/skin/' . $this->_skinName . '/js/codemirror/addon/dialog/dialog.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/star-rating.min.css')
 			->addCss('/modules/skin/' . $this->_skinName . '/css/bootstrap-hostcms.css')
+			->addCss('/modules/skin/' . $this->_skinName . '/js/dropzone/dropzone.css')
 			;
 	}
 
@@ -760,7 +761,7 @@ class Skin_Bootstrap extends Core_Skin
 				?><footer>
 <div class="container">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-xs-12">
 			<p class="copy pull-left copyright">Copyright © 2005–2016 <?php echo Core::_('Admin.company')?></p>
 			<p class="copy text-right contacts">
 				<?php echo Core::_('Admin.website')?> <a href="http://<?php echo Core::_('Admin.company-website')?>" target="_blank"><?php echo Core::_('Admin.company-website')?></a>
@@ -1097,13 +1098,13 @@ class Skin_Bootstrap extends Core_Skin
 				->caption(Core::_('Install.changeLanguage'))
 				->options($aLng)
 				->value(isset($_SESSION['LNG_INSTALL']) ? $_SESSION['LNG_INSTALL'] : DEFAULT_LNG)
-				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-12 col-xs-12'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-md-6'))
 				->execute();
 			?>
 			</div>
 
 			<div class="row">
-				<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-align-right">
+				<div class="form-group col-xs-12 text-align-right">
 					 <button name="step_0" type="submit" class="btn btn-info">
 						<?php echo Core::_('Install.next')?> <i class="fa fa-arrow-right"></i>
 					</button>

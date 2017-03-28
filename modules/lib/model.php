@@ -39,7 +39,8 @@ class Lib_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_hasMany = array(
-		'lib_property' => array()
+		'lib_property' => array(),
+		'template_section_lib' => array()
 	);
 
 	/**
@@ -103,6 +104,11 @@ class Lib_Model extends Core_Entity
 	{
 		$this->save();
 
+		$oStructure = Core_Entity::factory('Structure', $structure_id);
+		$oStructure->options = json_encode($array);
+		$oStructure->save();
+
+		/*
 		$sLibDatFilePath = $this->getLibDatFilePath($structure_id);
 		Core_File::mkdir(dirname($sLibDatFilePath), CHMOD, TRUE);
 
@@ -119,23 +125,36 @@ class Lib_Model extends Core_Entity
 		}
 
 		$content = strval(serialize($array));
-		Core_File::write($sLibDatFilePath, $content);
+		Core_File::write($sLibDatFilePath, $content);*/
 	}
 
 	/**
-	 * Get array for unserialized dat-file
+	 * Get array for options
 	 * @param int $structure_id structure id
 	 * @return array
 	 */
 	public function getDat($structure_id)
 	{
-		$datContent = $this->loadDatFile($structure_id);
-		if ($datContent)
+		$return = array();
+
+		$oStructure = Core_Entity::factory('Structure', $structure_id);
+
+		if (!is_null($oStructure->options))
 		{
-			$array = @unserialize(strval($datContent));
-			return Core_Type_Conversion::toArray($array);
+			$return = json_decode($oStructure->options, TRUE);
 		}
-		return array();
+		// Backward compatibility
+		else
+		{
+			$datContent = $this->loadDatFile($structure_id);
+			if ($datContent)
+			{
+				$array = @unserialize(strval($datContent));
+				$return = Core_Type_Conversion::toArray($array);
+			}
+		}
+
+		return $return;
 	}
 
 	/**
@@ -147,14 +166,9 @@ class Lib_Model extends Core_Entity
 	{
 		$path = $this->getLibDatFilePath($structure_id);
 
-		if (is_file($path))
-		{
-			return Core_File::read($path);
-		}
-		else
-		{
-			return NULL;
-		}
+		return is_file($path)
+			? Core_File::read($path)
+			: NULL;
 	}
 
 	/**

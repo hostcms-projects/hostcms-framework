@@ -379,7 +379,7 @@ class Core_File
 		if (!is_dir($pathname) && !is_link($pathname))
 		{
 			umask(0);
-		
+
 			if (mkdir($pathname, $chmod, $recursive))
 			{
 				chmod($pathname, $chmod);
@@ -539,8 +539,15 @@ class Core_File
 	 */
 	static public function flush()
 	{
+		if (@ini_get('output_handler') == 'ob_gzhandler')
+		{
+			return NULL;
+		}
+
+		ob_get_length() && ob_flush();
 		flush();
-		ob_get_length() !== FALSE && ob_flush();
+
+		return TRUE;
 	}
 
 	/**

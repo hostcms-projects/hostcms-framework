@@ -168,6 +168,8 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 	 */
 	public function download()
 	{
+		Core_Session::close();
+
 		$filePath = $this->_getFullPath();
 
 		Core_File::download($filePath, $this->name, array('content_disposition' => 'attachment'));
@@ -216,7 +218,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 
 		$oChild = Core::factory('Core_Html_Entity_I')
 			->class('fa fa-file-text-o');
-			
+
 		if ($this->type == 'file')
 		{
 			$aExt = array('JPG', 'JPEG', 'GIF', 'PNG');
@@ -229,7 +231,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 				$oChild = Core::factory('Core_Html_Entity_Img')
 					->src('/admin/images/icons/' . Core::$mainConfig['fileIcons'][$ext]);
 			}
-			
+
 			/*$icon_file = '/admin/images/icons/' . (
 				isset(Core::$mainConfig['fileIcons'][$ext])
 					? Core::$mainConfig['fileIcons'][$ext]
@@ -381,7 +383,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 								"data:" . Core_Mime::getFileMime($filePath) .
 								";base64," . base64_encode($sImgContent)
 							);
-						
+
 						//$icon_file = "data:" . Core_Mime::getFileMime($filePath) . ";base64," . base64_encode($sImgContent);
 					}
 				}
@@ -397,7 +399,7 @@ class Wysiwyg_Filemanager_File extends Core_Entity
 				? '/admin/images/top_point.gif'
 				: '/admin/images/folder.gif';*/
 		}
-		
+
 		/*?><div class=""><img src="<?php echo $icon_file?>" /></div><?php*/
 		$oCore_Html_Entity_Div
 			->add($oChild)

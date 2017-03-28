@@ -92,11 +92,11 @@ class Sql_Dataset_Optimize extends Admin_Form_Dataset
 						->current();
 
 					// Just for MyISAM
-					if (strtolower(Core_Array::get($aTableStatus, 'Engine')) == 'myisam')
-					{
+					//if (strtolower(Core_Array::get($aTableStatus, 'Engine')) == 'myisam')
+					//{
 						$this->_database->setQueryType(5)
 							->query("ALTER TABLE {$sTableName} AUTO_INCREMENT = 1");
-					}
+					//}
 				}
 				catch (Exception $e)
 				{

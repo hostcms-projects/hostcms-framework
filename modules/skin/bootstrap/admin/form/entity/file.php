@@ -173,9 +173,11 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 			$oLarge_Core_Html_Entity_Div->add($oLarge_Main_Block_Core_Html_Entity_Div);
 		}
 
-		$sDivClass = $this->smallImage['show']
+		/*$sDivClass = $this->smallImage['show']
 			? 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
-			: 'col-lg-12 col-md-12 col-sm-12 col-xs-12';
+			: 'col-lg-6 col-md-6 col-sm-6 col-xs-12';*/
+
+		$sDivClass = 'col-xs-12 col-sm-6';
 
 		$oLarge_Input_Div = Core::factory('Core_Html_Entity_Div')
 			->id('file_large_' . $iAdmin_Form_Count)

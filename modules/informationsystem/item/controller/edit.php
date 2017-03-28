@@ -322,6 +322,24 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oMainRow7->add($oImageField);
 
+				$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$sItemUrl = ($oInformationsystem->Structure->https ? 'https://' : 'http://')
+						. $oSiteAlias->name
+						. $oInformationsystem->Structure->getPath()
+						. $this->_object->getPath();
+
+					$this->getField('path')
+						->add(
+							Admin_Form_Entity::factory('A')
+								->target('_blank')
+								->href($sItemUrl)
+								->class('input-group-addon bg-blue bordered-blue')
+								->value('<i class="fa fa-external-link"></i>')
+						);
+				}
+
 				$this->getField('path')
 					->format(array('maxlen' => array('value' => 255)));
 
@@ -690,6 +708,24 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				$oMainRow4->add($oImageField);
 
+				$oSiteAlias = $oInformationsystem->Site->getCurrentAlias();
+				if ($oSiteAlias)
+				{
+					$sGroupUrl = ($oInformationsystem->Structure->https ? 'https://' : 'http://')
+						. $oSiteAlias->name
+						. $oInformationsystem->Structure->getPath()
+						. $this->_object->getPath();
+				}
+
+				$this->getField('path')
+					->add(
+						Admin_Form_Entity::factory('A')
+							->target('_blank')
+							->href($sGroupUrl)
+							->class('input-group-addon bg-blue bordered-blue')
+							->value('<i class="fa fa-external-link"></i>')
+				);
+
 				// Path
 				$this->getField('path')
 					->format(array('maxlen' => array('value' => 255)));
@@ -778,10 +814,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 		{
 			case 'Informationsystem_Item_Model':
 				$i18n = 'Informationsystem_Item';
+				$aExclude = array();
 			break;
 			case 'Informationsystem_Group_Model':
 			default:
 				$i18n = 'Informationsystem_Group';
+				$aExclude = array($this->_object->id);
 		}
 
 		if ($iCountGroups < Core::$mainConfig['switchSelectToAutocomplete'])
@@ -789,7 +827,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			$oInformationsystemGroupSelect = Admin_Form_Entity::factory('Select');
 			$oInformationsystemGroupSelect
 				->caption(Core::_($i18n . '.' . $fieldName))
-				->options(array(' … ') + self::fillInformationsystemGroup($this->_object->informationsystem_id, 0))
+				->options(array(' … ') + self::fillInformationsystemGroup($this->_object->informationsystem_id, 0, $aExclude))
 				->name($fieldName)
 				->value($this->_object->$fieldName)
 				->divAttr(array('class' => 'form-group col-xs-12'))
@@ -1500,11 +1538,10 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 	{
 		if (!is_null($operation) && $operation != '')
 		{
-			//$id = Core_Array::getPost('id');
 			$informationsystem_id = Core_Array::getPost('informationsystem_id');
 			$path = Core_Array::getPost('path');
 
-			if ($path == '')
+			/*if ($path == '')
 			{
 				$this->_object->name = Core_Array::getPost('name');
 				$this->_object->path = Core_Array::getPost('path');
@@ -1513,7 +1550,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$path = $this->_object->path;
 
 				$this->addSkipColumn('path');
-			}
+			}*/
 
 			$modelName = $this->_object->getModelName();
 

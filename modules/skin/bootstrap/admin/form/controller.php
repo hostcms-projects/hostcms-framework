@@ -453,9 +453,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 											// ALT-ы к картинкам
 											// TITLE-ы к картинкам
-											$alt_array = $title_array = array();
-
-											$value_trim = trim($value);
+											$alt_array = $title_array = $value_array = $ico_array = array();
 
 											/*
 											Разделяем варианты значений на строки, т.к. они приходят к нам в виде:
@@ -463,8 +461,6 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											1 = /images/on.gif
 											*/
 											$str_array = explode("\n", $oAdmin_Form_Field_Changed->image);
-											$value_array = array();
-											$ico_array = array();
 
 											foreach ($str_array as $str_value)
 											{
@@ -479,7 +475,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 													// Если указано альтернативное значение для картинки - добавим его в alt и title
 													if (isset($str_explode[2])
-														&& $value_trim == $mIndex)
+														&& trim($value) == $mIndex)
 													{
 														$alt_array[$mIndex] = $title_array[$mIndex] = trim($str_explode[2]);
 													}
@@ -498,46 +494,12 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 												? htmlspecialchars($Admin_Word_Value->name)
 												: "&mdash;";
 
-											// Warning: 01-06-11 Создать отдельное поле в таблице в БД и в нем хранить alt-ы
-											if (isset($field_value['admin_forms_field_alt']))
-											{
-												$str_array_alt = explode("\n", trim($field_value['admin_forms_field_alt']));
-
-												foreach ($str_array_alt as $str_value)
-												{
-													// Каждую строку разделяем по равно
-													$str_explode_alt = explode('=', $str_value, 2);
-
-													// сохраняем в массив варинаты значений и ссылки для них
-													if (count($str_explode_alt) > 1)
-													{
-														$alt_array[trim($str_explode_alt[0])] = trim($str_explode_alt[1]);
-													}
-												}
-											}
-											elseif (!isset($alt_array[$value]))
+											if (empty($alt_array[$value]))
 											{
 												$alt_array[$value] = $fieldCaption;
 											}
 
-											// Warning: 01-06-11 Создать отдельное поле в таблице в БД и в нем хранить title-ы
-											if (isset($field_value['admin_forms_field_title']))
-											{
-												$str_array_title = explode("\n", $field_value['admin_forms_field_title']);
-
-												foreach ($str_array_title as $str_value)
-												{
-													// Каждую строку разделяем по равно
-													$str_explode_title = explode('=', $str_value, 2);
-
-													if (count($str_explode_title) > 1)
-													{
-														// сохраняем в массив варинаты значений и ссылки для них
-														$title_array[trim($str_explode_title[0])] = trim($str_explode_title[1]);
-													}
-												}
-											}
-											elseif (!isset($title_array[$value]))
+											if (empty($title_array[$value]))
 											{
 												$title_array[$value] = $fieldCaption;
 											}
@@ -646,9 +608,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											}
 
 										break;
-										case 10: // Вычисляемое поле с помощью функции обратного вызова,
-										// имя функции обратного вызова f($field_value, $value)
-										// передается функции с именем, содержащимся в $field_value['callback_function']
+										case 10: // Вычисляемое поле с помощью функции обратного вызова
 											if (method_exists($oEntity, $fieldName)
 												|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($fieldName)
 											)

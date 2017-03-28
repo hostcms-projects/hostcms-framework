@@ -381,7 +381,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oProperty_Value = NULL;
 					foreach ($aPropertyValues as $oTmpPropertyValue)
 					{
-						// Ранее загруженное значение ищим по имени файла
+						// Ранее загруженное значение ищем по имени файла
 						if ($oTmpPropertyValue->file_name == $sFileName)
 						{
 							$oProperty_Value = $oTmpPropertyValue;

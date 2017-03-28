@@ -50,12 +50,27 @@ class Wysiwyg_Filemanager_Controller_Upload_File extends Admin_Form_Action_Contr
 
 		if (isset($this->file['name']))
 		{
-			$target = CMS_FOLDER . $this->cdir . Core_File::filenameCorrection(
-				/*Core_File::convertfileNameToLocalEncoding(*/$this->file['name']/*)*/
-			);
-
-			Core_File::moveUploadedFile($this->file['tmp_name'], $target);
+			if (is_array($this->file['name']))
+			{
+				foreach($this->file['name'] as $key => $fileName)
+				{
+					$this->_uploadFile($this->file['tmp_name'][$key], $fileName);
+				}
+			}
+			else
+			{
+				$this->_uploadFile($this->file['tmp_name'], $this->file['name']);
+			}
 		}
 		return FALSE;
+	}
+
+	protected function _uploadFile($tmpFile, $fileName)
+	{
+		$target = CMS_FOLDER . $this->cdir . Core_File::filenameCorrection(
+			/*Core_File::convertfileNameToLocalEncoding(*/$fileName/*)*/
+		);
+
+		Core_File::moveUploadedFile($tmpFile, $target);
 	}
 }

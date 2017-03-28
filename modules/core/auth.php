@@ -235,7 +235,10 @@ class Core_Auth
 			Core_I18n::instance()->setLng(CURRENT_LNG);
 
 			$oAdmin_Language = Core_Entity::factory('Admin_Language')->getByShortname(CURRENT_LNG);
-			define('CURRENT_LANGUAGE_ID', $oAdmin_Language->active ? $oAdmin_Language->id : 0);
+			define('CURRENT_LANGUAGE_ID', !is_null($oAdmin_Language) && $oAdmin_Language->active
+				? $oAdmin_Language->id
+				: 0
+			);
 		}
 	}
 
@@ -361,38 +364,37 @@ class Core_Auth
 	{
 		Core_Event::notify('Core_Auth.onBeforeLogin', NULL, array($login));
 
-		$error_admin_access = false;
-
-		$timestamp = time();
-
-		// выбираем информацию по данному пользователю за последние 24 часа из таблицы неудачных входов
-		$aUser_Accessdenieds = Core_Entity::factory('User_Accessdenied')->getByIp(Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1'));
+		$sIp = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
 
 		// Получаем количество неудачных попыток
-		$count_unsuccess_denied = count($aUser_Accessdenieds);
+		$iCountAccessdenied = Core_Entity::factory('User_Accessdenied')->getCountByIp($sIp);
 
 		// Были ли у данного пользователя неудачные попытки входа в систему администрирования за последние 24 часа?
-		if ($count_unsuccess_denied > 0)
+		if ($iCountAccessdenied)
 		{
-			$oUser_Accessdenied = $aUser_Accessdenieds[0];
+			// Last User_Accessdenied by IP
+			$oUser_Accessdenied = Core_Entity::factory('User_Accessdenied')->getLastByIp($sIp);
 
-			// определяем интервал времени между последней неудачной попыткой входа в систему
-			// и текущим временем входа в систему
-			$delta = $timestamp - Core_Date::sql2timestamp($oUser_Accessdenied->datetime);
-
-			// определяем период времени, в течении которого пользователю, имевшему неудачные
-			// попытки доступа в систему запрещен вход в систему
-			$delta_access_denied = $count_unsuccess_denied > 2
-				? 5 * exp(2 * log($count_unsuccess_denied - 1))
-				: 5;
-
-			// если период запрета доступа в систему не истек
-			if ($delta_access_denied > $delta)
+			if (!is_null($oUser_Accessdenied))
 			{
-				throw new Core_Exception(
-					Core::_('Admin.authorization_error_access_temporarily_unavailable'),
-						array('%s' => round($delta_access_denied - $delta)), 0, $bShowDebugTrace = FALSE
-				);
+				// определяем интервал времени между последней неудачной попыткой входа в систему
+				// и текущим временем входа в систему
+				$delta = time() - Core_Date::sql2timestamp($oUser_Accessdenied->datetime);
+
+				// определяем период времени, в течении которого пользователю, имевшему неудачные
+				// попытки доступа в систему запрещен вход в систему
+				$delta_access_denied = $iCountAccessdenied > 2
+					? 5 * exp(2 * log($iCountAccessdenied - 1))
+					: 5;
+
+				// если период запрета доступа в систему не истек
+				if ($delta_access_denied > $delta)
+				{
+					throw new Core_Exception(
+						Core::_('Admin.authorization_error_access_temporarily_unavailable'),
+							array('%s' => round($delta_access_denied - $delta)), 0, $bShowDebugTrace = FALSE
+					);
+				}
 			}
 		}
 
@@ -428,7 +430,7 @@ class Core_Auth
 
 			if ($assignSessionToIp)
 			{
-				$_SESSION['current_user_ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
+				$_SESSION['current_user_ip'] = $sIp;
 			}
 
 			Core_Log::instance()->clear()
@@ -443,7 +445,7 @@ class Core_Auth
 				->where('datetime', '<', Core_Date::timestamp2sql(time() - 86400))
 				// Удаляем все попытки доступа с текущего IP
 				->setOr()
-				->where('ip', '=', Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1'));
+				->where('ip', '=', $sIp);
 
 			$aUser_Accessdenieds = $oUser_Accessdenied->findAll(FALSE);
 			foreach ($aUser_Accessdenieds as $oUser_Accessdenied)
@@ -455,8 +457,8 @@ class Core_Auth
 		{
 			// Запись в базу об ошибке доступа
 			$oUser_Accessdenied = Core_Entity::factory('User_Accessdenied');
-			$oUser_Accessdenied->datetime = Core_Date::timestamp2sql($timestamp);
-			$oUser_Accessdenied->ip = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
+			$oUser_Accessdenied->datetime = Core_Date::timestamp2sql(time());
+			$oUser_Accessdenied->ip = $sIp;
 			$oUser_Accessdenied->save();
 
 			Core_Log::instance()->clear()

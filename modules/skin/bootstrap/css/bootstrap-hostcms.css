@@ -1314,11 +1314,6 @@ div.inactive, .line-through {text-decoration: line-through}
 
 .pagination{clear:both;padding-top:15px}
 
-/* oneps */
-.oneps_patch p{text-align: justify;margin: 5px 15px 5px 0px;}
-.oneps_patch img{margin: 0px 5px 0px 0px;}
-/* /oneps */
-
 /* Benchmark */
 .databox .benchmark-databox { font-size: 14px; font-weight: bold; }
 .databox .benchmark-databox-sparkline, .databox .benchmark-databox-number {font-size: 20px}
@@ -1887,3 +1882,24 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 
 .searchhelper.ui-autocomplete .ui-menu-item { padding: 5px; }
 .searchhelper.ui-autocomplete .ui-menu-item a { display: inline !important; width: 100% !important; }
+
+#dropzone {
+	margin-bottom: 2rem;
+	background: white none repeat scroll 0 0;
+	border: 2px dashed #9CD584 !important;
+	padding: 0 !important;
+}
+#dropzone .dz-message {
+	font-weight: 400;
+	margin-top: 3em !important;*/
+	text-align: center;
+	color: #9CD584 !important;
+	font-size: 20px;
+}
+#dropzone:hover { cursor: pointer; border: 2px dashed #70BAFD !important;}
+#dropzone:hover .dz-message { color: #70BAFD !important; }
+#dropzone .dz-preview .dz-image { border-radius: 10px !important; }
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+	padding: 3px 5px 3px 10px;
+}

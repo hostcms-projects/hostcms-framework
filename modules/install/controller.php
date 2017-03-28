@@ -43,7 +43,7 @@ class Install_Controller
 	 * Get template path
 	 * @return string
 	 */
-	function getTemplatePath()
+	public function getTemplatePath()
 	{
 		return $this->_sTemplatePath;
 	}
@@ -53,7 +53,7 @@ class Install_Controller
 	 * @param string $_sTemplatePath path
 	 * @return self
 	 */
-	function setTemplatePath($_sTemplatePath)
+	public function setTemplatePath($_sTemplatePath)
 	{
 		$this->_sTemplatePath = $_sTemplatePath;
 		return $this;
@@ -65,7 +65,7 @@ class Install_Controller
 	 * @param array $aReplace list of macroses
 	 * @return string
 	 */
-	function macroReplace($str, $aReplace)
+	public function macroReplace($str, $aReplace)
 	{
 		if (count($aReplace) > 0)
 		{
@@ -84,7 +84,7 @@ class Install_Controller
 	 * @param array $aReplace list of macroses
 	 * @return string
 	 */
-	function loadFile($filename, $aReplace = array())
+	public function loadFile($filename, $aReplace = array())
 	{
 		$filecontent = file_get_contents($filename);
 
@@ -101,7 +101,7 @@ class Install_Controller
 	 * @param string $filename file path
 	 * @param array $aReplace list of macroses
 	 */
-	function replaceFile($filename, $aReplace = array())
+	public function replaceFile($filename, $aReplace = array())
 	{
 		$filecontent = $this->loadFile($filename, $aReplace);
 		file_put_contents($filename, $filecontent);
@@ -112,7 +112,7 @@ class Install_Controller
 	*
 	* @param $path_file_without_extension - путь к файлу без расширения
 	*/
-	function getFileExtension($path_file_without_extension)
+	public function getFileExtension($path_file_without_extension)
 	{
 		clearstatcache();
 
@@ -151,7 +151,7 @@ class Install_Controller
 	 * @param $sourceInformationsystemId - идентификатор копируемой ИС
 	 * @param $sourceInformationsystemItemId - идентификатор копируемого ИЭ
 	 */
-	function moveInformationsystemItemImage($targetInformationsystemItemId, $sourceInformationsystemId, $sourceInformationsystemItemId)
+	public function moveInformationsystemItemImage($targetInformationsystemItemId, $sourceInformationsystemId, $sourceInformationsystemItemId)
 	{
 		$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item', $targetInformationsystemItemId);
 
@@ -221,7 +221,7 @@ class Install_Controller
 	 * @param $sourceInformationsystemId - идентификатор копирумой ИС
 	 * @param $sourceInformationsystemGroupId - идентификатор копируемой ИГ
 	 */
-	function moveInformationsystemGroupImage($targetInformationsystemGroupId, $sourceInformationsystemId, $sourceInformationsystemGroupId)
+	public function moveInformationsystemGroupImage($targetInformationsystemGroupId, $sourceInformationsystemId, $sourceInformationsystemGroupId)
 	{
 		//$InformationSystem = & singleton('InformationSystem');
 
@@ -283,7 +283,7 @@ class Install_Controller
 	 * @param $copyInformationsystemItemId - Идентификатор копируемого ИЭ
 	 * @param $copyInformationsystemPropertyValueId - Идентификатор значения доп. свойства типа "Файл" копируемого ИЭ
 	 */
-	function moveInformationsystemItemPropertyImage($informationsystemItemId, $informationsystemItemPropertyId, $copyInformationsystemId, $copyInformationsystemItemId, $copyInformationsystemPropertyValueId)
+	public function moveInformationsystemItemPropertyImage($informationsystemItemId, $informationsystemItemPropertyId, $copyInformationsystemId, $copyInformationsystemItemId, $copyInformationsystemPropertyValueId)
 	{
 		$informationsystemItemId = intval($informationsystemItemId);
 		$informationsystemItemPropertyId = intval($informationsystemItemPropertyId);
@@ -348,7 +348,7 @@ class Install_Controller
 	 * @param $copyInformationsystemGroupId - Идентификатор копируемой ИГ
 	 * @param $copyInformationsystemPropertyValueId - Идентификатор значения доп. свойства типа "Файл" копируемой ИГ
 	 */
-	function moveInformationsystemGroupPropertyImage($informationsystemGroupId, $informationsystemGroupPropertyId, $copyInformationsystemId, $copyInformationsystemGroupId, $copyInformationsystemPropertyValueId)
+	public function moveInformationsystemGroupPropertyImage($informationsystemGroupId, $informationsystemGroupPropertyId, $copyInformationsystemId, $copyInformationsystemGroupId, $copyInformationsystemPropertyValueId)
 	{
 		$informationsystemGroupId = intval($informationsystemGroupId);
 		$informationsystemGroupPropertyId = intval($informationsystemGroupPropertyId);
@@ -411,7 +411,7 @@ class Install_Controller
 	 * @param $sourceShopId - идентификатор копируемого магазина
 	 * @param $sourceShopItemId - идентификатор копируемого товара
 	 */
-	function moveShopItemImage($targetShopItemId, $sourceShopId, $sourceShopItemId)
+	public function moveShopItemImage($targetShopItemId, $sourceShopId, $sourceShopItemId)
 	{
 		$oShop_Item = Core_Entity::factory('Shop_Item', $targetShopItemId);
 
@@ -481,7 +481,7 @@ class Install_Controller
 	 * @param int $copyShopId - идентификатор копирумого магазина
 	 * @param int $copyGroupId - идентификатор копируемой группы товаров
 	 */
-	function moveShopGroupImage($shopGroupId, $copyShopId, $copyGroupId)
+	public function moveShopGroupImage($shopGroupId, $copyShopId, $copyGroupId)
 	{
 		$oShop_Group = Core_Entity::factory('Shop_Group', $shopGroupId);
 		$group_dir = $oShop_Group->getGroupPath();
@@ -553,7 +553,7 @@ class Install_Controller
 	 * @param $copyShopItemId - идентификатор копируемого товара
 	 * @param $copyShopItemPropertyId - идентификатор доп. свойства типа "Файл" копируемого товара
 	 */
-	function moveShopItemPropertyImage($shopItemId, $shopItemPropertyId, $copyShopId, $copyShopItemId, $copyShopItemPropertyId)
+	public function moveShopItemPropertyImage($shopItemId, $shopItemPropertyId, $copyShopId, $copyShopItemId, $copyShopItemPropertyId)
 	{
 		$oShop_Item = Core_Entity::factory('Shop_Item', $shopItemId);
 		$item_dir = $oShop_Item->getItemPath();
@@ -615,7 +615,7 @@ class Install_Controller
 	 * @param $copyShopGroupId - идентификатор копируемой группы товара
 	 * @param $copyShopGroupPropertyId - идентификатор доп. свойства типа "Файл" копируемой группы
 	 */
-	function moveShopGroupPropertyImage($shopGroupId, $shopGroupPropertyId, $copyShopId, $copyShopGroupId, $copyShopGroupPropertyId)
+	public function moveShopGroupPropertyImage($shopGroupId, $shopGroupPropertyId, $copyShopId, $copyShopGroupId, $copyShopGroupPropertyId)
 	{
 		$oShop_Group = Core_Entity::factory('Shop_Group', $shopGroupId);
 		$group_dir = $oShop_Group->getGroupPath();
@@ -638,7 +638,7 @@ class Install_Controller
 
 		if (is_file($shop_group_property_image_from))
 		{
-			$shop_group_property_image_to = $item_dir . "shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
+			$shop_group_property_image_to = $group_dir . "shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
 			Core_File::copy($shop_group_property_image_from, $shop_group_property_image_to);
 
 			$oValue->file_name = $oValue->file = basename($shop_group_property_image_to);
@@ -658,7 +658,7 @@ class Install_Controller
 
 		if (is_file($shop_group_property_small_image_from))
 		{
-			$shop_group_property_small_image_to = $item_dir . "small_shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
+			$shop_group_property_small_image_to = $group_dir . "small_shop_property_file_{$shopGroupId}_{$oValue->id}" . $ext;
 
 			Core_File::copy($shop_group_property_small_image_from, $shop_group_property_small_image_to);
 
@@ -678,7 +678,7 @@ class Install_Controller
 	 * @param $copyStructurePropertyValueId - Идентификатор значения доп. свойства, значение которого копируется
 	 */
 
-	function MoveStructureItemPropertyImage($structureId, $structurePropertyImageId, $copySiteId, $copyStructureId, $copyStructurePropertyValueId)
+	public function MoveStructureItemPropertyImage($structureId, $structurePropertyImageId, $copySiteId, $copyStructureId, $copyStructurePropertyValueId)
 	{
 		$structureId = intval($structureId);
 		$structurePropertyImageId = intval($structurePropertyImageId);

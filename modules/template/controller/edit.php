@@ -53,7 +53,8 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab
 			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		switch ($modelName)
 		{
@@ -66,16 +67,25 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->caption(Core::_('Template.tab_1'))
 					->name('Template');
 
-				$oCssTab = Admin_Form_Entity::factory('Tab')
+				$oLessCssTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Template.tab_2'))
-					->name('Css');
+					->name('Css/Less');
+
+				$oJsTab = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Template.tab_3'))
+					->name('Js');
+
+				$oManifestTab = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Template.tab_4'))
+					->name('Manifest');
 
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
 
 				$this
 					->addTabAfter($oTemplateTab, $oMainTab)
-					->addTabAfter($oCssTab, $oTemplateTab);
+					->addTabAfter($oLessCssTab, $oTemplateTab)
+					->addTabAfter($oJsTab, $oLessCssTab);
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(
@@ -109,9 +119,6 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oMainRow3->add($oSelect_Templates);
 
-				$oMainTab
-					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'));
-
 				$this->getField('sorting')
 					->divAttr(array('class' => 'form-group col-sm-5 col-md-4 col-lg-3'));
 
@@ -133,34 +140,87 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('template')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$oTemplateTab
-					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'));
+					->add($oTemplateRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
-				$oMainRow5->add($oTemplate_Textarea);
+				$oTemplateRow1->add($oTemplate_Textarea);
 
-				$oCss_Textarea = Admin_Form_Entity::factory('Textarea');
+				$oLessCss_Textarea = Admin_Form_Entity::factory('Textarea');
 
-				$oTmpOptions = $oCss_Textarea->syntaxHighlighterOptions;
+				$oTmpOptions = $oLessCss_Textarea->syntaxHighlighterOptions;
 				$oTmpOptions['mode'] = 'css';
 
-				$oCss_Textarea
+				$oLessCss_Textarea
 					->value(
-						$this->_object->loadTemplateCssFile()
+						$this->_object->less && is_file($this->_object->getTemplateLessFilePath())
+							? $this->_object->loadTemplateLessFile()
+							: $this->_object->loadTemplateCssFile()
 					)
 					->rows(30)
 					->caption(Core::_('Template.css'))
 					->name('css')
 					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 					->syntaxHighlighterOptions($oTmpOptions)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
-				$oCssTab
-					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'));
+				$oLessCssTab
+					->add($oCssRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oCssRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
-				$oMainRow6->add($oCss_Textarea);
+				$oCssRow1->add($oLessCss_Textarea);
 
+				$oMainTab->move($this->getField('less'), $oCssRow2);
+
+				$oJs_Textarea = Admin_Form_Entity::factory('Textarea');
+
+				$oTmpOptions = $oJs_Textarea->syntaxHighlighterOptions;
+				$oTmpOptions['mode'] = 'text/javascript';
+
+				$oJs_Textarea
+					->value(
+						$this->_object->loadTemplateJsFile()
+					)
+					->rows(30)
+					->caption(Core::_('Template.js'))
+					->name('js')
+					->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
+					->syntaxHighlighterOptions($oTmpOptions)
+					->divAttr(array('class' => 'form-group col-xs-12'));
+
+				$oJsTab
+					->add($oJsRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oJsRow1->add($oJs_Textarea);
+
+				if ($this->_object->less)
+				{
+					$this->addTabAfter($oManifestTab, $oJsTab);
+
+					$oManifestTab
+						->add($oManifestRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+					$oTextarea_Lng = Admin_Form_Entity::factory('Textarea');
+
+					$oTmpOptions = $oTextarea_Lng->syntaxHighlighterOptions;
+					$oTmpOptions['mode'] = 'xml';
+
+					$manifest = $this->_object->loadManifestFile();
+
+					!strlen($manifest) && $manifest = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+
+					$oTextarea_Lng
+						->value($manifest)
+						->rows(30)
+						->caption(Core::_('Template.manifest'))
+						->name('manifest')
+						->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
+						->syntaxHighlighterOptions($oTmpOptions)
+						->divAttr(array('class' => 'form-group col-xs-12'));
+
+					$oManifestRow1->add($oTextarea_Lng);
+				}
 			break;
 			case 'template_dir':
 			default:
@@ -220,43 +280,25 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->_object->save();
 			}
 
-			$this->_object->saveTemplateFile(Core_Array::getPost('template'));
-			$this->_object->saveTemplateCssFile(Core_Array::getPost('css'));
+			$this->_object
+				->saveTemplateFile(Core_Array::getPost('template'))
+				->saveTemplateJsFile(Core_Array::getPost('js'));
+			
+			$css = Core_Array::getPost('css');
 
-			// Обновляем сохраненные минимизированные CSS
-			if (Core::moduleIsActive('compression'))
-			{
-				$oCompression_Controller = Compression_Controller::instance('css');
+			$this->_object->less
+				// Save LESS and rebuild CSS
+				? $this->_object->saveTemplateLessFile($css)
+				// Save just CSS
+				: $this->_object->saveTemplateCssFile($css);
 
-				$sTemplatePath = $this->_object->getTemplateCssFileHref();
+			$manifest = Core_Array::getPost('manifest');
+			!is_null($manifest)
+				&& $this->_object->saveManifestFile($manifest);
 
-				$oCompression_Css = Core_Entity::factory('Compression_Css');
-				$oCompression_Css
-					->queryBuilder()
-					->where('path', 'LIKE', $sTemplatePath)
-					->groupBy('filename');
-
-				$aCompression_Css_With_Path = $oCompression_Css->findAll(FALSE);
-
-				foreach ($aCompression_Css_With_Path as $oCompression_Css)
-				{
-					$oCompression_Controller->clear();
-
-					$aCompression_Css = Core_Entity::factory('Compression_Css')->getAllByFilename(
-						$oCompression_Css->filename
-					);
-
-					// Все файлы, использованные при создании этого CSS
-					foreach ($aCompression_Css as $oTmpCompression_Css)
-					{
-						$oCompression_Controller->addCss(
-							$oTmpCompression_Css->path
-						);
-					}
-
-					$oCompression_Controller->buildCss($oCompression_Css->filename, TRUE);
-				}
-			}
+			$this->_object
+				->rebuildCompressionCss()
+				->updateTimestamp();
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));

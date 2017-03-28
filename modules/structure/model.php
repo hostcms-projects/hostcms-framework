@@ -83,7 +83,13 @@ class Structure_Model extends Core_Entity
 		'forum' => array()
 	);
 
-	// Warning: В контроллере при сохранении и при смене меню, для всех потомков изменять меню!
+	/**
+	 * Forbidden tags. If list of tags is empty, all tags will show.
+	 * @var array
+	 */
+	protected $_forbiddenTags = array(
+		'options'
+	);
 
 	/**
 	 * Constructor.
@@ -361,18 +367,18 @@ class Structure_Model extends Core_Entity
 	public function getChildCount()
 	{
 		$count = 0;
-		
+
 		$aStructures = $this->Structures->findAll(FALSE);
-		
+
 		foreach ($aStructures as $oStructure)
 		{
 			$count++;
 			$count += $oStructure->getChildCount();
 		}
-		
+
 		return $count;
 	}
-	
+
 	/**
 	 * Backend callback method
 	 * @return string
@@ -722,7 +728,7 @@ class Structure_Model extends Core_Entity
 
 		if (Core::moduleIsActive('informationsystem'))
 		{
-			$oInformationsystem = Core_Entity::factory('Informationsystem')->getByStructureId($this->id);
+			$oInformationsystem = Core_Entity::factory('Informationsystem')->getByStructure_id($this->id, FALSE);
 			if ($oInformationsystem)
 			{
 				$oSearch_Page->text .= htmlspecialchars($oInformationsystem->name) . ' ' . $oInformationsystem->description . ' ';
@@ -731,7 +737,7 @@ class Structure_Model extends Core_Entity
 
 		if (Core::moduleIsActive('shop'))
 		{
-			$oShop = Core_Entity::factory('Shop')->getByStructureId($this->id);
+			$oShop = Core_Entity::factory('Shop')->getByStructure_id($this->id, FALSE);
 			if ($oShop)
 			{
 				$oSearch_Page->text .= htmlspecialchars($oShop->name) . ' ' .
@@ -739,7 +745,7 @@ class Structure_Model extends Core_Entity
 			}
 		}
 
-		$aPropertyValues = $this->getPropertyValues();
+		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach ($aPropertyValues as $oPropertyValue)
 		{
 			// List
@@ -800,6 +806,7 @@ class Structure_Model extends Core_Entity
 	 * Set SEO info to page from structure node
 	 * @param Core_Page $oCore_Page page
 	 * @return self
+	 * @hostcms-event structure.onAfterSetCorePageSeo
 	 */
 	public function setCorePageSeo(Core_Page $oCore_Page)
 	{
@@ -819,6 +826,8 @@ class Structure_Model extends Core_Entity
 			->title($sTitle)
 			->description($sDescription)
 			->keywords($sKeywords);
+
+		Core_Event::notify($this->_modelName . '.onAfterSetCorePageSeo', $this, array($oCore_Page));
 
 		return $this;
 	}

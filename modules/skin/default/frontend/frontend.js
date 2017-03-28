@@ -191,6 +191,129 @@
 				.append('<iframe src="' + cmsrequest + '&hostcmsMode=blank"></iframe>')
 				.dialog('open');
 			return jDivWin;
+		},
+		changeActive: function(settings){
+			settings = hQuery.extend({
+				path: ''
+			}, settings);
+
+			var data = '';
+
+			data['_'] = Math.round(new Date().getTime());
+
+			hQuery.ajax({
+				context: settings.goal,
+				url: settings.path,
+				type: 'POST',
+				data: data,
+				dataType: 'json',
+				success: hQuery.refreshSectionCallback
+			});
+		},
+		refreshSection: function(id){
+			var data = '';
+			data['_'] = Math.round(new Date().getTime());
+
+			hQuery.ajax({
+				context: hQuery('#hostcmsSection' + id),
+				url: '/template-section.php?template_section_id=' + id,
+				type: 'POST',
+				data: data,
+				dataType: 'json',
+				success: hQuery.refreshSectionCallback
+			});
+		},
+		deleteWidget: function(settings){
+			settings = hQuery.extend({
+				path: ''
+			}, settings);
+
+			var data = '';
+			data['_'] = Math.round(new Date().getTime());
+
+			hQuery.ajax({
+				context: settings.goal,
+				url: settings.path,
+				type: 'POST',
+				data: data,
+				dataType: 'json',
+				success: hQuery.refreshSectionCallback
+			});
+		},
+		refreshSectionCallback: function(result)
+		{
+			var newDiv = hQuery(result);
+
+			document.write = function(str) {
+				newDiv.find('script').eq(0).after(str);
+            }
+
+			this.replaceWith(newDiv);
+
+			hQuery(".hostcmsPanel,.hostcmsSectionPanel,.hostcmsSectionWidgetPanel", newDiv)
+				.draggable({containment: "document"});
+		},
+		sortWidget: function()
+		{
+			hQuery(".hostcmsSection").sortable({
+				items: "> .hostcmsSectionWidget",
+				handle: ".drag-handle",
+				stop: function (event, ui) {
+					var data = hQuery(this).sortable("serialize");
+					hQuery.ajax({
+						data: data,
+						type: "POST",
+						url: "/template-section.php",
+					});
+				}
+			});
+		},
+		toggleSlidePanel: function()
+		{
+			hQuery('.backendBody .template-settings').toggleClass('show');
+			hQuery('.backendBody .template-settings #slidepanel-settings i').toggleClass('fa-cog fa-times');
+		},
+		reloadStylesheets: function()
+		{
+			var timestamp = new Date().getTime();
+			hQuery('link[rel="stylesheet"]').each(function () {
+				var newLink = hQuery('<link rel="stylesheet">').attr('href', this.href.replace(/&\d{9,}|$/, (this.href.indexOf('?') >= 0 ? '&' : '?') + timestamp)),
+				oldLink = hQuery(this);
+				oldLink.after(newLink);
+
+				setTimeout(function(){ oldLink.remove(); }, 500);
+			});
+		},
+		sendLessVariable: function()
+		{
+			var object = hQuery(this);
+			hQuery.ajax({
+				data: {name: object.attr('name'), value: object.val(), template: object.data('template')},
+				type: "POST",
+				url: "/template-less.php",
+				success: function(json){
+					var result = JSON.parse(json);
+					if (result == 'OK')
+					{
+						hQuery.reloadStylesheets();
+					}
+					else
+					{
+						Notify(result, 'top-left', '5000', 'danger', 'fa-gear', true, false);
+					}
+				}
+			});
 		}
 	});
 //})(hQuery);
+
+/*Show Notification*/
+function Notify(message, position, timeout, theme, icon, closable, sound) {
+    toastr.options.positionClass = 'toast-' + position;
+    toastr.options.extendedTimeOut = 0; //1000;
+    toastr.options.timeOut = timeout;
+    toastr.options.closeButton = closable;
+    toastr.options.iconClass = icon + ' toast-' + theme;
+	toastr.options.playSound = sound;
+    toastr['custom'](message);
+}

@@ -887,6 +887,16 @@ class Admin_Form_Controller
 	}
 
 	/**
+	 * Clear messages for administration center form
+	 * @return self
+	 */
+	public function clearMessages()
+	{
+		$this->_message = NULL;
+		return $this;
+	}
+
+	/**
 	 * Show built data
 	 */
 	public function show()
@@ -1654,7 +1664,6 @@ class Admin_Form_Controller
 							|| $oAdmin_Form_Dataset->issetExternalField($sTmpFieldName)
 						)
 						{
-
 							// Тип поля.
 							switch ($oAdmin_Form_Field->type)
 							{
@@ -1694,19 +1703,19 @@ class Admin_Form_Controller
 											: 'havingClose';
 
 										$oAdmin_Form_Dataset
-										->addCondition(array($openName => array()))
-										->addCondition(
-											array($sFilterType =>
-												array($fieldName, '=', 0)
+											->addCondition(array($openName => array()))
+											->addCondition(
+												array($sFilterType =>
+													array($fieldName, '=', 0)
+												)
 											)
-										)
-										->addCondition(array('setOr' => array()))
-										->addCondition(
-											array($sFilterType =>
-												array($fieldName, 'IS', NULL)
+											->addCondition(array('setOr' => array()))
+											->addCondition(
+												array($sFilterType =>
+													array($fieldName, 'IS', NULL)
+												)
 											)
-										)
-										->addCondition(array($closeName => array()));
+											->addCondition(array($closeName => array()));
 									}
 									else
 									{
@@ -1739,18 +1748,14 @@ class Admin_Form_Controller
 
 									// Дата до.
 									$date = trim(Core_Array::get($this->request, "admin_form_filter_to_{$oAdmin_Form_Field->id}"));
+
 									if (!empty($date))
 									{
-										if ($oAdmin_Form_Field->type == 5)
-										{
-											// Преобразуем из d.m.Y H:i:s в SQL формат.
-											$date = Core_Date::datetime2sql($date);
-										}
-										else
-										{
-											// Преобразуем из d.m.Y в SQL формат.
-											$date = date('Y-m-d 23:59:59', Core_Date::date2timestamp($date));
-										}
+										$date = $oAdmin_Form_Field->type == 5
+											// Преобразуем из d.m.Y H:i:s в SQL формат
+											? Core_Date::datetime2sql($date)
+											// Преобразуем из d.m.Y в SQL формат
+											: date('Y-m-d 23:59:59', Core_Date::date2timestamp($date));
 
 										$oAdmin_Form_Dataset->addCondition(
 											array($sFilterType =>

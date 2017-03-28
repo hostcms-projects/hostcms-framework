@@ -34,9 +34,7 @@ class Admin_Answer extends Core_Servant_Properties
 		parent::__construct();
 		$this->module = NULL;
 		$this->skin = TRUE;
-		$this->title = '';
-		$this->message = '';
-		$this->content = '';
+		$this->title = $this->message = $this->content = '';
 	}
 
 	/**
@@ -46,7 +44,8 @@ class Admin_Answer extends Core_Servant_Properties
 	{
 		Core::showJson(array(
 			'form_html' => $this->content,
-			'error' => $this->message,
+			// Content already consists message
+			'error' => $this->content == '' ? $this->message : '',
 			'title' => $this->title,
 			'module' => $this->module
 		));

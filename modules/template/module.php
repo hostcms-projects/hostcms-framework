@@ -23,14 +23,14 @@ class Template_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-08-18';
+	public $date = '2016-09-12';
 
 	/**
 	 * Module name
 	 * @var string
 	 */
 	protected $_moduleName = 'template';
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -48,5 +48,17 @@ class Template_Module extends Core_Module
 				'onclick' => "$.adminLoad({path: '/admin/template/index.php'}); return false"
 			)
 		);
+
+		if (Core_Auth::logged())
+		{
+			Core_Router::add('template-section-lib.php', '/template-section-lib.php')
+				->controller('Template_Section_Lib_Command_Controller');
+
+			Core_Router::add('template-section.php', '/template-section.php')
+				->controller('Template_Section_Command_Controller');
+
+			Core_Router::add('template-less.php', '/template-less.php')
+				->controller('Template_Less_Command_Controller');
+		}
 	}
 }
