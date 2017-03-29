@@ -105,7 +105,7 @@ return array(
 	'deleteNote' => 'Delete note',
 
 	'key_not_found' => 'License Key Not Found!',
-	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .3); padding: 0 20px">
+	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .4); padding: 0 20px; text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4)">
 	<h2>Getting key</h2>
 
 	<p>After installing you should register new user on our site or use exist username and password to access your «<a href="http://www.hostcms.ru/users/" target="_blank">Personal account</a>»</p>

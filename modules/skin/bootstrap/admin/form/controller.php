@@ -17,6 +17,8 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 	 * Show form content in administration center
 	 * @return self
 	 * @hostcms-event Admin_Form_Controller.onBeforeShowActions
+	 * @hostcms-event Admin_Form_Controller.onBeforeShowContent
+	 * @hostcms-event Admin_Form_Controller.onAfterShowContent
 	 */
 	public function showContent()
 	{
@@ -31,6 +33,8 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 		$allow_filter = FALSE;
 
+		Core_Event::notify('Admin_Form_Controller.onBeforeShowContent', $this);
+		
 		// div class="table-scrollable"
 		// table-bordered
 		?>
@@ -768,6 +772,8 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 			</table>
 		</div>
 		<?php
+		
+		Core_Event::notify('Admin_Form_Controller.onAfterShowContent', $this);
 
 		return $this;
 	}

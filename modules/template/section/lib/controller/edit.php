@@ -51,8 +51,9 @@ class Template_Section_Lib_Controller_Edit extends Admin_Form_Action_Controller_
 			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->id('lib_properties'))
-			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'));
+			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->id('lib_properties'))			
+			;
 
 		$oAdditionalTab
 			->add($oAdditionalRow1 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -120,14 +121,16 @@ class Template_Section_Lib_Controller_Edit extends Admin_Form_Action_Controller_
 
 		$Div_Lib_Properies
 			->html(ob_get_clean());
+			
+		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow2);			
 
-		$oMainRow2->add($Select_LibDir);
-		$oMainRow3->add($Select_Lib);
-		$oMainRow4->add($Div_Lib_Properies);
+		$oMainRow3->add($Select_LibDir);		
+		$oMainRow4->add($Select_Lib);
+		$oMainRow5->add($Div_Lib_Properies);
 
 		$oMainTab
-			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-3')), $oMainRow5)
-			->move($this->getField('active')->divAttr(array('class' => 'margin-top-21 form-group col-xs-12 col-sm-6 col-md-3')), $oMainRow5);
+			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-3')), $oMainRow3)
+			->move($this->getField('active')->divAttr(array('class' => 'margin-top-21 form-group col-xs-12 col-sm-6 col-md-3')), $oMainRow3);
 
 		return $this;
 	}

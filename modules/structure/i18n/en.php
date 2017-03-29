@@ -50,6 +50,8 @@ return array(
 	'static_page' => 'Page',
 	'typical_dynamic_page' => 'Sample dynamic page',
 	'dynamic_page' => 'Dynamic page',
+	'link' => 'Link',
+	'document_text' => 'Sample dynamic page text',
 	'siteuser_group_id' => '<acronym title="Group having access to this page">Access group</acronym>',
 	'https' => '<acronym title="Use just HTTPS access">HTTPS</acronym>',
 	'structure_source' => '<acronym title="PHP code to call dynamic page">Dynamic page</acronym>',

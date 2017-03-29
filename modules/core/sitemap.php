@@ -75,6 +75,8 @@ class Core_Sitemap extends Core_Servant_Properties
 		$this->rebuildTime = 14400; // 4 часа
 		$this->limit = 1000;
 		$this->createIndex = FALSE;
+
+		$this->_Informationsystems = $this->_Shops = array();
 	}
 
 	/**
@@ -422,8 +424,6 @@ class Core_Sitemap extends Core_Servant_Properties
 		if ($this->_bRebuild)
 		{
 			$this->createIndex && $this->createSitemapDir();
-
-			$this->_Informationsystems = $this->_Shops = array();
 
 			$oSite = $this->getSite();
 

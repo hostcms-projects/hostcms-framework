@@ -53,7 +53,6 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 
 		if (intval($group->id) != 0)
 		{
-			$xml = $xml->addChild('Группы');
 			$xml = $xml->addChild('Группа');
 			$xml->addChild('Ид', $group->guid);
 			$xml->addChild('Наименование', $group->name);
@@ -61,16 +60,21 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			$group->description != ''
 				&& $xml->addChild('Описание', $group->description);
 
-			$groups = $group->Shop_Groups->findALL(FALSE);
+			$aShop_Groups = $group->Shop_Groups->findALL(FALSE);
 		}
 		else
 		{
-			$groups = $this->shop->Shop_Groups->getAllByParent_id(0, FALSE);
+			$aShop_Groups = $this->shop->Shop_Groups->getAllByParent_id(0, FALSE);
 		}
 
-		foreach ($groups as $group)
+		if (count($aShop_Groups))
 		{
-			$this->getGroupsCML($group, $xml);
+			$xmlGroups = $xml->addChild('Группы');
+
+			foreach ($aShop_Groups as $group)
+			{
+				$this->getGroupsCML($group, $xmlGroups);
+			}
 		}
 	}
 
@@ -279,8 +283,6 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 		$retailPrice->addChild('Ид', $this->_retailPriceGUID);
 		$retailPrice->addChild('Наименование', 'Розничная');
 		$retailPrice->addChild('Валюта', $this->shop->Shop_Currency->code);
-
-		$this->getGroupsCML($this->group, new Core_SimpleXMLElement("<root></root>"));
 
 		$oShopItems = $this->shop->Shop_Items;
 		$oShopItems->queryBuilder()

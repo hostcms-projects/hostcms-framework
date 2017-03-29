@@ -907,4 +907,73 @@ class Structure_Model extends Core_Entity
 
 		return $this;
 	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'structure_menu_id' => $this->structure_menu_id,
+				'template_id' => $this->template_id,
+				'data_template_id' => $this->data_template_id,
+				'site_id' => $this->site_id,
+				'lib_id' => $this->lib_id,
+				'parent_id' => $this->parent_id,
+				'options' => $this->options,
+				'name' => $this->name,
+				'seo_title' => $this->seo_title,
+				'seo_description' => $this->seo_description,
+				'seo_keywords' => $this->seo_keywords,
+				'show' => $this->show,
+				'url' => $this->url,
+				'sorting' => $this->sorting,
+				'path' => $this->path,
+				'type' => $this->type,
+				'siteuser_group_id' => $this->siteuser_group_id,
+				'https' => $this->https,
+				'active' => $this->active,
+				'indexing' => $this->indexing,
+				'changefreq' => $this->changefreq,
+				'priority' => $this->priority,
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->options = Core_Array::get($aBackup, 'options');
+				$this->sorting = Core_Array::get($aBackup, 'sorting');
+				$this->seo_title = Core_Array::get($aBackup, 'seo_title');
+				$this->seo_description = Core_Array::get($aBackup, 'seo_description');
+				$this->seo_keywords = Core_Array::get($aBackup, 'seo_keywords');
+				$this->path = Core_Array::get($aBackup, 'path');
+				$this->save();
+			}
+		}
+
+		return $this;
+	}
 }

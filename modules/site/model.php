@@ -1603,7 +1603,7 @@ class Site_Model extends Core_Entity
 			{
 				$oDiv->add(
 					Core::factory('Core_Html_Entity_Span')
-						->class('label label-default')
+						->class('label label-' . ($oSite_Aliases->current ? 'palegreen' : 'default'))
 						->value(htmlspecialchars(Core_Str::cut($oSite_Aliases->name, 25)))
 					);
 

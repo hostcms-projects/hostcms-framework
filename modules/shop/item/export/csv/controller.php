@@ -162,7 +162,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				"", "", "", "", "", "", "", "", "", "",
 				"", "", "", "", "", "", "", "", "", "",
 				"", "", "", "", "", "", "", "", "", "",
-				"", ""
+				"", "", "", "", ""
 			);
 
 			$this->_aSpecialPriceBase_Properties = array(
@@ -185,7 +185,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Описание раздела"',
 				'"Путь для раздела"',
 				'"Порядок сортировки раздела"',
-				// 32
+				// 35
 				'"CML ID идентификатор товара"',
 				'"Артикул товара"',
 				'"Артикул родительского товара"',
@@ -193,6 +193,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				'"Описание товара"',
 				'"Текст для товара"',
 				'"Вес товара"',
+				'"Длина"',
+				'"Ширина"',
+				'"Высота"',
 				'"Тип товара"',
 				'"Метки"',
 				'"Цена товара"',
@@ -377,6 +380,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 				sprintf('"%s"', $this->prepareString($oShopItem->description)),
 				sprintf('"%s"', $this->prepareString($oShopItem->text)),
 				sprintf('"%s"', $this->prepareFloat($oShopItem->weight)),
+				sprintf('"%s"', $this->prepareFloat($oShopItem->length)),
+				sprintf('"%s"', $this->prepareFloat($oShopItem->width)),
+				sprintf('"%s"', $this->prepareFloat($oShopItem->height)),
 				sprintf('"%s"', $oShopItem->type),
 				sprintf('"%s"', (Core::moduleIsActive('tag') ? $this->prepareString(implode(",", $oShopItem->Tags->findAll(FALSE))) : "")),
 				sprintf('"%s"', $this->prepareFloat($oShopItem->price)),

@@ -302,11 +302,11 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		0 - Страница из документооборота
 		1 - Динамическая страница
 		2 - Типовая динамическая страница
+		3 - Ссылка на вшений ресурс
 		*/
-		$bExternalLink = $oStructure->type == 0 && strlen(trim($oStructure->url)) > 0;
 
 		// Если тип - страница
-		if ($oStructure->type == 0 && !$bExternalLink)
+		if ($oStructure->type == 0)
 		{
 			$oTemplate = $oStructure->Document->Template;
 		}
@@ -315,8 +315,8 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		{
 			$oTemplate = $oStructure->Template;
 		}
-
-		if ($bExternalLink)
+		// Ссылка на внешний файл (тип 3)
+		else
 		{
 			$oCore_Response->status(301);
 
@@ -529,19 +529,19 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 
 		if (Core_Array::get($_SERVER, 'REQUEST_URI') == '/' && !((~Core::convert64b32(Core_Array::get(Core::$config->get('core_hostcms'), 'hostcms'))) & (~1835217467)) && strlen($sContent) < 204800)
 		{
-			$search = array (
-				"'<script[^>]*?>.*?</script>'siu",
-				"'<noscript[^>]*?>.*?</noscript>'siu",
-				"'<style[^>]*?>.*?</style>'siu",
-				"'<select[^>]*?>.*?</select>'siu",
-				"'<head[^>]*?>.*?</head>'siu",
+			$search = array(
+				"'<script[^>]*?>.*?</script\s*?>'siu",
+				"'<noscript[^>]*?>.*?</noscript\s*?>'siu",
+				"'<style[^>]*?>.*?</style\s*?>'siu",
+				"'<select[^>]*?>.*?</select\s*?>'siu",
+				"'<head[^>]*?>.*?</head\s*?>'siu",
 				"'<!--.*?-->'siu"
 			);
 
 			$sTmpContent = preg_replace($search, ' ', str_replace(array("\r", "\n"), ' ', $sContent));
 
 			$pattern_index = "(?<!noindex)(?<!display)(?<!visible)";
-			$pat = "#<a([^>]{$pattern_index})*href=((\"http://(www.|)hostcms.ru(/|)\")|(http://(www.|)hostcms.ru(/|)))([^>]{$pattern_index})*>(.{3,})</a>#u";
+			$pat = "#<a(?:[^>]{$pattern_index})*?href=[\"]?http://(?:www.)?hostcms.ru[/]?[\"]?(?:[^>]{$pattern_index})*?>(.{3,})</a>#si";
 
 			if (!Core_Auth::logged() && !preg_match_all($pat, $sTmpContent, $matches))
 			{

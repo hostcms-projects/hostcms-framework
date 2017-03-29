@@ -21,6 +21,7 @@ return array(
 	'class' => 'Параметр "class"',
 	'active' => 'Активность',
 	'sorting' => 'Порядок сортировки',
+	'description' => 'Описание виджета',
 	'lib_dir_id' => 'Раздел',
 	'lib_id' => 'Страница',
 	'edit_success' => 'Данные успешно добавлены!',

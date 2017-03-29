@@ -75,4 +75,15 @@ class Revision_Model extends Core_Entity
 			->value($userName)
 			->execute();
 	}
+
+	/**
+	 * Get entity description
+	 * @return string
+	 */
+	public function getTrashDescription()
+	{
+		return htmlspecialchars(
+			Core_Str::cut($this->model, 255)
+		);
+	}
 }

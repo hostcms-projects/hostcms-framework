@@ -162,21 +162,27 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 				$this->_init = Core_Config::instance()->get('core_wysiwyg');
 
 				// add
-				$this->_init['script_url'] = "'/admin/wysiwyg/tiny_mce.js'";
+				$this->_init['script_url'] = "'/admin/wysiwyg/tinymce.min.js'";
 				$this->_init['language'] = '"' . $lng . '"';
-				$this->_init['docs_language'] = '"' . $lng . '"';
+				$this->_init['language_url'] = '"/admin/wysiwyg/langs/' . $lng . '.js"';
 				$this->_init['elements'] = '"' . $this->id . '"';
 				$this->_init['height'] = '"' . ($this->rows * 30) . '"';
 
-				$this->_init['theme'] = '$(window).width() < 700 ? "simple" : "advanced"';
-				
-				$aUserCsses = explode(',', trim(Core_Array::get($this->_init, 'content_css', ''), '\'"'));
-				$this->_init['content_css'] = '"' . implode(',', array_merge($aUserCsses, $aCSS)) . '"';
+				$this->_init['theme'] = '$(window).width() < 700 ? "inlite" : "modern"';
+
+				$userCss = trim(Core_Array::get($this->_init, 'content_css', ''), '\'"');
+
+				$aUserCsses = $userCss != ''
+					? array_merge(explode(',', $userCss), $aCSS)
+					: $aCSS;
+
+				if (count($aUserCsses))
+				{
+					$this->_init['content_css'] = "['" . implode("','", $aUserCsses) . "']";
+				}
 
 				// Array of structures
 				$aStructure = $this->_fillStructureList(CURRENT_SITE);
-
-				$tinyMCELinkList = 'var tinyMCELinkList = new Array(';
 
 				$tinyMCELinkListArray = array();
 
@@ -187,17 +193,15 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 						? $oStructure->getPath()
 						: $oStructure->url;
 
-					$tinyMCELinkListArray[] = '["' . addslashes($oStructure->menu_name) . '","' . $link . '"]';
+					$tinyMCELinkListArray[] = '{title: "' . addslashes($oStructure->menu_name) . '", value: "' . $link . '"}';
 				}
 
-				$tinyMCELinkList .= implode(",", $tinyMCELinkListArray);
-
-				$tinyMCELinkList .= ');';
+				$tinyMCELinkList = implode(",", $tinyMCELinkListArray);
 
 				unset($tinyMCELinkListArray);
 
 				// Передаем в конфигураци
-				$this->_init['external_link_list'] = '"' . addslashes($tinyMCELinkList) . '"';
+				$this->_init['link_list'] = '[' . $tinyMCELinkList . ']';
 
 				if (count($this->_init) > 0)
 				{

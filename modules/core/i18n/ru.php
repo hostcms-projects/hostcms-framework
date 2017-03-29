@@ -105,7 +105,7 @@ return array(
 	'deleteNote' => 'Удалить заметку',
 
 	'key_not_found' => 'Не найден лицензионный ключ!',
-	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .3); padding: 0 20px">
+	'getting_key' => '<div style="overflow: auto; height: 500px; z-index: 9999; background-color: rgba(255, 255, 255, .4); padding: 0 20px; text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4)">
 
 	<h2>Получение номера лицензии и PIN-кода <a href="http://www.hostcms.ru/documentation/introduction/licenses/licenses/" target="_blank"><i class="fa fa-external-link"></i></a></h2>
 

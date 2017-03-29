@@ -159,7 +159,7 @@ class Core_Captcha
 		while (TRUE)
 		{
 			$value = '';
-			for($i = 0; $i < $length; $i++)
+			for ($i = 0; $i < $length; $i++)
 			{
 				$value .= self::$_config['allowedCharacters'][mt_rand(0, $allowedCharactersLength - 1)];
 			}
@@ -392,21 +392,21 @@ class Core_Captcha
 			}
 		}
 
-		// частоты
+		// Частоты
 		$rand1 = mt_rand(700000, 1000000) / 14000000;
 		$rand2 = mt_rand(700000, 1000000) / 14000000;
 		$rand3 = mt_rand(700000, 1000000) / 14000000;
 		$rand4 = mt_rand(700000, 1000000) / 14000000;
 
-		// фазы
+		// Фазы
 		$rand5 = mt_rand(0, 3141592) / 1000000;
 		$rand6 = mt_rand(0, 3141592) / 1000000;
 		$rand7 = mt_rand(0, 3141592) / 1000000;
 		$rand8 = mt_rand(0, 3141592) / 1000000;
 
-		// амплитуды
-		$rand9 = mt_rand(100, 250) / 100;
-		$rand10 = mt_rand(100, 250) / 100;
+		// Амплитуды
+		$rand9 = mt_rand(400, 600) / 100;
+		$rand10 = mt_rand(400, 600) / 100;
 
 		// Искажение
 		for ($x = 0; $x < $width; $x++)
@@ -432,8 +432,7 @@ class Core_Captcha
 				{
 					continue;
 				}
-				else
-				if ($color == 0 && $color_x == 0 && $color_y == 0 && $color_xy == 0)
+				elseif ($color == 0 && $color_x == 0 && $color_y == 0 && $color_xy == 0)
 				{
 					$newred = $foreground_color[0];
 					$newgreen = $foreground_color[1];
@@ -448,8 +447,7 @@ class Core_Captcha
 
 					$newcolor = ($color * $frsx1 * $frsy1 + $color_x * $frsx * $frsy1 + $color_y * $frsx1 * $frsy + $color_xy * $frsx * $frsy);
 
-					if ($newcolor > 255)
-					$newcolor = 255;
+					$newcolor > 255 && $newcolor = 255;
 					$newcolor = $newcolor / 255;
 					$newcolor0 = 1 - $newcolor;
 
@@ -465,17 +463,14 @@ class Core_Captcha
 		}
 
 		// Шум
-		// Случайного цвета
-		for($i = 0; $i < $height * self::$_config['noise']; $i++)
+		for ($i = 0; $i < $height * self::$_config['noise'] * 2; $i++)
 		{
+			// Случайного цвета
 			imagesetpixel($img2, mt_rand(0, $width), mt_rand(0, $height),
 				imagecolorallocate($img2, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100))
 			);
-		}
 
-		// Цвета текста
-		for($i = 0; $i < $height * self::$_config['noise']; $i++)
-		{
+			// Цвета текста
 			imagesetpixel($img2, mt_rand(0, $width), mt_rand(0, $height),
 				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
 			);

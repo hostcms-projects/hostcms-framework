@@ -23,7 +23,7 @@ class Shop_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-12-22';
+	public $date = '2016-12-28';
 
 	/**
 	 * Module name

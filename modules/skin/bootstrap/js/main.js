@@ -352,9 +352,12 @@ function isEmpty(str) {
 			{
 				object.find('textarea').each(function(){
 					var elementId = this.id;
-					if (tinyMCE.getInstanceById(elementId) != null)
+					// if (tinyMCE.getInstanceById(elementId) != null)
+					if (tinyMCE.get(elementId) != null)
 					{
-						tinyMCE.execCommand('mceRemoveControl', false, elementId);
+						// console.log('mceRemoveControl');
+						tinyMCE.remove('#' + elementId);
+						//tinyMCE.execCommand('mceRemoveControl', false, elementId);
 						//jQuery('#content').tinymce().execCommand('mceInsertContent',false, elementId);
 					}
 				});
@@ -430,13 +433,13 @@ function isEmpty(str) {
 			}
 
 			var ajaxOptions = {
-				context: jQuery('#'+settings.windowId + ' #' + settings.context),
+				context: jQuery('#' + settings.windowId + ' #' + settings.context),
 				url: path,
 				type: 'POST',
 				data: data,
 				dataType: 'json',
 				success: settings.callBack,
-				abortOnRetry:1
+				abortOnRetry: 1
 			}
 
 			if (typeof settings.ajaxOptions != 'undefined')
@@ -449,6 +452,38 @@ function isEmpty(str) {
 			jQuery.ajax(ajaxOptions);
 
 			return false;
+		},
+		loadDocumentText: function(data, status, jqXHR)
+		{
+			var jWindow = jQuery(this),
+				tinyTextarea = $("textarea[name='document_text']", jWindow);
+
+			$.loadingScreen('hide');
+
+			if ('template_id' in data)
+			{
+				tinyTextarea.val(data['text']);
+
+				$("select#template_id", jWindow).val(data['template_id']);
+
+				if (typeof tinyMCE != 'undefined')
+				{
+					var elementId = tinyTextarea.attr('id'),
+						editor = tinyMCE.get(elementId);
+
+					if (editor != null)
+					{
+						/*var settings = editor.settings;
+						settings['content_css'] = "...";
+						tinyMCE.remove('#' + elementId);
+						tinyTextarea.tinymce(settings);*/
+
+						$.each(data['css'], function( index, value ) {
+							editor.dom.loadCSS(value);
+						});
+					}
+				}
+			}
 		},
 		loadSelectOptionsCallback: function(data, status, jqXHR)
 		{
@@ -668,22 +703,6 @@ function isEmpty(str) {
 			}
 			return jWin;
 		},
-		/*loadTagsListCallback: function(data, status, jqXHR)
-		{
-			$.loadingScreen('hide');
-
-			var windowId = this.parents("[class='hostcmsWindow ui-dialog-content ui-widget-content contentpadding']").attr('id');
-
-			if(windowId == undefined)
-				windowId = 'id_content';
-
-			var that = $('#'+ windowId).data('that');
-
-			that.element.siblings('.tag').removeClass('tag-important');
-
-			that.input.data('typeahead').source = data;
-			that.input.data('typeahead').process(data);
-		},*/
 		// Изменение статуса заказа товара
 		changeOrderStatus: function(windowId)
 		{
@@ -994,13 +1013,17 @@ function SetViewStructure(windowId, ASelectedItem)
 {
 	windowId = $.getWindowId(windowId);
 
-	var template_id = 'none',
+	var template_id = 'block',
 		document_dir = 'none',
 		document = 'none',
 		url = 'none',
 		lib_dir = 'none',
 		lib = 'none',
-		lib_properties = 'none';
+		lib_properties = 'none',
+		document_text = 'none';
+
+	$("#"+windowId+" #structure_source").hide();
+	$("#"+windowId+" #structure_config_source").hide();
 
 	switch (parseInt(ASelectedItem))
 	{
@@ -1008,24 +1031,20 @@ function SetViewStructure(windowId, ASelectedItem)
 		case 0: // Страница
 			document_dir = 'block';
 			document = 'block';
-			url = 'block';
-
-			$("#"+windowId+" #structure_source").hide();
-			$("#"+windowId+" #structure_config_source").hide();
+			document_text = 'block';
 		break;
 		case 1: // Динамическая страница
-			template_id = 'block';
 			$("#"+windowId+" #structure_source").show();
 			$("#"+windowId+" #structure_config_source").show();
 		break;
 		case 2: // Типовая дин. страница
-			template_id = 'block';
 			lib_dir = 'block';
 			lib = 'block';
 			lib_properties = 'block';
-			$("#"+windowId+" #structure_source").hide();
-			$("#"+windowId+" #structure_config_source").hide();
-
+		break;
+		case 3: // Ссылка
+			url = 'block';
+			template_id = 'none';
 		break;
 	}
 
@@ -1036,6 +1055,7 @@ function SetViewStructure(windowId, ASelectedItem)
 	$("#"+windowId+" #lib_dir").css('display', lib_dir);
 	$("#"+windowId+" #lib").css('display', lib);
 	$("#"+windowId+" #lib_properties").css('display', lib_properties);
+	$("#"+windowId+" #document_text").css('display', document_text);
 }
 
 /**
@@ -1559,19 +1579,6 @@ function HostCMSFileManager()
 
 		this.win = window.open(path, "FM", "top=" + y + ",left=" + x + ",scrollbars=yes,width=" + width + ",height=" + height + ",resizable=yes");
 
-		/*tinyMCE.openWindow({
-			file : path,
-			title : "File Browser",
-			width : 700,
-			height : 500,
-			close_previous : "no"
-		}, {
-			window : win,
-			input : field_name,
-			resizable : "yes",
-			inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-			editor_id : tinyMCE.selectedInstance.editorId
-		});*/
 		return false;
 	}
 
@@ -1579,11 +1586,14 @@ function HostCMSFileManager()
 	{
 		url = decodeURIComponent(url);
 		url = url.replace(new RegExp(/\\/g), '/');
-		this.callerWindow.document.forms[0].elements[this.field].value = url;
 
-		try
-		{
-			this.callerWindow.document.forms[0].elements[this.field].onchange();
+		var field = this.callerWindow.document.getElementById(this.field);
+
+		field.value = url;
+		//this.callerWindow.document.forms[0].elements[this.field].value = url;
+
+		try {
+			field.onchange();
 		}
 		catch (e){}
 

@@ -70,12 +70,17 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow71 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow11 = Admin_Form_Entity::factory('Div')->id('lib_properties'))
 			->add($oMainRow12 = Admin_Form_Entity::factory('Div')->class('row'))
 			;
+
+		$template_id = $this->_object->type == 0
+			? $this->_object->Document->template_id
+			: $this->_object->template_id;
 
 		$oMainTab->delete($this->getField('options'));
 
@@ -178,7 +183,8 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				array(
 					0 => Core::_('Structure.static_page'),
 					2 => Core::_('Structure.typical_dynamic_page'),
-					1 => Core::_('Structure.dynamic_page')
+					1 => Core::_('Structure.dynamic_page'),
+					3 => Core::_('Structure.link')
 				)
 			)
 			->buttonset(TRUE)
@@ -187,6 +193,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					0 => 'fa-file-o',
 					2 => 'fa-list-ul',
 					1 => 'fa-file-text-o',
+					3 => 'fa-link'
 				)
 			)
 			->onclick("SetViewStructure('{$windowId}', this.value, '{$this->_object->id}', '{$iLibDirId}', '{$iLibId}');");
@@ -252,7 +259,9 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Structure.document_id'))
 			->divAttr(array('id' => 'document', 'class' => 'form-group col-lg-6'))
 			->options($aDocumentForDir)
-			->value($this->_object->document_id);
+			->value($this->_object->document_id)
+			->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: '{$this->_formId}', callBack: $.loadDocumentText, additionalParams: 'loadDocumentText&document_id=' + this.value,windowId: '{$windowId}'}); return false");
+			;
 
 		$Select_Document
 			->add(
@@ -271,6 +280,17 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainRow7->add($Select_Document);
 
+		$oTextarea_Document_Text = Admin_Form_Entity::factory('Textarea')
+			->name('document_text')
+			->divAttr(array('id' => 'document_text', 'class' => 'form-group col-xs-12'))
+			->caption(Core::_('Structure.document_text'))
+			->value($oDocument->text)
+			->wysiwyg(TRUE)
+			->template_id($template_id)
+			->rows(20);
+
+		$oMainRow71->add($oTextarea_Document_Text);
+
 		// -!- Row --
 		// Выбор макета
 		$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
@@ -281,17 +301,18 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->options(
 				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 			)
+			->id('template_id')
 			->name('template_id')
-			->value($this->_object->template_id)
+			->value($template_id)
 			->caption(Core::_('Structure.template_id'))
-			->divAttr(array('class' => 'form-group col-lg-6', 'id' => 'template_id'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-lg-6', 'id' => 'template_id'));
 
 		$oMainRow13->add($oSelect_Template_Id);
 
 		$oAdditionalTab->delete($this->getField('template_id'));
 
 		$this->getField('path')
-			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		// -!- Row --
 		$oMainTab
@@ -451,10 +472,6 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSitemapRow2->add($oSelect_priority);
 
 		// ---- Дополнительные свойства
-		$template_id = $this->_object->type == 0
-			? $this->_object->Document->template_id
-			: $this->_object->template_id;
-
 		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)
 			->setDatasetId($this->getDatasetId())
@@ -490,6 +507,32 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->_object->saveStructureFile(Core_Array::getPost('structure_source'));
 		$this->_object->saveStructureConfigFile(Core_Array::getPost('structure_config_source'));
+
+		if ($this->_object->type == 0)
+		{
+			if ($this->_object->document_id)
+			{
+				$oDocument = $this->_object->Document;
+
+				// Backup document revision
+				if (Core::moduleIsActive('revision'))
+				{
+					$oDocument->backupRevision();
+				}
+			}
+			else
+			{
+				$oDocument = Core_Entity::factory('Document');
+				$oDocument->name = $this->_formValues['name'];
+			}
+
+			$oDocument->template_id = $this->_formValues['template_id'];
+			$oDocument->text = $this->_formValues['document_text'];
+			$oDocument->save();
+
+			$this->_object->document_id = $oDocument->id;
+			$this->_object->save();
+		}
 
 		// Lib properies
 		if ($this->_object->type == 2 && $this->_object->lib_id)
@@ -529,6 +572,12 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			Search_Controller::indexingSearchPages(array(
 				$this->_object->indexing()
 			));
+		}
+
+		// Backup structure revision
+		if (Core::moduleIsActive('revision'))
+		{
+			$this->_object->backupRevision();
 		}
 
 		$this->_object->clearCache();

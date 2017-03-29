@@ -50,6 +50,8 @@ return array(
 	'static_page' => 'Страница',
 	'typical_dynamic_page' => 'Типовая динамическая страница',
 	'dynamic_page' => 'Динамическая страница',
+	'link' => 'Ссылка',
+	'document_text' => 'Содержимое страницы',
 	'siteuser_group_id' => '<acronym title="Группа, имеющая права доступа к данной странице">Группа доступа</acronym>',
 	'https' => '<acronym title="Использовать HTTPS для доступа к узлу структуры">Доступ через HTTPS</acronym>',
 	'structure_source' => '<acronym title="PHP код вызова динамической страницы">Динамическая страница</acronym>',

@@ -653,6 +653,27 @@ class Core_Entity extends Core_ORM
 	}
 
 	/**
+	 * Get entity description
+	 * @return string
+	 */
+	public function getTrashDescription()
+	{
+		$text = isset($this->description) && strlen($this->description)
+			? $this->description
+			: (
+				isset($this->text) && strlen($this->text)
+					? $this->text
+					: NULL
+			);
+		
+		return !is_null($text)
+			? htmlspecialchars(
+				Core_Str::cut($text, 255)
+			)
+			: $text;
+	}
+
+	/**
 	 * Change copied name is necessary, default FALSE
 	 * @var boolean
 	 */

@@ -385,7 +385,7 @@ class Core_File
 		{
 			umask(0);
 
-			if (mkdir($pathname, $chmod, $recursive))
+			if (@mkdir($pathname, $chmod, $recursive))
 			{
 				chmod($pathname, $chmod);
 			}

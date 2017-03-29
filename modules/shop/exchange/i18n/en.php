@@ -8,7 +8,7 @@
  * @author Hostmake LLC
  * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-return array( 
+return array(
 	'!download' => '-- Not upload --',
 	'group_id' => 'Section IS',
 	'group_name' => 'Section name',
@@ -40,6 +40,9 @@ return array(
 	'item_image_small' => 'Small image file for product',
 	'item_tags' => 'Tags',
 	'item_weight' => 'Product weight',
+	'item_length' => 'Lenght',
+	'item_width' => 'Width',
+	'item_height' => 'Height',
 	'item_price' => 'Product price',
 	'item_active' => 'Product activity',
 	'item_sorting' => 'Product sorting order',
@@ -66,12 +69,12 @@ return array(
 	'specialprices_percent' => "Percentage from price",
 	'item_guid' => "CommerceML product identifier",
 	'group_active' => "Group activity",
-	
+
 	'siteuser_id' => "Идентификатор пользователя сайта",
 	'digital_item_name' => "Название электронного товара",
 	'item_yandex_market_sales_notes' => "Sales notes",
 	'item_parent_sop' => "Артикул родительского товара для сопутствующего товара",
-	
+
 	'order_guid' => "Order GUID",
 	'order_number' => "Order number",
 	'order_country' => "Country",

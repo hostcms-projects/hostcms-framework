@@ -23,7 +23,7 @@
 					});
 				},
 				blur: function(jEditInPlace) {
-					var item = jEditInPlace.prev();
+					var item = jEditInPlace.prevAll('.hostcmsEditable').eq(0);
 					item.html(jEditInPlace.val()).css('display', '');
 					jEditInPlace.remove();
 					settings.save(item, settings);
@@ -38,12 +38,12 @@
 					}
 					return false;
 				}).on('dblclick', function(){
-					
+
 					var item = hQuery(this);
-					
+
 					clearTimeout(item.data('timer'));
 					item.data('timer', null);
-					
+
 					var data = {
 						'id': item.attr('hostcms:id'),
 						'entity': item.attr('hostcms:entity'),
@@ -61,7 +61,7 @@
 						dataType: 'json',
 						success: function(result) {
 							//console.log(this, result);
-							
+
 							var item = hQuery(this), type = item.attr('hostcms:type'), jEditInPlace;
 
 							switch(type)
@@ -77,7 +77,9 @@
 
 							if (type != 'wysiwyg')
 							{
-								jEditInPlace.on('blur', function(){settings.blur(jEditInPlace)});
+								jEditInPlace.on('blur', function(){
+									settings.blur(jEditInPlace)
+								});
 							}
 
 							jEditInPlace.on('keydown', function(e){
@@ -101,19 +103,13 @@
 							{
 								setTimeout(function(){
 									jEditInPlace.tinymce({
-										mode: "exact",
-										theme: "simple",
-										setup : function(ed) {
-											ed.onInit.add(function(ed, evt) {
-												var dom = ed.dom, doc = ed.getDoc();
-
-												//tinymce.dom.Event.add(doc, 'blur', function(e) {
-												tinymce.dom.Event.add(tinymce.isGecko ? ed.getDoc() : ed.getWin(), 'blur', function(e) {
-													settings.blur(jEditInPlace)
-												});
+										theme: "modern",
+										init_instance_callback: function (editor) {
+											editor.on('blur', function (e) {
+												settings.blur(jEditInPlace);
 											});
 										},
-										language: "ru", docs_language: "ru", script_url: "/admin/wysiwyg/tiny_mce.js"});
+										language: "ru", docs_language: "ru", script_url: "/admin/wysiwyg/tinymce.min.js"});
 								}, 300);
 							}
 

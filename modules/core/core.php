@@ -476,6 +476,29 @@ class Core
 	}
 
 	/**
+	 * Site LNG
+	 */
+	static protected $_lng = NULL;
+	
+	/**
+	 * Get Site Language
+	 * @return string
+	 */
+	static public function getLng()
+	{
+		return self::$_lng;
+	}
+	
+	/**
+	 * Set Site Language
+	 * @param sting $lng
+	 */
+	static public function setLng($lng)
+	{
+		self::$_lng = $lng;
+	}
+	
+	/**
 	 * Initialize constants for site
 	 * @param Site_Model $oSite site
 	 * @hostcms-event Core.onBeforeInitConstants
@@ -504,6 +527,7 @@ class Core
 		}
 
 		// Язык
+		self::setLng($oSite->lng);
 		define('SITE_LNG', $oSite->lng);
 
 		// Кодировка

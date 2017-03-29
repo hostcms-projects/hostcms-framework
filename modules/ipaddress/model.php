@@ -118,4 +118,15 @@ class Ipaddress_Model extends Core_Entity
 		$this->_checkDuplicate();
 		return parent::save();
 	}
+	
+	/**
+	 * Get entity description
+	 * @return string
+	 */
+	public function getTrashDescription()
+	{
+		return htmlspecialchars(
+			Core_Str::cut($this->comment, 255)
+		);
+	}
 }

@@ -44,7 +44,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Radiogroup extends Skin_Default_Admin_For
 		<div class="radio-group">
 		<?php
 
-		$aClassBtnColors = array('btn-palegreen', 'btn-warning', 'btn-danger');
+		$aClassBtnColors = array('btn-palegreen', 'btn-warning', 'btn-danger', 'btn-sky');
 		$i = 0;
 
 		foreach ($this->radio as $key => $value)

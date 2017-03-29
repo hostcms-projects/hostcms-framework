@@ -14,6 +14,30 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
 	/**
+	 * Get Languages
+	 * @return array
+	 */
+	protected function _getLngs()
+	{
+		$aConfig = Core_Config::instance()->get('xsl_config', array()) + array(
+			'lngs' => array()
+		);
+
+		$aLngs = $aConfig['lngs'];
+
+		$aRows = Site_Controller::instance()->getLngList();
+		foreach ($aRows as $aRow)
+		{
+			if (!in_array($aRow['lng'], $aLngs))
+			{
+				$aLngs[] = $aRow['lng'];
+			}
+		}
+
+		return $aLngs;
+	}
+
+	/**
 	 * Set object
 	 * @param object $object object
 	 * @return self
@@ -106,13 +130,13 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab->move($this->getField('description'), $oMainRow6);
 
 				// DTD для всех языков
-				$aRows = Site_Controller::instance()->getLngList();
+				$aLngs = $this->_getLngs();
 
-				foreach ($aRows as $aRow)
+				foreach ($aLngs as $sLng)
 				{
 					$oTab_Lng = Admin_Form_Entity::factory('Tab')
-						->caption(Core::_('Xsl.tab_dtd', $aRow['lng']))
-						->name('lng_' . $aRow['lng']);
+						->caption(Core::_('Xsl.tab_dtd', $sLng))
+						->name('lng_' . $sLng);
 
 					$this->addTabAfter($oTab_Lng, $oMainTab);
 
@@ -125,11 +149,11 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$oTextarea_Lng
 						->value(
-							$this->_object->loadLngDtdFile($aRow['lng'])
+							$this->_object->loadLngDtdFile($sLng)
 						)
 						->rows(30)
-						->caption(Core::_('Xsl.dtd', $aRow['lng']))
-						->name('lng_' . $aRow['lng'])
+						->caption(Core::_('Xsl.dtd', $sLng))
+						->name('lng_' . $sLng)
 						->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 						->syntaxHighlighterOptions($oTmpOptions)
 						->divAttr(array('class' => 'form-group col-xs-12'));
@@ -235,13 +259,13 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->_object->saveXslFile($xsl_value);
 
 				// DTD для всех языков
-				$aRows = Site_Controller::instance()->getLngList();
+				$aLngs = $this->_getLngs();
 
-				foreach ($aRows as $aRow)
+				foreach ($aLngs as $sLng)
 				{
-					$content = Core_Array::getPost('lng_' . $aRow['lng']);
+					$content = Core_Array::getPost('lng_' . $sLng);
 
-					$this->_object->saveLngDtdFile($aRow['lng'], $content);
+					$this->_object->saveLngDtdFile($sLng, $content);
 				}
 
 				// Backup revision

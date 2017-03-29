@@ -1,4 +1,4 @@
-﻿<?php 
+﻿<?php
 /**
  * IP addresses.
  *
@@ -15,7 +15,8 @@ return array(
 	'edit_success' => "IP-адресу успішно змінено!",
 	'edit_error' => "Помилка додавання/редагування IP-адреси!",
 	'delete_success' => 'IP-адресу видалено успішно!',
-	'changeAccess_success' => 'Доступ успешно изменен!', 
+	'markDeleted_success' => 'IP-адресу видалено успішно!',
+	'changeAccess_success' => 'Доступ успешно изменен!',
 	'changeStatistic_success' => 'Учет в статистике успешно изменен!',
 	'delete_error' => 'Ошибка! IP-адресу не видалено!',
 	'add_title' => 'Додавання інформації про IP-адресу',

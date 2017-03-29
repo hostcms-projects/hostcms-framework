@@ -1286,22 +1286,26 @@ body.body-blank .page-breadcrumbs, body.body-blank .page-header {display:none}
 	padding-left: 0px;
 }
 
-.radio-group	input[type="radio"] +span{
+.radio-group input[type="radio"] +span{
 	border: 3px solid rgba(255,255,255,0);
 	border-radius: 3px;
 	box-shadow: none;
 }
 
-.radio-group	input[type="radio"]:checked +span.btn-palegreen{
-	border-color:	#97c862;
+.radio-group input[type="radio"]:checked +span.btn-palegreen{
+	border-color: #97c862;
 }
 
-.radio-group	input[type="radio"]:checked +span.btn-warning{
-	border-color:	#e6a900;
+.radio-group input[type="radio"]:checked +span.btn-warning{
+	border-color: #e6a900;
 }
 
-.radio-group	input[type="radio"]:checked +span.btn-danger{
-	border-color:	#ca392f;
+.radio-group input[type="radio"]:checked +span.btn-danger{
+	border-color: #ca392f;
+}
+
+.radio-group input[type="radio"]:checked +span.btn-sky{
+	border-color: #109ebe;
 }
 
 .typograph_result{font-size:110%;height:150px;overflow:auto;margin:15px 0;padding:0 0 0 15px;border-left:3px solid #db1905;}
@@ -1939,3 +1943,10 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 .navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu.dropdown-login-area > li.theme-area .colorpicker > li img:hover {
 	cursor: pointer;
 }
+
+/* TinyMCE */
+.mce-tinymce { border: 1px solid #e5e5e5 !important }
+.mce-panel { background-color: #f5f4f4 !important }
+.mce-btn { background: none !important }
+.mce-primary { background-color: #2d8ac7 !important }
+.mce-fullscreen { z-index: 999 !important; }

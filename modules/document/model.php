@@ -333,6 +333,7 @@ class Document_Model extends Core_Entity
 		{
 			$oDocument_Version_Std = new Document_Version_Std();
 			$oDocument_Version_Std->document_id = $this->id;
+			$oDocument_Version_Std->Template = $this->template;
 			return $oDocument_Version_Std;
 		}
 

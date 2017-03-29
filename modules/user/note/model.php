@@ -68,4 +68,15 @@ class User_Note_Model extends Core_Entity
 
 		return parent::delete($primaryKey);
 	}
+	
+	/**
+	 * Get entity description
+	 * @return string
+	 */
+	public function getTrashDescription()
+	{
+		return htmlspecialchars(
+			$this->value
+		);
+	}
 }

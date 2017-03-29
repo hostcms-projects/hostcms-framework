@@ -15,6 +15,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Document_Version_Std extends stdClass
 {
 	public $document_id = NULL;
+	public $Template = NULL;
 	
 	public function getCurrent()
 	{

@@ -81,4 +81,15 @@ class Property_Value_Float_Model extends Core_Entity
 
 		return parent::getXml();
 	}
+	
+	/**
+	 * Get entity description
+	 * @return string
+	 */
+	public function getTrashDescription()
+	{
+		return htmlspecialchars(
+			Core_Str::cut($this->value, 255)
+		);
+	}
 }

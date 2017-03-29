@@ -124,14 +124,17 @@ class Shop_Item_Controller_Apply_Discount extends Admin_Form_Action_Controller
 
 			foreach ($aChecked as $datasetKey => $checkedItems)
 			{
-				foreach ($checkedItems as $key => $value)
+				if ($datasetKey == 1)
 				{
-					$oCore_Html_Entity_Form->add(
-						 Core::factory('Core_Html_Entity_Input')
-							->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
-							->value(1)
-							->type('hidden')
-					);
+					foreach ($checkedItems as $key => $value)
+					{
+						$oCore_Html_Entity_Form->add(
+							 Core::factory('Core_Html_Entity_Input')
+								->name('hostcms[checked][' . $datasetKey . '][' . $key . ']')
+								->value(1)
+								->type('hidden')
+						);
+					}
 				}
 			}
 
