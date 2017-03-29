@@ -57,7 +57,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 		$oShopField = Admin_Form_Entity::factory('Select')
 			->name('shop_id')
 			->caption(Core::_('Shop_Payment_System.shop_id'))
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->options(
 				$this->_fillShops()
 			)
@@ -72,14 +72,14 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 		$oCurrencyField = Admin_Form_Entity::factory('Select')
 			->name('shop_currency_id')
 			->caption(Core::_('Shop_Payment_System.shop_currency_id'))
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->options($Shop_Controller_Edit->fillCurrencies())
 			->value($this->_object->shop_currency_id);
 
 		$oMainRow1->add($oCurrencyField);
 
-		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
-		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow2);
+		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow2);
 
 		// Добавляем новое поле типа файл
 		$oImageField = Admin_Form_Entity::factory('File');
@@ -117,7 +117,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 		$oMainRow3->add($oImageField);
 
 
-		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow4);
+		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow4);
 
 		$Admin_Form_Entity_Textarea = Admin_Form_Entity::factory('Textarea');
 
@@ -129,7 +129,7 @@ class Shop_Payment_System_Controller_Edit extends Admin_Form_Action_Controller_T
 				$this->_object->loadPaymentSystemFile()
 			)
 			->rows(30)
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
 			->caption(Core::_('Shop_Payment_System.system_of_pay_add_form_handler'))
 			->name('system_of_pay_add_form_handler')
 			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)

@@ -43,15 +43,15 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow1->add(Admin_Form_Entity::factory('Datetime')
 			->caption(Core::_('Seo.start_datetime'))
 			->name('start_datetime')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->value(Core_Date::timestamp2sql(time() - 2678400)));
 
-		$oMainRow2->add($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+		$oMainRow2->add($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 		$oMainRow3->add(Admin_Form_Entity::factory('Input')
 			->caption(Core::_('Seo.count'))
 			->name('count')
 			->value(10)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->format(array(
 					'lib' => array('value' => 'positiveInteger'),
 					'minlen' => array('value' => 1)
@@ -62,13 +62,13 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Seo.tcy'))
 			->name('tcy')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oMainRow5->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.pr'))
 			->name('pr')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		// Закладка обратных ссылок
 		$oLinksTab = Admin_Form_Entity::factory('Tab')
@@ -86,19 +86,19 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Seo.yandex'))
 			->name('yandex_links')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oLinksTabRow2->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.google'))
 			->name('google_links')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oLinksTabRow3->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.bing'))
 			->name('bing_links')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		// Закладка проиндексированных страниц
 		$oIndexedTab = Admin_Form_Entity::factory('Tab')
@@ -117,25 +117,25 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				->caption(Core::_('Seo.yandex'))
 				->name('yandex_indexed')
 				->value(1)
-				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oIndexedTabRow2->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.google'))
 				->name('google_indexed')
 				->value(1)
-				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oIndexedTabRow3->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.yahoo'))
 				->name('yahoo_indexed')
 				->value(1)
-				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		$oIndexedTabRow4->add(Admin_Form_Entity::factory('Checkbox')
 				->caption(Core::_('Seo.bing'))
 				->name('bing_indexed')
 				->value(1)
-				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		// Закладка каталогов
 		$oCatalogTab = Admin_Form_Entity::factory('Tab')
@@ -151,10 +151,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->addTabAfter($oCatalogTab, $oIndexedTab);
 
-		$oCatalogTabRow1->add($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCatalogTabRow2->add($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCatalogTabRow3->add($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCatalogTabRow4->add($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCatalogTabRow1->add($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCatalogTabRow2->add($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCatalogTabRow3->add($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCatalogTabRow4->add($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
 
 		// Закладка счетчиков
 		$oCounterTab = Admin_Form_Entity::factory('Tab')
@@ -172,11 +172,11 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		$this->addTabAfter($oCounterTab, $oCatalogTab);
 
 		// Закладка счетчиков
-		$oCounterTabRow1->add($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCounterTabRow2->add($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCounterTabRow3->add($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCounterTabRow4->add($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
-		$oCounterTabRow5->add($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))->value(1));
+		$oCounterTabRow1->add($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCounterTabRow2->add($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCounterTabRow3->add($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCounterTabRow4->add($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
+		$oCounterTabRow5->add($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))->value(1));
 
 		// Позиции в поисковых системах
 		$oPositionTab = Admin_Form_Entity::factory('Tab')
@@ -195,22 +195,22 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->caption(Core::_('Seo.yandex'))
 			->name('yandex_position')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 		$oPositionTabRow2->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.google'))
 			->name('google_position')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 		$oPositionTabRow3->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.yahoo'))
 			->name('yahoo_position')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 		$oPositionTabRow4->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.bing'))
 			->name('bing_position')
 			->value(1)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 		return $this;
 	}

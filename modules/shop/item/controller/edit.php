@@ -444,8 +444,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainRow6->add($oImageField);
 
 				$oMainTab
-					->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow7)
-					->move($this->getField('weight')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oMainRow7);
+					->move($this->getField('marking')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow7)
+					->move($this->getField('weight')->divAttr(array('class' => 'form-group col-xs-6 col-sm-4')), $oMainRow7);
 
 				// Удаляем единицы измерения
 				$oAdditionalTab->delete($this->getField('shop_measure_id'));
@@ -456,7 +456,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainRow7->add(
 					Admin_Form_Entity::factory('Select')
 						->caption(Core::_('Shop_Item.shop_measure_id'))
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'))
+						->divAttr(array('class' => 'form-group col-xs-6 col-sm-4'))
 						->options($Shop_Controller_Edit->fillMeasures())
 						->name('shop_measure_id')
 						->value($this->_object->shop_measure_id)
@@ -492,7 +492,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Item.shop_producer_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options($this->fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
 					->name('shop_producer_id')
 						->value($this->_object->id
@@ -506,7 +506,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Создаем поле групп пользователей сайта как выпадающий список
 				$oSiteUserGroupSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_("Shop_Item.siteuser_group_id"))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(array(-1 => Core::_('Shop_Item.shop_users_group_parrent')) + $aSiteuser_Groups)
 					->name('siteuser_group_id')
 					->value($this->_object->siteuser_group_id);
@@ -521,7 +521,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oShopSellerSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Item.shop_seller_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options($this->_fillSellersList())
 					->name('shop_seller_id')
 					->value($this->_object->id
@@ -565,7 +565,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oShopTaxSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_("Shop_Item.shop_tax_id"))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options($this->fillTaxesList())
 					->name('shop_tax_id')
 					->value($this->_object->shop_tax_id);

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2015 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_Entity_Select
 {
@@ -134,7 +134,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Select extends Skin_Default_Admin_Form_En
 			if ($this->caseSensitive)
 			{
 				Admin_Form_Entity::factory('Div')
-					->class('col-lg-3 col-md-4 col-sm-4 col-xs-3 no-padding-left' . (strlen($this->caption) ? ' margin-top-21' : ''))
+					->class('col-xs-3 col-sm-4 col-lg-3 no-padding-left' . (strlen($this->caption) ? ' margin-top-21' : ''))
 					->add(
 						Admin_Form_Entity::factory('Code')
 							->html('<label class="checkbox-inline">' .

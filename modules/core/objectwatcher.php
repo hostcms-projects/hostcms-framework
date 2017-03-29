@@ -93,6 +93,19 @@ class Core_ObjectWatcher
 	}
 
 	/**
+	 * Clear all instances
+	 */
+	static public function clear()
+	{
+		$instance = self::instance();
+
+		$instance->_cache = array();
+
+		// Forces collection of any existing garbage cycles
+		function_exists('gc_collect_cycles') && gc_collect_cycles();
+	}
+
+	/**
 	 * Delete instance of $model from cahce
 	 * @param Core_Entity $model
 	 */

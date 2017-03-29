@@ -51,13 +51,15 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 	{
 		!in_array($group->id, $this->_groupsID) && $this->_groupsID[] = $group->id;
 
-		if(intval($group->id) != 0)
+		if (intval($group->id) != 0)
 		{
 			$xml = $xml->addChild('Группы');
 			$xml = $xml->addChild('Группа');
 			$xml->addChild('Ид', $group->guid);
 			$xml->addChild('Наименование', $group->name);
-			$xml->addChild('Описание', $group->description);
+
+			$group->description != ''
+				&& $xml->addChild('Описание', $group->description);
 
 			$groups = $group->Shop_Groups->findALL(FALSE);
 		}
@@ -66,7 +68,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			$groups = $this->shop->Shop_Groups->getAllByParent_id(0, FALSE);
 		}
 
-		foreach($groups as $group)
+		foreach ($groups as $group)
 		{
 			$this->getGroupsCML($group, $xml);
 		}
@@ -94,7 +96,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 	protected function _setSimpleXML()
 	{
 		$this->_xml = new Core_SimpleXMLElement(sprintf(
-			'<?xml version="1.0" encoding="utf-8"?><КоммерческаяИнформация ВерсияСхемы="2.04" ДатаФормирования="%sT%s"></КоммерческаяИнформация>',
+			'<?xml version="1.0" encoding="utf-8"?><КоммерческаяИнформация ВерсияСхемы="2.08" ДатаФормирования="%sT%s"></КоммерческаяИнформация>',
 			date("Y-m-d"),
 			date("H:i:s")));
 
@@ -115,34 +117,47 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 		$this->_setSimpleXML();
 
 		$classifier = $this->_xml->addChild('Классификатор');
-		$catalog = $this->_xml->addChild('Каталог');
 
 		// Группы товаров
 		$this->getGroupsCML($this->group, $classifier);
 
 		// Свойства товаров
-		if ($this->exportItemExternalProperties)
-		{
-			$aItemProperties = Core_Entity::factory('Shop_Item_Property_List', $this->shop->id)->Properties->findAll();
-		}
-		else
-		{
-			$aItemProperties = array();
-		}
+		$aProperties = $this->exportItemExternalProperties
+			? Core_Entity::factory('Shop_Item_Property_List', $this->shop->id)->Properties->findAll(FALSE)
+			: array();
 
-		if(count($aItemProperties) > 0)
+		if (count($aProperties))
 		{
-			$properties = $classifier->addChild('Свойства');
+			$xmlProperties = $classifier->addChild('Свойства');
 
-			foreach($aItemProperties as $oItemProperty)
+			foreach ($aProperties as $oProperty)
 			{
-				$property = $properties->addChild('Свойство');
-				$property->addChild('Ид', $oItemProperty->guid);
-				$property->addChild('Наименование', $oItemProperty->name);
+				$xmlProperty = $xmlProperties->addChild('Свойство');
+				$xmlProperty->addChild('Ид', $oProperty->guid);
+				$xmlProperty->addChild('Наименование', $oProperty->name);
+
+				if ($oProperty->type == 3 && Core::moduleIsActive('list'))
+				{
+					$xmlProperty->addChild('ТипЗначений', 'Справочник');
+
+					$xmlValues = $xmlProperty->addChild('ВариантыЗначений');
+
+					$aList_Items = $oProperty->List->List_Items->findAll(FALSE);
+
+					foreach ($aList_Items as $oList_Item)
+					{
+						$xmlValue = $xmlValues->addChild('Справочник');
+						$xmlValue->addChild('ИдЗначения', $oList_Item->id);
+						$xmlValue->addChild('Значение', $oList_Item->value);
+					}
+				}
 			}
 		}
 
 		// Товары
+		$xmlCatalog = $this->_xml->addChild('Каталог');
+		$xmlGoods = $xmlCatalog->addChild('Товары');
+
 		$oShopItems = Core_Entity::factory('Shop_Item');
 		$oQueryBuilder = $oShopItems->queryBuilder()
 			->where('shop_group_id', 'IN', $this->_groupsID)
@@ -151,18 +166,20 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			->clearOrderBy()
 			->orderBy('id', 'ASC');
 
-		$catalog = $catalog->addChild('Товары');
-
 		$offset = 0;
 		$limit = 100;
 
 		do {
-			$oShopItems->queryBuilder()->offset($offset)->limit($limit);
+			$oShopItems
+				->queryBuilder()
+				->offset($offset)
+				->limit($limit);
+
 			$aShopItems = $oShopItems->findAll(FALSE);
 
 			foreach ($aShopItems as $oShopItem)
 			{
-				$this->_addImportItem($oShopItem, $catalog);
+				$this->_addImportItem($oShopItem, $xmlGoods);
 
 				// Модификации
 				if ($this->exportItemModifications)
@@ -170,7 +187,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 					$aModifications = $oShopItem->Modifications->findAll(FALSE);
 					foreach ($aModifications as $oModification)
 					{
-						$this->_addImportItem($oModification, $catalog);
+						$this->_addImportItem($oModification, $xmlGoods);
 					}
 				}
 			}
@@ -194,37 +211,45 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			? ''
 			: $oShopItem->Modification->guid . '#';
 
-		$item = $parentNode->addChild('Товар');
-		$item->addChild('Ид', $sMod . $oShopItem->guid);
-		$item->addChild('Артикул', $oShopItem->marking);
-		$item->addChild('Наименование', $oShopItem->name);
-		$item->addChild('Описание', $oShopItem->description);
-		$item->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
+		$xmlItem = $parentNode->addChild('Товар');
+		$xmlItem->addChild('Ид', $sMod . $oShopItem->guid);
+		$xmlItem->addChild('Артикул', $oShopItem->marking);
+		$xmlItem->addChild('Наименование', $oShopItem->name);
+		$xmlItem->addChild('Описание', $oShopItem->description);
+		$xmlItem->addChild('БазоваяЕдиница', $oShopItem->Shop_Measure->name)
 			->addAttribute('НаименованиеПолное', $oShopItem->Shop_Measure->description);
 
 		if ($oShopItem->modification_id && $oShopItem->Modification->Shop_Group->id)
 		{
-			$item->addChild('Группы')->addChild('Ид', $oShopItem->Modification->Shop_Group->guid);
+			$xmlItem->addChild('Группы')->addChild('Ид', $oShopItem->Modification->Shop_Group->guid);
 		}
 		elseif ($oShopItem->Shop_Group->id)
 		{
-			$item->addChild('Группы')->addChild('Ид', $oShopItem->Shop_Group->guid);
+			$xmlItem->addChild('Группы')->addChild('Ид', $oShopItem->Shop_Group->guid);
 		}
 
-		$oShopItem->image_large && $item->addChild('Картинка', $oShopItem->getItemHref() . $oShopItem->image_large);
+		$oShopItem->image_large
+			&& $xmlItem->addChild('Картинка', $oShopItem->getItemHref() . $oShopItem->image_large);
+
+		if ($oShopItem->shop_producer_id)
+		{
+			$xmlProducer = $xmlItem->addChild('Изготовитель');
+			$xmlProducer->addChild('Ид', $oShopItem->Shop_Producer->id);
+			$xmlProducer->addChild('Наименование', $oShopItem->Shop_Producer->name);
+		}
 
 		// Обработка дополнительных свойств
 		$aShopItemPropertyValues = $oShopItem->getPropertyValues(FALSE);
 
-		if(count($aShopItemPropertyValues) > 0)
+		if (count($aShopItemPropertyValues) > 0)
 		{
-			$properties = $item->addChild('ЗначенияСвойств');
+			$xmlProperyValues = $xmlItem->addChild('ЗначенияСвойств');
 
 			foreach ($aShopItemPropertyValues as $oShopItemPropertyValue)
 			{
-				$property = $properties->addChild('ЗначенияСвойства');
-				$property->addChild('Ид', $oShopItemPropertyValue->Property->guid);
-				$property->addChild('Значение', $oShopItemPropertyValue->Property->type == 2
+				$xmlPropertyValue = $xmlProperyValues->addChild('ЗначенияСвойства');
+				$xmlPropertyValue->addChild('Ид', $oShopItemPropertyValue->Property->guid);
+				$xmlPropertyValue->addChild('Значение', $oShopItemPropertyValue->Property->type == 2
 					? $oShopItemPropertyValue->getLargeFileHref()
 					: $oShopItemPropertyValue->value);
 			}
@@ -271,7 +296,7 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			$oShopItems->queryBuilder()->offset($offset)->limit($limit);
 			$aShopItems = $oShopItems->findAll(FALSE);
 
-			foreach($aShopItems as $oShopItem)
+			foreach ($aShopItems as $oShopItem)
 			{
 				$this->_addOffersItem($oShopItem, $packageOfProposals);
 

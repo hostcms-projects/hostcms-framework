@@ -192,7 +192,7 @@ class Shop_Delivery_Condition_Controller_Import extends Admin_Form_Action_Contro
 		// Добавляем поле типа "Файл"
 		$oCSVFileField = Admin_Form_Entity::factory('File')
 			->caption(Core::_("Shop_Delivery_Condition.import_price_list_file_type"))
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
 			->name("csvfile")
 			->largeImage(array(
 					'show_params' => FALSE

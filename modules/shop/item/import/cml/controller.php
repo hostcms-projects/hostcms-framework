@@ -984,52 +984,48 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			: array();*/
 
 		// Файл import.xml
-		if (count((array)$this->_oSimpleXMLElement->Классификатор) && count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0)
+		if (!isset($this->_oSimpleXMLElement->ПакетПредложений))
 		{
-			// Удаляем временный файл с дополнительными свойствами для модификаций
-			//is_file($this->_temporaryPropertyFile) && Core_File::delete($this->_temporaryPropertyFile);
-
-			$classifier = $this->_oSimpleXMLElement->Классификатор;
-
-			//print_r($classifier->xpath($sXmlns . 'Группы'));
-			//print_r($this->xpath($classifier, 'Группы'));
-			//print_r($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар'));
-
-			// Импортируем группы товаров
-			if ($this->importGroups)
+			if (isset($this->_oSimpleXMLElement->Классификатор))
 			{
-				// Наименования каталогов по умолчанию, если указано иное,
-				// то в качестве корневой будет создана группа с тем названием
-				if (!in_array(strval($this->_oSimpleXMLElement->Каталог->Наименование), $this->_aConfig['catalogName']))
+				$classifier = $this->_oSimpleXMLElement->Классификатор;
+
+				// Импортируем группы товаров
+				if ($this->importGroups)
 				{
-					$sCatalogId = strval($this->_oSimpleXMLElement->Каталог->Ид);
-					$sCatalogName = strval($this->_oSimpleXMLElement->Каталог->Наименование);
-
-					if (strlen($sCatalogId))
+					// Наименования каталогов по умолчанию, если указано иное,
+					// то в качестве корневой будет создана группа с тем названием
+					if (!in_array(strval($this->_oSimpleXMLElement->Каталог->Наименование), $this->_aConfig['catalogName']))
 					{
-						$oTmpGroup = $oShop->Shop_Groups->getByGuid($sCatalogId);
+						$sCatalogId = strval($this->_oSimpleXMLElement->Каталог->Ид);
+						$sCatalogName = strval($this->_oSimpleXMLElement->Каталог->Наименование);
 
-						if (is_null($oTmpGroup))
+						if (strlen($sCatalogId))
 						{
-							$oTmpGroup = Core_Entity::factory('Shop_Group');
-							$oTmpGroup->parent_id = $this->iShopGroupId;
-							$oTmpGroup->name = $sCatalogName;
-							$oTmpGroup->guid = $sCatalogId;
-							$oShop->add($oTmpGroup);
-						}
+							$oTmpGroup = $oShop->Shop_Groups->getByGuid($sCatalogId);
 
-						$this->iShopGroupId = $oTmpGroup->id;
+							if (is_null($oTmpGroup))
+							{
+								$oTmpGroup = Core_Entity::factory('Shop_Group');
+								$oTmpGroup->parent_id = $this->iShopGroupId;
+								$oTmpGroup->name = $sCatalogName;
+								$oTmpGroup->guid = $sCatalogId;
+								$oShop->add($oTmpGroup);
+							}
+
+							$this->iShopGroupId = $oTmpGroup->id;
+						}
+					}
+
+					foreach ($this->xpath($classifier, 'Группы') as $Groups)
+					{
+						$this->_importGroups($Groups, $this->iShopGroupId);
 					}
 				}
 
-				foreach ($this->xpath($classifier, 'Группы') as $Groups)
-				{
-					$this->_importGroups($Groups, $this->iShopGroupId);
-				}
+				// Импортируем дополнительные свойства товаров
+				$this->_importProperties($classifier);
 			}
-
-			// Импортируем дополнительные свойства товаров
-			$this->_importProperties($classifier);
 
 			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oXmlItem)
 			{
@@ -1267,7 +1263,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			}
 		}
 		// Файл offers.xml
-		elseif (count((array)$this->_oSimpleXMLElement->ПакетПредложений) && count((array)$this->_oSimpleXMLElement->Каталог) == 0)
+		elseif (isset($this->_oSimpleXMLElement->ПакетПредложений) && !isset($this->_oSimpleXMLElement->Каталог))
 		{
 			$classifier = $this->_oSimpleXMLElement->Классификатор;
 

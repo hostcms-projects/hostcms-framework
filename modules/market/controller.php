@@ -640,6 +640,11 @@ class Market_Controller extends Core_Servant_Properties
 		return $this->_ModuleXml;
 	}
 
+	/**
+	 * Array of files to upload after install
+	 */
+	protected $_uploadFiles = array();
+
 	public function applyModuleOptions()
 	{
 		// Читаем modules.xml
@@ -667,7 +672,7 @@ class Market_Controller extends Core_Servant_Properties
 						&& is_file($_FILES[$sFieldName]['tmp_name'])
 						&& $_FILES[$sFieldName]['size'] > 0)
 						{
-							$sFieldPath = $aFieldsValue['Path'];
+							$sFieldPath = ltrim($aFieldsValue['Path'], '/');
 							$sFieldExtension = $aFieldsValue['Extension'];
 
 							$sExt = Core_File::getExtension($_FILES[$sFieldName]['name']);
@@ -675,12 +680,12 @@ class Market_Controller extends Core_Servant_Properties
 
 							if (strlen(trim($sFieldExtension)) == 0 || in_array($sExt, $aAllowedExt))
 							{
-								if (!move_uploaded_file($_FILES[$sFieldName]['tmp_name'], CMS_FOLDER . $sFieldPath))
-								{
-									throw new Core_Exception(
-										Core::_('install.file_copy_error', $sFieldPath)
-									);
-								}
+								$this->_uploadFiles[] = array(
+									'source' => $_FILES[$sFieldName]['tmp_name'],
+									'destination' => CMS_FOLDER . $sFieldPath
+								);
+
+								//Core_File::moveUploadedFile($_FILES[$sFieldName]['tmp_name'], CMS_FOLDER . $sFieldPath);
 							}
 							else
 							{
@@ -711,6 +716,18 @@ class Market_Controller extends Core_Servant_Properties
 		if (is_dir($sFilesDir))
 		{
 			Core_File::copyDir($sFilesDir, CMS_FOLDER);
+		}
+
+		foreach ($this->_uploadFiles as $aUploadFile)
+		{
+			try
+			{
+				Core_File::moveUploadedFile($aUploadFile['source'], $aUploadFile['destination']);
+			}
+			catch (Exception $e)
+			{
+				Core_Message::show($e->getMessage(), 'error');
+			}
 		}
 
 		// Размещаем SQL из описания обновления

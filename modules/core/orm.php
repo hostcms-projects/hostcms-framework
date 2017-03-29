@@ -868,6 +868,21 @@ class Core_ORM
 	}
 
 	/**
+	 * Database driver's name, default is 'default'
+	 * @var string
+	 */
+	static protected $_databaseDriver = 'default';
+	
+	/**
+	 * Set name of Database Driver
+	 * @param string $name driver's name
+	 */
+	static public function setDatabaseDriver($name)
+	{
+		self::$_databaseDriver = $name;
+	}
+	
+	/**
 	 * Model initialization
 	 * @return Core_ORM
 	 */
@@ -877,7 +892,7 @@ class Core_ORM
 		{
 			if (is_null($this->_dataBase))
 			{
-				$this->_dataBase = Core_DataBase::instance();
+				$this->_dataBase = Core_DataBase::instance(self::$_databaseDriver);
 			}
 
 			// is_null() into getModelName()

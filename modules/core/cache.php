@@ -271,15 +271,22 @@ abstract class Core_Cache
 	 */
 	public function deleteByTag($tag)
 	{
-		$aCache_Tags = Core_Entity::factory('Cache_Tag')->getAllByTag(
-			Core::crc32($tag)
-		);
+		$limit = 1000;
 
-		foreach ($aCache_Tags as $oCache_Tag)
-		{
-			$this->_deleteByTag($oCache_Tag);
-			$oCache_Tag->delete();
+		do {
+			$oCache_Tags = Core_Entity::factory('Cache_Tag');
+			$oCache_Tags->queryBuilder()
+				->where('tag', '=', Core::crc32($tag))
+				->limit($limit);
+
+			$aCache_Tags = $oCache_Tags->findAll(FALSE);
+			foreach ($aCache_Tags as $oCache_Tag)
+			{
+				$this->_deleteByTag($oCache_Tag);
+				$oCache_Tag->delete();
+			}
 		}
+		while (count($aCache_Tags) == $limit);
 
 		return $this;
 	}

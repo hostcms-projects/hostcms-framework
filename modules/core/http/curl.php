@@ -32,7 +32,7 @@ class Core_Http_Curl extends Core_Http
 		// Предотвращаем chunked-ответ
 		curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 
-		curl_setopt($curl, CURLOPT_URL, "{$scheme}://{$host}{$path}{$query}");
+		curl_setopt($curl, CURLOPT_URL, "{$scheme}://{$host}:{$this->_port}{$path}{$query}");
 
 		switch ($this->_method)
 		{
@@ -88,6 +88,9 @@ class Core_Http_Curl extends Core_Http
 		curl_setopt($curl, CURLOPT_HEADER, TRUE);
 		// Can't set for FILE send
 		//curl_setopt($curl, CURLOPT_NOBODY, FALSE); // Return body
+
+		// Outgoing header
+		//curl_setopt($curl, CURLINFO_HEADER_OUT, TRUE);
 
 		curl_setopt($curl, CURLOPT_TIMEOUT, $this->_timeout);
 		curl_setopt($curl, CURLOPT_USERAGENT, $this->_userAgent);
@@ -163,14 +166,19 @@ class Core_Http_Curl extends Core_Http
 		// Get the target contents
 		$datastr = @curl_exec($curl);
 
+		$iHeaderSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+		$this->_headers = substr($datastr, 0, $iHeaderSize);
+		$this->_body = substr($datastr, $iHeaderSize);
+
 		// Close PHP cURL handle
 		@curl_close($curl);
 
-		$aTmp = explode("\r\n\r\n", $datastr, 2);
+		//$aTmp = explode("\r\n\r\n", $datastr, 2);
+
 		unset ($datastr);
 
-		$this->_headers = Core_Array::get($aTmp, 0);
-		$this->_body = Core_Array::get($aTmp, 1);
+		/*$this->_headers = Core_Array::get($aTmp, 0);
+		$this->_body = Core_Array::get($aTmp, 1);*/
 
 		return $this;
 	}

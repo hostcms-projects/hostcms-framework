@@ -26,7 +26,8 @@ class User_Module_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'user_group' => array(),
 		'module' => array(),
-		'site' => array()
+		'site' => array(),
+		'user' => array()
 	);
 
 	/**

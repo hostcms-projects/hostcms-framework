@@ -113,8 +113,8 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			->value($this->_object->shop_country_location_city_area_id);
 		$oMainRow2->add($CountryLocationCityAreasSelectField);
 
-		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow3);
-		$oMainTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow4);
+		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow3);
+		$oMainTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow4);
 
 		// флаг установки количества товара на складе
 		$oShopItemCountCheckBox = Admin_Form_Entity::factory('Checkbox');

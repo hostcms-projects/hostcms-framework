@@ -1856,6 +1856,21 @@ class Shop_Item_Model extends Core_Entity
 						->orderBy('shop_items.sorting', $items_sorting_direction);
 			}
 
+			$dateTime = Core_Date::timestamp2sql(time());
+			$oShop_Items_Modifications
+				->queryBuilder()
+				->open()
+					->where('shop_items.start_datetime', '<', $dateTime)
+					->setOr()
+					->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+				->close()
+				->setAnd()
+				->open()
+					->where('shop_items.end_datetime', '>', $dateTime)
+					->setOr()
+					->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+				->close();
+
 			$aShop_Items_Modifications = $oShop_Items_Modifications->getAllByActive(1);
 
 			if (count($aShop_Items_Modifications))

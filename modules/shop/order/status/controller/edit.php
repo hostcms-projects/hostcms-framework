@@ -22,6 +22,19 @@ class Shop_Order_Status_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	{
 		parent::setObject($object);
 
+		$oMainTab = $this->getTab('main');
+		$oAdditionalTab = $this->getTab('additional');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1)
+			->move($this->getField('description'), $oMainRow2)
+			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6')), $oMainRow3);
+
 		$title = $this->_object->id
 			? Core::_('Shop_Order_Status.order_status_edit_form_title')
 			: Core::_('Shop_Order_Status.order_status_add_form_title');

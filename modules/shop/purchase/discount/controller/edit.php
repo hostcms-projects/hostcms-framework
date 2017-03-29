@@ -40,9 +40,9 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 		;
 
-		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow1);
-		$oMainTab->move($this->getField('coupon')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow2);
-		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
+		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow1);
+		$oMainTab->move($this->getField('coupon')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow2);
+		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3);
 
 		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 		$oMainTab->delete($this->getField('mode'));
@@ -58,7 +58,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_percent'),
 				Core::_('Shop_Purchase_Discount.form_edit_affiliate_values_type_summ'))
 			)
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->value($this->_object->type);
 			//->onchange('$.changeDiscountPosition(this)');
 
@@ -78,7 +78,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 			->name('position')
 			->caption(Core::_('Shop_Purchase_Discount.position'))
 			->options(array(0 => Core::_('Shop_Purchase_Discount.total-amount'), 2 => 2, 3 => 3, 4 => 4, 5 => 5))
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->value($this->_object->position);
 
 		$oMainRow3
@@ -88,8 +88,8 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow4);
 		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow4);
 
-		$oMainTab->move($this->getField('min_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
-		$oMainTab->move($this->getField('max_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
+		$oMainTab->move($this->getField('min_amount')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow5);
+		$oMainTab->move($this->getField('max_amount')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow5);
 
 		$Shop_Controller_Edit = new Shop_Controller_Edit($this->_Admin_Form_Action);
 
@@ -98,7 +98,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 				->name('shop_currency_id')
 				->caption(Core::_('Shop_Purchase_Discount.shop_currency_id'))
 				->options($Shop_Controller_Edit->fillCurrencies())
-				->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 				->value($this->_object->shop_currency_id)
 		);
 
@@ -118,7 +118,7 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 						'fa-shopping-cart',
 					)
 				)
-				->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+				->divAttr(array('class' => 'form-group col-xs-12'))
 		);
 
 		$oMainTab->move($this->getField('min_count')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow7);

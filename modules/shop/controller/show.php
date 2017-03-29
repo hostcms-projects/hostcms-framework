@@ -363,17 +363,18 @@ class Shop_Controller_Show extends Core_Controller
 	protected function _applyItemConditionsQueryBuilder(Core_QueryBuilder_Select $oCore_QueryBuilder_Select, $tableName = 'shop_items')
 	{
 		$dateTime = Core_Date::timestamp2sql(time());
+
 		$oCore_QueryBuilder_Select
 			->open()
-			->where($tableName . '.start_datetime', '<', $dateTime)
-			->setOr()
-			->where($tableName . '.start_datetime', '=', '0000-00-00 00:00:00')
+				->where($tableName . '.start_datetime', '<', $dateTime)
+				->setOr()
+				->where($tableName . '.start_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->setAnd()
 			->open()
-			->where($tableName . '.end_datetime', '>', $dateTime)
-			->setOr()
-			->where($tableName . '.end_datetime', '=', '0000-00-00 00:00:00')
+				->where($tableName . '.end_datetime', '>', $dateTime)
+				->setOr()
+				->where($tableName . '.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
 			->where($tableName . '.siteuser_group_id', 'IN', $this->_aSiteuserGroups);
 

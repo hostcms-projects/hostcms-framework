@@ -32,4 +32,5 @@ return array(
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
 	'copy_success' => 'Page copied successfully!',
+	'structures' => 'Structures',
 );

@@ -293,7 +293,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopUserGroupSelect = Admin_Form_Entity::factory('Select')
 					->name('siteuser_group_id')
 					->caption(Core::_('Shop.siteuser_group_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(array(Core::_('Shop.allgroupsaccess')) + $aSiteuser_Groups)
 					->value($this->_object->siteuser_group_id);
 
@@ -303,7 +303,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oCompaniesField = Admin_Form_Entity::factory('Select')
 					->name('shop_company_id')
 					->caption(Core::_('Shop.shop_company_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						$this->_fillCompanies()
 					)
@@ -315,7 +315,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oCurrencyField = Admin_Form_Entity::factory('Select')
 					->name('shop_currency_id')
 					->caption(Core::_('Shop.shop_currency_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						$this->fillCurrencies()
 					)
@@ -327,7 +327,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oCountriesField = Admin_Form_Entity::factory('Select')
 					->name('shop_country_id')
 					->caption(Core::_('Shop.shop_country_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						$this->fillCountries()
 					)
@@ -339,7 +339,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oOrderStatusField = Admin_Form_Entity::factory('Select')
 					->name('shop_order_status_id')
 					->caption(Core::_('Shop.shop_order_status_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						$this->fillOrderStatuses()
 					)
@@ -351,7 +351,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMeasuresField = Admin_Form_Entity::factory('Select')
 					->name('shop_measure_id')
 					->caption(Core::_('Shop.shop_measure_id'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						$this->fillMeasures()
 					)
@@ -361,18 +361,18 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 
 				$oMainTab->move($this->getField('email')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					// clear standart url pattern
 					->format(array('lib' => array())), $oMainRow6);
 
 				$oMainTab->move($this->getField('items_on_page')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow6);
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow6);
 
 				// Добавляем тип URL
 				$oUrlTypeField = Admin_Form_Entity::factory('Select')
 					->name('url_type')
 					->caption(Core::_('Shop.url_type'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(
 						array(
 							Core::_('Shop.shop_shops_url_type_element_0'),
@@ -387,7 +387,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainRow7->add(Admin_Form_Entity::factory('Select')
 					->name('size_measure')
 					->caption(Core::_('Shop.size_measure'))
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					->options(array(Core::_('Shop.size_measure_0'),
 						Core::_('Shop.size_measure_1'),
 						Core::_('Shop.size_measure_2'),
@@ -397,7 +397,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oMainTab->delete($this->getField('reserve_hours'));
 
-				$oMainRow7->add($this->getField('reserve_hours')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')));
+				$oMainRow7->add($this->getField('reserve_hours')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
 				$oMainTab->move($this->getField('reserve'), $oMainRow8);
 				$oMainTab->move($this->getField('send_order_email_admin'), $oMainRow9);

@@ -34,6 +34,14 @@ class Admin_Word_Model extends Core_Entity
 	);
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+	
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */

@@ -646,7 +646,7 @@ class Core_Entity extends Core_ORM
 	{
 		$this->_loadColumns();
 
-		// Implement a getByXXX($value, $bCache, $compare = '=') methods
+		// Implement a getByXXX($value, $bCache = TRUE, $compare = '=') methods
 		if (count($arguments) > 0)
 		{
 			if (strpos($name, 'getBy') === 0)
@@ -660,7 +660,7 @@ class Core_Entity extends Core_ORM
 				$aObjects = $this->findAll(isset($arguments[1]) ? $arguments[1] : TRUE);
 				return isset($aObjects[0]) ? $aObjects[0] : NULL;
 			}
-			// Implement a getAllByXXX($value, $bCache, $compare = '=') methods
+			// Implement a getAllByXXX($value, $bCache = TRUE, $compare = '=') methods
 			elseif (strpos($name, 'getAllBy') === 0)
 			{
 				$field_name = strtolower(substr($name, 8));
@@ -669,6 +669,16 @@ class Core_Entity extends Core_ORM
 					->where($this->_tableName . '.' . $field_name, isset($arguments[2]) ? $arguments[2] : '=', $arguments[0]);
 
 				return $this->findAll(isset($arguments[1]) ? $arguments[1] : TRUE);
+			}
+			// Implement a getCountByXXX($value, $bCache = TRUE, $compare = '=') methods
+			elseif (strpos($name, 'getCountBy') === 0)
+			{
+				$field_name = strtolower(substr($name, 10));
+
+				$this->queryBuilder()
+					->where($this->_tableName . '.' . $field_name, isset($arguments[2]) ? $arguments[2] : '=', $arguments[0]);
+
+				return $this->getCount(isset($arguments[1]) ? $arguments[1] : TRUE);
 			}
 		}
 

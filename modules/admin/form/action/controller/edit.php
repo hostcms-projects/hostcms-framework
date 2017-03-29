@@ -105,13 +105,13 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		$oMainTab->move($this->getField('name'), $oMainRow1);
 
 		$this->getField('picture')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$this->getField('icon')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$this->getField('color')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$oMainTab
 			->move($this->getField('picture'), $oMainRow2)
@@ -122,10 +122,10 @@ class Admin_Form_Action_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		$oMainTab->move($this->getField('group'), $oMainRow4);
 
 		$this->getField('sorting')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$this->getField('dataset')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$oMainTab
 			->move($this->getField('sorting'), $oMainRow5)

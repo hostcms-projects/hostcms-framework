@@ -24,4 +24,6 @@ return array(
 	'markDeleted_success' => "Данные о статусах заказа успешно удалены!",
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	'sorting' => 'Порядок сортировки',
+	'apply_success' => 'Информация о статусе изменена!',
 );

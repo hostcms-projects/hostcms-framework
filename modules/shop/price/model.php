@@ -28,7 +28,8 @@ class Shop_Price_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop' => array(),
-		'siteuser_group' => array()
+		'siteuser_group' => array(),
+		'user' => array()
 	);
 
 	/**

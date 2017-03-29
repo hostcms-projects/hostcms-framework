@@ -124,7 +124,8 @@ class Skin_Bootstrap extends Core_Skin
 
 		<script type="text/javascript">
 		<?php
-		if (Core_Auth::logged())
+		$bLogged = Core_Auth::logged();
+		if ($bLogged)
 		{
 			?>var HostCMSFileManager = new HostCMSFileManager();
 
@@ -138,6 +139,49 @@ class Skin_Bootstrap extends Core_Skin
 
 		<script type="text/javascript" src="/admin/wysiwyg/jquery.tinymce.js"></script>
 		<?php
+		if ($this->_mode != 'install')
+		{
+			$wallpaperId = isset($_COOKIE['wallpaper-id'])
+				? intval($_COOKIE['wallpaper-id'])
+				: NULL;
+
+			if ($bLogged)
+			{
+				$oUser = Core_Entity::factory('User')->getCurrent();
+				$oModule = Core_Entity::factory('Module')->getByPath('user');
+				$type = 95;
+				$oUser_Settings = $oUser->User_Settings;
+				$oUser_Settings->queryBuilder()
+					->where('user_settings.module_id', '=', $oModule->id)
+					->where('user_settings.type', '=', $type)
+					->where('user_settings.active', '=', 1)
+					->limit(1);
+
+				$aUser_Settings = $oUser_Settings->findAll();
+
+				isset($aUser_Settings[0])
+					&& $wallpaperId = $aUser_Settings[0]->entity_id;
+			}
+			elseif (is_null($wallpaperId))
+			{
+				$oUser_Wallpapers = Core_Entity::factory('User_Wallpaper');
+				$oUser_Wallpapers->queryBuilder()
+					->clearOrderBy()
+					->orderBy('RAND()')
+					->limit(1);
+				
+				$aUser_Wallpapers = $oUser_Wallpapers->findAll();
+				isset($aUser_Wallpapers[0])
+					&& $wallpaperId = $aUser_Wallpapers[0]->id;
+			}
+
+			$sWallpaperPath = $wallpaperId
+				? '/upload/user/wallpaper/' . htmlspecialchars(Core_Entity::factory('User_Wallpaper', $wallpaperId)->image_large)
+				: '/modules/skin/bootstrap/img/bg.jpg';
+			
+			echo PHP_EOL;
+			?><style type="text/css">body.hostcms-bootstrap1:before { background-image: url("<?php echo $sWallpaperPath?>"); }</style><?php
+		}
 
 		return $this;
 	}
@@ -423,6 +467,25 @@ class Skin_Bootstrap extends Core_Skin
 												<img src="<?php echo $oUser->getImageHref()?>" class="avatar">
 											</div>
 										</li>
+										<!--Theme Selector Area-->
+										<li class="theme-area">
+											<ul class="colorpicker" id="skin-changer">
+												<?php
+												$aUser_Wallpapers = Core_Entity::factory('User_Wallpaper')->findAll(FALSE);
+
+												foreach ($aUser_Wallpapers as $oUser_Wallpaper)
+												{
+												?>
+												<li>
+													<span class="colorpick-btn">
+														<img onclick="$.changeWallpaper(this)" data-id="<?php echo $oUser_Wallpaper->id?>" data-original-path="<?php echo htmlspecialchars($oUser_Wallpaper->getLargeImageFileHref())?>" src="<?php echo htmlspecialchars($oUser_Wallpaper->getSmallImageFileHref())?>" />
+													</span>
+												</li>
+												<?php
+												}
+												?>
+											</ul>
+										</li>
 										<li class="dropdown-footer">
 											<a href="/admin/logout.php" onmousedown="$(window).off('beforeunload')"><?php echo Core::_('Admin.exit')?></a>
 										</li>
@@ -648,6 +711,7 @@ class Skin_Bootstrap extends Core_Skin
 				{
 					$this->_navBar();
 
+					echo PHP_EOL;
 					?><!-- Main Container -->
 					<div class="main-container container-fluid">
 						<!-- Page Container -->

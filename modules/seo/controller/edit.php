@@ -83,11 +83,11 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oCounterTabRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 		;
 
-		$this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+		$this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
-		$oMainTab->move($this->getField('pr')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
-		$oMainTab->move($this->getField('tcy')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
-		$oMainTab->move($this->getField('tcy_topic')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('pr')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('tcy')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
+		$oMainTab->move($this->getField('tcy_topic')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
 
 		// Закладка обратных ссылок
 		$oMainTab->move($this->getField('yandex_links')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oLinksTabRow1);
@@ -102,17 +102,17 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->move($this->getField('bing_indexed')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oIndexedTabRow2);
 
 		// Закладка каталогов
-		$oMainTab->move($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow1);
-		$oMainTab->move($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow2);
-		$oMainTab->move($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow3);
-		$oMainTab->move($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow4);
+		$oMainTab->move($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-xs-12')), $oCatalogTabRow1);
+		$oMainTab->move($this->getField('rambler_catalog')->divAttr(array('class' => 'form-group col-xs-12')), $oCatalogTabRow2);
+		$oMainTab->move($this->getField('dmoz_catalog')->divAttr(array('class' => 'form-group col-xs-12')), $oCatalogTabRow3);
+		$oMainTab->move($this->getField('mail_catalog')->divAttr(array('class' => 'form-group col-xs-12')), $oCatalogTabRow4);
 
 		// Закладка счетчиков
-		$oMainTab->move($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow1);
-		$oMainTab->move($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow2);
-		$oMainTab->move($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow3);
-		$oMainTab->move($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow4);
-		$oMainTab->move($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCounterTabRow5);
+		$oMainTab->move($this->getField('rambler_counter')->divAttr(array('class' => 'form-group col-xs-12')), $oCounterTabRow1);
+		$oMainTab->move($this->getField('spylog_counter')->divAttr(array('class' => 'form-group col-xs-12')), $oCounterTabRow2);
+		$oMainTab->move($this->getField('hotlog_counter')->divAttr(array('class' => 'form-group col-xs-12')), $oCounterTabRow3);
+		$oMainTab->move($this->getField('liveinternet_counter')->divAttr(array('class' => 'form-group col-xs-12')), $oCounterTabRow4);
+		$oMainTab->move($this->getField('mail_counter')->divAttr(array('class' => 'form-group col-xs-12')), $oCounterTabRow5);
 
 		return $this;
 	}

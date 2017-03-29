@@ -65,7 +65,7 @@ class Shop_Item_Bonus_Controller_Edit extends Admin_Form_Action_Controller_Type_
 				)
 			)
 			->name('apply_for_modifications')
-			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-xs-12'))
 		)
 		->add(Admin_Form_Entity::factory('Code')
 			->html("<script>$(function() {

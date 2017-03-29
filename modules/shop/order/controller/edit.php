@@ -74,7 +74,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			{
 				$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input')
 					->name('source_' . $sFieldName)
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-4'))
+					->divAttr(array('class' => 'form-group col-xs-4 col-sm-4'))
 					->caption(Core::_('Source.' . $sFieldName))
 					->class('form-control input-group-input')
 					->value($oSource->$sFieldName);
@@ -132,16 +132,16 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->move($this->getField('patronymic')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
 		$oMainTab->move($this->getField('company')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
 
-		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
-		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
-		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-12')), $oContactsTabRow5);
+		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-6 col-sm-4')), $oContactsTabRow5);
+		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-xs-6 col-sm-4')), $oContactsTabRow5);
+		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oContactsTabRow5);
 
 		$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oContactsTabRow6);
 		$oMainTab->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oContactsTabRow6);
 
 		$oMainTab->move($this->getField('guid'), $oAdditionalTab);
-		$oAdditionalTab->move($this->getField('shop_id')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow1);
-		$oAdditionalTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow2);
+		$oAdditionalTab->move($this->getField('shop_id')->divAttr(array('class' => 'form-group col-xs-12')), $oAdditionalTabRow1);
+		$oAdditionalTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-xs-12')), $oAdditionalTabRow2);
 
 		$oMainTab->move($this->getField('invoice')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow1);
 		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow1);
@@ -254,9 +254,9 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('status_datetime');
 
-		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow1);
-		$oMainTab->move($this->getField('system_information')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow2);
-		$oMainTab->move($this->getField('delivery_information')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oDescriptionTabRow3);
+		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oDescriptionTabRow1);
+		$oMainTab->move($this->getField('system_information')->divAttr(array('class' => 'form-group col-xs-12')), $oDescriptionTabRow2);
+		$oMainTab->move($this->getField('delivery_information')->divAttr(array('class' => 'form-group col-xs-12')), $oDescriptionTabRow3);
 
 		$oAdditionalTab->delete($this->getField('shop_currency_id'));
 

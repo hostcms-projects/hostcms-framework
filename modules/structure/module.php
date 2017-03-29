@@ -23,7 +23,7 @@ class Structure_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-11-18';
+	public $date = '2016-12-01';
 
 	/**
 	 * Module name

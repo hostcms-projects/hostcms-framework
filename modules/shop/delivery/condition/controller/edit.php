@@ -218,21 +218,21 @@ class Shop_Delivery_Condition_Controller_Edit extends Admin_Form_Action_Controll
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_delivery_id))
 					->name('shop_delivery_condition_dir_id')
 					->value($this->_object->shop_delivery_condition_dir_id)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров
 				$oMainRow1->add($oGroupSelect);
 
-				$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow5);
-				$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow6);
-				$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow7);
-				$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow8);
+				$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow5);
+				$oMainTab->move($this->getField('marking')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow6);
+				$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow7);
+				$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow8);
 
-				$oConditionsTab->move($oMinWeightField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow1);
-				$oConditionsTab->move($oMaxWeightField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow2);
-				$oConditionsTab->move($oMinPriceField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow3);
-				$oConditionsTab->move($oMaxPriceField->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oConditionsTabRow4);
+				$oConditionsTab->move($oMinWeightField->divAttr(array('class' => 'form-group col-xs-12')), $oConditionsTabRow1);
+				$oConditionsTab->move($oMaxWeightField->divAttr(array('class' => 'form-group col-xs-12')), $oConditionsTabRow2);
+				$oConditionsTab->move($oMinPriceField->divAttr(array('class' => 'form-group col-xs-12')), $oConditionsTabRow3);
+				$oConditionsTab->move($oMaxPriceField->divAttr(array('class' => 'form-group col-xs-12')), $oConditionsTabRow4);
 				$oConditionsTab->move($oPriceField->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-8')), $oConditionsTabRow5);
 
 				// Создаем экземпляр контроллера магазина

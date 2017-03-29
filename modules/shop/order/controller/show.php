@@ -7,9 +7,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * Доступные методы:
  *
- * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств заказов, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
+ * - ordersPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств заказов, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить товары. По умолчанию 0
- * - limit($limit) количество выводимых товаров
+ * - limit($limit) количество выводимых заказов
  * - page(2) текущая страница, по умолчанию 0, счет ведется с 0
  * - pattern($pattern) шаблон разбора данных в URI, см. __construct()
  *
@@ -27,6 +28,7 @@ class Shop_Order_Controller_Show extends Core_Controller
 	 */
 	protected $_allowedProperties = array(
 		'itemsProperties',
+		'ordersPropertiesList',
 		'offset',
 		'limit',
 		'page',
@@ -41,6 +43,18 @@ class Shop_Order_Controller_Show extends Core_Controller
 	 * @var Shop_Orders
 	 */
 	protected $_Shop_Orders = NULL;
+
+	/**
+	 * List of properties for item
+	 * @var array
+	 */
+	protected $_aOrder_Properties = array();
+
+	/**
+	 * List of property directories for item
+	 * @var array
+	 */
+	protected $_aOrder_Property_Dirs = array();
 
 	/**
 	 * Constructor.
@@ -71,10 +85,12 @@ class Shop_Order_Controller_Show extends Core_Controller
 
 		$this->_Shop_Orders
 			->queryBuilder()
+			->select('shop_orders.*')
 			->where('shop_orders.siteuser_id', '=', $siteuser_id)
 			->orderBy('shop_orders.datetime', 'DESC');
 
 		$this->itemsProperties = FALSE;
+		$this->ordersPropertiesList = FALSE;
 		$this->limit = 999;
 		$this->offset = 0;
 		$this->page = 0;
@@ -153,6 +169,39 @@ class Shop_Order_Controller_Show extends Core_Controller
 				->value(intval($this->total))
 		);
 
+		// Показывать дополнительные свойства информационного элемента
+		if ($this->itemsProperties && $this->ordersPropertiesList)
+		{
+			$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
+
+			$oProperties = $oShop_Order_Property_List->Properties;
+			if (is_array($this->ordersPropertiesList) && count($this->ordersPropertiesList))
+			{
+				$oProperties->queryBuilder()
+					->where('properties.id', 'IN', $this->ordersPropertiesList);
+			}
+			$aProperties = $oProperties->findAll();
+
+			foreach ($aProperties as $oProperty)
+			{
+				$this->_aOrder_Properties[$oProperty->property_dir_id][] = $oProperty->clearEntities();
+			}
+
+			$aProperty_Dirs = $oShop_Order_Property_List->Property_Dirs->findAll();
+			foreach ($aProperty_Dirs as $oProperty_Dir)
+			{
+				$oProperty_Dir->clearEntities();
+				$this->_aOrder_Property_Dirs[$oProperty_Dir->parent_id][] = $oProperty_Dir->clearEntities();
+			}
+
+			$Shop_Order_Properties = Core::factory('Core_Xml_Entity')
+				->name('shop_order_properties');
+
+			$this->addEntity($Shop_Order_Properties);
+
+			$this->_addordersPropertiesList(0, $Shop_Order_Properties);
+		}
+
 		// Paymentsystems
 		$oShopPaymentSystemsEntity = Core::factory('Core_Xml_Entity')
 			->name('shop_payment_systems');
@@ -186,6 +235,31 @@ class Shop_Order_Controller_Show extends Core_Controller
 		}
 
 		return parent::show();
+	}
+
+	/**
+	 * Add items properties list to $parentObject
+	 * @param int $parent_id parent group ID
+	 * @param object $parentObject object
+	 * @return self
+	 */
+	protected function _addordersPropertiesList($parent_id, $parentObject)
+	{
+		if (isset($this->_aOrder_Property_Dirs[$parent_id]))
+		{
+			foreach ($this->_aOrder_Property_Dirs[$parent_id] as $oProperty_Dir)
+			{
+				$parentObject->addEntity($oProperty_Dir);
+				$this->_addordersPropertiesList($oProperty_Dir->id, $oProperty_Dir);
+			}
+		}
+
+		if (isset($this->_aOrder_Properties[$parent_id]))
+		{
+			$parentObject->addEntities($this->_aOrder_Properties[$parent_id]);
+		}
+
+		return $this;
 	}
 
 	/**

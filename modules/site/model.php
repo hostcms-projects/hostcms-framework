@@ -46,6 +46,7 @@ class Site_Model extends Core_Entity
 		'affiliate_plan' => array(),
 		'advertisement' => array(),
 		'advertisement_group' => array(),
+		'cloud' => array(),
 		'counter' => array(),
 		'counter_page' => array(),
 		'document' => array(),
@@ -91,7 +92,7 @@ class Site_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'user' => array()
 	);
-	
+
 	/**
 	 * Default sorting for models
 	 * @var array
@@ -188,6 +189,11 @@ class Site_Model extends Core_Entity
 		{
 			$this->Advertisements->deleteAll(FALSE);
 			$this->Advertisement_Groups->deleteAll(FALSE);
+		}
+
+		if (Core::moduleIsActive('cloud'))
+		{
+			$this->Clouds->deleteAll(FALSE);
 		}
 
 		if (Core::moduleIsActive('counter'))
@@ -1511,7 +1517,7 @@ class Site_Model extends Core_Entity
 		$aEmails = array_map('trim', explode(',', $this->admin_email));
 		return $aEmails[0];
 	}
-	
+
 	/**
 	 * Get site keys as array
 	 * @return array
@@ -1597,7 +1603,7 @@ class Site_Model extends Core_Entity
 	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		$aSite_Aliases = $this->Site_Aliases->findAll();
-		
+
 		if (count($aSite_Aliases))
 		{
 			$aTmpSite_Aliases = array_slice($aSite_Aliases, 0, 5);

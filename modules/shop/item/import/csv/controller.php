@@ -350,6 +350,12 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	}
 
 	/**
+	 * CSV config
+	 * @var array
+	 */
+	protected $_aConfig = NULL;
+
+	/**
 	 * Constructor.
 	 * @param int $iCurrentShopId shop ID
 	 * @param int $iCurrentGroupId current group ID
@@ -358,11 +364,16 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 	{
 		parent::__construct();
 
+		$this->_aConfig = Core_Config::instance()->get('shop_csv', array()) + array(
+			'maxTime' => 20,
+			'maxCount' => 100
+		);
+
 		$this->_iCurrentShopId = $iCurrentShopId;
 		$this->_iCurrentGroupId = $iCurrentGroupId;
 
-		$this->time = 20;
-		$this->step = 100;
+		$this->time = $this->_aConfig['maxTime'];
+		$this->step = $this->_aConfig['maxCount'];
 
 		$this->init();
 

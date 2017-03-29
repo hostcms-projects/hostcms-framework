@@ -60,7 +60,7 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 		$oImageField
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
 			->name("image")
 			->id("image")
 			->largeImage(array(
@@ -85,10 +85,10 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				)
 			);
 
-		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow3);
+		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow3);
 		$oMainRow4->add($oImageField);
-		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow5);
-		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow6);
+		$oMainTab->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow5);
+		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow6);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Delivery.type_of_delivery_edit_form_title')
@@ -146,7 +146,7 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					'fa-file-code-o'
 				)
 			)
-			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-xs-12'))
 			->value($this->_object->type)
 			->name('type');
 
@@ -189,7 +189,7 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$oTextarea->caption(Core::_('Shop_Delivery.handler'))
 			->name('code')
 			->value($this->_object->loadHandlerFile())
-			->divAttr(array('id' => 'code', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('id' => 'code', 'class' => 'form-group col-xs-12'))
 			->rows(15)
 			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 			->syntaxHighlighterOptions($oTmpOptions);
@@ -219,9 +219,13 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 
 		$aDeliveryArray = array(' … ');
 
-		foreach($aDeliveries as $oDelivery)
+		foreach ($aDeliveries as $oDelivery)
 		{
-			$aDeliveryArray[$oDelivery->id] = $oDelivery->name;
+			$aDeliveryArray[$oDelivery->id] = array('value' => $oDelivery->name);
+			!$oDelivery->active && $aDeliveryArray[$oDelivery->id]['attr'] = array(
+				'style' => 'text-decoration: line-through',
+				'disabled' => 'disabled'
+			);
 		}
 
 		return $aDeliveryArray;

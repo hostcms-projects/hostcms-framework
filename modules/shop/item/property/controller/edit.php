@@ -67,7 +67,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					)
 					->name('shop_measure_id')
 					->value($this->_object->Shop_Item_Property->shop_measure_id)
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					;
 
 				$oMainRow1->add($oShopMeasuresSelect);
@@ -78,7 +78,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					->caption(Core::_('Shop_Item.property_prefix'))
 					->name('prefix')
 					->value($this->_object->Shop_Item_Property->prefix)
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 				$oMainRow1->add($oShopPrefixInput);
 
@@ -98,7 +98,7 @@ class Shop_Item_Property_Controller_Edit extends Property_Controller_Edit
 					)
 					->name('filter')
 					->value($this->_object->Shop_Item_Property->filter)
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 					;
 
 				$oMainRow1->add($oShopFilterSelect);

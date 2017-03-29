@@ -13,11 +13,25 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
  * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 500
+ * - stdOut() поток вывода, может использоваться для записи результата в файл. По умолчанию Core_Out_Std
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
  * 	Core_Entity::factory('Shop', 1)
  * );
+ *
+ * $Shop_Controller_YandexMarket->show();
+ * </code>
+ *
+ * <code>
+ * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
+ * 	Core_Entity::factory('Shop', 1)
+ * );
+ *
+ * // Write to file
+ * $oCore_Out_File = new Core_Out_File();
+ * $oCore_Out_File->filePath(CMS_FOLDER . "yandexmarket.xml");
+ * $Shop_Controller_YandexMarket->stdOut($oCore_Out_File);
  *
  * $Shop_Controller_YandexMarket->show();
  * </code>
@@ -41,7 +55,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		'deliveryOptions',
 		'type',
 		'onStep',
-		'protocol'
+		'protocol',
+		'stdOut'
 	);
 
 	/**
@@ -238,6 +253,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->type = 'offer';
 		$this->onStep = 500;
 
+		$this->stdOut = new Core_Out_Std();
+
 		$this->_Shop_Item_Controller = new Shop_Item_Controller();
 
 		Core_Session::close();
@@ -353,7 +370,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected function _currencies()
 	{
-		echo '<currencies>'. "\n";
+		$this->stdOut->write('<currencies>'. "\n");
 		$aShop_Currencies = Core_Entity::factory('Shop_Currency')->findAll(FALSE);
 
 		$aCurrenciesCodes = array(
@@ -372,11 +389,11 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			if (trim($oShop_Currency->code) != ''
 			&& in_array($oShop_Currency->code, $aCurrenciesCodes))
 			{
-				echo '<currency id="' . Core_Str::xml($oShop_Currency->code) .
-					'" rate="' . Core_Str::xml($oShop_Currency->exchange_rate) .'"'. "/>\n";
+				$this->stdOut->write('<currency id="' . Core_Str::xml($oShop_Currency->code) .
+					'" rate="' . Core_Str::xml($oShop_Currency->exchange_rate) .'"'. "/>\n");
 			}
 		}
-		echo '</currencies>'. "\n";
+		$this->stdOut->write('</currencies>'. "\n");
 
 		return $this;
 	}
@@ -411,12 +428,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected function _categories()
 	{
-		echo "<categories>\n";
+		$this->stdOut->write("<categories>\n");
 
 		// Название магазина
 		$oShop = $this->getEntity();
 
-		echo '<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n";
+		$this->stdOut->write('<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n");
 
 		// Массив активных ID групп
 		$this->_aCategoriesId = array();
@@ -447,7 +464,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 						? ''
 						: ' parentId="' . $oShop_Group->parent_id . '"';
 
-					echo '<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n";
+					$this->stdOut->write('<category id="' . $oShop_Group->id . '"' . $group_parent_id . '>' . Core_Str::xml($oShop_Group->name) . "</category>\n");
 				}
 				else
 				{
@@ -460,7 +477,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		}
 		while ($iFrom < $maxId);
 
-		echo "</categories>\n";
+		$this->stdOut->write("</categories>\n");
 
 		unset($aShop_Groups);
 
@@ -500,7 +517,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected function _offers()
 	{
-		echo "<offers>\n";
+		$this->stdOut->write("<offers>\n");
 
 		//$offset = 0;
 
@@ -547,12 +564,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				}
 			}
 
-			Core_File::flush();
+			//Core_File::flush();
 			$iFrom += $this->onStep;
 		}
 		while ($iFrom < $maxId);
 
-		echo '</offers>'. "\n";
+		$this->stdOut->write('</offers>'. "\n");
 
 		return $this;
 	}
@@ -576,29 +593,29 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? ' type="' . Core_Str::xml($this->type) . '"'
 			: '';
 
-		echo '<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cbid . $sType . " available=\"{$available}\">\n";
+		$this->stdOut->write('<offer id="' . $oShop_Item->id . '"'. $tag_bid . $tag_cbid . $sType . " available=\"{$available}\">\n");
 
 		Core_Event::notify(get_class($this) . '.onBeforeOffer', $this, array($oShop_Item));
 
 		/* URL */
-		echo '<url>' . Core_Str::xml($this->_shopPath . $oShop_Item->getPath()) . '</url>'. "\n";
+		$this->stdOut->write('<url>' . Core_Str::xml($this->_shopPath . $oShop_Item->getPath()) . '</url>'. "\n");
 
 		/* Определяем цену со скидкой */
 		$aPrices = $this->_Shop_Item_Controller->calculatePriceInItemCurrency($oShop_Item->price, $oShop_Item);
 
 		/* Цена */
-		echo '<price>' . $aPrices['price_discount'] . '</price>'. "\n";
+		$this->stdOut->write('<price>' . $aPrices['price_discount'] . '</price>'. "\n");
 
 		if ($aPrices['discount'] > 0)
 		{
 			/* Старая цена */
-			echo '<oldprice>' . ($aPrices['price'] + $aPrices['tax']) . '</oldprice>'. "\n";
+			$this->stdOut->write('<oldprice>' . ($aPrices['price'] + $aPrices['tax']) . '</oldprice>'. "\n");
 		}
 
 		/* CURRENCY */
 		// Обязательно поле в модели:
 		// (url?,buyurl?,price,wprice?,currencyId,xCategory?,categoryId+ ...
-		echo '<currencyId>'. Core_Str::xml($oShop_Item->Shop_Currency->code) . '</currencyId>'. "\n";
+		$this->stdOut->write('<currencyId>'. Core_Str::xml($oShop_Item->Shop_Currency->code) . '</currencyId>'. "\n");
 
 		/* Идентификатор категории */
 		// Основной товар
@@ -612,31 +629,31 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				? $oShop_Item->Modification->Shop_Group->id
 				: 0;
 		}
-		echo '<categoryId>' . $categoryId . '</categoryId>'. "\n";
+		$this->stdOut->write('<categoryId>' . $categoryId . '</categoryId>'. "\n");
 
 		if (!is_null($this->_MarketCategory))
 		{
 			$aProperty_Value_Market_Category = $this->_MarketCategory->getValues($oShop_Item->id);
 			if (isset($aProperty_Value_Market_Category[0]))
 			{
-				echo '<market_category>' .
+				$this->stdOut->write('<market_category>' .
 					Core_Str::xml($aProperty_Value_Market_Category[0]->value) .
-				'</market_category>'. "\n";
+				'</market_category>'. "\n");
 			}
 		}
 
 		/* PICTURE */
 		if ($oShop_Item->image_large != '')
 		{
-			echo '<picture>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n";
+			$this->stdOut->write('<picture>' . $this->protocol . '://' . Core_Str::xml($this->_siteAlias->name . $oShop_Item->getLargeFileHref()) . '</picture>'. "\n");
 		}
 
 		/* Delivery options */
 		if ($this->deliveryOptions)
 		{
-			echo '<store>' . ($oShop_Item->store == 1 ? 'true' : 'false') . '</store>'. "\n";
-			echo '<pickup>' . ($oShop_Item->pickup == 1 ? 'true' : 'false') . '</pickup>'. "\n";
-			echo '<delivery>' . ($oShop_Item->delivery == 1 ? 'true' : 'false') . '</delivery>'. "\n";
+			$this->stdOut->write('<store>' . ($oShop_Item->store == 1 ? 'true' : 'false') . '</store>'. "\n");
+			$this->stdOut->write('<pickup>' . ($oShop_Item->pickup == 1 ? 'true' : 'false') . '</pickup>'. "\n");
+			$this->stdOut->write('<delivery>' . ($oShop_Item->delivery == 1 ? 'true' : 'false') . '</delivery>'. "\n");
 
 			$this->_deliveryOptions($oShop, $oShop_Item);
 		}
@@ -647,17 +664,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			if ($this->type != 'vendor.model')
 			{
 				/* NAME */
-				echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
+				$this->stdOut->write('<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n");
 			}
 
 			if ($oShop_Item->shop_producer_id)
 			{
-				echo '<vendor>' . Core_Str::xml($oShop_Item->Shop_Producer->name) . '</vendor>'. "\n";
+				$this->stdOut->write('<vendor>' . Core_Str::xml($oShop_Item->Shop_Producer->name) . '</vendor>'. "\n");
 			}
 
 			if ($oShop_Item->vendorcode != '')
 			{
-				echo '<vendorCode>' . Core_Str::xml($oShop_Item->vendorcode) . '</vendorCode>'. "\n";
+				$this->stdOut->write('<vendorCode>' . Core_Str::xml($oShop_Item->vendorcode) . '</vendorCode>'. "\n");
 			}
 		}
 
@@ -672,7 +689,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				html_entity_decode(strip_tags($description), ENT_COMPAT, 'UTF-8'), 175
 			);
 
-			echo '<description>' . Core_Str::xml($description) . '</description>'. "\n";
+			$this->stdOut->write('<description>' . Core_Str::xml($description) . '</description>'. "\n");
 		}
 
 		/* sales_notes */
@@ -680,28 +697,28 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? $oShop_Item->yandex_market_sales_notes
 			: $oShop->yandex_market_sales_notes_default;
 
-		echo '<sales_notes>' . Core_Str::xml(html_entity_decode(strip_tags($sales_notes), ENT_COMPAT, 'UTF-8')) . '</sales_notes>'. "\n";
+		$this->stdOut->write('<sales_notes>' . Core_Str::xml(html_entity_decode(strip_tags($sales_notes), ENT_COMPAT, 'UTF-8')) . '</sales_notes>'. "\n");
 
 		if ($oShop_Item->manufacturer_warranty)
 		{
-			echo '<manufacturer_warranty>true</manufacturer_warranty>' . "\n";
+			$this->stdOut->write('<manufacturer_warranty>true</manufacturer_warranty>' . "\n");
 		}
 
 		if (trim($oShop_Item->country_of_origin) != '')
 		{
-			echo '<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n";
+			$this->stdOut->write('<country_of_origin>' . Core_Str::xml(html_entity_decode(strip_tags($oShop_Item->country_of_origin), ENT_COMPAT, 'UTF-8')) . '</country_of_origin>'. "\n");
 		}
 
 		// Элемент предназначен для обозначения товара, который можно скачать. Если указано значение параметра true, товарное предложение показывается во всех регионах независимо от регионов доставки, указанных магазином на странице Параметры размещения.
 		if ($oShop_Item->type == 1)
 		{
-			echo '<downloadable>true</downloadable>'. "\n";
+			$this->stdOut->write('<downloadable>true</downloadable>'. "\n");
 		}
 
 		/* adult */
 		if ($oShop_Item->adult)
 		{
-			echo '<adult>true</adult>' . "\n";
+			$this->stdOut->write('<adult>true</adult>' . "\n");
 		}
 
 		/* rec */
@@ -724,7 +741,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 			if (count($aTmp))
 			{
-				echo '<rec>' . implode(',', $aTmp) . '</rec>'. "\n";
+				$this->stdOut->write('<rec>' . implode(',', $aTmp) . '</rec>'. "\n");
 			}
 		}
 
@@ -732,7 +749,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));
 
-		echo '</offer>'. "\n";
+		$this->stdOut->write('</offer>'. "\n");
 	}
 
 	/**
@@ -752,14 +769,14 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		if (count($aShop_Item_Delivery_Options))
 		{
-			echo '<delivery-options>';
+			$this->stdOut->write('<delivery-options>');
 
 			foreach ($aShop_Item_Delivery_Options as $oShop_Item_Delivery_Option)
 			{
-				echo '<option cost="' . $oShop_Item_Delivery_Option->cost . '" days="' . $oShop_Item_Delivery_Option->day . '" order-before="' . $oShop_Item_Delivery_Option->order_before . '"/>' . "\n";
+				$this->stdOut->write('<option cost="' . $oShop_Item_Delivery_Option->cost . '" days="' . $oShop_Item_Delivery_Option->day . '" order-before="' . $oShop_Item_Delivery_Option->order_before . '"/>' . "\n");
 			}
 
-			echo '</delivery-options>';
+			$this->stdOut->write('</delivery-options>');
 		}
 
 		return count($aShop_Item_Delivery_Options);
@@ -938,18 +955,18 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				{
 					if (!in_array($sTagName, $this->_aForbid))
 					{
-						echo '<' . $sTagName . $sAttr . '>'
+						$this->stdOut->write('<' . $sTagName . $sAttr . '>'
 							. Core_Str::xml(html_entity_decode(strip_tags($value), ENT_COMPAT, 'UTF-8'))
-						. '</' . $sTagName . '>'. "\n";
+						. '</' . $sTagName . '>'. "\n");
 					}
 					elseif ($sTagName == 'age-year' && $value !== '' && in_array($value, $this->_aAgeYears))
 					{
-						echo '<age unit="year">' . intval($value) . '</age>'. "\n";
+						$this->stdOut->write('<age unit="year">' . intval($value) . '</age>'. "\n");
 						$bAge = TRUE;
 					}
 					elseif (!$bAge && $sTagName == 'age-month' && $value !== '' && in_array($value, $this->_aAgeMonthes))
 					{
-						echo '<age unit="month">' . intval($value) . '</age>'. "\n";
+						$this->stdOut->write('<age unit="month">' . intval($value) . '</age>'. "\n");
 					}
 				}
 			}
@@ -979,6 +996,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	{
 		Core_Event::notify(get_class($this) . '.onBeforeRedeclaredShow', $this);
 
+		$this->stdOut->open();
+
 		$oShop = $this->getEntity();
 		$oSite = $oShop->Site;
 
@@ -986,10 +1005,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->header('Content-Type', "text/xml; charset={$oSite->coding}")
 			->sendHeaders();
 
-		echo '<?xml version="1.0" encoding="' . $oSite->coding . '"?>' . "\n";
-		echo '<!DOCTYPE yml_catalog SYSTEM "shops.dtd">' . "\n";
-		echo '<yml_catalog date="' . date("Y-m-d H:i") . '">' . "\n";
-		echo "<shop>\n";
+		$this->stdOut->write('<?xml version="1.0" encoding="' . $oSite->coding . '"?>' . "\n");
+		$this->stdOut->write('<!DOCTYPE yml_catalog SYSTEM "shops.dtd">' . "\n");
+		$this->stdOut->write('<yml_catalog date="' . date("Y-m-d H:i") . '">' . "\n");
+		$this->stdOut->write("<shop>\n");
 
 		// Название магазина
 		$shop_name = trim(
@@ -998,17 +1017,17 @@ class Shop_Controller_YandexMarket extends Core_Controller
 				: $oSite->name
 		);
 
-		echo "<name>" . Core_Str::xml(mb_substr($shop_name, 0, 20)) . "</name>\n";
+		$this->stdOut->write("<name>" . Core_Str::xml(mb_substr($shop_name, 0, 20)) . "</name>\n");
 
 		// Название компании.
-		echo "<company>" . Core_Str::xml($oShop->Shop_Company->name) . "</company>\n";
+		$this->stdOut->write("<company>" . Core_Str::xml($oShop->Shop_Company->name) . "</company>\n");
 
 		$this->_siteAlias = $oSite->getCurrentAlias();
 		$this->_shopPath = $this->protocol . '://' . $this->_siteAlias->name . $oShop->Structure->getPath();
 
-		echo "<url>" . Core_Str::xml($this->_shopPath) . "</url>\n";
-		echo "<platform>HostCMS</platform>\n";
-		echo "<version>" . Core_Str::xml(CURRENT_VERSION) . "</version>\n";
+		$this->stdOut->write("<url>" . Core_Str::xml($this->_shopPath) . "</url>\n");
+		$this->stdOut->write("<platform>HostCMS</platform>\n");
+		$this->stdOut->write("<version>" . Core_Str::xml(CURRENT_VERSION) . "</version>\n");
 
 		/* Валюты */
 		$this->_currencies();
@@ -1021,20 +1040,22 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			// Disable if there aren't shop's delivery options
 			&& $this->deliveryOptions = $this->_deliveryOptions($oShop) > 0;
 
-		Core_File::flush();
+		//Core_File::flush();
 
 		/* adult */
 		if ($oShop->adult)
 		{
-			echo '<adult>true</adult>' . "\n";
+			$this->stdOut->write('<adult>true</adult>' . "\n");
 		}
 
 		/* Товары */
 		$this->_offers();
 
-		echo "</shop>\n";
-		echo '</yml_catalog>';
+		$this->stdOut->write("</shop>\n");
+		$this->stdOut->write('</yml_catalog>');
 
-		Core_File::flush();
+		$this->stdOut->close();
+
+		//Core_File::flush();
 	}
 }

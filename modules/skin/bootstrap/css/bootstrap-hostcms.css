@@ -401,24 +401,25 @@ body.body-authorization .hostcms-notice {
 /*.table thead tr th.highlight,
 .table thead tr td.highlight,
 */
+.table { background-color: rgba(255, 255, 255, .3) }
 .table tbody tr td.highlight {
-	background-color: #F9F9F9 !important;
+	background-color: rgba(235, 235, 235, .5) !important;
 }
 .table-striped > tbody > tr:nth-child(2n+1) {
-	background-color: #fff;
+	background-color: transparent; /* #fff */
 }
 .table-striped > tbody > tr:nth-child(even)/* > td*/,
 .table-striped > tbody > tr:nth-child(even)/* > th*/ {
-	background-color: #fbfbfb;
+	background-color: rgba(240, 240, 240, .5); /* #fbfbfb */
 }
 /* Checked */
 .table-striped > tbody > tr.cheked:nth-child(odd) > td,
 .table-striped > tbody > tr.cheked:nth-child(odd) > th {
-	background-color: #f9f9f9;
+	background-color: rgba(235, 235, 235, .5); /* #f9f9f9 */
 }
 .table-striped > tbody > tr.cheked:nth-child(even) > td,
 .table-striped > tbody > tr.cheked:nth-child(even) > th {
-	background-color: #f2f2f2;
+	background-color: rgba(225, 225, 225, .5); /* #f2f2f2 */
 }
 /* Hover */
 .table-hover > tbody > tr:hover > td,
@@ -473,7 +474,8 @@ h1.row-title .fa, h2.row-title .fa, h3.row-title .fa, h4.row-title .fa, h5.row-t
 
 /* Картинка Фон 1 */
 body.hostcms-bootstrap1:before {
-	background: #eee6cf url("/modules/skin/bootstrap/img/bg.jpg") repeat scroll center top / cover;
+	/*background: #eee6cf url("/modules/skin/bootstrap/img/bg.jpg") repeat scroll center top / cover;*/
+	background: #eee6cf repeat scroll center top / cover;
 }
 /*.hostcms-bootstrap1 .page-sidebar,*/
 .hostcms-bootstrap1 .page-breadcrumbs,
@@ -1869,8 +1871,8 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 	margin-top: 24px !important;
 }
 
-.siteuser_group_list_link>i {font-size:11px !important;margin-left:5px;}
-.siteuser_group_list_link>i:hover,.siteuser_group_list_link>i:focus {cursor:pointer;}
+.siteuser_group_list_link>i, .structure_list_link>i { font-size:11px !important;margin-left:5px; }
+.siteuser_group_list_link>i:hover,.siteuser_group_list_link>i:focus, .structure_list_link>i:hover,.structure_list_link>i:focus { cursor:pointer; }
 
 /* --- Autocomplete --- */
 .ui-autocomplete { position: absolute; top: 0; left: 0; cursor: default; padding: 0px; list-style: none; background-color: #fff; border: 1px solid #f5f5f5; }
@@ -1917,4 +1919,19 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 62px;
+}
+
+.navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu.dropdown-login-area > li.theme-area .colorpicker > li {
+    height: 30px !important;
+    width: 30px !important;
+	margin: 5px !important;
+}
+
+.navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu.dropdown-login-area > li.theme-area .colorpicker > li img {
+	width: 30px;
+	height: 30px;
+}
+
+.navbar .navbar-inner .navbar-header .navbar-account .account-area > li .dropdown-menu.dropdown-login-area > li.theme-area .colorpicker > li img:hover {
+	cursor: pointer;
 }

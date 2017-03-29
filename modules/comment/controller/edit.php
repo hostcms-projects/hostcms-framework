@@ -45,12 +45,12 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('text')->wysiwyg(TRUE);
 		$oMainTab->move($this->getField('text')
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow1);
+			->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow1);
 
 		$oMainTab->move($this->getField('author')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow2);
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow2);
 
-		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oMainRow2);
+		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-xs-6 col-sm-4')), $oMainRow2);
 
 		if ($this->_object->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
@@ -72,11 +72,11 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$oMainRow2->add($oSiteuserLink);
 		}
 
-		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
-		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow3);
-		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 margin-top-21')), $oMainRow3);
-		$oMainTab->move($this->getField('ip')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
-		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3);
+		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3);
+		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 margin-top-21')), $oMainRow3);
+		$oMainTab->move($this->getField('ip')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow4);
+		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow4);
 
 		$oMainTab
 			->delete($this->getField('grade'));
@@ -87,7 +87,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->id('grade')
 				->caption(Core::_('Comment.grade'))
 				->value($this->_object->grade)
-				->divAttr(array('class' => 'form-group stars col-lg-4 col-md-4 col-sm-4'))
+				->divAttr(array('class' => 'form-group stars col-xs-12 col-sm-4'))
 		);
 
 		return $this;

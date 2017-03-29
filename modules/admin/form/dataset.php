@@ -206,12 +206,22 @@ abstract class Admin_Form_Dataset
 	static public function _sortAsc($m, $n)
 	{
 		$sortField = $m->getSortField();
-		if ($m->$sortField == $n->$sortField)
+		
+		$first = $m->$sortField;
+		$second = $n->$sortField;
+
+		if ($sortField == 'datetime')
+		{
+			$first = Core_Date::sql2timestamp($first);
+			$second = Core_Date::sql2timestamp($second);
+		}
+		
+		if ($first == $second)
 		{
 			return 0;
 		}
 
-		return ($m->$sortField < $n->$sortField) ? -1 : 1;
+		return $first < $second ? -1 : 1;
 	}
 
 	/**
@@ -223,11 +233,21 @@ abstract class Admin_Form_Dataset
 	static public function _sortDesc($m, $n)
 	{
 		$sortField = $m->getSortField();
-		if ($m->$sortField == $n->$sortField)
+		
+		$first = $m->$sortField;
+		$second = $n->$sortField;
+
+		if ($sortField == 'datetime')
+		{
+			$first = Core_Date::sql2timestamp($first);
+			$second = Core_Date::sql2timestamp($second);
+		}
+		
+		if ($first == $second)
 		{
 			return 0;
 		}
 
-		return ($m->$sortField > $n->$sortField) ? -1 : 1;
+		return $first > $second ? -1 : 1;
 	}
 }

@@ -103,7 +103,7 @@ class Shop_Order_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
-			
+
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
 
@@ -129,7 +129,7 @@ class Shop_Order_Model extends Core_Entity
 		if ($this->source_id)
 		{
 			$title = htmlspecialchars($this->Source->service);
-			
+
 			switch ($this->Source->service)
 			{
 				case 'google':
@@ -147,7 +147,7 @@ class Shop_Order_Model extends Core_Entity
 			}
 		}
 	}
-	
+
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
@@ -176,7 +176,7 @@ class Shop_Order_Model extends Core_Entity
 		$this->Shop_Item_Reserveds->deleteAll(FALSE);
 
 		$this->source_id && $this->Source->delete();
-		
+
 		return parent::delete($primaryKey);
 	}
 
@@ -369,25 +369,35 @@ class Shop_Order_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRecalcDelivery', $this);
 
-		$iOrderSum = 0;
-		$iOrderWeight = 0;
+		$iOrderSum = $iOrderWeight = 0;
+
+		$oShop_Controller = Shop_Controller::instance();
 
 		$aOrderItems = $this->Shop_Order_Items->findAll();
 		$oShop = $this->Shop;
 
-		foreach($aOrderItems as $oShop_Order_Item)
+		foreach ($aOrderItems as $oShop_Order_Item)
 		{
-			$iOrderSum += floatval($oShop_Order_Item->price * $oShop_Order_Item->quantity);
-			$iOrderWeight += floatval($oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity);
+			if ($oShop_Order_Item->type == 0)
+			{
+				$tax = $oShop_Order_Item->rate
+					? $oShop_Controller->round($oShop_Order_Item->price * $oShop_Order_Item->rate / 100)
+					: 0;
+				$iOrderSum += ($oShop_Order_Item->price + $tax) * $oShop_Order_Item->quantity;
+				$iOrderWeight += $oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity;
+			}
 		}
 
-		$oShopDelivery = $this->Shop_Delivery_Condition->Shop_Delivery;
+		$iOrderSum = $oShop_Controller->round($iOrderSum);
+		$iOrderWeight = $oShop_Controller->round($iOrderWeight);
+
+		$oShopDelivery = $this->Shop_Delivery;
 		$iCountryId = $this->shop_country_id;
 		$iLocationId = $this->shop_country_location_id;
 		$iCityId = $this->shop_country_location_city_id;
 		$iCityAreaId = $this->shop_country_location_city_area_id;
 
-		for($i = 0; $i < 5; $i++)
+		for ($i = 0; $i < 5; $i++)
 		{
 			$sql = "
 			SELECT `shop_delivery_conditions`.*,
@@ -400,7 +410,7 @@ class Shop_Order_Model extends Core_Entity
 				AND `shop_deliveries`.`deleted`='0'
 				AND `shop_delivery_conditions`.`deleted`='0'
 				AND `shop_deliveries`.`id`=`shop_delivery_conditions`.`shop_delivery_id`
-				AND `shop_delivery_conditions`.`shop_delivery_id`='{$this->Shop_Delivery_Condition->shop_delivery_id}'
+				AND `shop_delivery_conditions`.`shop_delivery_id`='{$this->shop_delivery_id}'
 				AND `shop_country_id`='{$iCountryId}'
 				AND `shop_country_location_id`='{$iLocationId}'
 				AND `shop_country_location_city_id` = '{$iCityId}'
@@ -438,16 +448,32 @@ class Shop_Order_Model extends Core_Entity
 					->write(Core::_('Shop_Order.cond_of_delivery_duplicate', $oShopDelivery->name, $aRows[0]->id));
 				}
 
+				$oShop_Delivery_Condition = $aRows[0];
 
-				if ($this->shop_delivery_condition_id == $aRows[0]->id)
+				if ($this->shop_delivery_condition_id == $oShop_Delivery_Condition->id)
 				{
 					// Нашли то же условие доставки
 				}
 				else
 				{
 					// Нашли новое условие доставки
-					$this->shop_delivery_condition_id = $aRows[0]->id;
+					$this->shop_delivery_condition_id = $oShop_Delivery_Condition->id;
 					$this->save();
+
+					// Update order's delivery item
+					$oShop_Order_Item_Delivery = $this->Shop_Order_Items->getByType(1);
+					if (!is_null($oShop_Order_Item_Delivery))
+					{
+						$aPrice = $oShop_Delivery_Condition->getPriceArray();
+						$oShop_Order_Item_Delivery->price = $aPrice['price'];
+						$oShop_Order_Item_Delivery->quantity = 1;
+						$oShop_Order_Item_Delivery->rate = $aPrice['rate'];
+						$oShop_Order_Item_Delivery->marking = !is_null($oShop_Delivery_Condition->marking)
+							? $oShop_Delivery_Condition->marking
+							: '';
+						$oShop_Order_Item_Delivery->name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
+						$oShop_Order_Item_Delivery->save();
+					}
 				}
 
 				return TRUE;
@@ -660,7 +686,7 @@ class Shop_Order_Model extends Core_Entity
 				: strftime($this->Shop->format_datetime, Core_Date::sql2timestamp($this->datetime)));
 
 		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getOrderHref());
-				
+
 		$this->_showXmlCurrency && $this->shop_currency_id && $this->addEntity($this->Shop_Currency);
 
 		$this->source_id && $this->addEntity(
@@ -720,13 +746,14 @@ class Shop_Order_Model extends Core_Entity
 			$this->addEntity($oShop_Country);
 		}
 
-		if ($this->_showXmlDelivery && $this->shop_delivery_condition_id)
+		if ($this->_showXmlDelivery && $this->shop_delivery_id)
 		{
-			$oShop_Delivery_Condition = $this->Shop_Delivery_Condition->clearEntities();
-			$oShop_Delivery = $oShop_Delivery_Condition->Shop_Delivery
-				->clearEntities()
-				->addEntity($oShop_Delivery_Condition);
+			$oShop_Delivery = $this->Shop_Delivery->clearEntities();
 			$this->addEntity($oShop_Delivery);
+
+			$this->shop_delivery_condition_id && $oShop_Delivery->addEntity(
+				$this->Shop_Delivery_Condition->clearEntities()
+			);
 		}
 
 		$this->_showXmlPaymentSystem && $this->shop_payment_system_id && $this->addEntity($this->Shop_Payment_System);
@@ -1104,7 +1131,7 @@ class Shop_Order_Model extends Core_Entity
 	 */
 	public function getOrderPath()
 	{
-		return $this->Shop->getPath() . '/' . Core_File::getNestingDirPath($this->id, $this->Shop->Site->nesting_level) . '/order_' . $this->id . '/';
+		return $this->Shop->getPath() . '/orders/' . Core_File::getNestingDirPath($this->id, $this->Shop->Site->nesting_level) . '/' . $this->id . '/';
 	}
 
 	/**
@@ -1113,7 +1140,7 @@ class Shop_Order_Model extends Core_Entity
 	 */
 	public function getOrderHref()
 	{
-		return '/' . $this->Shop->getHref() . '/' . Core_File::getNestingDirPath($this->id, $this->Shop->Site->nesting_level) . '/order_' . $this->id . '/';
+		return '/' . $this->Shop->getHref() . '/orders/' . Core_File::getNestingDirPath($this->id, $this->Shop->Site->nesting_level) . '/' . $this->id . '/';
 	}
 
 	/**

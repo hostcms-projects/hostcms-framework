@@ -20,6 +20,14 @@ class Admin_Form_Setting_Model extends Core_Entity
 	protected $_marksDeleted = NULL;
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */

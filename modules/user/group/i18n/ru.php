@@ -30,6 +30,7 @@ return array(
 	'ua_apply_changes_user_type_success_message' => 'Изменения успешно внесены!',
 	'ua_apply_changes_user_type_error_message' => 'Изменения не внесены!',
 	'choosing_site' => 'Выбор сайта',
+	'wallpaper' => 'Обои',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
 );

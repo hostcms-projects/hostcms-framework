@@ -24,4 +24,6 @@ return array(
 	'markDeleted_success' => "Order statuses information deleted successfully!",
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	'sorting' => 'Sorting',
+	'apply_success' => 'Status information modified successfully!',
 );

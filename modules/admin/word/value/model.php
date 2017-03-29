@@ -24,7 +24,8 @@ class Admin_Word_Value_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'admin_language' => array()
+		'admin_language' => array(),
+		'user' => array()
 	);
 	
 	/**

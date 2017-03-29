@@ -22,10 +22,11 @@ class User_Setting_Model extends Core_Entity
 	/**
 	 * Type:
 	 * 77 - Widgets
+	 * 95 - Wallpapers
 	 * 98 - Notes
 	 * 99 - Shortcuts
 	 */
-	
+
 	/**
 	 * Belongs to relations
 	 * @var array
@@ -82,11 +83,8 @@ class User_Setting_Model extends Core_Entity
 
 		$aUsers_Setting = $this->findAll();
 
-		if (isset($aUsers_Setting[0]))
-		{
-			return $aUsers_Setting[0];
-		}
-
-		return NULL;
+		return isset($aUsers_Setting[0])
+			? $aUsers_Setting[0]
+			: NULL;
 	}
 }

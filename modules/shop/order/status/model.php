@@ -34,9 +34,18 @@ class Shop_Order_Status_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_sorting = array(
+		'shop_order_statuses.sorting' => 'ASC',
 		'shop_order_statuses.name' => 'ASC',
 	);
-	
+
+	/**
+	 * List of preloaded values
+	 * @var array
+	 */
+	protected $_preloadValues = array(
+		'sorting' => 0,
+	);
+
 	/**
 	 * Constructor.
 	 * @param int $id entity ID

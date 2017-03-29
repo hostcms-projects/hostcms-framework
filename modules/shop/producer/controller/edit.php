@@ -93,26 +93,26 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->addTabAfter($oBankContactsTab, $oContactsTab)
 					->addTabAfter($oSEOTab, $oBankContactsTab);
 
-				$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow1);
-				$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow2);
-				$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow3);
-				$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow4);
-				$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oContactsTabRow5);
+				$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow1);
+				$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow2);
+				$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow3);
+				$oMainTab->move($this->getField('site')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow4);
+				$oMainTab->move($this->getField('email')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow5);
 
-				$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('psrn')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('okpo')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('okved')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('bik')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('current_account')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('correspondent_account')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
-				$oMainTab->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('tin')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('psrn')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('okpo')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('okved')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bik')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('current_account')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('correspondent_account')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
+				$oMainTab->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-xs-12')), $oBankContactsTabRow1);
 
-				$oMainTab->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow1);
-				$oMainTab->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow2);
-				$oMainTab->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oSEOTabRow3);
+				$oMainTab->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-xs-12')), $oSEOTabRow1);
+				$oMainTab->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-xs-12')), $oSEOTabRow2);
+				$oMainTab->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-xs-12')), $oSEOTabRow3);
 
 				$oShop = $this->_object->Shop;
 
@@ -132,7 +132,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 				$windowId = $this->_Admin_Form_Controller->getWindowId();
 
 				$oImageField
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->name("image")
 					->id("image")
 					->largeImage(array(
@@ -177,7 +177,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id))
 					->name('shop_producer_dir_id')
 					->value($this->_object->shop_producer_dir_id)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров
@@ -210,7 +210,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->options(array(' … ') + $this->fillGroupList($this->_object->shop_id, 0, array($this->_object->id)))
 					->name('parent_id')
 					->value($this->_object->parent_id)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->filter(TRUE);
 
 				// Добавляем группу товаров

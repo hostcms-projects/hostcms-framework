@@ -158,7 +158,7 @@ class Document_Model extends Core_Entity
 
 		return $this;
 	}
-	
+
 	/**
 	 * Add message into search index
 	 * @return self
@@ -186,7 +186,7 @@ class Document_Model extends Core_Entity
 
 		return $this;
 	}
-	
+
 	/**
 	 * Search indexation
 	 * @return Search_Page
@@ -202,28 +202,65 @@ class Document_Model extends Core_Entity
 		$oSearch_Page->text = htmlspecialchars($this->name) . ' ';
 
 		$oDocument_Version_Current = $this->Document_Versions->getCurrent(FALSE);
-		
+
 		if ($oDocument_Version_Current)
 		{
 			$oSearch_Page->text .= $oDocument_Version_Current->loadFile();
-		
-			$oSearch_Page->title = $this->name;
-
 			$oSearch_Page->size = mb_strlen($oSearch_Page->text);
-			$oSearch_Page->site_id = $this->site_id;
 			$oSearch_Page->datetime = $oDocument_Version_Current->datetime;
-			$oSearch_Page->module = 6;
-			$oSearch_Page->module_id = $this->id;
-			$oSearch_Page->inner = 1;
-			$oSearch_Page->module_value_type = 0; // search_page_module_value_type
-			$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
-			$oSearch_Page->url = 'document-' . $this->id; // Уникальный номер
-
-			$oSearch_Page->siteuser_groups = array(0);
 		}
+		else
+		{
+			$oSearch_Page->size = 0;
+			$oSearch_Page->datetime = Core_Date::timestamp2sql(time());
+		}
+
+		$oSearch_Page->title = $this->name;
+		$oSearch_Page->site_id = $this->site_id;
+		$oSearch_Page->module = 6;
+		$oSearch_Page->module_id = $this->id;
+		$oSearch_Page->inner = 1;
+		$oSearch_Page->module_value_type = 0; // search_page_module_value_type
+		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
+		$oSearch_Page->url = 'document-' . $this->id; // Уникальный номер
+
+		$oSearch_Page->siteuser_groups = array(0);
 
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
 
 		return $oSearch_Page;
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$oStructures = Core_Entity::factory('Structure');
+		$oStructures->queryBuilder()
+			->where('structures.site_id', '=', CURRENT_SITE)
+			->where('structures.document_id', '=', $this->id);
+
+		$aStructures = $oStructures->findAll(FALSE);
+
+		if (count($aStructures))
+		{
+			$sListStructures = '';
+
+			foreach ($aStructures as $oStructure)
+			{
+				$sListStructures .= '<i class="fa fa-folder-open-o" style="margin-right: 5px"></i><a onclick="'
+				. ("$.adminCheckObject({objectId: 'check_0_" . $oStructure->id . "', windowId: 'id_content'}); $.adminLoad({path: '/admin/structure/index.php', action: 'edit', additionalParams: '', windowId: 'id_content'}); return false")
+				. '">' . $oStructure->name . "</a><br />";
+			}
+
+			Admin_Form_Entity::factory('Code')
+				->html('<a id="document_' . $this->id . '" type="button" class="structure_list_link" data-toggle="popover" data-placement="right" data-content="' . htmlspecialchars($sListStructures) . '" data-title="' . Core::_('Document.structures') . '" data-titleclass="bordered-darkorange" data-container="#document_' . $this->id . '" title="' . Core::_('Document.structures') . '"><i class="fa fa-link gray"></i></a>
+				')
+				->execute();
+		}
 	}
 }

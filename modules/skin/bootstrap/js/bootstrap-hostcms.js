@@ -1144,6 +1144,26 @@
 				},
 			});
 		},
+		changeWallpaper: function(img) {
+			var wallpaper_id =  $(img).data('id'),
+				original = $(img).data('original-path');
+
+			createCookie("wallpaper-id", wallpaper_id, 365);
+				
+			$.ajax({
+				url: '/admin/user/index.php',
+				/*url: '/admin/index.php?' + 'userSettings&moduleId=' + $(img).data('moduleId')
+					+ '&type=95'
+					+ '&width=' + ui.helper.width() + '&height=' + ui.helper.height() + '&active=' + (event.type == 'hostcmswindowbeforeclose' ? 0 : 1),*/
+				type: 'POST',
+				data: {'wallpaper-id':wallpaper_id},
+				dataType: 'json',
+				error: function(){},
+				success: function (object) {
+					$('head').append('<style>body.hostcms-bootstrap1:before{ background-image: url(' + original + ') }</style>');
+				},
+			});
+		},
 		widgetRequest: function(settings){
 			$.loadingScreen('show');
 

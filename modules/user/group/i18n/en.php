@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Administration center users.
  *
@@ -18,7 +18,7 @@ return array(
 	'ua_edit_user_type_error' => 'Error! User group information has not been modified!',
 	'ua_add_user_type_form_title' => 'Add user group information',
 	'ua_edit_user_type_form_title' => 'Edit user group information',
-	'id' => 'Id', 
+	'id' => 'Id',
 	'name' => '<acronym title="Name of user group">Group name</acronym>',
 	'site_id' => '<acronym title="Parent website of element">Website</acronym>',
 	'comment' => '<acronym title="Additional user group information in free format">Comment</acronym>',
@@ -31,6 +31,7 @@ return array(
 	'ua_apply_changes_user_type_success_message' => 'Changes introduces successfully!',
 	'ua_apply_changes_user_type_error_message' => 'Changes have not been introduced!',
 	'choosing_site' => 'Choosing site',
+	'wallpaper' => 'Обои',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
 );

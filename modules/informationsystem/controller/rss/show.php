@@ -11,6 +11,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - group($id) идентификатор информационной группы, если FALSE, то вывод инофрмационных элементов
  * осуществляется из всех групп
  * - yandex(TRUE|FALSE) экспорт в Яндекс.Новости, по умолчанию FALSE
+ * - stripTags(TRUE|FALSE) удалять HTML-теги из экспортируемых данных, по умолчанию TRUE
  * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  * - tag($path) путь тега, с использованием которого ведется отбор информационных элементов
  * - offset($offset) смещение, с которого выводить информационные элементы. По умолчанию 0
@@ -153,11 +154,9 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			->close()
 			->where('informationsystem_items.siteuser_group_id', 'IN', $aSiteuserGroups);
 
-		$this->group = FALSE;
+		$this->group = $this->yandex = FALSE;
+		$this->stripTags = $this->cache = TRUE;
 		$this->offset = 0;
-		$this->stripTags = TRUE;
-		$this->yandex = FALSE;
-		$this->cache = TRUE;
 
 		$this->_Core_Rss = new Core_Rss();
 	}

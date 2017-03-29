@@ -388,6 +388,8 @@ abstract class Core_Http
 			? $aUrl['path']
 			: '/';
 
+		isset($aUrl['port']) && $this->_port = $aUrl['port'];
+			
 		$host = Core_Array::get($aUrl, 'host', '');
 
 		$query = isset($aUrl['query']) ?

@@ -39,7 +39,7 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->addTabAfter($oImportExportTab, $oMainTab);
 
-		$oMainTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oImportExportTabRow1);
+		$oMainTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-xs-12')), $oImportExportTabRow1);
 
 		// Удаляем группу доступа
 		$oAdditionalTab->delete($this->getField('siteuser_group_id'));

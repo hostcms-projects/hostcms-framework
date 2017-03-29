@@ -194,11 +194,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainRow3->add(Admin_Form_Entity::factory('Code')->html($html2));
 
 				$this->getField('datetime')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 				$this->getField('start_datetime')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 				$this->getField('end_datetime')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 				$this->_object->start_datetime == '0000-00-00 00:00:00'
 					&& $this->getField('start_datetime')->value('');
@@ -212,9 +212,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->move($this->getField('end_datetime'), $oMainRow4);
 
 				$this->getField('active')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-4'));
 				$this->getField('indexing')
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-4'));
 
 				$oMainTab->move($this->getField('active'), $oMainRow5);
 				$oMainTab->move($this->getField('indexing'), $oMainRow5);
@@ -422,14 +422,14 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name("use_typograph_description")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_description'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-5 col-lg-4'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_description")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-5 col-lg-4'));
 
 					$oDescriptionRow2
 						->add($oUseTypograph)
@@ -456,14 +456,14 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name("use_typograph_text")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_for_text'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-5 col-lg-4'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_text")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation_for_text'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-4 col-md-5 col-sm-5'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-5 col-lg-4'));
 
 					$oDescriptionRow4
 						->add($oUseTypograph)
