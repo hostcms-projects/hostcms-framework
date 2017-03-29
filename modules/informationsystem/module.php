@@ -23,7 +23,7 @@ class Informationsystem_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-12-01';
+	public $date = '2016-12-22';
 
 	/**
 	 * Module name
@@ -204,7 +204,6 @@ class Informationsystem_Module extends Core_Module
 			->where('informationsystem_items.active', '=', 1)
 			->where('informationsystem_items.shortcut_id', '=', 0)
 			->where('informationsystem_items.deleted', '=', 0)
-
 			->open()
 				->where('informationsystem_items.start_datetime', '<', $dateTime)
 				->setOr()
@@ -216,7 +215,7 @@ class Informationsystem_Module extends Core_Module
 				->setOr()
 				->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-
+			->setAnd()
 			->open()
 				->where('informationsystem_groups.id', 'IS', NULL)
 				->setOr()

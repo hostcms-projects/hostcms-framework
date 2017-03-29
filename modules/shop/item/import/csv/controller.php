@@ -1709,7 +1709,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 											$oProperty_Value->setValue($oListItem->id);
 										}
 									break;
-									 case 8:
+									case 8:
 										if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $sData))
 										{
 											$sData = Core_Date::datetime2sql($sData);
@@ -1723,6 +1723,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 											$sData = Core_Date::datetime2sql($sData);
 										}
 
+										$oProperty_Value->setValue($sData);
+									break;
+									case 11: // Float
+										$sData = Shop_Controller::instance()->convertFloat($sData);
 										$oProperty_Value->setValue($sData);
 									break;
 									default:
@@ -2479,6 +2483,10 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							 $sPropertyValue = Core_Date::datetime2sql($sPropertyValue);
 							}
 
+							$oProperty_Value->setValue($sPropertyValue);
+						break;
+						case 11: // Float
+							$sPropertyValue = Shop_Controller::instance()->convertFloat($sPropertyValue);
 							$oProperty_Value->setValue($sPropertyValue);
 						break;
 						default:

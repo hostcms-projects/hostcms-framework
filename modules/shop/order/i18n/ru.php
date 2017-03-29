@@ -55,6 +55,7 @@ return array(
 	'id' => 'Идентификатор',
 	'markDeleted_success' => "Информация о заказе успешно удалена!",
 	'recalc_order_delivery_sum' => "Пересчитать стоимость доставки",
+	'recalc_delivery_success' => "Cтоимость доставки пересчитана успешно!",
 	'order_card_dt' => "Карточка заказа %s от %s",
 	'order_card_supplier' => "Поставщик",
 	'order_card_inn_kpp' => "ИНН/КПП",

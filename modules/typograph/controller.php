@@ -121,6 +121,9 @@ class Typograph_Controller
 		// кавычки в html-тегах на символ '¬'
 		//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('\\\"', '¬','\\1').'>'", $str);
 		$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("\"", "¬", $matches[1]) . ">";'), $str);
+		
+		// кавычки в квадратных скобках [] на символ '¬'
+		$str = preg_replace_callback("/\[([^>]*)\]/su", create_function('$matches', 'return "[" . str_replace("\"", "¬", $matches[1]) . "]";'), $str);
 
 		// Расстановка заков в скобках перед добавлением висячей пунктуации
 		$str = str_replace(

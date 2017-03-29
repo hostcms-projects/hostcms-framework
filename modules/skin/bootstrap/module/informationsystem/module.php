@@ -153,9 +153,9 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 											<div class="task-creator pull-left">
 												<div class="btn-group pull-right">
-													<a class="btn btn-default btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#informationsystemCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i> </a>
-													<a href="<?php echo $sEditHref?>" onclick="<?php echo $sEditOnClick?>" class="btn btn-default btn-xs darkgray" title="<?php echo Core::_('Comment.edit')?>"><i class="fa fa-pencil"></i> </a>
-													<a class="btn btn-default btn-xs darkgray" title="<?php echo Core::_('Comment.delete')?>" href="<?php echo $sMarkDeletedHref?>" onclick="res = confirm('<?php echo Core::_('Admin_Form.confirm_dialog', htmlspecialchars(Core::_('Admin_Form.msg_information_alt_delete')))?>'); if (res) { $.widgetRequest({path: '<?php echo $sMarkDeletedHref?>', context: $('#informationsystemCommentsAdminPage')}); } return false"><i class="fa fa-times"></i></a>
+													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#informationsystemCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i> </a>
+													<a href="<?php echo $sEditHref?>" onclick="<?php echo $sEditOnClick?>" class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.edit')?>"><i class="fa fa-pencil"></i> </a>
+													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.delete')?>" href="<?php echo $sMarkDeletedHref?>" onclick="res = confirm('<?php echo Core::_('Admin_Form.confirm_dialog', htmlspecialchars(Core::_('Admin_Form.msg_information_alt_delete')))?>'); if (res) { $.widgetRequest({path: '<?php echo $sMarkDeletedHref?>', context: $('#informationsystemCommentsAdminPage')}); } return false"><i class="fa fa-times"></i></a>
 													<?php
 													if ($oComment->active)
 													{
@@ -165,7 +165,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 
 														if ($oCurrentAlias)
 														{
-															?><a class="btn btn-default btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Informationsystem_Item->getPath() . '#comment' . $oComment->id?>" target="_blank"><i class="fa fa-external-link"></i> </a><?php
+															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Informationsystem_Item->getPath() . '#comment' . $oComment->id?>" target="_blank"><i class="fa fa-external-link"></i> </a><?php
 														}
 													}
 													?>

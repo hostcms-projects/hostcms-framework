@@ -134,6 +134,14 @@ class Shop_Model extends Core_Entity
 	);
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description'
+	);
+
+	/**
 	 * Forbidden tags. If list of tags is empty, all tags will be shown.
 	 * @var array
 	 */

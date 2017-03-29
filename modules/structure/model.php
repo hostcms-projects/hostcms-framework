@@ -717,13 +717,8 @@ class Structure_Model extends Core_Entity
 		// Страница статичная
 		if ($this->type == 0)
 		{
-			$oDocument_Version = $this->Document->Document_Versions->getCurrent();
-
-			if ($oDocument_Version)
-			{
-				$date = $oDocument_Version->datetime;
-				$oSearch_Page->text .= $oDocument_Version->loadFile() . ' ';
-			}
+			$date = $this->Document->datetime;
+			$oSearch_Page->text .= $this->Document->text . ' ';
 		}
 
 		if (Core::moduleIsActive('informationsystem'))
@@ -845,7 +840,7 @@ class Structure_Model extends Core_Entity
 		// Статичная страница
 		if ($this->type == 0)
 		{
-			$return = $this->Document->Document_Versions->getCurrent();
+			$return = $this->Document;
 		}
 		elseif ($this->type == 1)
 		{

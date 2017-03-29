@@ -40,6 +40,10 @@ body {padding-right: 0 !important; /*Fix bug with bootbox modal window */}
 
 .btn.btn-labeled .btn-label {line-height: 16px}
 
+.btn-default {
+	background-image: linear-gradient(to bottom, #eee 0px, #fbfbfb 100%);
+}
+
 .pointer,
 .sort,
 .control-item,

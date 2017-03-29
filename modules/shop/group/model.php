@@ -111,6 +111,14 @@ class Shop_Group_Model extends Core_Entity
 	);
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description'
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -992,10 +1000,10 @@ class Shop_Group_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags();
-			
+
 		!isset($this->_forbiddenTags['url'])
 			&& $this->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
-			
+
 		!isset($this->_forbiddenTags['dir'])
 			&& $this->addXmlTag('dir', $this->getGroupHref());
 
@@ -1055,6 +1063,67 @@ class Shop_Group_Model extends Core_Entity
 					$oCache_Static = Core_Cache::instance('static');
 					$oCache_Static->delete($url);
 				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'parent_id' => $this->parent_id,
+				'path' => $this->path,
+				'sorting' => $this->sorting,
+				'active' => $this->active,
+				'indexing' => $this->indexing,
+				'description' => $this->description,
+				'seo_title' => $this->seo_title,
+				'seo_description' => $this->seo_description,
+				'seo_keywords' => $this->seo_keywords,
+				'informationsystem_id' => $this->shop_id,
+				'siteuser_group_id' => $this->siteuser_group_id,
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->sorting = Core_Array::get($aBackup, 'sorting');
+				$this->path = Core_Array::get($aBackup, 'path');
+				$this->description = Core_Array::get($aBackup, 'description');
+				$this->active = Core_Array::get($aBackup, 'active');
+				$this->indexing = Core_Array::get($aBackup, 'indexing');
+				$this->seo_title = Core_Array::get($aBackup, 'seo_title');
+				$this->seo_description = Core_Array::get($aBackup, 'seo_description');
+				$this->seo_keywords = Core_Array::get($aBackup, 'seo_keywords');
+				$this->save();
 			}
 		}
 

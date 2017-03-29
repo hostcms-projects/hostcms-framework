@@ -22,6 +22,18 @@ class Template_Section_Lib_Model extends Core_Entity{
 	);
 
 	/**
+	 * Backend property
+	 * @var int
+	 */
+	public $name = NULL;
+
+	/**
+	 * Column consist item's name
+	 * @var string
+	 */
+	protected $_nameColumn = 'lib_id';
+
+	/**
 	 * List of preloaded values
 	 * @var array
 	 */

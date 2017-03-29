@@ -757,4 +757,61 @@ class Template_Model extends Core_Entity
 			}
 		}
 	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'template_dir_id' => $this->template_dir_id,
+				'template_id' => $this->template_id,
+				'sorting' => $this->sorting,
+				'template' => $this->loadTemplateFile(),
+				'css' => $this->loadTemplateCssFile(),
+				'less' => $this->loadTemplateLessFile(),
+				'js' => $this->loadTemplateJsFile(),
+				'manifest' => $this->loadManifestFile(),
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->sorting = Core_Array::get($aBackup, 'sorting');
+				$this->save();
+
+				$this->saveTemplateFile(Core_Array::get($aBackup, 'template'));
+				$this->saveTemplateCssFile(Core_Array::get($aBackup, 'css'));
+				$this->saveTemplateLessFile(Core_Array::get($aBackup, 'less'));
+				$this->saveTemplateJsFile(Core_Array::get($aBackup, 'js'));
+				$this->saveManifestFile(Core_Array::get($aBackup, 'manifest'));
+			}
+		}
+
+		return $this;
+	}
 }

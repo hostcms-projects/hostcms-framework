@@ -44,8 +44,9 @@ class Admin_Answer extends Core_Servant_Properties
 	{
 		Core::showJson(array(
 			'form_html' => $this->content,
-			// Content already consists message
-			'error' => $this->content == '' ? $this->message : '',
+			// Content already consists message. В хуках сообщения теряются
+			//'error' => $this->content == '' ? $this->message : '',
+			'error' => $this->message,
 			'title' => $this->title,
 			'module' => $this->module
 		));

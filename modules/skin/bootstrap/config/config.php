@@ -6,12 +6,12 @@ return array (
 		'content' => array(
 			'ico' => 'fa fa-newspaper-o',
 			'caption' => Core::_('Skin_Bootstrap.admin_menu_content'),
-			'modules' => array('informationsystem', 'shop', 'document', 'tag'),
+			'modules' => array('informationsystem', 'shop', 'document', 'tag', 'revision'),
 		),
 		'structure' => array(
 			'ico' => 'fa fa-sitemap',
 			'caption' => Core::_('Skin_Bootstrap.admin_menu_structure'),
-			'modules' => array('structure', 'template', 'lib', 'xsl'),
+			'modules' => array('structure', 'template', 'lib', 'xsl', 'shortcode'),
 		),
 		'services' => array(
 			'ico' => 'fa fa-cubes',

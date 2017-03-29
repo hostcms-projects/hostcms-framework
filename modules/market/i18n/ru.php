@@ -31,4 +31,5 @@ return array(
 	'max_file_size' => 'Максимальный размер файла: %s x %s',
 	'select_section' => 'Выбрать категорию',
 	'module-options' => 'Параметры установки "%s"',
+	'version_absent' => 'Нет версии',
 );

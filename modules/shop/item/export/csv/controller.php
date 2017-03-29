@@ -25,6 +25,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 		'exportGroupExternalProperties',
 		'exportItemModifications',
 		'exportOrders',
+		'producer',
 		'shopId',
 		'start_order_date',
 		'end_order_date'
@@ -167,7 +168,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$this->_aSpecialPriceBase_Properties = array(
 				"", "", "", ""
 			);
-			
+
 			$this->_iCurrentDataPosition = 0;
 
 			$this->_aShopPrices = Core_Entity::factory('Shop', $this->shopId)->Shop_prices->findAll(FALSE);
@@ -321,14 +322,9 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 			if ($oItem_Property->type == 2)
 			{
-				if ($iProperty_Values_Count)
-				{
-					$aItemProperties[] = ($aProperty_Values[0]->file_small == '' ? '' : sprintf('"%s"', $aProperty_Values[0]->getSmallFileHref()));
-				}
-				else
-				{
-					$aItemProperties[] = '';
-				}
+				$aItemProperties[] = $iProperty_Values_Count
+					? ($aProperty_Values[0]->file_small == '' ? '' : sprintf('"%s"', $aProperty_Values[0]->getSmallFileHref()))
+					: '';
 			}
 		}
 
@@ -371,7 +367,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$aTmpShortcuts[] = $oShortcut_Item->guid;
 		}
 		unset($aShortcuts);
-		
+
 		return array_merge($aTmpArray,
 			array(
 				sprintf('"%s"', $this->prepareString($oShopItem->guid)),
@@ -505,6 +501,11 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					->where('modification_id', '=', 0)
 					->where('shortcut_id', '=', 0);
 
+				if ($this->producer)
+				{
+					$oShopItems->queryBuilder()->where('shop_producer_id', '=', $this->producer);
+				}
+
 				if ($iShopGroupId != 0)
 				{
 					$aTmpArray = array(
@@ -582,7 +583,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					$aShopItems = $oShopItems->findAll(FALSE);
 
 					foreach ($aShopItems as $oShopItem)
-					{				
+					{
 						$this->_printRow($this->getItemData($oShopItem));
 
 						$iPropertyFieldOffset = count($this->_aGroupBase_Properties) + count($this->_aItemBase_Properties) + count($this->_aSpecialPriceBase_Properties);
@@ -597,7 +598,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 							$aProperty_Values = $oItem_Property->getValues($oShopItem->id, FALSE);
 							array_shift($aProperty_Values);
 
-							if(count($aProperty_Values))
+							if (count($aProperty_Values))
 							{
 								foreach ($aProperty_Values as $oProperty_Value)
 								{
@@ -896,7 +897,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	{
 		return str_replace('"', '""', trim($string));
 	}
-	
+
 	/**
 	 * Prepare float
 	 * @param mixed $string

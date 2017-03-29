@@ -539,12 +539,7 @@ class Core_Page extends Core_Servant_Properties
 
 			if ($oStructure->type == 0)
 			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$this->template($oDocument_Versions->Template);
-				}
+				$this->template($oStructure->Document->Template);
 			}
 			// Если динамическая страница или типовая дин. страница
 			elseif ($oStructure->type == 1 || $oStructure->type == 2)
@@ -589,12 +584,7 @@ class Core_Page extends Core_Servant_Properties
 
 			if ($oStructure->type == 0)
 			{
-				$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-				if (!is_null($oDocument_Versions))
-				{
-					$this->template($oDocument_Versions->Template);
-				}
+				$this->template($oStructure->Document->Template);
 			}
 			// Если динамическая страница или типовая дин. страница
 			elseif ($oStructure->type == 1 || $oStructure->type == 2)

@@ -152,6 +152,7 @@ class Core
 			'defaultCache' => 'file',
 			'timezone' => 'America/Los_Angeles',
 			'translate' => TRUE,
+			'chat' => TRUE,
 			'switchSelectToAutocomplete' => 100,
 		);
 	}

@@ -215,7 +215,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oDeliveryOption = $oShop_Item_Delivery_Option_Controller_Tab
 					->shop_id($oShop->id)
-					->shop_item_id($this->_object->id)
+					->shop_item_id(intval($this->_object->id))
 					->execute();
 
 				$oYandexMarketBlock->add($oDeliveryOption);
@@ -360,7 +360,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->id('shopItemType' . time())
 					->caption(Core::_('Shop_Item.type'))
 					->value($this->_object->type)
-					->divAttr(array('class' => 'form-group col-lg-8 col-md-12 col-sm-12'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-lg-7'))
 					->radio(array(
 						0 => Core::_('Shop_Item.item_type_selection_group_buttons_name_simple'),
 						2 => Core::_('Shop_Item.item_type_selection_group_buttons_name_divisible'),
@@ -376,6 +376,22 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Добавляем тип товара
 				$oMainRow4->add($oRadioType);
 
+				$sTmpHtml = '<div class="form-group col-lg-2 col-xs-12 margin-top-21">';
+
+				if ($this->_object->id)
+				{
+					$additionalParams1 = "shop_item_id={$this->_object->id}&shop_group_id={$this->_object->shop_group_id}";
+					$additionalParams2 = "shop_item_id={$this->_object->id}";
+
+					$sTmpHtml .= '<div class="btn-group">
+						<a href="' . $this->_Admin_Form_Controller->getAdminLoadHref('/admin/shop/item/associated/index.php', NULL, NULL, $additionalParams1) . '" onclick="' . $this->_Admin_Form_Controller->getAdminLoadAjax('/admin/shop/item/associated/index.php', NULL, NULL, $additionalParams1) . '" class="btn btn-default"><i class="fa fa-magnet no-margin"></i></a>
+						<a href="' . $this->_Admin_Form_Controller->getAdminLoadHref('/admin/shop/item/associated/index.php', NULL, NULL, $additionalParams2) . '" onclick="' . $this->_Admin_Form_Controller->getAdminLoadAjax('/admin/shop/item/modification/index.php', NULL, NULL, $additionalParams2) . '" class="btn btn-default"><i class="fa fa-code-fork no-margin"></i></a>
+					</div>';
+				}
+				$sTmpHtml .= "</div>";
+
+				$oMainRow4->add(Admin_Form_Entity::factory('Code')->html($sTmpHtml));
+
 				// Удаляем модификацию
 				$oAdditionalTab->delete($this->getField('modification_id'));
 
@@ -386,7 +402,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->options($this->_fillModificationList($this->_object))
 					->name('modification_id')
 					->value($this->_object->modification_id)
-					->divAttr(array('class' => 'form-group col-lg-4 col-md-12 col-sm-12'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-lg-3'));
 
 				$oMainRow4->add($oModificationSelect);
 
@@ -493,7 +509,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Item.shop_producer_id'))
 					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
-					->options($this->fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
+					->options(self::fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
 					->name('shop_producer_id')
 						->value($this->_object->id
 						? $this->_object->shop_producer_id
@@ -963,7 +979,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oShopGroupSeoTab)
 					->move($oGuidField = $this->getField('guid'), $oShopGroupImportExportTab)
 				;
-				
+
 				// Удаляем поле parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
@@ -1315,7 +1331,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
 				$oShop_Item_Delivery_Option_Controller_Tab
 					->shop_id($oShop->id)
-					->shop_item_id($this->_object->id)
+					->shop_item_id(intval($this->_object->id))
 					->applyObjectProperty();
 
 				// Специальные цены, установленные значения
@@ -1758,6 +1774,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
+		// Backup revision
+		if (Core::moduleIsActive('revision'))
+		{
+			$this->_object->backupRevision();
+		}
+
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		return $this;
@@ -1944,26 +1966,71 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	}
 
 	/**
-	 * Fill producers list
+	 * Shop producer dirs tree
+	 * @var array
+	 */
+	static protected $_aProducerDir = array();
+
+	/**
+	 * Build visual representation of producer dirs tree
 	 * @param int $iShopId shop ID
+	 * @param int $iShopProducerDirParentId parent ID
+	 * @param int $aExclude exclude group ID
+	 * @param int $iLevel current nesting level
 	 * @return array
 	 */
-	public function fillProducersList($iShopId)
+	static public function fillProducersList($iShopId, $iShopProducerDirParentId = 0, $aExclude = array(), $iLevel = 0)
 	{
-		$oShopProducer = Core_Entity::factory('Shop_Producer');
+		$iShopId = intval($iShopId);
+		$iShopProducerDirParentId = intval($iShopProducerDirParentId);
+		$iLevel = intval($iLevel);
 
-		!$iShopId && $iShopId = Core_Entity::factory('Shop_Item', intval(Core_Array::getGet('shop_item_id', 0)))->Shop->id;
-
-		$oShopProducer->queryBuilder()
-			->where("shop_id", "=", $iShopId);
-
-		$aReturn = array(" … ");
-
-		$aShopProducers = $oShopProducer->findAll();
-		foreach ($aShopProducers as $oShopProducer)
+		if ($iLevel == 0)
 		{
-			$aReturn[$oShopProducer->id] = $oShopProducer->name;
+			$aTmp = Core_QueryBuilder::select('id', 'parent_id', 'name')
+				->from('shop_producer_dirs')
+				->where('shop_id', '=', $iShopId)
+				->where('deleted', '=', 0)
+				->orderBy('sorting')
+				->orderBy('name')
+				->execute()->asAssoc()->result();
+
+			foreach ($aTmp as $aDir)
+			{
+				self::$_aProducerDir[$aDir['parent_id']][] = $aDir;
+			}
 		}
+
+		$aReturn = array(' … ');
+
+		if (isset(self::$_aProducerDir[$iShopProducerDirParentId]))
+		{
+			$countExclude = count($aExclude);
+			foreach (self::$_aProducerDir[$iShopProducerDirParentId] as $childrenDir)
+			{
+				if ($countExclude == 0 || !in_array($childrenDir['id'], $aExclude))
+				{
+					$aReturn['dir-' . $childrenDir['id']] = array(
+						'value' => str_repeat('  ', $iLevel) . $childrenDir['name'] . ' [' . $childrenDir['id'] . ']',
+						'attr' => array('disabled' => 'disabled')
+					);
+					$aReturn += self::fillProducersList($iShopId, $childrenDir['id'], $aExclude, $iLevel + 1);
+				}
+			}
+		}
+
+		$oShop_Producers = Core_Entity::factory('Shop_Producer');
+		$oShop_Producers->queryBuilder()
+			->where('shop_id', '=', $iShopId)
+			->where('shop_producer_dir_id', '=', $iShopProducerDirParentId);
+
+		$aShop_Producers = $oShop_Producers->findAll(FALSE);
+		foreach ($aShop_Producers as $oShop_Producer)
+		{
+			$aReturn[$oShop_Producer->id] = str_repeat('  ', $iLevel) . $oShop_Producer->name;
+		}
+
+		$iLevel == 0 && self::$_aProducerDir = array();
 
 		return $aReturn;
 	}

@@ -50,6 +50,12 @@ class Core_Entity extends Core_ORM
 	protected $_allowedTags = array();
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array();
+
+	/**
 	 * Add tag to allowed tags list
 	 * @param string $tag tag
 	 * @return self
@@ -184,20 +190,42 @@ class Core_Entity extends Core_ORM
 		return $this;
 	}
 
+	static protected $_cacheAllowedTags = array();
+
+	static protected $_cacheForbiddenTags = array();
+
+	static protected $_cacheShortcodeTags = array();
+
 	/**
 	 * Constructor.
 	 * @param string $primaryKey
 	 */
 	public function __construct($primaryKey = NULL)
 	{
+		$className = get_class($this);
+
 		if (!empty($this->_allowedTags))
 		{
-			$this->_allowedTags = array_combine($this->_allowedTags, $this->_allowedTags);
+			!isset(self::$_cacheAllowedTags[$className])
+				&& self::$_cacheAllowedTags[$className] = array_combine($this->_allowedTags, $this->_allowedTags);
+
+			$this->_allowedTags = self::$_cacheAllowedTags[$className];
 		}
 
 		if (!empty($this->_forbiddenTags))
 		{
-			$this->_forbiddenTags = array_combine($this->_forbiddenTags, $this->_forbiddenTags);
+			!isset(self::$_cacheForbiddenTags[$className])
+				&& self::$_cacheForbiddenTags[$className] = array_combine($this->_forbiddenTags, $this->_forbiddenTags);
+
+			$this->_forbiddenTags = self::$_cacheForbiddenTags[$className];
+		}
+
+		if (!empty($this->_shortcodeTags))
+		{
+			!isset(self::$_cacheShortcodeTags[$className])
+				&& self::$_cacheShortcodeTags[$className] = array_combine($this->_shortcodeTags, $this->_shortcodeTags);
+
+			$this->_shortcodeTags = self::$_cacheShortcodeTags[$className];
 		}
 
 		if (!is_null($this->_marksDeleted) && !isset($this->_preloadValues[$this->_marksDeleted]))
@@ -340,6 +368,26 @@ class Core_Entity extends Core_ORM
 		// Delete from ObjectWatcher
 		Core_ObjectWatcher::instance()->delete($this);
 
+		// Delete Revisions
+		if (Core::moduleIsActive('revision'))
+		{
+			if (is_null($primaryKey))
+			{
+				$primaryKey = $this->getPrimaryKey();
+			}
+
+			$oRevisions = Core_Entity::factory('Revision');
+			$oRevisions->queryBuilder()
+				->where('model', '=', $this->getModelName())
+				->where('entity_id', '=', $primaryKey);
+
+			$aRevisions = $oRevisions->findAll(FALSE);
+			foreach ($aRevisions as $oRevision)
+			{
+				$oRevision->delete();
+			}
+		}
+
 		return parent::delete($primaryKey);
 	}
 
@@ -360,7 +408,7 @@ class Core_Entity extends Core_ORM
 	/**
 	 * Find object in database and load one
 	 * @param mixed $primaryKey default NULL
-	 * @param bool $bCache use cache
+	 * @param boolean $bCache use cache
 	 * @return Core_ORM
 	 */
 	public function find($primaryKey = NULL, $bCache = TRUE)
@@ -401,7 +449,7 @@ class Core_Entity extends Core_ORM
 
 	/**
 	 * Find all objects
-	 * @param bool $bCache use cache, default TRUE
+	 * @param boolean $bCache use cache, default TRUE
 	 * @return array
 	 */
 	public function findAll($bCache = TRUE)
@@ -412,7 +460,7 @@ class Core_Entity extends Core_ORM
 
 	/**
 	 * Get count object
-	 * @param bool $bCache use cache, default TRUE
+	 * @param boolean $bCache use cache, default TRUE
 	 * @return int
 	 */
 	public function getCount($bCache = TRUE)
@@ -488,19 +536,30 @@ class Core_Entity extends Core_ORM
 
 		$xml .= ">\n";
 
-		$bAllowedTagsIsEmty = count($this->_allowedTags) == 0;
-		$bForbiddenTagsIsEmty = count($this->_forbiddenTags) == 0;
+		$bAllowedTagsIsEmpty = count($this->_allowedTags) == 0;
+		$bForbiddenTagsIsEmpty = count($this->_forbiddenTags) == 0;
+		$bShortcodeTags = Core::moduleIsActive('shortcode') && count($this->_shortcodeTags) > 0;
+
+		if ($bShortcodeTags)
+		{
+			$oShortcode_Controller = Shortcode_Controller::instance();
+			$iCountShortcodes = $oShortcode_Controller->getCount();
+		}
 
 		foreach ($this->_modelColumns as $field_name => $field_value)
 		{
 			// Разрешенные теги
 			if ($field_name != $this->_primaryKey
-				&& ($bAllowedTagsIsEmty || isset($this->_allowedTags[$field_name]))
+				&& ($bAllowedTagsIsEmpty || isset($this->_allowedTags[$field_name]))
 			)
 			{
 				// Запрещенные теги
-				if ($bForbiddenTagsIsEmty || !isset($this->_forbiddenTags[$field_name]))
+				if ($bForbiddenTagsIsEmpty || !isset($this->_forbiddenTags[$field_name]))
 				{
+					if ($bShortcodeTags && $iCountShortcodes && isset($this->_shortcodeTags[$field_name]))
+					{
+						$field_value = $oShortcode_Controller->applyShortcodes($field_value);
+					}
 					$xml .= "<{$field_name}>" . Core_Str::xml($field_value) . "</{$field_name}>\n";
 				}
 			}
@@ -573,6 +632,15 @@ class Core_Entity extends Core_ORM
 	 * @var string
 	 */
 	protected $_nameColumn = 'name';
+
+	/**
+	 * Get Name Column
+	 * @return string
+	 */
+	public function getNameColumn()
+	{
+		return $this->_nameColumn;
+	}
 
 	/**
 	 * Get entity name

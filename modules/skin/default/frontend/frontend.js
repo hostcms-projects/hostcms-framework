@@ -38,63 +38,88 @@
 					}
 					return false;
 				}).on('dblclick', function(){
-					var item = hQuery(this), type = item.attr('hostcms:type'), jEditInPlace;
-
+					
+					var item = hQuery(this);
+					
 					clearTimeout(item.data('timer'));
 					item.data('timer', null);
+					
+					var data = {
+						'id': item.attr('hostcms:id'),
+						'entity': item.attr('hostcms:entity'),
+						'field': item.attr('hostcms:field'),
+						'loadValue': true
+					};
+					data['_'] = Math.round(new Date().getTime());
 
-					switch(type)
-					{
-						case 'textarea':
-						case 'wysiwyg':
-							jEditInPlace = hQuery('<textarea>');
-						break;
-						case 'input':
-						default:
-							jEditInPlace = hQuery('<input>').prop('type', 'text');
-					}
+					hQuery.ajax({
+						// ajax loader
+						context: item,
+						url: settings.path,
+						type: 'POST',
+						data: data,
+						dataType: 'json',
+						success: function(result) {
+							//console.log(this, result);
+							
+							var item = hQuery(this), type = item.attr('hostcms:type'), jEditInPlace;
 
-					if (type != 'wysiwyg')
-					{
-						jEditInPlace.on('blur', function(){settings.blur(jEditInPlace)});
-					}
+							switch(type)
+							{
+								case 'textarea':
+								case 'wysiwyg':
+									jEditInPlace = hQuery('<textarea>');
+								break;
+								case 'input':
+								default:
+									jEditInPlace = hQuery('<input>').prop('type', 'text');
+							}
 
-					jEditInPlace.on('keydown', function(e){
-						if (e.keyCode == 13) {
-							e.preventDefault();
-							this.blur();
+							if (type != 'wysiwyg')
+							{
+								jEditInPlace.on('blur', function(){settings.blur(jEditInPlace)});
+							}
+
+							jEditInPlace.on('keydown', function(e){
+								if (e.keyCode == 13) {
+									e.preventDefault();
+									this.blur();
+								}
+								if (e.keyCode == 27) { // ESC
+									e.preventDefault();
+									var input = hQuery(this), item = input.prev();
+									item.css('display', '');
+									input.remove();
+								}
+							})/*.width('90%')*/.prop('name', item.parent().prop('id'))
+							.css(hQuery(this).getStyleObject())
+							.insertAfter(item)
+							.focus()
+							.val(result/*item.html()*/);
+
+							if (type == 'wysiwyg')
+							{
+								setTimeout(function(){
+									jEditInPlace.tinymce({
+										mode: "exact",
+										theme: "simple",
+										setup : function(ed) {
+											ed.onInit.add(function(ed, evt) {
+												var dom = ed.dom, doc = ed.getDoc();
+
+												//tinymce.dom.Event.add(doc, 'blur', function(e) {
+												tinymce.dom.Event.add(tinymce.isGecko ? ed.getDoc() : ed.getWin(), 'blur', function(e) {
+													settings.blur(jEditInPlace)
+												});
+											});
+										},
+										language: "ru", docs_language: "ru", script_url: "/admin/wysiwyg/tiny_mce.js"});
+								}, 300);
+							}
+
+							item.css('display', 'none');
 						}
-						if (e.keyCode == 27) { // ESC
-							e.preventDefault();
-							var input = hQuery(this), item = input.prev();
-							item.css('display', '');
-							input.remove();
-						}
-					})/*.width('90%')*/.prop('name', item.parent().prop('id'))
-					.css(hQuery(this).getStyleObject())
-					.insertAfter(item).focus().val(item.html());
-
-					if (type == 'wysiwyg')
-					{
-						setTimeout(function(){
-							jEditInPlace.tinymce({
-								mode: "exact",
-								theme: "simple",
-								setup : function(ed) {
-									ed.onInit.add(function(ed, evt) {
-										var dom = ed.dom, doc = ed.getDoc();
-
-										//tinymce.dom.Event.add(doc, 'blur', function(e) {
-										tinymce.dom.Event.add(tinymce.isGecko ? ed.getDoc() : ed.getWin(), 'blur', function(e) {
-											settings.blur(jEditInPlace)
-										});
-									});
-								},
-								language: "ru", docs_language: "ru", script_url: "/admin/wysiwyg/tiny_mce.js"});
-						}, 300);
-					}
-
-					item.css('display', 'none');
+					});
 				}).addClass('hostcmsEditable');
 			});
 		},

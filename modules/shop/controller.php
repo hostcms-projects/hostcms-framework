@@ -148,17 +148,28 @@ class Shop_Controller
 	}
 
 	/**
+	 * Convert float
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function convertFloat($value)
+	{
+		$value = preg_replace('/[^0-9.,\-]/u', '', $value);
+		$value = str_replace(array(',', '-'), '.', $value);
+		return $value;
+	}
+
+	/**
 	 * Convert price
-	 * @param string $price price
+	 * @param mixed $price price
 	 * @param int $decimalPlaces precision
 	 * @return mixed
 	 */
 	public function convertPrice($price, $decimalPlaces = 2)
 	{
-		$decimalPlaces = intval($decimalPlaces);
-		$price = preg_replace('/[^0-9.,\-]/u', '', $price);
-		$price = str_replace(array(',', '-'), '.', $price);
+		$price = $this->convertFloat($price);
 
+		$decimalPlaces = intval($decimalPlaces);
 		preg_match("/((\d+(\.)\d{1,{$decimalPlaces}})|\d+)/u", $price, $array_price);
 		return isset($array_price[1]) ? floatval($array_price[1]) : 0;
 	}

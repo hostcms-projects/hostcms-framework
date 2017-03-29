@@ -20,20 +20,13 @@ class Document_Model extends Core_Entity
 	public $img = 1;
 
 	/**
-	 * One-to-many or many-to-many relations
-	 * @var array
-	 */
-	protected $_hasMany = array(
-		'document_version' => array()
-	);
-
-	/**
 	 * Belongs to relations
 	 * @var array
 	 */
 	protected $_belongsTo = array(
 		'document_dir' => array(),
 		'document_status' => array(),
+		'template' => array(),
 		'user' => array(),
 		'site' => array()
 	);
@@ -51,22 +44,7 @@ class Document_Model extends Core_Entity
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 			$this->_preloadValues['site_id'] = defined('CURRENT_SITE') ? CURRENT_SITE : 0;
-		}
-	}
-
-	/**
-	 * Delete old version of document
-	 */
-	public function deleteOldVersions()
-	{
-		$oDocument_Versions = $this->Document_Versions->findAll();
-
-		foreach ($oDocument_Versions as $oDocument_Version)
-		{
-			if ($oDocument_Version->current == 0)
-			{
-				$oDocument_Version->markDeleted();
-			}
+			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 		}
 	}
 
@@ -99,31 +77,7 @@ class Document_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aDocument_Versions = $this->Document_Versions->findAll();
-		foreach($aDocument_Versions as $oDocument_Version)
-		{
-			$oDocument_Version->delete();
-		}
-
 		return parent::delete($primaryKey);
-	}
-
-	/**
-	 * Copy object
-	 * @return Core_Entity
-	 */
-	public function copy()
-	{
-		$newObject = parent::copy();
-
-		$oCurrent_Version = $this->Document_Versions->getCurrent(FALSE);
-		if ($oCurrent_Version)
-		{
-			$oNewCurrent_Version = $oCurrent_Version->copy();
-			$newObject->add($oNewCurrent_Version);
-		}
-
-		return $newObject;
 	}
 
 	/**
@@ -132,29 +86,25 @@ class Document_Model extends Core_Entity
 	 */
 	public function adminTemplate()
 	{
-		$oDocument_Version = $this->Document_Versions->getCurrent(FALSE);
-		if (!is_null($oDocument_Version))
-		{
-			return $oDocument_Version->Template->name;
-		}
+		return $this->Template->name;
 	}
 
 	/**
 	 * Edit-in-Place callback
-	 * @param string $text Text of document verison
+	 * @param string $text Text of document
 	 * @return self
 	 */
-	public function editInPlaceVersion($text)
+	public function editInPlace()
 	{
-		$oNewDocument_Version = Core_Entity::factory('Document_Version');
+		$args = func_get_args();
 
-		$oDocument_Version_Current = $this->Document_Versions->getCurrent(FALSE);
+		if (!isset($args[0]))
+		{
+			return $this->text;
+		}
 
-		!is_null($oDocument_Version_Current) && $oNewDocument_Version->description = $oDocument_Version_Current->description;
-		!is_null($oDocument_Version_Current) && $oNewDocument_Version->template_id = $oDocument_Version_Current->template_id;
-		$oNewDocument_Version->saveFile($text);
-		$this->add($oNewDocument_Version);
-		$oNewDocument_Version->setCurrent();
+		$this->text = $args[0];
+		$this->save();
 
 		return $this;
 	}
@@ -199,21 +149,9 @@ class Document_Model extends Core_Entity
 
 		Core_Event::notify($this->_modelName . '.onBeforeIndexing', $this, array($oSearch_Page));
 
-		$oSearch_Page->text = htmlspecialchars($this->name) . ' ';
-
-		$oDocument_Version_Current = $this->Document_Versions->getCurrent(FALSE);
-
-		if ($oDocument_Version_Current)
-		{
-			$oSearch_Page->text .= $oDocument_Version_Current->loadFile();
-			$oSearch_Page->size = mb_strlen($oSearch_Page->text);
-			$oSearch_Page->datetime = $oDocument_Version_Current->datetime;
-		}
-		else
-		{
-			$oSearch_Page->size = 0;
-			$oSearch_Page->datetime = Core_Date::timestamp2sql(time());
-		}
+		$oSearch_Page->text = htmlspecialchars($this->name) . ' ' . $this->text;
+		$oSearch_Page->size = mb_strlen($oSearch_Page->text);
+		$oSearch_Page->datetime = $this->datetime;
 
 		$oSearch_Page->title = $this->name;
 		$oSearch_Page->site_id = $this->site_id;
@@ -262,5 +200,142 @@ class Document_Model extends Core_Entity
 				')
 				->execute();
 		}
+	}
+
+	/**
+	 * Document content
+	 */
+	protected $_content = NULL;
+
+	/**
+	 * Get $this->_content
+	 * @return string
+	 */
+	public function getContent()
+	{
+		return $this->_content;
+	}
+
+	/**
+	 * Set $this->_content
+	 * @param string $content
+	 * @return self
+	 */
+	public function setContent($content)
+	{
+		$this->_content = $content;
+		return $this;
+	}
+
+	/**
+	 * Show document version.
+	 *
+	 * @hostcms-event document.onBeforeExecute
+	 * @hostcms-event document.onAfterExecute
+	 * <code>
+	 * Core_Entity::factory('Document', 123)->execute();
+	 * </code>
+	 */
+	public function execute()
+	{
+		$this->setContent($this->text);
+
+		Core_Event::notify($this->_modelName . '.onBeforeExecute', $this);
+
+		$checkPanel = Core::checkPanel();
+		if ($checkPanel)
+		{
+			?><div hostcms:id="<?php echo intval($this->id)?>" hostcms:field="editInPlace" hostcms:entity="document" hostcms:type="wysiwyg"><?php
+		}
+
+		$bShortcodeTags = Core::moduleIsActive('shortcode');
+
+		if ($bShortcodeTags)
+		{
+			$oShortcode_Controller = Shortcode_Controller::instance();
+			$iCountShortcodes = $oShortcode_Controller->getCount();
+
+			if ($iCountShortcodes)
+			{
+				$this->_content = $oShortcode_Controller->applyShortcodes($this->_content);
+			}
+		}
+
+		// Show content of document
+		echo $this->getContent();
+
+		if ($checkPanel)
+		{
+			?></div><?php
+		}
+
+		Core_Event::notify($this->_modelName . '.onAfterExecute', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'document_dir_id' => $this->document_dir_id,
+				'document_status_id' => $this->document_status_id,
+				'template_id' => $this->template_id,
+				'name' => $this->name,
+				'text' => $this->text,
+				'site_id' => $this->site_id,
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->text = Core_Array::get($aBackup, 'text');
+				$this->save();
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Utilized for reading data from inaccessible properties
+	 * @param string $property property name
+	 * @return mixed
+	 */
+	public function __get($property)
+	{
+		if ($property == 'Document_Versions')
+		{
+			$oDocument_Version_Std = new Document_Version_Std();
+			$oDocument_Version_Std->document_id = $this->id;
+			return $oDocument_Version_Std;
+		}
+
+		return parent::__get($property);
 	}
 }

@@ -160,8 +160,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$this->updateFields = array();
 		$this->importGroups = $this->createShopItems = TRUE;
 
-		//$this->_temporaryPropertyFile = CMS_FOLDER . TMP_DIR . "1c_exchange_files/modproplist.tmp";
-		//Core_File::mkdir(dirname($this->_temporaryPropertyFile));
 		Core_File::mkdir(CMS_FOLDER . TMP_DIR . '1c_exchange_files');
 	}
 
@@ -929,14 +927,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Start import
+	 * Import import.xml, offers.xml
 	 * @return array
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImport
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImport
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImportShopItem
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImportShopItem
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeOffer
-	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterOffersShopItem
 	 */
 	public function import()
 	{
@@ -1952,6 +1944,73 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		return $this;
 	}
 
+	/**
+	 * Import orders.xml
+	 */
+	public function importOrders()
+	{
+		Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportOrders', $this);
+
+		if (is_null($this->iShopId))
+		{
+			throw new Core_Exception(Core::_('Shop_Item.error_shop_id'));
+		}
+
+		$oShop = Core_Entity::factory('Shop', $this->iShopId);
+
+		foreach ($this->xpath($this->_oSimpleXMLElement, 'Документ') as $oDocument)
+		{
+			$sInvoice = strval($oDocument->Номер);
+			$oShop_Order = $oShop->Shop_Orders->getByInvoice($sInvoice);
+
+			if (!is_null($oShop_Order))
+			{
+				$sOperation = strval($oDocument->ХозОперация);
+				if ($sOperation == 'ЗаказТовара' || $sOperation == 'Заказ товара')
+				{
+					foreach ($this->xpath($oDocument, 'ЗначенияРеквизитов/ЗначениеРеквизита') as $oProperty_Value)
+					{
+						$sName = strval($oProperty_Value->Наименование);
+						$sValue = strval($oProperty_Value->Значение);
+
+						switch ($sName)
+						{
+							case 'ПометкаУдаления':
+								if ($sValue == 'true')
+								{
+									$oShop_Order->markDeleted();
+								}
+							break;
+							case 'Статус заказа':
+								if (!$oShop_Order->shop_order_status_id
+									|| $oShop_Order->Shop_Order_Status->name != $sValue)
+								{
+									$oShop_Order_Status = Core_Entity::factory('Shop_Order_Status')->getByName($sValue, FALSE);
+
+									// Create new
+									if (is_null($oShop_Order_Status))
+									{
+										$oShop_Order_Status = Core_Entity::factory('Shop_Order_Status');
+										$oShop_Order_Status->name = $sValue;
+										$oShop_Order_Status->save();
+									}
+
+									$oShop_Order->shop_order_status_id = $oShop_Order_Status->id;
+									$oShop_Order->save();
+								}
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				$this->debug && Core_Log::instance()->clear()
+					->status(Core_Log::$MESSAGE)
+					->write(sprintf('1С, заказ %s не найден', $sInvoice));
+			}
+		}
+	}
 
 	/**
 	 * Коды валют для МойСклад

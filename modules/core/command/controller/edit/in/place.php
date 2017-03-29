@@ -30,7 +30,7 @@ class Core_Command_Controller_Edit_In_Place extends Core_Command_Controller
 			$modelName = strval(Core_Array::getPost('entity'));
 			$fieldName = strval(Core_Array::getPost('field'));
 			$id = intval(Core_Array::getPost('id'));
-			$value = strval(Core_Array::getPost('value'));
+			$value = Core_Array::getPost('value');
 
 			if (class_exists($modelName . '_Model'))
 			{
@@ -42,16 +42,41 @@ class Core_Command_Controller_Edit_In_Place extends Core_Command_Controller
 
 					if ($oUser && $oUser->checkObjectAccess($oEntity))
 					{
-						if (isset($oEntity->$fieldName))
+						if (!is_null(Core_Array::getPost('loadValue')))
 						{
-							$oEntity->$fieldName = $value;
-							$oEntity->save();
-							$result = 'OK';
+							if (isset($oEntity->$fieldName))
+							{
+								$result = $oEntity->$fieldName;
+							}
+							elseif (method_exists($oEntity, $fieldName))
+							{
+								$result = $oEntity->$fieldName();
+							}
 						}
-						elseif (method_exists($oEntity, $fieldName))
+						else
 						{
-							$oEntity->$fieldName($value);
-							$result = 'OK';
+							if (!is_null($value))
+							{
+								$value = strval($value);
+
+								// Backup revision
+								if (Core::moduleIsActive('revision') && method_exists($oEntity, 'backupRevision'))
+								{
+									$oEntity->backupRevision();
+								}
+
+								if (isset($oEntity->$fieldName))
+								{
+									$oEntity->$fieldName = $value;
+									$oEntity->save();
+									$result = 'OK';
+								}
+								elseif (method_exists($oEntity, $fieldName))
+								{
+									$oEntity->$fieldName($value);
+									$result = 'OK';
+								}
+							}
 						}
 					}
 				}

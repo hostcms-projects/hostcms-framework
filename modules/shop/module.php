@@ -23,7 +23,7 @@ class Shop_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-12-01';
+	public $date = '2016-12-22';
 
 	/**
 	 * Module name
@@ -228,7 +228,6 @@ class Shop_Module extends Core_Module
 			->where('shop_items.shortcut_id', '=', 0)
 			->where('shop_items.active', '=', 1)
 			->where('shop_items.deleted', '=', 0)
-
 			->open()
 				->where('shop_items.start_datetime', '<', $dateTime)
 				->setOr()
@@ -240,7 +239,7 @@ class Shop_Module extends Core_Module
 				->setOr()
 				->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 			->close()
-
+			->setAnd()
 			->open()
 				->where('shop_groups.id', 'IS', NULL)
 				->setOr()

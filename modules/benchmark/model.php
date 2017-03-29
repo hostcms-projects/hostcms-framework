@@ -20,6 +20,12 @@ class Benchmark_Model extends Core_Entity
 	protected $_modelName = 'benchmark';
 
 	/**
+	 * Column consist item's name
+	 * @var string
+	 */
+	protected $_nameColumn = 'datetime';
+
+	/**
 	 * Belongs to relations
 	 * @var array
 	 */

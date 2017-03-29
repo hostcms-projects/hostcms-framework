@@ -317,4 +317,54 @@ class Lib_Model extends Core_Entity
 
 		return $newObject;
 	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'lib_dir_id' => $this->lib_dir_id,
+				'description' => $this->description,
+				'lib' => $this->loadLibFile(),
+				'lib_config' => $this->loadLibConfigFile(),
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->description = Core_Array::get($aBackup, 'description');
+				$this->save();
+
+				$this->saveLibFile(Core_Array::get($aBackup, 'lib'));
+				$this->saveLibConfigFile(Core_Array::get($aBackup, 'lib_config'));
+			}
+		}
+
+		return $this;
+	}
 }

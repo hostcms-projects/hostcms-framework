@@ -283,7 +283,7 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->_object
 				->saveTemplateFile(Core_Array::getPost('template'))
 				->saveTemplateJsFile(Core_Array::getPost('js'));
-			
+
 			$css = Core_Array::getPost('css');
 
 			try
@@ -306,11 +306,17 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->_object
 				->rebuildCompressionCss()
 				->updateTimestamp();
-				
+
 			// Delete all compressed JS
 			if (Core::moduleIsActive('compression'))
 			{
 				Compression_Controller::instance('js')->deleteAllJs();
+			}
+
+			// Backup revision
+			if (Core::moduleIsActive('revision'))
+			{
+				$this->_object->backupRevision();
 			}
 		}
 

@@ -31,4 +31,5 @@ return array(
 	'max_file_size' => 'Maximum file size: %s x %s',
 	'select_section' => 'Select a section',
 	'module-options' => 'Settings "%s"',
+	'version_absent' => 'Version absent',
 );

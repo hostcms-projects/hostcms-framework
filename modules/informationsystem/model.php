@@ -86,6 +86,14 @@ class Informationsystem_Model extends Core_Entity
 	);
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description'
+	);
+
+	/**
 	 * Tree of groups
 	 * @array
 	 */
@@ -577,7 +585,7 @@ class Informationsystem_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags()
-			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))		
+			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))
 			->addXmlTag('url', $this->Structure->getPath())
 			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0)
 			;

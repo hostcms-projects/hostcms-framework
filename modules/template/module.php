@@ -23,7 +23,7 @@ class Template_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-12-01';
+	public $date = '2016-12-22';
 
 	/**
 	 * Module name

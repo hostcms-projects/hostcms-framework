@@ -582,7 +582,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$this->addTabAfter($oInformationsystemGroupDescriptionTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.tab_1'))
 					->name('Description'), $oMainTab);
-					
+
 				$this->addTabAfter($oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.tab_2'))
 					->name('Seo'), $oInformationsystemGroupDescriptionTab);
@@ -591,12 +591,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->add($oInformationsystemGroupDescriptionTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oInformationsystemGroupDescriptionTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
-					
+
 				$oInformationsystemTabSeo
 					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
-					
+
 				// Name
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
@@ -614,7 +614,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab
 					->move($this->getField('description'), $oInformationsystemGroupDescriptionTabRow1)
 				;
-				
+
 				// Description
 				//$oMainTab->move($this->getField('description'), $oMainRow3);
 
@@ -1469,6 +1469,12 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 			$oMaillist_Fascicle->save();
 			$oMaillist->add($oMaillist_Fascicle);
+		}
+
+		// Backup revision
+		if (Core::moduleIsActive('revision'))
+		{
+			$this->_object->backupRevision();
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));

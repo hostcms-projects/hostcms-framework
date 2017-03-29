@@ -241,7 +241,7 @@ class Shop_Controller_Show extends Core_Controller
 
 		$this->itemsActivity = $this->groupsActivity = $this->commentsActivity = 'active'; // inactive, all
 
-		$this->pattern = rawurldecode($this->getEntity()->Structure->getPath()) . '({path})(/user-{user}/)(page-{page}/)(tag/{tag}/)(producer-{producer}/)';
+		$this->pattern = rawurldecode($this->getEntity()->Structure->getPath()) . '({path})(user-{user}/)(page-{page}/)(tag/{tag}/)(producer-{producer}/)';
 		$this->patternExpressions = array(
 			'page' => '\d+',
 			'producer' => '\d+',

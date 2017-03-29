@@ -174,27 +174,27 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow2->add($oTimezoneField);
 
 		/* $oMainRow3 */
-		$this->getField('max_size_load_image')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('max_size_load_image')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('max_size_load_image'), $oMainRow3);
-		$this->getField('max_size_load_image_big')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('max_size_load_image_big')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('max_size_load_image_big'), $oMainRow3);
 
 		/* $oMainRow4 */
-		$this->getField('admin_email')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('admin_email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('admin_email'), $oMainRow4);
-		$this->getField('lng')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('lng')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('lng'), $oMainRow4);
 
 		/* $oMainRow5 */
-		$this->getField('send_attendance_report')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('send_attendance_report')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('send_attendance_report'), $oMainRow5);
-		$this->getField('safe_email')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('safe_email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('safe_email'), $oMainRow5);
 
 		/* $oMainRow6 */
-		$this->getField('uploaddir')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('uploaddir')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('uploaddir'), $oMainRow6);
-		$this->getField('nesting_level')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('nesting_level')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('nesting_level'), $oMainRow6);
 
 		/* $oMainRow7 */
@@ -205,7 +205,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oIcoFileField
 			->type("file")
 			->caption(Core::_('Site.ico_files_uploaded'))
-			->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->name("icofile")
 			->id("icofile")
 			->largeImage(
@@ -230,25 +230,25 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow7->add($oIcoFileField);
 
 		/* $oSiteTabAccessRightsRow1 */
-		$this->getField('chmod')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('chmod')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('chmod'), $oSiteTabAccessRightsRow1);
-		$this->getField('files_chmod')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('files_chmod')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('files_chmod'), $oSiteTabAccessRightsRow1);
 
 		/* $oSiteTabFormatsRow1 */
-		$this->getField('date_format')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('date_format')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('date_format'), $oSiteTabFormatsRow1);
-		$this->getField('date_time_format')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('date_time_format')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('date_time_format'), $oSiteTabFormatsRow1);
 
 		/* $oSiteTabFormatsRow2 */
-		$this->getField('css_left')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('css_left')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('css_left'), $oSiteTabFormatsRow2);
-		$this->getField('css_right')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('css_right')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('css_right'), $oSiteTabFormatsRow2);
 
 		/* $oSiteTabErrorsRow1 & $oSiteTabErrorsRow2 & $oSiteTabErrorsRow3 */
-		$this->getField('error')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('error')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('error'), $oSiteTabErrorsRow1);
 
 		$oMainTab->delete(
@@ -271,7 +271,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('error404')
 			->value($this->_object->error404)
 			->caption(Core::_('Site.error404'))
-			->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$oSiteTabErrorsRow1->add($oSelect_404);
 
@@ -283,7 +283,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('error403')
 			->value($this->_object->error403)
 			->caption(Core::_('Site.error403'))
-			->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oSiteTabErrorsRow2->add($oSelect_403);
 
 		$oSelect_503 = Admin_Form_Entity::factory('Select');
@@ -294,7 +294,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('closed')
 			->value($this->_object->closed)
 			->caption(Core::_('Site.closed'))
-			->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oSiteTabErrorsRow2->add($oSelect_503);
 
 		/* $oSiteTabRobotsRow1 */
@@ -306,7 +306,7 @@ class Site_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->move($this->getField('key'), $oSiteTabLicenseRow1);
 
 		/* $oSiteTabCache */
-		$this->getField('html_cache_use')->divAttr(array('class' => 'form-group col-sm-6 col-md-6 col-lg-6'));
+		$this->getField('html_cache_use')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 		$oMainTab->move($this->getField('html_cache_use'), $oSiteTabCacheRow1);
 
 		$this->getField('html_cache_with')->divAttr(array('class' => 'form-group col-xs-12'));

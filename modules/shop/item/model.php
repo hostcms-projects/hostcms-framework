@@ -202,6 +202,15 @@ class Shop_Item_Model extends Core_Entity
 	);
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description',
+		'text'
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -1228,6 +1237,8 @@ class Shop_Item_Model extends Core_Entity
 	{
 		$oShopItem = Core_Entity::factory('Shop_Item', Core_Array::getGet('shop_item_id', 0));
 
+		$oShopItem->clearCache();
+
 		$oShopAssociatedItem = $oShopItem
 			->Shop_Item_Associateds
 			->getByAssociatedId($this->id);
@@ -2151,6 +2162,8 @@ class Shop_Item_Model extends Core_Entity
 				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
 					->deleteByTag('shop_group_0');
 
+			$this->modification_id && $this->Modification->clearCache();
+
 			// Static cache
 			$oSite = $this->Shop->Site;
 			if ($oSite->html_cache_use)
@@ -2237,5 +2250,120 @@ class Shop_Item_Model extends Core_Entity
 			->value($count < 100 ? $count : '∞')
 			->title($count)
 			->execute();
+	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'shop_group_id' => $this->shop_group_id,
+				'modification_id' => $this->modification_id,
+				'datetime' => $this->datetime,
+				'start_datetime' => $this->start_datetime,
+				'end_datetime' => $this->end_datetime,
+				'showed' => $this->showed,
+				'marking' => $this->marking,
+				'weight' => $this->weight,
+				'shop_measure_id' => $this->shop_measure_id,
+				'path' => $this->path,
+				'sorting' => $this->sorting,
+				'shop_producer_id' => $this->shop_producer_id,
+				'shop_seller_id' => $this->shop_seller_id,
+				'active' => $this->active,
+				'indexing' => $this->indexing,
+				'length' => $this->length,
+				'width' => $this->width,
+				'height' => $this->height,
+				'price' => $this->price,
+				'shop_currency_id' => $this->shop_currency_id,
+				'shop_tax_id' => $this->shop_tax_id,
+				'siteuser_id' => $this->siteuser_id,
+				'shortcut_id' => $this->shortcut_id,
+				'description' => $this->description,
+				'text' => $this->text,
+				'guid' => $this->guid,
+				'yandex_market' => $this->yandex_market,
+				'seo_title' => $this->seo_title,
+				'seo_description' => $this->seo_description,
+				'seo_keywords' => $this->seo_keywords,
+				'siteuser_group_id' => $this->siteuser_group_id,
+				'apply_purchase_discount' => $this->apply_purchase_discount,
+				'shop_id' => $this->shop_id,
+				'user_id' => $this->user_id
+			);
+
+			if (Core::moduleIsActive('siteuser'))
+			{
+				$aBackup['shop_item_prices'] = array();
+
+				$aShop_Item_Prices = $this->Shop_Item_Prices->findAll(FALSE);
+				foreach ($aShop_Item_Prices as $oShop_Item_Price)
+				{
+					$aBackup['shop_item_prices'][$oShop_Item_Price->shop_price_id] = $oShop_Item_Price->value;
+				}
+			}
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->sorting = Core_Array::get($aBackup, 'sorting');
+				$this->path = Core_Array::get($aBackup, 'path');
+				$this->price = Core_Array::get($aBackup, 'price');
+				$this->marking = Core_Array::get($aBackup, 'marking');
+				$this->description = Core_Array::get($aBackup, 'description');
+				$this->text = Core_Array::get($aBackup, 'text');
+				$this->active = Core_Array::get($aBackup, 'active');
+				$this->indexing = Core_Array::get($aBackup, 'indexing');
+				$this->seo_title = Core_Array::get($aBackup, 'seo_title');
+				$this->seo_description = Core_Array::get($aBackup, 'seo_description');
+				$this->seo_keywords = Core_Array::get($aBackup, 'seo_keywords');
+				$this->siteuser_id = Core_Array::get($aBackup, 'siteuser_id');
+
+				if (isset($aBackup['shop_item_prices']) && Core::moduleIsActive('siteuser'))
+				{
+					foreach ($aBackup['shop_item_prices'] as $shop_price_id => $value)
+					{
+						$oShop_Item_Price = $this->Shop_Item_Prices->getByShop_price_id($shop_price_id);
+						if (is_null($oShop_Item_Price))
+						{
+							$oShop_Item_Price = Core_Entity::factory('Shop_Item_Price');
+							$oShop_Item_Price->shop_item_id = $this->id;
+							$oShop_Item_Price->shop_price_id = $shop_price_id;
+						}
+						$oShop_Item_Price->value = $value;
+						$oShop_Item_Price->save();
+					}
+				}
+
+				$this->save();
+			}
+		}
+
+		return $this;
 	}
 }

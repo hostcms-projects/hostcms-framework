@@ -171,6 +171,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add(
 				Admin_Form_Entity::factory('Input')
 					->name('sum')
+					->id('sum')
 					->value($this->_object->getAmount())
 					->readonly('readonly')
 					->caption(Core::_("Shop_Order.cond_of_delivery_add_form_price_order"))
@@ -347,6 +348,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$Shop_Delivery_Controller_Edit->fillDeliveries(Core_Array::getGet('shop_id', 0))
 			)
 			->name('shop_delivery_id')
+			->id('shop_delivery_id')
 			->value($this->_object->shop_delivery_id)
 			->onchange("$.ajaxRequest({path: '/admin/shop/order/index.php',context: 'shop_delivery_condition_id', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadDeliveryConditionsList',additionalParams: 'delivery_id=' + this.value,windowId: '{$windowId}'}); return false")
 			->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
@@ -379,13 +381,16 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('class' => 'large-link form-group col-lg-12 col-md-12 col-sm-12'))
 			->a
 				->class('btn btn-default')
-				->href($this->_Admin_Form_Controller->getAdminActionLoadHref(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
+				/*->href($this->_Admin_Form_Controller->getAdminActionLoadHref(
+						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId, $additionalParams
 					)
-				)
-				->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId
+				)*/
+				/*->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax(
+						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId, $additionalParams
 					)
+				)*/
+				->onclick(
+					$this->_Admin_Form_Controller->getAdminSendForm('recalcDelivery')
 				)
 				->value(Core::_('Shop_Order.recalc_order_delivery_sum'));
 		$oRecalcDeliveryPriceLink

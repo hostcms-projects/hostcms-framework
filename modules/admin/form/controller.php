@@ -1096,20 +1096,6 @@ class Admin_Form_Controller
 	}
 
 	/**
-	 * Show form title in administration center
-	 * @return self
-	 */
-	/*protected function _showFormTitle()
-	{
-		// Заголовок формы
-		strlen($this->_pageTitle) && Admin_Form_Entity::factory('Title')
-			->name($this->_pageTitle)
-			->execute();
-
-		return $this;
-	}*/
-
-	/**
 	 * Edit-in-Place in administration center
 	 * @return self
 	 */

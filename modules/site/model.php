@@ -1169,12 +1169,6 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		// Search, поиск не копируем
-		/*if (Core::moduleIsActive('search'))
-		{
-
-		}*/
-
 		if (Core::moduleIsActive('seo'))
 		{
 			$aSeos = $this->Seos->findAll(FALSE);
@@ -1380,14 +1374,10 @@ class Site_Model extends Core_Entity
 		$aDocuments = $newObject->Documents->findAll(FALSE);
 		foreach($aDocuments as $oDocument)
 		{
-			$aDocument_Versions = $oDocument->Document_Versions->findAll(FALSE);
-			foreach($aDocument_Versions as $oDocument_Version)
+			if (isset($aMatchTemplates[$oDocument->template_id]))
 			{
-				if (isset($aMatchTemplates[$oDocument_Version->template_id]))
-				{
-					$oDocument_Version->template_id = $aMatchTemplates[$oDocument_Version->template_id]->id;
-					$oDocument_Version->save();
-				}
+				$oDocument->template_id = $aMatchTemplates[$oDocument->template_id]->id;
+				$oDocument->save();
 			}
 		}
 

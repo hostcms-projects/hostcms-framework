@@ -34,4 +34,7 @@ return array(
 	'copy_success' => 'Документ успешно скопирован!',
 	'add' => 'Добавление документа',
 	'structures' => 'Узлы структуры сайта',
+	'text' => '<acronym title="Содержание документа">Содержание документа</acronym>',
+	'template_id' => '<acronym title="Выберите макет для отображения страницы">Макет</acronym>',
+	'datetime' => '<acronym title="Дата создания документа">Дата</acronym>',
 );

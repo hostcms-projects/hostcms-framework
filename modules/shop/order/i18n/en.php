@@ -54,6 +54,7 @@ return array(
 	'id' => 'Id',
 	'markDeleted_success' => "Order information deleted successfully!",
 	'recalc_order_delivery_sum' => "Recalculate delivery price",
+	'recalc_delivery_success' => "Delivery price recalc successfully!",
 	'order_card' => "Order card",
 	'order_card_supplier' => "Supplier",
 	'order_card_inn_kpp' => "Taxpayer ID/RVC",

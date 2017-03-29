@@ -218,7 +218,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oMainRow5->add($oRadio_Type);
 
-		$oDocument = Core_Entity::factory('Document', $this->_object->document_id);
+		$oDocument = $this->_object->Document;
 
 		// Контроллер редактирования документа
 		$Document_Controller_Edit = new Document_Controller_Edit($this->_Admin_Form_Action);
@@ -237,7 +237,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow6->add($Select_DocumentDir);
 
 		$aDocumentForDir = array(' … ');
-		// intval() because $oDocument->document_dir_id may be NULL
+		// intval() because $oDocument->document_dir_id maybe NULL
 		$aDocuments = Core_Entity::factory('Document_Dir', intval($oDocument->document_dir_id))
 			->Documents->getBySiteId($this->_object->site_id);
 
@@ -451,15 +451,9 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oSitemapRow2->add($oSelect_priority);
 
 		// ---- Дополнительные свойства
-		if ($this->_object->type == 0)
-		{
-			$oDocument_Version = $oDocument->Document_Versions->getCurrent(FALSE);
-			$template_id = !is_null($oDocument_Version) ? $oDocument_Version->template_id : 0;
-		}
-		else
-		{
-			$template_id = $this->_object->template_id;
-		}
+		$template_id = $this->_object->type == 0
+			? $this->_object->Document->template_id
+			: $this->_object->template_id;
 
 		Property_Controller_Tab::factory($this->_Admin_Form_Controller)
 			->setObject($this->_object)

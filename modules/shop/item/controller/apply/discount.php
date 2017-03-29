@@ -88,7 +88,7 @@ class Shop_Item_Controller_Apply_Discount extends Admin_Form_Action_Controller
 			$oCore_Html_Entity_Form
 				->add($oAdmin_Form_Entity_Select_Discount)
 				->add($oAdmin_Form_Entity_Select_Discount_Checkbox);
-				
+
 			if (Core::moduleIsActive('siteuser'))
 			{
 				$aBonuses = array(" … ");
@@ -110,7 +110,7 @@ class Shop_Item_Controller_Apply_Discount extends Admin_Form_Action_Controller
 				$oAdmin_Form_Entity_Select_Bonus_Checkbox = Admin_Form_Entity::factory('Checkbox')
 					->name('flag_delete_bonus')
 					->caption(Core::_('Shop_Item.flag_delete_bonus'));
-					
+
 				$oCore_Html_Entity_Form
 					->add($oAdmin_Form_Entity_Select_Bonus)
 					->add($oAdmin_Form_Entity_Select_Bonus_Checkbox);
@@ -206,6 +206,8 @@ class Shop_Item_Controller_Apply_Discount extends Admin_Form_Action_Controller
 						&& is_null($oShop_Item->Shop_Item_Bonuses->getByShop_bonus_id($iBonusID));
 				}
 			}
+
+			$oShop_Item->clearCache();
 		}
 
 		return $this;

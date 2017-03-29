@@ -124,23 +124,17 @@ class Shop_Item_Delivery_Option_Controller_Tab extends Core_Servant_Properties
 	{
 		$aShop_Item_Delivery_Options = array();
 
-		if ($this->shop_id)
+		if ($this->shop_id && $this->shop_item_id !== 0)
 		{
 			$oShop_Item_Delivery_Options = Core_Entity::factory('Shop_Item_Delivery_Option');
-				$oShop_Item_Delivery_Options
-					->queryBuilder()
-					->where('shop_item_delivery_options.shop_id', '=', $this->shop_id);
+			$oShop_Item_Delivery_Options
+				->queryBuilder()
+				->where('shop_item_delivery_options.shop_id', '=', $this->shop_id)
+				->where('shop_item_delivery_options.shop_item_id', '=', !is_null($this->shop_item_id)
+					? $this->shop_item_id
+					: 0);
 
-			if ($this->shop_item_id !== 0)
-			{
-				$oShop_Item_Delivery_Options
-					->queryBuilder()
-					->where('shop_item_delivery_options.shop_item_id', '=', !is_null($this->shop_item_id)
-						? $this->shop_item_id
-						: 0);
-
-				$aShop_Item_Delivery_Options = $oShop_Item_Delivery_Options->findAll();
-			}
+			$aShop_Item_Delivery_Options = $oShop_Item_Delivery_Options->findAll();
 		}
 
 		return $aShop_Item_Delivery_Options;
@@ -157,7 +151,7 @@ class Shop_Item_Delivery_Option_Controller_Tab extends Core_Servant_Properties
 		foreach($aShop_Item_Delivery_Options as $oShop_Item_Delivery_Option)
 		{
 			$cost = Core_Array::getPost("deliveryOptionCost_{$oShop_Item_Delivery_Option->id}");
-			
+
 			if (!is_null($cost) && $cost !== '')
 			{
 				$oShop_Item_Delivery_Option

@@ -381,7 +381,7 @@ class Core_ORM
 	}
 
 	/**
-	 * Find object in database and load one
+	 * Find object in database and load one. Use clear() before find() with conditions!
 	 * @param mixed $primaryKey default NULL
 	 * @param bool $bCache use cache
 	 * <code>
@@ -422,7 +422,7 @@ class Core_ORM
 
 		if ($aCurrent !== FALSE)
 		{
-			/* */
+			/* Use clear() before find() with conditions! */
 			$this->setValues($this->_modelColumns + $aCurrent);
 
 			$Core_DataBase->free();
@@ -872,7 +872,7 @@ class Core_ORM
 	 * @var string
 	 */
 	static protected $_databaseDriver = 'default';
-	
+
 	/**
 	 * Set name of Database Driver
 	 * @param string $name driver's name
@@ -881,7 +881,7 @@ class Core_ORM
 	{
 		self::$_databaseDriver = $name;
 	}
-	
+
 	/**
 	 * Model initialization
 	 * @return Core_ORM
@@ -1661,7 +1661,7 @@ class Core_ORM
 	}
 
 	/**
-	 * Save object. Use self::update() or self::create()
+	 * Save object. Uses self::update() or self::create()
 	 *
 	 * @return Core_ORM
 	 * @hostcms-event modelname.onBeforeSave

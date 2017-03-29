@@ -60,65 +60,6 @@ class Document_Version_Model extends Core_Entity
 	}
 
 	/**
-	 * Document content
-	 */
-	protected $_content = NULL;
-
-	/**
-	 * Get $this->_content
-	 * @return string
-	 */
-	public function getContent()
-	{
-		return $this->_content;
-	}
-
-	/**
-	 * Set $this->_content
-	 * @param string $content
-	 * @return self
-	 */
-	public function setContent($content)
-	{
-		$this->_content = $content;
-		return $this;
-	}
-
-	/**
-	 * Show document version.
-	 *
-	 * @hostcms-event document_version.onBeforeExecute
-	 * @hostcms-event document_version.onAfterExecute
-	 * <code>
-	 * Core_Entity::factory('Document', 123)->Document_Versions->getCurrent()->execute();
-	 * </code>
-	 */
-	public function execute()
-	{
-		$this->setContent(Core_File::read($this->getPath()));
-
-		Core_Event::notify($this->_modelName . '.onBeforeExecute', $this);
-
-		$checkPanel = Core::checkPanel();
-		if ($checkPanel)
-		{
-			?><div hostcms:id="<?php echo intval($this->Document->id)?>" hostcms:field="editInPlaceVersion" hostcms:entity="document" hostcms:type="wysiwyg"><?php
-		}
-
-		// Show content of document
-		echo $this->getContent();
-
-		if ($checkPanel)
-		{
-			?></div><?php
-		}
-
-		Core_Event::notify($this->_modelName . '.onAfterExecute', $this);
-
-		return $this;
-	}
-
-	/**
 	 * Get document's file path
 	 * @return string
 	 */
@@ -129,16 +70,35 @@ class Document_Version_Model extends Core_Entity
 	}
 
 	/**
+	 * Save object.
+	 *
+	 * @return Core_ORM
+	 * @hostcms-event modelname.onBeforeSave
+	 * @hostcms-event modelname.onAfterSave
+	 */
+	public function save()
+	{
+		// disable save
+		return $this;
+	}
+	
+	/**
 	 * Save document file
 	 * @param string $content content
 	 * @return boolean
 	 */
 	public function saveFile($content)
 	{
-		$this->save();
+		//$this->save();
 
 		$content = trim($content);
-		Core_File::write($this->getPath(), $content);
+		//Core_File::write($this->getPath(), $content);
+		
+		$oDocument = Core_Entity::factory('Document', $this->document_id);
+		$oDocument->text = $content;
+		$oDocument->template_id = $this->template_id;
+		$oDocument->datetime = $this->datetime;
+		$oDocument->save();
 	}
 
 	/**

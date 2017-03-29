@@ -243,6 +243,12 @@ class Xsl_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					$this->_object->saveLngDtdFile($aRow['lng'], $content);
 				}
+
+				// Backup revision
+				if (Core::moduleIsActive('revision'))
+				{
+					$this->_object->backupRevision();
+				}
 			break;
 		}
 

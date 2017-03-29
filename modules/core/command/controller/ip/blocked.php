@@ -51,18 +51,7 @@ class Core_Command_Controller_Ip_Blocked extends Core_Command_Controller
 
 				if ($oStructure->type == 0)
 				{
-					$oDocument_Versions = $oStructure->Document->Document_Versions->getCurrent();
-
-					if (is_null($oDocument_Versions))
-					{
-						// Document version not found
-						$oCore_Router_Route = new Core_Router_Route('()');
-						return $oCore_Router_Route
-							->controller('Core_Command_Controller_Document_Not_Found')
-							->execute();
-					}
-
-					$oTemplate = $oDocument_Versions->Template;
+					$oTemplate = $oStructure->Document->Template;
 				}
 				// Если динамическая страница или типовая дин. страница
 				elseif ($oStructure->type == 1 || $oStructure->type == 2)

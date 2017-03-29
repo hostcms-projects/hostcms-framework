@@ -158,6 +158,7 @@ return array(
 	'input_file_encoding0' => 'Windows-1251',
 	'input_file_encoding1' => 'UTF-8',
 	'import_price_list_parent_group' => "<acronym title=\"Вы можете выгружать товары из указанного каталога, включая все подкаталоги\">Родительская группа для выгрузки товаров</acronym>",
+	'import_price_list_producer' => "<acronym title=\"Вы можете выгружать товары указанного производителя\">Производитель товаров</acronym>",
 	'import_price_list_images_path' => "<acronym title=\"Путь для внешних файлов, например /upload_images/\">Путь для внешних файлов</acronym>",
 	'import_price_list_action_items' => "<acronym title=\"Действие для существующих товаров\">Действие для существующих товаров</acronym>",
 	'import_price_action_items0' => "Удалить существующие товары во всех группах",

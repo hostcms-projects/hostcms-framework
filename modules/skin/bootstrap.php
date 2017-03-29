@@ -320,6 +320,8 @@ class Skin_Bootstrap extends Core_Skin
 								</li>
 								<?php
 								$oModule = Core_Entity::factory('Module')->getByPath('user');
+								if (Core::$mainConfig['chat'])
+								{
 								?><li>
 									<a id="chat-link" title="Chat" href="#">
 										<i class="icon glyphicon glyphicon-comment"></i>
@@ -445,6 +447,9 @@ class Skin_Bootstrap extends Core_Skin
 										});
 									</script>
 								</li>
+								<?php
+								}
+								?>
 								<li>
 									<a class="login-area dropdown-toggle" data-toggle="dropdown">
 										<div class="avatar" title="View your public profile">

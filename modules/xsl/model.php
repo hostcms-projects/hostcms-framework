@@ -192,4 +192,52 @@ class Xsl_Model extends Core_Entity
 			? $aXsls[0]
 			: NULL;
 	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'xsl_dir_id' => $this->xsl_dir_id,
+				'description' => $this->description,
+				'xsl' => $this->loadXslFile(),
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->description = Core_Array::get($aBackup, 'description');
+				$this->save();
+
+				$this->saveXslFile(Core_Array::get($aBackup, 'xsl'));
+			}
+		}
+
+		return $this;
+	}
 }

@@ -245,7 +245,8 @@ class Core_Sitemap extends Core_Servant_Properties
 						$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
 						foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 						{
-							if (isset($aGroupsIDs[$oInformationsystem_Item->informationsystem_group_id]))
+							if ($oInformationsystem_Item->informationsystem_group_id == 0
+								|| isset($aGroupsIDs[$oInformationsystem_Item->informationsystem_group_id]))
 							{
 								$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
 							}
@@ -355,7 +356,8 @@ class Core_Sitemap extends Core_Servant_Properties
 						$aShop_Items = $oShop_Items->findAll(FALSE);
 						foreach ($aShop_Items as $oShop_Item)
 						{
-							if (isset($aGroupsIDs[$oShop_Item->shop_group_id]))
+							if ($oShop_Item->shop_group_id == 0
+								|| isset($aGroupsIDs[$oShop_Item->shop_group_id]))
 							{
 								$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
 							}

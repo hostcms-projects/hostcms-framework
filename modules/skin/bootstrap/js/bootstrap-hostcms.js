@@ -1139,7 +1139,8 @@
 					 // height: '215px',
 					  height: 'auto',
 					  color: 'rgba(0,0,0,0.3)',
-					  size: '5px'
+					  size: '5px',
+					  wheelStep: 2
 					});
 				},
 			});
@@ -1149,7 +1150,7 @@
 				original = $(img).data('original-path');
 
 			createCookie("wallpaper-id", wallpaper_id, 365);
-				
+
 			$.ajax({
 				url: '/admin/user/index.php',
 				/*url: '/admin/index.php?' + 'userSettings&moduleId=' + $(img).data('moduleId')

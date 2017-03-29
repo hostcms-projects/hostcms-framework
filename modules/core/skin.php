@@ -483,10 +483,7 @@ abstract class Core_Skin
 			// Template
 			if ($oStructure->type == 0)
 			{
-				$oDocument_Version = $oStructure->Document->Document_Versions->getCurrent();
-				$oTemplate = is_null($oDocument_Version)
-					? NULL
-					: $oDocument_Version->Template;
+				$oTemplate = $oStructure->Document->Template;
 			}
 			else
 			{

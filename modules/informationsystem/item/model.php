@@ -69,7 +69,16 @@ class Informationsystem_Item_Model extends Core_Entity
 	protected $_forbiddenTags = array(
 		'datetime',
 		'start_datetime',
-		'end_datetime',
+		'end_datetime'
+	);
+
+	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description',
+		'text'
 	);
 
 	/**
@@ -1457,5 +1466,75 @@ class Informationsystem_Item_Model extends Core_Entity
 			->value($count < 100 ? $count : '∞')
 			->title($count)
 			->execute();
+	}
+
+	/**
+	 * Backup revision
+	 * @return self
+	 */
+	public function backupRevision()
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$aBackup = array(
+				'name' => $this->name,
+				'informationsystem_group_id' => $this->informationsystem_group_id,
+				'datetime' => $this->datetime,
+				'start_datetime' => $this->start_datetime,
+				'end_datetime' => $this->end_datetime,
+				'active' => $this->active,
+				'indexing' => $this->indexing,
+				'sorting' => $this->sorting,
+				'ip' => $this->ip,
+				'showed' => $this->showed,
+				'siteuser_id' => $this->siteuser_id,
+				'shortcut_id' => $this->shortcut_id,
+				'path' => $this->path,
+				'description' => $this->description,
+				'text' => $this->text,
+				'seo_title' => $this->seo_title,
+				'seo_description' => $this->seo_description,
+				'seo_keywords' => $this->seo_keywords,
+				'siteuser_group_id' => $this->siteuser_group_id,
+				'user_id' => $this->user_id
+			);
+
+			Revision_Controller::backup($this, $aBackup);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Rollback Revision
+	 * @param int $revision_id Revision ID
+	 * @return self
+	 */
+	public function rollbackRevision($revision_id)
+	{
+		if (Core::moduleIsActive('revision'))
+		{
+			$oRevision = Core_Entity::factory('Revision', $revision_id);
+
+			$aBackup = json_decode($oRevision->value, TRUE);
+
+			if (is_array($aBackup))
+			{
+				$this->name = Core_Array::get($aBackup, 'name');
+				$this->sorting = Core_Array::get($aBackup, 'sorting');
+				$this->path = Core_Array::get($aBackup, 'path');
+				$this->description = Core_Array::get($aBackup, 'description');
+				$this->text = Core_Array::get($aBackup, 'text');
+				$this->active = Core_Array::get($aBackup, 'active');
+				$this->indexing = Core_Array::get($aBackup, 'indexing');
+				$this->seo_title = Core_Array::get($aBackup, 'seo_title');
+				$this->seo_description = Core_Array::get($aBackup, 'seo_description');
+				$this->seo_keywords = Core_Array::get($aBackup, 'seo_keywords');
+				$this->siteuser_id = Core_Array::get($aBackup, 'siteuser_id');
+				$this->save();
+			}
+		}
+
+		return $this;
 	}
 }

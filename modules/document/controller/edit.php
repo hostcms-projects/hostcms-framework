@@ -67,24 +67,18 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					? Core::_('Document.edit')
 					: Core::_('Document.add');
 
-				$oMainTab
-					->move($this->getField('name'), $oMainRow1);
+				$oMainTab->move($this->getField('name'), $oMainRow1);
 
-				$oDocument_Version_Current = $this->_object->Document_Versions->getCurrent(FALSE);
+				$oMainTab->delete($this->getField('text'));
 
 				$oTextarea_Document = Admin_Form_Entity::factory('Textarea')
-					->value(
-						!is_null($oDocument_Version_Current)
-							? $oDocument_Version_Current->loadFile()
-							: ''
-					)
+					->value($this->_object->text)
 					->rows(15)
-					->caption(Core::_('Document_Version.text'))
+					->caption(Core::_('Document.text'))
 					->name('text')
 					->wysiwyg(TRUE)
-					->template_id(!is_null($oDocument_Version_Current)
-						? $oDocument_Version_Current->template_id
-						: 0);
+					->divAttr(array('class' => 'form-group col-xs-12'))
+					->template_id($this->_object->template_id);
 
 				$oMainRow2->add($oTextarea_Document);
 
@@ -98,13 +92,13 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name("use_typograph")
 						->caption(Core::_('Document.use_typograph'))
 						->value(1)
-						->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+						->divAttr(array('class' => 'form-group col-sm-12 col-md-6'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox')
 						->name("use_trailing_punctuation")
 						->caption(Core::_('Document.use_trailing_punctuation'))
 						->value(1)
-						->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+						->divAttr(array('class' => 'form-group col-sm-12 col-md-6'));
 
 					$oMainTab
 						->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -114,17 +108,9 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->add($oUseTrailingPunctuation);
 				}
 
-				// Attr
-				$oAttrTab = Admin_Form_Entity::factory('Tab')
-					->caption(Core::_('Document.tab_1'))
-					->name('tab_1');
-
-				$this->addTabAfter($oAttrTab, $oMainTab);
-
-				$oAttrTab
-					->add($oAttrRow1 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oAttrRow2 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oAttrRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+				$oMainTab
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$oAdditionalTab->delete($this->getField('document_dir_id'));
 
@@ -135,7 +121,9 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('document_dir_id')
 					->value($this->_object->document_dir_id)
 					->caption(Core::_('Document.document_dir_id'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6'));
+
+				$oAdditionalTab->delete($this->getField('template_id'));
 
 				// Выбор макета
 				$Template_Controller_Edit = new Template_Controller_Edit($this->_Admin_Form_Action);
@@ -147,15 +135,11 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 					)
 					->name('template_id')
-					->value(
-						!is_null($oDocument_Version_Current)
-						? $oDocument_Version_Current->template_id
-						: 0
-					)
-					->caption(Core::_('Document_Version.template_id'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->value($this->_object->template_id)
+					->caption(Core::_('Document.template_id'))
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6'));
 
-				$oAttrRow1
+				$oMainRow4
 					->add($oSelect_Dirs)
 					->add($oSelect_Template_Id);
 
@@ -172,38 +156,11 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('document_status_id')
 					->value($this->_object->document_status_id)
 					->caption(Core::_('Document.document_status_id'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-sm-12 col-md-6'));
 
-				// Текушая версия
-				$oInput_Current = Admin_Form_Entity::factory('Checkbox')
-					->name('current')
-					->value(1)
-					->caption(Core::_('Document_Version.current'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6 checkbox-margin-top'));
+				$oMainRow5->add($oSelect_Statuses);
 
-				if (is_null($oDocument_Version_Current) || $oDocument_Version_Current->current)
-				{
-					$oInput_Current->checked('checked');
-				}
-
-				$oAttrRow2
-					->add($oSelect_Statuses)
-					->add($oInput_Current);
-
-				$oTextarea_Description = Admin_Form_Entity::factory('Textarea')
-					->value(
-						!is_null($oDocument_Version_Current)
-							? $oDocument_Version_Current->description
-							: ''
-					)
-					->rows(15)
-					->caption(Core::_('Document_Version.description'))
-					->name('description')
-					->divAttr(array('class' => 'form-group col-xs-12'));
-
-				$oAttrRow3
-					->add($oTextarea_Description);
-
+				$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow5);
 			break;
 			case 'document_dir':
 			default:
@@ -257,16 +214,12 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$text = Typograph_Controller::instance()->process($text, Core_Array::getPost('use_trailing_punctuation'));
 				}
 
-				$oNewDocument_Version = Core_Entity::factory('Document_Version');
-				$oNewDocument_Version->description = Core_Array::getPost('description');
-				$oNewDocument_Version->template_id = intval(Core_Array::getPost('template_id'));
-				$oNewDocument_Version->current = Core_Array::getPost('current');
-				$oNewDocument_Version->saveFile($text);
-				$this->_object->add($oNewDocument_Version);
+				$this->_object->text = $text;
 
-				if ($oNewDocument_Version->current)
+				// Backup revision
+				if (Core::moduleIsActive('revision'))
 				{
-					$oNewDocument_Version->setCurrent();
+					$this->_object->backupRevision();
 				}
 			break;
 		}

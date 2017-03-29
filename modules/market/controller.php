@@ -231,6 +231,8 @@ class Market_Controller extends Core_Servant_Properties
 						$oObject->siteuser_id = intval($value->siteuser_id);
 						$oObject->price = strval($value->price);
 						$oObject->currency = strval($value->currency);
+						// $oObject->isset_version = intval($value->isset_version);
+						$oObject->isset_version = strval($value->isset_version);
 						$oObject->paid = isset($value->paid)
 							? intval($value->paid)
 							: 0;
@@ -627,9 +629,6 @@ class Market_Controller extends Core_Servant_Properties
 	public function parseModuleXml()
 	{
 		$sModuleXmlPath = $this->tmpDir . DIRECTORY_SEPARATOR . 'module.xml';
-
-		// echo '<p>parseModuleXml():';
-		//var_dump($sModuleXmlPath);
 
 		if (is_file($sModuleXmlPath))
 		{
@@ -1043,7 +1042,14 @@ class Market_Controller extends Core_Servant_Properties
 			}
 			else
 			{
-				$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+				if ($object->isset_version)
+				{
+					$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+				}
+				else
+				{
+					$sHtml .= '<span class="btn btn-labeled btn-default pull-right"><i class="btn-label fa fa-times"></i>' . Core::_('Market.version_absent') . '</span>';
+				}
 			}
 
 			$sHtml .= '</div>
