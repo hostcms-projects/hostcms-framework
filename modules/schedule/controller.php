@@ -18,8 +18,10 @@ class Schedule_Controller
 	 */
 	public function execute(Schedule_Model $oSchedule)
 	{
-		// Выполнен
-		$oSchedule->completed = 1;
+		$oSchedule->interval
+			? $oSchedule->start_datetime = Core_Date::timestamp2sql(time() + $oSchedule->interval)
+			: $oSchedule->completed = 1;
+
 		$oSchedule->save();
 
 		$oModule = $oSchedule->Module;

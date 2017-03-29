@@ -61,18 +61,24 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	/**
 	 * Clear cart operation's options
 	 * @return Shop_Cart_Controller
+	 * @hostcms-event Shop_Cart_Controller.onBeforeClear
+	 * @hostcms-event Shop_Cart_Controller.onAfterClear
 	 */
 	public function clear()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeClear', $this);
+
 		$this->shop_item_id = NULL;
-		
+
 		$this->quantity = 1;
 		$this->postpone = $this->shop_warehouse_id = 0;
 		$this->marking = '';
-		
+
+		Core_Event::notify(get_class($this) . '.onAfterClear', $this);
+
 		return $this;
 	}
-	
+
 	/**
 	 * The singleton instances.
 	 * @var mixed
@@ -97,9 +103,13 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	 * Move goods from session cart to database
 	 * @param Shop_Model $oShop shop
 	 * @return self
+	 * @hostcms-event Shop_Cart_Controller.onBeforeMoveTemporaryCart
+	 * @hostcms-event Shop_Cart_Controller.onAfterMoveTemporaryCart
 	 */
 	public function moveTemporaryCart(Shop_Model $oShop)
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeMoveTemporaryCart', $this);
+
 		if ($this->siteuser_id)
 		{
 			$aShop_Cart = $this->_getAllFromSession($oShop);
@@ -120,6 +130,8 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				$this->clearSessionCart();
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterMoveTemporaryCart', $this);
 
 		return $this;
 	}
@@ -187,7 +199,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 
 		$shop_id = $oShop->id;
 
-		$aCart = Core_Array::get($_SESSION, 'hostcmsCart', array());
+		$aCart = Core_Array::getSession('hostcmsCart', array());
 		$aCart[$shop_id] = Core_Array::get($aCart, $shop_id, array());
 
 		$aShop_Cart = array();
@@ -223,9 +235,13 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 	/**
 	 * Get item from cart
 	 * @return object
+	 * @hostcms-event Shop_Cart_Controller.onBeforeGet
+	 * @hostcms-event Shop_Cart_Controller.onAfterGet
 	 */
 	public function get()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeGet', $this);
+
 		// Проверяем наличие данных о пользователе
 		if ($this->siteuser_id)
 		{
@@ -245,7 +261,7 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 
 			$Shop_Item = Core_Entity::factory('Shop_Item', $this->shop_item_id);
 
-			$aCart = Core_Array::get($_SESSION, 'hostcmsCart', array());
+			$aCart = Core_Array::getSession('hostcmsCart', array());
 			$aCart[$Shop_Item->shop_id] = Core_Array::get($aCart, $Shop_Item->shop_id, array());
 
 			$aReturn = Core_Array::get($aCart[$Shop_Item->shop_id], $this->shop_item_id, array()) + array(
@@ -259,15 +275,22 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 
 			$oShop_Cart = (object)$aReturn;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterGet', $this);
+
 		return $oShop_Cart;
 	}
 
 	/**
 	 * Delete item from cart
 	 * @return Shop_Cart_Controller
+	 * @hostcms-event Shop_Cart_Controller.onBeforeDelete
+	 * @hostcms-event Shop_Cart_Controller.onAfterDelete
 	 */
 	public function delete()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeDelete', $this);
+
 		// Проверяем наличие данных о пользователе
 		if ($this->siteuser_id)
 		{
@@ -285,15 +308,22 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				unset($_SESSION['hostcmsCart'][$oShop_Item->shop_id][$this->shop_item_id]);
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterDelete', $this);
+
 		return $this;
 	}
 
 	/**
 	 * Add item into cart
 	 * @return Shop_Cart_Controller
+	 * @hostcms-event Shop_Cart_Controller.onBeforeAdd
+	 * @hostcms-event Shop_Cart_Controller.onAfterAdd
 	 */
 	public function add()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeAdd', $this);
+
 		if (is_null($this->shop_item_id))
 		{
 			throw new Core_Exception('Shop item id is NULL.');
@@ -304,15 +334,21 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 		// Увеличиваем на количество уже в корзине
 		$this->quantity += $oItem_In_Cart->quantity;
 
+		Core_Event::notify(get_class($this) . '.onAfterAdd', $this);
+
 		return $this->update();
 	}
 
 	/**
 	 * Update item in cart
 	 * @return Shop_Cart_Controller
+	 * @hostcms-event Shop_Cart_Controller.onBeforeUpdate
+	 * @hostcms-event Shop_Cart_Controller.onAfterUpdate
 	 */
 	public function update()
 	{
+		Core_Event::notify(get_class($this) . '.onBeforeUpdate', $this);
+
 		$oShop_Item = Core_Entity::factory('Shop_Item')->find($this->shop_item_id);
 
 		if (!is_null($oShop_Item->id))
@@ -408,6 +444,8 @@ class Shop_Cart_Controller extends Core_Servant_Properties
 				}
 			}
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterUpdate', $this);
 
 		return $this;
 	}

@@ -125,11 +125,7 @@ class Skin_Default extends Core_Skin
 		<script type="text/javascript"><?php
 		if (Core_Auth::logged())
 		{
-			// Получаем данные о корневом пути для группы, в которой размещен текущий пользователь
-			$oUser = Core_Entity::factory('User')->getCurrent();
-			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo Core_Str::escapeJavascriptVariable($oUser
-				? $oUser->User_Group->root_dir
-				: '')?>');<?php
+			?>var HostCMSFileManager = new HostCMSFileManager();<?php
 		}
 		?>
 

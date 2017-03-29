@@ -227,13 +227,23 @@ class Comment_Model extends Core_Entity
 
 		$subCommentCount = $this->Comments->getCount();
 
-		$subCommentCount > 0 && $oCore_Html_Entity_Div
+		$subCommentCount && $oCore_Html_Entity_Div
 			->add(
 				Core::factory('Core_Html_Entity_Span')
 					->class('count')
 					->value(htmlspecialchars($subCommentCount))
 			);
 
+		if (strlen($this->ip))
+		{
+			$oCore_Html_Entity_Div
+				->add(
+					Core::factory('Core_Html_Entity_Span')
+						->class('small darkgray')
+						->value(htmlspecialchars($this->ip))
+				);
+		}
+			
 		$oCore_Html_Entity_Div->execute();
 		return ob_get_clean();
 	}

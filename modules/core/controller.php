@@ -184,6 +184,8 @@ class Core_Controller extends Core_Servant_Properties
 	 * Get HTML based by entities tree, use XSL $this->_xsl
 	 * @see getXml()
 	 * @return string
+	 * @hostcms-event Core_Controller.onBeforeShow
+	 * @hostcms-event Core_Controller.onAfterShow
 	 */
 	public function get()
 	{
@@ -208,7 +210,7 @@ class Core_Controller extends Core_Servant_Properties
 				Xsl_Processor::instance()->formatXml($sXml)
 			) . "</pre>";*/
 
-		Core_Event::notify(get_class($this) . '.onAfterShow', $this);
+		Core_Event::notify(get_class($this) . '.onAfterShow', $this, array($sXml));
 
 		return $return;
 	}

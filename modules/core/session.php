@@ -339,11 +339,10 @@ class Core_Session
 		// Для уже запущенной сесии обновляем время жизни
 		if (self::$_started)
 		{
-			$id = session_id();
-
 			Core_QueryBuilder::update('sessions')
 				->set('maxlifetime', $maxlifetime)
-				->where('id', '=', $id)
+				->where('id', '=', session_id())
+				->where('maxlifetime', '<', $maxlifetime)
 				->execute();
 
 			// Set cookie with expiration date

@@ -31,7 +31,8 @@ class Schedule_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'site' => array(),
-		'module' => array()
+		'module' => array(),
+		'user' => array()
 	);
 
 	/**
@@ -44,6 +45,9 @@ class Schedule_Model extends Core_Entity
 
 		if (is_null($id))
 		{
+			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
+			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+
 			$this->_preloadValues['start_datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['site_id'] = defined('CURRENT_SITE') ? CURRENT_SITE : 0;
@@ -76,7 +80,7 @@ class Schedule_Model extends Core_Entity
 		{
 			$oSchedule_Controller = new Schedule_Controller();
 			$aModuleActions = $oSchedule_Controller->getModuleActions($oModule->id);
-			
+
 			if (isset($aModuleActions[$this->action]))
 			{
 				echo htmlspecialchars($aModuleActions[$this->action]);

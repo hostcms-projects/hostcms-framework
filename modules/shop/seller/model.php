@@ -36,7 +36,8 @@ class Shop_Seller_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop' => array(),
-		'siteuser' => array()
+		'siteuser' => array(),
+		'user' => array()
 	);
 
 	/**

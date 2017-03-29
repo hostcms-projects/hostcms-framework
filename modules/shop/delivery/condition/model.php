@@ -43,7 +43,8 @@ class Shop_Delivery_Condition_Model extends Core_Entity
 		'shop_country_location_city' => array(),
 		'shop_country_location_city_area' => array(),
 		'shop_tax' => array(),
-		'shop_currency' => array()
+		'shop_currency' => array(),
+		'user' => array()
 	);
 
 	/**

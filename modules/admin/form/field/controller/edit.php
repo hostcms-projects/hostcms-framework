@@ -95,14 +95,14 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 							'maxlen' => array('value' => 255)
 						)
 					)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
 					->caption(Core::_('Admin_Form_Field.form_forms_field_lng_description') . ' (' . $oAdmin_Language->shortname . ')')
 					->value($description)
 					->rows(2)
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$oNameTab
 					->add(
@@ -120,10 +120,10 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 
 		$this->getField('name')
 			->class('form-control')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$this->getField('sorting')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$oMainTab
 			->move($this->getField('name'), $oMainRow1)
@@ -149,7 +149,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->name('type')
 			->value($this->_object->type)
 			->caption(Core::_('Admin_Form_Field.type'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->onchange("ShowRowsAdminForm('{$windowId}', this.options[this.selectedIndex].value)");
 
 		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
@@ -162,7 +162,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$oMainTab->delete($this->getField('type'));
 
 		$this->getField('format')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$oMainRow2->add($oSelect_Type);
 		$oMainTab->move($this->getField('format'), $oMainRow2);
@@ -172,19 +172,19 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$oMainTab->move($this->getField('editable'), $oMainRow5);
 
 		$this->getField('image')
-			->divAttr(array('id' => 'image', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('id' => 'image', 'class' => 'form-group col-xs-12'))
 			->rows(3);
 
 		$this->getField('link')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-xs-12'))
 			->rows(2);
 
 		$this->getField('onclick')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('id' => 'link', 'class' => 'form-group col-xs-12'))
 			->rows(2);
 
 		$this->getField('list')
-			->divAttr(array('id' => 'list', 'class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('id' => 'list', 'class' => 'form-group col-xs-12'))
 			->rows(3);
 
 		$oMainTab
@@ -201,19 +201,19 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->name('filter_type')
 			->value($this->_object->filter_type)
 			->caption(Core::_('Admin_Form_Field.filter_type'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$oMainTab->delete($this->getField('filter_type'));
 		$oMainRow10->add($oFilter_Type);
 
 		$this->getField('class')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$this->getField('width')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$this->getField('ico')
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 		$oMainTab
 			->move($this->getField('class'), $oViewRow1)

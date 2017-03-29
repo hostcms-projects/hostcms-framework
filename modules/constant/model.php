@@ -24,7 +24,8 @@ class Constant_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'constant_dir' => array()
+		'constant_dir' => array(),
+		'user' => array()
 	);
 
 	/**

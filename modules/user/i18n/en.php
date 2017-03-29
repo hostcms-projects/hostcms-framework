@@ -59,4 +59,5 @@ return array(
 	'chat_count_unread_message' => 'Unread messages: %s',
 	'chat_count_new_message' => 'New messages: ',
 	'new_message_from' => 'New message from %s %s',	
+	'backend-field-caption' => 'Backend User',
 );

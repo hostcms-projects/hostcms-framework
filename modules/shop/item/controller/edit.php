@@ -139,6 +139,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oShopItemTabExportImportRow3 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopItemTabExportImportRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopItemTabExportImportRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
 
 				$oShopItemTabSEO
@@ -189,23 +190,25 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('delivery'), $oShopItemTabExportImport)
 					->move($this->getField('pickup'), $oShopItemTabExportImport)
 					->move($this->getField('store'), $oShopItemTabExportImport)
+					->move($this->getField('adult'), $oShopItemTabExportImport)
 					->move($this->getField('seo_title')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_description')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_keywords')->rows(3), $oShopItemTabSEO)
 				;
 
 				$oShopItemTabExportImport
-					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oGuidRow)
-					->move($this->getField('yandex_market')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabExportImportRow1)
-					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow2)
-					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow2)
-					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-top-21')), $oShopItemTabExportImportRow3)
-					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-lg-8 col-md-8 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow3)
-					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow4)
-					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-lg-8 col-md-8 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow4)
-					->move($this->getField('delivery')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
-					->move($this->getField('pickup')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
-					->move($this->getField('store')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-6 col-xs-12')), $oShopItemTabExportImportRow5)
+					->move($this->getField('guid')->divAttr(array('class' => 'form-group col-xs-12')), $oGuidRow)
+					->move($this->getField('yandex_market')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabExportImportRow1)
+					->move($this->getField('yandex_market_bid')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6')), $oShopItemTabExportImportRow2)
+					->move($this->getField('yandex_market_cid')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-6')), $oShopItemTabExportImportRow2)
+					->move($this->getField('manufacturer_warranty')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4 margin-top-21')), $oShopItemTabExportImportRow3)
+					->move($this->getField('vendorcode')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-8')), $oShopItemTabExportImportRow3)
+					->move($this->getField('country_of_origin')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow4)
+					->move($this->getField('yandex_market_sales_notes')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-8')), $oShopItemTabExportImportRow4)
+					->move($this->getField('delivery')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
+					->move($this->getField('pickup')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
+					->move($this->getField('store')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
+					->move($this->getField('adult')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabExportImportRow6)
 				;
 
 				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
@@ -218,9 +221,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oYandexMarketBlock->add($oDeliveryOption);
 
 				$oShopItemTabSEO
-					->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow1)
-					->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow2)
-					->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')), $oShopItemTabSEORow3)
+					->move($this->getField('seo_title')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabSEORow1)
+					->move($this->getField('seo_description')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabSEORow2)
+					->move($this->getField('seo_keywords')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabSEORow3)
 				;
 
 				$oDescriptionField
@@ -244,7 +247,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						)
 						->caption(Core::_("Shop_Item.exec_typograph_for_text"))
 						->name("exec_typograph_for_description")
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 						//->divAttr(array('style' => 'float: left'))
 						;
 
@@ -256,7 +259,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						)
 						->name("use_trailing_punctuation_for_description")
 						->caption(Core::_("Shop_Item.use_trailing_punctuation_for_text"))
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 						;
 
 					$oShopItemTabDescriptionRow2->add($oOpticalAlignDescriptionCheckBox);
@@ -285,7 +288,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						)
 						->caption(Core::_("Shop_Item.exec_typograph_for_text"))
 						->name("exec_typograph_for_text")
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 						;
 
 					$oShopItemTabDescriptionRow4->add($oTypographicTextCheckBox);
@@ -297,7 +300,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						)
 						->name("use_trailing_punctuation_for_text")
 						->caption(Core::_("Shop_Item.use_trailing_punctuation_for_text"))
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 					$oShopItemTabDescriptionRow4->add($oOpticalAlignCheckBox);
 				}
@@ -425,7 +428,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$sFormPath = $this->_Admin_Form_Controller->getPath();
 
 				$oImageField
-					->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->name("image")
 					->id("image")
 					->largeImage(array('max_width' => $oShop->image_large_max_width, 'max_height' => $oShop->image_large_max_height, 'path' => $oLargeFilePath, 'show_params' => TRUE, 'watermark_position_x' => $oShop->watermark_default_position_x, 'watermark_position_y' => $oShop->watermark_default_position_y, 'place_watermark_checkbox_checked' => $oShop->watermark_default_use_large_image, 'delete_onclick' =>
@@ -687,10 +690,10 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$oMainTab
-					->move($this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
-					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow8)
-					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow9)
-					->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow9);
+					->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow8)
+					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow8)
+					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9)
+					->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9);
 
 				// Заполняем вкладку специальных цен
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();
@@ -960,19 +963,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$oShopGroupSeoTab)
 					->move($oGuidField = $this->getField('guid'), $oShopGroupImportExportTab)
 				;
-
+				
 				// Удаляем поле parent_id
 				$oAdditionalTab->delete($this->getField('parent_id'));
-
-				/*$oShopGroupParentSelect = Admin_Form_Entity::factory('Select')
-					->caption(Core::_('Shop_Group.parent_id'))
-					->options(array(' … ') + self::fillShopGroup($this->_object->shop_id, 0, array($this->_object->id)))
-					->name('parent_id')
-					->value($this->_object->parent_id)
-					->filter(TRUE);
-
-				// Добавляем поле parent_id
-				$oMainRow1->add($oShopGroupParentSelect);*/
 
 				// Добавляем группу товаров
 				$aResult = $this->shopGroupShow('parent_id');
@@ -1070,6 +1063,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab->move($this->getField('path'), $oMainRow3);
 
 				$oDescriptionField = $this->getField('description')
+					->rows(15)
 					->wysiwyg(TRUE)
 					->template_id($template_id);
 
@@ -1091,7 +1085,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							$oShop->typograph_default_items == 1 ? 1 : 0
 						)
 						->name("exec_typograph_for_description")
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 					;
 
 					$oShopGroupDescriptionTabRow2->add($oTypographField);
@@ -1105,7 +1099,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->value(
 							$oShop->typograph_default_items == 1 ? 1 : 0
 						)
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 					;
 
 					$oShopGroupDescriptionTabRow2->add($oOpticalAlignmentField);
@@ -1864,10 +1858,12 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			case 'Shop_Item_Model':
 				$i18n = 'Shop_Item';
+				$aExclude = array();
 			break;
 			case 'Shop_Group_Model':
 			default:
 				$i18n = 'Shop_Group';
+				$aExclude = array($this->_object->id);
 		}
 
 		if ($iCountGroups < Core::$mainConfig['switchSelectToAutocomplete'])
@@ -1875,7 +1871,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$oShopGroupSelect = Admin_Form_Entity::factory('Select');
 			$oShopGroupSelect
 				->caption(Core::_($i18n . '.' . $fieldName))
-				->options(array(' … ') + self::fillShopGroup($this->_object->shop_id))
+				->options(array(' … ') + self::fillShopGroup($this->_object->shop_id, 0, $aExclude))
 				->name($fieldName)
 				->value($this->_object->$fieldName)
 				->divAttr(array('class' => 'form-group col-xs-12'))

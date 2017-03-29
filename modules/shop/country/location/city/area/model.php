@@ -20,18 +20,12 @@ class Shop_Country_Location_City_Area_Model extends Core_Entity
 	public $districts = 0;
 
 	/**
-	 * One-to-many or many-to-many relations
-	 * @var array
-	 */
-	protected $_hasMany = array(
-	);
-
-	/**
 	 * Belongs to relations
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_country_location_city' => array()
+		'shop_country_location_city' => array(),
+		'user' => array()
 	);
 
 	/**

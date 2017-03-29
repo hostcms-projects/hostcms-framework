@@ -415,7 +415,7 @@ abstract class Shop_Payment_System_Handler
 					$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
 					$oShop_Order_Item->quantity = $oShop_Cart->quantity;
 					$oShop_Order_Item->shop_item_id = $oShop_Cart->shop_item_id;
-					$oShop_Order_Item->shop_warehouse_id = $oShop_Cart->shop_warehouse_id;
+					$oShop_Order_Item->shop_warehouse_id = intval($oShop_Cart->shop_warehouse_id);
 
 					// Prices
 					$oShop_Item_Controller = new Shop_Item_Controller();
@@ -454,8 +454,8 @@ abstract class Shop_Payment_System_Handler
 					{
 						$oShop_Item_Reserved = Core_Entity::factory('Shop_Item_Reserved');
 						$oShop_Item_Reserved->shop_order_id = $this->_shopOrder->id;
-						$oShop_Item_Reserved->shop_item_id = $oShop_Order_Item->shop_item_id;
-						$oShop_Item_Reserved->shop_warehouse_id = $oShop_Order_Item->shop_warehouse_id;
+						$oShop_Item_Reserved->shop_item_id = intval($oShop_Order_Item->shop_item_id);
+						$oShop_Item_Reserved->shop_warehouse_id = intval($oShop_Order_Item->shop_warehouse_id);
 						$oShop_Item_Reserved->count = $oShop_Order_Item->quantity;
 						$oShop_Item_Reserved->save();
 					}

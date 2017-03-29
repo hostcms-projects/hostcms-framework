@@ -37,10 +37,10 @@ class Seo_Query_Position_Controller_Edit extends Admin_Form_Action_Controller_Ty
 		);
 
 		$oMainTab
-			->move($this->getField('yandex')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow1)
-			->move($this->getField('google')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow1)
-			->move($this->getField('yahoo')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2)
-			->move($this->getField('bing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow2);
+			->move($this->getField('yandex')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow1)
+			->move($this->getField('google')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow1)
+			->move($this->getField('yahoo')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow2)
+			->move($this->getField('bing')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow2);
 
 		return $this;
 	}

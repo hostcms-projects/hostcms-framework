@@ -18,13 +18,13 @@ class Tag_Dir_Model extends Core_Entity
 	 * @var string
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $site_count = '';
-	
+
 	/**
 	 * Backend property
 	 * @var string
@@ -38,6 +38,14 @@ class Tag_Dir_Model extends Core_Entity
 	protected $_hasMany = array(
 		'tag' => array(),
 		'tag_dir' => array('foreign_key' => 'parent_id')
+	);
+
+	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
 	);
 
 	/**

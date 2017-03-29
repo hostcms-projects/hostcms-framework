@@ -22,6 +22,14 @@ class Shop_Measure_Model extends Core_Entity
 	);
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+
+	/**
 	 * Default sorting for models
 	 * @var array
 	 */

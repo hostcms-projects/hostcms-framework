@@ -115,7 +115,7 @@ class Admin_Form_Action_Controller_Type_Shortcut extends Admin_Form_Action_Contr
 				->add($oAdmin_Form_Entity_Select)
 				->add(
 					Admin_Form_Entity::factory('Div')
-						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+						->class('form-group col-xs-12')
 						->add($oAdmin_Form_Entity_Button)
 				);
 

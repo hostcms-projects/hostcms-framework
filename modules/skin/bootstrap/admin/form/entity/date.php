@@ -64,7 +64,7 @@ class Skin_Bootstrap_Admin_Form_Entity_Date extends Skin_Default_Admin_Form_Enti
 
 		<script type="text/javascript">
 		(function($) {
-			$('#<?php echo $windowId?> #div_<?php echo $this->id?>').datetimepicker({locale: 'ru', format: 'DD.MM.YYYY'});
+			$('#<?php echo $windowId?> #div_<?php echo $this->id?>').datetimepicker({locale: 'ru', format: '<?php echo Core::$mainConfig['datePickerFormat']?>'});
 		})(jQuery);
 		</script><?php
 

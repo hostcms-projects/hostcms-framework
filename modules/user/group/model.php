@@ -24,6 +24,14 @@ class User_Group_Model extends Core_Entity
 	);
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+	
+	/**
 	 * List of preloaded values
 	 * @var array
 	 */

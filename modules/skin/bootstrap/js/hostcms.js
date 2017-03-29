@@ -141,7 +141,6 @@ InitiateSettings();
 InitiateWidgets();
 
 function InitiateSideMenu() {
-
     //Sidebar Toggler
     $(".page-content").on('click', '.sidebar-toggler', function () {
         $("#sidebar").toggleClass("hide");

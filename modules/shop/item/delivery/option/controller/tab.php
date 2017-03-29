@@ -156,18 +156,17 @@ class Shop_Item_Delivery_Option_Controller_Tab extends Core_Servant_Properties
 
 		foreach($aShop_Item_Delivery_Options as $oShop_Item_Delivery_Option)
 		{
-			if (!is_null(Core_Array::getPost("deliveryOptionCost_{$oShop_Item_Delivery_Option->id}")))
+			$cost = Core_Array::getPost("deliveryOptionCost_{$oShop_Item_Delivery_Option->id}");
+			
+			if (!is_null($cost) && $cost !== '')
 			{
 				$oShop_Item_Delivery_Option
 					->shop_id(intval($this->shop_id))
 					->shop_item_id(intval($this->shop_item_id))
 					->day(strval(Core_Array::getPost("deliveryOptionDay_{$oShop_Item_Delivery_Option->id}", 0)))
 					->order_before(intval(Core_Array::getPost("deliveryOptionOrderBefore_{$oShop_Item_Delivery_Option->id}", 0)))
-					->cost(Shop_Controller::instance()->convertPrice(Core_Array::getPost("deliveryOptionCost_{$oShop_Item_Delivery_Option->id}", 0)));
-
-				$oShop_Item_Delivery_Option->cost !== ''
-					? $oShop_Item_Delivery_Option->save()
-					: $oShop_Item_Delivery_Option->delete();
+					->cost(Shop_Controller::instance()->convertPrice($cost))
+					->save();
 			}
 			else
 			{
@@ -185,26 +184,29 @@ class Shop_Item_Delivery_Option_Controller_Tab extends Core_Servant_Properties
 
 			foreach ($aDeliveryOptions as $key => $deliveryOption)
 			{
-				$price = Shop_Controller::instance()->convertPrice($deliveryOption);
+				if ($deliveryOption !== '')
+				{
+					$price = Shop_Controller::instance()->convertPrice($deliveryOption);
 
-				$oShop_Item_Delivery_Option = Core_Entity::factory('Shop_Item_Delivery_Option')
-					->shop_id(intval($this->shop_id))
-					->shop_item_id(intval($this->shop_item_id))
-					->day(strval(Core_Array::get($aDeliveryOptionDay, $key)))
-					->order_before(intval(Core_Array::get($aDeliveryOptionOrderBefore, $key)))
-					->cost($price)
-					->save();
+					$oShop_Item_Delivery_Option = Core_Entity::factory('Shop_Item_Delivery_Option')
+						->shop_id(intval($this->shop_id))
+						->shop_item_id(intval($this->shop_item_id))
+						->day(strval(Core_Array::get($aDeliveryOptionDay, $key)))
+						->order_before(intval(Core_Array::get($aDeliveryOptionOrderBefore, $key)))
+						->cost($price)
+						->save();
 
-				ob_start();
-				Core::factory('Core_Html_Entity_Script')
-					->type("text/javascript")
-					->value("$(\"#{$windowId} input[name='deliveryOptionDay_\\[\\]']\").eq(0).prop('name', 'deliveryOptionDay_{$oShop_Item_Delivery_Option->id}');
-					$(\"#{$windowId} input[name='deliveryOptionOrderBefore_\\[\\]']\").eq(0).prop('name', 'deliveryOptionOrderBefore_{$oShop_Item_Delivery_Option->id}');
-					$(\"#{$windowId} input[name='deliveryOptionCost_\\[\\]']\").eq(0).prop('name', 'deliveryOptionCost_{$oShop_Item_Delivery_Option->id}');
-					")
-					->execute();
+					ob_start();
+					Core::factory('Core_Html_Entity_Script')
+						->type("text/javascript")
+						->value("$(\"#{$windowId} input[name='deliveryOptionDay_\\[\\]']\").eq(0).prop('name', 'deliveryOptionDay_{$oShop_Item_Delivery_Option->id}');
+						$(\"#{$windowId} input[name='deliveryOptionOrderBefore_\\[\\]']\").eq(0).prop('name', 'deliveryOptionOrderBefore_{$oShop_Item_Delivery_Option->id}');
+						$(\"#{$windowId} input[name='deliveryOptionCost_\\[\\]']\").eq(0).prop('name', 'deliveryOptionCost_{$oShop_Item_Delivery_Option->id}');
+						")
+						->execute();
 
-				$this->_Admin_Form_Controller->addMessage(ob_get_clean());
+					$this->_Admin_Form_Controller->addMessage(ob_get_clean());
+				}
 			}
 		}
 	}

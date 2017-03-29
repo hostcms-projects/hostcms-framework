@@ -51,6 +51,23 @@ class Shop_Controller
 	}
 
 	/**
+	 * Number of decimal digits
+	 * @var int
+	 */
+	protected $_decimalDigits = 2;
+
+	/**
+	 * Set number of decimal digits
+	 * @param string $floatFormat format
+	 * @return self
+	 */
+	public function decimalDigits($decimalDigits)
+	{
+		$this->_decimalDigits = $decimalDigits;
+		return $this;
+	}
+
+	/**
 	 * Use Banker's Rounding. Default TRUE
 	 * @var boolean
 	 */
@@ -125,8 +142,8 @@ class Shop_Controller
 	public function round($value)
 	{
 		return sprintf($this->_floatFormat, $this->_bankersRounding
-			? $this->bRound($value, 2)
-			: round($value, 2)
+			? $this->bRound($value, $this->_decimalDigits)
+			: round($value, $this->_decimalDigits)
 		);
 	}
 
@@ -155,7 +172,7 @@ class Shop_Controller
 	 */
 	public function getCurrencyCoefficientInShopCurrency(Shop_Currency_Model $oItem_Currency, Shop_Currency_Model $oShop_Currency)
 	{
-		// Определяем коэффициент пересчета в базовую валюту (НО НЕ В ВАЛЮТУ МАГАЗИНА)!
+		// Определяем коэффициент пересчета в базовую валюту
 		$fItemExchangeRate = $oItem_Currency->exchange_rate;
 		if ($fItemExchangeRate == 0)
 		{
@@ -170,7 +187,7 @@ class Shop_Controller
 		}
 
 		// Без округления
-		//return round($fItemExchangeRate / $fShopExchangeRate, 2);
+		//return round($fItemExchangeRate / $fShopExchangeRate, $this->_decimalDigits);
 		return $fItemExchangeRate / $fShopExchangeRate;
 	}
 

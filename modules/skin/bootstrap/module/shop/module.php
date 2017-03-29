@@ -60,7 +60,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 				}
 				else
 				{
-					?><div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="shopCommentsAdminPage" data-hostcmsurl="<?php echo htmlspecialchars($this->_path)?>">
+					?><div class="col-xs-12 col-sm-6" id="shopCommentsAdminPage" data-hostcmsurl="<?php echo htmlspecialchars($this->_path)?>">
 						<script type="text/javascript">
 						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopCommentsAdminPage') });
 						</script>
@@ -91,7 +91,6 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 		$oUser = Core_Entity::factory('User')->getCurrent();
 
 		$oComments = Core_Entity::factory('Comment');
-
 		$oComments->queryBuilder()
 			->straightJoin()
 			->join('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
@@ -100,6 +99,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 			->where('shop_items.deleted', '=', 0)
 			->where('shops.deleted', '=', 0)
 			->where('site_id', '=', CURRENT_SITE)
+			->clearOrderBy()
 			->orderBy('comments.datetime', 'DESC')
 			->limit(5);
 
@@ -121,7 +121,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						<a data-toggle="maximize">
 							<i class="fa fa-expand gray"></i>
 						</a>
-						<a onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopCommentsAdminPage'), 'button': $(this).find('i') });">
+						<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopCommentsAdminPage'), 'button': $(this).find('i') });">
 							<i class="fa fa-refresh gray"></i>
 						</a>
 					</div>
@@ -152,7 +152,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 								?>
 								<li class="task-item">
 									<div class="row">
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-state">
 												<span class="label label-<?php echo $masColorNames[$color == 3 ? $color = 0 : $color]; ++$color;?>">
 												<?php echo $oComment->subject != ''
@@ -161,17 +161,17 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 												</span>
 											</div>
 										</div>
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-time"><?php echo Core_Date::sql2date($oComment->datetime)?></div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-12">
+										<div class="col-xs-12">
 											<div class="task-body"><?php echo trim(htmlspecialchars(Core_Str::cut(strip_tags(html_entity_decode($oComment->text, ENT_COMPAT, 'UTF-8')), 150)))?></div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-creator pull-left">
 												<div class="btn-group pull-right">
 													<a class="btn btn-default btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#shopCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i> </a>
@@ -193,7 +193,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-assignedto pull-right"><?php
 											if ($oComment->author != '')
 											{
@@ -237,8 +237,8 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 
 		if (count($aLast_Shop_Orders))
 		{
-		?><div class="no-padding col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+		?><div class="col-xs-12 no-padding">
+			<div class="col-xs-12 col-md-9">
 				<?php
 				$iBeginTimestamp = strtotime('-1 month');
 
@@ -296,7 +296,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 					while (count($aShop_Orders));
 
 					$offset = 0;
-					
+
 					// Paid
 					do {
 						$oShop_Orders = Core_Entity::factory('Shop_Order');
@@ -340,7 +340,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 
 						<div id="sales" class="box-body tab-pane animated fadeInUp no-padding-bottom" style="padding:20px 20px 0 20px;">
 							<div class="row">
-								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+								<div class="col-xs-6 col-sm-3">
 									<div class="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
 										<div class="databox-top">
 											<div class="databox-sparkline">
@@ -358,7 +358,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 										</div>
 									</div>
 								</div>
-								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+								<div class="col-xs-6 col-sm-3">
 									<div class="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
 										<div class="databox-top">
 											<div class="databox-sparkline">
@@ -377,7 +377,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 									</div>
 								</div>
 
-								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+								<div class="col-xs-6 col-sm-3">
 									<div class="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
 										<div class="databox-top">
 											<div class="databox-sparkline">
@@ -396,7 +396,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 									</div>
 								</div>
 
-								<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+								<div class="col-xs-6 col-sm-3">
 									<div class="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
 										<div class="databox-top">
 											<div class="databox-sparkline">
@@ -453,14 +453,13 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 				</script>
 			</div>
 
-			<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+			<div class="col-xs-12 col-md-3">
 				<div class="orders-container">
 					<div class="orders-header">
 						<h6><?php echo Core::_('Shop.recent_orders')?></h6>
 					</div>
 					<ul class="orders-list">
 						<?php
-
 
 						$iAdmin_Form_Id = 75;
 						$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
@@ -476,20 +475,20 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 							?>
 							<li class="order-item">
 							<div class="row">
-								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 item-left">
+								<div class="col-xs-12 item-left">
 									<div class="item-booker<?php echo $oShop_Order->canceled ? ' line-through' : ''?>"><?php echo $oShop_Order->invoice?>, <?php echo strlen(trim($oShop_Order->company))
 										? $oShop_Order->company
 										: $oShop_Order->surname . ' ' . $oShop_Order->name . ' ' . $oShop_Order->patronymic?></div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 item-left">
+								<div class="col-xs-7 item-left">
 									<div class="item-time">
 										<i class="fa fa-<?php echo $oShop_Order->paid ? 'check' : 'calendar'?>"></i>
 										<span><?php echo Core_Date::sql2datetime($oShop_Order->datetime)?></span>
 									</div>
 								</div>
-								<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 item-right">
+								<div class="col-xs-5 item-right">
 									<div class="item-price">
 										<span class="price"><?php echo $oShop_Order->getAmount()?></span> <span class="currency"><?php echo htmlspecialchars($oShop_Order->Shop_Currency->name)?></span>
 									</div>

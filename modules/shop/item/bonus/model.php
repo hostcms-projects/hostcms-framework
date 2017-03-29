@@ -24,7 +24,8 @@ class Shop_Item_Bonus_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_bonus' => array()
+		'shop_bonus' => array(),
+		'user' => array()
 	);
 
 	/**

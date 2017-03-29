@@ -81,7 +81,7 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 			);
 
 		$this->class .= ' form-control';
-		$this->divAttr = array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12');
+		$this->divAttr = array('class' => 'form-group col-xs-12');
 	}
 
 	/**

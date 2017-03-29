@@ -20,6 +20,14 @@ class Ipaddress_Model extends Core_Entity
 	protected $_nameColumn = 'ip';
 
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -62,7 +70,7 @@ class Ipaddress_Model extends Core_Entity
 		$this->save();
 		return $this;
 	}
-	
+
 	/**
 	 * Change statistic mode
 	 * @return self

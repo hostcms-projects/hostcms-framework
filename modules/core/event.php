@@ -54,7 +54,7 @@ class Core_Event
 	{
 		if (isset(self::$_attached[$eventName]))
 		{
-			foreach (self::$_attached[$eventName] AS $key => $value)
+			foreach (self::$_attached[$eventName] as $key => $value)
 			{
 				if ($function === $value)
 				{

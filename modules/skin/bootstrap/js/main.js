@@ -989,11 +989,8 @@ function cSelectFilter(windowId, sObjectId)
  *
  * @windowId
  * @ASelectedItem код выбранного элемента
- * @structure_id идентификатор структуры
- * @lib_dir_id раздел типовых динамически страниц
- * @lib_id идентификатор типовых динамически страниц
  */
-function SetViewStructure(windowId, ASelectedItem, iStructureId, iLibDirId, iLibId)
+function SetViewStructure(windowId, ASelectedItem)
 {
 	windowId = $.getWindowId(windowId);
 
@@ -1531,21 +1528,16 @@ function declension(number, nominative, genitive_singular, genitive_plural)
 // /-- Проверка ячеек
 
 // http://www.tinymce.com/wiki.php/How-to_implement_a_custom_file_browser
-function HostCMSFileManager(defaultpath)
+function HostCMSFileManager()
 {
-	this.defaultpath = defaultpath;
-
 	this.fileBrowserCallBack = function(field_name, url, type, win)
 	{
 		this.field = field_name;
 		this.callerWindow = win;
 
-		if (url == '') {
-			url = this.defaultpath;
-		}
 		url = url.split('\\').join('/');
 
-		var cdir = '/', dir = '', lastPos = url.lastIndexOf('/');
+		var cdir = '', dir = '', lastPos = url.lastIndexOf('/');
 
 		if (lastPos != -1)
 		{
@@ -1561,7 +1553,7 @@ function HostCMSFileManager(defaultpath)
 			}
 		}
 
-		var path = "/admin/wysiwyg/filemanager/index.php?field_name=" + field_name + "&cdir=" + cdir + "&dir=" + dir + "&type=" + type, width = 700, height = 500;
+		var path = "/admin/wysiwyg/filemanager/index.php?field_name=" + field_name + "&cdir=" + cdir + "&dir=" + dir + "&type=" + type, width = screen.width / 1.2, height = screen.height / 1.2;
 
 		var x = parseInt(screen.width / 2.0) - (width / 2.0), y = parseInt(screen.height / 2.0) - (height / 2.0);
 

@@ -22,6 +22,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - forbiddenTags(array('name')) массив тегов узла структуры, запрещенных к передаче в генерируемый XML
  * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
+ * - onStep(3000) количество элементов, выбираемых запросом за 1 шаг, по умолчанию 500
  *
  * Доступные свойства:
  *
@@ -68,6 +69,7 @@ class Structure_Controller_Show extends Core_Controller
 		'cache',
 		'currentStructureId',
 		'showPanel',
+		'onStep',
 	);
 
 	/**
@@ -131,6 +133,8 @@ class Structure_Controller_Show extends Core_Controller
 		$this->showPanel = $this->cache = TRUE;
 
 		$this->currentStructureId = Core_Page::instance()->structure->id;
+		
+		$this->onStep = 500;
 	}
 
 	/**
@@ -304,7 +308,7 @@ class Structure_Controller_Show extends Core_Controller
 	{
 		$oSite = $this->getEntity();
 
-		$aInformationsystems = $oSite->Informationsystems->findAll();
+		$aInformationsystems = $oSite->Informationsystems->findAll(FALSE);
 		foreach ($aInformationsystems as $oInformationsystem)
 		{
 			$oInformationsystem->structure_id && $this->_Informationsystems[$oInformationsystem->structure_id] = $oInformationsystem;
@@ -463,7 +467,7 @@ class Structure_Controller_Show extends Core_Controller
 
 		Core_Event::notify(get_class($this) . '.onBeforeFindInformationsystemGroups', $this, array($oInformationsystem_Groups, $parentObject, $oInformationsystem));
 
-		$aInformationsystem_Groups = $oInformationsystem_Groups->findAll();
+		$aInformationsystem_Groups = $oInformationsystem_Groups->findAll(FALSE);
 		foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
 		{
 			$this->_aInformationsystem_Groups[$oInformationsystem_Group->parent_id][] = $oInformationsystem_Group;
@@ -526,7 +530,7 @@ class Structure_Controller_Show extends Core_Controller
 
 			Core_Event::notify(get_class($this) . '.onBeforeFindInformationsystemItems', $this, array($oInformationsystem_Items, $parentObject, $oInformationsystem));
 
-			$aInformationsystem_Items = $oInformationsystem_Items->findAll();
+			$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
 			foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 			{
 				$this->_aInformationsystem_Items[$oInformationsystem_Item->informationsystem_group_id][] = $oInformationsystem_Item;
@@ -669,7 +673,7 @@ class Structure_Controller_Show extends Core_Controller
 
 		Core_Event::notify(get_class($this) . '.onBeforeFindShopGroups', $this, array($oShop_Groups, $parentObject, $oShop));
 
-		$aShop_Groups = $oShop_Groups->findAll();
+		$aShop_Groups = $oShop_Groups->findAll(FALSE);
 		foreach ($aShop_Groups as $oShop_Group)
 		{
 			$this->_aShop_Groups[$oShop_Group->parent_id][] = $oShop_Group;
@@ -678,66 +682,84 @@ class Structure_Controller_Show extends Core_Controller
 		// Shop's items
 		if ($this->showShopItems)
 		{
-			$oShop_Items = $oShop->Shop_Items;
-			$oShop_Items->queryBuilder()
-				->select('shop_items.*')
-				->open()
-				->where('shop_items.start_datetime', '<', $dateTime)
-				->setOr()
-				->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
-				->close()
-				->setAnd()
-				->open()
-				->where('shop_items.end_datetime', '>', $dateTime)
-				->setOr()
-				->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
-				->close()
-				->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
-				->where('shop_items.modification_id', '=', 0)
-				->clearOrderBy();
-
-			switch ($oShop->items_sorting_direction)
-			{
-				case 1:
-					$items_sorting_direction = 'DESC';
-				break;
-				case 0:
-				default:
-					$items_sorting_direction = 'ASC';
-			}
-
-			// Определяем поле сортировки информационных элементов
-			switch ($oShop->items_sorting_field)
-			{
-				case 1:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.name', $items_sorting_direction)
-						->orderBy('shop_items.sorting', $items_sorting_direction);
-					break;
-				case 2:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.sorting', $items_sorting_direction)
-						->orderBy('shop_items.name', $items_sorting_direction);
-					break;
-				case 0:
-				default:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.datetime', $items_sorting_direction)
-						->orderBy('shop_items.sorting', $items_sorting_direction);
-			}
-
 			$this->_aShop_Items = array();
+			
+			$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
+			$oCore_QueryBuilder_Select
+				->from('shop_items')
+				->where('shop_items.shop_id', '=', $oShop->id)
+				->where('shop_items.deleted', '=', 0);
 
-			Core_Event::notify(get_class($this) . '.onBeforeFindShopItems', $this, array($oShop_Items, $parentObject, $oShop));
+			$aRow = $oCore_QueryBuilder_Select->execute()->asAssoc()->current();
 
-			$aShop_Items = $oShop_Items->findAll();
-			foreach ($aShop_Items as $oShop_Item)
-			{
-				$this->_aShop_Items[$oShop_Item->shop_group_id][] = $oShop_Item;
+			$maxId = $aRow['max_id'];
+
+			$iFrom = 0;
+
+			do {
+				$oShop_Items = $oShop->Shop_Items;
+				$oShop_Items->queryBuilder()
+					->select('shop_items.*')
+					->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->onStep))
+					->open()
+					->where('shop_items.start_datetime', '<', $dateTime)
+					->setOr()
+					->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+					->close()
+					->setAnd()
+					->open()
+					->where('shop_items.end_datetime', '>', $dateTime)
+					->setOr()
+					->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+					->close()
+					->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
+					->where('shop_items.modification_id', '=', 0)
+					->clearOrderBy();
+
+				switch ($oShop->items_sorting_direction)
+				{
+					case 1:
+						$items_sorting_direction = 'DESC';
+					break;
+					case 0:
+					default:
+						$items_sorting_direction = 'ASC';
+				}
+
+				// Определяем поле сортировки информационных элементов
+				switch ($oShop->items_sorting_field)
+				{
+					case 1:
+						$oShop_Items
+							->queryBuilder()
+							->orderBy('shop_items.name', $items_sorting_direction)
+							->orderBy('shop_items.sorting', $items_sorting_direction);
+						break;
+					case 2:
+						$oShop_Items
+							->queryBuilder()
+							->orderBy('shop_items.sorting', $items_sorting_direction)
+							->orderBy('shop_items.name', $items_sorting_direction);
+						break;
+					case 0:
+					default:
+						$oShop_Items
+							->queryBuilder()
+							->orderBy('shop_items.datetime', $items_sorting_direction)
+							->orderBy('shop_items.sorting', $items_sorting_direction);
+				}
+
+				Core_Event::notify(get_class($this) . '.onBeforeFindShopItems', $this, array($oShop_Items, $parentObject, $oShop));
+
+				$aShop_Items = $oShop_Items->findAll(FALSE);
+				foreach ($aShop_Items as $oShop_Item)
+				{
+					$this->_aShop_Items[$oShop_Item->shop_group_id][] = $oShop_Item;
+				}
+			
+				$iFrom += $this->onStep;
 			}
+			while ($iFrom < $maxId);
 		}
 
 		$this->_addShopGroupsByParentId(0, $parentObject);

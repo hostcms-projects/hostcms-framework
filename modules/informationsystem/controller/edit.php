@@ -279,46 +279,46 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 
 				// Форматы
 				$this->getField('format_date')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 				$this->getField('format_datetime')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainTab
 					->move($this->getField('format_date'), $oFormatsRow1)
 					->move($this->getField('format_datetime'), $oFormatsRow1);
 
 				$this->getField('image_large_max_width')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 				$this->getField('image_large_max_height')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainTab
 					->move($this->getField('image_large_max_width'), $oFormatsRow2)
 					->move($this->getField('image_large_max_height'), $oFormatsRow2);
 
 				$this->getField('image_small_max_width')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 				$this->getField('image_small_max_height')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainTab
 					->move($this->getField('image_small_max_width'), $oFormatsRow3)
 					->move($this->getField('image_small_max_height'), $oFormatsRow3);
 
 				$this->getField('group_image_large_max_width')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$this->getField('group_image_large_max_height')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainTab
 					->move($this->getField('group_image_large_max_width'), $oFormatsRow4)
 					->move($this->getField('group_image_large_max_height'), $oFormatsRow4);
 
 				$this->getField('group_image_small_max_width')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 				$this->getField('group_image_small_max_height')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 				$oMainTab
 					->move($this->getField('group_image_small_max_width'), $oFormatsRow5)
 					->move($this->getField('group_image_small_max_height'), $oFormatsRow5);
@@ -371,10 +371,10 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->move($this->getField('watermark_default_position_y'), $oImageRow8);
 
 				$this->getField('watermark_default_position_x')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$this->getField('watermark_default_position_y')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 			break;
 			case 'informationsystem_dir':

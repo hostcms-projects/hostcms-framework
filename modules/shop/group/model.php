@@ -96,7 +96,8 @@ class Shop_Group_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop_group' => array('foreign_key' => 'parent_id'),
 		'shop' => array(),
-		'siteuser_group' => array()
+		'siteuser_group' => array(),
+		'user' => array()
 	);
 
 	/**
@@ -990,9 +991,13 @@ class Shop_Group_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
-		$this->clearXmlTags()
-			->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath())
-			->addXmlTag('dir', $this->getGroupHref());
+		$this->clearXmlTags();
+			
+		!isset($this->_forbiddenTags['url'])
+			&& $this->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
+			
+		!isset($this->_forbiddenTags['dir'])
+			&& $this->addXmlTag('dir', $this->getGroupHref());
 
 		if ($this->_showXmlProperties)
 		{

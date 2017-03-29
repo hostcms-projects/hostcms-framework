@@ -124,13 +124,13 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oAdditionalTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 		;
 
-		$oMainTab->move($this->getField('postcode')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow3);
+		$oMainTab->move($this->getField('postcode')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow3);
 		$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-9 col-md-9 col-sm-9 col-xs-12')), $oContactsTabRow3);
 
-		$oMainTab->move($this->getField('surname')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
-		$oMainTab->move($this->getField('name')->class('form-control')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
-		$oMainTab->move($this->getField('patronymic')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
-		$oMainTab->move($this->getField('company')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('surname')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('name')->class('form-control')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('patronymic')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
+		$oMainTab->move($this->getField('company')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oContactsTabRow4);
 
 		$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
 		$oMainTab->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4 col-xs-6')), $oContactsTabRow5);
@@ -143,9 +143,9 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oAdditionalTab->move($this->getField('shop_id')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow1);
 		$oAdditionalTab->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oAdditionalTabRow2);
 
-		$oMainTab->move($this->getField('invoice')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
-		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow1);
-		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')), $oMainRow1);
+		$oMainTab->move($this->getField('invoice')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow1);
+		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow1);
+		$oAdditionalTab->move($this->getField('siteuser_id')->divAttr(array('class' => 'form-group col-xs-6 col-sm-3')), $oMainRow1);
 
 		if ($this->_object->siteuser_id && Core::moduleIsActive('siteuser'))
 		{
@@ -153,7 +153,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oSiteuserLink = Admin_Form_Entity::factory('Link');
 			$oSiteuserLink
-				->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+				->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-6 col-sm-3'))
 				->a
 					->class('btn btn-labeled btn-sky')
 					->href($this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/siteuser/siteuser/index.php', 'edit', NULL, 0, $oSiteuser->id))
@@ -174,12 +174,12 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->getAmount())
 					->readonly('readonly')
 					->caption(Core::_("Shop_Order.cond_of_delivery_add_form_price_order"))
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'))
 			)
 			->add(
 				Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Order.order_currency'))
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'))
 					->options(
 						$Shop_Controller_Edit->fillCurrencies()
 					)
@@ -197,7 +197,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oItemsLink = Admin_Form_Entity::factory('Link');
 		$oItemsLink
-			->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
+			->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-12 col-sm-3'))
 			->a
 				->class('btn btn-labeled btn-success')
 				->href($this->_Admin_Form_Controller->getAdminLoadHref(
@@ -215,17 +215,17 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow2->add($oItemsLink);
 
 		$oMainTab->move($this->getField('paid')->divAttr(
-				array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')
+				array('class' => 'form-group col-xs-6 col-sm-3')
 			), $oMainRow3);
 		$oMainTab->move($this->getField('canceled')->divAttr(
-				array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6')
+				array('class' => 'form-group col-xs-6 col-sm-3')
 			), $oMainRow3);
 
-		$oMainTab->move($this->getField('payment_datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow4);
+		$oMainTab->move($this->getField('payment_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow4);
 
 		$oMainRow4->add(
 			Admin_Form_Entity::factory('Select')
-				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-3'))
 				->caption(Core::_('Shop_Order.system_of_pay'))
 				->options(
 					$this->_fillPaymentSystems(Core_Array::getGet('shop_id', 0))
@@ -243,14 +243,14 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->name('shop_order_status_id')
 				->value($this->_object->shop_order_status_id)
 				->onchange("$.changeOrderStatus('{$windowId}')")
-				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-3'))
 		);
 
 		$oMainTab->move($this->getField('status_datetime')
 			->id('status_datetime')
-			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow5);
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow5);
 
-		$oMainTab->move($this->getField('ip')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-12')), $oMainRow5);
+		$oMainTab->move($this->getField('ip')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow5);
 
 		$this->getField('status_datetime');
 
@@ -273,7 +273,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$CountriesSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_id')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 				$Shop_Controller_Edit->fillCountries()
 			)
@@ -291,7 +291,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('shop_country_location_id')
 			->id('list2')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocations($this->_object->shop_country_id)
 				)
@@ -309,7 +309,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('shop_country_location_city_id')
 			->id('list3')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocationCities($this->_object->shop_country_location_id)
 				)
@@ -328,7 +328,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				->name('shop_country_location_city_area_id')
 				->id('list4')
 				->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))
-				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 				->options(
 					$Shop_Controller_Edit->fillCountryLocationCityAreas($this->_object->shop_country_location_city_id)
 				)
@@ -349,7 +349,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('shop_delivery_id')
 			->value($this->_object->shop_delivery_id)
 			->onchange("$.ajaxRequest({path: '/admin/shop/order/index.php',context: 'shop_delivery_condition_id', callBack: $.loadSelectOptionsCallback, objectId: {$objectId}, action: 'loadDeliveryConditionsList',additionalParams: 'delivery_id=' + this.value,windowId: '{$windowId}'}); return false")
-			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+			->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
 
 		$oMainRow6->add($oShopDeliveryTypeSelect);
 
@@ -368,7 +368,7 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				)
 				->name('shop_delivery_condition_id')
 				->value($this->_object->shop_delivery_condition_id)
-				->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+				->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'))
 		);
 
 		$iOrderId = intval($this->_object->id);

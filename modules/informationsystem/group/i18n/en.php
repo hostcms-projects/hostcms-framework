@@ -15,8 +15,9 @@ return array(
 	'show_information_groups_link4' => 'Properties',
 	'information_groups_add_form_title' => 'Add information group',
 	'information_groups_edit_form_title' => 'Edit information group',
-	'information_groups_form_tab_seo' => 'SEO',
-	'information_groups_form_tab_properties' => 'Additional properties',
+	'tab_1' => 'Description',
+	'tab_2' => 'SEO',
+	'tab_3' => 'Additional properties',
 
 	'id' => 'Id',
 	'informationsystem_id' => 'Informationsystem id',

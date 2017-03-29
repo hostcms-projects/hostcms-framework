@@ -39,8 +39,8 @@ class Shop_Bonus_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('description')->wysiwyg(TRUE);
 		$oMainTab->move($this->getField('description')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow2);
-		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
-		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow3);
+		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow3);
 
 		$oMainTab->move($this->getField('active')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oMainRow4);
 

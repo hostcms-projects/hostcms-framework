@@ -27,7 +27,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	 */
 	protected $_belongsTo = array(
 		'shop' => array(),
-		'shop_item' =>array()
+		'shop_item' =>array(),
+		'user' => array()
 	);
 
 	/**
@@ -38,6 +39,15 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 		'value' => 0,
 		'active' => 1,
 		'type' => 0
+	);
+
+	/**
+	 * Forbidden tags. If list of tags is empty, all tags will be shown.
+	 * @var array
+	 */
+	protected $_forbiddenTags = array(
+		'start_datetime',
+		'end_datetime',
 	);
 
 	/**
@@ -113,7 +123,18 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
+		$oShop = $this->Shop;
+
 		$this->clearXmlTags();
+
+		$this->addXmlTag('start_datetime', $this->start_datetime == '0000-00-00 00:00:00'
+			? $this->start_datetime
+			: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->start_datetime)));
+
+		$this->addXmlTag('end_datetime', $this->end_datetime == '0000-00-00 00:00:00'
+			? $this->end_datetime
+			: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
+
 		$this->type == 0
 			? $this->addXmlTag('percent', $this->value)
 			: $this->addXmlTag('amount', $this->value);

@@ -42,20 +42,20 @@ class Schedule_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('start_datetime')
 			->class('input-lg')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-12 col-xs-12'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-md-4'));
 
 		$this->getField('datetime')
 			->class('input-lg')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-12 col-xs-12'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-md-4'));
 
-		$this->getField('entity_id')
+		$this->getField('interval')
 			->class('input-lg')
-			->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-12 col-xs-12'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-md-4'));
 
 		$oMainTab
 			->move($this->getField('start_datetime'), $oMainRow1)
 			->move($this->getField('datetime'), $oMainRow1)
-			->move($this->getField('entity_id'), $oMainRow1);
+			->move($this->getField('interval'), $oMainRow1);
 
 		$oAdditionalTab->delete($this->getField('module_id'));
 
@@ -64,7 +64,7 @@ class Schedule_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			Admin_Form_Entity::factory('Select')
 				->name('module_id')
 				->caption(Core::_('Schedule.module_id'))
-				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 				->options(
 					array(' … ') + $this->fillModules()
 				)
@@ -83,9 +83,11 @@ class Schedule_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->id('scheduleAction')
 			->name('action')
 			->caption(Core::_('Schedule.action'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
 			->options(count($aModuleActions) ? $aModuleActions : array(' … '))
 			->value($this->_object->action));
+
+		$oMainTab->move($this->getField('entity_id')->divAttr(array('class' => 'form-group col-xs-12 col-md-4')), $oMainRow2);
 
 		$oMainTab->move($this->getField('description'), $oMainRow3);
 

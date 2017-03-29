@@ -55,7 +55,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 		$CountriesSelectField = Admin_Form_Entity::factory('Select')
 			->name('shop_country_id')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountries()
 				)
@@ -73,7 +73,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			->name('shop_country_location_id')
 			->id('list2')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocations($this->_object->shop_country_id)
 				)
@@ -91,7 +91,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			->name('shop_country_location_city_id')
 			->id('list3')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocationCities($this->_object->shop_country_location_id)
 				)
@@ -106,7 +106,7 @@ class Shop_Warehouse_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 			->name('shop_country_location_city_area_id')
 			->id('list4')
 			->caption(Core::_('Shop_Delivery_Condition.shop_country_location_city_area_id'))
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
 			->options(
 					$Shop_Controller_Edit->fillCountryLocationCityAreas($this->_object->shop_country_location_city_id)
 				)

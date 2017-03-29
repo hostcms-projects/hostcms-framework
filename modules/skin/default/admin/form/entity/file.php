@@ -60,10 +60,10 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 
 		$aTypicalLargeParams = array(
 			// image_big_max_width - значение максимальной ширины большого изображения;
-			'max_width' => MAX_SIZE_LOAD_IMAGE_BIG,
+			'max_width' => defined('MAX_SIZE_LOAD_IMAGE_BIG') ? MAX_SIZE_LOAD_IMAGE_BIG : 0,
 
 			// image_big_max_height - значение максимальной высоты большого изображения;
-			'max_height' => MAX_SIZE_LOAD_IMAGE_BIG,
+			'max_height' => defined('MAX_SIZE_LOAD_IMAGE_BIG') ? MAX_SIZE_LOAD_IMAGE_BIG : 0,
 
 			// big_image_path - адрес большого загруженного изображения
 			'path' => '',
@@ -122,10 +122,10 @@ class Skin_Default_Admin_Form_Entity_File extends Admin_Form_Entity_Input
 			'show' => TRUE,
 
 			// image_small_max_width - значение максимальной ширины малого изображения;
-			'max_width' => MAX_SIZE_LOAD_IMAGE,
+			'max_width' => defined('MAX_SIZE_LOAD_IMAGE') ? MAX_SIZE_LOAD_IMAGE : 0,
 
 			// image_small_max_height - значение максимальной высоты малого изображения;
-			'max_height' => MAX_SIZE_LOAD_IMAGE,
+			'max_height' => defined('MAX_SIZE_LOAD_IMAGE') ? MAX_SIZE_LOAD_IMAGE : 0,
 
 			// small_image_path - адрес малого загруженного изображения
 			'path' => '',

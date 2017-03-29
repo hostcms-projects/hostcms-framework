@@ -18,13 +18,13 @@ class Template_Dir_Model extends Core_Entity
 	 * @var int
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var int
 	 */
 	public $tempalte_sections = 0;
-	
+
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
@@ -40,7 +40,8 @@ class Template_Dir_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'template_dir' => array('foreign_key' => 'parent_id'),
-		'site' => array()
+		'site' => array(),
+		'user' => array()
 	);
 
 	/**

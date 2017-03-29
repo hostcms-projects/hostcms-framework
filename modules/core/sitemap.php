@@ -170,6 +170,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 				$iFrom = 0;
 
+				$aGroupsIDs = array();
+
 				$path = $sProtocol . $oSite_Alias->name . $oInformationsystem->Structure->getPath();
 
 				do {
@@ -179,7 +181,7 @@ class Core_Sitemap extends Core_Servant_Properties
 							'informationsystem_groups.informationsystem_id',
 							'informationsystem_groups.parent_id',
 							'informationsystem_groups.path'
-							)
+						)
 						->where('informationsystem_groups.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 						->where('informationsystem_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 						->where('informationsystem_groups.active', '=', 1)
@@ -191,6 +193,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 					foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
 					{
+						$aGroupsIDs[$oInformationsystem_Group->id] = $oInformationsystem_Group->id;
+
 						$this->addNode($path . $oInformationsystem_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
 					}
 					$iFrom += $this->limit;
@@ -218,18 +222,18 @@ class Core_Sitemap extends Core_Servant_Properties
 								'informationsystem_items.informationsystem_group_id',
 								'informationsystem_items.shortcut_id',
 								'informationsystem_items.path'
-								)
+							)
 							->where('informationsystem_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 							->open()
-							->where('informationsystem_items.start_datetime', '<', $dateTime)
-							->setOr()
-							->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
+								->where('informationsystem_items.start_datetime', '<', $dateTime)
+								->setOr()
+								->where('informationsystem_items.start_datetime', '=', '0000-00-00 00:00:00')
 							->close()
 							->setAnd()
 							->open()
-							->where('informationsystem_items.end_datetime', '>', $dateTime)
-							->setOr()
-							->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
+								->where('informationsystem_items.end_datetime', '>', $dateTime)
+								->setOr()
+								->where('informationsystem_items.end_datetime', '=', '0000-00-00 00:00:00')
 							->close()
 							->where('informationsystem_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 							->where('informationsystem_items.active', '=', 1)
@@ -241,13 +245,18 @@ class Core_Sitemap extends Core_Servant_Properties
 						$aInformationsystem_Items = $oInformationsystem_Items->findAll(FALSE);
 						foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 						{
-							$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+							if (isset($aGroupsIDs[$oInformationsystem_Item->informationsystem_group_id]))
+							{
+								$this->addNode($path . $oInformationsystem_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+							}
 						}
 
 						$iFrom += $this->limit;
 					}
 					while ($iFrom < $maxId);
 				}
+
+				unset($aGroupsIDs);
 			}
 
 			// Shop
@@ -265,6 +274,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 				$iFrom = 0;
 
+				$aGroupsIDs = array();
+
 				$path = $sProtocol . $oSite_Alias->name . $oShop->Structure->getPath();
 
 				do {
@@ -274,7 +285,7 @@ class Core_Sitemap extends Core_Servant_Properties
 							'shop_groups.shop_id',
 							'shop_groups.parent_id',
 							'shop_groups.path'
-							)
+						)
 						->where('shop_groups.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 						->where('shop_groups.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 						->where('shop_groups.active', '=', 1)
@@ -286,6 +297,8 @@ class Core_Sitemap extends Core_Servant_Properties
 
 					foreach ($aShop_Groups as $oShop_Group)
 					{
+						$aGroupsIDs[$oShop_Group->id] = $oShop_Group->id;
+
 						$this->addNode($path . $oShop_Group->getPath(), $oStructure->changefreq, $oStructure->priority);
 					}
 
@@ -316,17 +329,17 @@ class Core_Sitemap extends Core_Servant_Properties
 								'shop_items.modification_id',
 								'shop_items.path'
 								)
-							->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))	
+							->where('shop_items.id', 'BETWEEN', array($iFrom + 1, $iFrom + $this->limit))
 							->open()
-							->where('shop_items.start_datetime', '<', $dateTime)
-							->setOr()
-							->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+								->where('shop_items.start_datetime', '<', $dateTime)
+								->setOr()
+								->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
 							->close()
 							->setAnd()
 							->open()
-							->where('shop_items.end_datetime', '>', $dateTime)
-							->setOr()
-							->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+								->where('shop_items.end_datetime', '>', $dateTime)
+								->setOr()
+								->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 							->close()
 							->where('shop_items.siteuser_group_id', 'IN', $this->_aSiteuserGroups)
 							->where('shop_items.active', '=', 1)
@@ -338,17 +351,22 @@ class Core_Sitemap extends Core_Servant_Properties
 							&& $oShop_Items->queryBuilder()->where('shop_items.modification_id', '=', 0);
 
 						Core_Event::notify('Core_Sitemap.onBeforeSelectShopItems', $this, array($oShop_Items));
-						
+
 						$aShop_Items = $oShop_Items->findAll(FALSE);
 						foreach ($aShop_Items as $oShop_Item)
 						{
-							$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+							if (isset($aGroupsIDs[$oShop_Item->shop_group_id]))
+							{
+								$this->addNode($path . $oShop_Item->getPath(), $oStructure->changefreq, $oStructure->priority);
+							}
 						}
 
 						$iFrom += $this->limit;
 					}
 					while ($iFrom < $maxId);
 				}
+
+				unset($aGroupsIDs);
 			}
 
 			// Structure

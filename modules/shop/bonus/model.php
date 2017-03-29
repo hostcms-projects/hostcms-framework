@@ -27,7 +27,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	 */
 	protected $_belongsTo = array(
 		'shop' => array(),
-		'shop_item' =>array()
+		'shop_item' => array(),
+		'user' => array()
 	);
 
 	/**

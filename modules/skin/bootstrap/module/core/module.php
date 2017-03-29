@@ -215,7 +215,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 								<div class="ticket-type col-lg-2 col-sm-6 col-xs-6">
 									<span class="divider hidden-xs"></span>
 									<i class="fa fa-user"></i>
-									<span class="type"><?php echo htmlspecialchars($aLine[1])?></span>
+									<span class="type user-login"><?php echo htmlspecialchars($aLine[1])?></span>
 								</div>
 								<div class="ticket-state bg-<?php echo $statusColorName?>">
 									<i class="fa <?php echo $statusCharClassName?>"></i>
@@ -561,7 +561,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 			$aUser_Notes = $oUser->User_Notes->findAll(FALSE);
 
 			?><div id="overview" class="row">
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="col-xs-12">
 					<div class="widget">
 						<div class="widget-header bordered-bottom bordered-darkorange">
 							<i class="widget-icon fa fa-tasks darkorange"></i>

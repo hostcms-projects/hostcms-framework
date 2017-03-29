@@ -33,7 +33,8 @@ class Shop_Warehouse_Model extends Core_Entity
 		'shop_country' => array(),
 		'shop_country_location' => array(),
 		'shop_country_location_city' => array(),
-		'shop_country_location_city_area' => array()
+		'shop_country_location_city_area' => array(),
+		'user' => array()
 	);
 
 	/**

@@ -134,7 +134,7 @@ class User_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					'show' => FALSE
 				)
 			)
-			->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-12'));
+			->divAttr(array('class' => 'form-group col-xs-12'));
 		$oMainRow3->add($oImageField);
 
 		$oMainTab->delete($this->getField('settings'));

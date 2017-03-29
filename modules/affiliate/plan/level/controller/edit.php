@@ -61,7 +61,7 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 		$oAffiliatePlanField
 			->name('affiliate_plan_id')
 			->caption(Core::_('Affiliate_Plan_Level.affiliate_plan_id'))
-			->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
 			->options(
 				$this->_fillAffiliatePlans($this->_object->Affiliate_Plan->site_id)
 			)

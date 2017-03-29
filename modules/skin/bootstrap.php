@@ -126,9 +126,7 @@ class Skin_Bootstrap extends Core_Skin
 		<?php
 		if (Core_Auth::logged())
 		{
-			// Получаем данные о корневом пути для группы, в которой размещен текущий пользователь
-			$oUser = Core_Entity::factory('User')->getCurrent();
-			?>var HostCMSFileManager = new HostCMSFileManager('<?php echo Core_Str::escapeJavascriptVariable($oUser ? $oUser->User_Group->root_dir : '')?>');
+			?>var HostCMSFileManager = new HostCMSFileManager();
 
 			<?php if (!defined('CONFIRM_CLOSE_BROWSER') || CONFIRM_CLOSE_BROWSER)
 			{
@@ -238,7 +236,7 @@ class Skin_Bootstrap extends Core_Skin
 											foreach ($aAdmin_Languages as $oAdmin_Language)
 											{
 												?><li>
-												<a <?php echo Core_Array::get($_SESSION, 'current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . $oAdmin_Language->shortname . '"' : ''?> onmousedown="$(window).off('beforeunload')">
+												<a <?php echo Core_Array::getSession('current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . $oAdmin_Language->shortname . '"' : ''?> onmousedown="$(window).off('beforeunload')">
 
 													<div class="clearfix">
 														<div class="notification-icon">
@@ -249,7 +247,7 @@ class Skin_Bootstrap extends Core_Skin
 														</div>
 														<div class="notification-extra">
 															<?php
-															if (Core_Array::get($_SESSION, 'current_lng') == $oAdmin_Language->shortname)
+															if (Core_Array::getSession('current_lng') == $oAdmin_Language->shortname)
 															{
 																?><i class="fa fa-check-circle-o pull-right green"></i><?php
 															}

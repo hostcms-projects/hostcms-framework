@@ -53,7 +53,8 @@ class Tag_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'tag_dir' => array()
+		'tag_dir' => array(),
+		'user' => array()
 	);
 
 	/**

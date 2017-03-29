@@ -32,7 +32,8 @@ class Admin_Form_Action_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'admin_word' => array(),
-		'admin_form' => array()
+		'admin_form' => array(),
+		'user' => array()
 	);
 
 	/**

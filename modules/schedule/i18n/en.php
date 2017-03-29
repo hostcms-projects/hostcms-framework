@@ -21,6 +21,7 @@ return array(
 	'action' => 'Action',
 	'entity_id' => 'Entity ID',
 	'completed' => 'Active',
+	'interval' => '<acronym title="Interval (sec.)">Interval</acronym>',
 	'site_id' => 'Site ID',
 	'id' => 'Task ID',
 	'edit_success' => "Task added successfully!",

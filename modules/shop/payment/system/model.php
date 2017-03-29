@@ -14,20 +14,21 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Payment_System_Model extends Core_Entity
 {
 	/**
-	 * Belongs to relations
-	 * @var array
-	 */
-	protected $_belongsTo = array(
-		'shop' => array(),
-		'shop_currency' => array()
-	);
-
-	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
 	 */
 	protected $_hasMany = array(
 		'shop_delivery_payment_system' => array()
+	);
+
+	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'shop' => array(),
+		'shop_currency' => array(),
+		'user' => array()
 	);
 
 	/**
@@ -117,9 +118,9 @@ class Shop_Payment_System_Model extends Core_Entity
 		} catch (Exception $e) {}
 
 		$this->Shop_Delivery_Payment_Systems->deleteAll(FALSE);
-		
+
 		// Удаляем файл изображения
-		$this->deleteImage();		
+		$this->deleteImage();
 
 		return parent::delete($primaryKey);
 	}

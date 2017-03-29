@@ -372,7 +372,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 								?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
 
-								$fieldName = $oAdmin_Form_Field_Changed->name;
+								$fieldName = $this->getFieldName($oAdmin_Form_Field_Changed->name);
 
 								try
 								{
@@ -667,7 +667,8 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 								$iActionsCount = 0;
 
 								// Подмена массива действий через событие
-								$aActions = Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
+								Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
+								$aActions = Core_Event::getLastReturn();
 
 								!is_array($aActions)
 									&& $aActions = $aAllowed_Admin_Form_Actions;

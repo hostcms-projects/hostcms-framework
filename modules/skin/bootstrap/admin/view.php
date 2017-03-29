@@ -110,29 +110,24 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 			}
 			?>
 			<div id="id_message"><?php echo $this->message?></div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="widget">
-						<div class="widget-body">
-
-							<div class="table-toolbar">
-								<?php $this->showFormMenus()?>
-								<?php
-								if (strlen($this->pageSelector))
-								{
-								?>
-								<div class="pull-right" id="editabledatatable_length">
-									<label><?php echo $this->pageSelector?></label>
-								</div>
-								<?php
-								}
-								?>
-							</div>
-
-							<?php $this->showChildren()?>
-							<?php echo $this->content?>
+			<div class="widget">
+				<div class="widget-body">
+					<div class="table-toolbar">
+						<?php $this->showFormMenus()?>
+						<?php
+						if (strlen($this->pageSelector))
+						{
+						?>
+						<div class="pull-right" id="editabledatatable_length">
+							<label><?php echo $this->pageSelector?></label>
 						</div>
+						<?php
+						}
+						?>
 					</div>
+
+					<?php $this->showChildren()?>
+					<?php echo $this->content?>
 				</div>
 			</div>
 		</div><?php

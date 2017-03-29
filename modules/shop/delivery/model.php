@@ -34,7 +34,8 @@ class Shop_Delivery_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop' => array()
+		'shop' => array(),
+		'user' => array()
 	);
 
 	/**

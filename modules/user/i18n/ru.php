@@ -60,4 +60,5 @@ return array(
 	'chat_count_unread_message' => 'Непрочитанные сообщения: %s',
 	'chat_count_new_message' => 'Новые сообщения: ',
 	'new_message_from' => 'Новое сообщение от %s %s',
+	'backend-field-caption' => 'Пользователь',
 );

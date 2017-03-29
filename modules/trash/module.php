@@ -23,7 +23,7 @@ class Trash_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-09-12';
+	public $date = '2016-11-18';
 
 	/**
 	 * Module name

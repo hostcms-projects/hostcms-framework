@@ -21,16 +21,16 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 	public function execute($operation = NULL)
 	{
 		$oShopItemParent = Core_Entity::factory('Shop_Item', intval(Core_Array::getPost('shop_item_id', 0)));
+
 		$oShop = $oShopItemParent->Shop;
-		$oShopGroup = $oShopItemParent->Shop_Group;
-		$oShopDir = $oShop->Shop_Dir;
 
 		$iIndex = 0;
+
 		$aPropertiesId = array();
 		$aData = array();
-		foreach($_POST as $key => $sPostData)
+		foreach ($_POST as $key => $sPostData)
 		{
-			if(strpos($key, 'property_') === 0)
+			if (strpos($key, 'property_') === 0)
 			{
 				$iPropertyID = explode('_', $key);
 
@@ -38,11 +38,11 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 
 				$aPropertiesId[] = $iPropertyID[1];
 
-				$aList_Items = $oProperty->List->List_Items->getAllByActive(1);
+				//$aList_Items = $oProperty->List->List_Items->getAllByActive(1);
 
-				if(isset($_POST["property{$oProperty->id}list"]))
+				if (isset($_POST["property{$oProperty->id}list"]))
 				{
-					foreach($_POST["property{$oProperty->id}list"] as $value)
+					foreach ($_POST["property{$oProperty->id}list"] as $value)
 					{
 						$aData[$iIndex][] = array(
 							'property' => $oProperty,
@@ -83,7 +83,7 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			$oShopItem->save();
 
 			// Копировать основные свойства
-			if(!is_null(Core_Array::getPost('copy_main_properties')))
+			if (!is_null(Core_Array::getPost('copy_main_properties')))
 			{
 				$oShopItem->datetime = $oShopItemParent->datetime;
 				$oShopItem->start_datetime = $oShopItemParent->start_datetime;
@@ -114,7 +114,7 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать SEO-поля
-			if(!is_null(Core_Array::getPost('copy_seo')))
+			if (!is_null(Core_Array::getPost('copy_seo')))
 			{
 				$oShopItem->seo_title = $oShopItemParent->seo_title;
 				$oShopItem->seo_description = $oShopItemParent->seo_description;
@@ -122,7 +122,7 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать поля вкладки "Экспорт/Импорт"
-			if(!is_null(Core_Array::getPost('copy_export_import')))
+			if (!is_null(Core_Array::getPost('copy_export_import')))
 			{
 				$oShopItem->yandex_market = $oShopItemParent->yandex_market;
 				$oShopItem->vendorcode = $oShopItemParent->vendorcode;
@@ -132,11 +132,11 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать дополнительные цены для товара
-			if(!is_null(Core_Array::getPost('copy_prices_to_item')))
+			if (!is_null(Core_Array::getPost('copy_prices_to_item')))
 			{
 				$aShop_Item_Prices = $oShopItemParent->Shop_Item_Prices->findAll();
 
-				foreach($aShop_Item_Prices as $oShop_Item_Price)
+				foreach ($aShop_Item_Prices as $oShop_Item_Price)
 				{
 					$oShop_Item_Price_Copy = clone $oShop_Item_Price;
 					$oShop_Item_Price_Copy->shop_item_id = $oShopItem->id;
@@ -145,11 +145,11 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать специальные цены
-			if(!is_null(Core_Array::getPost('copy_specials_prices_to_item')))
+			if (!is_null(Core_Array::getPost('copy_specials_prices_to_item')))
 			{
 				$aShop_Specialprices = $oShopItemParent->Shop_Specialprices->findAll();
 
-				foreach($aShop_Specialprices as $oShop_Specialprice)
+				foreach ($aShop_Specialprices as $oShop_Specialprice)
 				{
 					$oShop_Specialprice_Copy = clone $oShop_Specialprice;
 					$oShop_Specialprice_Copy->shop_item_id = $oShopItem->id;
@@ -158,11 +158,11 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать сопутствующие товары
-			if(!is_null(Core_Array::getPost('copy_tying_products')))
+			if (!is_null(Core_Array::getPost('copy_tying_products')))
 			{
 					$aShop_Item_Associated = $oShopItemParent->Shop_Item_Associateds->findAll();
 
-					foreach($aShop_Item_Associated as $oShop_Item_Associated)
+					foreach ($aShop_Item_Associated as $oShop_Item_Associated)
 					{
 						$oShop_Item_Associated_Copy = clone $oShop_Item_Associated;
 						$oShop_Item_Associated_Copy->shop_item_id = $oShopItem->id;
@@ -171,10 +171,10 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать дополнительные свойства
-			if(!is_null(Core_Array::getPost('copy_external_property')))
+			if (!is_null(Core_Array::getPost('copy_external_property')))
 			{
 				$aPropertyValues = $oShopItemParent->getPropertyValues();
-				foreach($aPropertyValues as $oPropertyValue)
+				foreach ($aPropertyValues as $oPropertyValue)
 				{
 					// Не копируем св-во, по которому создается модификация
 					if (!in_array($oPropertyValue->property_id, $aPropertiesId))
@@ -202,10 +202,10 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			}
 
 			// Копировать метки
-			if(!is_null(Core_Array::getPost('copy_tags')))
+			if (!is_null(Core_Array::getPost('copy_tags')))
 			{
-				$aTags = $oShopItemParent->Tags->findAll();
-				foreach($aTags as $oTag)
+				$aTags = $oShopItemParent->Tags->findAll(FALSE);
+				foreach ($aTags as $oTag)
 				{
 					$oShopItem->add($oTag);
 				}

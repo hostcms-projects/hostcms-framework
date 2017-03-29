@@ -53,7 +53,8 @@ class Shop_Purchase_Discount_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop' => array(),
-		'shop_currency' => array()
+		'shop_currency' => array(),
+		'user' => array()
 	);
 
 	/**

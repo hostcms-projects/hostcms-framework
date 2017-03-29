@@ -187,6 +187,7 @@ class Shop_Item_Model extends Core_Entity
 		'siteuser' => array(),
 		'shop_item' => array('foreign_key' => 'shortcut_id'),
 		'modification' => array('model' => 'Shop_Item', 'foreign_key' => 'modification_id'),
+		'user' => array()
 	);
 
 	/**
@@ -212,6 +213,7 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['delivery'] = $this->_preloadValues['pickup'] = 1;
@@ -318,22 +320,21 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
-	 * Get the quantity in stocks
+	 * Get the quantity in the active warehouses
 	 * @return float
 	 */
 	public function getRest()
 	{
-		$aShop_Warehouse_Items = !$this->shortcut_id
-			? $this->Shop_Warehouse_Items->findAll()
-			: Core_Entity::factory('Shop_Item', $this->shortcut_id)->Shop_Warehouse_Items->findAll();
+		$queryBuilder = Core_QueryBuilder::select(array('SUM(count)', 'count'))
+			->from('shop_warehouse_items')
+			->join('shop_warehouses', 'shop_warehouses.id', '=', 'shop_warehouse_items.shop_warehouse_id')
+			->where('shop_warehouse_items.shop_item_id', '=', !$this->shortcut_id ? $this->id : $this->shortcut_id)
+			->where('shop_warehouses.active', '=', 1)
+			->where('shop_warehouses.deleted', '=', 0);
 
-		$rest = 0;
-		foreach ($aShop_Warehouse_Items as $oShop_Warehouse_Item)
-		{
-			$rest += $oShop_Warehouse_Item->count;
-		}
+		$aResult = $queryBuilder->execute()->asAssoc()->current();
 
-		return $rest;
+		return $aResult['count'];
 	}
 
 	/**
@@ -831,7 +832,20 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function move($iShopGroupId)
 	{
+		if ($this->shortcut_id)
+		{
+			$oShop_Group = Core_Entity::factory('Shop_Group', $iShopGroupId);
+
+			$oShop_Item = $oShop_Group->Shop_Items->getByShortcut_id($this->shortcut_id);
+
+			if (!is_null($oShop_Item))
+			{
+				return $this;
+			}
+		}
+
 		$this->shop_group_id = $iShopGroupId;
+
 		return $this->save()->clearCache();
 	}
 
@@ -1677,6 +1691,10 @@ class Shop_Item_Model extends Core_Entity
 	 * Get XML for entity and children entities
 	 * @return string
 	 * @hostcms-event shop_item.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_item.onBeforeShowXmlModifications
+	 * @hostcms-event shop_item.onBeforeAddModification
+	 * @hostcms-event shop_item.onBeforeSelectAssociatedItems
+	 * @hostcms-event shop_item.onBeforeAddAssociatedEntity
 	 */
 	public function getXml()
 	{
@@ -1684,8 +1702,10 @@ class Shop_Item_Model extends Core_Entity
 
 		$oShop = $this->Shop;
 
-		$this->clearXmlTags()
-			->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
+		$this->clearXmlTags();
+
+		!isset($this->_forbiddenTags['url'])
+			&& $this->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
 
 		!isset($this->_forbiddenTags['date'])
 			&& $this->addXmlTag('date', strftime($oShop->format_date, Core_Date::sql2timestamp($this->datetime)));
@@ -1884,7 +1904,14 @@ class Shop_Item_Model extends Core_Entity
 		// Associated items
 		if ($this->_showXmlAssociatedItems)
 		{
-			$aShop_Item_Associateds = $this->Item_Associateds->getAllByActive(1);
+			$oShop_Item_Associateds = $this->Item_Associateds;
+			$oShop_Item_Associateds
+				->queryBuilder()
+				->where('shop_items.active', '=', 1);
+
+			Core_Event::notify($this->_modelName . '.onBeforeSelectAssociatedItems', $this, array($oShop_Item_Associateds));
+
+			$aShop_Item_Associateds = $oShop_Item_Associateds->findAll();
 
 			if (count($aShop_Item_Associateds))
 			{
@@ -1920,9 +1947,7 @@ class Shop_Item_Model extends Core_Entity
 							->showXmlSiteuser($this->_showXmlSiteuser)
 							->showXmlProperties($this->_showXmlProperties);
 
-						Core_Event::notify($this->_modelName . '.onBeforeAddAssociatedEntity', $this, array(
-							$oShop_Item_Associated
-						));
+						Core_Event::notify($this->_modelName . '.onBeforeAddAssociatedEntity', $this, array($oShop_Item_Associated));
 
 						$oAssociatedEntity->addEntity(
 							$oShop_Item_Associated

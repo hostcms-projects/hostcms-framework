@@ -9,8 +9,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  *
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
+ * - recommended(TRUE|FALSE) экспортировать рекомендованные товары, по умолчанию FALSE.
+ * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
- * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 100
+ * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 500
  *
  * <code>
  * $Shop_Controller_YandexMarket = new Shop_Controller_YandexMarket(
@@ -35,6 +37,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	protected $_allowedProperties = array(
 		'itemsProperties',
 		'modifications',
+		'recommended',
 		'deliveryOptions',
 		'type',
 		'onStep',
@@ -230,11 +233,13 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->itemsProperties = $this->modifications = $this->deliveryOptions = TRUE;
 
+		$this->recommended = FALSE;
+
 		$this->type = 'offer';
-		$this->onStep = 10;
+		$this->onStep = 500;
 
 		$this->_Shop_Item_Controller = new Shop_Item_Controller();
-		
+
 		Core_Session::close();
 	}
 
@@ -258,6 +263,54 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	}
 
 	/**
+	 * Add conditions for Shop_Item
+	 * @param Shop_Item_Model $oShop_Item
+	 * @return self
+	 * @hostcms-event Shop_Controller_YandexMarket.onBeforeSelectShopItems
+	 */
+	protected function _addShopItemConditions($oShop_Item)
+	{
+		$dateTime = Core_Date::timestamp2sql(time());
+
+		$oShop_Item
+			->queryBuilder()
+			->select('shop_items.*')
+			->leftJoin('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id'/*,
+				array(
+						array('AND' => array('shop_groups.active', '=', 1)),
+						array('OR' => array('shop_items.shop_group_id', '=', 0))
+					)*/
+			)
+			// Активность группы или группа корневая
+			->open()
+				->where('shop_groups.active', '=', 1)
+				->setOr()
+				->where('shop_groups.id', 'IS', NULL)
+			->close()
+			->where('shop_items.shortcut_id', '=', 0)
+			->where('shop_items.active', '=', 1)
+			->where('shop_items.siteuser_id', 'IN', $this->_aSiteuserGroups)
+			->open()
+				->where('shop_items.start_datetime', '<', $dateTime)
+				->setOr()
+				->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+			->setAnd()
+			->open()
+				->where('shop_items.end_datetime', '>', $dateTime)
+				->setOr()
+				->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
+			->close()
+			->where('shop_items.yandex_market', '=', 1)
+			//->where('shop_items.price', '>', 0)
+			->where('shop_items.modification_id', '=', 0);
+
+		Core_Event::notify(get_class($this) . '.onBeforeSelectShopItems', $this, array($oShop_Item));
+
+		return $this;
+	}
+
+	/**
 	 * Prepare $this->_Shop_Items
 	 * @return self
 	 */
@@ -271,40 +324,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->clearOrderBy()
 			->orderBy('shop_items.id', 'ASC');
 
-		$dateTime = Core_Date::timestamp2sql(time());
-		$this->_Shop_Items
-			->queryBuilder()
-			->select('shop_items.*')
-			->leftJoin('shop_groups', 'shop_groups.id', '=', 'shop_items.shop_group_id'/*,
-				array(
-						array('AND' => array('shop_groups.active', '=', 1)),
-						array('OR' => array('shop_items.shop_group_id', '=', 0))
-					)*/
-			)
-			// Активность группы или группа корневая
-			->open()
-			->where('shop_groups.active', '=', 1)
-			->setOr()
-			->where('shop_groups.id', 'IS', NULL)
-			->close()
-
-			->where('shop_items.shortcut_id', '=', 0)
-			->where('shop_items.active', '=', 1)
-			->where('shop_items.siteuser_id', 'IN', $this->_aSiteuserGroups)
-			->open()
-			->where('shop_items.start_datetime', '<', $dateTime)
-			->setOr()
-			->where('shop_items.start_datetime', '=', '0000-00-00 00:00:00')
-			->close()
-			->setAnd()
-			->open()
-			->where('shop_items.end_datetime', '>', $dateTime)
-			->setOr()
-			->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
-			->close()
-			->where('shop_items.yandex_market', '=', 1)
-			->where('shop_items.price', '>', 0)
-			->where('shop_items.modification_id', '=', 0);
+		$this->_addShopItemConditions($this->_Shop_Items);
 
 		return $this;
 	}
@@ -504,7 +524,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			{
 				if (isset($this->_aCategoriesId[$oShop_Item->shop_group_id]))
 				{
-					$this->_showOffer($oShop_Item);
+					if ($oShop_Item->price > 0)
+					{
+						$this->_showOffer($oShop_Item);
+					}
 
 					if ($this->modifications)
 					{
@@ -515,7 +538,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 						$aModifications = $oModifications->findAll(FALSE);
 						foreach ($aModifications as $oModification)
 						{
-							$this->_showOffer($oModification);
+							if ($oModification->price > 0)
+							{
+								$this->_showOffer($oModification);
+							}
 						}
 					}
 				}
@@ -563,10 +589,10 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		/* Цена */
 		echo '<price>' . $aPrices['price_discount'] . '</price>'. "\n";
 
-		if ($aPrices['price'] > $aPrices['price_discount'])
+		if ($aPrices['discount'] > 0)
 		{
 			/* Старая цена */
-			echo '<oldprice>' . $aPrices['price'] . '</oldprice>'. "\n";
+			echo '<oldprice>' . ($aPrices['price'] + $aPrices['tax']) . '</oldprice>'. "\n";
 		}
 
 		/* CURRENCY */
@@ -616,10 +642,13 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		}
 
 		// (name, vendor?, vendorCode?)
-		if (mb_strlen($oShop_Item->name) > 0)
+		if (strlen($oShop_Item->name) > 0)
 		{
-			/* NAME */
-			echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
+			if ($this->type != 'vendor.model')
+			{
+				/* NAME */
+				echo '<name>' . Core_Str::xml($oShop_Item->name) . '</name>'. "\n";
+			}
 
 			if ($oShop_Item->shop_producer_id)
 			{
@@ -667,6 +696,36 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		if ($oShop_Item->type == 1)
 		{
 			echo '<downloadable>true</downloadable>'. "\n";
+		}
+
+		/* adult */
+		if ($oShop_Item->adult)
+		{
+			echo '<adult>true</adult>' . "\n";
+		}
+
+		/* rec */
+		if ($this->recommended)
+		{
+			$aTmp = array();
+
+			$oItem_Associateds = $oShop_Item->Item_Associateds;
+			$this->_addShopItemConditions($oItem_Associateds);
+
+			$aItem_Associateds = $oItem_Associateds->findAll(FALSE);
+
+			foreach ($aItem_Associateds as $oTmp_Shop_Item)
+			{
+				if ($oTmp_Shop_Item->price > 0)
+				{
+					$aTmp[] = $oTmp_Shop_Item->id;
+				}
+			}
+
+			if (count($aTmp))
+			{
+				echo '<rec>' . implode(',', $aTmp) . '</rec>'. "\n";
+			}
 		}
 
 		$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
@@ -963,6 +1022,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			&& $this->deliveryOptions = $this->_deliveryOptions($oShop) > 0;
 
 		Core_File::flush();
+
+		/* adult */
+		if ($oShop->adult)
+		{
+			echo '<adult>true</adult>' . "\n";
+		}
 
 		/* Товары */
 		$this->_offers();

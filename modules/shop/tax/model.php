@@ -14,6 +14,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 class Shop_Tax_Model extends Core_Entity
 {
 	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */
@@ -36,22 +44,5 @@ class Shop_Tax_Model extends Core_Entity
 	{
 		$this->tax_is_included = 1 - $this->tax_is_included;
 		return $this->save();
-	}
-
-	/**
-	 * Get tax by guid
-	 * @param string $guid guid
-	 * @return self|NULL
-	 */
-	public function getByGuid($guid)
-	{
-		$this->queryBuilder()
-			//->clear()
-			->where('guid', '=', $guid)
-			->limit(1);
-
-		$aObjects = $this->findAll(FALSE);
-
-		return isset($aObjects[0]) ? $aObjects[0] : NULL;
 	}
 }

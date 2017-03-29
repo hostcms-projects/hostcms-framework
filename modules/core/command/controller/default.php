@@ -223,11 +223,12 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		// то делаем 301 редирект
 		if ($oStructure->https == 1 && !Core::httpsUses())
 		{
-			$url = str_replace(array("\r", "\n"), '', Core::$url['host'] . $this->_uri);
+			$url = Core::$url['host'] . $this->_uri;
+			isset(Core::$url['query']) && $url .= '?' . Core::$url['query'];
 
 			$oCore_Response
 				->status(301)
-				->header('Location', 'https://' . $url);
+				->header('Location', 'https://' . str_replace(array("\r", "\n", "\0"), '', $url));
 
 			return $oCore_Response;
 		}

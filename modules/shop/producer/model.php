@@ -43,6 +43,7 @@ class Shop_Producer_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop' => array(),
 		'shop_producer_dir' => array(),
+		'user' => array()
 	);
 
 	/**

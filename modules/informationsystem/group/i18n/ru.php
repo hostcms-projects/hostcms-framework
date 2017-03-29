@@ -15,8 +15,9 @@ return array(
 	'show_information_groups_link4' => 'Дополнительные свойства',
 	'information_groups_add_form_title' => 'Добавление информационной группы',
 	'information_groups_edit_form_title' => 'Редактирование информационной группы',
-	'information_groups_form_tab_seo' => 'SEO',
-	'information_groups_form_tab_properties' => 'Дополнительные свойства',
+	'tab_1' => 'Описание',
+	'tab_2' => 'SEO',
+	'tab_3' => 'Дополнительные свойства',
 
 	'id' => 'Идентификатор',
 	'informationsystem_id' => 'Идентификатор информационной системы',

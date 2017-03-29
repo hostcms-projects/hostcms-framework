@@ -33,7 +33,8 @@ class Xsl_Dir_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'xsl_dir' => array('foreign_key' => 'parent_id')
+		'xsl_dir' => array('foreign_key' => 'parent_id'),
+		'user' => array()
 	);
 
 	/**

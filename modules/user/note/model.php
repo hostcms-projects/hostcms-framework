@@ -17,14 +17,22 @@ class User_Note_Model extends Core_Entity
 	 * Column consist item's name
 	 * @var string
 	 */
-	protected $_nameColumn = 'id';	
-	
+	protected $_nameColumn = 'id';
+
 	/**
 	 * One-to-one relations
 	 * @var array
 	 */
 	protected $_hasOne = array(
 		'user_setting' => array('foreign_key' => 'entity_id'),
+	);
+
+	/**
+	 * Belongs to relations
+	 * @var array
+	 */
+	protected $_belongsTo = array(
+		'user' => array()
 	);
 
 	/**

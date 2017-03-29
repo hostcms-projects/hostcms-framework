@@ -184,6 +184,29 @@ abstract class Core_Module
 	}
 
 	/**
+	 * Get List of Notification
+	 * @param int $type
+	 * @param int $entityId
+	 * @return array
+	 */
+	public function getNotifications($type, $entityId)
+	{
+		return array(
+			'icon' => array(
+				'ico' => 'fa fa-check',
+				'color' => 'white',
+				'background-color' => 'bg-themeprimary'
+			),
+			'href' => '',
+			'onclick' => '',
+			'extra' => array(
+				'icons' => array(),
+				'description' => NULL
+			)
+		);
+	}
+	
+	/**
 	 * Notify module on the action on schedule
 	 * @param int $action action number
 	 * @param int $entityId entity ID
@@ -194,6 +217,14 @@ abstract class Core_Module
 		// do smth
 	}
 
+	/**
+	 * Call new notifications
+	 */
+	public function callNotifications()
+	{
+		// do smth
+	}
+	
 	/**
 	 * Install module
 	 * @return self

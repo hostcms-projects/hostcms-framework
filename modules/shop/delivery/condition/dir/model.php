@@ -35,6 +35,7 @@ class Shop_Delivery_Condition_Dir_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop_delivery_condition_dir' => array('foreign_key' => 'parent_id'),
 		'shop_delivery' => array(),
+		'user' => array()
 	);
 	
 	/**

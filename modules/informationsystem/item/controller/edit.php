@@ -220,11 +220,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab->move($this->getField('indexing'), $oMainRow5);
 
 				$this->getField('sorting')
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
 				$this->getField('ip')
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
 				$this->getField('showed')
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
 
 				$oMainTab
 					->move($this->getField('sorting'), $oMainRow6)
@@ -237,7 +237,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->value($this->_object->siteuser_id)
 					->caption(Core::_('Informationsystem_Group.siteuser_id'))
 					->name('siteuser_id')
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
 
 				$oMainRow6->add($oSiteuser);
 
@@ -357,9 +357,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('maillist_id')
 					->value(0)
 					->caption(Core::_('Informationsystem_Item.maillist'))
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
-					$oMainRow8->add($oSelect_Maillist);
+					$oMainRow9->add($oSelect_Maillist);
 				}
 
 				if (Core::moduleIsActive('siteuser'))
@@ -383,7 +383,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('siteuser_group_id')
 					->value($this->_object->siteuser_group_id)
 					->caption(Core::_('Informationsystem_Item.siteuser_group_id'))
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainRow9->add($oSelect_SiteuserGroups);
 
@@ -551,7 +551,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					: 0;
 
 				$oPropertyTab = Admin_Form_Entity::factory('Tab')
-					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_properties'))
+					->caption(Core::_('Informationsystem_Group.tab_3'))
 					->name('Property');
 
 				$this->addTabBefore($oPropertyTab, $oAdditionalTab);
@@ -572,12 +572,31 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab
 					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					//->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'));
 
+				// Добавляем новые вкладки
+				$this->addTabAfter($oInformationsystemGroupDescriptionTab = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem_Group.tab_1'))
+					->name('Description'), $oMainTab);
+					
+				$this->addTabAfter($oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem_Group.tab_2'))
+					->name('Seo'), $oInformationsystemGroupDescriptionTab);
+
+				$oInformationsystemGroupDescriptionTab
+					->add($oInformationsystemGroupDescriptionTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemGroupDescriptionTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
+					
+				$oInformationsystemTabSeo
+					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+					
 				// Name
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
@@ -592,10 +611,15 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					$oMainRow2->add($resultItem);
 				}
 
+				$oMainTab
+					->move($this->getField('description'), $oInformationsystemGroupDescriptionTabRow1)
+				;
+				
 				// Description
-				$oMainTab->move($this->getField('description'), $oMainRow3);
+				//$oMainTab->move($this->getField('description'), $oMainRow3);
 
 				$this->getField('description')
+					->rows(15)
 					->wysiwyg(TRUE)
 					->template_id($template_id);
 
@@ -610,16 +634,16 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->name("use_typograph_description")
 						->caption(Core::_('Informationsystem_Item.exec_typograph_description'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 					$oUseTrailingPunctuation = Admin_Form_Entity::factory('Checkbox');
 					$oUseTrailingPunctuation
 						->name("use_trailing_punctuation_description")
 						->caption(Core::_('Informationsystem_Item.use_trailing_punctuation'))
 						->value($oInformationsystem->typograph_default_items)
-						->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
-					$oMainRow3
+					$oInformationsystemGroupDescriptionTabRow2
 						->add($oUseTypograph)
 						->add($oUseTrailingPunctuation);
 				}
@@ -734,7 +758,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				// Sorting
 				$this->getField('sorting')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainTab->move($this->getField('sorting'), $oMainRow6);
 
@@ -761,7 +785,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->name('siteuser_group_id')
 					->value($this->_object->siteuser_group_id)
 					->caption(Core::_('Informationsystem_Group.siteuser_group_id'))
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
 
 				$oMainRow6->add($oSelect_SiteuserGroups);
 
@@ -775,17 +799,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$oMainTab->move($this->getField('indexing'), $oMainRow7);
 
 				// SEO
-				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
-					->caption(Core::_('Informationsystem_Group.information_groups_form_tab_seo'))
-					->name('Seo');
-
-				$this->addTabAfter($oInformationsystemTabSeo, $oMainTab);
-
-				$oInformationsystemTabSeo
-					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
-					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
-
 				$oMainTab
 					->move($this->getField('seo_title'), $oSeoRow1)
 					->move($this->getField('seo_description'), $oSeoRow2)

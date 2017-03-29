@@ -1592,6 +1592,18 @@ class Admin_Form_Controller
 	}
 
 	/**
+	 * Get field name, cut table name. E.g. table.field => field
+	 * @param string $fieldName
+	 * @return string
+	 */
+	public function getFieldName($fieldName)
+	{
+		strpos($fieldName, '.') !== FALSE && list(, $fieldName) = explode('.', $fieldName);
+
+		return $fieldName;
+	}
+
+	/**
 	 * Set dataset conditions
 	 * @return self
 	 */
@@ -1612,11 +1624,12 @@ class Admin_Form_Controller
 			if ($oAdmin_Form_Field_Order->allow_sorting)
 			{
 				// Check field exists in the model
-				$fieldName = $oAdmin_Form_Field_Order->name;
+				$fieldName = $this->getFieldName($oAdmin_Form_Field_Order->name);
 				if (isset($oEntity->$fieldName) || method_exists($oEntity, $fieldName)
 					// Для сортировки должно существовать св-во модели
 					// || property_exists($oEntity, $fieldName)
 					|| $oAdmin_Form_Dataset->issetExternalField($fieldName)
+					|| strpos($oAdmin_Form_Field_Order->name, '.') !== FALSE
 				)
 				{
 					$oAdmin_Form_Dataset->addCondition(array(
@@ -1633,8 +1646,8 @@ class Admin_Form_Controller
 			{
 				if ($oAdmin_Form_Field->allow_filter)
 				{
-					// Имя поля.
-					$fieldName = $oAdmin_Form_Field->name;
+					// Если имя поля counter_pages.date, то остается date
+					$fieldName = $this->getFieldName($oAdmin_Form_Field->name);
 
 					$sFilterValue = Core_Array::get($this->request, "admin_form_filter_{$oAdmin_Form_Field->id}", NULL);
 
@@ -1652,16 +1665,12 @@ class Admin_Form_Controller
 							? 'where'
 							: 'having';
 
-						// Если имя поля counter_pages.date, то остается date
-						$sTmpFieldName = $fieldName;
-						strpos($fieldName, '.') !== FALSE && list(, $sTmpFieldName) = explode('.', $fieldName);
-
 						// для HAVING не проверяем наличие поля
 						if ($oAdmin_Form_Field->filter_type == 1
-							|| isset($oEntity->$sTmpFieldName)
-							|| method_exists($oEntity, $sTmpFieldName)
-							|| property_exists($oEntity, $sTmpFieldName)
-							|| $oAdmin_Form_Dataset->issetExternalField($sTmpFieldName)
+							|| isset($oEntity->$fieldName)
+							|| method_exists($oEntity, $fieldName)
+							|| property_exists($oEntity, $fieldName)
+							|| $oAdmin_Form_Dataset->issetExternalField($fieldName)
 						)
 						{
 							// Тип поля.
@@ -1679,9 +1688,7 @@ class Admin_Form_Controller
 									$sFilterValue = str_replace(array('*', '?'), array('%', '_'), trim($sFilterValue));
 
 									$oAdmin_Form_Dataset->addCondition(
-										array($sFilterType =>
-											array($fieldName, 'LIKE', $sFilterValue)
-										)
+										array($sFilterType => array($oAdmin_Form_Field->name, 'LIKE', $sFilterValue))
 									);
 								break;
 
@@ -1694,26 +1701,22 @@ class Admin_Form_Controller
 
 									if ($sFilterValue != 1)
 									{
-										$openName = ($oAdmin_Form_Field->filter_type == 0)
+										$openName = $oAdmin_Form_Field->filter_type == 0
 											? 'open'
 											: 'havingOpen';
 
-										$closeName = ($oAdmin_Form_Field->filter_type == 0)
+										$closeName = $oAdmin_Form_Field->filter_type == 0
 											? 'close'
 											: 'havingClose';
 
 										$oAdmin_Form_Dataset
 											->addCondition(array($openName => array()))
 											->addCondition(
-												array($sFilterType =>
-													array($fieldName, '=', 0)
-												)
+												array($sFilterType => array($oAdmin_Form_Field->name, '=', 0))
 											)
 											->addCondition(array('setOr' => array()))
 											->addCondition(
-												array($sFilterType =>
-													array($fieldName, 'IS', NULL)
-												)
+												array($sFilterType => array($oAdmin_Form_Field->name, 'IS', NULL))
 											)
 											->addCondition(array($closeName => array()));
 									}
@@ -1721,7 +1724,7 @@ class Admin_Form_Controller
 									{
 										$oAdmin_Form_Dataset->addCondition(
 											array($sFilterType =>
-												array($fieldName, '!=', 0)
+												array($oAdmin_Form_Field->name, '!=', 0)
 											)
 										);
 									}
@@ -1741,7 +1744,7 @@ class Admin_Form_Controller
 
 										$oAdmin_Form_Dataset->addCondition(
 											array($sFilterType =>
-												array($fieldName, '>=', $date)
+												array($oAdmin_Form_Field->name, '>=', $date)
 											)
 										);
 									}
@@ -1759,7 +1762,7 @@ class Admin_Form_Controller
 
 										$oAdmin_Form_Dataset->addCondition(
 											array($sFilterType =>
-												array($fieldName, '<=', $date)
+												array($oAdmin_Form_Field->name, '<=', $date)
 											)
 										);
 									}
@@ -1776,7 +1779,7 @@ class Admin_Form_Controller
 									{
 										$oAdmin_Form_Dataset->addCondition(
 											array($sFilterType =>
-												array($fieldName, 'LIKE', $sFilterValue)
+												array($oAdmin_Form_Field->name, 'LIKE', $sFilterValue)
 											)
 										);
 									}

@@ -18,7 +18,8 @@ class Lib_Property_List_Value_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'lib_property' => array()
+		'lib_property' => array(),
+		'user' => array()
 	);
 
 	/**

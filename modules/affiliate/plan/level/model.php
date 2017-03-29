@@ -18,7 +18,8 @@ class Affiliate_Plan_Level_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'affiliate_plan' => array()
+		'affiliate_plan' => array(),
+		'user' => array()
 	);
 
 	/**

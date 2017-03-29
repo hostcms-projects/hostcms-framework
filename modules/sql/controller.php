@@ -68,6 +68,8 @@ class Sql_Controller
 
 			$oCore_DataBase = Core_DataBase::instance();
 
+			$aConfig = $oCore_DataBase->getConfig();
+
 			while ($i < count($aSql))
 			{
 				$sql = trim($aSql[$i]);
@@ -90,6 +92,11 @@ class Sql_Controller
 					{
 						try
 						{
+							if (isset($aConfig['storageEngine']) && $aConfig['storageEngine'] != 'MyISAM')
+							{
+								$sql = str_replace(' ENGINE=MyISAM', ' ENGINE=' . $aConfig['storageEngine'], $sql);
+							}
+
 							$oCore_DataBase->setQueryType(1)->query($sql);
 							$count_query++;
 						}

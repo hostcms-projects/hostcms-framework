@@ -88,33 +88,33 @@ class Shop_Company_Controller_Edit extends Admin_Form_Action_Controller_Type_Edi
 			->move($this->getField('guid'), $oTabGUID)
 		;
 
-		$oTabManagers->move($this->getField('legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
-		$oTabManagers->move($this->getField('accountant_legal_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabManagersRow1);
+		$oTabManagers->move($this->getField('legal_name')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabManagersRow1);
+		$oTabManagers->move($this->getField('accountant_legal_name')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabManagersRow1);
 
-		$oTabContacts->move($this->getField('address')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabContactsRow1);
+		$oTabContacts->move($this->getField('address')->divAttr(array('class' => 'form-group col-xs-12')),$oTabContactsRow1);
 
-		$oTabContacts->move($this->getField('phone')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow2);
-		$oTabContacts->move($this->getField('fax')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow2);
+		$oTabContacts->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabContactsRow2);
+		$oTabContacts->move($this->getField('fax')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabContactsRow2);
 
-		$oTabContacts->move($this->getField('site')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow3);
-		$oTabContacts->move($this->getField('email')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabContactsRow3);
+		$oTabContacts->move($this->getField('site')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabContactsRow3);
+		$oTabContacts->move($this->getField('email')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabContactsRow3);
 
-		$oTabBankingDetails->move($this->getField('tin')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow1);
-		$oTabBankingDetails->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow1);
+		$oTabBankingDetails->move($this->getField('tin')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow1);
+		$oTabBankingDetails->move($this->getField('kpp')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow1);
 
-		$oTabBankingDetails->move($this->getField('psrn')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow2);
-		$oTabBankingDetails->move($this->getField('okpo')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow2);
+		$oTabBankingDetails->move($this->getField('psrn')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow2);
+		$oTabBankingDetails->move($this->getField('okpo')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow2);
 
-		$oTabBankingDetails->move($this->getField('okved')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow3);
-		$oTabBankingDetails->move($this->getField('bic')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow3);
+		$oTabBankingDetails->move($this->getField('okved')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow3);
+		$oTabBankingDetails->move($this->getField('bic')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow3);
 
-		$oTabBankingDetails->move($this->getField('current_account')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow4);
-		$oTabBankingDetails->move($this->getField('correspondent_account')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow4);
+		$oTabBankingDetails->move($this->getField('current_account')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow4);
+		$oTabBankingDetails->move($this->getField('correspondent_account')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow4);
 
-		$oTabBankingDetails->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
-		$oTabBankingDetails->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')),$oTabBankingDetailsRow5);
+		$oTabBankingDetails->move($this->getField('bank_name')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow5);
+		$oTabBankingDetails->move($this->getField('bank_address')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')),$oTabBankingDetailsRow5);
 
-		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')),$oTabGUIDRow1);
+		$oTabGUID->move($this->getField('guid')->divAttr(array('class' => 'form-group col-xs-12')),$oTabGUIDRow1);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Company.company_form_edit_title')

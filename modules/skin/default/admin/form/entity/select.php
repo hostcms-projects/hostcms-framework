@@ -84,7 +84,7 @@ class Skin_Default_Admin_Form_Entity_Select extends Admin_Form_Entity
 		$this->invertor_id = 'field_id_' . $iAdmin_Form_Count;
 
 		$this->class .= ' form-control';
-		$this->divAttr = array('class' => 'form-group col-lg-12 col-md-12 col-sm-12 col-xs-12');
+		$this->divAttr = array('class' => 'form-group col-xs-12');
 
 		$this->caseSensitive = TRUE;
 	}

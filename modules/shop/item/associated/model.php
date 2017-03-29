@@ -36,7 +36,8 @@ class Shop_Item_Associated_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_item' => array()
+		'shop_item' => array(),
+		'user' => array()
 	);
 
 	/**

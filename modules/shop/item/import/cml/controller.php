@@ -11,7 +11,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - importGroups(TRUE|FALSE) импортировать группы товаров, по умолчанию TRUE
  * - createShopItems(TRUE|FALSE) создавать новые товары, по умолчанию TRUE
  * - updateFields(array()) массив полей товара, которые необходимо обновлять при импорте CML товара, если не заполнен, то обновляются все поля. Пример массива array('marking', 'name', 'shop_group_id', 'text', 'description', 'images', 'taxes', 'shop_producer_id')
- * - itemDescription() имя поля товара, в которое загружать описание товаров, может принимать значения description, text. По умолчанию text.
+ * - itemDescription() имя поля товара, в которое загружать описание товаров, может принимать значения description, text. По умолчанию text
+ * - shortDescription() название тега, из которого загружать описание товара, например МалоеОписание или КраткоеОписание. По умолчанию МалоеОписание
  *
  * @package HostCMS
  * @subpackage Shop
@@ -30,6 +31,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		'createShopItems',
 		'updateFields',
 		'itemDescription',
+		'shortDescription',
 		'iShopId',
 		'iShopGroupId',
 		'sShopDefaultPriceName',
@@ -153,6 +155,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$this->sShopDefaultPriceGUID = '';
 
 		$this->itemDescription = 'text';
+		$this->shortDescription = 'МалоеОписание';
 
 		$this->updateFields = array();
 		$this->importGroups = $this->createShopItems = TRUE;
@@ -192,6 +195,109 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			is_null($oShopGroup->path) && $oShopGroup->path= '';
 			$oShopGroup->save();
 
+			// Указание Картинка для группы не соответсвует формату обмена CML!
+			$PictureData = strval($oXMLGroupNode->Картинка);
+
+			if (strlen($PictureData) && Core_File::isValidExtension($PictureData, Core::$mainConfig['availableExtension']))
+			{
+				// Папка назначения
+				$sDestinationFolder = $oShopGroup->getGroupPath();
+
+				// Создаем папку назначения
+				$oShopGroup->createDir();
+
+				$sSourceFile = CMS_FOLDER . $this->sPicturesPath . ltrim($PictureData, '/\\');
+				$sSourceFileBaseName = basename($sSourceFile, '');
+
+				$oShop = $oShopGroup->Shop;
+
+				if (!$oShop->change_filename)
+				{
+					$sTargetFileName = $sSourceFileBaseName;
+				}
+				else
+				{
+					$sTargetFileExtension = Core_File::getExtension($PictureData);
+
+					if ($sTargetFileExtension != '')
+					{
+						$sTargetFileExtension = ".{$sTargetFileExtension}";
+					}
+
+					$sTargetFileName = "shop_group_image{$oShopGroup->id}{$sTargetFileExtension}";
+				}
+
+				// Создаем массив параметров для загрузки картинок элементу
+				$aPicturesParam = array();
+				$aPicturesParam['large_image_isset'] = TRUE;
+				$aPicturesParam['large_image_source'] = $sSourceFile;
+				$aPicturesParam['large_image_name'] = $sSourceFileBaseName;
+				$aPicturesParam['large_image_target'] = $sDestinationFolder . $sTargetFileName;
+
+				$aPicturesParam['watermark_file_path'] = $oShop->getWatermarkFilePath();
+				$aPicturesParam['watermark_position_x'] = $oShop->watermark_default_position_x;
+				$aPicturesParam['watermark_position_y'] = $oShop->watermark_default_position_y;
+				$aPicturesParam['large_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio;
+
+				$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
+				$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
+				$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
+				$aPicturesParam['create_small_image_from_large'] = TRUE;
+				$aPicturesParam['small_image_max_width'] = $oShop->group_image_small_max_width;
+				$aPicturesParam['small_image_max_height'] = $oShop->group_image_small_max_height;
+				$aPicturesParam['small_image_watermark'] = $oShop->watermark_default_use_small_image;
+				$aPicturesParam['small_image_preserve_aspect_ratio'] = $aPicturesParam['large_image_preserve_aspect_ratio'];
+
+				$aPicturesParam['large_image_max_width'] = $oShop->group_image_large_max_width;
+				$aPicturesParam['large_image_max_height'] = $oShop->group_image_large_max_height;
+				$aPicturesParam['large_image_watermark'] = $oShop->watermark_default_use_large_image;
+
+				// Удаляем старое большое изображение
+				if ($oShopGroup->image_large)
+				{
+					try
+					{
+						Core_File::delete($oShopGroup->getLargeFilePath());
+					} catch (Exception $e) {}
+				}
+
+				// Удаляем старое малое изображение
+				if ($oShopGroup->image_small)
+				{
+					try
+					{
+						Core_File::delete($oShopGroup->getSmallFilePath());
+					} catch (Exception $e) {}
+				}
+
+				try {
+					$result = Core_File::adminUpload($aPicturesParam);
+				}
+				catch (Exception $e)
+				{
+					Core_Message::show(strtoupper($this->encoding) == 'UTF-8'
+						? $e->getMessage()
+						: @iconv($this->encoding, "UTF-8//IGNORE//TRANSLIT", $e->getMessage())
+					, 'error');
+
+					$result = array('large_image' => FALSE, 'small_image' => FALSE);
+				}
+
+				if ($result['large_image'])
+				{
+					$oShopGroup->image_large = $sTargetFileName;
+					$oShopGroup->setLargeImageSizes();
+				}
+
+				if ($result['small_image'])
+				{
+					$oShopGroup->image_small = "small_{$sTargetFileName}";
+					$oShopGroup->setSmallImageSizes();
+				}
+				$oShopGroup->save();
+			}
+
+			// Дочерние группы
 			foreach ($this->xpath($oXMLGroupNode, 'Группы') as $Groups)
 			{
 				$this->_importGroups($Groups, $oShopGroup->id);
@@ -203,13 +309,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 	/**
 	 * Add characteristic to item
-	 * @param object $oShopItem shop item
+	 * @param object $oShop_Item shop item
 	 * @param object $oItemProperty item property
 	 * @return self
 	 */
-	/*protected function _addCharacteristic($oShopItem, $oItemProperty)
+	/*protected function _addCharacteristic($oShop_Item, $oItemProperty)
 	{
-		$this->_addPredefinedAdditionalProperty($oShopItem, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
+		$this->_addPredefinedAdditionalProperty($oShop_Item, strval($oItemProperty->Наименование), strval($oItemProperty->Значение), TRUE);
 
 		return $this;
 	}*/
@@ -218,9 +324,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * Check if property exists in array and save it if so
 	 * @return self
 	 */
-	protected function _addPredefinedAdditionalProperty($oShopItem, SimpleXMLElement $oPropertyValue, $sValue, $bForcedAdd = FALSE)
+	protected function _addPredefinedAdditionalProperty($oShop_Item, SimpleXMLElement $oPropertyValue, $sValue, $bForcedAdd = FALSE)
 	{
-		if (is_null($oShopItem))
+		if (is_null($oShop_Item))
 		{
 			return $this;
 		}
@@ -232,17 +338,25 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		if (isset($this->_aBaseAttributes[$sUpperGUID]))
 		{
 			$sFieldName = $this->_aBaseAttributes[$sUpperGUID];
-			$oShopItem->$sFieldName = Shop_Controller::instance()->convertPrice($sValue);
-			$oShopItem->save();
+			$oShop_Item->$sFieldName = Shop_Controller::instance()->convertPrice($sValue);
+			$oShop_Item->save();
 
 			return $this;
 		}
+
+		if ($sPropertyGUID == 'ОписаниеВФорматеHTML' && strlen($sValue))
+		{
+			$oShop_Item->text = $sValue;
+			$oShop_Item->save();
+			return $this;
+		}
+
 		/*// для совместимости с МойСклад
 		// не импортируется, т.к. затирает значение поля "Описание"
 		if (mb_strtoupper($sPropertyGUID) == 'ПОЛНОЕ НАИМЕНОВАНИЕ')
 		{
-			$oShopItem->description = $sValue;
-			$oShopItem->save();
+			$oShop_Item->description = $sValue;
+			$oShop_Item->save();
 			return $this;
 		}*/
 
@@ -253,7 +367,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oProperty = $this->_getProperty($oPropertyValue);
 
 			!is_null($oProperty)
-				&& $this->_addItemProperty($oShopItem, $oProperty, $sValue);
+				&& $this->_addItemPropertyValue($oShop_Item, $oProperty, $sValue);
 		}
 		return $this;
 	}
@@ -291,7 +405,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param Property_Model $oProperty
 	 * @param string $sValue property value
 	 */
-	protected function _addItemProperty(Shop_Item_Model $oShopItem, Property_Model $oProperty, $sValue)
+	protected function _addItemPropertyValue(Shop_Item_Model $oShopItem, Property_Model $oProperty, $sValue)
 	{
 		$oShop = Core_Entity::factory('Shop', $this->iShopId);
 
@@ -300,22 +414,115 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			: intval($oShopItem->Modification->Shop_Group->id)
 		));
 
-		$sPropertyValue = isset($this->_aPropertyValues[$sValue])
+		$value = isset($this->_aPropertyValues[$sValue])
 			? $this->_aPropertyValues[$sValue]
 			: $sValue;
 
-		$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
-
-		$oProperty_Value = isset($aPropertyValues[0])
-			? $aPropertyValues[0]
-			: $oProperty->createNewValue($oShopItem->id);
-
-		/*if ($oProperty->type == 7)
+		switch ($oProperty->type)
 		{
-			mb_strtoupper($sPropertyValue) == 'ДА' ? $sPropertyValue = 1 : $sPropertyValue = intval($sPropertyValue);
-		}*/
+			// целое число
+			case 0:
+				$changedValue = Shop_Controller::instance()->convertPrice($value);
+			break;
+			// Файл
+			case 2:
+				$changedValue = NULL;
+			break;
+			// Список
+			case 3:
+				if (Core::moduleIsActive('list') && $oProperty->list_id)
+				{
+					$oListItem = Core_Entity::factory('List', $oProperty->list_id)
+						->List_Items
+						->getByValue($value, FALSE);
 
-		$this->_setPropertyValue($oProperty_Value, $sPropertyValue);
+					if (is_null($oListItem))
+					{
+						$oListItem = Core_Entity::factory('List_Item')
+							->list_id($oProperty->list_id)
+							->value($value)
+							->save();
+					}
+					$changedValue = $oListItem->id;
+				}
+				else
+				{
+					$changedValue = NULL;
+				}
+			break;
+			case 7:
+				$value = mb_strtolower($value);
+
+				if ($value == 'true' || $value == 'да')
+				{
+					$changedValue = 1;
+				}
+				elseif ($value == 'false' || $value == 'нет')
+				{
+					$changedValue = 0;
+				}
+				else
+				{
+					$changedValue = (boolean)$value === TRUE ? 1 : 0;
+				}
+			break;
+			case 8:
+				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $value))
+				{
+					$changedValue = Core_Date::datetime2sql($value);
+				}
+				else
+				{
+					$changedValue = NULL;
+				}
+			break;
+			case 9:
+				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $value))
+				{
+					$changedValue = Core_Date::datetime2sql($value);
+				}
+				else
+				{
+					$changedValue = NULL;
+				}
+			break;
+			default:
+				$changedValue = nl2br($value);
+			break;
+		}
+
+		if (!is_null($changedValue))
+		{
+			$aPropertyValues = $oProperty->getValues($oShopItem->id, FALSE);
+			if ($oProperty->multiple)
+			{
+				foreach ($aPropertyValues as $oProperty_Value)
+				{
+					if ($oProperty_Value->value == $changedValue)
+					{
+						return $this;
+					}
+				}
+
+				$oProperty_Value = $oProperty->createNewValue($oShopItem->id);
+			}
+			else
+			{
+				$oProperty_Value = isset($aPropertyValues[0])
+					? $aPropertyValues[0]
+					: $oProperty->createNewValue($oShopItem->id);
+			}
+
+			/*if ($oProperty->type == 7)
+			{
+				mb_strtoupper($value) == 'ДА' ? $value = 1 : $value = intval($value);
+			}*/
+
+			$oProperty_Value->setValue($changedValue);
+			$oProperty_Value->save();
+		}
+
+		return $this;
 	}
 
 	/**
@@ -445,102 +652,105 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Файл-источник
 				$sSourceFile = CMS_FOLDER . $this->sPicturesPath . ltrim($PictureData, '/\\');
 
-				$sSourceFileBaseName = basename($PictureData);
-
-				if (!$oShop->change_filename)
+				if (is_file($sSourceFile))
 				{
-					$sTargetFileName = $sSourceFileBaseName;
-				}
-				else
-				{
-					$sTargetFileExtension = Core_File::getExtension($PictureData);
+					$sSourceFileBaseName = basename($PictureData);
 
-					if ($sTargetFileExtension != '')
+					if (!$oShop->change_filename)
 					{
-						$sTargetFileExtension = ".{$sTargetFileExtension}";
-					}
-
-					if (!$bFirstPicture)
-					{
-						$sTargetFileName = "shop_property_file_{$oShopItem->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
+						$sTargetFileName = $sSourceFileBaseName;
 					}
 					else
 					{
-						$sTargetFileName = "shop_items_catalog_image{$oShopItem->id}{$sTargetFileExtension}";
+						$sTargetFileExtension = Core_File::getExtension($PictureData);
+
+						if ($sTargetFileExtension != '')
+						{
+							$sTargetFileExtension = ".{$sTargetFileExtension}";
+						}
+
+						if (!$bFirstPicture)
+						{
+							$sTargetFileName = "shop_property_file_{$oShopItem->id}_{$oProperty_Value->id}{$sTargetFileExtension}";
+						}
+						else
+						{
+							$sTargetFileName = "shop_items_catalog_image{$oShopItem->id}{$sTargetFileExtension}";
+						}
 					}
-				}
 
-				$aPicturesParam = array();
-				$aPicturesParam['large_image_isset'] = TRUE;
-				$aPicturesParam['large_image_source'] = $sSourceFile;
-				$aPicturesParam['large_image_name'] = $sSourceFileBaseName;
-				$aPicturesParam['large_image_target'] = $sDestinationFolder . $sTargetFileName;
-				$aPicturesParam['watermark_file_path'] = $oShop->getWatermarkFilePath();
-				$aPicturesParam['watermark_position_x'] = $oShop->watermark_default_position_x;
-				$aPicturesParam['watermark_position_y'] = $oShop->watermark_default_position_y;
-				$aPicturesParam['large_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio;
-				$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
-				$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
-				$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
-				$aPicturesParam['create_small_image_from_large'] = TRUE;
+					$aPicturesParam = array();
+					$aPicturesParam['large_image_isset'] = TRUE;
+					$aPicturesParam['large_image_source'] = $sSourceFile;
+					$aPicturesParam['large_image_name'] = $sSourceFileBaseName;
+					$aPicturesParam['large_image_target'] = $sDestinationFolder . $sTargetFileName;
+					$aPicturesParam['watermark_file_path'] = $oShop->getWatermarkFilePath();
+					$aPicturesParam['watermark_position_x'] = $oShop->watermark_default_position_x;
+					$aPicturesParam['watermark_position_y'] = $oShop->watermark_default_position_y;
+					$aPicturesParam['large_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio;
+					$aPicturesParam['small_image_source'] = $aPicturesParam['large_image_source'];
+					$aPicturesParam['small_image_name'] = $aPicturesParam['large_image_name'];
+					$aPicturesParam['small_image_target'] = $sDestinationFolder . "small_{$sTargetFileName}";
+					$aPicturesParam['create_small_image_from_large'] = TRUE;
 
-				if (!$bFirstPicture)
-				{
-					$aPicturesParam['large_image_max_width'] = $oProperty->image_large_max_width;
-					$aPicturesParam['large_image_max_height'] = $oProperty->image_large_max_height;
-					$aPicturesParam['small_image_max_width'] = $oProperty->image_small_max_width;
-					$aPicturesParam['small_image_max_height'] = $oProperty->image_small_max_height;
-				}
-				else
-				{
-					$aPicturesParam['large_image_max_width'] = $oShop->image_large_max_width;
-					$aPicturesParam['large_image_max_height'] = $oShop->image_large_max_height;
-					$aPicturesParam['small_image_max_width'] = $oShop->image_small_max_width;
-					$aPicturesParam['small_image_max_height'] = $oShop->image_small_max_height;
-				}
-
-				$aPicturesParam['small_image_watermark'] = $oShop->watermark_default_use_small_image;
-				$aPicturesParam['small_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio_small;
-
-				$aPicturesParam['large_image_watermark'] = $oShop->watermark_default_use_large_image;
-
-				try
-				{
-					$result = Core_File::adminUpload($aPicturesParam);
-				}
-				catch (Exception $exc)
-				{
-					$result = array('large_image' => FALSE, 'small_image' => FALSE);
-				}
-
-				if ($result['large_image'])
-				{
 					if (!$bFirstPicture)
 					{
-						$oProperty_Value->file = $sTargetFileName;
-						$oProperty_Value->file_name = $sFileName;
-						$oProperty_Value->file_description = $sFileDescription;
-						$oProperty_Value->save();
+						$aPicturesParam['large_image_max_width'] = $oProperty->image_large_max_width;
+						$aPicturesParam['large_image_max_height'] = $oProperty->image_large_max_height;
+						$aPicturesParam['small_image_max_width'] = $oProperty->image_small_max_width;
+						$aPicturesParam['small_image_max_height'] = $oProperty->image_small_max_height;
 					}
 					else
 					{
-						$oShopItem->image_large = $sTargetFileName;
-						$oShopItem->setLargeImageSizes();
+						$aPicturesParam['large_image_max_width'] = $oShop->image_large_max_width;
+						$aPicturesParam['large_image_max_height'] = $oShop->image_large_max_height;
+						$aPicturesParam['small_image_max_width'] = $oShop->image_small_max_width;
+						$aPicturesParam['small_image_max_height'] = $oShop->image_small_max_height;
 					}
-				}
 
-				if ($result['small_image'])
-				{
-					if (!$bFirstPicture)
+					$aPicturesParam['small_image_watermark'] = $oShop->watermark_default_use_small_image;
+					$aPicturesParam['small_image_preserve_aspect_ratio'] = $oShop->preserve_aspect_ratio_small;
+
+					$aPicturesParam['large_image_watermark'] = $oShop->watermark_default_use_large_image;
+
+					try
 					{
-						$oProperty_Value->file_small = "small_{$sTargetFileName}";
-						$oProperty_Value->file_small_name = '';
-						$oProperty_Value->save();
+						$result = Core_File::adminUpload($aPicturesParam);
 					}
-					else
+					catch (Exception $exc)
 					{
-						$oShopItem->image_small = "small_{$sTargetFileName}";
-						$oShopItem->setSmallImageSizes();
+						$result = array('large_image' => FALSE, 'small_image' => FALSE);
+					}
+
+					if ($result['large_image'])
+					{
+						if (!$bFirstPicture)
+						{
+							$oProperty_Value->file = $sTargetFileName;
+							$oProperty_Value->file_name = $sFileName;
+							$oProperty_Value->file_description = $sFileDescription;
+							$oProperty_Value->save();
+						}
+						else
+						{
+							$oShopItem->image_large = $sTargetFileName;
+							$oShopItem->setLargeImageSizes();
+						}
+					}
+
+					if ($result['small_image'])
+					{
+						if (!$bFirstPicture)
+						{
+							$oProperty_Value->file_small = "small_{$sTargetFileName}";
+							$oProperty_Value->file_small_name = '';
+							$oProperty_Value->save();
+						}
+						else
+						{
+							$oShopItem->image_small = "small_{$sTargetFileName}";
+							$oShopItem->setSmallImageSizes();
+						}
 					}
 				}
 
@@ -589,7 +799,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	}
 
 	/**
-	 * Import properties
+	 * Import property values
 	 *
 	 * ЗначенияСвойств/ЗначенияСвойства
 	 * ХарактеристикиТовара/ХарактеристикаТовара
@@ -598,7 +808,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param SimpleXMLElement $oPropertyValue
 	 * @retrun self
 	 */
-	protected function _importProperties(Shop_Item_Model $oShop_Item, SimpleXMLElement $oPropertyValue)
+	protected function _importPropertyValues(Shop_Item_Model $oShop_Item, SimpleXMLElement $oPropertyValue)
 	{
 		$sPropertyGUID = strval($oPropertyValue->Ид);
 
@@ -657,7 +867,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			$oProperty = $this->_getProperty($oPropertyValue);
 
 			!is_null($oProperty)
-				&& $this->_addItemProperty($oShop_Item, $oProperty, $sValue);
+				&& $this->_addItemPropertyValue($oShop_Item, $oProperty, $sValue);
 		}
 
 		return $this;
@@ -725,6 +935,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImport
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeImportShopItem
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterImportShopItem
+	 * @hostcms-event Shop_Item_Import_Cml_Controller.onBeforeOffer
 	 * @hostcms-event Shop_Item_Import_Cml_Controller.onAfterOffersShopItem
 	 */
 	public function import()
@@ -818,89 +1029,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			}
 
 			// Импортируем дополнительные свойства товаров
-			$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
-			foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
-			{
-				$sPropertyGUID = strval($oItemProperty->Ид);
-				$sPropertyName = strval($oItemProperty->Наименование);
-
-				$oProperty = strlen($sPropertyGUID)
-					? $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE)
-					// В версии 2.0.5 для ХарактеристикиТовара/ХарактеристикаТовара не передается ИД, только Наименование
-					: $oShop_Item_Property_List->Properties->getByName($sPropertyName, FALSE);
-
-				if (is_null($oProperty) && strlen($sPropertyGUID))
-				{
-					$oProperty = Core_Entity::factory('Property');
-					$oProperty->name = $sPropertyName;
-					$oProperty->guid = $sPropertyGUID;
-
-					if (strval($oItemProperty->ТипЗначений) == 'Справочник' && Core::moduleIsActive('list'))
-					{
-						$oProperty->type = 3;
-
-						// Check if list exists
-						$oList = $oShop->Site->Lists->getByName($sPropertyName, FALSE);
-
-						// Create new List
-						if (is_null($oList))
-						{
-							$oList = Core_Entity::factory('List');
-							$oList->name = $sPropertyName;
-							$oList->list_dir_id = 0;
-							$oList->site_id = $oShop->site_id;
-							$oList->save();
-						}
-
-						$oProperty->list_id = $oList->id;
-					}
-					else
-					{
-						$oProperty->type = 1;
-					}
-
-					$oProperty->tag_name = Core_Str::transliteration($oProperty->name);
-
-					// Для вновь создаваемого допсвойства размеры берем из магазина
-					$oProperty->image_large_max_width = $oShop->image_large_max_width;
-					$oProperty->image_large_max_height = $oShop->image_large_max_height;
-					$oProperty->image_small_max_width = $oShop->image_small_max_width;
-					$oProperty->image_small_max_height = $oShop->image_small_max_height;
-
-					$oShop_Item_Property_List->add($oProperty);
-				}
-
-				$this->_cacheProperty[$sPropertyGUID] = $oProperty;
-
-				foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
-				{
-					$listValue = strval($oValue->Значение);
-					$this->_aPropertyValues[strval($oValue->ИдЗначения)] = $listValue;
-
-					if ($oProperty->type == 3 && $oProperty->list_id && Core::moduleIsActive('list'))
-					{
-						$oList_Item = $oProperty->List->List_Items->getByValue($listValue, FALSE);
-
-						if (is_null($oList_Item))
-						{
-							$oList_Item = Core_Entity::factory('List_Item');
-							$oList_Item->value = $listValue;
-							$oList_Item->list_id = $oProperty->list_id;
-							$oList_Item->save();
-						}
-					}
-				}
-
-				if (in_array(mb_strtoupper($sPropertyName), $this->_aPredefinedBaseProperties))
-				{
-					// Основное свойство товара
-					$this->_aBaseProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
-				}
-				else
-				{
-					$this->aAdditionalProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
-				}
-			}
+			$this->_importProperties($classifier);
 
 			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oXmlItem)
 			{
@@ -987,7 +1116,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						$sGUIDmod === FALSE
 							? $oShopItem->shop_group_id = $oShop_Group->id
 							: $oShopItem->Modification->shop_group_id($oShop_Group->id)->save();
-							
+
 						$this->_bNewShopItem && $oShop_Group->incCountItems();
 					}
 					else
@@ -1052,7 +1181,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Обрабатываем "малое описание" товара. Данный тег не соответствует стандарту CommerceML!
-				foreach ($this->xpath($oXmlItem, 'МалоеОписание') as $DescriptionData)
+				foreach ($this->xpath($oXmlItem, $this->shortDescription) as $DescriptionData)
 				{
 					$oShopItem->description = nl2br(strval($DescriptionData));
 					$oShopItem->save();
@@ -1091,12 +1220,12 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				// Добавляем значения для общих свойств всех товаров
 				foreach ($this->xpath($oXmlItem, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
 				{
-					$this->_importProperties($oShopItem, $ItemPropertyValue);
+					$this->_importPropertyValues($oShopItem, $ItemPropertyValue);
 				}
 
 				foreach ($this->xpath($oXmlItem, 'ХарактеристикиТовара/ХарактеристикаТовара') as $oItemProperty)
 				{
-					$this->_importProperties($oShopItem, $oItemProperty);
+					$this->_importPropertyValues($oShopItem, $oItemProperty);
 				}
 
 				// Сохраняем список характеристик модификаций во временный файл
@@ -1140,6 +1269,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		// Файл offers.xml
 		elseif (count((array)$this->_oSimpleXMLElement->ПакетПредложений) && count((array)$this->_oSimpleXMLElement->Каталог) == 0)
 		{
+			$classifier = $this->_oSimpleXMLElement->Классификатор;
+
+			// Импортируем дополнительные свойства товаров
+			$this->_importProperties($classifier);
+
 			$packageOfProposals = $this->_oSimpleXMLElement->ПакетПредложений;
 
 			// Обработка специальных цен
@@ -1208,6 +1342,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Обработка предложений
 			foreach ($this->xpath($packageOfProposals, 'Предложения/Предложение') as $oProposal)
 			{
+				Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeOffer', $this, array($oProposal));
+
 				$sItemGUID = strval($oProposal->Ид);
 
 				$sGUIDmod = FALSE;
@@ -1270,13 +1406,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					// Добавляем значения для общих свойств всех товаров
 					foreach ($this->xpath($oProposal, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
 					{
-						$this->_importProperties($oShopItem, $ItemPropertyValue);
+						$this->_importPropertyValues($oShopItem, $ItemPropertyValue);
 					}
 
 					// Обработка характеристик товара из файла offers для совместимости с МойСклад
 					foreach ($this->xpath($oProposal, 'ХарактеристикиТовара/ХарактеристикаТовара') as $oItemProperty)
 					{
-						$this->_importProperties($oShopItem, $oItemProperty);
+						$this->_importPropertyValues($oShopItem, $oItemProperty);
 					}
 
 					foreach ($this->xpath($oProposal, 'Цены/Цена') as $oPrice)
@@ -1486,7 +1622,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$oShopItem->save();
 					$this->_aReturn['updateItemCount']++;
 
-					Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterOffersShopItem', $this, array($oShopItem));
+					Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterOffersShopItem', $this, array($oShopItem, $oProposal));
 				}
 			}
 		}
@@ -1628,7 +1764,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					}
 					$oShopItem->save();
 
-					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault("1", FALSE);
+					$oWarehouse = Core_Entity::factory('Shop', $this->iShopId)->Shop_Warehouses->getByDefault('1', FALSE);
 					if (!is_null($oWarehouse))
 					{
 						$oShop_Warehouse_Item = $oWarehouse->Shop_Warehouse_Items->getByShopItemId($oShopItem->id, FALSE);
@@ -1650,6 +1786,102 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImport', $this);
 
 		return $this->_aReturn;
+	}
+
+	/**
+	 * Import list of properties
+	 * @param object $classifier
+	 * @return self
+	 */
+	protected function _importProperties($classifier)
+	{
+		$oShop = Core_Entity::factory('Shop', $this->iShopId);
+
+		$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->iShopId);
+		foreach ($this->xpath($classifier, 'Свойства/Свойство') as $oItemProperty)
+		{
+			$sPropertyGUID = strval($oItemProperty->Ид);
+			$sPropertyName = strval($oItemProperty->Наименование);
+
+			$oProperty = strlen($sPropertyGUID)
+				? $oShop_Item_Property_List->Properties->getByGuid($sPropertyGUID, FALSE)
+				// В версии 2.0.5 для ХарактеристикиТовара/ХарактеристикаТовара не передается ИД, только Наименование
+				: $oShop_Item_Property_List->Properties->getByName($sPropertyName, FALSE);
+
+			if (is_null($oProperty) && strlen($sPropertyGUID))
+			{
+				$oProperty = Core_Entity::factory('Property');
+				$oProperty->name = $sPropertyName;
+				$oProperty->guid = $sPropertyGUID;
+
+				if (strval($oItemProperty->ТипЗначений) == 'Справочник' && Core::moduleIsActive('list'))
+				{
+					$oProperty->type = 3;
+
+					// Check if list exists
+					$oList = $oShop->Site->Lists->getByName($sPropertyName, FALSE);
+
+					// Create new List
+					if (is_null($oList))
+					{
+						$oList = Core_Entity::factory('List');
+						$oList->name = $sPropertyName;
+						$oList->list_dir_id = 0;
+						$oList->site_id = $oShop->site_id;
+						$oList->save();
+					}
+
+					$oProperty->list_id = $oList->id;
+				}
+				else
+				{
+					$oProperty->type = 1;
+				}
+
+				$oProperty->tag_name = Core_Str::transliteration($oProperty->name);
+
+				// Для вновь создаваемого допсвойства размеры берем из магазина
+				$oProperty->image_large_max_width = $oShop->image_large_max_width;
+				$oProperty->image_large_max_height = $oShop->image_large_max_height;
+				$oProperty->image_small_max_width = $oShop->image_small_max_width;
+				$oProperty->image_small_max_height = $oShop->image_small_max_height;
+
+				$oShop_Item_Property_List->add($oProperty);
+			}
+
+			$this->_cacheProperty[$sPropertyGUID] = $oProperty;
+
+			foreach ($this->xpath($oItemProperty, 'ВариантыЗначений/Справочник') as $oValue)
+			{
+				$listValue = strval($oValue->Значение);
+				$this->_aPropertyValues[strval($oValue->ИдЗначения)] = $listValue;
+
+				if ($oProperty->type == 3 && $oProperty->list_id && Core::moduleIsActive('list'))
+				{
+					$oList_Item = $oProperty->List->List_Items->getByValue($listValue, FALSE);
+
+					if (is_null($oList_Item))
+					{
+						$oList_Item = Core_Entity::factory('List_Item');
+						$oList_Item->value = $listValue;
+						$oList_Item->list_id = $oProperty->list_id;
+						$oList_Item->save();
+					}
+				}
+			}
+
+			if (in_array(mb_strtoupper($sPropertyName), $this->_aPredefinedBaseProperties))
+			{
+				// Основное свойство товара
+				$this->_aBaseProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
+			}
+			else
+			{
+				$this->aAdditionalProperties[strval($oItemProperty->Ид)] = strval($oItemProperty->Наименование);
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -1720,87 +1952,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$shopItem->Modification->save();
 			}
 		}
-		
+
 		return $this;
 	}
 
-	/**
-	 * Сохранение значения свойства заданного типа
-	 * @param Property_Value_Model $oProperty_Value property value object
-	 * @param string $value value
-	 */
-	protected function _setPropertyValue($oProperty_Value, $value)
-	{
-		$oProperty = $oProperty_Value->Property;
-
-		switch ($oProperty->type)
-		{
-			// целое число
-			case 0:
-				$oProperty_Value->setValue(Shop_Controller::instance()->convertPrice($value));
-			break;
-			// Файл
-			case 2:
-			break;
-			// Список
-			case 3:
-				if (Core::moduleIsActive('list') && $oProperty->list_id)
-				{
-					$oListItem = Core_Entity::factory('List', $oProperty->list_id)
-						->List_Items
-						->getByValue($value, FALSE);
-
-					if (is_null($oListItem))
-					{
-						$oListItem = Core_Entity::factory('List_Item')
-							->list_id($oProperty->list_id)
-							->value($value)
-							->save();
-					}
-					$oProperty_Value->setValue($oListItem->id);
-				}
-			break;
-			case 7:
-				$value = mb_strtolower($value);
-
-				if ($value == 'true' || $value == 'да')
-				{
-					$value = 1;
-				}
-				elseif ($value == 'false' || $value == 'нет')
-				{
-					$value = 0;
-				}
-				else
-				{
-					$value = (boolean)$value === TRUE ? 1 : 0;
-				}
-
-				$oProperty_Value->setValue($value);
-			break;
-			case 8:
-				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/", $value))
-				{
-					$value = Core_Date::datetime2sql($value);
-				}
-
-				$oProperty_Value->setValue($value);
-			break;
-			case 9:
-				if (!preg_match("/^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}) ([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/", $value))
-				{
-					$value = Core_Date::datetime2sql($value);
-				}
-
-				$oProperty_Value->setValue($value);
-			break;
-			default:
-				$oProperty_Value->setValue(nl2br($value));
-			break;
-		}
-
-		$oProperty_Value->save();
-	}
 
 	/**
 	 * Коды валют для МойСклад

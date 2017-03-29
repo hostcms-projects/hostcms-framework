@@ -35,6 +35,7 @@ class Shop_Producer_Dir_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'shop_producer_dir' => array('foreign_key' => 'parent_id'),
 		'shop' => array(),
+		'user' => array()
 	);
 	
 	/**

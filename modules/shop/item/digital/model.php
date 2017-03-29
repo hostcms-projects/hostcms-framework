@@ -41,6 +41,7 @@ class Shop_Item_Digital_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop_item' => array(),
+		'user' => array()
 	);
 
 	/**

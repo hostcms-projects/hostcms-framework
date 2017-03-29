@@ -75,8 +75,8 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 		$oMainTab->move($this->getField('active'), $oMainRow3);
 		$oMainRow4->add($oSiteUserGroupField);
 		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow5);
-		$oMainTab->move($this->getField('min_count_of_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow6);
-		$oMainTab->move($this->getField('min_amount_of_items')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow6);
+		$oMainTab->move($this->getField('min_count_of_items')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow6);
+		$oMainTab->move($this->getField('min_amount_of_items')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow6);
 		$oMainTab->move($this->getField('include_delivery'), $oMainRow7);
 
 		// Заголовок формы

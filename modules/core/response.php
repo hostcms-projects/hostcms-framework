@@ -157,6 +157,22 @@ class Core_Response
 	}
 
 	/**
+	 * Change response body
+	 *
+	 * <code>
+	 * $oCore_Response
+	 * 	->body('New body');
+	 * </code>
+	 * @param string $body
+	 * @return Core_Response
+	 */
+	public function changeBody($body)
+	{
+		$this->_body = $body;
+		return $this;
+	}
+
+	/**
 	 * Add response header
 	 *
 	 * <code>
@@ -273,7 +289,7 @@ class Core_Response
 	{
 		return $this->_body;
 	}
-	
+
 	/**
 	 * Show response body
 	 *

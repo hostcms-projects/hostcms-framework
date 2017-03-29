@@ -58,7 +58,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 		// Пропускаемые свойства модели
 		$this->skipColumns = array(
-			'user_id',
+			//'user_id',
 			'deleted'
 		);
 
@@ -459,8 +459,9 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 							$oAdmin_Form_Entity_For_Column->class($oAdmin_Form_Entity_For_Column->class . ' input-lg');
 						}
 
-						$columnName == 'id' && $oAdmin_Form_Entity_For_Column->readonly('readonly');
-
+						$columnName == 'id'
+							&& $oAdmin_Form_Entity_For_Column->readonly('readonly');
+							
 						break;
 				}
 
@@ -503,14 +504,15 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 				if (!empty($format))
 				{
-					$oAdmin_Form_Entity_For_Column
-						->format($format);
+					$oAdmin_Form_Entity_For_Column->format($format);
 				}
 
 				$oAdmin_Form_Entity_For_Column
 					->name($columnName)
 					->caption(Core::_($modelName . '.' . $columnName));
 
+				
+					
 				// На дополнительную или основную вкладку
 				/*$sTabName = isset($this->_keys[$columnName])
 					? 'oAdmin_Form_Tab_EntityAdditional'
@@ -524,10 +526,35 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					)
 				{
 					$this->_tabs[$sTabName]->add(
-						$oEntity_Row->add(
-							$oAdmin_Form_Entity_For_Column
-						)
+						$oEntity_Row->add($oAdmin_Form_Entity_For_Column)
 					);
+					
+					if ($columnName == 'user_id')
+					{
+						$oAdmin_Form_Entity_For_Column
+							->caption(Core::_('User.backend-field-caption'))
+							->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
+						
+						if ($this->_object->user_id && Core::moduleIsActive('user'))
+						{
+							$oUser = $this->_object->User;
+
+							$oUserLink = Admin_Form_Entity::factory('Link');
+							$oUserLink
+								->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-6 col-sm-3'))
+								->a
+									->class('btn btn-labeled btn-sky')
+									->href($this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/user/user/index.php', 'edit', NULL, 0, $oUser->id, 'user_group_id=' . $oUser->user_group_id))
+									->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax('/admin/user/user/index.php', 'edit', NULL, 0, $oUser->id, 'user_group_id=' . $oUser->user_group_id))
+									->value($oUser->login)
+									->target('_blank');
+							$oUserLink
+								->icon
+									->class('btn-label fa fa-user');
+
+							$oEntity_Row->add($oUserLink);
+						}
+					}
 				}
 
 				$this->addField($oAdmin_Form_Entity_For_Column);
@@ -619,6 +646,9 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforeApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 
 		$aColumns = $this->_object->getTableColums();
+
+		// Show on the additional tab, but not change!
+		$this->skipColumns = $this->skipColumns + array('user_id' => 'user_id');
 
 		// Применение данных к объекту
 		foreach ($aColumns as $columnName => $columnArray)

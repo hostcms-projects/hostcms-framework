@@ -319,6 +319,7 @@ abstract class Core_DataBase
 			'password' => '',
 			'database' => NULL,
 			'charset' => 'UTF8',
+			'storageEngine' => 'MyISAM',
 			'newlink' => FALSE,
 			'attr' => array(),
 			//'cache' => 'memory'

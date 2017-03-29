@@ -47,6 +47,7 @@ class Shop_Dir_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'site' => array(),
 		'shop_dir' => array('foreign_key' => 'parent_id'),
+		'user' => array()
 	);
 
 	/**

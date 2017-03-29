@@ -59,7 +59,7 @@ return array(
 	'item_end_datetime' => 'Дата завершения публикации',
 	'item_start_datetime' => 'Дата публикации',
 	'item_type' => 'Тип товара',
-	'item_additional_group' => "Дополнительный раздел",
+	'item_additional_group' => "Ярлыки GUID",
 	'specialprices_min_quantity' => "Количество товара от",
 	'specialprices_max_quantity' => "Количество товара до",
 	'specialprices_price' => "Значение цены",

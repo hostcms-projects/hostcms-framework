@@ -31,14 +31,23 @@ class Core_Date
 	}
 
 	/**
-	 * Преобразовывает дату из формата даты-времени во временную метку
+	 * Преобразовывает дату из формата даты-времени во временную метку.
+	 * При установленном формате обратного преобразования в Core::::$mainConfig['reverseDateTimeFormat'] будет использоваться он.
 	 *
 	 * @param string $sDate дата в формате SQL
 	 * @return int временную метку
 	 */
 	static public function datetime2timestamp($sDate)
 	{
-		return strtotime($sDate);
+		if (isset(Core::$mainConfig['reverseDateTimeFormat']))
+		{
+			$DateTime = DateTime::createFromFormat(Core::$mainConfig['reverseDateTimeFormat'], $sDate);
+			return $DateTime->getTimestamp();
+		}
+		else
+		{
+			return strtotime($sDate);
+		}
 	}
 
 	/**

@@ -116,7 +116,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 				->add($oAdmin_Form_Entity_Select)
 				->add(
 					Admin_Form_Entity::factory('Div')
-						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+						->class('form-group col-xs-12')
 						->add($oAdmin_Form_Entity_Button)
 				);
 
@@ -137,7 +137,7 @@ class Admin_Form_Action_Controller_Type_Move extends Admin_Form_Action_Controlle
 		}
 		else
 		{
-			$destinationId = Core_Array::getPost('destinationId');
+			$destinationId = intval(Core_Array::getPost('destinationId'));
 
 			if (is_null($destinationId))
 			{

@@ -48,7 +48,7 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 		}
 		else
 		{
-			?><div class="col-lg-12" id="counterAdminPage">
+			?><div class="col-xs-12" id="counterAdminPage">
 				<script type="text/javascript">
 				$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#counterAdminPage') });
 				</script>
@@ -70,7 +70,7 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 					<a data-toggle="maximize">
 						<i class="fa fa-expand gray"></i>
 					</a>
-					<a onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#counterAdminPage'), 'button': $(this).find('i') });">
+					<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#counterAdminPage'), 'button': $(this).find('i') });">
 						<i class="fa fa-refresh gray"></i>
 					</a>
 				</div>

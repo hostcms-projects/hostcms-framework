@@ -24,7 +24,8 @@ class Xsl_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'xsl_dir' => array()
+		'xsl_dir' => array(),
+		'user' => array()
 	);
 
 	/**

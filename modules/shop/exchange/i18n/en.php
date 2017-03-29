@@ -59,7 +59,7 @@ return array(
 	'item_end_datetime' => '<acronym title="Completion date of product publishing">Completion date of publication</acronym>',
 	'item_start_datetime' => '<acronym title="Date of product publication">Publication date</acronym>',
 	'item_type' => 'Product type',
-	'item_additional_group' => "Additional category",
+	'item_additional_group' => "Shortcute's GUID",
 	'specialprices_min_quantity' => "Count from",
 	'specialprices_max_quantity' => "Count to",
 	'specialprices_price' => "Price value",
@@ -72,7 +72,7 @@ return array(
 	'item_yandex_market_sales_notes' => "Sales notes",
 	'item_parent_sop' => "Артикул родительского товара для сопутствующего товара",
 	
-	'order_guid' => "order GUID",
+	'order_guid' => "Order GUID",
 	'order_number' => "Order number",
 	'order_country' => "Country",
 	'order_location' => "Location",

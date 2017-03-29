@@ -88,7 +88,10 @@ class Core_Mail_Smtp extends Core_Mail
 				return FALSE;
 			}
 
-			fputs($fp, "MAIL FROM: <{$this->_config['username']}>\r\n");
+			// MAIL FROM and user name may be different
+			$smtpFrom = Core_Array::get($this->_config, 'from', $this->_config['username']);
+
+			fputs($fp, "MAIL FROM: <{$smtpFrom}>\r\n");
 			$server_response = $this->_serverFgets($fp);
 			if (!$this->_serverParse($server_response, "250")) {
 				fclose($fp);

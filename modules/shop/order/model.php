@@ -70,6 +70,7 @@ class Shop_Order_Model extends Core_Entity
 		'shop_order_status' => array(),
 		'shop_payment_system' => array(),
 		'source' => array(),
+		'user' => array()
 	);
 
 	/**
@@ -102,6 +103,7 @@ class Shop_Order_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
 
@@ -312,38 +314,44 @@ class Shop_Order_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeChangeStatusCanceled', $this);
 
-		$oShop_Payment_System_Handler = Shop_Payment_System_Handler::factory(
-			Core_Entity::factory('Shop_Payment_System', $this->shop_payment_system_id)
-		);
+		if ($this->shop_payment_system_id)
+		{
+			$oShop_Payment_System_Handler = Shop_Payment_System_Handler::factory(
+				Core_Entity::factory('Shop_Payment_System', $this->shop_payment_system_id)
+			);
 
-		if ($oShop_Payment_System_Handler)
-		{
-			$oShop_Payment_System_Handler->shopOrder($this)->shopOrderBeforeAction(clone $this);
-		}
-		// HostCMS v. 5
-		elseif (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
-		{
-			$shop = new shop();
-			$order_row = $shop->GetOrder($this->id);
+			if ($oShop_Payment_System_Handler)
+			{
+				$oShop_Payment_System_Handler->shopOrder($this)->shopOrderBeforeAction(clone $this);
+			}
+			// HostCMS v. 5
+			elseif (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
+			{
+				$shop = new shop();
+				$order_row = $shop->GetOrder($this->id);
+			}
 		}
 
 		$this->canceled = 1 - $this->canceled;
 		$this->save();
 
-		if ($oShop_Payment_System_Handler)
+		if ($this->shop_payment_system_id)
 		{
-			$oShop_Payment_System_Handler->changedOrder('cancelPaid');
-		}
-		// HostCMS v. 5
-		elseif (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
-		{
-			// Вызываем обработчик платежной системы для события сменя статуса HostCMS v. 5
-			$shop->ExecSystemsOfPayChangeStatus($order_row['shop_system_of_pay_id'], array(
-				'shop_order_id' => $this->id,
-				'action' => $this->canceled ? 'cancel' : 'undoCancel',
-				// Предыдущие даные о заказе до редактирования
-				'prev_order_row' => $order_row
-			));
+			if ($oShop_Payment_System_Handler)
+			{
+				$oShop_Payment_System_Handler->changedOrder('cancelPaid');
+			}
+			// HostCMS v. 5
+			elseif (defined('USE_HOSTCMS_5') && USE_HOSTCMS_5)
+			{
+				// Вызываем обработчик платежной системы для события сменя статуса HostCMS v. 5
+				$shop->ExecSystemsOfPayChangeStatus($order_row['shop_system_of_pay_id'], array(
+					'shop_order_id' => $this->id,
+					'action' => $this->canceled ? 'cancel' : 'undoCancel',
+					// Предыдущие даные о заказе до редактирования
+					'prev_order_row' => $order_row
+				));
+			}
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterChangeStatusCanceled', $this);
@@ -640,17 +648,19 @@ class Shop_Order_Model extends Core_Entity
 			->addXmlTag('amount', $this->getAmount())
 			->addXmlTag('payment_datetime', $this->payment_datetime == '0000-00-00 00:00:00'
 				? $this->payment_datetime
-				: strftime($this->Shop->Site->date_time_format, Core_Date::sql2timestamp($this->payment_datetime)))
+				: strftime($this->Shop->format_datetime, Core_Date::sql2timestamp($this->payment_datetime)))
 			->addXmlTag('status_datetime', $this->status_datetime == '0000-00-00 00:00:00'
 				? $this->status_datetime
-				: strftime($this->Shop->Site->date_time_format, Core_Date::sql2timestamp($this->status_datetime)))
+				: strftime($this->Shop->format_datetime, Core_Date::sql2timestamp($this->status_datetime)))
 			->addXmlTag('date', $this->datetime == '0000-00-00 00:00:00'
 				? $this->datetime
-				: strftime($this->Shop->Site->date_format, Core_Date::sql2timestamp($this->datetime)))
+				: strftime($this->Shop->format_date, Core_Date::sql2timestamp($this->datetime)))
 			->addXmlTag('datetime', $this->datetime == '0000-00-00 00:00:00'
 				? $this->datetime
-				: strftime($this->Shop->Site->date_time_format, Core_Date::sql2timestamp($this->datetime)));
+				: strftime($this->Shop->format_datetime, Core_Date::sql2timestamp($this->datetime)));
 
+		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getOrderHref());
+				
 		$this->_showXmlCurrency && $this->shop_currency_id && $this->addEntity($this->Shop_Currency);
 
 		$this->source_id && $this->addEntity(

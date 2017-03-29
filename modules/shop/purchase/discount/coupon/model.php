@@ -34,7 +34,8 @@ class Shop_Purchase_Discount_Coupon_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_purchase_discount' => array()
+		'shop_purchase_discount' => array(),
+		'user' => array()
 	);
 
 	/**
@@ -49,6 +50,7 @@ class Shop_Purchase_Discount_Coupon_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			
 			$this->_preloadValues['start_datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['end_datetime'] = '2030-12-31 23:59:59';
 			$this->_preloadValues['text'] = sprintf("%03d-%03d-%03d-%03d", rand(0, 999), rand(0, 999), rand(0, 999), rand(0, 999));

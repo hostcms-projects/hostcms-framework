@@ -90,16 +90,16 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainTab->move($this->getField('tcy_topic')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow1);
 
 		// Закладка обратных ссылок
-		$oMainTab->move($this->getField('yandex_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow1);
-		$oMainTab->move($this->getField('google_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow1);
-		$oMainTab->move($this->getField('yahoo_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow2);
-		$oMainTab->move($this->getField('bing_links')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oLinksTabRow2);
+		$oMainTab->move($this->getField('yandex_links')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oLinksTabRow1);
+		$oMainTab->move($this->getField('google_links')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oLinksTabRow1);
+		$oMainTab->move($this->getField('yahoo_links')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oLinksTabRow2);
+		$oMainTab->move($this->getField('bing_links')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oLinksTabRow2);
 
 		// Закладка проиндексированных страниц
-		$oMainTab->move($this->getField('yandex_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow1);
-		$oMainTab->move($this->getField('google_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow1);
-		$oMainTab->move($this->getField('yahoo_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow2);
-		$oMainTab->move($this->getField('bing_indexed')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oIndexedTabRow2);
+		$oMainTab->move($this->getField('yandex_indexed')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oIndexedTabRow1);
+		$oMainTab->move($this->getField('google_indexed')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oIndexedTabRow1);
+		$oMainTab->move($this->getField('yahoo_indexed')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oIndexedTabRow2);
+		$oMainTab->move($this->getField('bing_indexed')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oIndexedTabRow2);
 
 		// Закладка каталогов
 		$oMainTab->move($this->getField('yandex_catalog')->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12')), $oCatalogTabRow1);

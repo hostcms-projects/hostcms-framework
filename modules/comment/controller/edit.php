@@ -58,7 +58,7 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oSiteuserLink = Admin_Form_Entity::factory('Link');
 			$oSiteuserLink
-				->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-lg-3 col-md-3 col-sm-3 col-xs-6'))
+				->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-6 col-sm-3'))
 				->a
 					->class('btn btn-labeled btn-sky')
 					->href($this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/siteuser/siteuser/index.php', 'edit', NULL, 0, $oSiteuser->id))

@@ -120,6 +120,7 @@ return array(
 	'size_measure_4' => 'футы',
 	'reserve' => '<acronym title="Резервировать заказанные товары">Резервировать заказанные товары</acronym>',
 	'reserve_hours' => '<acronym title="Время резервирования товаров (в часах)">Резервировать (в часах)</acronym>',
+	'adult' => 'Для взрослых',
 	'sales_statistics' => 'Статистика продаж',
 	'ordered' => 'Заказано',
 	'paid_orders' => 'Оплачено заказов',
@@ -127,7 +128,6 @@ return array(
 	'paid_orders_amount' => 'Сумма оплат',
 	'undefined_default_currency' => 'Валюта по умолчанию не установлена!',
 	'recent_orders' => 'Последние заказы',
-
 	'schedule-searchIndexItem' => 'Индексировать товар',
 	'schedule-searchIndexGroup' => 'Индексировать группу товаров',
 	'schedule-searchUnindexItem' => 'Снять товар с индексации',

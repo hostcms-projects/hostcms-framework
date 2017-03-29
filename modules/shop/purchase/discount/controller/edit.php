@@ -85,8 +85,8 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 			->add($oTypeSelectField)
 			->add($oPositionSelectField);
 
-		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);
-		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow4);
+		$oMainTab->move($this->getField('start_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow4);
+		$oMainTab->move($this->getField('end_datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow4);
 
 		$oMainTab->move($this->getField('min_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
 		$oMainTab->move($this->getField('max_amount')->divAttr(array('class' => 'form-group col-lg-4 col-md-4 col-sm-4')), $oMainRow5);
@@ -121,8 +121,8 @@ class Shop_Purchase_Discount_Controller_Edit extends Admin_Form_Action_Controlle
 				->divAttr(array('class' => 'form-group col-lg-12 col-md-12 col-sm-12'))
 		);
 
-		$oMainTab->move($this->getField('min_count')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7);
-		$oMainTab->move($this->getField('max_count')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6')), $oMainRow7);
+		$oMainTab->move($this->getField('min_count')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow7);
+		$oMainTab->move($this->getField('max_count')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow7);
 
 		$this->title($this->_object->id
 			? Core::_('Shop_Purchase_Discount.edit_order_discount_form_title')

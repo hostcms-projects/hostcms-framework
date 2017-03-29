@@ -921,9 +921,13 @@ class Informationsystem_Group_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
-		$this->clearXmlTags()
-			->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath())
-			->addXmlTag('dir', $this->getGroupHref());
+		$this->clearXmlTags();
+		
+		!isset($this->_forbiddenTags['url'])
+			&& $this->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath());
+			
+		!isset($this->_forbiddenTags['dir'])
+			&& $this->addXmlTag('dir', $this->getGroupHref());
 
 		if ($this->_showXmlProperties)
 		{

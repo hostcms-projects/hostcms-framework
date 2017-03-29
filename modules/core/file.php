@@ -29,6 +29,11 @@ class Core_File
 	{
 		if (is_uploaded_file($fileName))
 		{
+			$destination = str_replace(array("\r", "\n", "\0"), '', $destination);
+
+			// Create destination dir
+			self::mkdir(dirname($destination), CHMOD, TRUE);
+			
 			if (move_uploaded_file($fileName, $destination))
 			{
 				chmod($destination, $chmod);

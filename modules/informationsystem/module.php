@@ -23,7 +23,7 @@ class Informationsystem_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-09-12';
+	public $date = '2016-11-18';
 
 	/**
 	 * Module name
@@ -269,11 +269,12 @@ class Informationsystem_Module extends Core_Module
 							->showXmlComments(TRUE)
 							->showXmlProperties(TRUE);
 
+						$oInformationsystem_Item->informationsystem_group_id
+							&& $oSearch_Page->addEntity($oInformationsystem_Item->Informationsystem_Group);
+							
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
 
 						$oSearch_Page->addEntity($oInformationsystem_Item);
-
-						$oInformationsystem_Item->informationsystem_group_id && $oSearch_Page->addEntity($oInformationsystem_Item->Informationsystem_Group);
 					}
 				break;
 			}

@@ -84,7 +84,7 @@ class Core
 		}
 
 		$fBeginTime = Core::getmicrotime();
-		
+
 		self::setModulesPath();
 		self::registerCallbackFunction();
 
@@ -132,7 +132,7 @@ class Core
 		self::$_init = TRUE;
 
 		Core_Registry::instance()->set('Core_Statistics.totalTimeBegin', $fBeginTime);
-		
+
 		return TRUE;
 	}
 
@@ -146,6 +146,8 @@ class Core
 			'skin' => 'default',
 			'dateFormat' => 'd.m.Y',
 			'dateTimeFormat' => 'd.m.Y H:i:s',
+			'datePickerFormat' => 'DD.MM.YYYY',
+			'dateTimePickerFormat' => 'DD.MM.YYYY HH:mm:ss',
 			'availableExtension' => array ('JPG', 'JPEG', 'GIF', 'PNG', 'PDF', 'ZIP'),
 			'defaultCache' => 'file',
 			'timezone' => 'America/Los_Angeles',

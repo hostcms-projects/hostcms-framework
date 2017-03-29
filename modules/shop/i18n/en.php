@@ -122,6 +122,7 @@ return array(
 	'size_measure_4'=>'ft',
 	'reserve' => '<acronym title="Reserve ordered goods">Reserve ordered goods</acronym>',
 	'reserve_hours' => '<acronym title="Reserve ordered goods (in hours)">Reserve (in hours)</acronym>',
+	'adult' => 'Adult',
 	'sales_statistics' => 'Sales statistics',
 	'ordered' => 'Ordered',
 	'paid_orders' => 'Paid orders',
@@ -129,7 +130,6 @@ return array(
 	'paid_orders_amount' => 'The amount of paid orders',
 	'undefined_default_currency' => 'The default currency is undefined!',
 	'recent_orders' => 'Recent orders',
-
 	'schedule-searchIndexItem' => 'Index shop item',
 	'schedule-searchIndexGroup' => 'Index shop group',
 	'schedule-searchUnindexItem' => 'Unindex shop item',

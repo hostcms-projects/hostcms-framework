@@ -25,7 +25,8 @@ class Shop_Warehouse_Item_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'shop_item' => array(),
-		'shop_warehouse' => array()
+		'shop_warehouse' => array(),
+		'user' => array()
 	);
 
 	/**

@@ -24,10 +24,10 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 
 		$aTypicalLargeParams = array(
 			// image_big_max_width - значение максимальной ширины большого изображения;
-			'max_width' => MAX_SIZE_LOAD_IMAGE_BIG,
+			'max_width' => defined('MAX_SIZE_LOAD_IMAGE_BIG') ? MAX_SIZE_LOAD_IMAGE_BIG : 0,
 
 			// image_big_max_height - значение максимальной высоты большого изображения;
-			'max_height' => MAX_SIZE_LOAD_IMAGE_BIG,
+			'max_height' => defined('MAX_SIZE_LOAD_IMAGE_BIG') ? MAX_SIZE_LOAD_IMAGE_BIG : 0,
 
 			// big_image_path - адрес большого загруженного изображения
 			'path' => '',
@@ -86,10 +86,10 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 			'show' => TRUE,
 
 			// image_small_max_width - значение максимальной ширины малого изображения;
-			'max_width' => MAX_SIZE_LOAD_IMAGE,
+			'max_width' => defined('MAX_SIZE_LOAD_IMAGE') ? MAX_SIZE_LOAD_IMAGE : 0,
 
 			// image_small_max_height - значение максимальной высоты малого изображения;
-			'max_height' => MAX_SIZE_LOAD_IMAGE,
+			'max_height' => defined('MAX_SIZE_LOAD_IMAGE') ? MAX_SIZE_LOAD_IMAGE : 0,
 
 			// small_image_path - адрес малого загруженного изображения
 			'path' => '',
@@ -174,8 +174,8 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 		}
 
 		/*$sDivClass = $this->smallImage['show']
-			? 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
-			: 'col-lg-6 col-md-6 col-sm-6 col-xs-12';*/
+			? 'col-xs-12 col-sm-6 col-md-6'
+			: 'col-xs-12 col-sm-6 col-md-6';*/
 
 		$sDivClass = 'col-xs-12 col-sm-6';
 
@@ -302,7 +302,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				$oLargeWatermark_Div
 					->add(
 						Core::factory('Core_Html_Entity_Div')
-						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+						->class('form-group col-xs-12')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
 								->class('checkbox-inline')
@@ -338,7 +338,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 				$oLargeWatermark_Div
 					->add(
 						Core::factory('Core_Html_Entity_Div')
-						->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+						->class('form-group col-xs-12')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
 								->class('checkbox-inline')
@@ -462,7 +462,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 			$oLarge_Main_Block_Core_Html_Entity_Div
 				->add(
 					Core::factory('Core_Html_Entity_Div')
-						->class('form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')
+						->class('form-group col-xs-12 col-sm-6 col-md-6')
 						->add(
 							Core::factory('Core_Html_Entity_Span')
 								->class('caption')
@@ -604,7 +604,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+								->class('form-group col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -640,7 +640,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+								->class('form-group col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -676,7 +676,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oSmallWatermark_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-12 col-md-12 col-sm-12 col-xs-12')
+								->class('form-group col-xs-12')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
 										->class('checkbox-inline')
@@ -699,7 +699,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oLarge_Main_Block_Core_Html_Entity_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-lg-6 col-md-6 col-sm-6 col-xs-12')
+								->class('form-group col-xs-12 col-sm-6 col-md-6')
 								->add(
 									Core::factory('Core_Html_Entity_Span')
 										->class('caption')

@@ -249,7 +249,7 @@ class Shop_Controller_Show extends Core_Controller
 
 		if ($this->favorite && isset($_SESSION))
 		{
-			$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
+			$hostcmsFavorite = Core_Array::get(Core_Array::getSession('hostcmsFavorite', array()), $oShop->id, array());
 			count($hostcmsFavorite) && $this->addCacheSignature('hostcmsFavorite=' . implode(',', $hostcmsFavorite));
 		}
 	}
@@ -451,7 +451,7 @@ class Shop_Controller_Show extends Core_Controller
 	{
 		$oShop = $this->getEntity();
 
-		$hostcmsCompare = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsCompare', array()), $oShop->id, array());
+		$hostcmsCompare = Core_Array::get(Core_Array::getSession('hostcmsCompare', array()), $oShop->id, array());
 
 		if (count($hostcmsCompare))
 		{
@@ -485,7 +485,7 @@ class Shop_Controller_Show extends Core_Controller
 	{
 		$oShop = $this->getEntity();
 
-		$hostcmsFavorite = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsFavorite', array()), $oShop->id, array());
+		$hostcmsFavorite = Core_Array::get(Core_Array::getSession('hostcmsFavorite', array()), $oShop->id, array());
 
 		if (count($hostcmsFavorite))
 		{
@@ -535,12 +535,13 @@ class Shop_Controller_Show extends Core_Controller
 	/**
 	 * Add viewed goods
 	 * @return self
+	 * @hostcms-event Shop_Controller_Show.onBeforeAddViewedEntity
 	 */
 	protected function _addViewed()
 	{
 		$oShop = $this->getEntity();
 
-		$hostcmsViewed = Core_Array::get(Core_Array::get($_SESSION, 'hostcmsViewed', array()), $oShop->id, array());
+		$hostcmsViewed = Core_Array::get(Core_Array::getSession('hostcmsViewed', array()), $oShop->id, array());
 
 		if (count($hostcmsViewed))
 		{
@@ -581,6 +582,8 @@ class Shop_Controller_Show extends Core_Controller
 					$oShop_Item->showXmlComments($this->comments);
 					$oShop_Item->showXmlBonuses($this->bonuses);
 					$oShop_Item->showXmlSpecialprices($this->specialprices);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddViewedEntity', $this, array($oShop_Item));
 
 					$oViewedEntity->addEntity($oShop_Item);
 				}

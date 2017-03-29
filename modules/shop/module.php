@@ -23,7 +23,7 @@ class Shop_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-09-12';
+	public $date = '2016-11-18';
 
 	/**
 	 * Module name
@@ -365,11 +365,12 @@ class Shop_Module extends Core_Module
 							->showXmlProperties($showXmlProperties)
 							->showXmlSpecialprices(TRUE);
 
+						$oShop_Item->shop_group_id
+							&& $oSearch_Page->addEntity($oShop_Item->Shop_Group);
+							
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oShop_Item));
-
+						
 						$oSearch_Page->addEntity($oShop_Item);
-
-						$oShop_Item->shop_group_id && $oSearch_Page->addEntity($oShop_Item->Shop_Group);
 					}
 				break;
 			}

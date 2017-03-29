@@ -286,11 +286,18 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			
 			$css = Core_Array::getPost('css');
 
-			$this->_object->less
-				// Save LESS and rebuild CSS
-				? $this->_object->saveTemplateLessFile($css)
-				// Save just CSS
-				: $this->_object->saveTemplateCssFile($css);
+			try
+			{
+				$this->_object->less
+					// Save LESS and rebuild CSS
+					? $this->_object->saveTemplateLessFile($css)
+					// Save just CSS
+					: $this->_object->saveTemplateCssFile($css);
+			}
+			catch (Exception $e)
+			{
+				Core_Message::show($e->getMessage(), 'error');
+			}
 
 			$manifest = Core_Array::getPost('manifest');
 			!is_null($manifest)
@@ -299,6 +306,12 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$this->_object
 				->rebuildCompressionCss()
 				->updateTimestamp();
+				
+			// Delete all compressed JS
+			if (Core::moduleIsActive('compression'))
+			{
+				Compression_Controller::instance('js')->deleteAllJs();
+			}
 		}
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));

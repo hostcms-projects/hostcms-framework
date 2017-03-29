@@ -24,7 +24,8 @@ class Shop_Item_Discount_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_discount' => array()
+		'shop_discount' => array(),
+		'user' => array()
 	);
 
 	/**

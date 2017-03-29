@@ -379,10 +379,14 @@ abstract class Core_Mail
 
 	/**
 	 * Send mail
+	 *
 	 * @return mixed
+	 * @hostcms-event Core_Mail.onBeforeSend
 	 */
 	public function send()
 	{
+		Core_Event::notify('Core_Mail.onBeforeSend', $this);
+
 		$sFrom = !is_null($this->_senderName)
 			? '=?UTF-8?B?' . base64_encode($this->_senderName) . "?= <{$this->_from}>"
 			: $this->_from;
@@ -394,7 +398,7 @@ abstract class Core_Mail
 		$sTo = !is_null($this->_recipientName)
 			? '=?UTF-8?B?' . base64_encode($this->_recipientName) . "?= <{$this->_to}>"
 			: $this->_to;
-			
+
 		if (!isset($this->_headers['Reply-To']))
 		{
 			$this->header('Reply-To', "<{$this->_from}>");

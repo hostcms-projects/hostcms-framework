@@ -145,7 +145,7 @@ class Core_Str
 
 			preg_match('/^((?:.*?[.!?。])*)/su', $text, $matches);
 
-			$text = isset($matches[1])
+			$text = isset($matches[1]) && mb_strlen($matches[1])
 				? $matches[1]
 				: mb_substr($text, 0, mb_strrpos($text, ' '));
 		}

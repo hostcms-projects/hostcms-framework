@@ -211,7 +211,7 @@ class Core_Auth
 
 		define('IS_ADMIN_PART', TRUE);
 
-		self::setCurrentLng(Core_Array::get($_SESSION, 'current_lng'));
+		self::setCurrentLng(Core_Array::getSession('current_lng'));
 
 		// Записываем в сессию язык, содержащийся в константе
 		$_SESSION['current_lng'] = CURRENT_LNG;

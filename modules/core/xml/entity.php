@@ -91,9 +91,14 @@ class Core_Xml_Entity extends Core_Servant_Properties
 		$xml .= '>';
 
 		// Children entities
-		foreach ($this->_childrenEntities as $oChildrenEntity)
+		if (!empty($this->_childrenEntities))
 		{
-			$xml .= "\n" . $oChildrenEntity->getXml();
+			$xml .= "\n";
+
+			foreach ($this->_childrenEntities as $oChildrenEntity)
+			{
+				$xml .= $oChildrenEntity->getXml();
+			}
 		}
 
 		if (!is_null($this->value))

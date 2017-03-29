@@ -76,7 +76,7 @@ class Tag_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->caption(Core::_('Tag_Dir.parent_name'));
 
 				$oMainTab->addBefore(
-					$oSelect_Dirs, $this->getField('path')
+					$oSelect_Dirs, $this->getField('path')->format(array('lib' => array()))
 				);
 
 				$this->getField('description')

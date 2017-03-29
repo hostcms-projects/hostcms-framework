@@ -31,7 +31,8 @@ class Affiliate_Plan_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'site' => array(),
-		'siteuser_group' => array()
+		'siteuser_group' => array(),
+		'user' => array()
 	);
 
 	/**

@@ -40,7 +40,7 @@ class Xsl_Processor_Observer
 				+ $iTime
 		);
 
-		if (Core::checkPanel() && Core_Array::get($_SESSION, 'HOSTCMS_SHOW_XML'))
+		if (Core::checkPanel() && Core_Array::getSession('HOSTCMS_SHOW_XML'))
 		{
 			$oXslPanel = Core::factory('Core_Html_Entity_Div')
 				->class('hostcmsPanel');

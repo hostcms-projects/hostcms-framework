@@ -26,10 +26,16 @@ class Informationsystem_Item_Model extends Core_Entity
 	public $img = 1;
 
 	/**
+	 * Callback property_id
+	 * @var int
+	 */
+	public $reviews = 1;
+
+	/**
 	 * Backend property
 	 * @var mixed
 	 */
-	public $comment_field = NULL;
+	//public $comment_field = NULL;
 
 	/**
 	 * One-to-many or many-to-many relations
@@ -126,7 +132,7 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		return $this->applyTagsArray($aTags);
 	}
-	
+
 	/**
 	 * Apply array tags for item
 	 * @param array $aTags array of tags
@@ -254,7 +260,7 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		// Remove from search index
 		$this->unindex();
-		
+
 		return parent::delete($primaryKey);
 	}
 
@@ -303,7 +309,20 @@ class Informationsystem_Item_Model extends Core_Entity
 	 */
 	public function move($informationsystem_group_id)
 	{
+		if ($this->shortcut_id)
+		{
+			$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group', $informationsystem_group_id);
+
+			$oInformationsystem_Item = $oInformationsystem_Group->Informationsystem_Items->getByShortcut_id($this->shortcut_id);
+
+			if (!is_null($oInformationsystem_Item))
+			{
+				return $this;
+			}
+		}
+
 		$this->informationsystem_group_id = $informationsystem_group_id;
+
 		return $this->save()->clearCache();
 	}
 
@@ -760,7 +779,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		$this->active && $this->indexing
 			? $this->index()
 			: $this->unindex();
-			
+
 		return $this->save();
 	}
 
@@ -889,37 +908,6 @@ class Informationsystem_Item_Model extends Core_Entity
 		}
 
 		$oCore_Html_Entity_Div->execute();
-	}
-
-	/**
-	 * Backend callback method
-	 * @param Admin_Form_Field $oAdmin_Form_Field
-	 * @param Admin_Form_Controller $oAdmin_Form_Controller
-	 * @return string
-	 */
-	public function adminComment($oAdmin_Form_Field, $oAdmin_Form_Controller)
-	{
-		ob_start();
-
-		$windowId = $oAdmin_Form_Controller->getWindowId();
-
-		$queryBuilder = Core_QueryBuilder::select(array('COUNT(*)', 'count'))
-			->from('comment_informationsystem_items')
-			->join('comments', 'comments.id', '=', 'comment_informationsystem_items.comment_id')
-			->where('informationsystem_item_id', '=', $this->id)
-			->where('comments.deleted', '=', 0);
-
-		$aCountComments = $queryBuilder->execute()->asAssoc()->current();
-
-		$iCountComments = $aCountComments['count'];
-
-		Core::factory('Core_Html_Entity_A')
-			->href('/admin/informationsystem/item/comment/index.php?informationsystem_item_id=' . $this->id)
-			->onclick("$.adminLoad({path: '/admin/informationsystem/item/comment/index.php', additionalParams: 'informationsystem_item_id={$this->id}', windowId: '{$windowId}'}); return false")
-			->value(htmlspecialchars($iCountComments))
-			->execute();
-
-		return ob_get_clean();
 	}
 
 	/**
@@ -1186,8 +1174,10 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		$oInformationsystem = $this->Informationsystem;
 
-		$this->clearXmlTags()
-			->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath());
+		$this->clearXmlTags();
+
+		!isset($this->_forbiddenTags['url'])
+			&& $this->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath());
 
 		!isset($this->_forbiddenTags['date'])
 			&& $this->addXmlTag('date', strftime($oInformationsystem->format_date, Core_Date::sql2timestamp($this->datetime)));
@@ -1432,7 +1422,7 @@ class Informationsystem_Item_Model extends Core_Entity
 				? $this->Informationsystem_Group->clearCache()
 				: Core_Cache::instance(Core::$mainConfig['defaultCache'])
 					->deleteByTag('informationsystem_group_0');
-					
+
 			// Static cache
 			$oSite = $this->Informationsystem->Site;
 			if ($oSite->html_cache_use)
@@ -1443,7 +1433,7 @@ class Informationsystem_Item_Model extends Core_Entity
 					$url = $oSiteAlias->name
 						. $this->Informationsystem->Structure->getPath()
 						. $this->getPath();
-					
+
 					$oCache_Static = Core_Cache::instance('static');
 					$oCache_Static->delete($url);
 				}
@@ -1451,5 +1441,21 @@ class Informationsystem_Item_Model extends Core_Entity
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function reviewsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Comments->getCount();
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-azure white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
 	}
 }

@@ -32,7 +32,8 @@ class Shop_Country_Location_City_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'shop_country_location' => array()
+		'shop_country_location' => array(),
+		'user' => array()
 	);
 
 	/**

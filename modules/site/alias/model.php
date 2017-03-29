@@ -24,7 +24,8 @@ class Site_Alias_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'site' => array()
+		'site' => array(),
+		'user' => array()
 	);
 
 	/**

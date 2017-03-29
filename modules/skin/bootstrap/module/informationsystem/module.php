@@ -56,7 +56,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 		}
 		else
 		{
-			?><div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="informationsystemCommentsAdminPage" data-hostcmsurl="<?php echo htmlspecialchars($this->_path)?>">
+			?><div class="col-xs-12 col-sm-6" id="informationsystemCommentsAdminPage" data-hostcmsurl="<?php echo htmlspecialchars($this->_path)?>">
 				<script type="text/javascript">
 				$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#informationsystemCommentsAdminPage') });
 				</script>
@@ -77,6 +77,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 			->where('informationsystem_items.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
 			->where('site_id', '=', CURRENT_SITE)
+			->clearOrderBy()
 			->orderBy('comments.datetime', 'DESC')
 			->limit(5);
 
@@ -99,7 +100,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 						<a data-toggle="maximize">
 							<i class="fa fa-expand gray"></i>
 						</a>
-						<a onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#informationsystemCommentsAdminPage'), 'button': $(this).find('i') });">
+						<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#informationsystemCommentsAdminPage'), 'button': $(this).find('i') });">
 							<i class="fa fa-refresh gray"></i>
 						</a>
 					</div>
@@ -144,7 +145,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-12">
+										<div class="col-xs-12">
 											<div class="task-body"><?php echo trim(htmlspecialchars(Core_Str::cut(strip_tags(html_entity_decode($oComment->text, ENT_COMPAT, 'UTF-8')), 150)))?></div>
 										</div>
 									</div>

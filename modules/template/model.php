@@ -32,7 +32,8 @@ class Template_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'template_dir' => array(),
 		'template' => array(),
-		'site' => array()
+		'site' => array(),
+		'user' => array()
 	);
 
 	/**

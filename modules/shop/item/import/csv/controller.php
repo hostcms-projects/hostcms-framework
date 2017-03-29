@@ -437,7 +437,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				continue;
 			}
 
-			foreach($aCsvLine as $iKey => $sData)
+			foreach ($aCsvLine as $iKey => $sData)
 			{
 				if (!isset($this->csv_fields[$iKey]))
 				{
@@ -737,7 +737,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							// чем название группы, тогда просто обновляем название группы
 							if ($sNeedKeyCML !== FALSE
 								&& $sNeedKeyCML < $sNeedKeyName
-								&& $this->_oCurrentGroup->id)
+								// Для новой группы "CML ID|Название группы", id будет пустым
+								/*&& $this->_oCurrentGroup->id*/)
 							{
 								// Меняем название на переданное
 								$this->_oCurrentGroup->name = $sData;
@@ -791,7 +792,20 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 									// Группа не нашлась
 									$oTmpObject = Core_Entity::factory('Shop_Group');
 									$oTmpObject->name = $sData;
-									$oTmpObject->parent_id = intval($this->_oCurrentGroup->id);
+
+									$sNeedKeyParentCML = array_search('shop_shop_groups_parent_cml_id', $this->csv_fields);
+
+									if ($sNeedKeyParentCML !== FALSE
+										// Если явно переданный CML Parent ID идет до названия
+										&& $sNeedKeyParentCML < $sNeedKeyName)
+									{
+										$oTmpObject->parent_id = intval($this->_oCurrentGroup->parent_id);
+									}
+									else
+									{
+										$oTmpObject->parent_id = intval($this->_oCurrentGroup->id);
+									}
+
 									$oTmpObject->shop_id = $this->_oCurrentShop->id;
 
 									// Переданные GUID для новой группы
@@ -971,7 +985,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
-									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									$aTmpReturn = Core_Event::getLastReturn();
 									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 									$result = Core_File::adminUpload($aPicturesParam);
@@ -1082,7 +1097,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
-									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									$aTmpReturn = Core_Event::getLastReturn();
 									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 									$result = Core_File::adminUpload($aPicturesParam);
@@ -1256,7 +1272,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						break;
 						// Дополнительные группы для товара (CML_ID), где нужно создавать ярлыки
 						case 'additional_group':
-							$this->_aAdditionalGroups[] = $sData;
+							$aShortcuts = explode(',', $sData);
+							$this->_aAdditionalGroups = array_merge($this->_aAdditionalGroups, $aShortcuts);
 						break;
 						// Идентификатор товара
 						case 'shop_items_catalog_item_id':
@@ -1627,7 +1644,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 											}
 
 											try {
-												$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+												Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+												$aTmpReturn = Core_Event::getLastReturn();
 												is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 												$result = Core_File::adminUpload($aPicturesParam);
@@ -1708,9 +1726,17 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				}
 			}
 
-			!$this->_oCurrentItem->modification_id && !$this->_oCurrentItem->id && $this->_oCurrentItem->shop_group_id = (int)$this->_oCurrentGroup->id;
-			!$this->_oCurrentItem->id && is_null($this->_oCurrentItem->path) && $this->_oCurrentItem->path = '';
-			$this->_oCurrentItem->id && $this->_oCurrentItem->id == $this->_oCurrentItem->modification_id && $this->_oCurrentItem->modification_id = 0;
+			!$this->_oCurrentItem->modification_id
+				&& !$this->_oCurrentItem->id
+				&& $this->_oCurrentItem->shop_group_id = intval($this->_oCurrentGroup->id);
+
+			!$this->_oCurrentItem->id
+				&& is_null($this->_oCurrentItem->path)
+				&& $this->_oCurrentItem->path = '';
+
+			$this->_oCurrentItem->id
+				&& $this->_oCurrentItem->id == $this->_oCurrentItem->modification_id
+				&& $this->_oCurrentItem->modification_id = 0;
 
 			if (!is_null($this->_oCurrentOrder))
 			{
@@ -1773,7 +1799,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						// Удаляем уже существующие связи с метками
 						$this->_oCurrentItem->Tag_Shop_Items->deleteAll(FALSE);
 
-						foreach($aTags as $iTagId => $sTagName)
+						foreach ($aTags as $iTagId => $sTagName)
 						{
 							$aTmpTags = Core_Str::getHashes($sTagName, array ('hash_function' => 'crc32'));
 							$aTmpTags = array_unique($aTmpTags);
@@ -1889,30 +1915,32 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 				// Обрабатываем ярлыки
 				if (count($this->_aAdditionalGroups))
 				{
-					$aShopGroups = $this->_oCurrentShop->Shop_Groups;
-					$aShopItems = $this->_oCurrentShop->Shop_Items;
-					$aShopItems->queryBuilder()
-						->where('shortcut_id', '=', $this->_oCurrentItem->id);
+					$this->_aAdditionalGroups = array_map('trim', $this->_aAdditionalGroups);
 
-					$aShopGroups->queryBuilder()->where('guid', 'IN', $this->_aAdditionalGroups);
+					$aShopGroups = $this->_oCurrentShop->Shop_Groups;
+					$aShopGroups
+						->queryBuilder()
+						->where('guid', 'IN', $this->_aAdditionalGroups);
 
 					$aShopGroups = $aShopGroups->findAll(FALSE);
 
-					foreach($aShopGroups as $oShopGroup)
+					foreach ($aShopGroups as $oShopGroup)
 					{
+						$aShopItems = $this->_oCurrentShop->Shop_Items;
 						$aShopItems->queryBuilder()
-							->where('shop_group_id', '=', $oShopGroup->id);
+							->where('shortcut_id', '=', $this->_oCurrentItem->id)
+							->where('shop_group_id', '=', $oShopGroup->id)
+							->limit(1);
 
-						$aShopItems = $aShopItems->findAll(FALSE);
+						$iCountShortcuts = $aShopItems->getCount(FALSE);
 
-						if (count($aShopItems) == 0)
+						if (!$iCountShortcuts)
 						{
 							Core_Entity::factory('Shop_Item')
 								->shop_group_id($oShopGroup->id)
 								->shortcut_id($this->_oCurrentItem->id)
 								->shop_id($this->_oCurrentShop->id)
-								->save()
-							;
+								->save();
 						}
 					}
 				}
@@ -2036,7 +2064,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 						try
 						{
-							$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							$aTmpReturn = Core_Event::getLastReturn();
 							is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 							$result = Core_File::adminUpload($aPicturesParam);
@@ -2160,7 +2189,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							$aPicturesParam['small_image_preserve_aspect_ratio'] = $this->_oCurrentShop->preserve_aspect_ratio_small;
 
 							try {
-								$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+								Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+								$aTmpReturn = Core_Event::getLastReturn();
 								is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 								$result = Core_File::adminUpload($aPicturesParam);
@@ -2233,7 +2263,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 
 					if (!isset($this->_aClearedPropertyValues[$this->_oCurrentItem->id]) || !in_array($oProperty->guid, $this->_aClearedPropertyValues[$this->_oCurrentItem->id]))
 					{
-						foreach($aPropertyValues as $oPropertyValue)
+						foreach ($aPropertyValues as $oPropertyValue)
 						{
 							$oProperty->type == 2 && $oPropertyValue->setDir($this->_oCurrentItem->getItemPath());
 							$oPropertyValue->delete();
@@ -2362,7 +2392,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 								}
 
 								try {
-									$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+									$aTmpReturn = Core_Event::getLastReturn();
 									is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 									$aResult = Core_File::adminUpload($aPicturesParam);
@@ -2537,7 +2568,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						}
 
 						try {
-							$aTmpReturn = Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							Core_Event::notify('Shop_Item_Import_Cml_Controller.oBeforeAdminUpload', $this, array($aPicturesParam));
+							$aTmpReturn = Core_Event::getLastReturn();
 							is_array($aTmpReturn) && $aPicturesParam = $aTmpReturn;
 
 							$aResult = Core_File::adminUpload($aPicturesParam);
@@ -2626,7 +2658,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 		fclose($fInputFile);
 
 		Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImport', $this, array($this->_oCurrentShop, $iCurrentSeekPosition));
-		
+
 		return $iCurrentSeekPosition;
 	}
 
