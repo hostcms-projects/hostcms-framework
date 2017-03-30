@@ -6,7 +6,7 @@
  * @subpackage Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Sites',
@@ -70,9 +70,9 @@ return array(
 	'menu2_sub_caption' => 'Registration data',
 
 	'accountinfo_title' => 'Edit registration data',
-	'accountinfo_login' => '<acronym title="User login">Login</acronym>',
-	'accountinfo_contract_number' => '<acronym title="License number">License</acronym>',
-	'accountinfo_pin_code' => '<acronym title="PIN code">PIN code</acronym>',
+	'accountinfo_login' => '<acronym title="User Login at hostcms.org">Login at hostcms.org</acronym>',
+	'accountinfo_contract_number' => '<acronym title="License Number">License Number</acronym>',
+	'accountinfo_pin_code' => '<acronym title="License PIN code">PIN сode</acronym>',
 	'accountInfo_success' => 'Registration data modified successfully.',
 
 	'delete_success' => 'Item deleted successfully!',

@@ -4,14 +4,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
  * Typical editing controller
- * 
+ *
  * Типовой контроллер редактирования.
  *
  * @package HostCMS
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controller
 {
@@ -128,7 +128,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		$this->_tabs[$oAdmin_Form_Entity_Tab->name] = $oAdmin_Form_Entity_Tab;
 		return $this;
 	}
-	
+
 	/**
 	 * Delete tab
 	 * @param string $tabName Name of tab
@@ -140,10 +140,10 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		{
 			unset($this->_tabs[$tabName]);
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Move tab before some another tab
 	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab tab you want to move
@@ -169,7 +169,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 		$this->addTabAfter($oAdmin_Form_Entity_Tab, $oAdmin_Form_Entity_Tab_After);
 		return $this;
 	}
-	
+
 	/**
 	 * Add new tab into form before $oAdmin_Form_Entity_Tab_Before
 	 * @param Skin_Default_Admin_Form_Entity_Tab $oAdmin_Form_Entity_Tab new tab
@@ -461,7 +461,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 						$columnName == 'id'
 							&& $oAdmin_Form_Entity_For_Column->readonly('readonly');
-							
+
 						break;
 				}
 
@@ -511,8 +511,8 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					->name($columnName)
 					->caption(Core::_($modelName . '.' . $columnName));
 
-				
-					
+
+
 				// На дополнительную или основную вкладку
 				/*$sTabName = isset($this->_keys[$columnName])
 					? 'oAdmin_Form_Tab_EntityAdditional'
@@ -528,13 +528,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					$this->_tabs[$sTabName]->add(
 						$oEntity_Row->add($oAdmin_Form_Entity_For_Column)
 					);
-					
+
 					if ($columnName == 'user_id')
 					{
 						$oAdmin_Form_Entity_For_Column
 							->caption(Core::_('User.backend-field-caption'))
 							->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
-						
+
 						if ($this->_object->user_id && Core::moduleIsActive('user'))
 						{
 							$oUser = $this->_object->User;
@@ -576,6 +576,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	public function execute($operation = NULL)
 	{
 		Core_Event::notify('Admin_Form_Action_Controller_Type_Edit.onBeforeExecute', $this, array($operation, $this->_Admin_Form_Controller));
+
+		$eventResult = Core_Event::getLastReturn();
+
+		if (!is_null($eventResult))
+		{
+			return $eventResult;
+		}
 
 		switch ($operation)
 		{

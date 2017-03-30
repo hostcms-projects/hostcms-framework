@@ -6,7 +6,7 @@
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Информационные группы',
@@ -63,9 +63,11 @@ return array(
 	'changeIndexation_success' => 'Индексация информационной группы изменена.',
 	'apply_success' => 'Информация изменена.',
 	'copy_success' => 'Информационная группа скопирована!',
-	
+
 	'move_success' => 'Информационные группы перенесены.',
 	'show_information_propertys_groups_title' => 'Дополнительные свойства групп информационной системы "%s"',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	'tab_export' => 'Экспорт/Импорт',
+	'guid' => '<acronym title="Уникальный идентификатор элемента, например ID00029527">GUID</acronym>',
 );

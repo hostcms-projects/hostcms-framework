@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Install_Module extends Core_Module
 {
@@ -23,5 +23,5 @@ class Install_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2016-12-28';
+	public $date = '2017-01-27';
 }

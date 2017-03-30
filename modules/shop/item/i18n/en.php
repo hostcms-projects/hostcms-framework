@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Products',
@@ -15,7 +15,7 @@ return array(
 	'name' => "<acronym title=\"Product name\">Name</acronym>",
 	'type' => "<acronym title=\"Select product type (conventional or digital)\">Product type</acronym>",
 	'marking' => "<acronym title=\"Marking of product\">Marking</acronym>",
-	'vendorcode' => "<acronym title=\"Product code placed in 'vendorCode' element when exporting to Yandex.Market\">Product code</acronym>",
+	'vendorcode' => "<acronym title=\"Product code placed in 'vendorCode' element when exporting to Yandex.Market\">Vendor Code</acronym>",
 	'description' => "<acronym title=\"Short description of product\">Description</acronym>",
 	'text' => "<acronym title=\"Detailed description of product\">Text</acronym>",
 	'image_large' => "<acronym title=\"Product image\">Product image</acronym>",
@@ -157,6 +157,7 @@ return array(
 	'input_file_encoding0' => 'Windows-1251',
 	'input_file_encoding1' => 'UTF-8',
 	'import_price_list_parent_group' => "<acronym title=\"Parent group for product\">Parent group</acronym>",
+	'import_price_list_producer' => "<acronym title=\"Upload item for selected producer\">Producer</acronym>",
 	'import_price_list_images_path' => "<acronym title=\"Path for external files, e.g. /upload_images/\">Path for external files</acronym>",
 	'import_price_list_action_items' => "<acronym title=\"Action for existing products\">Action for existing products</acronym>",
 	'import_price_action_items0' => "Delete existing products in all groups",
@@ -278,7 +279,7 @@ return array(
 	'delivery' => 'Delivery',
 	'pickup' => 'Pickup',
 	'store' => 'Offline Store',
-	'store' => 'Adult',
+	'adult' => 'Adult',
 	'show_in_group'=>'Show property in group',
 	'show_in_item'=>'Show property in item',
 	'add_value'=>'Add the default property values ​​for the items with unset values',

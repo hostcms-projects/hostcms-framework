@@ -7,7 +7,7 @@
  * @subpackage Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'changeLanguage' => 'Select your language:',
@@ -31,16 +31,36 @@ return array(
 	'megabytes' => 'M',
 
 	'title' => 'Content Management System Installation',
+	'menu_0' => 'Select your language',
+	'menu_1' => 'License Agreement',
+	'menu_2' => 'Server Settings',
+	'menu_3' => 'Settings',
+	'menu_4' => 'Configuration',
+	'menu_5' => 'License',
+	'menu_6' => 'Choose template',
+	'menu_7' => 'Template Settings',
+	'menu_8' => 'Installation Complete',
+	
+	'license-caption' => 'Registration Data',
+	'login' => 'Login at hostcms.org',
+	'login-placeholder' => 'Login at hostcms.org',
+	'license' => 'License Number',
+	'pin' => 'PIN сode',
+	
 	'step_0' => 'HostCMS installation',
-	'step_1' => 'Step 1: License agreement',
-	'step_2' => 'Step 2: Server settings',
+	'step_1' => 'Step 1: License Agreement',
+	'step_2' => 'Step 2: Server Settings',
 	'step_3' => 'Step 3: Settings',
 	'step_4' => 'Step 4: Configuration',
-	'step_5' => 'Step 5: Choose template',
-	'step_6' => 'Step 6: Color scheme',
-	'step_7' => 'Step 7: Template settings',
-	'step_8' => 'Step 8: Installation complete',
+	'step_5' => 'Step 5: License',
+	'step_6' => 'Step 6: Choose Template',
+	'step_7' => 'Step 7: Template Settings',
+	'step_8' => 'Step 8: Installation Complete',
 
+	'step_5_warning1' => 'License number and PIN-code can be found in your <a href="http://www.hostcms.ru/users/" target="_blank">account</a> on our website in the <a href="http://www.hostcms.ru/users/licence/" target="_blank">Licenses</a>.',
+	'step_5_warning2' => 'You can not fill the license data at this step.',
+	'step_5_warning3' => 'New user has an empty list of licenses, you can <a href="http://www.hostcms.ru/shop/" target="_blank">buy</a> <i class="fa fa-external-link"></i> or <a href="http://www.hostcms.ru/users/licence/add-free/" target="_blank">create your own license</a> <i class="fa fa-external-link"></i> for the edition HostCMS.Free. Just press the button +HostCMS.Free.',
+	
 	'write_error' => 'Error while writing into file %s.',
 	'template_data_information' => 'Template settings.',
 	'allowed_extension' => 'Allowed file extensions: %s',

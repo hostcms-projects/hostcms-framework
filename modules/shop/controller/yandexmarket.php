@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - recommended(TRUE|FALSE) экспортировать рекомендованные товары, по умолчанию FALSE.
- * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE.
+ * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE. У самого магазина должно быть указано хотя бы одно условие доставки.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
  * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 500
  * - stdOut() поток вывода, может использоваться для записи результата в файл. По умолчанию Core_Out_Std
@@ -40,7 +40,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexMarket extends Core_Controller
 {
@@ -548,18 +548,30 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 					if ($this->modifications)
 					{
-						$oModifications = $oShop_Item->Modifications;
-						$oModifications->queryBuilder()
-							->where('shop_items.yandex_market', '=', 1);
+						$iModificationOffset = 0;
 
-						$aModifications = $oModifications->findAll(FALSE);
-						foreach ($aModifications as $oModification)
-						{
-							if ($oModification->price > 0)
+						do {
+							$oModifications = $oShop_Item->Modifications;
+							$oModifications->queryBuilder()
+								->where('shop_items.yandex_market', '=', 1)
+								->clearOrderBy()
+								->orderBy('shop_items.id', 'ASC')
+								->offset($iModificationOffset)
+								->limit($this->onStep);
+
+							$aModifications = $oModifications->findAll(FALSE);
+
+							foreach ($aModifications as $oModification)
 							{
-								$this->_showOffer($oModification);
+								if ($oModification->price > 0)
+								{
+									$this->_showOffer($oModification);
+								}
 							}
+
+							$iModificationOffset += $this->onStep;
 						}
+						while (count($aModifications));
 					}
 				}
 			}

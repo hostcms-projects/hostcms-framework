@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -315,6 +315,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->multiple('multiple')
 					->divAttr(array('class' => 'form-group col-xs-12'));
 
+				$this->addField($oAdditionalGroupsSelect);
+
 				$oMainRow3->add($oAdditionalGroupsSelect);
 
 				$html2 = '
@@ -509,7 +511,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopProducerSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Item.shop_producer_id'))
 					->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'))
-					->options(self::fillProducersList(intval(Core_Array::getGet('shop_id', 0))))
+					->options(self::fillProducersList($object->shop_id))
 					->name('shop_producer_id')
 						->value($this->_object->id
 						? $this->_object->shop_producer_id

@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Libproperties extends Lib_Controller_Libproperties
 {
@@ -39,10 +39,9 @@ class Structure_Controller_Libproperties extends Lib_Controller_Libproperties
 		{
 			$LA = $this->_object->id
 				? (
-					// Backward compatibility
-					!is_null($this->_object->options)
+					$this->_object->options != ''
 						? json_decode($this->_object->options, TRUE)
-						: $oLib->getDat($this->_object->id)
+						: array()
 				)
 				: array();
 

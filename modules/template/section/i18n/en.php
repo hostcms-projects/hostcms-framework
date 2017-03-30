@@ -6,23 +6,25 @@
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
-	'model_name' => 'Секции макета сайта',
-	'section_show_title' => 'Секции макета "%s"',
-	'section_form_title_edit' => 'Редактирвоание секции макета',
-	'section_form_title_add' => 'Добавление секции макета',
-	'id' => 'Идентификатор',	
-	'name' => 'Название',
-	'alias' => 'Псевдоним',
-	'sorting' => 'Порядок сортировки',
-	'template_id' => 'Идентификатор макета',
-	'edit_success' => 'Данные успешно добавлены!',
-	'edit_error' => 'Ошибка добавления информации!',
-	'apply_success' => 'Информация изменена!',
-	'copy_success' => 'Свойства типовой динамической страницы скопировано.',
-	'delete_success' => 'Элемент удален!',
-	'undelete_success' => 'Элемент восстановлен!',
-	'markDeleted_success' => 'Секция макета сайта успешно удалена!',
+	'model_name' => 'Template Sections',
+	'section_show_title' => 'Template %s` setions',
+	'section_form_title_edit' => 'Edit Template Section',
+	'section_form_title_add' => 'Add Template Section',
+	'id' => 'Id',
+	'name' => 'Name',
+	'alias' => 'Alias',
+	'color' => 'Section Border Color',
+	'sorting' => 'Sorting',
+	'template_id' => 'Template Id',
+	'edit_success' => 'Template Sections modified successfully!',
+	'apply_success' => 'Information modified successfully!',
+	'copy_success' => 'Template Sections copied successfully.',
+	'delete_success' => 'Template Sections deleted successfully!',
+	'undelete_success' => 'Template Sections restored successfully!',
+	'markDeleted_success' => 'Template Sections deleted successfully!',
+	'section_settings' => "Template Sections '%s' options",
+	'add_widget' => 'Add new widget into section',
 );

@@ -9,19 +9,36 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Currency_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
 	/**
-	 * Load object's fields when object has been set
-	 * После установки объекта загружаются данные о его полях
-	 * @param object $object
-	 * @return Shop_Currency_Controller_Edit
+	 * Prepare backend item's edit form
+	 *
+	 * @return self
 	 */
-	public function setObject($object)
+	protected function _prepareForm()
 	{
-		parent::setObject($object);
+		parent::_prepareForm();
+
+		$object = $this->_object;
+
+		$oMainTab = $this->getTab('main');
+		$oAdditionalTab = $this->getTab('additional');
+
+		$oMainTab
+			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+		$oMainTab
+			->move($this->getField('name'), $oMainRow1)
+			->move($this->getField('exchange_rate')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow2)
+			->move($this->getField('date')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow2)
+			->move($this->getField('default')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 margin-top-21')), $oMainRow2)
+			->move($this->getField('code')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3)
+			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Currency.currency_edit_form_title')

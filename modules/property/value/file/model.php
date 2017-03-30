@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_File_Model extends Core_Entity
 {
@@ -144,15 +144,20 @@ class Property_Value_File_Model extends Core_Entity
 	public function deleteLargeFile()
 	{
 		$path = $this->getLargeFilePath();
-		try
-		{
-			Core_File::delete($path);
-		} catch (Exception $e) {}
 
-		$this->file = '';
-		$this->file_name = '';
-		//$this->file_description = '';
-		return $this->save();
+		if ($this->file != '' && is_file($path))
+		{
+			try
+			{
+				Core_File::delete($path);
+			} catch (Exception $e) {}
+
+			$this->file = '';
+			$this->file_name = '';
+			//$this->file_description = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -181,15 +186,19 @@ class Property_Value_File_Model extends Core_Entity
 	{
 		$path = $this->getSmallFilePath();
 
-		try
+		if ($this->file_small != '' && is_file($path))
 		{
-			Core_File::delete($path);
-		} catch (Exception $e) {}
+			try
+			{
+				Core_File::delete($path);
+			} catch (Exception $e) {}
 
-		$this->file_small = '';
-		$this->file_small_name = '';
-		//$this->file_small_description = '';
-		return $this->save();
+			$this->file_small = '';
+			$this->file_small_name = '';
+			//$this->file_small_description = '';
+			$this->save();
+		}
+		return $this;
 	}
 
 	/**
@@ -206,7 +215,7 @@ class Property_Value_File_Model extends Core_Entity
 	public function getXml()
 	{
 		$this->clearXmlTags();
-		
+
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		if (!is_null($this->_href))
@@ -283,7 +292,7 @@ class Property_Value_File_Model extends Core_Entity
 
 		return parent::getXml();
 	}
-	
+
 	/**
 	 * Get entity description
 	 * @return string

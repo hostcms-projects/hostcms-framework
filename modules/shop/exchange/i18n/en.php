@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'!download' => '-- Not upload --',
@@ -54,6 +54,11 @@ return array(
 	'item_yandex_market' => 'Checkbox "Export to Yandex.Market"',
 	'item_yandex_market_bid' => 'Yandex.Market base charge',
 	'item_yandex_market_cid' => 'Yandex.Market charge for model cards',
+	
+	'item_yandex_market_manufacturer_warranty' => 'Manufacturer warranty',
+	'item_yandex_market_vendorcode' => 'Vendor Code',
+	'item_yandex_market_country_of_origin' => 'Country of origin',
+	
 	'item_parent_marking' => 'Parent\'s marking for modifications',
 	'item_parent_guid' => 'Parent\'s CommerceML for modifications',
 	'digital_item_value' => "Text of digital product",

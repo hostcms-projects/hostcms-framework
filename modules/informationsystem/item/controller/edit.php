@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -158,6 +158,8 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->multiple('multiple')
 					->divAttr(array('class' => 'form-group col-xs-12'));
 
+				$this->addField($oAdditionalGroupsSelect);
+					
 				$oMainRow3->add($oAdditionalGroupsSelect);
 
 				$html2 = '
@@ -470,6 +472,19 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						->add($oUseTrailingPunctuation);
 				}
 
+				// Export
+				$oInformationsystemItemTabExportImport = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem_Item.tab_export'))
+					->name('ExportImport');
+
+				$this->addTabAfter($oInformationsystemItemTabExportImport, $oInformationsystemTabDescription);
+
+				$oInformationsystemItemTabExportImport
+					->add($oExportRow1 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oMainTab
+					->move($this->getField('guid'), $oExportRow1);
+
 				// SEO
 				$oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Item.tab_2'))
@@ -583,6 +598,11 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->caption(Core::_('Informationsystem_Group.tab_1'))
 					->name('Description'), $oMainTab);
 
+				// Добавляем новые вкладки
+				$this->addTabAfter($oInformationsystemGroupExportTab = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem_Group.tab_export'))
+					->name('Export'), $oInformationsystemGroupDescriptionTab);
+
 				$this->addTabAfter($oInformationsystemTabSeo = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Informationsystem_Group.tab_2'))
 					->name('Seo'), $oInformationsystemGroupDescriptionTab);
@@ -591,6 +611,14 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->add($oInformationsystemGroupDescriptionTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oInformationsystemGroupDescriptionTabRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 				;
+
+				$oInformationsystemGroupExportTab
+					->add($oInformationsystemGroupExportTabRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+				;
+
+				// Name
+				$oMainTab
+					->move($this->getField('guid'), $oInformationsystemGroupExportTabRow1);
 
 				$oInformationsystemTabSeo
 					->add($oSeoRow1 = Admin_Form_Entity::factory('Div')->class('row'))

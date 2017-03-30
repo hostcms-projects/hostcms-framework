@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Model extends Core_Entity
 {
@@ -191,6 +191,16 @@ class Comment_Model extends Core_Entity
 		$this->active = 1 - $this->active;
 		$this->save();
 
+		// Clear tagged cache
+		if ($this->Comment_Informationsystem_Item->id)
+		{
+			$this->Comment_Informationsystem_Item->Informationsystem_Item->clearCache();
+		}
+		elseif ($this->Comment_Shop_Item->id)
+		{
+			$this->Comment_Shop_Item->Shop_Item->clearCache();
+		}
+		
 		Core_Event::notify($this->_modelName . '.onAfterChangeActive', $this);
 
 		return $this;

@@ -6,7 +6,7 @@
  * @subpackage Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Parameters of sample dynamic pages',
@@ -31,6 +31,7 @@ return array(
 	'lib_property_type_4' => 'SQL query',
 	'lib_property_type_5' => 'Large text field',
 	'lib_property_type_6' => 'Multiple values',
+	'value' => 'Value',
 	'copy_from' => ' [Copy of %s]',
 	'sql_request' => '<acronym title="Text of SQL query">SQL query</acronym>',
 	'sql_caption_field' => '<acronym title="Table field acting as header when displaying query information">Header field</acronym>',

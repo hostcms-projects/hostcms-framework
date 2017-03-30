@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap extends Core_Skin
 {
@@ -169,7 +169,7 @@ class Skin_Bootstrap extends Core_Skin
 					->clearOrderBy()
 					->orderBy('RAND()')
 					->limit(1);
-				
+
 				$aUser_Wallpapers = $oUser_Wallpapers->findAll();
 				isset($aUser_Wallpapers[0])
 					&& $wallpaperId = $aUser_Wallpapers[0]->id;
@@ -178,7 +178,7 @@ class Skin_Bootstrap extends Core_Skin
 			$sWallpaperPath = $wallpaperId
 				? '/upload/user/wallpaper/' . htmlspecialchars(Core_Entity::factory('User_Wallpaper', $wallpaperId)->image_large)
 				: '/modules/skin/bootstrap/img/bg.jpg';
-			
+
 			echo PHP_EOL;
 			?><style type="text/css">body.hostcms-bootstrap1:before { background-image: url("<?php echo $sWallpaperPath?>"); }</style><?php
 		}
@@ -218,8 +218,8 @@ class Skin_Bootstrap extends Core_Skin
 								<?php
 								$oModule = Core_Entity::factory('Module')->getByPath('user');
 								?><li>
-									<a id="sound-switch" title="Sound" href="#">
-										<i class="icon fa fa-<?php echo $oUser->sound ? 'bell' : 'bell-slash'?>"></i>
+									<a id="sound-switch" title="<?php echo Core::_('Admin.backend-sound')?>" href="#">
+										<i class="icon fa fa-<?php echo $oUser->sound ? 'volume-up' : 'volume-off'?>"></i>
 									</a>
 
 									<script type="text/javascript">
@@ -266,7 +266,7 @@ class Skin_Bootstrap extends Core_Skin
 									<!--/Tasks Dropdown-->
 								</li>
 								<li>
-									<a class="dropdown-toggle" data-toggle="dropdown" title="Languages" href="#">
+									<a class="dropdown-toggle" data-toggle="dropdown" title="<?php echo Core::_('Admin.backend-language')?>" href="#">
 										<i class="icon fa fa-flag"></i>
 									</a>
 
@@ -323,7 +323,7 @@ class Skin_Bootstrap extends Core_Skin
 								if (Core::$mainConfig['chat'])
 								{
 								?><li>
-									<a id="chat-link" title="Chat" href="#">
+									<a id="chat-link" title="<?php echo Core::_('Admin.chat')?>" href="#">
 										<i class="icon glyphicon glyphicon-comment"></i>
 										<span class="badge hidden"></span>
 									</a>
@@ -452,7 +452,7 @@ class Skin_Bootstrap extends Core_Skin
 								?>
 								<li>
 									<a class="login-area dropdown-toggle" data-toggle="dropdown">
-										<div class="avatar" title="View your public profile">
+										<div class="avatar" title="<?php echo Core::_('Admin.profile')?>">
 											<img src="<?php echo $oUser->getImageHref()?>">
 										</div>
 										<section>
@@ -502,7 +502,7 @@ class Skin_Bootstrap extends Core_Skin
 								no space must be between these elements-->
 								<!-- Settings -->
 							</ul><div class="setting">
-								<a id="btn-setting" title="Setting" href="#">
+								<a id="btn-setting" title="<?php echo Core::_('Admin.settings')?>" href="#">
 									<i class="icon glyphicon glyphicon-cog"></i>
 								</a>
 							</div><div class="setting-container">

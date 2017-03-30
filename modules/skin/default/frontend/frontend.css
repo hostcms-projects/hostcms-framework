@@ -7,7 +7,7 @@
 .hostcmsPanel img { vertical-align: baseline }
 .hostcmsPanel a:link,.hostcmsPanel a:visited,.hostcmsPanel a:hover{color:#0070BD;text-decoration:underline}
 .hostcmsPanel .hostcmsSubPanel{ margin-bottom: -4px; white-space: nowrap}
-.hostcmsPanel .hostcmsSubPanel a img{margin: 0 2px; cursor: pointer; }
+.hostcmsPanel .hostcmsSubPanel a img{margin: 0 2px !important; cursor: pointer; max-width: 16px !important; max-height: 16px !important }
 .hostcmsTopPanel{left:50%;margin-left:-110px;top:0}
 /* Панель для XSL */
 .hostcmsXsl {margin: 3px 0}

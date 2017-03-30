@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Less_Command_Controller extends Core_Command_Controller
 {
@@ -45,15 +45,22 @@ class Template_Less_Command_Controller extends Core_Command_Controller
 
 							//@color-rgba: rgba(232, 176, 21, 0.8);
 
-							$less = preg_replace("/(@{$variableName})\s*:\s*.*?;/si", '${1}: ' . $variableValue . ';', $less);
+							if (trim($variableValue) != '')
+							{
+								$less = preg_replace("/(@{$variableName})\s*:\s*.*?;/si", '${1}: ' . $variableValue . ';', $less);
 
-							$oTemplate->saveTemplateLessFile($less);
+								$oTemplate->saveTemplateLessFile($less);
 
-							$oTemplate
-								->rebuildCompressionCss()
-								->updateTimestamp();
+								$oTemplate
+									->rebuildCompressionCss()
+									->updateTimestamp();
 
-							$result = 'OK';
+								$result = 'OK';
+							}
+							else
+							{
+								$result = 'Error';
+							}
 						}
 					}
 					else

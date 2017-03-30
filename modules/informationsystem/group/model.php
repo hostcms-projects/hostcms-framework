@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Group_Model extends Core_Entity
 {
@@ -76,6 +76,7 @@ class Informationsystem_Group_Model extends Core_Entity
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
+			$this->_preloadValues['guid'] = Core_Guid::get();
 		}
 	}
 

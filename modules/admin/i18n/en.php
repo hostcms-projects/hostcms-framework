@@ -7,7 +7,7 @@
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Administration center',
@@ -63,7 +63,7 @@ return array(
 	'notes' => 'Notes',
 	'notes_save' => 'Notes saved successfully.',
 	'save_notes' => 'Save',
-	
+
 	'updates_count_access' => '%s %s available. <a href="/admin/update/index.php">Display updates list</a>.',
 
 	'unknown' => 'Unknown',
@@ -95,4 +95,10 @@ return array(
 	'fixed-sideBar' => 'SideBar',
 	'fixed-breadcrumbs' => 'BreadCrumbs',
 	'fixed-header' => 'Header',
+
+	'backend-sound' => 'Backend sound',
+	'backend-language' => 'Language',
+	'chat' => 'Chat',
+	'profile' => 'Profile',
+	'settings' => 'Settings',
 );

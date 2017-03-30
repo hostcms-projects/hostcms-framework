@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Smtp extends Core_Mail
 {
@@ -31,9 +31,11 @@ class Core_Mail_Smtp extends Core_Mail
 		$header .= $message . $this->_separator;
 		$timeout = 5;
 
-		$fp = function_exists('stream_socket_client')
-			? stream_socket_client($this->_config['host'] . ":" . $this->_config['port'], $errno, $errstr, $timeout)
-			: fsockopen($this->_config['host'], $this->_config['port'], $errno, $errstr, $timeout);
+		$context = stream_context_create(Core_Array::get($this->_config, 'options', array()));
+
+		$fp = /*function_exists('stream_socket_client')
+			? */stream_socket_client($this->_config['host'] . ":" . $this->_config['port'], $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context)
+			/*: fsockopen($this->_config['host'], $this->_config['port'], $errno, $errstr, $timeout)*/;
 
 		if ($fp)
 		{

@@ -6,7 +6,7 @@
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Информационные элементы',
@@ -88,7 +88,7 @@ return array(
 	'move_success' => 'Информационные элементы перенесены.',
 
 	'show_comments_title' => 'Комментарии к информационному элементу "%s"',
-	'shortcut_success' => 'Ярлык товара успешно добавлен',
+	'shortcut_success' => 'Ярлык элемента успешно добавлен',
 
 	'show_information_propertys_title' => 'Дополнительные свойства элементов информационной системы "%s"',
 	'delete_success' => 'Элемент удален!',
@@ -96,4 +96,47 @@ return array(
 	'root' => 'Корень информационной системы',
 	'shortcut_group_tags' => "<acronym title=\"Группы в которых располагаются ярлыки текущего элемента\">Дополнительные группы</acronym>",
 	'select_group' => 'Выберите группу',
+	'export' => 'Экспорт',
+	'export_list_separator' => "<acronym title=\"Разделитель для столбцов\">Разделитель</acronym>",
+	'export_list_separator1' => "Запятая",
+	'export_list_separator2' => "Точка с запятой",
+	'export_encoding' => "Кодировка",
+	'input_file_encoding0' => 'Windows-1251',
+	'input_file_encoding1' => 'UTF-8',
+	'export_parent_group' => "<acronym title=\"Вы можете выгружать элементы из указанного каталога, включая все подкаталоги\">Родительская группа для выгрузки элементов</acronym>",
+	'export_external_properties_allow_items' => "Экспортировать дополнительные свойства элементов",
+	'export_external_properties_allow_groups' => "Экспортировать дополнительные свойства групп",
+	'tab_export' => 'Экспорт/Импорт',
+	'guid' => '<acronym title="Уникальный идентификатор элемента, например ID00029527">GUID</acronym>',
+	'import_small_images' => "Малое изображение для ",
+	'import' => "Импорт",
+	'import_list_file' => "<acronym title=\"Выберите файл с компьютера\">Выберите файл с компьютера</acronym>",
+	'alternative_file_pointer_form_import' => "<acronym title=\"Задайте относительный путь к файлу от директории системы, например, tmp/myfile.csv\">или укажите путь к файлу на сервере</acronym>",
+	'import_list_name_field_f' => "<acronym title=\"Флаг, указывающий на то, содержит ли первая строка имена полей\">Первая строка содержит имена полей</acronym>",
+	'import_separator' => "<acronym title=\"Разделитель для столбцов\">Разделитель</acronym>",
+	'import_separator1' => "Запятая",
+	'import_separator2' => "Точка с запятой",
+	'import_separator3' => "Табуляция",
+	'import_separator4' => 'Другой',
+	'import_stop' => "<acronym title=\"Ограничитель для полей\">Ограничитель</acronym>",
+	'import_stop1' => "Кавычки",
+	'import_stop2' => 'Другой',
+	'import_encoding' => "Кодировка",
+	'import_parent_group' => "<acronym title=\"Вы можете выгружать элементы из указанного каталога, включая все подкаталоги\">Родительская группа для выгрузки элементов</acronym>",
+	'import_images_path' => "<acronym title=\"Путь для внешних файлов, например /upload_images/\">Путь для внешних файлов</acronym>",
+	'import_action_items' => "<acronym title=\"Действие для существующих элементов\">Действие для существующих элементов</acronym>",
+	'import_action_items0' => "Удалить существующие элементы во всех группах",
+	'import_action_items1' => "Обновить существующие элементы",
+	'import_action_items2' => "Оставить без изменений",
+	'import_action_delete_image' => "<acronym title=\"Установка данного флага позволяет удалять изображения для элементов, если эти изображения не переданы или пусты\">Удалять изображения для элементов при обновлении</acronym>",
+	'search_event_indexation_import' => "Использовать событийную индексацию при вставке групп элементов и элементов",
+	'import_max_time' => "<acronym title=\"Максимальное время выполнения (в секундах)\">Максимальное время выполнения</acronym>",
+	'import_max_count' => "<acronym title=\"Максимальное количество импортируемых за шаг элементов\">Максимальное кол-во импортируемых за шаг</acronym>",
+	'import_button_load' => "Загрузить",
+	'root_folder' => 'Корневая группа',
+	'count_insert_item' => 'Загружено элементов',
+	'count_update_item' => 'Обновлено элементов',
+	'create_catalog' => 'Создано разделов',
+	'update_catalog' => 'Обновлено разделов',
+	'msg_download_complete' => "Импорт завершен!",
 );

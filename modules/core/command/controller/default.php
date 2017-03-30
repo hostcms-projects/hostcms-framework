@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Command
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Command_Controller_Default extends Core_Command_Controller
 {
@@ -321,7 +321,8 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$oCore_Response->status(301);
 
 			// If page is not a child of the given
-			if (mb_strpos($this->_uri, $oStructure->url) !== 0)
+			//if (mb_strpos($this->_uri, $oStructure->url) !== 0)
+			if (trim($this->_uri, '/') != trim($oStructure->url, '/'))
 			{
 				$oCore_Response
 					->header('Location', $oStructure->url);
@@ -541,7 +542,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$sTmpContent = preg_replace($search, ' ', str_replace(array("\r", "\n"), ' ', $sContent));
 
 			$pattern_index = "(?<!noindex)(?<!display)(?<!visible)";
-			$pat = "#<a(?:[^>]{$pattern_index})*?href=[\"]?http://(?:www.)?hostcms.ru[/]?[\"]?(?:[^>]{$pattern_index})*?>(.{3,})</a>#si";
+			$pat = "#<a(?:[^>]{$pattern_index})*?href=[\"]?http://(?:www.)?hostcms.(?:ru|com)[/]?[\"]?(?:[^>]{$pattern_index})*?>(.{3,})</a>#si";
 
 			if (!Core_Auth::logged() && !preg_match_all($pat, $sTmpContent, $matches))
 			{

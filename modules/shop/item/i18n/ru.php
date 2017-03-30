@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Товары магазина',
@@ -15,7 +15,7 @@ return array(
 	'name' => "<acronym title=\"Название товара\">Название</acronym>",
 	'type' => "<acronym title=\"Выбор типа товара (обычный или электронный)\">Тип товара</acronym>",
 	'marking' => "<acronym title=\"Артикул товара\">Артикул</acronym>",
-	'vendorcode' => "<acronym title=\"Код товара (указывается код производителя), размещается в элементе 'vendorCode' при экспорте в Яндекс.Маркет\">Код товара</acronym>",
+	'vendorcode' => "<acronym title=\"Код товара (указывается код производителя), размещается в элементе 'vendorCode' при экспорте в Яндекс.Маркет\">Код товара от производителя</acronym>",
 	'description' => "<acronym title=\"Краткое описание товара\">Описание</acronym>",
 	'text' => "<acronym title=\"Детальное описание товара\">Текст</acronym>",
 	'image_large' => "<acronym title=\"Изображение товара\">Изображение товара</acronym>",

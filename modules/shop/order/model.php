@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Model extends Core_Entity
 {
@@ -1252,8 +1252,8 @@ class Shop_Order_Model extends Core_Entity
 		);
 		$oOrderXml->addChild('Сумма', $this->getAmount());
 
-		$oContractor = $oOrderXml->addChild('Контрагенты');
-		$oContractor = $oContractor->addChild('Контрагент');
+		$oContractors = $oOrderXml->addChild('Контрагенты');
+		$oContractor = $oContractors->addChild('Контрагент');
 
 		$bCompany = strlen(trim($this->company)) > 0;
 
@@ -1395,7 +1395,7 @@ class Shop_Order_Model extends Core_Entity
 			$oShop_Measure->okei && $oXmlMeasure->addAttribute('Код', $oShop_Measure->okei);
 			strlen($oShop_Measure->description) && $oXmlMeasure->addAttribute('НаименованиеПолное', $oShop_Measure->description);
 
-			$oCurrentItemXml->addChild('ЦенаЗаЕдиницу', $oShop_Order_Item->price);
+			$oCurrentItemXml->addChild('ЦенаЗаЕдиницу', $oShop_Order_Item->getPrice());
 			$oCurrentItemXml->addChild('Количество', $oShop_Order_Item->quantity);
 			$oCurrentItemXml->addChild('Сумма', $oShop_Order_Item->getAmount());
 
@@ -1409,5 +1409,22 @@ class Shop_Order_Model extends Core_Entity
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function order_itemsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$count = $this->Shop_Order_items->getCount();
+
+		$count && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-palegreen white')
+			->value($count < 100 ? $count : '∞')
+			->title($count)
+			->execute();
 	}
 }

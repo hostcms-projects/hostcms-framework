@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'!download' => '-- Не загружать --',
@@ -54,6 +54,11 @@ return array(
 	'item_yandex_market' => 'Флаг "Экспортировать в Яндекс.Маркет"',
 	'item_yandex_market_bid' => 'Яндекс.Маркет основная расценка',
 	'item_yandex_market_cid' => 'Яндекс.Маркет расценка для карточек моделей',
+
+	'item_yandex_market_manufacturer_warranty' => 'Гарантия производителя',
+	'item_yandex_market_vendorcode' => 'Код товара от производителя',
+	'item_yandex_market_country_of_origin' => 'Страна производства',
+
 	'item_parent_marking' => 'Артикул родительского товара для модификации',
 	'item_parent_guid' => 'CML ID родительского товара для модификации',
 	'digital_item_value' => "Текст электронного товара",

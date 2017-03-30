@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Валюты',
@@ -17,7 +17,7 @@ return array(
 	'currency_edit_form_title' => "Редактирование информации о валюте",
 	'name' => "<acronym title=\"Название валюты\">Название</acronym>",
 	'exchange_rate' => "<acronym title=\"Сколько единиц в базовой валюте дают за указанную валюту\">Курс</acronym>",
-	'code' => "<acronym title=\"Название валюты в международном формате, например RUB\">Интернациональное название валюты</acronym>",
+	'code' => "<acronym title=\"Код валюты в международном формате в соответствии с ISO 4217, например RUB\">Трехбуквенный код (ISO 4217)</acronym>",
 	'sorting' => "<acronym title=\"Порядок сортировки\">Порядок сортировки</acronym>",
 	'default' => "<acronym title=\"Является ли валюта базовой\">Базовая</acronym>",
 	'id' => "Идентификатор",

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Model extends Core_Entity
 {
@@ -122,6 +122,7 @@ class Informationsystem_Item_Model extends Core_Entity
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
+			$this->_preloadValues['guid'] = Core_Guid::get();
 		}
 
 		if (/*$this->_loaded && */$this->shortcut_id != 0)

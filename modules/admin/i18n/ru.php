@@ -7,7 +7,7 @@
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'authorization_form_title' => 'Центр администрирования',
@@ -95,4 +95,10 @@ return array(
 	'fixed-sideBar' => 'Меню',
 	'fixed-breadcrumbs' => 'Навигацию',
 	'fixed-header' => 'Всё',
+
+	'backend-sound' => 'Звук в центре администрирования',
+	'backend-language' => 'Язык центра администрирования',
+	'chat' => 'Чат',
+	'profile' => 'Профиль',
+	'settings' => 'Настройки',
 );

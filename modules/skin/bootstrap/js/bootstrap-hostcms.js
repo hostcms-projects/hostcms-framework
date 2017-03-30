@@ -231,8 +231,8 @@
 					var jSoundSwitch = $("#sound-switch");
 
 					result['answer'] == 0
-						? jSoundSwitch.html('<i class="icon fa fa-bell-slash"></i>')
-						: jSoundSwitch.html('<i class="icon fa fa-bell"></i>');
+						? jSoundSwitch.html('<i class="icon fa fa-volume-off"></i>')
+						: jSoundSwitch.html('<i class="icon fa fa-volume-up"></i>');
 				},
 			});
 		},

@@ -11,14 +11,14 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Kruglov Sergei
  * @author Hostmake LLC
  * @copyright © 2006, 2007, 2008, 2011 Kruglov Sergei, http://www.captcha.ru
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Captcha
 {
 	/**
 	 * Путь к шрифтам
 	 */
-	protected $_fontsDir = 'hostcmsfiles/captcha/fonts';
+	//protected $_fontsDir = 'hostcmsfiles/captcha/fonts';
 
 	/**
 	 * Порядок символов в шрифтах
@@ -28,7 +28,7 @@ class Core_Captcha
 	/**
 	 * амплитуда искажения
 	 */
-	protected $_amplitudeDistortion = 7;
+	protected $_amplitudeDistortion = 10;
 
 	/**
 	 * Флаг, указывающий, слитно писать символы CAPTCHA или нет
@@ -77,7 +77,7 @@ class Core_Captcha
 				'allowedCharacters' => '23456789abcdeghkmnpqsuvxyz',
 				//'color' => array(mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100)),
 				'backgroundColor' => array(mt_rand(230, 255), mt_rand(230, 255), mt_rand(230, 255)),
-				'noise' => 10,
+				'noise' => 5,
 				'width' => 88,
 				'height' => 31,
 				// Минимальная длина строки
@@ -85,6 +85,31 @@ class Core_Captcha
 				// Максимальная длина строки
 				'maxLenght' => 4,
 				'fillBackground' => TRUE,
+				'fonts' => array(
+					'/hostcmsfiles/captcha/fonts/antiqua.png',
+					// '/hostcmsfiles/captcha/fonts/baskerville.png',//
+					// '/hostcmsfiles/captcha/fonts/batang.png',//
+					// '/hostcmsfiles/captcha/fonts/bodoni.png', //?
+					'/hostcmsfiles/captcha/fonts/bookman.png',
+					'/hostcmsfiles/captcha/fonts/cambria.png',
+					'/hostcmsfiles/captcha/fonts/centaur.png',
+					'/hostcmsfiles/captcha/fonts/century.png',
+					'/hostcmsfiles/captcha/fonts/constantia.png',
+					// '/hostcmsfiles/captcha/fonts/elizabeth.png', //
+					// '/hostcmsfiles/captcha/fonts/footlight.png', //?
+					// '/hostcmsfiles/captcha/fonts/garamond.png',//
+					'/hostcmsfiles/captcha/fonts/goudy_old.png',
+					'/hostcmsfiles/captcha/fonts/high_tower.png',
+					'/hostcmsfiles/captcha/fonts/lucida.png',
+					// '/hostcmsfiles/captcha/fonts/modern_20.png', //?
+					'/hostcmsfiles/captcha/fonts/palatino.png',
+					'/hostcmsfiles/captcha/fonts/palatino_linotype_bold.png',
+					'/hostcmsfiles/captcha/fonts/perpetua.png',
+					'/hostcmsfiles/captcha/fonts/perpetua_bold.png',
+					'/hostcmsfiles/captcha/fonts/rockwell.png',
+					'/hostcmsfiles/captcha/fonts/times.png',
+					'/hostcmsfiles/captcha/fonts/times_bold.png',
+				)
 			);
 		}
 	}
@@ -114,9 +139,11 @@ class Core_Captcha
 			: $max;
 
 		$captchaId = mt_rand(0, $maxValue);
-		while (isset($_SESSION['captcha_' + $captchaId]))
+		$i = 0;
+		while (isset($_SESSION['captcha_' . $captchaId]) && $i < $max)
 		{
 			$captchaId = mt_rand(0, $maxValue);
+			$i++;
 		}
 
 		return $captchaId;
@@ -195,7 +222,7 @@ class Core_Captcha
 		$backgroundColor = self::$_config['backgroundColor'];
 
 		// ШРИФТЫ
-		$fonts = array();
+		/*$fonts = array();
 		$_fontsDir = CMS_FOLDER . $this->_fontsDir;
 
 		if (is_dir($_fontsDir) && !is_link($_fontsDir))
@@ -214,10 +241,11 @@ class Core_Captcha
 
 				closedir($handle);
 			}
-		}
+		}*/
 
 		// Случайный шрифт
-		$font = imagecreatefrompng($fonts[mt_rand(0, count($fonts) - 1)]);
+		$randKey = array_rand(self::$_config['fonts'], 1);
+		$font = imagecreatefrompng(CMS_FOLDER . self::$_config['fonts'][$randKey]);
 
 		// Устанавливает режим смешивания для изображения
 		imageAlphaBlending($font, FALSE);
@@ -289,10 +317,10 @@ class Core_Captcha
 		{
 			$m = $font_metrics[$value[$i]];
 
-			$y = mt_rand(- $this->_amplitudeDistortion, $this->_amplitudeDistortion) + ($height - $fontfile_height) / 2 + 2;
-
-			if (!$this->_spaces)
+			/*if (!$this->_spaces)
 			{
+				$y = mt_rand(- $this->_amplitudeDistortion, $this->_amplitudeDistortion) + ($height - $fontfile_height) / 2 + 2;
+
 				$shift = 0;
 
 				if ($i > 0)
@@ -344,12 +372,12 @@ class Core_Captcha
 				}
 			}
 			else
-			{
+			{*/
 				$shift = 1;
-			}
+			/*}*/
 
 			// Наносим символ на рисунок CAPTCHA
-			imagecopy($img, $font, $x, mt_rand(4, 10), $m['start'], 1, $m['end'] - $m['start'], $fontfile_height);
+			imagecopy($img, $font, $x, mt_rand(3, 5), $m['start'], 1, $m['end'] - $m['start'], $fontfile_height);
 
 			// Курсор после последнего нанесенного символа
 			$x += $m['end'] - $m['start'] - $shift;
@@ -463,16 +491,31 @@ class Core_Captcha
 		}
 
 		// Шум
-		for ($i = 0; $i < $height * self::$_config['noise'] * 2; $i++)
+		for ($i = 0; $i < $height * self::$_config['noise']; $i++)
 		{
+			$pX = mt_rand(0, $width);
+			$pY = mt_rand(0, $height);
+
+			// Цвета текста
+			imagesetpixel($img2, $pX, $pY,
+				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
+			);
+			$pX > 0 && imagesetpixel($img2, $pX - 1, $pY,
+				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
+			);
+			$pX < $width && imagesetpixel($img2, $pX + 1, $pY,
+				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
+			);
+			$pY > 0 && imagesetpixel($img2, $pX, $pY - 1,
+				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
+			);
+			$pY < $height && imagesetpixel($img2, $pX, $pY + 1,
+				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
+			);
+
 			// Случайного цвета
 			imagesetpixel($img2, mt_rand(0, $width), mt_rand(0, $height),
 				imagecolorallocate($img2, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100))
-			);
-
-			// Цвета текста
-			imagesetpixel($img2, mt_rand(0, $width), mt_rand(0, $height),
-				imagecolorallocate($img2, $foreground_color[0], $foreground_color[1], $foreground_color[2])
 			);
 		}
 

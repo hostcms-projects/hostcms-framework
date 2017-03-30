@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -49,6 +49,15 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->wysiwyg(TRUE);
 
 				$oMainTab = $this->getTab('main');
+
+				$oMainTab
+					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
+					;
 
 				$oAdditionalTab = $this->getTab('additional');
 
@@ -92,6 +101,9 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->addTabAfter($oContactsTab, $oMainTab)
 					->addTabAfter($oBankContactsTab, $oContactsTab)
 					->addTabAfter($oSEOTab, $oBankContactsTab);
+
+				$oMainTab
+					->move($this->getField('name')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow1);
 
 				$oMainTab->move($this->getField('address')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow1);
 				$oMainTab->move($this->getField('phone')->divAttr(array('class' => 'form-group col-xs-12')), $oContactsTabRow2);
@@ -167,7 +179,7 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 						'preserve_aspect_ratio_checkbox_checked' => $oShop->preserve_aspect_ratio_small
 					));
 
-				$oMainTab->addAfter($oImageField, $this->getField('description'));
+				$oMainRow6->add($oImageField);
 
 				// Удаляем группу товаров
 				$oAdditionalTab->delete($this->getField('shop_producer_dir_id'));
@@ -181,7 +193,14 @@ class Shop_Producer_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					->filter(TRUE);
 
 				// Добавляем группу товаров
-				$oMainTab->addAfter($oGroupSelect, $this->getField('name'));
+				$oMainRow2->add($oGroupSelect);
+
+				$oMainTab
+					->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-8')), $oMainRow3)
+					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow3)
+					->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-3')), $oMainRow4)
+					->move($this->getField('default')->divAttr(array('class' => 'form-group col-xs-12 col-sm-5')), $oMainRow4)
+					->move($this->getField('description')->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow5);
 
 				$title = $this->_object->id
 					? Core::_('Shop_Producer.producer_edit_form_title')

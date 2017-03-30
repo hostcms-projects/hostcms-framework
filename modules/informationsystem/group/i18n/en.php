@@ -6,7 +6,7 @@
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Information groups',
@@ -63,4 +63,6 @@ return array(
 	'show_information_propertys_groups_title' => 'Additional properties of groups of information system "%s"',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
+	'tab_export' => 'Export/Import',
+	'guid' => '<acronym title="Group identifier, e.g. ID00029527">GUID</acronym>',
 );
