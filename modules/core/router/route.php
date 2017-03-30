@@ -18,7 +18,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Router
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Router_Route
 {
@@ -90,6 +90,7 @@ class Core_Router_Route
 		foreach ($expressions as $name => $regex)
 		{
 			$name = preg_quote($name, '/');
+			//$regex = preg_quote($regex, '/');
 			$expression = str_replace("(?'{$name}'.*?)", "(?'{$name}'{$regex})", $expression);
 		}
 

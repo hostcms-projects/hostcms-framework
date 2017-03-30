@@ -240,7 +240,8 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event informationsystem_group.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -251,8 +252,15 @@ class Informationsystem_Group_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
 		$aInformationsystem_Items = $this->Informationsystem_Items->deleteAll(FALSE);
 		$aInformationsystem_Groups = $this->Informationsystem_Groups->deleteAll(FALSE);
+		
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}		
 
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues();
@@ -641,14 +649,22 @@ class Informationsystem_Group_Model extends Core_Entity
 	/**
 	 * Get group path
 	 * @return string
+	 * @hostcms-event informationsystem_group.onBeforeGetPath
 	 */
 	public function getPath()
 	{
-		$sPath = rawurlencode($this->path) . '/';
+		Core_Event::notify($this->_modelName . '.onBeforeGetPath', $this);
 
-		if (!is_null($oParentGroup = $this->getParent()))
+		$sPath = Core_Event::getLastReturn();
+		
+		if (is_null($sPath))
 		{
-			$sPath = $oParentGroup->getPath() . $sPath;
+			$sPath = rawurlencode($this->path) . '/';
+
+			if (!is_null($oParentGroup = $this->getParent()))
+			{
+				$sPath = $oParentGroup->getPath() . $sPath;
+			}
 		}
 
 		return $sPath;

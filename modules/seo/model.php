@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Model extends Core_Entity
 {
@@ -24,7 +24,7 @@ class Seo_Model extends Core_Entity
 	 * @var string
 	 */
 	protected $_tableName = 'seo';
-	
+
 	/**
 	 * Name of the model
 	 * @var string
@@ -45,7 +45,6 @@ class Seo_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_preloadValues = array(
-		'pr' => 0,
 		'tcy' => 0,
 		'yandex_indexed' => 0,
 		'yahoo_indexed' => 0,

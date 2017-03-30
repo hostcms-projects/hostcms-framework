@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
  class Shop_Bonus_Model extends Core_Entity
 {
@@ -89,7 +89,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event shop_bonus.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -100,11 +101,9 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 		$this->id = $primaryKey;
 
-		$aShop_Item_Bonuses = $this->Shop_Item_Bonuses->findAll(FALSE);
-		foreach($aShop_Item_Bonuses as $oShop_Item_Bonus)
-		{
-			$oShop_Item_Bonus->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
+		$this->Shop_Item_Bonuses->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

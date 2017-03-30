@@ -47,7 +47,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$this
 					->addSkipColumn('image_large')
 					->addSkipColumn('image_small')
-					->addSkipColumn('top_parent_id')
 					->addSkipColumn('subgroups_count')
 					->addSkipColumn('subgroups_total_count')
 					->addSkipColumn('items_count')

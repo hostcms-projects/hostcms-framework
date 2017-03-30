@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -30,6 +30,13 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				if (!$object->id)
 				{
 					$object->shop_dir_id = intval(Core_Array::getGet('shop_dir_id', 0));
+
+					$object->order_admin_subject = Core::_('Shop_Order.shop_order_admin_subject');
+					$object->order_user_subject = Core::_('Shop_Order.shop_order_admin_subject');
+					$object->confirm_admin_subject = Core::_('Shop_Order.confirm_admin_subject');
+					$object->confirm_user_subject = Core::_('Shop_Order.confirm_user_subject');
+					$object->cancel_admin_subject = Core::_('Shop_Order.cancel_admin_subject');
+					$object->cancel_user_subject = Core::_('Shop_Order.cancel_user_subject');
 				}
 
 			break;
@@ -101,6 +108,9 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oShopTabOrders = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop.tab_sort'))
 					->name('Orders');
+				$oShopTabMailSubjects = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Shop.tab_mail_subject'))
+					->name('Mail_Subjects');
 
 				$oMainTab
 					->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
@@ -155,9 +165,15 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oShopTabOrdersRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oShopTabOrdersRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
+				$oShopTabMailSubjects
+					->add($oShopTabMailSubjectsRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopTabMailSubjectsRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopTabMailSubjectsRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
 				$this
 					->addTabAfter($oShopTabFormats, $oMainTab)
-					->addTabAfter($oShopTabExport, $oShopTabFormats)
+					->addTabAfter($oShopTabMailSubjects, $oShopTabFormats)
+					->addTabAfter($oShopTabExport, $oShopTabMailSubjects)
 					->addTabAfter($oShopTabWatermark, $oShopTabExport)
 					->addTabAfter($oShopTabOrders, $oShopTabWatermark);
 
@@ -199,6 +215,13 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('items_sorting_direction'), $oShopTabOrders)
 					->move($this->getField('groups_sorting_field'), $oShopTabOrders)
 					->move($this->getField('groups_sorting_direction'), $oShopTabOrders)
+					//Mail subjects
+					->move($this->getField('order_admin_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow1)
+					->move($this->getField('order_user_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow1)
+					->move($this->getField('confirm_admin_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow2)
+					->move($this->getField('confirm_user_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow2)
+					->move($this->getField('cancel_admin_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow3)
+					->move($this->getField('cancel_user_subject')->divAttr(array('class' => 'form-group col-xs-12 col-lg-6')), $oShopTabMailSubjectsRow3)
 					;
 
 				// Переопределяем стандартные поля на нужный нам вид

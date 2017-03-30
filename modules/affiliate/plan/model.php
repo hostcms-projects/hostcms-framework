@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Model extends Core_Entity
 {
@@ -72,7 +72,8 @@ class Affiliate_Plan_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event affiliate_plan.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -83,6 +84,8 @@ class Affiliate_Plan_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
 		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Affiliate_Plan_Levels->deleteAll(FALSE);
 

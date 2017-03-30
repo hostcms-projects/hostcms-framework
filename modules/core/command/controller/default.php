@@ -418,7 +418,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 				}
 			}
 
-			$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
+			$bLogged && Core_Page::instance()->addFrontendExecutionTimes(
 				Core::_('Core.time_page_config', Core::getmicrotime() - $fBeginTimeConfig)
 			);
 		}
@@ -471,7 +471,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			->buildingPage(TRUE)
 			->execute();
 
-		$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
+		$bLogged && Core_Page::instance()->addFrontendExecutionTimes(
 			Core::_('Core.time_page', Core::getmicrotime() - $fBeginTime)
 		);
 

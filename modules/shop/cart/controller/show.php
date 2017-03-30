@@ -34,7 +34,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Controller_Show extends Core_Controller
 {
@@ -174,8 +174,6 @@ class Shop_Cart_Controller_Show extends Core_Controller
 			$this->_addItemsPropertiesList(0, $Shop_Item_Properties);
 		}
 
-		$Shop_Cart_Controller = $this->_getCartController();
-
 		$quantityPurchaseDiscount = $amountPurchaseDiscount = $quantity = $amount = $tax = $weight = 0;
 
 		// Массив цен для расчета скидок каждый N-й со скидкой N%
@@ -193,6 +191,8 @@ class Shop_Cart_Controller_Show extends Core_Controller
 		
 		// Есть скидки на N-й товар
 		$bPositionDiscount = $oShop_Purchase_Discounts->getCount() > 0;
+		
+		$Shop_Cart_Controller = $this->_getCartController();
 		
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)

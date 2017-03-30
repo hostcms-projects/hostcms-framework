@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Typograph
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Typograph_Controller
 {
@@ -39,7 +39,7 @@ class Typograph_Controller
 	 * @param string $str исходная строка
 	 * <code>
 	 * <?php
-	 * $str = '<span style="margin-right: 0.3em"> </span> <span style="margin-left: -0.3em">&laquo;Типограф</span>&raquo;&nbsp;&mdash; удобный инструмент для&nbsp;автоматического типографирования в&nbsp;соответствии с&nbsp;правилами, принятыми для&nbsp;экранной типографики. Может применяться как&nbsp;для&nbsp;обычного текста, так&nbsp;и&nbsp;HTML-кода.';
+	 * $str = '<span style="margin-right: 0.3em"> </span> <span style="margin-left: -0.3em">«Типограф</span>»&nbsp;&mdash; удобный инструмент для&nbsp;автоматического типографирования в&nbsp;соответствии с&nbsp;правилами, принятыми для&nbsp;экранной типографики. Может применяться как&nbsp;для&nbsp;обычного текста, так&nbsp;и&nbsp;HTML-кода.';
 	 *
 	 * echo Typograph_Controller::instance()->eraseOpticalAlignment($str);
 	 *
@@ -121,7 +121,7 @@ class Typograph_Controller
 		// кавычки в html-тегах на символ '¬'
 		//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('\\\"', '¬','\\1').'>'", $str);
 		$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("\"", "¬", $matches[1]) . ">";'), $str);
-		
+
 		// кавычки в квадратных скобках [] на символ '¬'
 		$str = preg_replace_callback("/\[([^>]*)\]/su", create_function('$matches', 'return "[" . str_replace("\"", "¬", $matches[1]) . "]";'), $str);
 
@@ -176,24 +176,26 @@ class Typograph_Controller
 		* Открывающиеся кавычки могут встречаться:
 		* в начале строки, после скобок "([{", дефиса, пробелов и ещё одной кавычки
 		*/
-		$str = str_replace('&quot;','"', $str);
+		$str = str_replace('&quot;', '"', $str);
 
 		// Заменяем на сущности
-		$str = str_replace(
+		/*$str = str_replace(
 			array('«', '»',
 				'”', '„',
 				'“'),
 			array('&laquo;', '&raquo;',
 				'&rdquo;', '&bdquo;',
 				'&ldquo;'),
-			$str);
+			$str);*/
 
 		// Заменяем сущности на простые кавычки
-		$str = str_replace(array('&laquo;',
-			'&raquo;',
-			'&rdquo;',
-			'&bdquo;',
-			'&ldquo;'), '"', $str);
+		$str = str_replace(
+			array(
+				'&laquo;', '&raquo;', '&rdquo;', '&bdquo;', '&ldquo;',
+				'«', '»', '”', '„', '“'
+			),
+			'"', $str
+		);
 
 		// "Ответ на известную арию из "Русалки" ".
 		$str = str_replace('" "','""', $str);
@@ -225,7 +227,7 @@ class Typograph_Controller
 		$str = str_replace('"', $aEntries['RAQUO'], $str);
 
 		// Заменяем ”
-		$str = str_replace('&rdquo;', $aEntries['RAQUO'], $str);
+		$str = str_replace('”', $aEntries['RAQUO'], $str);
 
 		// исправляем ошибки в расстановке кавычек типа ""... и ...""
 		$str = preg_replace('/'.$aEntries['LAQUO'].$aEntries['RAQUO'].$aEntries['RAQUO'].'/u', $aEntries['LAQUO'], $str);
@@ -262,7 +264,7 @@ class Typograph_Controller
 		// заменяем коды символов на HTML-entities.
 		$str = str_replace(
 		array($aEntries['LAQUO'], $aEntries['RAQUO'], $aEntries['LDQUO'], $aEntries['RDQUO'], $aEntries['MDASH'], $aEntries['NDASH'], $aEntries['APOS']),
-		array('&laquo;','&raquo;','&bdquo;','&ldquo;','&mdash;','&#8211;','&#8217;'), $str);
+		array('«','»','„','“','&mdash;','&#8211;','&#8217;'), $str);
 		// / расстановка кавычек
 
 		// расстанавливаем правильные коды, тире и многоточия
@@ -316,8 +318,8 @@ class Typograph_Controller
 		$str = str_replace('( ', ' (', $str);
 
 		// Убираем пробелы внутри кавычек.
-		$str = str_replace('&laquo; ', ' &laquo;', $str);
-		$str = str_replace(' &raquo;', '&raquo; ', $str);
+		$str = str_replace('« ', ' «', $str);
+		$str = str_replace(' »', '» ', $str);
 
 		// Двойной пробел (убираем второй раз).
 		// $str = str_replace('  ', ' ', $str);
@@ -525,27 +527,27 @@ class Typograph_Controller
 			$str = str_replace(chr(0x01), '(', $str);
 
 			// Заменяем ЁЛОЧКИ В ТЕГАХ на непечатные символы.
-			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&laquo;', chr(0x02),'\\1').'>'", $str);
-			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("&laquo;", chr(0x02), $matches[1]) . ">";'), $str);
+			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('«', chr(0x02),'\\1').'>'", $str);
+			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("«", chr(0x02), $matches[1]) . ">";'), $str);
 
 			// Добавляем висячие елочки.
 			// возможно проблема вылезания за <p>, пример изменения см. выше
-			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)?(\s)?(\&laquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&laquo;', chr(0x02), '\\4').'</span>'", $str);
-			$str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)?(\s)?(\&laquo;\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('&laquo;', chr(0x02), \$matches[4]).'</span>';"), $str);
+			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)?(\s)?(\«\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('«', chr(0x02), '\\4').'</span>'", $str);
+			$str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)?(\s)?(\«\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('«', chr(0x02), \$matches[4]).'</span>';"), $str);
 
 			// Восстанавливаем елочки в тегах.
-			$str = str_replace(chr(0x02), "&laquo;", $str);
+			$str = str_replace(chr(0x02), "«", $str);
 
 			// Заменяем ЛАПКИ В ТЕГАХ на непечатные символы.
-			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('&bdquo;', chr(0x03),'\\1').'>'", $str);
-			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("&bdquo;", chr(0x03), $matches[1]) . ">";'), $str);
+			//$str = preg_replace("/<([^>]*)>/esu", "'<'.str_replace('„', chr(0x03),'\\1').'>'", $str);
+			$str = preg_replace_callback("/<([^>]*)>/su", create_function('$matches', 'return "<" . str_replace("„", chr(0x03), $matches[1]) . ">";'), $str);
 
 			// Добавляем висячие лапки.
-			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)(\s)?(\&bdquo;\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('&bdquo;', chr(0x03), '\\4').'</span>\\5'", $str);
-			$str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)(\s)?(\&bdquo;\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('&bdquo;', chr(0x03), \$matches[4]) . '</span>' . \$matches[5];"), $str);
+			//$str = preg_replace("/(\s)?(<[^\/][^>]*>)(\s)?(\„\w*)/iseu", "'{$right_span} </span> \\2{$left_span}'.str_replace('„', chr(0x03), '\\4').'</span>\\5'", $str);
+			// $str = preg_replace_callback("/(\s)?(<[^\/][^>]*>)(\s)?(\„\w*)/isu", create_function('$matches', "return '{$right_span} </span> ' . \$matches[2] . '{$left_span}' . str_replace('„', chr(0x03), \$matches[4]) . '</span>' . \$matches[5];"), $str);
 
 			// Восстанавливаем лапки в тегах.
-			$str = str_replace(chr(0x03), "&bdquo;", $str);
+			$str = str_replace(chr(0x03), "„", $str);
 		}
 
 		// меняем "¬" обратно на кавычки

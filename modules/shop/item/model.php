@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Model extends Core_Entity
 {
@@ -141,6 +141,7 @@ class Shop_Item_Model extends Core_Entity
 		'shop_warehouse_item' => array(),
 		'vote' => array('through' => 'vote_shop_item'),
 		'shop_item_delivery_option' => array(),
+		'shop_favorite' => array(),
 	);
 
 	/**
@@ -959,23 +960,31 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Get path for files
 	 * @return string
+	 * @hostcms-event shop_item.onBeforeGetPath
 	 */
 	public function getPath()
 	{
-		$sPath = ($this->path == ''
-			? $this->id
-			: rawurlencode($this->path)) . '/';
+		Core_Event::notify($this->_modelName . '.onBeforeGetPath', $this);
 
-		if ($this->modification_id == 0)
+		$sPath = Core_Event::getLastReturn();
+
+		if (is_null($sPath))
 		{
-			if ($this->shop_group_id)
+			$sPath = ($this->path == ''
+				? $this->id
+				: rawurlencode($this->path)) . '/';
+
+			if ($this->modification_id == 0)
 			{
-				$sPath = $this->Shop_Group->getPath() . $sPath;
+				if ($this->shop_group_id)
+				{
+					$sPath = $this->Shop_Group->getPath() . $sPath;
+				}
 			}
-		}
-		else
-		{
-			$sPath = $this->Modification->getPath() . $sPath;
+			else
+			{
+				$sPath = $this->Modification->getPath() . $sPath;
+			}
 		}
 
 		return $sPath;
@@ -1274,7 +1283,8 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event shop_item.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -1285,6 +1295,13 @@ class Shop_Item_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}
+
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
@@ -1294,6 +1311,7 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		$this->Shop_Carts->deleteAll(FALSE);
+		$this->Shop_Favorites->deleteAll(FALSE);
 
 		// Удаляем комментарии
 		$this->Comments->deleteAll(FALSE);

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Str
 {
@@ -322,7 +322,6 @@ class Core_Str
 		);
 
 		$text = strip_tags($text);
-		$text = mb_strtolower($text);
 
 		!isset($param['hash_function']) && $param['hash_function'] = 'md5';
 
@@ -331,6 +330,8 @@ class Core_Str
 		{
 			$text = str_replace(array_keys($aConfig['replaces']), array_values($aConfig['replaces']), $text);
 		}
+
+		$text = mb_strtolower($text);
 
 		// Разделять числа и символы
 		if ($aConfig['splitNumberAndAlpha'])
@@ -538,6 +539,41 @@ class Core_Str
 			$size = 0;
 		}
 		return $size;
+	}
+
+	/**
+	 * Convert size from bytes to kb, mb, etc
+	 *
+	 * @param int $int e.g. 20480000
+	 * @return int
+	 */
+	static public function getTextSize($size)
+	{
+		if ($size >= 1024)
+		{
+			$textSize = Core::_('Core.kbyte');
+			$size = $size / 1024;
+
+			if ($size >= 1024)
+			{
+				$textSize = Core::_('Core.mbyte');
+				$size = $size / 1024;
+
+				if ($size >= 1024)
+				{
+					$textSize = Core::_('Core.gbyte');
+					$size = $size / 1024;
+				}
+			}
+
+			$size = sprintf('%.2f', $size);
+		}
+		else
+		{
+			$textSize = Core::_('Core.byte');
+		}
+
+		return $size . ' ' . $textSize;
 	}
 
 	/**

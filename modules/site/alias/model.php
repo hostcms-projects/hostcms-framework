@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Site
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Site_Alias_Model extends Core_Entity
 {
@@ -293,5 +293,23 @@ class Site_Alias_Model extends Core_Entity
 			->addXmlTag('alias_name_without_mask', $this->alias_name_without_mask);
 
 		return parent::getXml();
+	}
+	
+	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$this->name != '' && Core::factory('Core_Html_Entity_A')
+			->href('http://' . $this->name)
+			->target('_blank')
+			->add(
+				Core::factory('Core_Html_Entity_I')
+					->class('fa fa-external-link')
+			)
+			->execute();
 	}
 }

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Market
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Market_Controller extends Core_Servant_Properties
 {
@@ -1028,28 +1028,27 @@ class Market_Controller extends Core_Servant_Properties
 					) . ' </div>
 				</div>
 
-				<div class="databox-cell cell-6 no-padding">
-				';
+				<div class="databox-cell cell-6 no-padding">';
 
-			if ($object->paid && !$object->installed || $object->price == 0)
+			if ($object->isset_version)
 			{
-				$sHtml .= '
-					<a class="btn btn-labeled btn-darkorange pull-right" onclick="res =confirm(\'' . Core::_('Market.install_warning') . '\'); if (res){ $.adminLoad({path:\'/admin/market/index.php\',action:\'\',operation:\'\',additionalParams:\'install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '\',windowId:\'' . $sWindowId . '\'}); } return false" href="/admin/market/index.php?hostcms[window]=' . $sWindowId . '&install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '">
-						<i class="btn-label fa fa-download"></i>
-						' . Core::_('Market.install') . '
-					</a>
-				';
-			}
-			else
-			{
-				if ($object->isset_version)
+				if ($object->paid && !$object->installed || $object->price == 0)
 				{
-					$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+					$sHtml .= '
+						<a class="btn btn-labeled btn-darkorange pull-right" onclick="res =confirm(\'' . Core::_('Market.install_warning') . '\'); if (res){ $.adminLoad({path:\'/admin/market/index.php\',action:\'\',operation:\'\',additionalParams:\'install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '\',windowId:\'' . $sWindowId . '\'}); } return false" href="/admin/market/index.php?hostcms[window]=' . $sWindowId . '&install=' . $object->id . '&category_id=' . $this->category_id . '&current=' . $this->page . '">
+							<i class="btn-label fa fa-download"></i>
+							' . Core::_('Market.install') . '
+						</a>
+					';
 				}
 				else
 				{
-					$sHtml .= '<span class="btn btn-labeled btn-default pull-right"><i class="btn-label fa fa-times"></i>' . Core::_('Market.version_absent') . '</span>';
+					$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
 				}
+			}
+			else
+			{
+				$sHtml .= '<span class="btn btn-labeled btn-default pull-right"><i class="btn-label fa fa-times"></i>' . Core::_('Market.version_absent') . '</span>';
 			}
 
 			$sHtml .= '</div>

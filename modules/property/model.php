@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Model extends Core_Entity
 {
@@ -125,11 +125,9 @@ class Property_Model extends Core_Entity
 		// Кэшировать и данные со значениями всех св-в были загружены
 		if ($bCache && !is_null($this->_aAllValues))
 		{
-			if (isset($this->_aAllValues[$entityId]))
-			{
-				return $this->_aAllValues[$entityId];
-			}
-			return array();
+			return isset($this->_aAllValues[$entityId])
+				? $this->_aAllValues[$entityId]
+				: array();
 		}
 
 		return Property_Controller_Value::factory($this->type)
@@ -241,7 +239,8 @@ class Property_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event property.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -252,6 +251,8 @@ class Property_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
 		// Relations
 		$this->Structure_Property->delete();
 		$this->Informationsystem_Item_Property->delete();

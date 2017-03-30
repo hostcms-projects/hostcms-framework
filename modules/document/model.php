@@ -64,23 +64,6 @@ class Document_Model extends Core_Entity
 	}
 
 	/**
-	 * Delete object from database
-	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Document_Model
-	 */
-	public function delete($primaryKey = NULL)
-	{
-		if (is_null($primaryKey))
-		{
-			$primaryKey = $this->getPrimaryKey();
-		}
-
-		$this->id = $primaryKey;
-
-		return parent::delete($primaryKey);
-	}
-
-	/**
 	 * Backend callback method
 	 * @return string
 	 */
@@ -338,5 +321,54 @@ class Document_Model extends Core_Entity
 		}
 
 		return parent::__get($property);
+	}
+
+	/**
+	 * Add related object. If main object does not save, it will save.
+	 * @param Core_ORM $model
+	 * @param string $relation
+	 * @return Core_ORM
+	 */
+	public function add(Core_ORM $model, $relation = NULL)
+	{
+		if (is_null($relation))
+		{
+			$modelName = $model->getModelName();
+
+			if ($modelName == 'document_version')
+			{
+				$this->template_id = $model->template_id;
+				$model->document_id = $this->id;
+
+				return $this->save();
+			}
+		}
+
+		return parent::add($model, $relation);
+	}
+
+	/**
+	 * Delete object from database
+	 * @param mixed $primaryKey primary key for deleting object
+	 * @return self
+	 * @hostcms-event document.onBeforeRedeclaredDelete
+	 */
+	public function delete($primaryKey = NULL)
+	{
+		if (is_null($primaryKey))
+		{
+			$primaryKey = $this->getPrimaryKey();
+		}
+
+		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}
+
+		return parent::delete($primaryKey);
 	}
 }

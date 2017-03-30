@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Xsl
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Xsl_Dir_Model extends Core_Entity
 {
@@ -18,7 +18,7 @@ class Xsl_Dir_Model extends Core_Entity
 	 * @var string
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
@@ -27,7 +27,7 @@ class Xsl_Dir_Model extends Core_Entity
 		'xsl' => array(),
 		'xsl_dir' => array('foreign_key' => 'parent_id')
 	);
-	
+
 	/**
 	 * Belongs to relations
 	 * @var array
@@ -65,6 +65,7 @@ class Xsl_Dir_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Xsl_Dir_Model
+	 * @hostcms-event xsl_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -75,17 +76,10 @@ class Xsl_Dir_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aXsls = $this->Xsls->findAll();
-		foreach($aXsls as $oXsl)
-		{
-			$oXsl->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		$aXsl_Dirs = $this->Xsl_Dirs->findAll();
-		foreach($aXsl_Dirs as $oXsl_Dir)
-		{
-			$oXsl_Dir->delete();
-		}
+		$this->Xsls->deleteAll(FALSE);
+		$this->Xsl_Dirs->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -35,7 +35,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow3 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 		;
 
 		$this->addTab($oMainTab);
@@ -61,12 +60,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow4->add(Admin_Form_Entity::factory('Checkbox')
 			->caption(Core::_('Seo.tcy'))
 			->name('tcy')
-			->value(1)
-			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
-
-		$oMainRow5->add(Admin_Form_Entity::factory('Checkbox')
-			->caption(Core::_('Seo.pr'))
-			->name('pr')
 			->value(1)
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')));
 
@@ -258,13 +251,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				$windowId = $this->_Admin_Form_Controller->getWindowId();
 
-				// Заголовок формы добавляется до вывода крошек, которые могут быть добавлены в контроллере
-				/*
-				Admin_Form_Entity::factory('Title')
-					->name($this->title)
-					->execute();
-*/
-
 				$start_datetime = Core_Date::datetime2sql(Core_Array::get($this->_formValues, 'start_datetime', Core_Date::timestamp2sql(time() - 2678400)));
 				$end_datetime = Core_Date::datetime2sql(Core_Array::get($this->_formValues, 'datetime', $this->_object->datetime));
 
@@ -277,7 +263,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				$param = array('arrow' => TRUE);
 
 
-				$oCore_Html_Entity_Table_For_Clone = Core::factory('Core_Html_Entity_Table')				
+				$oCore_Html_Entity_Table_For_Clone = Core::factory('Core_Html_Entity_Table')
 					->class('admin-table table table-bordered table-hover table-striped');
 				?>
 				<script type="text/javascript">
@@ -292,9 +278,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						},
 						xaxis: {
 							mode: "time",
-							//timeformat: "%d.%m.%Y %H:%M:%S",
 							timeformat: "%d.%m.%Y",
-							//tickSize: [1, 'hour'],
 							color: gridbordercolor,
 							timezone: "browser"
 						},
@@ -313,18 +297,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 							defaultTheme: false,
 							dateFormat: "%d.%m.%Y",
 							content: "<b>%s</b> : <span>%x</span> : <span>%y</span>"
-							/*
-							content: function(label, xval, yval, flotItem) {
-								//console.log(arguments);
-								var dateValue = new Date(xval);
-								return "<b>" + label + "</b> : <span>" + dateValue.getDate() + "." + (dateValue.getMonth() + 1) + "." + dateValue.getFullYear() + "</span> : <span>" + yval.toFixed(3) + " сек.</span>";
-
-							}	*/
 						},
-						/*
-						crosshair: {
-							mode: "x"
-						},*/
 						selection: {
 							mode: "x"
 						}
@@ -336,24 +309,13 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				//Если в отчете должен быть тИЦ
 				if (intval(Core_Array::get($this->_formValues, 'tcy')))
 				{
-					/*
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.tcy'))
-						->execute();
-						*/
-					//$aSeo = Core_Entity::factory('Site', $oSite->id)->Seos->getByDatetime($start_datetime, $end_datetime);
-
 					$aTcyTitlesPerDay = array();
 					$aTcyValuesPerDay = array();
 
 					foreach ($aSeo as $oSeo)
 					{
-
 						$aTcyTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
 						$aTcyValuesPerDay[] = $oSeo->tcy;
-						//$data[0][] = $oSeo->tcy;
-						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
-						//$legend[] = Core::_('Seo.tcy');
 					}
 					?>
 					<div class="widget">
@@ -381,9 +343,9 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 								</div>
 								<div class="row">
 									<div class="form-group col-sm-12">
-										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>									
+										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
 									</div>
-								</div>								
+								</div>
 								<div class="row">
 									<div class="col-lg-12">
 										<div class="table-scrollable">
@@ -446,130 +408,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						})
 					</script>
 
-					<?php					
-				}
-
-				//Если в отчете должен быть PageRank
-				if (intval(Core_Array::get($this->_formValues, 'pr')))
-				{
-					/*
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.pr'))
-						->execute();
-
-					Core::factory('Core_Html_Entity_Img')
-						->src("/admin/seo/img.php?id_report=5&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}")
-						->execute();
-						*/
-
-					//$site_id = intval(Core_Array::getGet('site_id', CURRENT_SITE));
-
-					//$aSeo = Core_Entity::factory('Site', $oSite->id)->Seos->getByDatetime($start_datetime, $end_datetime);
-
-					$aPrTitlesPerDay = array();
-					$aPrValuesPerDay = array();
-
-					foreach ($aSeo as $oSeo)
-					{
-						$aPrTitlesPerDay[] = strtotime($oSeo->datetime) * 1000;
-						$aPrValuesPerDay[] = $oSeo->pr;
-						//$data[0][] = $oSeo->tcy;
-						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
-						//$legend[] = Core::_('Seo.tcy');
-					}
-					?>
-					<div class="widget">
-						<div class="widget-header bordered-bottom bordered-themeprimary">
-							<i class="widget-icon fa fa-bar-chart-o themeprimary"></i>
-							<span class="widget-caption themeprimary"><?php echo Core::_('Seo.pr') ?></span>
-							<div class="widget-buttons">
-								<a href="#" data-toggle="maximize">
-									<i class="fa fa-expand pink"></i>
-								</a>
-								<a href="#" data-toggle="collapse">
-									<i class="fa fa-minus blue"></i>
-								</a>
-								<a href="#" data-toggle="dispose">
-									<i class="fa fa-times darkorange"></i>
-								</a>
-							</div>
-						</div>
-						<div class="widget-body">
-
-							<div id="pr">
-								<div class="row">
-									<div class="col-sm-12">
-										<div id="pr-chart" class="chart chart-lg"></div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="form-group col-sm-12">										
-										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-lg-12">
-										<div class="table-scrollable">
-										<?php
-										$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
-
-										// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
-										$report = $this->_buildMassReport($aSeo, "pr", $count);
-
-										// Дата
-										$oCore_Html_Entity_Table
-										//->add($this->_showTableTitleReport($report));					
-											->add(
-													Core::factory('Core_Html_Entity_Thead')
-														->add($this->_showTableTitleReport($report))
-												);
-
-										// PageRank
-										$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.pr'), "pr", $param));
-
-										$oCore_Html_Entity_Table->execute();
-										?>
-										</div>
-									</div>
-								</div>	
-							</div>
-						</div>
-					</div>
-					<script type="text/javascript">
-						$(function(){
-							var prTitlesPerDay = [<?php echo implode(',',$aPrTitlesPerDay)?>],
-								prValuesPerDay = [<?php echo implode(',', $aPrValuesPerDay)?>],
-								prValueTitlesPerDay = [];
-
-								for(var i = 0; i < prValuesPerDay.length; i++) {
-									prValueTitlesPerDay.push([new Date(prTitlesPerDay[i]), prValuesPerDay[i]]);
-								}
-
-							var themeprimary = getThemeColorFromCss('themeprimary'), dataPrPerDay = [{
-								color: themeprimary,
-								label: "<?php echo Core::_('Seo.pr') ?>",
-								data: prValueTitlesPerDay
-							}],
-
-							placeholderPrPerDay = $("#pr-chart");
-
-							placeholderPrPerDay.bind("plotselected", function (event, ranges) {
-									plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, $.extend(true, {}, optionsForGraph, {
-										xaxis: {
-											min: ranges.xaxis.from,
-											max: ranges.xaxis.to
-										}
-									}));
-							});
-
-							$('<?php echo '#' . $windowId ?> #pr #setOriginalZoom').on('click', function(){
-								plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, optionsForGraph);
-							});
-
-							var plotPrPerDay = $.plot(placeholderPrPerDay, dataPrPerDay, optionsForGraph);
-						})
-					</script>
-					<?php					
+					<?php
 				}
 
 				$google_links = intval(Core_Array::get($this->_formValues, 'google_links', 0));
@@ -579,16 +418,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				if ($google_links || $yandex_links /*|| $yahoo_links*/ || $bing_links)
 				{
-					/*
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.report_links'))
-						->execute();
-
-					Core::factory('Core_Html_Entity_Img')
-						->src("/admin/seo/img.php?id_report=2&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&google_links={$google_links}&yandex_links={$yandex_links}&bing_links={$bing_links}")
-						->execute();
-						*/
-
 					$aLinksTitlesPerDay = array();
 					$aGoogleValuesPerDay = array();
 					$aYandexValuesPerDay = array();
@@ -601,10 +430,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						$google_links && $aGoogleValuesPerDay[] = $oSeo->google_links;
 						$yandex_links && $aYandexValuesPerDay[] = $oSeo->yandex_links;
 						$bing_links && $aBingValuesPerDay[] = $oSeo->bing_links;
-
-						//$data[0][] = $oSeo->tcy;
-						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
-						//$legend[] = Core::_('Seo.tcy');
 					}
 					?>
 					<div class="widget">
@@ -631,8 +456,8 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 									</div>
 								</div>
 								<div class="row">
-									<div class="form-group col-sm-12">										
-										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>										
+									<div class="form-group col-sm-12">
+										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
 									</div>
 								</div>
 								<div class="row">
@@ -662,21 +487,16 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_links", $param));
 										}
 
-										/*if ($yahoo_links)
-										{
-											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yahoo'), "yahoo_links", $param));
-										}*/
-
 										if ($bing_links)
 										{
 											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.bing'), "bing_links", $param));
 										}
 
 										$oCore_Html_Entity_Table->execute();
-										?>	
+										?>
 										</div>
 									</div>
-								</div>	
+								</div>
 							</div>
 						</div>
 					</div>
@@ -777,21 +597,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				$yandex_indexed = intval(Core_Array::get($this->_formValues, 'yandex_indexed', 0));
 				$yahoo_indexed = intval(Core_Array::get($this->_formValues, 'yahoo_indexed', 0));
 				$bing_indexed = intval(Core_Array::get($this->_formValues, 'bing_indexed', 0));
-				//$rambler_indexed = intval(Core_Array::get($this->_formValues, 'rambler_indexed', 0));
 				$google_indexed = intval(Core_Array::get($this->_formValues, 'google_indexed', 0));
 
 				if ($yandex_indexed || $yahoo_indexed || $bing_indexed /*|| $rambler_indexed*/ || $google_indexed)
 				{
-					/*
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.report_indexed'))
-						->execute();
-
-					Core::factory('Core_Html_Entity_Img')
-						->src("/admin/seo/img.php?id_report=3&site_id={$oSite->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_indexed={$yandex_indexed}&yahoo_indexed={$yahoo_indexed}&bing_indexed={$bing_indexed}&google_indexed={$google_indexed}")
-						->execute();
-						*/
-
 					$aIndexedTitlesPerDay = array();
 					$aGoogleValuesPerDay = array();
 					$aYandexValuesPerDay = array();
@@ -806,10 +615,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						$yandex_indexed && $aYandexValuesPerDay[] = $oSeo->yandex_indexed;
 						$bing_indexed && $aBingValuesPerDay[] = $oSeo->bing_indexed;
 						$yahoo_indexed && $aYahooValuesPerDay[] = $oSeo->yahoo_indexed;
-
-						//$data[0][] = $oSeo->tcy;
-						//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
-						//$legend[] = Core::_('Seo.tcy');
 					}
 					?>
 					<div class="widget">
@@ -836,8 +641,8 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 									</div>
 								</div>
 								<div class="row">
-									<div class="form-group col-sm-12">										
-											<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>									
+									<div class="form-group col-sm-12">
+											<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
 									</div>
 								</div>
 								<div class="row">
@@ -851,7 +656,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 										// Дата
 										$oCore_Html_Entity_Table
-											//->add($this->_showTableTitleReport($report));
 											->add(
 													Core::factory('Core_Html_Entity_Thead')
 														->add($this->_showTableTitleReport($report))
@@ -862,12 +666,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 										{
 											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.yandex'), "yandex_indexed", $param));
 										}
-
-										// Rambler
-										/*if ($rambler_indexed)
-										{
-											$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.rambler'), "rambler_indexed", $param));
-										}*/
 
 										// Google
 										if ($google_indexed)
@@ -890,8 +688,8 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 										$oCore_Html_Entity_Table->execute();
 										?>
 										</div>
-									</div>	
-								</div>	
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1016,7 +814,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 				//Если в отчете должны быть данные о каталогах
 				if ($yandex_catalog || $rambler_catalog || $dmoz_catalog || $mail_catalog)
-				{					
+				{
 					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
 					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
@@ -1024,7 +822,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 					// Дата
 					$oCore_Html_Entity_Table
-						//->add($this->_showTableTitleReport($report));
 						->add(
 							Core::factory('Core_Html_Entity_Thead')
 								->add($this->_showTableTitleReport($report))
@@ -1052,7 +849,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					if ($mail_catalog)
 					{
 						$oCore_Html_Entity_Table->add($this->_showTableRow($report, Core::_('Seo.mail_catalog'), "mail_catalog", $param));
-					}									
+					}
 					?>
 					<div class="widget">
 						<div class="widget-header bordered-bottom bordered-themeprimary">
@@ -1070,7 +867,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 								</a>
 							</div>
 						</div>
-						<div class="widget-body">														
+						<div class="widget-body">
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="table-scrollable">
@@ -1078,10 +875,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 									$oCore_Html_Entity_Table->execute();
 									?>
 									</div>
-								</div>	
-							</div>							
+								</div>
+							</div>
 						</div>
-					</div>	
+					</div>
 					<?php
 				}
 
@@ -1094,12 +891,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 				// Если в отчете должны быть данные о наличии счетчиков
 				if ($spylog_counter || $rambler_counter || $hotlog_counter || $liveinternet_counter || $mail_counter)
 				{
-					/*
-					Core::factory('Core_Html_Entity_H2')
-						->value(Core::_('Seo.report_counter'))
-						->execute();
-						*/
-
 					$oCore_Html_Entity_Table = clone $oCore_Html_Entity_Table_For_Clone;
 
 					// Не показываем некоторые столбцы, если общее количество таковых больше максимально разрешенного
@@ -1107,7 +898,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 					// Дата
 					$oCore_Html_Entity_Table
-						//->add($this->_showTableTitleReport($report));
 						->add(
 							Core::factory('Core_Html_Entity_Thead')
 								->add($this->_showTableTitleReport($report))
@@ -1161,7 +951,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 								</a>
 							</div>
 						</div>
-						<div class="widget-body">														
+						<div class="widget-body">
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="table-scrollable">
@@ -1169,10 +959,10 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 									$oCore_Html_Entity_Table->execute();
 									?>
 									</div>
-								</div>	
-							</div>							
+								</div>
+							</div>
 						</div>
-					</div>	
+					</div>
 					<?php
 				}
 
@@ -1194,16 +984,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 					foreach ($aSeo_Queries as $oSeo_Query)
 					{
-						/*
-						Core::factory('Core_Html_Entity_H2')
-							->value(Core::_('Seo.report_position_text', $oSeo_Query->query))
-							->execute();
-
-
-						Core::factory('Core_Html_Entity_Img')
-							->src("/admin/seo/img.php?id_report=4&seo_query_id={$oSeo_Query->id}&start_datetime={$start_datetime}&end_datetime={$end_datetime}&yandex_position={$yandex_position}&google_position{$google_position}&yahoo_position={$yahoo_position}&bing_position={$bing_position}")
-							->execute();*/
-
 						$aSeo_Query_Positions = Core_Entity::factory('Seo_Query', $oSeo_Query->id)
 							->Seo_Query_Positions
 							->getByDatetime($start_datetime, $end_datetime);
@@ -1225,11 +1005,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 								$yandex_position && $aYandexValuesPerDay[] = -$oSeo_Query_Position->yandex;
 								$bing_position && $aBingValuesPerDay[] = -$oSeo_Query_Position->bing;
 								$yahoo_position && $aYahooValuesPerDay[] = -$oSeo_Query_Position->yahoo;
-								//$rambler_position && $aRamblerValuesPerDay[] = $oSeo_Query_Position->rambler;
-
-								//$data[0][] = $oSeo->tcy;
-								//$abscissa[] = Core_Date::sql2date($oSeo->datetime);
-								//$legend[] = Core::_('Seo.tcy');
 							}
 							?>
 							<div class="widget">
@@ -1256,8 +1031,8 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 											</div>
 										</div>
 										<div class="row">
-											<div class="form-group col-sm-12">												
-												<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>												
+											<div class="form-group col-sm-12">
+												<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Seo.reset')?></button>
 											</div>
 										</div>
 										<div class="row">
@@ -1278,7 +1053,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 
 													// Дата
 													$oCore_Html_Entity_Table
-														//->add($this->_showTableTitleReport($report));
 														->add(
 															Core::factory('Core_Html_Entity_Thead')
 																->add($this->_showTableTitleReport($report))
@@ -1307,7 +1081,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 													$oCore_Html_Entity_Table->execute();
 												?>
 												</div>
-											</div>		
+											</div>
 										</div>
 									</div>
 								</div>
@@ -1405,7 +1179,7 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 									var placeholderQueryPositionPerDay = $("#queryPosition<?php echo $oSeo_Query->id;?>-chart"),
 										optionsForQueryPositionGraph = $.extend(true, {}, optionsForGraph, {
 											yaxis: {
-												min: null,												
+												min: null,
 												tickFormatter: function(val, axis){ return -val}
 											}
 										});
@@ -1431,8 +1205,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 						}
 					}
 				}
-
-				//$this->addContent(ob_get_clean());
 
 				$this->addEntity(
 					Admin_Form_Entity::factory('Code')
@@ -1476,21 +1248,13 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	*/
 	protected function _drawStatusReport($value)
 	{
-		/*	
-		$oCore_Html_Entity_Img = Core::factory('Core_Html_Entity_Img');
-
-		$value ? $oCore_Html_Entity_Img->src('/admin/images/check.gif')
-			: $oCore_Html_Entity_Img->src('/admin/images/not_check.gif');
-			*/
-
 		ob_start();
-		
+
 		if ($value)
 		{
 			echo '<i class="fa fa-check success"></i>';
 		}
-		
-		//$oCore_Html_Entity_Img->execute();
+
 		return ob_get_clean();
 	}
 
@@ -1516,7 +1280,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		$oCore_Html_Entity_Tr = Core::factory('Core_Html_Entity_Tr')
-			//->class('admin_table_title')
 			->add(Core::factory('Core_Html_Entity_Th')->width('150px'));
 
 		for($i = 0; $i < $count; $i++)
@@ -1664,9 +1427,6 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 					break;
 			case 'tcy':
 				$field_value[] = "tcy";
-				break;
-			case 'pr':
-				$field_value[] = "pr";
 				break;
 			case 'links':
 				$field_value[] = "google_links";
@@ -1837,31 +1597,13 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	{
 		if ($prev_value != false && $current_value != false)
 		{
-			/*
-			$oCore_Html_Entity_Span = Core::factory('Core_Html_Entity_Span');
+			ob_start();
 
-			if ($prev_value < $current_value)
-			{				
-				 $oCore_Html_Entity_Span->class('arrow_up')
-					->value('&uarr;'); 
-				
-			}
-			elseif ($prev_value > $current_value)
-			{
-				 $oCore_Html_Entity_Span->class('arrow_down')
-					->value('&darr;'); 
-					
-			}
-			*/
-			ob_start();			
-			
 			if ($change_value = $current_value - $prev_value)
 			{
 				echo ' <i class="fa fa-' . ($change_value > 0 ? 'sort-asc success' : 'sort-desc danger') . '"></i>';
-			}	
-						
-			//$oCore_Html_Entity_Span->execute();
-			
+			}
+
 			return ob_get_clean();
 		}
 	}
@@ -1886,34 +1628,14 @@ class Seo_Controller_Report extends Admin_Form_Action_Controller_Type_Edit
 	{
 		if ($prev_value !== false && $current_value !== false && $current_value != 0)
 		{
-			//if ()
-			//{
-				/*
-				$oCore_Html_Entity_Span = Core::factory('Core_Html_Entity_Span');
+			ob_start();
 
-				
-				if ($prev_value > $current_value || $prev_value == 0)
-				{
-					$oCore_Html_Entity_Span->class('arrow_up')
-						->value('&uarr;');
-				}
-				elseif ($prev_value < $current_value && $prev_value !== 0)
-				{
-					$oCore_Html_Entity_Span->class('arrow_down')
-						->value('&darr;');
-				}
-				*/
-			
-				ob_start();
-				
-				if ($change_value = $prev_value - $current_value)
-				{
-					echo ' <i class="fa fa-' . (($change_value > 0 || -$change_value == $current_value) ? 'sort-asc success' : 'sort-desc danger') . '"></i>';
-				}	
-				
-				//$oCore_Html_Entity_Span->execute();
-				return ob_get_clean();
-			//}
+			if ($change_value = $prev_value - $current_value)
+			{
+				echo ' <i class="fa fa-' . (($change_value > 0 || -$change_value == $current_value) ? 'sort-asc success' : 'sort-desc danger') . '"></i>';
+			}
+
+			return ob_get_clean();
 		}
 	}
 }

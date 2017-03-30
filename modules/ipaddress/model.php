@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Ipaddress
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Ipaddress_Model extends Core_Entity
 {
@@ -38,26 +38,9 @@ class Ipaddress_Model extends Core_Entity
 		if (is_null($id))
 		{
 			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
+			$this->_preloadValues['deny_access'] = 1;
 			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
 		}
-	}
-
-	/**
-	 * Get ipaddress by ip
-	 * @param string $ip ip
-	 * @return Ip|NULL
-	 */
-	public function getByIp($ip)
-	{
-		$this->queryBuilder()
-			->clear()
-			->where('ip', '=', $ip)
-			->limit(1);
-
-		$aIp = $this->findAll();
-		return isset($aIp[0])
-			? $aIp[0]
-			: NULL;
 	}
 
 	/**
@@ -67,6 +50,17 @@ class Ipaddress_Model extends Core_Entity
 	public function changeAccess()
 	{
 		$this->deny_access = 1 - $this->deny_access;
+		$this->save();
+		return $this;
+	}
+
+	/**
+	 * Change backend access mode
+	 * @return self
+	 */
+	public function changeBackendAccess()
+	{
+		$this->deny_backend = 1 - $this->deny_backend;
 		$this->save();
 		return $this;
 	}
@@ -118,7 +112,7 @@ class Ipaddress_Model extends Core_Entity
 		$this->_checkDuplicate();
 		return parent::save();
 	}
-	
+
 	/**
 	 * Get entity description
 	 * @return string

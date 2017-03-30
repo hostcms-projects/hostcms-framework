@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Section_Model extends Core_Entity{
 	/**
@@ -55,6 +55,7 @@ class Template_Section_Model extends Core_Entity{
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event template_section.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -64,6 +65,8 @@ class Template_Section_Model extends Core_Entity{
 		}
 
 		$this->id = $primaryKey;
+		
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 		
 		$this->Template_Section_Libs->deleteAll(FALSE);
 

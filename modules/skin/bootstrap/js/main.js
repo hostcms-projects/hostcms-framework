@@ -1282,6 +1282,7 @@ function ShowExport(windowId, index)
 		order_end_date = 'none',
 		import_price_encoding = 'none',
 		shop_groups_parent_id = 'none',
+		shop_producer_id = 'none',
 		export_external_properties_allow_items = 'none',
 		export_external_properties_allow_groups = 'none',
 		export_modifications_allow = 'none',
@@ -1297,6 +1298,7 @@ function ShowExport(windowId, index)
 			export_external_properties_allow_items = 'block';
 			export_external_properties_allow_groups = 'block';
 			export_modifications_allow = 'block';
+			shop_producer_id = 'block';
 		break;
 		case 1:
 			export_price_separator = 'block';
@@ -1307,6 +1309,7 @@ function ShowExport(windowId, index)
 		break;
 		case 2:
 		case 3:
+			shop_groups_parent_id = 'block';
 			export_modifications_allow = 'block';
 			export_external_properties_allow_items = 'block';
 		break;
@@ -1317,6 +1320,7 @@ function ShowExport(windowId, index)
 	$("#"+windowId+" #order_end_date").css('display', order_end_date);
 	$("#"+windowId+" #import_price_encoding").css('display', import_price_encoding);
 	$("#"+windowId+" #shop_groups_parent_id").css('display', shop_groups_parent_id);
+	$("#"+windowId+" #shop_producer_id").css('display', shop_producer_id);
 	$("#"+windowId+" #export_external_properties_allow_items").css('display', export_external_properties_allow_items);
 	$("#"+windowId+" #export_external_properties_allow_groups").css('display', export_external_properties_allow_groups);
 	$("#"+windowId+" #export_modifications_allow").css('display', export_modifications_allow);

@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online stores',
@@ -16,6 +16,7 @@ return array(
 	'tab_export' => 'Export',
 	'tab_watermark' => 'Image',
 	'tab_sort' => 'Sorting',
+	'tab_mail_subject' => 'Mails',
 	'allgroupsaccess' => 'All',
 	'add_title' => "Add online store information",
 	'edit_title' => "Edit online store information",
@@ -133,4 +134,10 @@ return array(
 	'schedule-searchIndexItem' => 'Index shop item',
 	'schedule-searchIndexGroup' => 'Index shop group',
 	'schedule-searchUnindexItem' => 'Unindex shop item',
+	'order_admin_subject' => 'New order email subject',
+	'order_user_subject' => 'New order customer\'s email subject',
+	'confirm_admin_subject' => 'Paid order email subject',
+	'confirm_user_subject' => 'Paid order customer\'s email subject',
+	'cancel_admin_subject' => 'Cancel order email subject',
+	'cancel_user_subject' => 'Cancel order customer\'s email subject',
 );

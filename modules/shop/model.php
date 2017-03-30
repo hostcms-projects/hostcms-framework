@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Model extends Core_Entity
 {
@@ -51,6 +51,7 @@ class Shop_Model extends Core_Entity
 		'affiliate_plan' => array('through' => 'shop_affiliate_plan'),
 		'shop_affiliate_plan' => array(),
 		'shop_cart' => array(),
+		'shop_favorite' => array(),
 		'shop_delivery' => array(),
 		'shop_bonus' => array(),
 		'shop_discount' => array(),
@@ -205,6 +206,7 @@ class Shop_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return self
+	 * @hostcms-event shop.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -214,6 +216,8 @@ class Shop_Model extends Core_Entity
 		}
 
 		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
 		// Fix bug with 'deleted' relations
 		$this->deleted = 0;
@@ -243,6 +247,7 @@ class Shop_Model extends Core_Entity
 
 		$this->Shop_Affiliate_Plans->deleteAll(FALSE);
 		$this->Shop_Carts->deleteAll(FALSE);
+		$this->Shop_Favorites->deleteAll(FALSE);
 		$this->Shop_Deliveries->deleteAll(FALSE);
 		$this->Shop_Bonuses->deleteAll(FALSE);
 		$this->Shop_Discounts->deleteAll(FALSE);

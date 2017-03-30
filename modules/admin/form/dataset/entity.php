@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 {
@@ -38,6 +38,72 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 	}
 
 	/**
+	 * Check if entity conditions consist of having/groupBy
+	 * @return boolean
+	 */
+	protected function _issetHavingOrGroupBy()
+	{
+		$issetHaving = FALSE;
+		foreach ($this->_conditions as $condition)
+		{
+			$aCondition = each($condition);
+
+			if ($aCondition['key'] == 'having' || $aCondition['key'] == 'groupBy')
+			{
+				$issetHaving = TRUE;
+				break;
+			}
+		}
+
+		return $issetHaving;
+	}
+
+	/**
+	 * Get FOUND_ROWS
+	 * @return int
+	 */
+	protected function _getFoundRows()
+	{
+		$row = Core_QueryBuilder::select(array('FOUND_ROWS()', 'count'))->execute()->asAssoc()->current();
+
+		// Warning
+		if (Core_Array::getRequest('debug'))
+		{
+			echo '<p><b>Query FOUND_ROWS</b>.</p>';
+		}
+
+		return $row['count'];
+	}
+
+	/**
+	 * Get total count by COUNT(*)
+	 * @return int
+	 */
+	protected function _getTotalCountByCount()
+	{
+		$queryBuilder = $this->_entity->queryBuilder()
+			->clearSelect()
+			->clearOrderBy()
+			->select(array('COUNT(*)', 'count'))
+			->from($this->_entity->getTableName())
+			->limit(1)
+			->offset(0)
+			->asAssoc();
+
+		$Core_DataBase = $queryBuilder->execute();
+
+		$row = $Core_DataBase->current();
+
+		// Warning
+		if (Core_Array::getRequest('debug'))
+		{
+			echo '<p><b>getCount Query</b>: <pre>', $Core_DataBase->getLastQuery(), '</pre></p>';
+		}
+
+		return $row['count'];
+	}
+
+	/**
 	 * Get items count
 	 * @return int
 	 */
@@ -50,30 +116,11 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 
 			$this->_entity->applyMarksDeleted();
 
-			$issetHaving = FALSE;
-			foreach ($this->_conditions as $condition)
-			{
-				$aCondition = each($condition);
-
-				if ($aCondition['key'] == 'having' || $aCondition['key'] == 'groupBy')
-				{
-					$issetHaving = TRUE;
-					break;
-				}
-			}
+			$issetHaving = $this->_issetHavingOrGroupBy();
 
 			if (!$issetHaving)
 			{
-				$queryBuilder = $this->_entity->queryBuilder()
-					->clearSelect()
-					->clearOrderBy()
-					->select(array('COUNT(*)', 'count'))
-					->from($this->_entity->getTableName())
-					->limit(1)
-					->offset(0)
-					->asAssoc();
-
-				$Core_DataBase = $queryBuilder->execute();
+				$this->_count = $this->_getTotalCountByCount();
 			}
 			else
 			{
@@ -88,22 +135,15 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 
 				$queryBuilder->execute();
 
-				$queryBuilder
-					->clear()
-					->select(array('FOUND_ROWS()', 'count'))
-					->asAssoc();
+				// Warning
+				if (Core_Array::getRequest('debug'))
+				{
+					echo '<p><b>Query</b>: sqlCalcFoundRows before FOUND_ROWS()</p>';
+				}
 
-				$Core_DataBase = $queryBuilder->execute();
+				$this->_count = $this->_getFoundRows();
 			}
 
-			$row = $Core_DataBase->current();
-			$this->_count = $row['count'];
-
-			// Warning
-			if (Core_Array::getRequest('debug'))
-			{
-				echo '<p><b>Запрос количества</b>: <pre>', $Core_DataBase->getLastQuery(), '</pre></p>';
-			}
 			//$this->_count = count($this->_entity->findAll());
 		}
 
@@ -149,7 +189,15 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 				->limit($this->_limit)
 				->offset($this->_offset);
 
-			is_null($this->_count) && $this->_entity->queryBuilder()->sqlCalcFoundRows();
+			if (is_null($this->_count))
+			{
+				$issetHaving = $this->_issetHavingOrGroupBy();
+
+				if ($issetHaving)
+				{
+					$this->_entity->queryBuilder()->sqlCalcFoundRows();
+				}
+			}
 
 			// Load columns
 			$this->_entity->getTableColums();
@@ -159,7 +207,7 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			// Warning
 			if (Core_Array::getRequest('debug'))
 			{
-				echo '<p><b>Запрос на выборку</b>: <pre>', Core_DataBase::instance()->getLastQuery(), '</pre></p>';
+				echo '<p><b>Select Query</b>: <pre>', Core_DataBase::instance()->getLastQuery(), '</pre></p>';
 			}
 
 			$this->_loaded = TRUE;
@@ -167,15 +215,14 @@ class Admin_Form_Dataset_Entity extends Admin_Form_Dataset
 			// Расчет количества
 			if (is_null($this->_count))
 			{
-				$queryBuilder
-					->clear()
-					->select(array('FOUND_ROWS()', 'count'))
-					->asAssoc();
-
-				$Core_DataBase = $queryBuilder->execute();
-
-				$row = $Core_DataBase->current();
-				$this->_count = $row['count'];
+				if ($issetHaving)
+				{
+					$this->_count = $this->_getFoundRows();
+				}
+				else
+				{
+					$this->_count = $this->_getTotalCountByCount();
+				}
 			}
 		}
 		return $this->_objects;

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Update
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Update_Entity extends Core_Entity
 {
@@ -337,12 +337,14 @@ class Update_Entity extends Core_Entity
 					is_file($update_file) && Core_File::delete($update_file);
 
 					// Clear Core_ORM_ColumnCache
-					$aCore_Orm_Config = Core::$config->get('core_orm') + array(
+					Core_ORM::clearColumnCache();
+
+					/*$aCore_Orm_Config = Core::$config->get('core_orm') + array(
 						'cache' => 'memory',
 						'columnCache' => 'memory'
 					);
 					$oCore_Cache = Core_Cache::instance($aCore_Orm_Config['columnCache']);
-					$oCore_Cache->deleteAll('Core_ORM_ColumnCache');
+					$oCore_Cache->deleteAll('Core_ORM_ColumnCache');*/
 
 					// Если не было ошибок
 					if (!$error_update)

@@ -228,6 +228,7 @@ return array(
 	'export_external_properties_allow_items' => "Export additional properties of products",
 	'export_external_properties_allow_groups' => "Export additional properties of groups",
 	'export_modifications_allow' => "Export modifications",
+	'export_shortcuts_allow' => "Export shortcuts",
 	'export_orders_allow' => "Export orders",
 	'load_parent_group' => '--- Root ---',
 	'accepted_prices' => 'Product prices information updated successfully!',

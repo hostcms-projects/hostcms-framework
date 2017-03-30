@@ -103,7 +103,7 @@ class Core_Mail_Smtp extends Core_Mail
 			$aRecipients = explode(',', $to);
 			foreach ($aRecipients as $sTo)
 			{
-				fputs($fp, "RCPT TO: <{$sTo}>\r\n");
+				fputs($fp, "RCPT TO: {$sTo}\r\n");
 				$server_response = $this->_serverFgets($fp);
 				if (!$this->_serverParse($server_response, "250"))
 				{

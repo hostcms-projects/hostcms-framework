@@ -152,6 +152,7 @@ class Shop_Order_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event shop_order.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -161,6 +162,8 @@ class Shop_Order_Model extends Core_Entity
 		}
 
 		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues();

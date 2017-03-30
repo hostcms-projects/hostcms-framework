@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Dir_Model extends Core_Entity
 {
@@ -18,13 +18,13 @@ class Lib_Dir_Model extends Core_Entity
 	 * @var int
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * Backend property
 	 * @var string
 	 */
 	public $description = '';
-	
+
 	/**
 	 * Backend property
 	 * @var int
@@ -67,7 +67,8 @@ class Lib_Dir_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event lib_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -78,19 +79,10 @@ class Lib_Dir_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$libs = $this->libs->findAll();
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		foreach($libs as $oLib)
-		{
-			$oLib->delete();
-		}
-
-		$aLibDirs = $this->Lib_Dirs->findAll();
-
-		foreach($aLibDirs as $oLibDir)
-		{
-			$oLibDir->delete();
-		}
+		$this->libs->deleteAll(FALSE);
+		$this->Lib_Dirs->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Cart_Model extends Core_Entity
 {
@@ -103,6 +103,7 @@ class Shop_Cart_Model extends Core_Entity
 		$oShop_Item = $this->Shop_Item
 			->clearEntities()
 			->showXmlWarehousesItems(TRUE)
+			->showXmlBonuses(TRUE)
 			->showXmlProperties($this->_showXmlProperties)
 			->cartQuantity($this->quantity);
 

@@ -6,8 +6,8 @@
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
- */ 
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ */
 return array(
 	'model_name' => 'SEO characteristics',
 	'menu' => 'SEO services',
@@ -34,7 +34,6 @@ return array(
 	'edit_title' => 'Edit website characteristics',
 	'datetime' => 'Date',
 	'tcy' => 'TIC',
-	'pr' => 'PageRank',
 	'tcy_topic' => 'Category in Yandex.Catalogue',
 	'google_links' => 'According to Google.com',
 	'yandex_links' => 'According to Yandex.ru',
@@ -84,6 +83,6 @@ return array(
 	'define_error' => 'Error! Characteristics have not been calculated!',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!',
-	
+
 	'reset' => 'Reset'
 );

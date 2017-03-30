@@ -5,7 +5,7 @@
  * @package HostCMS
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Интернет-магазины',
@@ -16,6 +16,7 @@ return array(
 	'tab_export' => 'Экспорт',
 	'tab_watermark' => 'Изображение',
 	'tab_sort' => 'Сортировка',
+	'tab_mail_subject' => 'Письма',
 	'allgroupsaccess' => 'Все',
 	'add_title' => "Добавление информации об интернет-магазине",
 	'edit_title' => "Редактирование информации об интернет-магазине",
@@ -131,4 +132,10 @@ return array(
 	'schedule-searchIndexItem' => 'Индексировать товар',
 	'schedule-searchIndexGroup' => 'Индексировать группу товаров',
 	'schedule-searchUnindexItem' => 'Снять товар с индексации',
+	'order_admin_subject' => 'Тема письма о поступившем заказе куратору магазина',
+	'order_user_subject' => 'Тема письма о поступившем заказе пользователю',
+	'confirm_admin_subject' => 'Тема письма подтверждения оплаты куратору магазина',
+	'confirm_user_subject' => 'Тема письма подтверждения оплаты пользователю',
+	'cancel_admin_subject' => 'Тема письма об отмене заказа куратору магазина',
+	'cancel_user_subject' => 'Тема письма об отмене заказа пользователю',
 );

@@ -295,7 +295,7 @@ class Comment_Model extends Core_Entity
 			return ob_get_clean();
 		}
 
-		return $this->author;
+		return htmlspecialchars($this->author);
 	}
 
 	/**

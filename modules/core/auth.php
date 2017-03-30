@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Auth
 {
@@ -19,6 +19,38 @@ class Core_Auth
 	 */
 	static public function authorization($moduleName)
 	{
+		// Check IP addresses
+		$sRemoteAddr = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
+		$aIp = array($sRemoteAddr);
+		$HTTP_X_FORWARDED_FOR = Core_Array::get($_SERVER, 'HTTP_X_FORWARDED_FOR');
+		if (!is_null($HTTP_X_FORWARDED_FOR) && $sRemoteAddr != $HTTP_X_FORWARDED_FOR)
+		{
+			$aIp[] = $HTTP_X_FORWARDED_FOR;
+		}
+
+		if (Core::moduleIsActive('ipaddress'))
+		{
+			$oIpaddress_Controller = new Ipaddress_Controller();
+
+			$bBlocked = $oIpaddress_Controller->isBackendBlocked($aIp);
+
+			if ($bBlocked)
+			{
+				$oCore_Response = new Core_Response();
+
+				$oCore_Response
+					->status(403)
+					->header('Pragma', 'no-cache')
+					->header('Cache-Control', 'private, no-cache')
+					->header('Last-Modified', gmdate('D, d M Y H:i:s', time()) . ' GMT')
+					->header('X-Powered-By', 'HostCMS')
+					->body('HostCMS: Error 403. Access Forbidden!')
+					->sendHeaders()
+					->showBody();
+				exit();
+			}
+		}
+
 		self::systemInit();
 
 		if (!is_array($moduleName))
@@ -45,6 +77,13 @@ class Core_Auth
 					Core_Message::show($e->getMessage(), 'error');
 				}
 
+				if (!self::logged())
+				{
+					Core_Log::instance()->clear()
+						->status(Core_Log::$ERROR)
+						->write(Core::_('Core.error_log_attempt_to_access', $sModuleName));
+				}
+
 				$message = ob_get_clean();
 			}
 			else
@@ -54,10 +93,6 @@ class Core_Auth
 
 			if (!self::logged())
 			{
-				Core_Log::instance()->clear()
-					->status(Core_Log::$ERROR)
-					->write(Core::_('Core.error_log_attempt_to_access', $sModuleName));
-
 				// Нужен старт сессии, чтобы записать в нее HOSTCMS_HTTP_AUTH_FLAG
 				if (@session_id() == '')
 				{
@@ -460,11 +495,6 @@ class Core_Auth
 			$oUser_Accessdenied->datetime = Core_Date::timestamp2sql(time());
 			$oUser_Accessdenied->ip = $sIp;
 			$oUser_Accessdenied->save();
-
-			Core_Log::instance()->clear()
-				->status(Core_Log::$ERROR)
-				->notify(FALSE)
-				->write(Core::_('Core.error_log_authorization_error'));
 
 			return FALSE;
 		}

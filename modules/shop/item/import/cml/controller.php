@@ -13,12 +13,13 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - updateFields(array()) массив полей товара, которые необходимо обновлять при импорте CML товара, если не заполнен, то обновляются все поля. Пример массива array('marking', 'name', 'shop_group_id', 'text', 'description', 'images', 'taxes', 'shop_producer_id')
  * - itemDescription() имя поля товара, в которое загружать описание товаров, может принимать значения description, text. По умолчанию text
  * - shortDescription() название тега, из которого загружать описание товара, например МалоеОписание или КраткоеОписание. По умолчанию МалоеОписание
+ * - timeout(30) время выполнения шага импорта, получается из настроек PHP.
  *
  * @package HostCMS
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 {
@@ -39,6 +40,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		'sPicturesPath',
 		'importAction',
 		'namespace',
+		'timeout',
 		'debug'
 	);
 
@@ -50,7 +52,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		'insertDirCount' => 0,
 		'insertItemCount' => 0,
 		'updateDirCount' => 0,
-		'updateItemCount' => 0
+		'updateItemCount' => 0,
+		'status' => 'success'
 	);
 
 	/**
@@ -160,6 +163,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		$this->updateFields = array();
 		$this->importGroups = $this->createShopItems = TRUE;
 
+		$this->timeout = (!defined('DENY_INI_SET') || !DENY_INI_SET)
+			? ini_get('max_execution_time')
+			: 30;
+
 		Core_File::mkdir(CMS_FOLDER . TMP_DIR . '1c_exchange_files');
 	}
 
@@ -173,8 +180,13 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		foreach ($this->xpath($oXMLNode, 'Группа') as $oXMLGroupNode)
 		{
-			$oShopGroup = Core_Entity::factory('Shop', $this->iShopId)->Shop_Groups->getByGuid(strval($oXMLGroupNode->Ид), FALSE);
-			is_null($oShopGroup) && $oShopGroup = Core_Entity::factory('Shop_Group');
+			$oShopGroup = Core_Entity::factory('Shop', $this->iShopId)
+				->Shop_Groups
+				->getByGuid(strval($oXMLGroupNode->Ид), FALSE);
+
+			is_null($oShopGroup)
+				&& $oShopGroup = Core_Entity::factory('Shop_Group');
+
 			$oShopGroup->name = strval($oXMLGroupNode->Наименование);
 			$oShopGroup->guid = strval($oXMLGroupNode->Ид);
 
@@ -191,12 +203,15 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				: $this->_aReturn['updateDirCount']++;
 
 			is_null($oShopGroup->path) && $oShopGroup->path= '';
+
 			$oShopGroup->save();
 
 			// Указание Картинка для группы не соответсвует формату обмена CML!
 			$PictureData = strval($oXMLGroupNode->Картинка);
 
-			if (strlen($PictureData) && Core_File::isValidExtension($PictureData, Core::$mainConfig['availableExtension']))
+			if (strlen($PictureData)
+				&& Core_File::isValidExtension($PictureData, Core::$mainConfig['availableExtension'])
+			)
 			{
 				// Папка назначения
 				$sDestinationFolder = $oShopGroup->getGroupPath();
@@ -528,7 +543,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 * @param Shop_Item_Model $oShopItem item
 	 * @param array $oImages
 	 */
-	protected function _importImages(Shop_Item_Model $oShopItem, $oImages)
+	public function importImages(Shop_Item_Model $oShopItem, $oImages)
 	{
 		$bFirstPicture = TRUE;
 		$sGUID = 'ADDITIONAL-IMAGES';
@@ -970,15 +985,16 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			list(, $this->namespace) = each($aNamespaces);
 		}
 
-		// Проверяем, есть ли файл с дополнительными свойствами для модификаций, если есть - извлекаем данные
-		/*$aModificationProperties = is_file($this->_temporaryPropertyFile)
-			? unserialize(file_get_contents($this->_temporaryPropertyFile))
-			: array();*/
+		$timeout = Core::getmicrotime();
 
 		// Файл import.xml
 		if (!isset($this->_oSimpleXMLElement->ПакетПредложений))
 		{
-			if (isset($this->_oSimpleXMLElement->Классификатор))
+			$importPosition = Core_Array::getSession('importPosition', 0);
+
+			Core_Session::close();
+
+			if (isset($this->_oSimpleXMLElement->Классификатор) && $importPosition == 0)
 			{
 				$classifier = $this->_oSimpleXMLElement->Классификатор;
 
@@ -1019,7 +1035,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				$this->_importProperties($classifier);
 			}
 
-			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, 'Товары/Товар') as $oXmlItem)
+			$xPath = $importPosition == 0
+				? 'Товары/Товар'
+				: 'Товары/Товар[position() > ' . $importPosition . ']';
+
+			foreach ($this->xpath($this->_oSimpleXMLElement->Каталог, $xPath) as $oXmlItem)
 			{
 				Core_Event::notify('Shop_Item_Import_Cml_Controller.onBeforeImportShopItem', $this, array($oXmlItem));
 
@@ -1096,9 +1116,21 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 
 				if ($this->_checkUpdateField('shop_group_id'))
 				{
-					if (is_array($aTmp = $this->xpath($oXmlItem, 'Группы'))
-					&& count($aTmp) > 0
-					&& !is_null($oShop_Group = $oShop->Shop_Groups->getByGuid(strval($aTmp[0]->Ид), FALSE)))
+					// Массив CML ID групп, в которые помещается товар
+					$aGroupsCmlIDs = array();
+					foreach ($this->xpath($oXmlItem, 'Группы/Ид') as $oXmlGroupId)
+					{
+						$aGroupsCmlIDs[] = strval($oXmlGroupId);
+					}
+
+					$firstGroupCmlId = count($aGroupsCmlIDs)
+						? array_shift($aGroupsCmlIDs)
+						: NULL;
+					
+					// Остальные группы из массива обрабатываются ниже
+					if (!is_null($firstGroupCmlId)
+						&& !is_null($oShop_Group = $oShop->Shop_Groups->getByGuid($firstGroupCmlId, FALSE))
+					)
 					{
 						// Группа указана в файле и существует в магазине
 						$sGUIDmod === FALSE
@@ -1154,6 +1186,35 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					throw new Core_Exception(Core::_('Shop_Item.error_save_without_name'));
 				}
 
+				// В остальные группы помещается ярлык
+				if ($this->_checkUpdateField('shop_group_id') && count($aGroupsCmlIDs))
+				{
+					foreach ($aGroupsCmlIDs as $sGroupCmlID)
+					{
+						$oTmpShopGroup = $oShop->Shop_Groups->getByGuid($sGroupCmlID, FALSE);
+						
+						if (!is_null($oTmpShopGroup))
+						{
+							$aShopItems = $oShop->Shop_Items;
+							$aShopItems->queryBuilder()
+								->where('shortcut_id', '=', $oShopItem->id)
+								->where('shop_group_id', '=', $oTmpShopGroup->id)
+								->limit(1);
+
+							$iCountShortcuts = $aShopItems->getCount(FALSE);
+
+							if (!$iCountShortcuts)
+							{
+								Core_Entity::factory('Shop_Item')
+									->shop_group_id($oTmpShopGroup->id)
+									->shortcut_id($oShopItem->id)
+									->shop_id($oShop->id)
+									->save();
+							}
+						}
+					}
+				}
+				
 				// Обрабатываем описание товара
 				foreach ($this->xpath($oXmlItem, 'Описание') as $DescriptionData)
 				{
@@ -1176,7 +1237,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				// Картинки основного товара
-				$this->_checkUpdateField('images') && $this->_importImages($oShopItem, $this->xpath($oXmlItem, 'Картинка'));
+				$this->_checkUpdateField('images') && $this->importImages($oShopItem, $this->xpath($oXmlItem, 'Картинка'));
 
 				// До обработки свойств из 1С нужно записать значения "по умолчанию" для всех свойств, заданных данной группе товара
 				$aProperties = Core_Entity::factory('Shop_Item_Property_List', $oShop->id)->Properties;
@@ -1216,12 +1277,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->_importPropertyValues($oShopItem, $oItemProperty);
 				}
 
-				// Сохраняем список характеристик модификаций во временный файл
-				/*if (count($aModificationProperties))
-				{
-					file_put_contents($this->_temporaryPropertyFile, serialize($aModificationProperties));
-				}*/
-
 				foreach ($this->xpath($oXmlItem, 'ЗначенияРеквизитов/ЗначениеРеквизита') as $oItemProperty)
 				{
 					$this->_addPredefinedAdditionalProperty($oShopItem, $oItemProperty, strval($oItemProperty->Значение));
@@ -1252,6 +1307,17 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 
 				Core_Event::notify('Shop_Item_Import_Cml_Controller.onAfterImportShopItem', $this, array($oShopItem, $oXmlItem));
+
+				$importPosition++;
+
+				// Прерываем этап импорта
+				if ($this->timeout && (Core::getmicrotime() - $timeout + 2 > $this->timeout))
+				{
+					$_SESSION['importPosition'] = $importPosition;
+
+					$this->_aReturn['status'] = 'progress';
+					return $this->_aReturn;
+				}
 			}
 		}
 		// Файл offers.xml
@@ -1366,15 +1432,6 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						// Подменяем товар на модификацию
 						$oShopItem = $oModificationItem;
 
-						// извлекаем список допсвойств для данной модификации
-						/*if (isset($aModificationProperties[$oShopItem->guid]) && is_array($aModificationProperties[$oShopItem->guid]))
-						{
-							foreach ($aModificationProperties[$oShopItem->guid] as $aModificationPropertyData)
-							{
-								$this->_addPredefinedAdditionalProperty($oShopItem, $aModificationPropertyData['name'], $aModificationPropertyData['value'], TRUE);
-							}
-						}*/
-
 						// Для модификации обновляется название и артикул
 						$oShopItem->marking = strval($oProposal->Артикул);
 						$oShopItem->name = strval($oProposal->Наименование);
@@ -1389,7 +1446,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					$this->_importBaseMeasure($oProposal, $oShopItem);
 
 					// Картинки предложений (модификаций)
-					$this->_importImages($oShopItem, $this->xpath($oProposal, 'Картинка'));
+					$this->importImages($oShopItem, $this->xpath($oProposal, 'Картинка'));
 
 					// Добавляем значения для общих свойств всех товаров
 					foreach ($this->xpath($oProposal, 'ЗначенияСвойств/ЗначенияСвойства') as $ItemPropertyValue)
@@ -1768,6 +1825,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			}
 		}
 
+		Core_Session::start();
+		$_SESSION['importPosition'] = 0;
+
 		// Пересчет количества товаров в группах
 		$oShop->recount();
 
@@ -1880,8 +1940,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	 */
 	protected function _importBaseMeasure($oNode, Shop_Item_Model $oShopItem)
 	{
-		$sMeasure = strval($oNode->БазоваяЕдиница);
-		if (strlen($sMeasure))
+		if (isset($oNode->БазоваяЕдиница))
 		{
 			$okei = strval($oNode->БазоваяЕдиница->attributes()->Код);
 
@@ -1891,19 +1950,27 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				: NULL;
 
 			// Получаем по названию
-			is_null($oShopMeasure)
-				&& $oShopMeasure = Core_Entity::factory('Shop_Measure')->getByName($sMeasure, FALSE);
-
 			if (is_null($oShopMeasure))
 			{
-				$oShopMeasure = Core_Entity::factory('Shop_Measure');
-				$oShopMeasure->name = strval($sMeasure);
-				$oShopMeasure->description = strval($oNode->БазоваяЕдиница->attributes()->НаименованиеПолное);
-				$oShopMeasure->okei = $okei;
-				$oShopMeasure->save();
+				$sMeasure = strval($oNode->БазоваяЕдиница);
+
+				if ($sMeasure != '')
+				{
+					$oShopMeasure = Core_Entity::factory('Shop_Measure')->getByName($sMeasure, FALSE);
+
+					if (is_null($oShopMeasure))
+					{
+						$oShopMeasure = Core_Entity::factory('Shop_Measure');
+						$oShopMeasure->name = strval($sMeasure);
+						$oShopMeasure->description = strval($oNode->БазоваяЕдиница->attributes()->НаименованиеПолное);
+						$oShopMeasure->okei = $okei;
+						$oShopMeasure->save();
+					}
+				}
 			}
 
-			$oShopItem->shop_measure_id = $oShopMeasure->id;
+			!is_null($oShopMeasure)
+				&& $oShopItem->shop_measure_id = $oShopMeasure->id;
 		}
 
 		return $this;

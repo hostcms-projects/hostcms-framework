@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Dir_Model extends Core_Entity
 {
@@ -109,7 +109,8 @@ class Document_Dir_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event document_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -120,17 +121,10 @@ class Document_Dir_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aDocuments = $this->Documents->findAll();
-		foreach($aDocuments as $oDocument)
-		{
-			$oDocument->delete();
-		}
-
-		$aDocument_Dirs = $this->Document_Dirs->findAll();
-		foreach($aDocument_Dirs as $oDocument_Dir)
-		{
-			$oDocument_Dir->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
+		$this->Documents->deleteAll(FALSE);
+		$this->Document_Dirs->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

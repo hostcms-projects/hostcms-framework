@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Ipaddress
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Ipaddress_Controller
 {
@@ -34,7 +34,7 @@ class Ipaddress_Controller
 	}
 
 	/**
-	 * Check is IP blocked
+	 * Check is IP blocked in Frontend
 	 * @param mixed $ip array of IPs or IP
 	 * @return boolean
 	 */
@@ -44,22 +44,19 @@ class Ipaddress_Controller
 
 		$bBlocked = FALSE;
 
-		$aIpaddresses = Core_Entity::factory('Ipaddress')->findAll(FALSE);
+		$aIpaddresses = Core_Entity::factory('Ipaddress')->getAllBydeny_access(1, FALSE);
 
 		foreach ($ip as $sIp)
 		{
 			foreach ($aIpaddresses as $oIpaddress)
 			{
-				if ($oIpaddress->deny_access)
-				{
-					$bBlocked = strpos($oIpaddress->ip, '/') === FALSE
-						? $sIp == $oIpaddress->ip
-						: $this->ipCheck($sIp, $oIpaddress->ip);
+				$bBlocked = strpos($oIpaddress->ip, '/') === FALSE
+					? $sIp == $oIpaddress->ip
+					: $this->ipCheck($sIp, $oIpaddress->ip);
 
-					if ($bBlocked)
-					{
-						break 2;
-					}
+				if ($bBlocked)
+				{
+					break 2;
 				}
 			}
 		}
@@ -68,9 +65,41 @@ class Ipaddress_Controller
 	}
 
 	/**
+	 * Check is IP blocked in Backend
+	 * @param mixed $ip array of IPs or IP
+	 * @return boolean
+	 */
+	public function isBackendBlocked($ip)
+	{
+		!is_array($ip) && $ip = array($ip);
+
+		$bBlocked = FALSE;
+
+		$aIpaddresses = Core_Entity::factory('Ipaddress')->getAllBydeny_backend(1, FALSE);
+
+		foreach ($ip as $sIp)
+		{
+			foreach ($aIpaddresses as $oIpaddress)
+			{
+				$bBlocked = strpos($oIpaddress->ip, '/') === FALSE
+					? $sIp == $oIpaddress->ip
+					: $this->ipCheck($sIp, $oIpaddress->ip);
+
+				if ($bBlocked)
+				{
+					break 2;
+				}
+			}
+		}
+
+		return $bBlocked;
+	}
+	
+	/**
 	 * Check IP in CIDR
 	 * @param string $ip IP
 	 * @param strin $cidr CIDR (Classless Inter-Domain Routing)
+	 * @return boolean
 	 */
 	public function ipCheck($ip, $cidr)
 	{

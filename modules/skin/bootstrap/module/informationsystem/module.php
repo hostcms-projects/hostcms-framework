@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_Module
 {
@@ -76,7 +76,7 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 			->join('informationsystems', 'informationsystem_items.informationsystem_id', '=', 'informationsystems.id')
 			->where('informationsystem_items.deleted', '=', 0)
 			->where('informationsystems.deleted', '=', 0)
-			->where('site_id', '=', CURRENT_SITE)
+			->where('informationsystems.site_id', '=', CURRENT_SITE)
 			->clearOrderBy()
 			->orderBy('comments.datetime', 'DESC')
 			->limit(5);

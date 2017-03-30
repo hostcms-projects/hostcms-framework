@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_DataBase_Pdo extends Core_DataBase
 {
@@ -635,6 +635,8 @@ class Core_DataBase_Pdo extends Core_DataBase
 					$this->_asObject = $_asObject;
 				}
 			}
+			
+			$this->_free($result);
 		}
 
 		return $return;
@@ -785,11 +787,20 @@ class Core_DataBase_Pdo extends Core_DataBase
 	 */
 	public function free()
 	{
-		if ($this->_result)
-		{
-			$this->_result->closeCursor();
-			$this->_result = NULL;
-		}
+		$this->_free($this->_result);
+		$this->_result = NULL;
+
+		return $this;
+	}
+	
+	/**
+	 * Free result memory
+	 * @return self
+	 */
+	protected function _free($result)
+	{
+		$result && $result->closeCursor();
+		$result = NULL;
 
 		return $this;
 	}

@@ -176,6 +176,7 @@ class Site_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event site.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -183,8 +184,11 @@ class Site_Model extends Core_Entity
 		{
 			$primaryKey = $this->getPrimaryKey();
 		}
+		
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
 		if (Core::moduleIsActive('advertisement'))
 		{
 			$this->Advertisements->deleteAll(FALSE);

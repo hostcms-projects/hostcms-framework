@@ -98,7 +98,8 @@ class Property_Value_File_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Property_Value_File_Model
+	 * @return self
+	 * @hostcms-event property_value_file.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -109,6 +110,8 @@ class Property_Value_File_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
 		if ($this->_dir)
 		{
 			$this

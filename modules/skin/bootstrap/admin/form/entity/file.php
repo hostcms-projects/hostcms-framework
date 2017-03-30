@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Entity_File {
 
@@ -164,7 +164,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 			$oLarge_Core_Html_Entity_Div
 				->add(
 					Core::factory('Core_Html_Entity_Div')
-						->class('col-lg-12')
+						->class('col-xs-12')
 						->add($oLarge_Main_Block_Core_Html_Entity_Div)
 				);
 		}
@@ -240,12 +240,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						->class('form-group')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
-								->class('col-lg-8 control-label')
+								->class('col-xs-12 col-lg-8 control-label')
 								->value(Core::_('Admin_Form.large_image_max_width'))
 						)
 						->add(
 							Core::factory('Core_Html_Entity_Div')
-								->class('col-lg-4')
+								->class('col-xs-12 col-lg-4')
 								->add(
 									Core::factory('Core_Html_Entity_Input')
 										->type('text')
@@ -264,12 +264,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						->class('form-group')
 						->add(
 							Core::factory('Core_Html_Entity_Label')
-								->class('col-lg-8 control-label')
+								->class('col-xs-12 col-lg-8 control-label')
 								->value(Core::_('Admin_Form.large_image_max_height'))
 							)
 						->add(
 							Core::factory('Core_Html_Entity_Div')
-								->class('col-lg-4')
+								->class('col-xs-12 col-lg-4')
 								->add(
 									Core::factory('Core_Html_Entity_Input')
 										->type('text')
@@ -366,12 +366,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 							->class('form-group')
 							->add(
 								Core::factory('Core_Html_Entity_Label')
-									->class('col-lg-8 control-label')
+									->class('col-xs-12 col-lg-8 control-label')
 									->value(Core::_('Admin_Form.watermark_position_x'))
 							)
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-									->class('col-lg-4')
+									->class('col-xs-12 col-lg-4')
 									->add(
 										Core::factory('Core_Html_Entity_Input')
 											->type('text')
@@ -397,12 +397,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 							->class('form-group')
 							->add(
 								Core::factory('Core_Html_Entity_Label')
-									->class('col-lg-8 control-label')
+									->class('col-xs-12 col-lg-8 control-label')
 									->value(Core::_('Admin_Form.watermark_position_y'))
 							)
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-									->class('col-lg-4')
+									->class('col-xs-12 col-lg-4')
 									->add(
 										Core::factory('Core_Html_Entity_Input')
 											->type('text')
@@ -462,7 +462,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 			$oLarge_Main_Block_Core_Html_Entity_Div
 				->add(
 					Core::factory('Core_Html_Entity_Div')
-						->class('form-group col-xs-12 col-sm-6 col-md-6')
+						->class('form-group col-xs-12 col-sm-6')
 						->add(
 							Core::factory('Core_Html_Entity_Span')
 								->class('caption')
@@ -486,7 +486,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 		{
 			$oSmall_Input_Div = Core::factory('Core_Html_Entity_Div')
 				->id('file_small_' . $iAdmin_Form_Count)
-				->class('form-group ' . $sDivClass)
+				->class('form-group ' . $sDivClass . ($this->smallImage['show_description'] ? ' clear' : ''))
 				->add(
 					Core::factory('Core_Html_Entity_Span')
 						->class('caption')
@@ -542,12 +542,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 								->class('form-group')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
-										->class('col-lg-8 control-label')
+										->class('col-xs-12 col-lg-8 control-label')
 										->value(Core::_('Admin_Form.small_image_max_width'))
 								)
 								->add(
 									Core::factory('Core_Html_Entity_Div')
-										->class('col-lg-4')
+										->class('col-xs-12 col-lg-4')
 										->add(
 											Core::factory('Core_Html_Entity_Input')
 												->type('text')
@@ -566,12 +566,12 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 								->class('form-group')
 								->add(
 									Core::factory('Core_Html_Entity_Label')
-										->class('col-lg-8 control-label')
+										->class('col-xs-12 col-lg-8 control-label')
 										->value(Core::_('Admin_Form.small_image_max_height'))
 									)
 								->add(
 									Core::factory('Core_Html_Entity_Div')
-										->class('col-lg-4')
+										->class('col-xs-12 col-lg-4')
 										->add(
 											Core::factory('Core_Html_Entity_Input')
 												->type('text')
@@ -699,7 +699,7 @@ class Skin_Bootstrap_Admin_Form_Entity_File extends Skin_Default_Admin_Form_Enti
 						$oLarge_Main_Block_Core_Html_Entity_Div
 							->add(
 								Core::factory('Core_Html_Entity_Div')
-								->class('form-group col-xs-12 col-sm-6 col-md-6')
+								->class('form-group col-xs-12 col-sm-6')
 								->add(
 									Core::factory('Core_Html_Entity_Span')
 										->class('caption')

@@ -25,7 +25,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Mail
 {
@@ -397,7 +397,7 @@ abstract class Core_Mail
 
 		$sTo = !is_null($this->_recipientName)
 			? '=?UTF-8?B?' . base64_encode($this->_recipientName) . "?= <{$this->_to}>"
-			: $this->_to;
+			: "<{$this->_to}>";
 
 		if (!isset($this->_headers['Reply-To']))
 		{

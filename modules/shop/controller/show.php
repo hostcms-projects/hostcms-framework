@@ -78,7 +78,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Show extends Core_Controller
 {
@@ -486,7 +486,13 @@ class Shop_Controller_Show extends Core_Controller
 	{
 		$oShop = $this->getEntity();
 
-		$hostcmsFavorite = Core_Array::get(Core_Array::getSession('hostcmsFavorite', array()), $oShop->id, array());
+		$hostcmsFavorite = array();
+
+		$aShop_Favorites = Shop_Favorite_Controller::instance()->getAll($oShop);
+		foreach ($aShop_Favorites as $oShop_Favorite)
+		{
+			$hostcmsFavorite[] = $oShop_Favorite->shop_item_id;
+		}
 
 		if (count($hostcmsFavorite))
 		{

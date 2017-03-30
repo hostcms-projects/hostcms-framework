@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Country_Location_Model extends Core_Entity
 {
@@ -64,7 +64,7 @@ class Shop_Country_Location_Model extends Core_Entity
 		'name_pl', 'name_lt', 'name_lv',
 		'name_cz', 'name_ja', 'name'
 	);
-	
+
 	/**
 	 * Constructor.
 	 * @param int $id entity ID
@@ -97,10 +97,10 @@ class Shop_Country_Location_Model extends Core_Entity
 		{
 			$name = $this->name;
 		}
-		
+
 		return $name;
 	}
-	
+
 	/**
 	 * Get XML for entity and children entities
 	 * @return string
@@ -109,17 +109,18 @@ class Shop_Country_Location_Model extends Core_Entity
 	public function getXml()
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
-		
+
 		$this->clearXmlTags()
 			->addXmlTag('name', $this->getName());
-			
+
 		return parent::getXml();
 	}
-	
+
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event shop_country_location.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -129,11 +130,9 @@ class Shop_Country_Location_Model extends Core_Entity
 		}
 		$this->id = $primaryKey;
 
-		$aShop_Country_Location_Cities = $this->Shop_Country_Location_Cities->findAll();
-		foreach($aShop_Country_Location_Cities as $oShop_Country_Location_City)
-		{
-			$oShop_Country_Location_City->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
+		$this->Shop_Country_Location_Cities->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

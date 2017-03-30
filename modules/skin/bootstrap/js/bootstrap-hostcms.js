@@ -1253,7 +1253,7 @@
 
 			jNewObject.find("input[id^='field_id'],select,textarea").attr('name', 'property_' + index + '[]');
 			jNewObject.find("div[id^='file_small'] input[id^='small_field_id']").attr('name', 'small_property_' + index + '[]').val('');
-			jNewObject.find("input[id^='field_id'][type!=checkbox],input[id^='property_'][type!=checkbox],select,textarea").val('');
+			jNewObject.find("input[id^='field_id'][type!=checkbox],input[id^='property_'][type!=checkbox],input[id^='description'][type!=checkbox],select,textarea").val('');
 
 			jNewObject.find("input[id^='create_small_image_from_large_small_property']").attr('checked', true);
 

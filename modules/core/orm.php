@@ -494,7 +494,8 @@ class Core_ORM
 		// Cache
 		$bCache && self::$cache->set($sql, $result, __CLASS__);
 
-		$Core_DataBase->free();
+		// moved to result()
+		//$Core_DataBase->free();
 
 		Core_Event::notify($this->_modelName . '.onAfterFindAll', $this);
 
@@ -1005,9 +1006,8 @@ class Core_ORM
 
 	/**
 	 * Clear self::$_columnCache
-	 * @return self
 	 */
-	public function clearColumnCache()
+	static public function clearColumnCache()
 	{
 		self::$_columnCache = self::$_columnCacheDefaultValues = array();
 
@@ -1016,8 +1016,6 @@ class Core_ORM
 			$cacheName = 'Core_ORM_ColumnCache';
 			self::$columnCache->deleteAll($cacheName);
 		}
-
-		return $this;
 	}
 
 	/**

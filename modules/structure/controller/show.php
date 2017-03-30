@@ -15,10 +15,10 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - showInformationsystemItems(TRUE|FALSE) выводить связанные с узлом структуры информационные элементы, по умолчанию FALSE
  * - showShopGroups(TRUE|FALSE) выводить связанные с узлом структуры группы магазина, по умолчанию FALSE
  * - showShopItems(TRUE|FALSE) выводить связанные с узлом структуры товары, по умолчанию FALSE
- * - showInformationsystemGroupProperties(TRUE|FALSE) выводить значения дополнительных свойств групп информационной системы, по умолчанию FALSE
- * - showInformationsystemItemProperties(TRUE|FALSE) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE
- * - showShopGroupProperties(TRUE|FALSE) выводить значения дополнительных свойств групп магазина, по умолчанию FALSE
- * - showShopItemProperties(TRUE|FALSE) выводить значения дополнительных свойств товаров, по умолчанию FALSE
+ * - showInformationsystemGroupProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп информационной системы, по умолчанию FALSE
+ * - showInformationsystemItemProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств информационных элементов, по умолчанию FALSE
+ * - showShopGroupProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств групп магазина, по умолчанию FALSE
+ * - showShopItemProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию FALSE
  * - forbiddenTags(array('name')) массив тегов узла структуры, запрещенных к передаче в генерируемый XML
  * - cache(TRUE|FALSE) использовать кэширование, по умолчанию TRUE
  * - showPanel(TRUE|FALSE) показывать панель быстрого редактирования, по умолчанию TRUE
@@ -44,7 +44,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Show extends Core_Controller
 {

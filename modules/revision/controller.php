@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Revision
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Revision_Controller
 {
@@ -31,7 +31,6 @@ class Revision_Controller
 	 * Create revision
 	 * @param object $oModel model for revision
 	 * @param array $aValues values array
-	 * @return self
 	 */
 	static public function backup($oModel, array $aValues)
 	{
@@ -44,5 +43,21 @@ class Revision_Controller
 			->save();
 
 		self::deleteOldRevisions();
+	}
+
+	/**
+	 * Delete revision
+	 * @param sting $modelName model name for revision
+	 * @param int $entity_id entity ID
+	 */
+	static public function delete($modelName, $entity_id)
+	{
+		$oRevisions = Core_Entity::factory('Revision');
+		$oRevisions->queryBuilder()
+			->where('revisions.model', '=', $modelName)
+			->where('revisions.entity_id', '=', $entity_id)
+			->where('revisions.deleted', '=', 0);
+
+		$oRevisions->deleteAll(FALSE);
 	}
 }

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Dir_Model extends Core_Entity
 {
@@ -97,7 +97,8 @@ class Property_Dir_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Property_Dir_Model
+	 * @return self
+	 * @hostcms-event property_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -108,17 +109,10 @@ class Property_Dir_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aProperties = $this->Properties->findAll();
-		foreach($aProperties as $oProperty)
-		{
-			$oProperty->delete();
-		}
-
-		$aProperty_Dirs = $this->Property_Dirs->findAll();
-		foreach($aProperty_Dirs as $oProperty_Dir)
-		{
-			$oProperty_Dir->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
+		$this->Properties->deleteAll(FALSE);
+		$this->Property_Dirs->deleteAll(FALSE);
 
 		// Relations
 		$this->Structure_Property_Dir->delete();

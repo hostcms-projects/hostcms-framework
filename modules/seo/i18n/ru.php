@@ -6,7 +6,7 @@
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'SEO характеристики',
@@ -34,7 +34,6 @@ return array(
 	'edit_title' => 'Редактирование характеристик сайта',
 	'datetime' => 'Дата',
 	'tcy' => 'тИЦ',
-	'pr' => 'PageRank',
 	'tcy_topic' => 'Рубрика в Яндекс.Каталоге',
 	'google_links' => 'По данным Google.com',
 	'yandex_links' => 'По данным Yandex.ru',

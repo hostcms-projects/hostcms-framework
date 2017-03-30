@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Lib
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Lib_Model extends Core_Entity
 {
@@ -174,7 +174,8 @@ class Lib_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event lib.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -185,6 +186,13 @@ class Lib_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}		
+		
 		// Удаляем код и настройки
 		try
 		{
@@ -201,11 +209,7 @@ class Lib_Model extends Core_Entity
 			Core_File::deleteDir($this->getLibPath());
 		} catch (Exception $e) {}
 
-		$aLibProperties = $this->Lib_Properties->findAll();
-		foreach($aLibProperties as $oLibProperty)
-		{
-			$oLibProperty->delete();
-		}
+		$this->Lib_Properties->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

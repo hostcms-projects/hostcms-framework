@@ -198,7 +198,7 @@ class Core
 
 		Core_Event::notify('Core.onAfterLoadModuleList');
 
-		$bLogged && Core_Page::instance()->addFrontentExecutionTimes(
+		$bLogged && Core_Page::instance()->addFrontendExecutionTimes(
 			Core::_('Core.time_load_modules', Core::getmicrotime() - $fBeginTime)
 		);
 	}

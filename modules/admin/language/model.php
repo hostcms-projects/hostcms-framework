@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Language_Model extends Core_Entity
 {
@@ -111,7 +111,8 @@ class Admin_Language_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event admin_language.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -122,12 +123,9 @@ class Admin_Language_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$admin_word_values = $this->admin_word_values->findAll();
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		foreach($admin_word_values AS $oAdmin_Word_Value)
-		{
-			$oAdmin_Word_Value->delete();
-		}
+		$this->Admin_Word_Values->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

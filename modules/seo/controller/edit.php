@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -85,7 +85,6 @@ class Seo_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
-		$oMainTab->move($this->getField('pr')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
 		$oMainTab->move($this->getField('tcy')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
 		$oMainTab->move($this->getField('tcy_topic')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow1);
 

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Dir_Model extends Core_Entity
 {
@@ -18,7 +18,7 @@ class Informationsystem_Dir_Model extends Core_Entity
 	 * @var mixed
 	 */
 	public $img = 0;
-	
+
 	/**
 	 * One-to-many or many-to-many relations
 	 * @var array
@@ -81,7 +81,8 @@ class Informationsystem_Dir_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event informationsystem_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -92,19 +93,10 @@ class Informationsystem_Dir_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		// Удаление информационных систем
-		$aInformationsystems = $this->Informationsystems->findAll(FALSE);
-		foreach($aInformationsystems as $oInformationsystem)
-		{
-			$oInformationsystem->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		// Удаление дочерних разделов
-		$aInformationsystem_Dirs = $this->Informationsystem_Dirs->findAll(FALSE);
-		foreach($aInformationsystem_Dirs as $oInformationsystem_Dir)
-		{
-			$oInformationsystem_Dir->delete();
-		}
+		$this->Informationsystems->deleteAll(FALSE);
+		$this->Informationsystem_Dirs->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

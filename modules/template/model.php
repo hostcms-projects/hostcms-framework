@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Model extends Core_Entity
 {
@@ -408,7 +408,8 @@ class Template_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event template.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -418,6 +419,8 @@ class Template_Model extends Core_Entity
 		}
 
 		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
 		// Удаляем файл макета
 		try
@@ -442,6 +445,11 @@ class Template_Model extends Core_Entity
 
 		$this->Templates->deleteAll(FALSE);
 		$this->Template_Sections->deleteAll(FALSE);
+
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}
 
 		return parent::delete($primaryKey);
 	}
@@ -747,13 +755,16 @@ class Template_Model extends Core_Entity
 					$lessFieldValue = $lessFieldType = NULL;
 				}
 
-				?><div class="row panel-item">
-					<div class="col-xs-12">
-						<label for="<?php echo $fieldName?>"><?php echo strval($oOptionName[0])?></label>
-						<input type="text" class="form-control <?php echo $fieldType == 'color' ? 'colorpicker' : ''?>" name="<?php echo $fieldName?>" value="<?php echo htmlspecialchars($lessFieldValue)?>" <?php echo $fieldType == 'color' && ($lessFieldType == 'rgb' || $lessFieldType == 'rgba') ? 'data-format="rgb"' : '' ?> <?php echo $fieldType == 'color' && $lessFieldType == 'rgba' ? 'data-rgba="true"' : '' ?> data-template="<?php echo $this->id ?>" />
+				if (!is_array($lessFieldValue))
+				{
+					?><div class="row panel-item">
+						<div class="col-xs-12">
+							<label for="<?php echo $fieldName?>"><?php echo strval($oOptionName[0])?></label>
+							<input type="text" class="form-control <?php echo $fieldType == 'color' ? 'colorpicker' : ''?>" name="<?php echo $fieldName?>" value="<?php echo htmlspecialchars($lessFieldValue)?>" <?php echo $fieldType == 'color' && ($lessFieldType == 'rgb' || $lessFieldType == 'rgba') ? 'data-format="rgb"' : '' ?> <?php echo $fieldType == 'color' && $lessFieldType == 'rgba' ? 'data-rgba="true"' : '' ?> data-template="<?php echo $this->id ?>" />
+						</div>
 					</div>
-				</div>
-				<?php
+					<?php
+				}
 			}
 		}
 	}

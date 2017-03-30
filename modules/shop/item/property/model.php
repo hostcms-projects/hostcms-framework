@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Property_Model extends Core_Entity
 {
@@ -45,11 +45,12 @@ class Shop_Item_Property_Model extends Core_Entity
 		'show_in_group' => 1,
 		'show_in_item' => 1,
 	);
-	
+
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return self
+	 * @hostcms-event shop_item_property.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -59,6 +60,8 @@ class Shop_Item_Property_Model extends Core_Entity
 		}
 
 		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
 		$this->Shop_Item_Property_For_Groups->deleteAll(FALSE);
 

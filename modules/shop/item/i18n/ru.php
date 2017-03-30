@@ -229,6 +229,7 @@ return array(
 	'export_external_properties_allow_items' => "Экспортировать дополнительные свойства товаров",
 	'export_external_properties_allow_groups' => "Экспортировать дополнительные свойства групп",
 	'export_modifications_allow' => "Экспортировать модификации",
+	'export_shortcuts_allow' => "Экспортировать ярлыки",
 	'export_orders_allow' => "Экспортировать заказы",
 	'load_parent_group' => '--- Корневая ---',
 	'accepted_prices' => 'Обновление информации о ценах для товаров прошло успешно!',

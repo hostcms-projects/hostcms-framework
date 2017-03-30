@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Skin
 {
@@ -621,12 +621,12 @@ abstract class Core_Skin
 		$oDebugWindowUl = Core::factory('Core_Html_Entity_Ul');
 		$oDebugWindow->add($oDebugWindowUl);
 
-		$aFrontentExecutionTimes = Core_Page::instance()->getFrontentExecutionTimes();
-		foreach ($aFrontentExecutionTimes as $sFrontentExecutionTimes)
+		$aFrontendExecutionTimes = Core_Page::instance()->getFrontendExecutionTimes();
+		foreach ($aFrontendExecutionTimes as $sFrontendExecutionTimes)
 		{
 			$oDebugWindowUl->add(
 				Core::factory('Core_Html_Entity_Li')
-					->liValue($sFrontentExecutionTimes)
+					->liValue($sFrontendExecutionTimes)
 			);
 		}
 

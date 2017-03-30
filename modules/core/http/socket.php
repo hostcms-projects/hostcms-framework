@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Socket extends Core_Http
 {
@@ -31,11 +31,14 @@ class Core_Http_Socket extends Core_Http
 		{
 			throw new Core_Exception("Fsockopen has been disabled, please contact your system administrator!");
 		}
-		
+
 		$fp = @fsockopen($socketHost, $this->_port, $errno, $errstr, $this->_timeout);
 
 		if (!$fp)
 		{
+			$this->_errno = $errno;
+			$this->_error = $errstr;
+
 			throw new Core_Exception("Fsockopen failed '%errstr' (%errno)",
 				array('%errstr' => $errstr, '%errno' => $errno), $errno
 			);

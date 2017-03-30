@@ -395,7 +395,7 @@ abstract class Shop_Payment_System_Handler
 
 		// Массив цен для расчета скидок каждый N-й со скидкой N%
 		$aDiscountPrices = array();
-		
+
 		$aShop_Cart = $Shop_Cart_Controller->getAll($oShop);
 		foreach ($aShop_Cart as $oShop_Cart)
 		{
@@ -433,7 +433,7 @@ abstract class Shop_Payment_System_Handler
 					{
 						$aDiscountPrices[] = $aPrices['price_discount'];
 					}
-					
+
 					// Сумма для скидок от суммы заказа рассчитывается отдельно
 					$oShop_Item->apply_purchase_discount
 						&& $amountPurchaseDiscount += $aPrices['price_discount'] * $oShop_Cart->quantity;
@@ -1073,11 +1073,11 @@ abstract class Shop_Payment_System_Handler
 
 		$oShopOrder = $this->_shopOrder;
 		$oShop = $oShopOrder->Shop;
-		
+
 		// В адрес "ОТ КОГО" для администратора указывается адрес магазина,
 		// а в Reply-To указывается email пользователя
 		$from = $this->_getEmailFrom();
-		
+
 		$replyTo = Core_Valid::email($oShopOrder->email)
 			? $oShopOrder->email
 			: $from;
@@ -1090,7 +1090,7 @@ abstract class Shop_Payment_System_Handler
 		$date_str = Core_Date::sql2datetime($oShopOrder->datetime);
 		$admin_subject = !is_null($this->_adminMailSubject)
 			? $this->_adminMailSubject
-			: Core::_('Shop_Order.shop_order_admin_subject', $oShopOrder->invoice, $oShop->name, $date_str);
+			: sprintf($oShop->order_admin_subject, $oShopOrder->invoice, $oShop->name, $date_str);
 
 		$oCore_Mail
 			->from($from)
@@ -1102,7 +1102,7 @@ abstract class Shop_Payment_System_Handler
 			->header('Precedence', 'bulk');
 
 		$aEmails = array_map('trim', $this->getAdminEmails());
-		
+
 		foreach ($aEmails as $key => $sEmail)
 		{
 			// Delay 0.350s for second mail and others
@@ -1143,9 +1143,9 @@ abstract class Shop_Payment_System_Handler
 				if ($oShop_Item_Digital->filename != '' && is_file($oShop_Item_Digital->getFullFilePath()))
 				{
 					$oCore_Mail->attach(array(
-					 'filepath' => $oShop_Item_Digital->getFullFilePath(),
-					 'filename' => $oShop_Item_Digital->filename,
-					 ));
+						'filepath' => $oShop_Item_Digital->getFullFilePath(),
+						'filename' => $oShop_Item_Digital->filename,
+					));
 				}
 			}
 		}
@@ -1163,7 +1163,7 @@ abstract class Shop_Payment_System_Handler
 	{
 		return $this->_shopOrder->Shop->getFirstEmail();
 	}
-	
+
 	/**
 	 * Send e-mail to user
 	 * @param Core_Mail $oCore_Mail mail
@@ -1193,7 +1193,7 @@ abstract class Shop_Payment_System_Handler
 			// Тема письма пользователю
 			$user_subject = !is_null($this->_siteuserMailSubject)
 				? $this->_siteuserMailSubject
-				: Core::_('Shop_Order.shop_order_admin_subject', $oShopOrder->invoice, $oShop->name, $date_str);
+				: sprintf($oShop->order_user_subject, $oShopOrder->invoice, $oShop->name, $date_str);
 
 			// Attach digitals items
 			if ($this->_shopOrder->paid == 1 && $this->_shopOrder->Shop->attach_digital_items == 1)
@@ -1236,7 +1236,7 @@ abstract class Shop_Payment_System_Handler
 		$this->_notificationModes = $notificationModes;
 		return $this;
 	}
-	
+
 	/**
 	 * Уведомление об операциях с заказом
 	 * @param string $mode режим изменения:
@@ -1257,26 +1257,29 @@ abstract class Shop_Payment_System_Handler
 			{
 				$date_str = Core_Date::sql2datetime($this->getShopOrder()->datetime);
 
+				$oShop = $this->getShopOrder()->Shop;
+
 				// Изменение темы письма при оплате
 				if ($this->getShopOrder()->paid)
 				{
+
 					$this->adminMailSubject(
-						Core::_('Shop_Order.confirm_admin_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+						sprintf($oShop->confirm_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
 					);
 
 					$this->siteuserMailSubject(
-						Core::_('Shop_Order.confirm_user_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+						sprintf($oShop->confirm_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
 					);
 				}
 				// Изменение темы письма при отмене заказа
 				elseif ($this->getShopOrder()->canceled)
 				{
 					$this->adminMailSubject(
-						Core::_('Shop_Order.cancel_admin_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+						sprintf($oShop->cancel_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
 					);
 
 					$this->siteuserMailSubject(
-						Core::_('Shop_Order.cancel_user_subject', $this->getShopOrder()->invoice, $this->getShopOrder()->Shop->name, $date_str)
+						sprintf($oShop->cancel_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
 					);
 				}
 

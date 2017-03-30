@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Controller
 {
@@ -17,6 +17,8 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 	 * Executes the business logic.
 	 * @param mixed $operation Operation name
 	 * @return self
+	 * @hostcms-event Shop_Item_Modification_Create_Controller.onBeforeNewModificationSave
+	 * @hostcms-event Shop_Item_Modification_Create_Controller.onAfterExecute
 	 */
 	public function execute($operation = NULL)
 	{
@@ -80,6 +82,9 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 			$oShopItem->shop_measure_id = Core_Array::getPost('measure');
 			$oShopItem->marking = str_replace("{N}", $iCount++, Core_Array::getPost('marking'));
 			$oShopItem->shop_id = $oShopItemParent->shop_id;
+
+			Core_Event::notify('Shop_Item_Modification_Create_Controller.onBeforeNewModificationSave', $this, array($oShopItem, $oShopItemParent));
+
 			$oShopItem->save();
 
 			// Копировать основные свойства
@@ -221,6 +226,8 @@ class Shop_Item_Modification_Create_Controller extends Admin_Form_Action_Control
 
 			$oShopItem->save();
 		}
+
+		Core_Event::notify('Shop_Item_Modification_Create_Controller.onAfterExecute', $this, array($oShopItemParent));
 
 		return $this;
 	}

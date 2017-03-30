@@ -118,6 +118,8 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			throw new Core_Exception('Parent group does not specified!');
 		}
 
+		$this->_groupsID[] = $this->group->id;
+
 		$this->_setSimpleXML();
 
 		$classifier = $this->_xml->addChild('Классификатор');
@@ -273,6 +275,8 @@ class Shop_Item_Export_Cml_Controller extends Core_Servant_Properties
 			throw new Core_Exception("Parent group does not specified!");
 		}
 
+		$this->_groupsID[] = $this->group->id;
+		
 		$this->_setSimpleXML();
 
 		$packageOfProposals = $this->_xml->addChild('ПакетПредложений');

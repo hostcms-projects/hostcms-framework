@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Http_Curl extends Core_Http
 {
@@ -101,54 +101,66 @@ class Core_Http_Curl extends Core_Http
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE); // No certificate
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE); // Return in string
 
-		if (ini_get('open_basedir') == '' && ini_get('safe_mode') != 1 && strtolower(ini_get('safe_mode')) != 'off')
-		{
-			// When CURLOPT_FOLLOWLOCATION and CURLOPT_HEADER are both true and redirects have happened then the header returned by curl_exec() will contain all the headers in the redirect chain in the order they were encountered.
-			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
-		}
-		else
-		{
-			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
+		// Close connection
+		//curl_setopt($curl, CURLOPT_FORBID_REUSE, TRUE);
 
-			$mr = $maxredirect = 5;
+		// TLS 1.2
+		//curl_setopt($curl, CURLOPT_SSLVERSION, 6);
 
-			if ($mr > 0)
+		if (!isset($this->_config['options'][CURLOPT_FOLLOWLOCATION]))
+		{
+			if (ini_get('open_basedir') == ''
+				&& ini_get('safe_mode') != 1
+				&& strtolower(ini_get('safe_mode')) != 'off'
+			)
 			{
-				$newurl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+				// When CURLOPT_FOLLOWLOCATION and CURLOPT_HEADER are both true and redirects have happened then the header returned by curl_exec() will contain all the headers in the redirect chain in the order they were encountered.
+				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
+			}
+			else
+			{
+				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
 
-				$rch = curl_copy_handle($curl);
-				curl_setopt($rch, CURLOPT_HEADER, TRUE);
-				curl_setopt($rch, CURLOPT_NOBODY, TRUE);
-				curl_setopt($rch, CURLOPT_FORBID_REUSE, TRUE);
-				curl_setopt($rch, CURLOPT_RETURNTRANSFER, TRUE);
-				do {
-					curl_setopt($rch, CURLOPT_URL, $newurl);
-					$header = curl_exec($rch);
-					if (curl_errno($rch))
-					{
-						$code = 0;
-					}
-					else
-					{
-						$code = curl_getinfo($rch, CURLINFO_HTTP_CODE);
-						if ($code == 301 || $code == 302) {
-							preg_match('/Location:(.*?)\n/', $header, $matches);
-							$newurl = trim(array_pop($matches));
-						}
-						else
+				$mr = $maxredirect = 5;
+
+				if ($mr > 0)
+				{
+					$newurl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+
+					$rch = curl_copy_handle($curl);
+					curl_setopt($rch, CURLOPT_HEADER, TRUE);
+					curl_setopt($rch, CURLOPT_NOBODY, TRUE);
+					curl_setopt($rch, CURLOPT_FORBID_REUSE, TRUE);
+					curl_setopt($rch, CURLOPT_RETURNTRANSFER, TRUE);
+					do {
+						curl_setopt($rch, CURLOPT_URL, $newurl);
+						$header = curl_exec($rch);
+						if (curl_errno($rch))
 						{
 							$code = 0;
 						}
+						else
+						{
+							$code = curl_getinfo($rch, CURLINFO_HTTP_CODE);
+							if ($code == 301 || $code == 302) {
+								preg_match('/Location:(.*?)\n/', $header, $matches);
+								$newurl = trim(array_pop($matches));
+							}
+							else
+							{
+								$code = 0;
+							}
+						}
+					} while ($code && --$mr);
+
+					curl_close($rch);
+
+					if (!$mr)
+					{
+						return false;
 					}
-				} while ($code && --$mr);
-
-				curl_close($rch);
-
-				if (!$mr)
-				{
-					return false;
+					curl_setopt($curl, CURLOPT_URL, $newurl);
 				}
-				curl_setopt($curl, CURLOPT_URL, $newurl);
 			}
 		}
 
@@ -165,6 +177,9 @@ class Core_Http_Curl extends Core_Http
 
 		// Get the target contents
 		$datastr = @curl_exec($curl);
+
+		$this->_errno = curl_errno($curl);
+		$this->_error = curl_error($curl);
 
 		$iHeaderSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 		$this->_headers = substr($datastr, 0, $iHeaderSize);

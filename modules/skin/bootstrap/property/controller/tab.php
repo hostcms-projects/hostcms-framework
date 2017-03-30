@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Property_Controller_Tab extends Property_Controller_Tab {
 
@@ -23,8 +23,7 @@ class Skin_Bootstrap_Property_Controller_Tab extends Property_Controller_Tab {
 					->class('input-group-addon no-padding add-remove-property')
 					->add(
 						Admin_Form_Entity::factory('Div')
-						//->class('no-padding-right col-lg-12')
-						->class('no-padding-' . ($oProperty->type == 2 || $oProperty->type == 5 || $oProperty->type == 12 ? 'left' : 'right') . ' col-lg-12')
+						->class('no-padding-' . ($oProperty->type == 2 || $oProperty->type == 5 || $oProperty->type == 12 ? 'left' : 'right') . ' col-xs-12')
 						->add(
 							Admin_Form_Entity::factory('Div')
 								->class('btn btn-palegreen')

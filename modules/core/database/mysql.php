@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_DataBase_Mysql extends Core_DataBase
 {
@@ -692,6 +692,8 @@ class Core_DataBase_Mysql extends Core_DataBase
 					$this->_asObject = $_asObject;
 				}
 			}
+			
+			$this->_free($result);
 		}
 
 		return $return;
@@ -843,11 +845,20 @@ class Core_DataBase_Mysql extends Core_DataBase
 	 */
 	public function free()
 	{
-		if (is_resource($this->_result))
-		{
-			mysql_free_result($this->_result);
-			$this->_result = NULL;
-		}
+		$this->_free($this->_result);
+		$this->_result = NULL;
+
+		return $this;
+	}
+	
+	/**
+	 * Free result memory
+	 * @return self
+	 */
+	protected function _free($result)
+	{
+		is_resource($result) && mysql_free_result($result);
+		$result = NULL;
 
 		return $this;
 	}

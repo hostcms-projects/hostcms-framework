@@ -1944,6 +1944,8 @@ div.message-info div.contact-name { display: block; overflow: hidden; text-overf
 	cursor: pointer;
 }
 
+.clear { clear: both }
+
 /* TinyMCE */
 .mce-tinymce { border: 1px solid #e5e5e5 !important }
 .mce-panel { background-color: #f5f4f4 !important }

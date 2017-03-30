@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Field_Model extends Core_Entity
 {
@@ -61,32 +61,10 @@ class Admin_Form_Field_Model extends Core_Entity
 	}
 
 	/**
-	 * Get form field by name
-	 * @param String $name name
-	 * @return Admin_Form_Field
-	 */
-	public function getByName($name)
-	{
-		$this->queryBuilder()
-			// т.к. с учетом заданных в связи условий формы
-			//->clear()
-			->where('name', '=', $name)
-			->limit(1);
-
-		$aAdmin_Form_Fields = $this->findAll();
-
-		if (isset($aAdmin_Form_Fields[0]))
-		{
-			return $aAdmin_Form_Fields[0];
-		}
-
-		return NULL;
-	}
-
-	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event admin_form_field.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -97,8 +75,9 @@ class Admin_Form_Field_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		// Удаляем слово, относящиеся к полю
-		$this->admin_word->delete();
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
+		$this->Admin_Word->delete();
 
 		return parent::delete($primaryKey);
 	}

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Dir_Model extends Core_Entity
 {
@@ -71,6 +71,7 @@ class Template_Dir_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event template_dir.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -78,19 +79,13 @@ class Template_Dir_Model extends Core_Entity
 		{
 			$primaryKey = $this->getPrimaryKey();
 		}
+
 		$this->id = $primaryKey;
 
-		$aTemplate_Dirs = $this->Template_Dirs->findAll(FALSE);
-		foreach($aTemplate_Dirs as $oTemplate_Dir)
-		{
-			$oTemplate_Dir->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		$aTemplates = $this->Templates->findAll(FALSE);
-		foreach($aTemplates as $oTemplate)
-		{
-			$oTemplate->delete();
-		}
+		$this->Template_Dirs->deleteAll(FALSE);
+		$this->Templates->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

@@ -6,7 +6,7 @@
  * @subpackage Ipaddress
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'IP-адреса',
@@ -17,6 +17,7 @@ return array(
 	'delete_success' => 'IP-адрес успешно удален!',
 	'markDeleted_success' => 'IP-адрес успешно удален!',
 	'changeAccess_success' => 'Доступ успешно изменен!',
+	'changeBackendAccess_success' => 'Доступ успешно изменен!',
 	'changeStatistic_success' => 'Учет в статистике успешно изменен!',
 	'delete_error' => 'Ошибка! IP-адрес не удален!',
 	'add_title' => 'Добавление информаци об IP-адресе',
@@ -30,6 +31,7 @@ return array(
 	'add' => 'Добавить',
 	'comment' => '<acronym title="Комментарий">Комментарий</acronym>',
 	'deny_access' => '<acronym title="Запретить доступ к сайту c данного IP-адреса">Запретить доступ</acronym>',
+	'deny_backend' => '<acronym title="Запретить доступ к центру администрирования c данного IP-адреса">Запретить доступ к центру администрирования</acronym>',
 	'no_statistic' => '<acronym title="Не учитывать в статистике сайта посещения с данного IP-адреса">Не учитывать в статистике</acronym>',
 	'invalid_ip' => 'Вы ввели недопустимый IP-адрес.',
 	'undelete_success' => 'Элемент восстановлен!',

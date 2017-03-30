@@ -19,7 +19,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Session
 {
@@ -121,7 +121,7 @@ class Core_Session
 					? '.' . $domain
 					: '';
 
-				session_set_cookie_params($expires, '/', $domain);
+				session_set_cookie_params($expires, '/', $domain, FALSE, TRUE);
 			}
 
 			// При повторном запуске $_SESSION уже будет
@@ -157,7 +157,7 @@ class Core_Session
 
 			$expires = self::getMaxLifeTime();
 
-			setcookie(session_name(), session_id(), time() + $expires, '/', $domain);
+			setcookie(session_name(), session_id(), time() + $expires, '/', $domain, FALSE, TRUE);
 
 			// Заменяем заголовок ($replace = TRUE)
 			//Core::setcookie(session_name(), session_id(), time() + $expires, '/', $domain, FALSE, TRUE, $replace = TRUE);
@@ -177,7 +177,7 @@ class Core_Session
 			self::$_started = FALSE;
 			session_write_close();
 		//}
-		return FALSE;
+		return TRUE;
 	}
 
 	/**
@@ -221,6 +221,18 @@ class Core_Session
 	}
 
 	/**
+	 * Get LOCK name
+	 * @param int $id session ID
+	 * @return string
+	 */
+	protected function _getLockName($id)
+	{
+		return function_exists('hash')
+			? hash('sha256', $this->_lockPrefix . '_' . $id)
+			: $this->_lockPrefix . '_' . $id;
+	}
+
+	/**
 	 * Lock session
 	 * @param int $id session ID
 	 * @return boolean
@@ -232,7 +244,7 @@ class Core_Session
 		while (!connection_aborted())
 		{
 			$oDataBase = $this->_dataBase->setQueryType(0)
-				->query('SELECT GET_LOCK("' . $this->_dataBase->quote($this->_lockPrefix . '_' . $id) . '",'
+				->query('SELECT GET_LOCK(' . $this->_dataBase->quote($this->_getLockName($id)) . ', '
 				. intval($this->_getLockTimeout) . ') AS `lock`');
 
 			$row = $oDataBase->asAssoc()->current();
@@ -244,11 +256,9 @@ class Core_Session
 
 			if (isset($row['lock']) && $row['lock'] == 1)
 			{
-				// Блокировка удалась
 				return TRUE;
 			}
 
-			// Время, прошедшее с начала попытки блокировки
 			$iTime = time() - $iStartTime;
 
 			if ($iTime > $this->_lockTimeout)
@@ -270,7 +280,7 @@ class Core_Session
 	protected function _unlock($id)
 	{
 		$oDataBase = $this->_dataBase->setQueryType(0)
-			->query('SELECT RELEASE_LOCK("' . $this->_dataBase->quote($this->_lockPrefix . '_' . $id) . '") AS `lock`');
+			->query('SELECT RELEASE_LOCK(' . $this->_dataBase->quote($this->_getLockName($id)) . ') AS `lock`');
 
 		$row = $oDataBase->asAssoc()->current();
 
@@ -285,7 +295,7 @@ class Core_Session
 	/**
 	 * The read callback must always return a session encoded (serialized) string, or an empty string if there is no data to read.
 	 * @param string $id session ID
-	 * @return boolean
+	 * @return string
 	 */
 	public function sessionRead($id)
 	{
@@ -313,7 +323,7 @@ class Core_Session
 			}
 		}
 
-		return FALSE;
+		return '';
 	}
 
 	/**

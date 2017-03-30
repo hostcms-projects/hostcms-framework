@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Query_Model extends Core_Entity
 {
@@ -61,7 +61,8 @@ class Seo_Query_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event seo_query.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -71,11 +72,9 @@ class Seo_Query_Model extends Core_Entity
 		}
 		$this->id = $primaryKey;
 
-		$aSeo_Query_Positions = $this->Seo_Query_Positions->findAll();
-		foreach ($aSeo_Query_Positions as $oSeo_Query_Position)
-		{
-			$oSeo_Query_Position->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+		
+		$this->Seo_Query_Positions->deleteAll();
 
 		return parent::delete($primaryKey);
 	}

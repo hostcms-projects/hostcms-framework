@@ -605,7 +605,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				if (Core::moduleIsActive('siteuser') || defined('BACKEND_SHOP_PRICES'))
 				{
 					$aShopPrices = $oShop->Shop_Prices->findAll(FALSE);
-					foreach($aShopPrices as $oShopPrice)
+					foreach ($aShopPrices as $oShopPrice)
 					{
 						$oPriceBlock->add($oPricesRowN = Admin_Form_Entity::factory('Div')->class('row'));
 
@@ -668,9 +668,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						$oWarehouseCurrentRow
 							->add(
 								Admin_Form_Entity::factory('Div')
-									//->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
 									->value($oWarehouse->name)
-									->class('form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9')
+									->class('form-group margin-top-10 col-xs-9 col-sm-6 col-md-4')
 							)
 							->add(
 								Admin_Form_Entity::factory('Input')
@@ -680,8 +679,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 										: $oWarehouseItem->count
 									)
 									->name("warehouse_{$oWarehouse->id}")
-									->divAttr(array('class' => 'form-group col-lg-2 col-md-4 col-sm-4 col-xs-3'))
-									//->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
+									->divAttr(array('class' => 'form-group col-xs-3 col-sm-4 col-lg-2'))
 							);
 
 						$oWarehouseBlock
@@ -755,7 +753,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				if (count($aShop_Specialprices) > 0)
 				{
-					foreach($aShop_Specialprices as $oShop_Specialprice)
+					foreach ($aShop_Specialprices as $oShop_Specialprice)
 					{
 						$oSpecMinQuantity = clone $oSpecMinQuantity;
 						$oSpecMaxQuantity = clone $oSpecMaxQuantity;
@@ -1232,7 +1230,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							// Получаем список меток
 							$aTags = $oTags->findAll(FALSE);
 
-							foreach($aTags as $oTag)
+							foreach ($aTags as $oTag)
 							{
 								// Получаем хэш тэга
 								$array_tags = Core_Str::getHashes($oTag->name, 	array('hash_function' => 'crc32'));
@@ -1338,7 +1336,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				// Специальные цены, установленные значения
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();
-				foreach($aShop_Specialprices as $oShop_Specialprice)
+				foreach ($aShop_Specialprices as $oShop_Specialprice)
 				{
 					if (!is_null(Core_Array::getPost("specPrice_{$oShop_Specialprice->id}")))
 					{
@@ -1405,7 +1403,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Обработка складов
 				$aShopWarehouses = $oShop->Shop_Warehouses->findAll();
 
-				foreach($aShopWarehouses as $oShopWarehouse)
+				foreach ($aShopWarehouses as $oShopWarehouse)
 				{
 					$iWarehouseValue = Core_Array::getPost("warehouse_{$oShopWarehouse->id}", 0);
 
@@ -1428,7 +1426,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				if (Core_Array::getPost('apply_price_for_modification'))
 				{
 					$aModifications = $this->_object->Modifications->findAll();
-					foreach($aModifications as $oModification)
+					foreach ($aModifications as $oModification)
 					{
 						$oModification->price = $this->_object->price;
 						$oModification->shop_currency_id = $this->_object->shop_currency_id;
@@ -1495,7 +1493,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$aShop_Item_Property_For_Groups = Core_Entity::factory('Shop_Group', $this->_object->parent_id)->Shop_Item_Property_For_Groups->findAll();
 
-					foreach($aShop_Item_Property_For_Groups as $oShop_Item_Property_For_Group)
+					foreach ($aShop_Item_Property_For_Groups as $oShop_Item_Property_For_Group)
 					{
 						$oShop_Item_Property_For_Group_new = clone $oShop_Item_Property_For_Group;
 						$oShop_Item_Property_For_Group_new->shop_group_id = $this->_object->id;
@@ -2053,7 +2051,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$aReturn = array(' … ');
 
-		foreach($aTaxes as $oTax)
+		foreach ($aTaxes as $oTax)
 		{
 			$aReturn[$oTax->id] = $oTax->name;
 		}
@@ -2211,7 +2209,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->limit($iModificationsLimit);
 
 		$aShopItems = $oShopItemTemp->findAll(FALSE);
-		foreach($aShopItems as $oShop_Item)
+		foreach ($aShopItems as $oShop_Item)
 		{
 			$oShop_Item->id != $oShopItem->id && $aReturnArray[$oShop_Item->id] = $oShop_Item->name;
 		}

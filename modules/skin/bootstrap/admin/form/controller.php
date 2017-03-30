@@ -250,31 +250,29 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 								</script>
 								<?php
 							break;
-
 							case 8: // Выпадающий список.
+								?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" style="<?php echo $style?>">
+								<option value="HOST_CMS_ALL" <?php echo $value == 'HOST_CMS_ALL' ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
+								<?php
+								$str_array = explode("\n", $oAdmin_Form_Field_Changed->list);
+								$value_array = array();
 
-							?><select name="admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" id="id_admin_form_filter_<?php echo $oAdmin_Form_Field->id?>" style="<?php echo $style?>">
-							<option value="HOST_CMS_ALL" <?php echo $value == 'HOST_CMS_ALL' ? "selected" : ''?>><?php echo htmlspecialchars(Core::_('Admin_Form.filter_selected_all'))?></option>
-							<?php
-							$str_array = explode("\n", $oAdmin_Form_Field_Changed->list);
-							$value_array = array();
-
-							foreach ($str_array as $str_value)
-							{
-								// Каждую строку разделяем по равно
-								$str_explode = explode('=', $str_value);
-
-								if ($str_explode[0] != 0 && count($str_explode) > 1)
+								foreach ($str_array as $str_value)
 								{
-									// сохраняем в массив варинаты значений и ссылки для них
-									$value_array[intval(trim($str_explode[0]))] = trim($str_explode[1]);
+									// Каждую строку разделяем по равно
+									$str_explode = explode('=', $str_value);
 
-									?><option value="<?php echo htmlspecialchars($str_explode[0])?>" <?php echo $value == $str_explode[0] ? "selected" : ''?>><?php echo htmlspecialchars(trim($str_explode[1]))?></option><?php
+									if ($str_explode[0] != 0 && count($str_explode) > 1)
+									{
+										// сохраняем в массив варинаты значений и ссылки для них
+										$value_array[intval(trim($str_explode[0]))] = trim($str_explode[1]);
+
+										?><option value="<?php echo htmlspecialchars($str_explode[0])?>" <?php echo $value == $str_explode[0] ? "selected" : ''?>><?php echo htmlspecialchars(trim($str_explode[1]))?></option><?php
+									}
 								}
-							}
-							?>
-							</select>
-							<?php
+								?>
+								</select>
+								<?php
 							break;
 
 							default:

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Http
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Http
 {
@@ -54,7 +54,6 @@ abstract class Core_Http
 
 		return $oDriver->config($aConfig[$name]);
 	}
-
 
 	/**
 	 * Constructor.
@@ -110,6 +109,18 @@ abstract class Core_Http
 		return $this;
 	}
 
+	/**
+	 * Add option
+	 * @param string $name Header name
+	 * @param string $value Value
+	 * @return self
+	 */
+	public function addOption($name, $value)
+	{
+		$this->_config['options'][$name] = $value;
+		return $this;
+	}
+	
 	/**
 	 * Send request
 	 * @param string $host host
@@ -319,7 +330,7 @@ abstract class Core_Http
 
 	/**
 	 * Headers of the request
-	 * @return string
+	 * @var string
 	 */
 	protected $_headers = NULL;
 
@@ -334,7 +345,7 @@ abstract class Core_Http
 
 	/**
 	 * Body of the request
-	 * @return string
+	 * @var string
 	 */
 	protected $_body = NULL;
 
@@ -371,6 +382,36 @@ abstract class Core_Http
 		return $this->_body;
 	}
 
+	/**
+	 * Error number
+	 * @var int
+	 */
+	protected $_errno = 0;
+	
+	/**
+	 * Get Error number
+	 * @return int
+	 */
+	public function getErrno()
+	{
+		return $this->_errno;
+	}
+	
+	/**
+	 * Error message
+	 * @var string|NULL
+	 */
+	protected $_error = NULL;
+	
+	/**
+	 * Get Error message
+	 * @return string|NULL
+	 */
+	public function getError()
+	{
+		return $this->_error;
+	}
+	
 	/**
 	 * Executes the business logic.
 	 */

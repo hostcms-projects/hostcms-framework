@@ -21,7 +21,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Entity extends Core_ORM
 {
@@ -359,6 +359,18 @@ class Core_Entity extends Core_ORM
 	}
 
 	/**
+	 * Clear object
+	 * @return self
+	 */
+	public function clear()
+	{
+		// Delete from ObjectWatcher
+		Core_ObjectWatcher::instance()->delete($this);
+
+		return parent::clear();
+	}
+
+	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
@@ -665,7 +677,7 @@ class Core_Entity extends Core_ORM
 					? $this->text
 					: NULL
 			);
-		
+
 		return !is_null($text)
 			? htmlspecialchars(
 				Core_Str::cut($text, 255)

@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Доступные методы:
  *
  * - fileTimestamp(TRUE|FALSE) использовать в качестве временной метки дату файла, а не дату изменения макета, по умолчанию FALSE.
- * - compress(TRUE|FALSE) использовать компрессию, по умочанию TRUE. Требует модуль "Компрессия страниц".
+ * - compress(TRUE|FALSE) использовать компрессию, по умолчанию TRUE. Требует модуль "Компрессия страниц".
  *
  * <code>
  * // Get Title
@@ -80,7 +80,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Page extends Core_Servant_Properties
 {
@@ -627,28 +627,36 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
-	 * frontentExecutionTimes
+	 * frontendExecutionTimes
 	 * @var array
 	 */
-	protected $_frontentExecutionTimes = array();
+	protected $_frontendExecutionTimes = array();
 
 	/**
-	 * Add Frontent Execution Time
+	 * Add Frontend Execution Time
 	 * @var string $value
 	 * @return self
 	 */
-	public function addFrontentExecutionTimes($value)
+	public function addFrontendExecutionTimes($value)
 	{
-		$this->_frontentExecutionTimes[] = $value;
+		$this->_frontendExecutionTimes[] = $value;
 		return $this;
 	}
 
 	/**
-	 * Get array of Frontent Execution Time
+	 * Get array of Frontend Execution Time
 	 * @return array
 	 */
-	public function getFrontentExecutionTimes()
+	public function getFrontendExecutionTimes()
 	{
-		return $this->_frontentExecutionTimes;
+		return $this->_frontendExecutionTimes;
+	}
+	
+	/**
+	 * Fix name bug
+	 */
+	public function addFrontentExecutionTimes($value)
+	{
+		return $this->addFrontendExecutionTimes($value);
 	}
 }

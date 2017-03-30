@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Install
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Install_Controller
 {
@@ -69,10 +69,11 @@ class Install_Controller
 	{
 		if (count($aReplace) > 0)
 		{
-			foreach ($aReplace as $key => $value)
+			$str = strtr($str, $aReplace);
+			/*foreach ($aReplace as $key => $value)
 			{
 				$str = str_replace($key, $value, $str);
-			}
+			}*/
 		}
 
 		return $str;

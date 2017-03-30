@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Group_Model extends Core_Entity
 {
@@ -492,15 +492,24 @@ class Shop_Group_Model extends Core_Entity
 	/**
 	 * Get group path
 	 * @return string
+	 * @hostcms-event shop_group.onBeforeGetPath
 	 */
 	public function getPath()
 	{
-		$sPath = rawurlencode($this->path) . '/';
+		Core_Event::notify($this->_modelName . '.onBeforeGetPath', $this);
 
-		if (!is_null($oParentGroup = $this->getParent()))
+		$sPath = Core_Event::getLastReturn();
+
+		if (is_null($sPath))
 		{
-			$sPath = $oParentGroup->getPath() . $sPath;
+			$sPath = rawurlencode($this->path) . '/';
+
+			if (!is_null($oParentGroup = $this->getParent()))
+			{
+				$sPath = $oParentGroup->getPath() . $sPath;
+			}
 		}
+
 		return $sPath;
 	}
 
@@ -837,7 +846,8 @@ class Shop_Group_Model extends Core_Entity
 	/**
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
-	 * @return Core_Entity
+	 * @return self
+	 * @hostcms-event shop_group.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -847,6 +857,13 @@ class Shop_Group_Model extends Core_Entity
 		}
 
 		$this->id = $primaryKey;
+
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
+
+		if (Core::moduleIsActive('revision'))
+		{
+			Revision_Controller::delete($this->getModelName(), $this->id);
+		}
 
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues();
@@ -940,6 +957,7 @@ class Shop_Group_Model extends Core_Entity
 
 	/**
 	 * Get IDs of child groups
+	 * @param boolean $bCache cache mode
 	 * @return array
 	 *
 	 * <code>
@@ -949,22 +967,26 @@ class Shop_Group_Model extends Core_Entity
 	 *	$oShop_Groups->queryBuilder()
 	 *		->where('parent_id', '=', $shop_group_id);
 	 *
-	 *	$aChildrenId = $oShop_Groups->getGroupChildrenId();
+	 *	$aChildrenId = $oShop_Groups->getGroupChildrenId(FALSE);
 	 *	foreach ($aChildrenId as $iGroupId)
 	 *	{
 	 *		var_dump($iGroupId);
 	 *	}
 	 * </code>
 	 */
-	public function getGroupChildrenId()
+	public function getGroupChildrenId($bCache = TRUE)
 	{
 		//$aGroupIDs = array($this->id);
 		$aGroupIDs = array();
 
-		$aShop_Groups = $this->findAll();
-		foreach($aShop_Groups as $oShop_Group)
+		$aShop_Groups = $this->findAll($bCache);
+		foreach ($aShop_Groups as $oShop_Group)
 		{
-			$aGroupIDs = array_merge($aGroupIDs, array($oShop_Group->id), $oShop_Group->Shop_Groups->getGroupChildrenId());
+			$aGroupIDs = array_merge(
+				$aGroupIDs,
+				array($oShop_Group->id),
+				$oShop_Group->Shop_Groups->getGroupChildrenId($bCache)
+			);
 		}
 
 		return $aGroupIDs;

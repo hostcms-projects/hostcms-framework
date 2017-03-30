@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class User_Group_Model extends Core_Entity
 {
@@ -30,7 +30,7 @@ class User_Group_Model extends Core_Entity
 	protected $_belongsTo = array(
 		'user' => array()
 	);
-	
+
 	/**
 	 * List of preloaded values
 	 * @var array
@@ -58,6 +58,7 @@ class User_Group_Model extends Core_Entity
 	 * Delete object from database
 	 * @param mixed $primaryKey primary key for deleting object
 	 * @return Core_Entity
+	 * @hostcms-event user_group.onBeforeRedeclaredDelete
 	 */
 	public function delete($primaryKey = NULL)
 	{
@@ -68,23 +69,11 @@ class User_Group_Model extends Core_Entity
 
 		$this->id = $primaryKey;
 
-		$aUsers = $this->Users->findAll();
-		foreach($aUsers as $oUser)
-		{
-			$oUser->delete();
-		}
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
-		$aUser_Modules = $this->User_Modules->findAll();
-		foreach($aUser_Modules as $oUser_Module)
-		{
-			$oUser_Module->delete();
-		}
-
-		$aUser_Group_Action_Accesses = $this->User_Group_Action_Accesses->findAll();
-		foreach($aUser_Group_Action_Accesses as $oUser_Group_Action_Access)
-		{
-			$oUser_Group_Action_Access->delete();
-		}
+		$this->Users->deleteAll(FALSE);
+		$this->User_Modules->deleteAll(FALSE);
+		$this->User_Group_Action_Accesses->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}
@@ -151,7 +140,7 @@ class User_Group_Model extends Core_Entity
 
 	/**
 	 * Get acces to module
-	 * @param Module_Model $oModule module 
+	 * @param Module_Model $oModule module
 	 * @param Site_Model $oSite site
 	 * @return User_Module_Model
 	 */
@@ -169,7 +158,7 @@ class User_Group_Model extends Core_Entity
 	/**
 	 * Get acces to form's action
 	 * @param Admin_Form_Action_Model $oAdmin_Form_Action action
-	 * @param Site_Model $oSite site 
+	 * @param Site_Model $oSite site
 	 * @return User_Group_Action_Access_Model
 	 */
 	public function getAdminFormActionAccess(Admin_Form_Action_Model $oAdmin_Form_Action, Site_Model $oSite)

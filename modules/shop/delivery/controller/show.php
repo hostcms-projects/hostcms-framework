@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Delivery_Controller_Show extends Core_Controller
 {
@@ -234,7 +234,8 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 						&& $quantityPurchaseDiscount += $oShop_Cart->quantity;
 
 					$weight += $oShop_Cart->Shop_Item->weight * $oShop_Cart->quantity;
-					$this->volume += Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->length * $oShop_Cart->Shop_Item->width * $oShop_Cart->Shop_Item->height, $oShop->size_measure, 0);
+
+					$this->volume += Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->length, $oShop->size_measure, 0) * Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->width, $oShop->size_measure, 0) * Shop_Controller::convertSizeMeasure($oShop_Cart->Shop_Item->height, $oShop->size_measure, 0);
 				}
 			}
 		}

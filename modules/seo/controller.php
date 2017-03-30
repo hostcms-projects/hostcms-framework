@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Seo
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
  */
 class Seo_Controller
 {
@@ -1464,7 +1464,7 @@ class Seo_Controller
 					$oSeo->yandex_catalog = 1;
 				}
 
-				$oSeo->pr = $oSeo_Controller->GetPageRank($sAliasName);
+				// $oSeo->pr = $oSeo_Controller->GetPageRank($sAliasName);
 				$oSeo->yandex_links = $oSeo_Controller->getYandexLinks($sAliasName);
 				$oSeo->google_links = $oSeo_Controller->getGoogleLinks($sAliasName);
 				//$oSeo->yahoo_links = $oSeo_Controller->getYahooLinks($sAliasName);
