@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Card extends Core_Servant_Properties
 {
@@ -33,9 +33,9 @@ class Shop_Item_Card extends Core_Servant_Properties
 		?>
 		<style>
 			div.main {
-				width: <?php echo $this->width?>mm;
-				height: <?php echo $this->height?>mm;
-				font-size: <?php echo $this->font?>pt;
+				width: <?php echo htmlspecialchars($this->width)?>mm;
+				height: <?php echo htmlspecialchars($this->height)?>mm;
+				font-size: <?php echo htmlspecialchars($this->font)?>pt;
 				overflow: hidden; 
 				font-family: Arial, sans-serif;
 				border: 1px solid #000;
@@ -68,7 +68,7 @@ class Shop_Item_Card extends Core_Servant_Properties
 		</style>
 		<?php
 	}
-	
+
 	/**
 	 * Build DIV for item
 	 * @param Shop_Item_Model $oShopItem item
@@ -76,13 +76,37 @@ class Shop_Item_Card extends Core_Servant_Properties
 	 */
 	public function build(Shop_Item_Model $oShopItem)
 	{
-		$sMeasureName = $oShopItem->Shop_Measure->name;
-		$sMeasureTitle = '';
-		$sMeasureName != '' && $sMeasureTitle = 'Ед.: ';
-		$sMarkingName = $oShopItem->marking;
-		$sMarkingTitle = '';
-		$sMarkingName != '' && $sMarkingTitle = 'Артикул: ';
+		$sMeasureTitle = $oShopItem->Shop_Measure->name != '' ? 'Ед.: ' : '';
+		$sMarkingTitle = $oShopItem->marking != '' ? 'Артикул: ' : '';
 		
-		?><div class="main"><div><div><div class="c b"><?php echo $oShopItem->Shop->Shop_Company->name?></div></div><div><div class="txt"><?php echo Core::_('Shop_Item.item_cards_desription')?>:</div></div><div><div class="name c"><?php echo $oShopItem->name?></div></div><div><div class="txt"><span class="s"><?php echo $sMeasureTitle?></span><span class="b"><?php echo $sMeasureName?></span><span class="r"><span class="s"><?php echo $sMarkingTitle?></span><span class="b"><?php echo $sMarkingName?></span></span></div></div><div><div class="txt"><span class="s"><?php echo Core::_('Shop_Item.item_cards_price')?>,</span> <span class="b"><?php echo $oShopItem->Shop_Currency->name?></span>:</div></div><div><div class="price c b"><?php echo $oShopItem->price?></div></div><div><div class="txt s"><?php echo Core::_('Shop_Item.item_cards_sign')?>:</div></div><div><div class="txt s footer"><div><p><span> </span><span class="d"><?php echo $this->fio?></span></p><p><span></span><span class="d"><?php echo $this->date?></span></p></div></div></div></div></div><?php
+		?><div class="main">
+			<div>
+				<div>
+					<div class="c b"><?php echo htmlspecialchars($oShopItem->Shop->Shop_Company->name)?></div>
+				</div>
+				<div>
+					<div class="txt"><?php echo Core::_('Shop_Item.item_cards_desription')?>:</div>
+				</div>
+				<div>
+					<div class="name c"><?php echo htmlspecialchars($oShopItem->name)?></div>
+				</div>
+				<div>
+					<div class="txt"><span class="s"><?php echo htmlspecialchars($sMeasureTitle)?></span><span class="b"><?php echo htmlspecialchars($oShopItem->Shop_Measure->name)?></span><span class="r"><span class="s"><?php echo htmlspecialchars($sMarkingTitle)?></span><span class="b"><?php echo htmlspecialchars($oShopItem->marking)?></span></span>
+					</div>
+				</div>
+				<div>
+					<div class="txt"><span class="s"><?php echo Core::_('Shop_Item.item_cards_price')?>,</span> <span class="b"><?php echo htmlspecialchars($oShopItem->Shop_Currency->name)?></span>:</div>
+				</div>
+				<div>
+					<div class="price c b"><?php echo htmlspecialchars($oShopItem->price)?></div>
+				</div>
+				<div>
+					<div class="txt s"><?php echo Core::_('Shop_Item.item_cards_sign')?>:</div>
+				</div>
+				<div>
+					<div class="txt s footer"><div><p><span> </span><span class="d"><?php echo htmlspecialchars($this->fio)?></span></p><p><span></span><span class="d"><?php echo htmlspecialchars($this->date)?></span></p></div></div>
+				</div>
+			</div>
+		</div><?php
 	}
 }

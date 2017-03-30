@@ -593,7 +593,8 @@ class Core_File
 		header("Pragma: public");
 		header("Content-Type: " . Core_Mime::getFileMime($file));
 
-		$contentDisposition = isset($param['content_disposition']) && strtolower($param['content_disposition']) == 'attachment'
+		$contentDisposition = isset($param['content_disposition'])
+			&& strtolower($param['content_disposition']) == 'attachment'
 			? 'attachment'
 			: 'inline';
 

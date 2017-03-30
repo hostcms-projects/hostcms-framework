@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Tab extends Core_Servant_Properties
 {
@@ -227,7 +227,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		$oAdmin_Form_Entity_Section = Admin_Form_Entity::factory('Section')
 			->caption($parent_id == 0
 				? Core::_('Property_Dir.main_section')
-				: Core_Entity::factory('Property_Dir', $parent_id)->name
+				: htmlspecialchars(Core_Entity::factory('Property_Dir', $parent_id)->name)
 			)
 			->id('accordion_' . $parent_id);
 
@@ -368,7 +368,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					if ($oAdmin_Form_Entity)
 					{
 						$oAdmin_Form_Entity->name("property_{$oProperty->id}[]")
-							->caption($oProperty->name)
+							->caption(htmlspecialchars($oProperty->name))
 							->value(
 								$this->_correctPrintValue($oProperty, $oProperty->default_value)
 							)
@@ -490,7 +490,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				case 5: // ИС
 					// Директории
 					$oAdmin_Form_Entity_InfGroups = Admin_Form_Entity::factory('Select')
-						->caption($oProperty->name)
+						->caption(htmlspecialchars($oProperty->name))
 						->divAttr(array('class' => 'form-group col-xs-12'))
 						->id("group_{$oProperty->id}[]")
 						->filter(TRUE);
@@ -542,7 +542,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				case 12: // Интернет-магазин
 					// Директории
 					$oAdmin_Form_Entity_Shop_Groups = Admin_Form_Entity::factory('Select')
-						->caption($oProperty->name)
+						->caption(htmlspecialchars($oProperty->name))
 						->divAttr(array('class' => 'form-group col-xs-12'))
 						->id("group_{$oProperty->id}[]")
 						->filter(TRUE);
@@ -743,7 +743,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
 						return $('<li></li>')
 							.data('item.autocomplete', item)
-							.append('<a>' + item.label + '</a>')
+							.append($('<a>').text(item.label))
 							.appendTo(ul);
 					}
 
@@ -921,7 +921,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
 						return $('<li></li>')
 							.data('item.autocomplete', item)
-							.append('<a>' + item.label + '</a>')
+							.append($('<a>').text(item.label))
 							.appendTo(ul);
 					}
 
@@ -1483,6 +1483,8 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					? ''
 					: Core_Date::datetime2sql($value);
 			break;
+			default:
+				$value = htmlspecialchars($value);
 		}
 		return $value;
 	}

@@ -201,8 +201,6 @@
 			newContent = jNewObject.find("span[id ^= 'file_small_settings_']").data('content').replace('_watermark_small_property_' + suffix, '_watermark_small_property_' + index + '_'+ iRand).replace(new RegExp(suffix,'g'), index + '[]');
 			jNewObject.find("span[id^='file_small_settings_']").attr('data-content', newContent);
 
-
-
 			jNewObject.find("input[id^='field_id'],select,textarea").attr('name', 'property_' + index + '[]');
 			jNewObject.find("div[id^='file_small'] input[id^='small_field_id']").attr('name', 'small_property_' + index + '[]').val('');
 			jNewObject.find("input[id^='field_id'][type!=checkbox],input[id^='property_'][type!=checkbox],select,textarea").val('');

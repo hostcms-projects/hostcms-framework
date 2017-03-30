@@ -143,4 +143,18 @@ return array(
 	'redaction3'=>'Small business',
 	'redaction5'=>'Business',
 	'redaction7'=>'Corporation',
+	
+	'byte' => 'Byte',
+	'kbyte' => 'KB',
+	'mbyte' => 'MB',
+	'gbyte' => 'GB',
+	
+	'timePeriodSeconds' => '%ssec later',
+	'timePeriodMinutes' => '%smin later',
+	'timePeriodHours' => '%sh later',
+	'timePeriodDays' => '%sd later',
+	'timePeriodYesterday' => 'yesterday',
+	'timePeriodMonths' => '%smon назад',
+	'timePeriodYears' => '%sy назад',
+	'timePeriodYearMonths' => '%sy %smon назад',
 );

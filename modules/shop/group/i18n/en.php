@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Products groups',
@@ -37,7 +37,7 @@ return array(
 	'edit_success' => "Products group added successfully!",
 	'copy_success' => "Products group copied successfully!",
 	'markDeleted_success' => "Products group deleted successfully!",
-	'changeActive_success' => "Products group has been changed",
+	'changeActive_success' => 'Status changed successfully!',
 	'properties' => "Properties",
 	'list_of_property_for_group' => "Properties list of product group",
 	'tab_properties' => "Additional properties",

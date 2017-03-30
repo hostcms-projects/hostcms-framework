@@ -20,12 +20,6 @@ class Informationsystem_Item_Model extends Core_Entity
 	protected $_modelName = 'informationsystem_item';
 
 	/**
-	 * Backend property
-	 * @var mixed
-	 */
-	public $img = 1;
-
-	/**
 	 * Callback property_id
 	 * @var int
 	 */
@@ -123,11 +117,6 @@ class Informationsystem_Item_Model extends Core_Entity
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['ip'] = Core_Array::get($_SERVER, 'REMOTE_ADDR', '127.0.0.1');
 			$this->_preloadValues['guid'] = Core_Guid::get();
-		}
-
-		if (/*$this->_loaded && */$this->shortcut_id != 0)
-		{
-			$this->img = 2;
 		}
 	}
 
@@ -244,12 +233,12 @@ class Informationsystem_Item_Model extends Core_Entity
 		$this->id = $primaryKey;
 
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
-		
+
 		if (Core::moduleIsActive('revision'))
 		{
 			Revision_Controller::delete($this->getModelName(), $this->id);
-		}		
-		
+		}
+
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues(FALSE);
 		foreach($aPropertyValues as $oPropertyValue)
@@ -839,7 +828,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeGetPath', $this);
 
 		$sPath = Core_Event::getLastReturn();
-		
+
 		if (is_null($sPath))
 		{
 			$sPath = ($this->path == ''
@@ -886,9 +875,8 @@ class Informationsystem_Item_Model extends Core_Entity
 			? $this->Informationsystem_Item
 			: $this;
 
-		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')->value(
-			htmlspecialchars($object->name)
-		);
+		$oCore_Html_Entity_Div = Core::factory('Core_Html_Entity_Div')
+			->value(htmlspecialchars($object->name));
 
 		$bRightTime =
 			($this->start_datetime == '0000-00-00 00:00:00' || time() > Core_Date::sql2timestamp($this->start_datetime))
@@ -1221,7 +1209,8 @@ class Informationsystem_Item_Model extends Core_Entity
 				? $this->end_datetime
 				: strftime($oInformationsystem->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
 
-		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getItemHref());
+		!isset($this->_forbiddenTags['dir'])
+			&& $this->addXmlTag('dir', Core_Page::instance()->informationsystemCDN . $this->getItemHref());
 
 		// Отображается часть текста
 		if ($this->_showXmlPart > 0 && !isset($this->_forbiddenTags['text']))
@@ -1554,9 +1543,31 @@ class Informationsystem_Item_Model extends Core_Entity
 
 		return $this;
 	}
-	
+
 	/*public function __destruct()
 	{
 		echo "\nd";
 	}*/
+
+	/**
+	 * Backend callback method
+	 * @return string
+	 */
+	public function img()
+	{
+		if ($this->shortcut_id)
+		{
+			return '<i class="fa fa-link"></i>';
+		}
+		elseif (strlen($this->image_small))
+		{
+			$dataContent = '<img class="backend-preview" src="' . htmlspecialchars($this->getSmallFileHref()) . '" />';
+
+			return '<img data-toggle="popover-hover" data-placement="top" data-content="' . htmlspecialchars($dataContent) . '" class="backend-thumbnail" src="' . htmlspecialchars($this->getSmallFileHref()) . '" />';
+		}
+		else
+		{
+			return '<i class="fa fa-file-text-o"></i>';
+		}
+	}
 }

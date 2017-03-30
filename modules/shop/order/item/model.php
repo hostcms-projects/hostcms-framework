@@ -94,7 +94,9 @@ class Shop_Order_Item_Model extends Core_Entity
 	 */
 	public function sum()
 	{
-		return sprintf("%.2f %s", $this->getAmount(), $this->Shop_Order->Shop_Currency->name);
+		return htmlspecialchars(
+			sprintf("%.2f %s", $this->getAmount(), $this->Shop_Order->Shop_Currency->name)
+		);
 	}
 
 	/**
@@ -105,17 +107,20 @@ class Shop_Order_Item_Model extends Core_Entity
 	 */
 	public function name($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
-		if(is_null($this->Shop_Item->id))
+		if (is_null($this->Shop_Item->id))
 		{
-			return $this->name;
+			return htmlspecialchars($this->name);
 		}
 		else
 		{
 			$sShopItemPath = '/admin/shop/item/index.php';
 			$iShopItemId = $this->Shop_Item->id;
 
-			return sprintf('<a href="%s" target="_blank">%s <i class="fa fa-external-link"></i></a>',
-			$oAdmin_Form_Controller->getAdminActionLoadHref($sShopItemPath, 'edit', NULL, 1, $iShopItemId), $this->Shop_Item->name);
+			return sprintf(
+				'<a href="%s" target="_blank">%s <i class="fa fa-external-link"></i></a>',
+				htmlspecialchars($oAdmin_Form_Controller->getAdminActionLoadHref($sShopItemPath, 'edit', NULL, 1, $iShopItemId)),
+				htmlspecialchars($this->Shop_Item->name)
+			);
 		}
 	}
 

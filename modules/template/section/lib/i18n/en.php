@@ -29,7 +29,7 @@ return array(
 	'delete_success' => 'Widgets deleted successfully!',
 	'undelete_success' => 'Widgets restored successfully!',
 	'markDeleted_success' => 'Widgets deleted successfully!',
-	'changeActive_success' => 'Information modified successfully!',
+	'changeActive_success' => 'Status changed successfully!',
 	'widget_settings' => "Widget '%s' options",
 	'widget_delete' => "Delete Widget '%s'",
 	'widget_active' => "Change '%s' active",

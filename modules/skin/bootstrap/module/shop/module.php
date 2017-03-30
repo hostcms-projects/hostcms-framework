@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 {
@@ -106,7 +106,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 		// Права доступа пользователя к комментариям
 		if ($oUser->superuser == 0 && $oUser->only_access_my_own == 1)
 		{
-			$oComments->queryBuilder()->where('comments.user_id', '=', $oUser->id);
+			$oComments
+				->queryBuilder()
+				->where('comments.user_id', '=', $oUser->id);
 		}
 
 		$aComments = $oComments->findAll(FALSE);
@@ -156,7 +158,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 											<div class="task-state">
 												<span class="label label-<?php echo $masColorNames[$color == 3 ? $color = 0 : $color]; ++$color;?>">
 												<?php echo $oComment->subject != ''
-													? trim(htmlspecialchars(Core_Str::cut(strip_tags(html_entity_decode($oComment->subject, ENT_COMPAT, 'UTF-8')), 150)))
+													? htmlspecialchars(Core_Str::cut($oComment->subject, 150))
 													: Core::_('Admin_Form.noSubject')?>
 												</span>
 											</div>
@@ -186,7 +188,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 
 														if ($oCurrentAlias)
 														{
-															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id?>" target="_blank"><i class="fa fa-external-link"></i> </a><?php
+															$href = ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id;
+															
+															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo htmlspecialchars($href)?>" target="_blank"><i class="fa fa-external-link"></i></a><?php
 														}
 													}
 													?>
@@ -390,7 +394,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 											</div>
 										</div>
 										<div class="databox-bottom no-padding text-align-center">
-											<span class="databox-number lightcarbon no-margin"><?php echo number_format(array_sum($aOrderedAmount), 2, '.', ' ') . ' ' . $oDefault_Currency->name?></span>
+											<span class="databox-number lightcarbon no-margin"><?php echo htmlspecialchars(
+												number_format(array_sum($aOrderedAmount), 2, '.', ' ') . ' ' . $oDefault_Currency->name
+											)?></span>
 											<span class="databox-text lightcarbon no-margin"><?php echo Core::_('Shop.orders_amount')?></span>
 										</div>
 									</div>
@@ -409,7 +415,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 											</div>
 										</div>
 										<div class="databox-bottom no-padding text-align-center">
-											<span class="databox-number lightcarbon no-margin"><?php echo number_format(array_sum($aPaidAmount), 2, '.', ' ') . ' ' . $oDefault_Currency->name?></span>
+											<span class="databox-number lightcarbon no-margin"><?php echo htmlspecialchars(
+												number_format(array_sum($aPaidAmount), 2, '.', ' ') . ' ' . $oDefault_Currency->name
+											)?></span>
 											<span class="databox-text lightcarbon no-margin"><?php echo Core::_('Shop.paid_orders_amount')?></span>
 										</div>
 									</div>
@@ -476,9 +484,9 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 							<li class="order-item">
 							<div class="row">
 								<div class="col-xs-12 item-left">
-									<div class="item-booker<?php echo $oShop_Order->canceled ? ' line-through' : ''?>"><?php echo $oShop_Order->invoice?>, <?php echo strlen(trim($oShop_Order->company))
-										? $oShop_Order->company
-										: $oShop_Order->surname . ' ' . $oShop_Order->name . ' ' . $oShop_Order->patronymic?></div>
+									<div class="item-booker<?php echo $oShop_Order->canceled ? ' line-through' : ''?>"><?php echo htmlspecialchars($oShop_Order->invoice)?>, <?php echo strlen(trim($oShop_Order->company))
+										? htmlspecialchars($oShop_Order->company)
+										: htmlspecialchars($oShop_Order->surname . ' ' . $oShop_Order->name . ' ' . $oShop_Order->patronymic)?></div>
 								</div>
 							</div>
 							<div class="row">

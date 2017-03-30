@@ -332,7 +332,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 							// Экранируем ' в имени индексного поля, т.к. дальше это значение пойдет в JS
 							$quotedEntityKey = htmlspecialchars($entityKey);
-							$escapedEntityKey = Core_Str::escapeJavascriptVariable($this->jQueryEscape($entityKey));
+							$escapedEntityKey = Core_Str::escapeJavascriptVariable($this->jQueryEscape(htmlspecialchars($entityKey)));
 
 							/*$entityKey = str_replace(
 								array("'", '%'),
@@ -399,13 +399,15 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 									$element_name = "apply_check_{$quotedDatasetKey}_{$quotedEntityKey}_fv_{$oAdmin_Form_Field_Changed->id}";
 
 									$sCheckSelector = "check_{$escapedDatasetKey}_{$escapedEntityKey}";
+									// Формат не экранируем, т.к. он может содержать теги
+									$sFormat = $oAdmin_Form_Field_Changed->format;
 
 									// Отображения элементов полей, в зависимости от их типа.
 									switch ($oAdmin_Form_Field_Changed->type)
 									{
 										case 1: // Текст.
 											?><span id="<?php echo $element_name?>"<?php echo 	$oAdmin_Form_Field_Changed->editable ? ' class="editable"' : ''?>><?php
-											echo $this->applyFormat(nl2br($value), $oAdmin_Form_Field_Changed->format)?></span><?php
+											echo $this->applyFormat($value, $sFormat)?></span><?php
 										break;
 										case 2: // Поле ввода.
 											?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>" onchange="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" class="form-control input-xs" /><?php
@@ -414,11 +416,11 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											?><label><input type="checkbox" name="<?php echo $element_name?>" id="<?php echo $element_name?>" <?php echo intval($value) ? 'checked="checked"' : ''?> onclick="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight();" value="1" /><span class="text"></span></label><?php
 										break;
 										case 4: // Ссылка.
-											$link = $oAdmin_Form_Field_Changed->link;
-											$onclick = $oAdmin_Form_Field_Changed->onclick;
+											$link = htmlspecialchars($oAdmin_Form_Field_Changed->link);
+											$onclick = htmlspecialchars($oAdmin_Form_Field_Changed->onclick);
 
 											//$link_text = trim($value);
-											$link_text = $this->applyFormat($value, $oAdmin_Form_Field_Changed->format);
+											$link_text = $this->applyFormat($value, $sFormat);
 
 											$link = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $link);
 											$onclick = $this->doReplaces($aAdmin_Form_Fields, $oEntity, $onclick, 'onclick');
@@ -436,14 +438,14 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											$value = $value == '0000-00-00 00:00:00' || $value == ''
 												? ''
 												: Core_Date::sql2datetime($value);
-											echo $this->applyFormat($value, $oAdmin_Form_Field_Changed->format);
+											echo $this->applyFormat($value, $sFormat);
 
 										break;
 										case 6: // Дата.
 											$value = $value == '0000-00-00 00:00:00' || $value == ''
 												? ''
 												: Core_Date::sql2date($value);
-											echo $this->applyFormat($value, $oAdmin_Form_Field_Changed->format);
+											echo $this->applyFormat($value, $sFormat);
 
 										break;
 										case 7: // Картинка-ссылка.
@@ -541,11 +543,11 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											// Отображаем картинку без ссылки
 											if (!is_null($ico))
 											{
-												?><i class="<?php echo htmlspecialchars($ico)?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>"></i><?php
+												?><i class="<?php echo htmlspecialchars($ico)?>" title="<?php echo htmlspecialchars(Core_Array::get($title_array, $value))?>"></i><?php
 											}
 											elseif (!is_null($src))
 											{
-												?><img src="<?php echo htmlspecialchars($src)?>" alt="<?php echo Core_Type_Conversion::toStr($alt_array[$value])?>" title="<?php echo Core_Type_Conversion::toStr($title_array[$value])?>" /><?php
+												?><img src="<?php echo htmlspecialchars($src)?>" alt="<?php echo htmlspecialchars(Core_Array::get($alt_array, $value))?>" title="<?php echo htmlspecialchars(Core_Array::get($title_array, $value))?>" /><?php
 											}
 											/*elseif (!empty($link) && !isset($value_array[$value]))
 											{
@@ -695,7 +697,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 									$Admin_Word_Value = $o_Admin_Form_Action->Admin_Word->getWordByLanguage($this->_Admin_Language->id);
 
 									$name = $Admin_Word_Value && strlen($Admin_Word_Value->name) > 0
-										? $Admin_Word_Value->name
+										? htmlspecialchars($Admin_Word_Value->name)
 										: '';
 
 									$href = $this->getAdminActionLoadHref($this->getPath(), $o_Admin_Form_Action->name, NULL, $escapedDatasetKey, $escapedEntityKey);
@@ -705,7 +707,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 									// Добавляем установку метки для чекбокса и строки + добавлем уведомление, если необходимо
 									if ($o_Admin_Form_Action->confirm)
 									{
-										$onclick = "res = confirm('".Core::_('Admin_Form.confirm_dialog', htmlspecialchars($name))."'); if (!res) { $('#{$windowId} #row_{$escapedDatasetKey}_{$escapedEntityKey}').toggleHighlight(); } else {{$onclick}} return res;";
+										$onclick = "res = confirm('" .
+											htmlspecialchars(Core::_('Admin_Form.confirm_dialog', $name)) .
+											"'); if (!res) { $('#{$windowId} #row_{$escapedDatasetKey}_{$escapedEntityKey}').toggleHighlight(); } else {{$onclick}} return res;";
 									}
 
 									// Раскрашиваем кнопки с верификацией
@@ -733,9 +737,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											break;
 									}*/
 
-									$sActionsFullView .= '<a class="btn btn-xs btn-' . $o_Admin_Form_Action->color .' " title="' . $name . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . $o_Admin_Form_Action->icon . '"></i></a>';
+									$sActionsFullView .= '<a class="btn btn-xs btn-' . htmlspecialchars($o_Admin_Form_Action->color) .' " title="' . $name . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . '"></i></a>';
 
-									$sActionsShortView .= '<li><a title="' . $name . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . $o_Admin_Form_Action->icon . ' btn-sm btn-' . $o_Admin_Form_Action->color . '"></i>' . $name . '</a></li>';
+									$sActionsShortView .= '<li><a title="' . $name . '" href="' . htmlspecialchars($href) . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . ' btn-sm btn-' . htmlspecialchars($o_Admin_Form_Action->color) . '"></i>' . $name . '</a></li>';
 								}
 
 								if ($iActionsCount)
@@ -832,9 +836,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						// надписями и при отключении картинок текст дублируется
 						/* alt="<?php echo htmlspecialchars($text)?>"*/
 
-						$sActionsFullView .= '<li><a title="' . htmlspecialchars($text) . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . $o_Admin_Form_Action->icon . ' btn-sm btn-' . $o_Admin_Form_Action->color . '"></i>' . htmlspecialchars($text) . '</a></li>';
+						$sActionsFullView .= '<li><a title="' . htmlspecialchars($text) . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . ' btn-sm btn-' . htmlspecialchars($o_Admin_Form_Action->color) . '"></i>' . htmlspecialchars($text) . '</a></li>';
 
-						$sActionsShortView .= '<a href="' . $href . '" onclick="' . $onclick . '" class="btn-labeled btn btn-'. $o_Admin_Form_Action->color . '" ><i class="btn-label ' . $o_Admin_Form_Action->icon . '"></i>' . htmlspecialchars($text) . '</a>';
+						$sActionsShortView .= '<a href="' . htmlspecialchars($href) . '" onclick="' . $onclick . '" class="btn-labeled btn btn-'. htmlspecialchars($o_Admin_Form_Action->color) . '" ><i class="btn-label ' . htmlspecialchars($o_Admin_Form_Action->icon) . '"></i>' . htmlspecialchars($text) . '</a>';
 					}
 				}
 

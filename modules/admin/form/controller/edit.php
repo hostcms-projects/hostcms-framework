@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -65,13 +65,19 @@ class Admin_Form_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAdmin_Form_Entity_Input_Name = Admin_Form_Entity::factory('Input')
 					->name('name_lng_' . $oAdmin_Language->id)
-					->caption(Core::_('Admin_Form.form_forms_lng_name') . ' (' . $oAdmin_Language->shortname . ')')
+					->caption(
+						Core::_('Admin_Form.form_forms_lng_name')
+						. ' (' . htmlspecialchars($oAdmin_Language->shortname) . ')'
+					)
 					->value($name)
 					->class('form-control input-lg');
 
 				$oAdmin_Form_Entity_Textarea_Description = Admin_Form_Entity::factory('Textarea')
 					->name('description_lng_' . $oAdmin_Language->id)
-					->caption(Core::_('Admin_Form.form_forms_lng_description') . ' (' . $oAdmin_Language->shortname . ')')
+					->caption(
+						Core::_('Admin_Form.form_forms_lng_description')
+						. ' (' . htmlspecialchars($oAdmin_Language->shortname) . ')'
+					)
 					->value($description)
 					->rows(2);
 

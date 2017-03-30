@@ -6,7 +6,7 @@
  * @package HostCMS 6\Shortcode
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'menu' => 'Shortcodes',
@@ -23,7 +23,7 @@ return array(
 	'example' => 'Shortcode Example',
 	'php' => 'PHP',
 	'shortcode_dir_id' => 'Section',
-	'changeActive_success' => 'Shortcode modified successfully.',
+	'changeActive_success' => 'Status changed successfully!',
 	'apply_success' => 'Information modified successfully.',
 	'copy_success' => 'Shortcode copied successfully!',
 	'markDeleted_success' => 'Shortcode deleted successfully.',

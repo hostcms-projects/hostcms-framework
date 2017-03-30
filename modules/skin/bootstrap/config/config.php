@@ -36,7 +36,7 @@ return array (
 		'clouds' => array(
 			'ico' => 'fa fa-cloud',
 			'caption' => Core::_('Skin_Bootstrap.admin_menu_clouds'),
-			'modules' => array('cloud'),
+			'modules' => array('cloud', 'cdn'),
 		),
 		'market' => array(
 			'ico' => 'fa fa-cogs',

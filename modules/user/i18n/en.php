@@ -6,7 +6,7 @@
  * @subpackage User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */ 
 return array(
 	'model_name' => 'Backend users',
@@ -43,7 +43,7 @@ return array(
 	'markDeleted_success' => 'User entry deleted successfully',
 	'markDeleted_error' => 'Error! User entry has not been deleted!',
 	'edit_success' => 'User information modified successfully!',
-	'changeActive_success' => "Information has been successfully changed",	
+	'changeActive_success' => 'Status changed successfully!',	
 	'apply_success' => 'Information modified successfully!',
 	'error_superuser' => 'Error! System should contain at least one superuser!',
 	'user_has_already_registered' => 'Error! User has already registered!',

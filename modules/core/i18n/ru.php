@@ -118,9 +118,9 @@ return array(
 
 	<p>Коммерческие пользователи могут узнать свой номер лицензии и PIN-код из таблицы в разделе «Лицензии» личного кабинета, пользователи HostCMS.Халява могут добавить новую лицензию.</p>
 	<p>Узнав номер лицензии и PIN-код можно вернуться в <a href="/admin/" target="_blank">центр администрирования</a> и ввести эти данные в разделе «Система» → «Сайты» → пункт меню «Настройки» → «Регистрационные данные».</p>
-	
+
 	<h2>Получение ключа <a href="http://www.hostcms.ru/documentation/introduction/key/key/" target="_blank"><i class="fa fa-external-link"></i></a></h2>
-	
+
 	<p>Далее можно получать ключи в <a href="/admin/" target="_blank">центре администрирования</a> системы управления, перейдя в раздел «Система» → «Сайты», выбрать глобус для соответствующего сайта в столбце «Домены»:</p>
 
 	<p align="center">
@@ -147,4 +147,18 @@ return array(
 	'redaction3' => 'Малый бизнес',
 	'redaction5' => 'Бизнес',
 	'redaction7' => 'Корпорация',
+
+	'timePeriodSeconds' => '%s сек. назад',
+	'timePeriodMinutes' => '%s мин. назад',
+	'timePeriodHours' => '%s час. назад',
+	'timePeriodDays' => '%s дн. назад',
+	'timePeriodYesterday' => 'вчера',
+	'timePeriodMonths' => '%s мес. назад',
+	'timePeriodYears' => '%s г. назад',
+	'timePeriodYearMonths' => '%s г. %s мес. назад',
+
+	'byte' => 'Байт',
+	'kbyte' => 'КБ',
+	'mbyte' => 'МБ',
+	'gbyte' => 'ГБ'
 );

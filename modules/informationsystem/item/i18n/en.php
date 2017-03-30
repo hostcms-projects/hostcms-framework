@@ -72,9 +72,8 @@ return array(
 	'apply_success' => 'Information modified successfully.',
 	'copy_success' => 'Information item copied successfully!',
 
-	'changeActive_success' => 'Information item modified successfully.',
+	'changeActive_success' => 'Status changed successfully!',
 	'changeIndexation_success' => 'Information item modified successfully.',
-	// Перенос информационных элементов и групп
 	'move_items_groups_title' => 'Transfer of groups and items',
 	'move_items_groups_information_groups_id' => '<acronym title="Group into which items and groups will be transferred.">Parent group</acronym>',
 

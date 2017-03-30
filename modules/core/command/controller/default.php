@@ -354,6 +354,30 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 		$oStructure->setCorePageSeo($oCore_Page);
 		$oCore_Page->addChild($oStructure->getRelatedObjectByType());
 
+		// CDN
+		if (Core::moduleIsActive('cdn'))
+		{
+			$oCdn_Site = Cdn_Controller::getDefaultCdnSite();
+
+			if (!is_null($oCdn_Site) && $oCdn_Site->active)
+			{
+				$oCdn = $oCdn_Site->Cdn;
+				$oCdn_Controller = Cdn_Controller::instance($oCdn->driver);
+				$oCdn_Controller->setCdnSite($oCdn_Site);
+
+				$oCdn_Site->css
+					&& $oCore_Page->cssCDN = '//' . htmlspecialchars($oCdn_Controller->getCssDomain());
+				$oCdn_Site->js
+					&& $oCore_Page->jsCDN = '//' . htmlspecialchars($oCdn_Controller->getJsDomain());
+				$oCdn_Site->informationsystem
+					&& $oCore_Page->informationsystemCDN = '//' . htmlspecialchars($oCdn_Controller->getInformationsystemDomain());
+				$oCdn_Site->shop
+					&& $oCore_Page->shopCDN = '//' . htmlspecialchars($oCdn_Controller->getShopDomain());
+				$oCdn_Site->structure
+					&& $oCore_Page->structureCDN = '//' . htmlspecialchars($oCdn_Controller->getStructureDomain());
+			}
+		}
+
 		// Counter is active and it's a bot
 		if (Core::moduleIsActive('counter') && Counter_Controller::checkBot(Core_Array::get($_SERVER, 'HTTP_USER_AGENT')))
 		{

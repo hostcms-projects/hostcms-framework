@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Benchmark_Module extends Benchmark_Module
 {
@@ -31,23 +31,15 @@ class Skin_Bootstrap_Module_Benchmark_Module extends Benchmark_Module
 		$oBenchmark
 			->queryBuilder()
 			->where('benchmarks.site_id', '=', CURRENT_SITE)
-			->limit(1)
 			->clearOrderBy()
-			->orderBy('benchmarks.id', 'DESC');
+			->orderBy('benchmarks.id', 'DESC')
+			->limit(1);
 
 		$aBenchmarks = $oBenchmark->findAll(FALSE);
 
-		if(count($aBenchmarks))
-		{
-			$oBenchmark = $aBenchmarks[0];
-
-			//Общая оценка производительности сайта
-			$iBenchmark = $oBenchmark->getBenchmark();
-		}
-		else
-		{
-			$iBenchmark = 0;
-		}
+		$iBenchmark = isset($aBenchmarks[0])
+			? $aBenchmarks[0]->getBenchmark()
+			: 0;
 
 		$aColors = array('gray', 'danger', 'orange', 'warning', 'success');
 		$sColor = $aColors[ceil($iBenchmark / 25)];

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Revision
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Revision_Model extends Core_Entity
 {
@@ -68,11 +68,14 @@ class Revision_Model extends Core_Entity
 	public function user($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		$oUser = $this->User;
-		$userName = !is_null($oUser->id) ? $oUser->login : 'Unknown user';
 
 		Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
-			->value($userName)
+			->value(
+				htmlspecialchars(
+					!is_null($oUser->id) ? $oUser->login : 'Unknown user'
+				)
+			)
 			->execute();
 	}
 

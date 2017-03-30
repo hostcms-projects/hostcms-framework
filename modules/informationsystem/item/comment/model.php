@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Comment_Model extends Comment_Model
 {
@@ -44,10 +44,7 @@ class Informationsystem_Item_Comment_Model extends Comment_Model
 			->href($href)
 			->target('_blank')
 			->add(
-				//Core::factory('Core_Html_Entity_Img')
-				//	->src('/admin/images/comment_view.gif')
-				Core::factory('Core_Html_Entity_I')
-					->class('fa fa-external-link')
+				Core::factory('Core_Html_Entity_I')->class('fa fa-external-link')
 			)
 			->execute();
 

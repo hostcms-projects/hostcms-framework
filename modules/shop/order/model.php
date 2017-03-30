@@ -288,7 +288,11 @@ class Shop_Order_Model extends Core_Entity
 	 */
 	public function sum()
 	{
-		return sprintf("%.2f %s", $this->getAmount(), $this->Shop_Currency->name);
+		return sprintf(
+			"%s %s",
+			Shop_Controller::instance()->round($this->getAmount()),
+			htmlspecialchars($this->Shop_Currency->name)
+		);
 	}
 
 	/**
@@ -304,7 +308,7 @@ class Shop_Order_Model extends Core_Entity
 		{
 			$weight += $oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity;
 		}
-		return sprintf("%.2f", $weight);
+		return Shop_Controller::instance()->round($weight);
 	}
 
 	/**
@@ -465,18 +469,22 @@ class Shop_Order_Model extends Core_Entity
 
 					// Update order's delivery item
 					$oShop_Order_Item_Delivery = $this->Shop_Order_Items->getByType(1);
-					if (!is_null($oShop_Order_Item_Delivery))
+					if (is_null($oShop_Order_Item_Delivery))
 					{
-						$aPrice = $oShop_Delivery_Condition->getPriceArray();
-						$oShop_Order_Item_Delivery->price = $aPrice['price'];
-						$oShop_Order_Item_Delivery->quantity = 1;
-						$oShop_Order_Item_Delivery->rate = $aPrice['rate'];
-						$oShop_Order_Item_Delivery->marking = !is_null($oShop_Delivery_Condition->marking)
-							? $oShop_Delivery_Condition->marking
-							: '';
-						$oShop_Order_Item_Delivery->name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
-						$oShop_Order_Item_Delivery->save();
+						$oShop_Order_Item_Delivery = Core_Entity::factory('Shop_Order_Item');
+						$oShop_Order_Item_Delivery->shop_order_id = $this->id;
+						$oShop_Order_Item_Delivery->type = 1;
 					}
+
+					$aPrice = $oShop_Delivery_Condition->getPriceArray();
+					$oShop_Order_Item_Delivery->price = $aPrice['price'];
+					$oShop_Order_Item_Delivery->quantity = 1;
+					$oShop_Order_Item_Delivery->rate = $aPrice['rate'];
+					$oShop_Order_Item_Delivery->marking = !is_null($oShop_Delivery_Condition->marking)
+						? $oShop_Delivery_Condition->marking
+						: '';
+					$oShop_Order_Item_Delivery->name = Core::_('Shop_Delivery.delivery', $oShop_Delivery_Condition->Shop_Delivery->name);
+					$oShop_Order_Item_Delivery->save();
 				}
 
 				return TRUE;
@@ -688,7 +696,8 @@ class Shop_Order_Model extends Core_Entity
 				? $this->datetime
 				: strftime($this->Shop->format_datetime, Core_Date::sql2timestamp($this->datetime)));
 
-		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getOrderHref());
+		!isset($this->_forbiddenTags['dir'])
+			&& $this->addXmlTag('dir', Core_Page::instance()->shopCDN . $this->getOrderHref());
 
 		$this->_showXmlCurrency && $this->shop_currency_id && $this->addEntity($this->Shop_Currency);
 

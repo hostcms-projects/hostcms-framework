@@ -713,17 +713,15 @@ class Shop_Group_Model extends Core_Entity
 
 		if ($this->active == 0)
 		{
-			$oCore_Html_Entity_Div
-				->style("text-decoration: line-through");
+			$oCore_Html_Entity_Div->style("text-decoration: line-through");
 		}
 
-		$oCore_Html_Entity_Div
-			->add(
-				Core::factory('Core_Html_Entity_A')
-					->href($link)
-					->onclick($onclick)
-					->value(htmlspecialchars($this->name))
-			);
+		$oCore_Html_Entity_Div->add(
+			Core::factory('Core_Html_Entity_A')
+				->href($link)
+				->onclick($onclick)
+				->value(htmlspecialchars($this->name))
+		);
 
 		if ($this->active == 1)
 		{
@@ -736,8 +734,7 @@ class Shop_Group_Model extends Core_Entity
 					. $this->Shop->Structure->getPath()
 					. $this->getPath();
 
-				$oCore_Html_Entity_Div
-				->add(
+				$oCore_Html_Entity_Div->add(
 					Core::factory('Core_Html_Entity_A')
 						->href($href)
 						->target('_blank')
@@ -1027,7 +1024,7 @@ class Shop_Group_Model extends Core_Entity
 			&& $this->addXmlTag('url', $this->Shop->Structure->getPath() . $this->getPath());
 
 		!isset($this->_forbiddenTags['dir'])
-			&& $this->addXmlTag('dir', $this->getGroupHref());
+			&& $this->addXmlTag('dir', Core_Page::instance()->shopCDN . $this->getGroupHref());
 
 		if ($this->_showXmlProperties)
 		{

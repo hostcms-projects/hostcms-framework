@@ -85,7 +85,9 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 		$oUser = Core_Entity::factory('User')->getCurrent();
 		if ($oUser->superuser == 0 && $oUser->only_access_my_own == 1)
 		{
-			$oComments->queryBuilder()->where('comments.user_id', '=', $oUser->id);
+			$oComments
+				->queryBuilder()
+				->where('comments.user_id', '=', $oUser->id);
 		}
 
 		$aComments = $oComments->findAll(FALSE);
@@ -131,16 +133,16 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 								?>
 								<li class="task-item">
 									<div class="row">
-										<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+										<div class="col-xs-9">
 											<div class="task-state">
 												<span class="label label-<?php echo $masColorNames[$color == 3 ? $color = 0 : $color]; ++$color;?>">
 												<?php echo $oComment->subject != ''
-													? trim(htmlspecialchars(Core_Str::cut(strip_tags(html_entity_decode($oComment->subject, ENT_COMPAT, 'UTF-8')), 150)))
+													? htmlspecialchars(Core_Str::cut($oComment->subject, 150))
 													: Core::_('Admin_Form.noSubject')?>
 												</span>
 											</div>
 										</div>
-										<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+										<div class="col-xs-3">
 											<div class="task-time"><?php echo Core_Date::sql2date($oComment->datetime)?></div>
 										</div>
 									</div>
@@ -150,10 +152,10 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-creator pull-left">
 												<div class="btn-group pull-right">
-													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#informationsystemCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i> </a>
+													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#informationsystemCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i></a>
 													<a href="<?php echo $sEditHref?>" onclick="<?php echo $sEditOnClick?>" class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.edit')?>"><i class="fa fa-pencil"></i> </a>
 													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.delete')?>" href="<?php echo $sMarkDeletedHref?>" onclick="res = confirm('<?php echo Core::_('Admin_Form.confirm_dialog', htmlspecialchars(Core::_('Admin_Form.msg_information_alt_delete')))?>'); if (res) { $.widgetRequest({path: '<?php echo $sMarkDeletedHref?>', context: $('#informationsystemCommentsAdminPage')}); } return false"><i class="fa fa-times"></i></a>
 													<?php
@@ -165,14 +167,15 @@ class Skin_Bootstrap_Module_Informationsystem_Module extends Informationsystem_M
 
 														if ($oCurrentAlias)
 														{
-															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Informationsystem_Item->getPath() . '#comment' . $oComment->id?>" target="_blank"><i class="fa fa-external-link"></i> </a><?php
+															$href = ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Informationsystem_Item->getPath() . '#comment' . $oComment->id;
+															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo htmlspecialchars($href)?>" target="_blank"><i class="fa fa-external-link"></i> </a><?php
 														}
 													}
 													?>
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<div class="col-xs-6">
 											<div class="task-assignedto pull-right"><?php
 											if ($oComment->author != '')
 											{

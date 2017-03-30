@@ -256,11 +256,11 @@ class Informationsystem_Group_Model extends Core_Entity
 
 		$aInformationsystem_Items = $this->Informationsystem_Items->deleteAll(FALSE);
 		$aInformationsystem_Groups = $this->Informationsystem_Groups->deleteAll(FALSE);
-		
+
 		if (Core::moduleIsActive('revision'))
 		{
 			Revision_Controller::delete($this->getModelName(), $this->id);
-		}		
+		}
 
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues();
@@ -656,7 +656,7 @@ class Informationsystem_Group_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeGetPath', $this);
 
 		$sPath = Core_Event::getLastReturn();
-		
+
 		if (is_null($sPath))
 		{
 			$sPath = rawurlencode($this->path) . '/';
@@ -815,8 +815,7 @@ class Informationsystem_Group_Model extends Core_Entity
 					. $this->Informationsystem->Structure->getPath()
 					. $this->getPath();
 
-				$oCore_Html_Entity_Div
-				->add(
+				$oCore_Html_Entity_Div->add(
 					Core::factory('Core_Html_Entity_A')
 						->href($href)
 						->target('_blank')
@@ -952,7 +951,7 @@ class Informationsystem_Group_Model extends Core_Entity
 			&& $this->addXmlTag('url', $this->Informationsystem->Structure->getPath() . $this->getPath());
 
 		!isset($this->_forbiddenTags['dir'])
-			&& $this->addXmlTag('dir', $this->getGroupHref());
+			&& $this->addXmlTag('dir', Core_Page::instance()->informationsystemCDN . $this->getGroupHref());
 
 		if ($this->_showXmlProperties)
 		{

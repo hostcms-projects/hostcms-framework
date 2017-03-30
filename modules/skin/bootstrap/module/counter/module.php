@@ -7,7 +7,7 @@
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 {
@@ -89,12 +89,12 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 					<div class="tab-content tabs-flat no-padding">
 						<div id="website_traffic" class="tab-pane animated fadeInUp active">
 							<div class="row">
-								<div class="col-sm-12">
+								<div class="col-xs-12">
 									<div id="website-traffic-chart" class="chart chart-lg"></div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-sm-12">
+								<div class="col-xs-12">
 									<div class="col-sm-12 col-md-6">
 										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Counter.reset')?></button>
 									</div>
@@ -103,12 +103,12 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 						</div>
 						<div id="search_bots" class="tab-pane padding-left-5 padding-right-10 animated fadeInUp">
 							<div class="row">
-								<div class="col-sm-12">
+								<div class="col-xs-12">
 									<div id="search-bots-chart" class="chart chart-lg" style="width:100%"></div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-sm-12">
+								<div class="col-xs-12">
 									<div class="col-sm-12 col-md-6">
 										<button class="btn btn-palegreen" id="setOriginalZoom"><i class="fa fa-area-chart icon-separator"></i><?php echo Core::_('Counter.reset')?></button>
 									</div>

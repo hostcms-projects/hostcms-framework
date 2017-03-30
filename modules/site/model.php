@@ -49,6 +49,7 @@ class Site_Model extends Core_Entity
 		'cloud' => array(),
 		'counter' => array(),
 		'counter_page' => array(),
+		'cdn_site' => array(),
 		'document' => array(),
 		'document_dir' => array(),
 		'document_status' => array(),
@@ -184,15 +185,20 @@ class Site_Model extends Core_Entity
 		{
 			$primaryKey = $this->getPrimaryKey();
 		}
-		
+
 		$this->id = $primaryKey;
 
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
-		
+
 		if (Core::moduleIsActive('advertisement'))
 		{
 			$this->Advertisements->deleteAll(FALSE);
 			$this->Advertisement_Groups->deleteAll(FALSE);
+		}
+
+		if (Core::moduleIsActive('cdn'))
+		{
+			$this->Cdn_Sites->deleteAll(FALSE);
 		}
 
 		if (Core::moduleIsActive('cloud'))

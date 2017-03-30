@@ -23,12 +23,6 @@ class Shop_Item_Model extends Core_Entity
 	 * Callback property_id
 	 * @var int
 	 */
-	public $img = 1;
-
-	/**
-	 * Callback property_id
-	 * @var int
-	 */
 	public $related = 1;
 
 	/**
@@ -227,11 +221,6 @@ class Shop_Item_Model extends Core_Entity
 			$this->_preloadValues['guid'] = Core_Guid::get();
 			$this->_preloadValues['datetime'] = Core_Date::timestamp2sql(time());
 			$this->_preloadValues['delivery'] = $this->_preloadValues['pickup'] = 1;
-		}
-
-		if (/*$this->_loaded && */$this->shortcut_id != 0)
-		{
-			$this->img = 2;
 		}
 	}
 
@@ -466,7 +455,7 @@ class Shop_Item_Model extends Core_Entity
 			? Core_Entity::factory('Shop_Item', $this->shortcut_id)
 			: $this;
 
-		return $oShopItem->Shop_Currency->name;
+		return htmlspecialchars($oShopItem->Shop_Currency->name);
 	}
 
 	/**
@@ -1184,8 +1173,6 @@ class Shop_Item_Model extends Core_Entity
 
 		Core::factory('Core_Html_Entity_A')
 			->add(
-				/*Core::factory('Core_Html_Entity_Img')
-					->src('/admin/images/' . ($iCount ? 'check.gif' : 'not_check.gif'))*/
 				Core::factory('Core_Html_Entity_I')
 					->class('fa fa-lightbulb-o ' . ($iCount ? 'fa-active' : 'fa-inactive'))
 			)
@@ -1449,8 +1436,7 @@ class Shop_Item_Model extends Core_Entity
 						->href($href)
 						->target('_blank')
 						->add(
-							Core::factory('Core_Html_Entity_I')
-							->class('fa fa-external-link')
+							Core::factory('Core_Html_Entity_I')->class('fa fa-external-link')
 						)
 				);
 			}
@@ -1459,8 +1445,7 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$oCore_Html_Entity_Div
 				->add(
-					Core::factory('Core_Html_Entity_I')
-						->class('fa fa-clock-o black')
+					Core::factory('Core_Html_Entity_I')->class('fa fa-clock-o black')
 				);
 		}
 
@@ -1752,7 +1737,8 @@ class Shop_Item_Model extends Core_Entity
 				? $this->end_datetime
 				: strftime($oShop->format_datetime, Core_Date::sql2timestamp($this->end_datetime)));
 
-		!isset($this->_forbiddenTags['dir']) && $this->addXmlTag('dir', $this->getItemHref());
+		!isset($this->_forbiddenTags['dir'])
+			&& $this->addXmlTag('dir', Core_Page::instance()->shopCDN . $this->getItemHref());
 
 		if ($this->_showXmlVotes && Core::moduleIsActive('siteuser'))
 		{
@@ -2383,5 +2369,27 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Backend callback method
+	 * @return string
+	 */
+	public function img()
+	{
+		if ($this->shortcut_id)
+		{
+			return '<i class="fa fa-link"></i>';
+		}
+		elseif (strlen($this->image_small))
+		{
+			$dataContent = '<img class="backend-preview" src="' . htmlspecialchars($this->getSmallFileHref()) . '" />';
+
+			return '<img data-toggle="popover-hover" data-placement="top" data-content="' . htmlspecialchars($dataContent) . '" class="backend-thumbnail" src="' . htmlspecialchars($this->getSmallFileHref()) . '" />';
+		}
+		else
+		{
+			return '<i class="fa fa-file-text-o"></i>';
+		}
 	}
 }

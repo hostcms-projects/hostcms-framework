@@ -312,7 +312,7 @@ class User_Model extends Core_Entity
 	 */
 	public function getImageFileHref()
 	{
-		return '/' . $this->getHref() . $this->image;
+		return '/' . $this->getHref() . rawurlencode($this->image);
 	}
 
 	/**

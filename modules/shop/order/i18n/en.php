@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Online store orders',
@@ -122,8 +122,10 @@ return array(
 	'acceptance_report_form' => 'Acceptance report',
 	'acceptance_report_invoice' => 'Invoice',
 	'acceptance_report_year' => ' year',
-	'document_number' => 'Document number',
-	'document_datetime' => 'Document date',
+	'document_number' => 'Delivery Note #',
+	'document_datetime' => 'Delivery Note Date',
+	'vat_number' => 'VAT Invoice #',
+	'vat_datetime' => 'VAT Invoice Date',
 	'vat_invoice_title' => 'Vat invoice %s from %s г.',
 	'vat_invoice_intro' => '',
 	'vat_invoice_seller' => 'Seller: ',

@@ -559,7 +559,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->add($oPriceRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
 				$this->getField('price')
-					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-6'))
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-2'))
 					->id('price');
 
 				$oMainTab->move($this->getField('price'), $oPriceRow1);
@@ -570,7 +570,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				// Создаем поле валюты как выпадающий список
 				$oShopCurrencySelect = Admin_Form_Entity::factory('Select')
 					->caption("&nbsp;")
-					->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-6'))
+					->divAttr(array('class' => 'form-group col-xs-6 col-sm-2'))
 					->options($Shop_Controller_Edit->fillCurrencies())
 					->name('shop_currency_id')
 					->value($this->_object->shop_currency_id);
@@ -617,11 +617,11 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							: $oShop_Item_Price->value;
 
 						$oItemPriceCheckBox = Admin_Form_Entity::factory('Checkbox')
-							->caption($oShopPrice->name)
+							->caption(htmlspecialchars($oShopPrice->name))
 							->id("item_price_id_{$oShopPrice->id}")
-							->value($value)
+							->value(htmlspecialchars($value))
 							->name("item_price_id_{$oShopPrice->id}")
-							->divAttr(array('class' => 'form-group margin-top-10 col-lg-4 col-md-4 col-sm-6 col-xs-9'))
+							->divAttr(array('class' => 'form-group margin-top-10 col-xs-9 col-sm-6 col-md-4'))
 							->onclick("document.getElementById('item_price_value_{$oShopPrice->id}').disabled
 						= !this.checked; if (this.checked)
 						{document.getElementById('item_price_value_{$oShopPrice->id}').value
@@ -632,7 +632,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							->id("item_price_value_{$oShopPrice->id}")
 							->name("item_price_value_{$oShopPrice->id}")
 							->value($value)
-							->divAttr(array('class' => 'form-group col-lg-2 col-md-2 col-sm-2 col-xs-3'))
+							->divAttr(array('class' => 'form-group col-xs-3 col-sm-2'))
 						;
 
 						$value == 0 && $oItemPriceTextBox->disabled('disabled');
@@ -706,8 +706,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				}
 
 				$oMainTab
-					->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow8)
-					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow8)
+					->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-8')), $oMainRow8)
+					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow8)
 					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9)
 					->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9);
 
@@ -1941,7 +1941,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
 							return $('<li></li>')
 								.data('item.autocomplete', item)
-								.append('<a>' + item.label + '</a>')
+								.append($('<a>').text(item.label))
 								.appendTo(ul);
 						}
 

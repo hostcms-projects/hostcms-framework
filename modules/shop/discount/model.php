@@ -155,6 +155,6 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
 	{
 		echo $this->type == 0
 			? '%'
-			: ' ' . $this->Shop->Shop_Currency->name;
+			: ' ' . htmlspecialchars($this->Shop->Shop_Currency->name);
 	}
 }

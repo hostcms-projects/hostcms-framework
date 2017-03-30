@@ -92,6 +92,7 @@ class Property_Value_Int_Model extends Core_Entity
 	 * Get XML for entity and children entities
 	 * @return string
 	 * @hostcms-event property_value_int.onBeforeRedeclaredGetXml
+	 * @hostcms-event property_value_int.onBeforeAddListItem
 	 * @hostcms-event property_value_int.onBeforeAddInformationsystemItem
 	 * @hostcms-event property_value_int.onBeforeAddShopItem
 	 */
@@ -116,6 +117,8 @@ class Property_Value_Int_Model extends Core_Entity
 
 				if ($oList_Item->id)
 				{
+					Core_Event::notify($this->_modelName . '.onBeforeAddListItem', $this, array($oList_Item));
+
 					$this
 						->addXmlTag('value', $oList_Item->value)
 						->addXmlTag('description', $oList_Item->description)

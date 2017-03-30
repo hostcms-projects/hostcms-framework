@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Склады',
@@ -33,5 +33,5 @@ return array(
 	'warehouse_default_not_exist' => "Внимание! Склад \"по умолчанию\" отсутствует, добавьте склад \"по умолчанию\"!",
 	'warehouse_default_name' => "Основной",
 	'warehouse_default_count' => "<acronym title=\"Устанавливаем всем товарам количество 0 на данном складе\">Установить количество товара на складе</acronym>",
-	'guid' => '<acronym title="Идентификатор склада">Идентификатор склада</acronym>',
+	'guid' => '<acronym title="Идентификатор склада CommerceML">Идентификатор склада CommerceML</acronym>',
 );

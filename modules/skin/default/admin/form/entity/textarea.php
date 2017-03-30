@@ -182,18 +182,18 @@ class Skin_Default_Admin_Form_Entity_Textarea extends Admin_Form_Entity
 				}
 
 				// Array of structures
-				$aStructure = $this->_fillStructureList(CURRENT_SITE);
+				$aStructures = $this->_fillStructureList(CURRENT_SITE);
 
 				$tinyMCELinkListArray = array();
 
-				foreach ($aStructure as $oStructure)
+				foreach ($aStructures as $oStructure)
 				{
 					// Внешняя ссылка есть, если значение внешней ссылки не пустой
-					$link = (strlen(trim($oStructure->url)) == 0)
+					$link = $oStructure->type != 3
 						? $oStructure->getPath()
 						: $oStructure->url;
 
-					$tinyMCELinkListArray[] = '{title: "' . addslashes($oStructure->menu_name) . '", value: "' . $link . '"}';
+					$tinyMCELinkListArray[] = '{title: "' . htmlspecialchars($oStructure->menu_name) . '", value: "' . htmlspecialchars($link) . '"}';
 				}
 
 				$tinyMCELinkList = implode(",", $tinyMCELinkListArray);

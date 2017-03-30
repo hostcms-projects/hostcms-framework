@@ -69,7 +69,7 @@ class Document_Model extends Core_Entity
 	 */
 	public function adminTemplate()
 	{
-		return $this->Template->name;
+		return htmlspecialchars($this->Template->name);
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Document_Model extends Core_Entity
 			{
 				$sListStructures .= '<i class="fa fa-folder-open-o" style="margin-right: 5px"></i><a onclick="'
 				. ("$.adminCheckObject({objectId: 'check_0_" . $oStructure->id . "', windowId: 'id_content'}); $.adminLoad({path: '/admin/structure/index.php', action: 'edit', additionalParams: '', windowId: 'id_content'}); return false")
-				. '">' . $oStructure->name . "</a><br />";
+				. '">' . htmlspecialchars($oStructure->name) . "</a><br />";
 			}
 
 			Admin_Form_Entity::factory('Code')

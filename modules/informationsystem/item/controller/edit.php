@@ -818,9 +818,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 				// Active
 				$this->getField('active')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6'));
 				$this->getField('indexing')
-					->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'));
+					->divAttr(array('class' => 'form-group col-xs-6'));
 
 				$oMainTab->move($this->getField('active'), $oMainRow7);
 				$oMainTab->move($this->getField('indexing'), $oMainRow7);
@@ -915,7 +915,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
 							return $('<li></li>')
 								.data('item.autocomplete', item)
-								.append('<a>' + item.label + '</a>')
+								.append($('<a>').text(item.label))
 								.appendTo(ul);
 						}
 

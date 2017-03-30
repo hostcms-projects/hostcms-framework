@@ -43,6 +43,26 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	protected $_formValues = NULL;
 
 	/**
+	 * Set _formValues
+	 * @param array $values
+	 * @return self
+	 */
+	public function setFormValues(array $values)
+	{
+		$this->_formValues = $values;
+		return $this;
+	}
+
+	/**
+	 * Get _formValues
+	 * @return array
+	 */
+	public function getFormValues()
+	{
+		return $this->_formValues;
+	}
+
+	/**
 	 * Constructor.
 	 * @param Admin_Form_Action_Model $oAdmin_Form_Action action
 	 */
@@ -510,8 +530,6 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 				$oAdmin_Form_Entity_For_Column
 					->name($columnName)
 					->caption(Core::_($modelName . '.' . $columnName));
-
-
 
 				// На дополнительную или основную вкладку
 				/*$sTabName = isset($this->_keys[$columnName])

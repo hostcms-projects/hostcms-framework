@@ -286,7 +286,7 @@ class Update_Entity extends Core_Entity
 
 							Core_Log::instance()->clear()
 								->status(Core_Log::$MESSAGE)
-								->write(Core::_('Update.msg_unpack_package', $original_filename));
+								->write(Core::_('Update.msg_unpack_package', basename($aTmpUpdateItem['tar'])));
 
 							// Распаковываем файлы
 							if (!$Core_Tar->extractModify(CMS_FOLDER, CMS_FOLDER))

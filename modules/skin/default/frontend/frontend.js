@@ -36,6 +36,10 @@
 					if (href != undefined && !obj.data('timer')) {
 					   obj.data('timer', setTimeout(function(){window.location = href;}, 500));
 					}
+					else
+					{
+						obj.dblclick();
+					}
 					return false;
 				}).on('dblclick', function(){
 
@@ -267,7 +271,7 @@
 
 			document.write = function(str) {
 				newDiv.find('script').eq(0).after(str);
-            }
+			}
 
 			this.replaceWith(newDiv);
 
@@ -330,11 +334,11 @@
 
 /*Show Notification*/
 function Notify(message, position, timeout, theme, icon, closable, sound) {
-    toastr.options.positionClass = 'toast-' + position;
-    toastr.options.extendedTimeOut = 0; //1000;
-    toastr.options.timeOut = timeout;
-    toastr.options.closeButton = closable;
-    toastr.options.iconClass = icon + ' toast-' + theme;
+	toastr.options.positionClass = 'toast-' + position;
+	toastr.options.extendedTimeOut = 0; //1000;
+	toastr.options.timeOut = timeout;
+	toastr.options.closeButton = closable;
+	toastr.options.iconClass = icon + ' toast-' + theme;
 	toastr.options.playSound = sound;
-    toastr['custom'](message);
+	toastr['custom'](message);
 }

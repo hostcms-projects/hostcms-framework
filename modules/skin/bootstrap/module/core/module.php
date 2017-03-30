@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_Core_Module extends Core_Module
 {
@@ -144,111 +144,109 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 				<!--<div class="padd scroll-systemsevents">-->
 				<div class="widget-main no-padding">
 					<div class="tickets-container">
-
 					<!--<ul class="eventsjournal timeline fadeInDown">-->
-		<?php
-		if (is_file($file_name))
-		{
-			if ($fp = @fopen($file_name, 'r'))
-			{
-				?>
-				<ul class="tickets-list">
-				<?php
-				$countEvents = 8;
-
-				$aLines = array();
-				$iSize = @filesize($file_name);
-				$iSlice = 10240;
-
-				$iSize > $iSlice && fseek($fp, $iSize - $iSlice);
-
-				// [0]-дата/время, [1]-имя пользователя, [2]-события, [3]-статус события, [4]-сайт, [5]-страница
-				while (!feof($fp))
-				{
-					$event = fgetcsv($fp, $iSlice);
-					if (empty($event[0]) || count($event) < 3)
+					<?php
+					if (is_file($file_name))
 					{
-						continue;
-					}
-					$aLines[] = $event;
-				}
-
-				count($aLines) > $countEvents && $aLines = array_slice($aLines, -$countEvents);
-				$aLines = array_reverse($aLines);
-
-				foreach ($aLines as $aLine)
-				{
-					if (count($aLine) > 3)
-					{
-						switch (intval($aLine[3]))
+						if ($fp = @fopen($file_name, 'r'))
 						{
-							case 1:
-								$statusCharClassName = ' fa-check';
-								$statusColorName = 'palegreen';
-							break;
-							case 2:
-								$statusCharClassName = 'fa-exclamation';
-								$statusColorName = 'yellow';
-							break;
-							case 3:
-								$statusCharClassName = 'fa-exclamation';
-								$statusColorName = 'orange';
-							break;
-							case 4:
-								$statusCharClassName = 'fa-exclamation';
-								$statusColorName = 'red';
-							break;
-							default:
-								$statusCharClassName = 'fa-info';
-								$statusColorName = 'darkgray';
-						}
-						?><li class="ticket-item">
-							<div class="row">
-								<div class="ticket-user col-lg-7 col-sm-12">
-									<span class="user-name"><?php echo htmlspecialchars(Core_Str::cut(strip_tags($aLine[2]), 70))?></span>
-								</div>
-								<div class="ticket-time col-lg-3 col-sm-6 col-xs-6">
-									<div class="divider hidden-md hidden-sm hidden-xs"></div>
-									<i class="fa fa-clock-o"></i>
-									<span class="time"><?php echo htmlspecialchars(Core_Date::sql2datetime($aLine[0]));?></span>
-								</div>
-								<div class="ticket-type col-lg-2 col-sm-6 col-xs-6">
-									<span class="divider hidden-xs"></span>
-									<i class="fa fa-user"></i>
-									<span class="type user-login"><?php echo htmlspecialchars($aLine[1])?></span>
-								</div>
-								<div class="ticket-state bg-<?php echo $statusColorName?>">
-									<i class="fa <?php echo $statusCharClassName?>"></i>
-								</div>
-							</div>
-						</li>
-					<?php
-					}
-				}
+							?>
+							<ul class="tickets-list">
+							<?php
+							$countEvents = 10;
 
-				unset($aLines);
-				?>
-				</ul>
-				<?php
-				if (Core::moduleIsActive('eventlog'))
-				{
-					$sEventlogHref = '/admin/eventlog/index.php';
+							$aLines = array();
+							$iSize = @filesize($file_name);
+							$iSlice = 10240;
+
+							$iSize > $iSlice && fseek($fp, $iSize - $iSlice);
+
+							// [0]-дата/время, [1]-имя пользователя, [2]-события, [3]-статус события, [4]-сайт, [5]-страница
+							while (!feof($fp))
+							{
+								$event = fgetcsv($fp, $iSlice);
+								if (empty($event[0]) || count($event) < 3)
+								{
+									continue;
+								}
+								$aLines[] = $event;
+							}
+
+							count($aLines) > $countEvents && $aLines = array_slice($aLines, -$countEvents);
+							$aLines = array_reverse($aLines);
+
+							foreach ($aLines as $aLine)
+							{
+								if (count($aLine) > 3)
+								{
+									switch (intval($aLine[3]))
+									{
+										case 1:
+											$statusCharClassName = ' fa-check';
+											$statusColorName = 'palegreen';
+										break;
+										case 2:
+											$statusCharClassName = 'fa-exclamation';
+											$statusColorName = 'yellow';
+										break;
+										case 3:
+											$statusCharClassName = 'fa-exclamation';
+											$statusColorName = 'orange';
+										break;
+										case 4:
+											$statusCharClassName = 'fa-exclamation';
+											$statusColorName = 'red';
+										break;
+										default:
+											$statusCharClassName = 'fa-info';
+											$statusColorName = 'darkgray';
+									}
+									?><li class="ticket-item">
+										<div class="row">
+											<div class="ticket-user col-xs-12 col-lg-7">
+												<span class="user-name"><?php echo htmlspecialchars(Core_Str::cut(strip_tags($aLine[2]), 70))?></span>
+											</div>
+											<div class="ticket-time col-xs-6 col-lg-3">
+												<div class="divider hidden-md hidden-sm hidden-xs"></div>
+												<i class="fa fa-clock-o"></i>
+												<span class="time"><?php echo htmlspecialchars(Core_Date::sql2datetime($aLine[0]));?></span>
+											</div>
+											<div class="ticket-type col-xs-6 col-lg-2">
+												<span class="divider hidden-xs"></span>
+												<i class="fa fa-user"></i>
+												<span class="type user-login"><?php echo htmlspecialchars($aLine[1])?></span>
+											</div>
+											<div class="ticket-state bg-<?php echo $statusColorName?>">
+												<i class="fa <?php echo $statusCharClassName?>"></i>
+											</div>
+										</div>
+									</li>
+								<?php
+								}
+							}
+							unset($aLines);
+							?>
+							</ul>
+							<?php
+							if (Core::moduleIsActive('eventlog'))
+							{
+								$sEventlogHref = '/admin/eventlog/index.php';
+								?>
+								<br />
+								<div class="footer">
+									<a class="btn btn-info" href="<?php echo $sEventlogHref?>" onclick="$.adminLoad({path: '<?php echo $sEventlogHref?>'}); return false"><i class="fa fa-book"></i><?php echo Core::_('Admin.index_events_journal_link')?></a>
+								</div>
+								<?php
+							}
+						}
+						else
+						{
+							$oModalWindowSub->value(
+								Core_Message::get(Core::_('Admin.index_error_open_log') . $file_name, 'error')
+							);
+						}
+					}
 					?>
-					<br />
-					<div class="footer">
-						<a class="btn btn-info" href="<?php echo $sEventlogHref;?>" onclick="$.adminLoad({path: '<?php echo $sEventlogHref;?>'}); return false"><i class="fa fa-book"></i><?php echo Core::_('Admin.index_events_journal_link') ?></a>
-					</div>
-					<?php
-				}
-			}
-			else
-			{
-				$oModalWindowSub->value(
-					Core_Message::get(Core::_('Admin.index_error_open_log') . $file_name, 'error')
-				);
-			}
-		}
-		?>
 					</div>
 				</div>
 			</div>
@@ -576,7 +574,7 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 							<div id="user-notes" class="row">
 
 								<!-- Default note -->
-								<div id="default-user-note" class="user-note col-lg-3 col-md-4 col-sm-6 col-xs-12">
+								<div id="default-user-note" class="user-note col-xs-12 col-sm-6 col-md-4 col-lg-3">
 									<div class="row">
 										<div class="user-note-block">
 											<div>
@@ -638,24 +636,23 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 			{
 				$oSite_Alias = $oSite->Site_Aliases->getByCurrent(1);
 
+				$sSite = '<div class="notification-icon">
+					<i class="fa ' . $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
+				</div>
+				<div class="notification-body">
+					<span class="title">' . htmlspecialchars(Core_Str::cut($oSite->name, 35)) . '</span>
+					<span class="description">' .
+					 (!is_null($oSite_Alias)
+						? htmlspecialchars($oSite_Alias->name)
+						: 'undefined' ) . '
+					</span>
+				</div>';
+
 				if ($oSite->id != CURRENT_SITE)
 				{
 					$sListSitesContent .= '<li>
 						<a href="/admin/index.php?changeSiteId=' . $oSite->id . '" onmousedown="$(window).off(\'beforeunload\')">
-							<div class="clearfix">
-								<div class="notification-icon">
-									<i class="fa '. $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
-								</div>
-								<div class="notification-body">
-									<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
-									<span class="description">' .
-
-									 (!is_null($oSite_Alias)
-										? htmlspecialchars($oSite_Alias->name)
-										: 'undefined' ) . '
-									</span>
-								</div>
-							</div>
+							<div class="clearfix">' . $sSite . '</div>
 						</a></li>';
 				}
 				else
@@ -663,17 +660,8 @@ class Skin_Bootstrap_Module_Core_Module extends Core_Module
 					$sListSitesContent = '<li>
 						<a>
 							<div class="clearfix">
-								<div class="notification-icon">
-									<i class="fa ' . $aSiteColors[$iCountColor < 4 ? $iCountColor++ : $iCountColor = 0] . ' white hostcms-font"><b>' . $oSite->id . '</b></i>
-								</div>
-								<div class="notification-body">
-									<span class="title">' . Core_Str::cut($oSite->name, 35) . '</span>
-									<span class="description">' .
-									 (!is_null($oSite_Alias)
-										? htmlspecialchars($oSite_Alias->name)
-										: 'undefined' ) . '
-									</span>
-								</div><div class="notification-extra"><i class="fa fa-check-circle-o green"></i></div>
+								' . $sSite . '
+								<div class="notification-extra"><i class="fa fa-check-circle-o green"></i></div>
 							</div>
 						</a></li>' . $sListSitesContent;
 				}

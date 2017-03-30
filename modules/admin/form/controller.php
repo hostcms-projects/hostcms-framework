@@ -585,7 +585,7 @@ class Admin_Form_Controller
 	 */
 	public function pageTitle($pageTitle)
 	{
-		$this->_pageTitle = $pageTitle;
+		$this->_pageTitle = html_entity_decode($pageTitle);
 		return $this;
 	}
 
@@ -916,11 +916,15 @@ class Admin_Form_Controller
 
 	/**
 	 * Executes the business logic.
+	 * @hostcms-event Admin_Form_Controller.onBeforeExecute
+	 * @hostcms-event Admin_Form_Controller.onAfterExecute
 	 */
 	public function execute()
 	{
 		ob_start();
 
+		Core_Event::notify('Admin_Form_Controller.onBeforeExecute', $this);
+		
 		if (!empty($this->_action))
 		{
 			$actionName = $this->_action;
@@ -1093,6 +1097,8 @@ class Admin_Form_Controller
 			->addMessage(ob_get_clean())
 			->addContent($this->_getForm())
 			->show();
+			
+		Core_Event::notify('Admin_Form_Controller.onAfterExecute', $this);
 	}
 
 	/**
@@ -1207,7 +1213,7 @@ class Admin_Form_Controller
 			$subject = str_replace(
 				'{'.$columnName.'}',
 				$mode == 'link'
-					? $oEntity->$columnName
+					? htmlspecialchars($oEntity->$columnName)
 					: Core_Str::escapeJavascriptVariable($this->jQueryEscape($oEntity->$columnName)),
 				$subject
 			);
@@ -1227,9 +1233,9 @@ class Admin_Form_Controller
 	*/
 	public function applyFormat($str, $format)
 	{
-		!empty($format) && $str = sprintf($format, $str);
-
-		return $str;
+		return !empty($format)
+			? sprintf($format, $str)
+			: $str;
 	}
 
 	/**
@@ -1336,9 +1342,9 @@ class Admin_Form_Controller
 		}*/
 
 		$path = Core_Str::escapeJavascriptVariable($path);
-		$action = Core_Str::escapeJavascriptVariable($action);
-		$operation = Core_Str::escapeJavascriptVariable($operation);
-		$windowId = Core_Str::escapeJavascriptVariable($this->getWindowId());
+		$action = Core_Str::escapeJavascriptVariable(htmlspecialchars($action));
+		$operation = Core_Str::escapeJavascriptVariable(htmlspecialchars($operation));
+		$windowId = Core_Str::escapeJavascriptVariable(htmlspecialchars($this->getWindowId()));
 
 		$aData = array();
 
@@ -1514,14 +1520,14 @@ class Admin_Form_Controller
 		{
 			$action = $this->_action;
 		}
-		$action = Core_Str::escapeJavascriptVariable($action);
+		$action = Core_Str::escapeJavascriptVariable(htmlspecialchars($action));
 		$aData[] = "action: '{$action}'";
 
 		/*if (is_null($operation))
 		{
 			$operation = $this->_operation;
 		}*/
-		$operation = Core_Str::escapeJavascriptVariable($operation);
+		$operation = Core_Str::escapeJavascriptVariable(htmlspecialchars($operation));
 		$aData[] = "operation: '{$operation}'";
 
 		is_null($additionalParams) && $additionalParams = $this->_additionalParams;
@@ -1571,7 +1577,7 @@ class Admin_Form_Controller
 		$sortingDirection = intval($sortingDirection);
 		$aData[] = "sortingDirection: '{$sortingDirection}'";
 
-		$windowId = Core_Str::escapeJavascriptVariable($this->getWindowId());
+		$windowId = Core_Str::escapeJavascriptVariable(htmlspecialchars($this->getWindowId()));
 		$aData[] = "windowId: '{$windowId}'";
 
 		return "$.adminSendForm({" . implode(',', $aData) . "}); return false";

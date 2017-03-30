@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Config
 {
@@ -135,6 +135,18 @@ class Core_Config
 
 		Core_File::write($path, $content);
 
+		return $this;
+	}
+	
+	/**
+	 * Replace config without changing config file
+	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
+	 * @param array $value Config value, e.g. array('key' => 'value')
+	 * @return Core_Config
+	 */
+	public function replace($name, $value)
+	{
+		$this->_values[$name] = $value;
 		return $this;
 	}
 }

@@ -100,7 +100,12 @@ class Core_Page extends Core_Servant_Properties
 		'object',
 		'buildingPage',
 		'fileTimestamp',
-		'compress'
+		'compress',
+		'cssCDN',
+		'jsCDN',
+		'informationsystemCDN',
+		'shopCDN',
+		'structureCDN'
 	);
 
 	/**
@@ -244,6 +249,25 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
+	 * Get block of linked css and clear added CSS list
+	 * @param boolean $bExternal add as link
+	 * @return string
+	 * @hostcms-event Core_Page.onBeforeGetCss
+	 */
+	public function getCss($bExternal = TRUE)
+	{
+		Core_Event::notify(get_class($this) . '.onBeforeGetCss', $this);
+
+		$return = $this->compress && Core::moduleIsActive('compression')
+			? $this->_getCssCompressed()
+			: $this->_getCss($bExternal);
+
+		$this->css = array();
+
+		return $return;
+	}
+
+	/**
 	 * Get block of linked css
 	 * @param boolean $bExternal add as link
 	 * @return string
@@ -260,7 +284,7 @@ class Core_Page extends Core_Servant_Properties
 					? filemtime($sPath)
 					: Core_Date::sql2timestamp($this->template->timestamp);
 
-				$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $css . '?' . $timestamp . '" />' . "\n";
+				$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $this->cssCDN . $css . '?' . $timestamp . '" />' . "\n";
 			}
 			else
 			{
@@ -293,7 +317,7 @@ class Core_Page extends Core_Servant_Properties
 			}
 
 			$sPath = $oCompression_Controller->getPath();
-			$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $sPath . '?' . Core_Date::sql2timestamp($this->template->timestamp) . '" />' . "\n";
+			$sReturn .= '<link rel="stylesheet" type="text/css" href="' . $this->cssCDN . $sPath . '?' . Core_Date::sql2timestamp($this->template->timestamp) . '" />' . "\n";
 		}
 		catch (Exception $e)
 		{
@@ -302,26 +326,7 @@ class Core_Page extends Core_Servant_Properties
 
 		return $sReturn;
 	}
-
-	/**
-	 * Get block of linked css and clear added CSS list
-	 * @param boolean $bExternal add as link
-	 * @return string
-	 * @hostcms-event Core_Page.onBeforeGetCss
-	 */
-	public function getCss($bExternal = TRUE)
-	{
-		Core_Event::notify(get_class($this) . '.onBeforeGetCss', $this);
-
-		$return = $this->compress && Core::moduleIsActive('compression')
-			? $this->_getCssCompressed()
-			: $this->_getCss($bExternal);
-
-		$this->css = array();
-
-		return $return;
-	}
-
+	
 	/**
 	 * Show block of linked css and clear added CSS list
 	 * @param boolean $bExternal add as link
@@ -377,58 +382,6 @@ class Core_Page extends Core_Servant_Properties
 	}
 
 	/**
-	 * Get block of linked js
-	 * @return string
-	 */
-	protected function _getJs()
-	{
-		$sReturn = '';
-
-		foreach ($this->js as $aJs)
-		{
-			$timestamp = $this->fileTimestamp && is_file($sPath = CMS_FOLDER . ltrim($aJs[0], DIRECTORY_SEPARATOR))
-				? filemtime($sPath)
-				: NULL;
-
-			$sReturn .= '<script type="text/javascript"' . ($aJs[1] ? ' async="async"' : '') . ' src="' . $aJs[0] . (!is_null($timestamp) ? '?' . $timestamp : '') . '"></script>' . "\n";
-		}
-
-		return $sReturn;
-	}
-
-	/**
-	 * Get block of linked compressed js
-	 * @param boolean $async Run asynchronously, default FALSE
-	 * @return string
-	 */
-	protected function _getJsCompressed($async = FALSE)
-	{
-		try
-		{
-			$sReturn = '';
-
-			$oCompression_Controller = Compression_Controller::instance('js');
-			$oCompression_Controller->clear();
-
-			foreach ($this->js as $aJs)
-			{
-				$oCompression_Controller->addJs($aJs[0]);
-			}
-
-			$sAsync = $async ? ' async="async"' : '';
-
-			$sPath = $oCompression_Controller->getPath();
-			$sReturn .= '<script type="text/javascript"' . $sAsync . ' src="' . $sPath . '"></script>' . "\n";
-		}
-		catch (Exception $e)
-		{
-			$sReturn = $this->_getJs();
-		}
-
-		return $sReturn;
-	}
-
-	/**
 	 * Get block of linked JS and clear added JS list
 	 * @param boolean $async Run asynchronously, default FALSE
 	 * @return string
@@ -459,6 +412,58 @@ class Core_Page extends Core_Servant_Properties
 
 		echo $this->getJs($async);
 		return $this;
+	}
+
+	/**
+	 * Get block of linked js
+	 * @return string
+	 */
+	protected function _getJs()
+	{
+		$sReturn = '';
+
+		foreach ($this->js as $aJs)
+		{
+			$timestamp = $this->fileTimestamp && is_file($sPath = CMS_FOLDER . ltrim($aJs[0], DIRECTORY_SEPARATOR))
+				? filemtime($sPath)
+				: NULL;
+
+			$sReturn .= '<script type="text/javascript"' . ($aJs[1] ? ' async="async"' : '') . ' src="' . $this->jsCDN . $aJs[0] . (!is_null($timestamp) ? '?' . $timestamp : '') . '"></script>' . "\n";
+		}
+
+		return $sReturn;
+	}
+
+	/**
+	 * Get block of linked compressed js
+	 * @param boolean $async Run asynchronously, default FALSE
+	 * @return string
+	 */
+	protected function _getJsCompressed($async = FALSE)
+	{
+		try
+		{
+			$sReturn = '';
+
+			$oCompression_Controller = Compression_Controller::instance('js');
+			$oCompression_Controller->clear();
+
+			foreach ($this->js as $aJs)
+			{
+				$oCompression_Controller->addJs($aJs[0]);
+			}
+
+			$sAsync = $async ? ' async="async"' : '';
+
+			$sPath = $oCompression_Controller->getPath();
+			$sReturn .= '<script type="text/javascript"' . $sAsync . ' src="' . $this->jsCDN . $sPath . '"></script>' . "\n";
+		}
+		catch (Exception $e)
+		{
+			$sReturn = $this->_getJs();
+		}
+
+		return $sReturn;
 	}
 
 	/**
@@ -651,7 +656,7 @@ class Core_Page extends Core_Servant_Properties
 	{
 		return $this->_frontendExecutionTimes;
 	}
-	
+
 	/**
 	 * Fix name bug
 	 */

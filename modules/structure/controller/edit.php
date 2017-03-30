@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -156,7 +156,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
 
 		$this->getField('sorting')
-			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$oMainTab
 			->move($this->getField('path'), $oMainRow3)
@@ -200,10 +200,6 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		// Статичный документ
 		$oAdditionalTab->delete($this->getField('document_id'));
-
-		$oMainTab
-			->delete($this->getField('url'))
-			->add($this->getField('url'));
 
 		$this->getField('url')
 			->divAttr(array('id' => 'url', 'class' => 'form-group col-lg-6'))
@@ -313,6 +309,25 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->getField('path')
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
+
+		$oSite = $this->_object->Site;
+		$oSiteAlias = $oSite->getCurrentAlias();
+		if ($oSiteAlias)
+		{
+			$sItemUrl = ($this->_object->https ? 'https://' : 'http://')
+				. $oSiteAlias->name
+				. $this->_object->getPath()
+				;
+
+			$this->getField('path')
+				->add(
+					Admin_Form_Entity::factory('A')
+						->target('_blank')
+						->href($sItemUrl)
+						->class('input-group-addon bg-blue bordered-blue')
+						->value('<i class="fa fa-external-link"></i>')
+				);
+		}
 
 		// -!- Row --
 		$oMainTab

@@ -407,7 +407,7 @@ class Structure_Model extends Core_Entity
 
 			$oCore_Html_Entity_Div->add(
 				Core::factory('Core_Html_Entity_A')
-					->href("http://" . htmlspecialchars($oSite_Alias->name . $sPath))
+					->href("http://" . $oSite_Alias->name . $sPath)
 					->target("_blank")
 					->value(htmlspecialchars(urldecode($sPath)))
 			);
@@ -665,7 +665,7 @@ class Structure_Model extends Core_Entity
 
 		$this->clearXmlTags()
 			->addXmlTag('link', $this->getPath())
-			->addXmlTag('dir', '/' . $this->getDirHref());
+			->addXmlTag('dir', Core_Page::instance()->shopCDN . '/' . $this->getDirHref());
 
 		if ($this->_showXmlProperties)
 		{

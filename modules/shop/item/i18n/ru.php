@@ -296,4 +296,5 @@ return array(
 	'bonus_select_caption' => 'Список бонусов',
 	'apply_discount_success' => 'Информация добавлена успешно!',
 	'shop_item_associated_unset' => 'Информация успешно изменена',
+	'print_forms' => 'Печатные формы',
 );

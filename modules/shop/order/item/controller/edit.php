@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -75,7 +75,7 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 				)
 				->name('shop_warehouse_id')
 				->value($this->_object->shop_warehouse_id)
-				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'))
+				->divAttr(array('class' => 'form-group col-xs-6'))
 		);
 
 		$oMainTab->delete($this->getField('type'));
@@ -92,14 +92,14 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 				)
 				->name('type')
 				->value($this->_object->type)
-				->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6'))
+				->divAttr(array('class' => 'form-group col-xs-6'))
 		);
 
-		$oMainTab->move($this->getField('marking')->id('itemMarking')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+		$oMainTab->move($this->getField('marking')->id('itemMarking')->divAttr(array('class' => 'form-group col-xs-6')), $oMainRow3);
 
 		$oAdditionalTab->move($this->getField('shop_item_id'), $oMainTab);
 
-		$oMainTab->move($this->getField('shop_item_id')->id('itemId')->divAttr(array('class' => 'form-group col-lg-6 col-md-6 col-sm-6 col-xs-6')), $oMainRow3);
+		$oMainTab->move($this->getField('shop_item_id')->id('itemId')->divAttr(array('class' => 'form-group col-xs-6')), $oMainRow3);
 
 		$oCore_Html_Entity_Script = Core::factory('Core_Html_Entity_Script')
 		->type("text/javascript")
@@ -119,12 +119,12 @@ class Shop_Order_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_
 				  },
 				  minLength: 1,
 				  create: function() {
-					$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+					$(this).data('ui-autocomplete')._renderItem = function(ul, item) {
 						return $('<li></li>')
 							.data('item.autocomplete', item)
-							.append('<a>' + item.label + '</a>')
-							.append('<span>' + item.price_with_tax + ' ' + item.currency + '</span>')
-							.append('<span>' + item.marking + '</span>')
+							.append($('<a>').text(item.label))
+							.append($('<span>').text(item.price_with_tax + ' ' + item.currency))
+							.append($('<span>').text(item.marking))
 							.appendTo(ul);
 					}
 

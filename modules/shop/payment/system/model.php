@@ -252,7 +252,7 @@ class Shop_Payment_System_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
-		$this->addXmlTag('dir', $this->getHref());
+		$this->addXmlTag('dir', Core_Page::instance()->shopCDN . $this->getHref());
 
 		return parent::getXml();
 	}

@@ -90,7 +90,7 @@ return array(
 	'type_tag' => 'Type tag ...',
 	'items_catalog_add_form_title' => "Add product information",
 	'items_catalog_edit_form_title' => "Edit product information",
-	'changeActive_success' => "Information has been successfully changed",
+	'changeActive_success' => 'Status changed successfully!',
 	'apply_success' => "Information has been successfully changed",
 	'adminChangeAssociated_success' => "Information has been successfully changed",
 	'adminSetAssociated_success' => "Information has been successfully changed",
@@ -295,4 +295,5 @@ return array(
 	'bonus_select_caption' => 'Bonuses',
 	'apply_discount_success' => 'Information has been successfully changed!',
 	'shop_item_associated_unset' => 'Information has been successfully changed',
+	'print_forms' => 'Print forms',	
 );

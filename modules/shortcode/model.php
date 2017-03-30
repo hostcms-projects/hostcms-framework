@@ -97,7 +97,7 @@ class Shortcode_Model extends Core_Entity
 	{
 		Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
-			->value($this->example)
+			->value(htmlspecialchars($this->example))
 			->execute();
 	}
 

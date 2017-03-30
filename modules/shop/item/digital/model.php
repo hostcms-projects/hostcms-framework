@@ -84,7 +84,7 @@ class Shop_Item_Digital_Model extends Core_Entity
 	}
 
 	/**
-	 * Get the most suit digital item
+	 * Get the most suits digital item
 	 * @return array
 	 */
 	public function getBySorting()
@@ -94,8 +94,8 @@ class Shop_Item_Digital_Model extends Core_Entity
 			->select(
 				array(Core_QueryBuilder::expression("IF(`count` = '-1', 2, IF(`count` = '0', 3, 1))"), 'iternal_order')
 			)
-			->orderBy('iternal_order')
-			->orderBy('count')
+			->orderBy('iternal_order', 'ASC')
+			->orderBy('count', 'ASC')
 			->orderBy('id');
 
 		return $this->findAll(FALSE);

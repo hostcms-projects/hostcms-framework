@@ -6,7 +6,7 @@
  * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'title' => 'Comments',
@@ -37,7 +37,7 @@ return array(
 	'edit_success' => 'Comment modified successfully!',
 	'copy_success' => 'Comment copied successfully!',
 	'markDeleted_success' => 'Comment deleted successfully!',
-	'changeActive_success' => 'Comment status changed successfully!',
+	'changeActive_success' => 'Status changed successfully!',
 	'delete_success' => 'Item deleted successfully!',
 	'undelete_success' => 'Item restored successfully!'
 );

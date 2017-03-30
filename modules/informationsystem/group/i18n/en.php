@@ -54,7 +54,7 @@ return array(
 
 	'error_URL_information_group' => 'Group already contains information subgroup with this URL!',
 	'error_information_group_URL_add_edit_URL' => 'Group already contains information item with the name in URL coinciding with the URL of subgroup to be added/deleted!',
-	'changeActive_success' => 'Information group modified successfully.',
+	'changeActive_success' => 'Status changed successfully!',
 	'changeIndexation_success' => 'Information group modified successfully.',
 	'apply_success' => 'Information modified successfully.',
 	'copy_success' => 'Information group copied successfully!',

@@ -6,7 +6,7 @@
  * @subpackage Module
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Modules',
@@ -23,7 +23,7 @@ return array(
 	'markDeleted_success' => 'Module deleted successfully!',
 	'modules_deletes_message' => 'Modules deleted successfully!',
 	'apply_success' => 'Information modified successfully!',
-	'changeActive_success' => 'Information modified successfully!',
+	'changeActive_success' => 'Status changed successfully!',
 	'changeIndexing_success' => 'Indexing modified successfully!',
 	'modules_add_form_title' => 'Add module information',
 	'modules_edit_form_title' => 'Edit module information',

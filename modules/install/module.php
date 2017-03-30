@@ -17,11 +17,11 @@ class Install_Module extends Core_Module
 	 * Module version
 	 * @var string
 	 */
-	public $version = '6.6';
+	public $version = '6.7';
 
 	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2017-03-01';
+	public $date = '2017-03-21';
 }

@@ -129,7 +129,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 	 */
 	public function init()
 	{
-		if(!$this->exportOrders)
+		if (!$this->exportOrders)
 		{
 			// Заполняем склады
 			$this->_aShopWarehouses = Core_Entity::factory('Shop', $this->shopId)
@@ -549,7 +549,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 		$oShop = Core_Entity::factory('Shop', $this->shopId);
 
-		if(!$this->exportOrders)
+		if (!$this->exportOrders)
 		{
 			foreach ($this->_aCurrentData as $aData)
 			{
@@ -838,19 +838,26 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 			$offset = 0;
 			$limit = 100;
 
-			$oShop_Orders = $oShop->Shop_Orders;
-
-			if(!is_null($this->start_order_date) && !is_null($this->end_order_date))
+			if (!is_null($this->start_order_date) && !is_null($this->end_order_date))
 			{
 				$sStartDate = Core_Date::timestamp2sql(Core_Date::datetime2timestamp($this->start_order_date . " 00:00:00"));
 				$sEndDate = Core_Date::timestamp2sql(Core_Date::datetime2timestamp($this->end_order_date . " 23:59:59"));
-
-				$oShop_Orders
-					->queryBuilder()
-					->where('datetime', 'BETWEEN', array($sStartDate, $sEndDate));
+			}
+			else
+			{
+				$sStartDate = $sEndDate = NULL;
 			}
 
 			do {
+				$oShop_Orders = $oShop->Shop_Orders;
+
+				if (!is_null($this->start_order_date) && !is_null($this->end_order_date))
+				{
+					$oShop_Orders
+						->queryBuilder()
+						->where('datetime', 'BETWEEN', array($sStartDate, $sEndDate));
+				}
+
 				$oShop_Orders
 					->queryBuilder()
 					->orderBy('id', 'ASC')

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Value_Text_Model extends Core_Entity
 {
@@ -56,6 +56,14 @@ class Property_Value_Text_Model extends Core_Entity
 	 */
 	protected $_tagName = 'property_value';
 
+	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'value'
+	);
+	
 	/**
 	 * Get XML for entity and children entities
 	 * @return string

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Module_User_Module extends User_Module
 {
@@ -86,10 +86,10 @@ class Skin_Bootstrap_Module_User_Module extends User_Module
 
 						$aJson[] = array(
 							'id' => $oUser->id,
-							'login' => $oUser->login,
-							'firstName' => strval($oUser->name),
-							'lastName' => strval($oUser->surname),
-							'avatar' => $oUser->getImageHref(),
+							'login' => htmlspecialchars($oUser->login),
+							'firstName' => htmlspecialchars($oUser->name),
+							'lastName' => htmlspecialchars($oUser->surname),
+							'avatar' => htmlspecialchars($oUser->getImageHref()),
 							'lastChatTime' => Core_Date::time2string($iLastMessageTime),
 							'lastActivity' => Core_Date::time2string($oUser->getLastActivity()),
 							'online' => intval($oUser->isOnline()),

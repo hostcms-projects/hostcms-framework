@@ -6,7 +6,7 @@
  * @subpackage Structure
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Структура сайта',
@@ -44,7 +44,7 @@ return array(
 	'seo_description' => '<acronym title="Значение мета-тега <description> для страницы">Описание страницы [Description]</acronym>',
 	'seo_keywords' => '<acronym title="Значение мета-тега <keywords> для страницы">Ключевые слова [Keywords]</acronym>',
 	'url' => '<acronym title="Раздел сайта может являться внешней ссылкой">Ссылка на другой файл</acronym>',
-	'sorting' => '<acronym title="Поле, по которому производится сортировка страницы">Сортировка для текущего уровня</acronym>',
+	'sorting' => '<acronym title="Поле, по которому производится сортировка страницы">Порядок сортировки</acronym>',
 	'path' => '<acronym title="Фрагмент пути относительно родительского раздела, например, about-company">Путь</acronym>',
 	'type' => '<acronym title="Выберите тип раздела">Тип раздела</acronym>',
 	'static_page' => 'Страница',

@@ -10,6 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - recommended(TRUE|FALSE) экспортировать рекомендованные товары, по умолчанию FALSE.
+ * - checkAvailable(TRUE|FALSE) проверять остаток на складе, по умолчанию TRUE. Если FALSE, то товар будет выгружаться доступным назвисимо от остатка на складе.
  * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE. У самого магазина должно быть указано хотя бы одно условие доставки.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
  * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 500
@@ -52,6 +53,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		'itemsProperties',
 		'modifications',
 		'recommended',
+		'checkAvailable',
 		'deliveryOptions',
 		'type',
 		'onStep',
@@ -246,7 +248,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->_setShopGroups();
 
-		$this->itemsProperties = $this->modifications = $this->deliveryOptions = TRUE;
+		$this->itemsProperties = $this->modifications = $this->deliveryOptions
+			= $this->checkAvailable = TRUE;
 
 		$this->recommended = FALSE;
 
@@ -599,7 +602,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			? ' cbid="' . Core_Str::xml($oShop_Item->yandex_market_cid) . '"'
 			: '';
 
-		$available = $oShop_Item->getRest() > 0 ? 'true' : 'false';
+		$available = !$this->checkAvailable || $oShop_Item->getRest() > 0 ? 'true' : 'false';
 
 		$sType = $this->type != 'offer'
 			? ' type="' . Core_Str::xml($this->type) . '"'

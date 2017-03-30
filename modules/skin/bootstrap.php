@@ -235,7 +235,7 @@ class Skin_Bootstrap extends Core_Skin
 
 								if (!is_null($oAlias))
 								{
-									?><a title="<?php echo Core::_('Admin.viewSite')?>" target="_blank" href="//<?php echo Core_Str::escapeJavascriptVariable($oAlias->name)?>">
+									?><a title="<?php echo Core::_('Admin.viewSite')?>" target="_blank" href="//<?php echo htmlspecialchars($oAlias->name)?>">
 										<i class="icon fa fa-desktop"></i>
 									</a><?php
 								}
@@ -280,14 +280,14 @@ class Skin_Bootstrap extends Core_Skin
 											foreach ($aAdmin_Languages as $oAdmin_Language)
 											{
 												?><li>
-												<a <?php echo Core_Array::getSession('current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . $oAdmin_Language->shortname . '"' : ''?> onmousedown="$(window).off('beforeunload')">
+												<a <?php echo Core_Array::getSession('current_lng') != $oAdmin_Language->shortname ? 'href="/admin/index.php?lng_value=' . htmlspecialchars($oAdmin_Language->shortname) . '"' : ''?> onmousedown="$(window).off('beforeunload')">
 
 													<div class="clearfix">
 														<div class="notification-icon">
-															<img src="<?php echo '/modules/skin/bootstrap/img/flags/' . $oAdmin_Language->shortname . '.png'?>" class="message-avatar" alt="<?php echo $oAdmin_Language->name?>" />
+															<img src="<?php echo '/modules/skin/bootstrap/img/flags/' . htmlspecialchars($oAdmin_Language->shortname) . '.png'?>" class="message-avatar" alt="<?php echo htmlspecialchars($oAdmin_Language->name)?>" />
 														</div>
 														<div class="notification-body">
-															<?php echo $oAdmin_Language->name?>
+															<?php echo htmlspecialchars($oAdmin_Language->name)?>
 														</div>
 														<div class="notification-extra">
 															<?php
@@ -425,7 +425,13 @@ class Skin_Bootstrap extends Core_Skin
 													$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
 														return $('<li></li>')
 															.data('item.autocomplete', item)
-															.append('<i class="' + item.icon + '"></i><a href="' + item.href + '" onclick="' + item.onclick + '">' + item.label + '</a>')
+															.append($('<i>').addClass(item.icon))
+															.append(
+																$('<a>')
+																	.attr('href', item.href)
+																	.attr('onclick', item.onclick)
+																	.text(item.label)
+															)
 															.appendTo(ul.addClass('searchhelper'));
 													}
 

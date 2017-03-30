@@ -985,12 +985,12 @@ class Market_Controller extends Core_Servant_Properties
 				<div class="databox-top bg-white padding-10">
 					<div class="row">
 						<div class="col-xs-4">
-							<a target="_blank" href="' . $object->url . '">
-								<img src="' . $object->image_small . '" style="width:80px; height:80px;" class="market-item-image bordered-3 bordered-white" />
+							<a target="_blank" href="' . htmlspecialchars($object->url) . '">
+								<img src="' . htmlspecialchars($object->image_small) . '" style="width:80px; height:80px;" class="market-item-image bordered-3 bordered-white" />
 							</a>
 						</div>
 						<div class="col-xs-8 text-align-left padding-10">
-							<span class="databox-header carbon no-margin"><a target="_blank" href="' . $object->url . '">' . htmlspecialchars($object->name) . '</a></span>
+							<span class="databox-header carbon no-margin"><a target="_blank" href="' . htmlspecialchars($object->url) . '">' . htmlspecialchars($object->name) . '</a></span>
 							<span class="databox-text lightcarbon no-margin"> ' . htmlspecialchars($object->category_name) . ' </span>
 						</div>
 					</div>
@@ -1043,7 +1043,7 @@ class Market_Controller extends Core_Servant_Properties
 				}
 				else
 				{
-					$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . $object->url . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
+					$sHtml .= '<a class="btn btn-labeled btn-palegreen pull-right" target="_blank" href="' . htmlspecialchars($object->url) . '"><i class="btn-label fa fa-shopping-cart"></i>' . Core::_('Market.buy') . '</a>';
 				}
 			}
 			else
