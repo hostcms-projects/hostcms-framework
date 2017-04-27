@@ -666,7 +666,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					$oShopItems->queryBuilder()->where('shop_id', '=', $this->shopId);
 				}
 
-				$iPropertyFieldOffset = count($this->_aGroupBase_Properties)
+				$iPropertyFieldOffsetOriginal = count($this->_aGroupBase_Properties)
 					+ count($this->_aItemBase_Properties)
 					+ count($this->_aSpecialPriceBase_Properties);
 
@@ -683,6 +683,8 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 					foreach ($aShopItems as $oShopItem)
 					{
+						$iPropertyFieldOffset = $iPropertyFieldOffsetOriginal;
+
 						// Кэш всех значений свойств товара
 						$this->_cachePropertyValues[$oShopItem->id] = array();
 						foreach ($this->_aItem_Properties as $oProperty)

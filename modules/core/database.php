@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_DataBase
 {
@@ -50,6 +50,7 @@ abstract class Core_DataBase
 	 * 6 - DROP
 	 * 7 - TRUNCATE
 	 * 8 - LOCK
+	 * 9 - SHOW
 	 * 99 - OTHER
 	 */
 	protected $_queryType = NULL;

@@ -6,9 +6,10 @@
  * @subpackage User
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ÎÎÎ "Õîñòìýéê" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ÎÎÎ "Õîñòìýéê" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
+	'model_name' => 'Wallpapers',
 	'title' => 'Wallpapers',
 	'edit_title' => 'Edit wallpaper',
 	'add_title' => 'Add wallpaper',

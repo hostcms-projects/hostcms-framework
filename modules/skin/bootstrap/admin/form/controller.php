@@ -34,7 +34,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		$allow_filter = FALSE;
 
 		Core_Event::notify('Admin_Form_Controller.onBeforeShowContent', $this);
-		
+
 		// div class="table-scrollable"
 		// table-bordered
 		?>
@@ -347,53 +347,52 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						}
 
 						?><tr id="row_<?php echo $quotedDatasetKey?>_<?php echo $quotedEntityKey?>">
-							<?php
-							// Чекбокс "Для элемента" показываем только при наличии действий
-							if ($this->_Admin_Form->show_operations && $this->_showOperations)
+						<?php
+						// Чекбокс "Для элемента" показываем только при наличии действий
+						if ($this->_Admin_Form->show_operations && $this->_showOperations)
+						{
+							?><td align="center" width="25">
+								<label>
+								<input type="checkbox" class="colored-black" id="check_<?php echo $quotedDatasetKey?>_<?php echo $quotedEntityKey?>" onclick="$('#<?php echo $windowId?>').setTopCheckbox(); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" /><span class="text"></span>
+								</label><?php
+							?></td><?php
+						}
+
+						foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)
+						{
+							// Перекрытие параметров для данного поля
+							$oAdmin_Form_Field_Changed = $this->_changeField($oAdmin_Form_Dataset, $oAdmin_Form_Field);
+
+							// Параметры поля.
+							$width = htmlspecialchars(trim($oAdmin_Form_Field_Changed->width));
+							$class = htmlspecialchars($oAdmin_Form_Field_Changed->class);
+
+							$oAdmin_Form_Field->allow_sorting
+								&& is_object($this->_sortingAdmin_Form_Field)
+								&& $oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id
+								&& $class .= ' highlight';
+
+							?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
+
+							$fieldName = $this->getFieldName($oAdmin_Form_Field_Changed->name);
+
+							try
 							{
-								?><td align="center" width="25">
-									<label>
-									<input type="checkbox" class="colored-black" id="check_<?php echo $quotedDatasetKey?>_<?php echo $quotedEntityKey?>" onclick="$('#<?php echo $windowId?>').setTopCheckbox(); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" /><span class="text"></span>
-									</label><?php
-								?></td><?php
-							}
-
-							foreach ($aAdmin_Form_Fields as $oAdmin_Form_Field)
-							{
-								// Перекрытие параметров для данного поля
-								$oAdmin_Form_Field_Changed = $this->_changeField($oAdmin_Form_Dataset, $oAdmin_Form_Field);
-
-								// Параметры поля.
-								$width = htmlspecialchars(trim($oAdmin_Form_Field_Changed->width));
-								$class = htmlspecialchars($oAdmin_Form_Field_Changed->class);
-
-								$oAdmin_Form_Field->allow_sorting
-									&& is_object($this->_sortingAdmin_Form_Field)
-									&& $oAdmin_Form_Field->id == $this->_sortingAdmin_Form_Field->id
-									&& $class .= ' highlight';
-
-								?><td class="<?php echo trim($class)?>" <?php echo !empty($width) ? "width=\"{$width}\"" : ''?>><?php
-
-								$fieldName = $this->getFieldName($oAdmin_Form_Field_Changed->name);
-
-								try
+								if ($oAdmin_Form_Field_Changed->type != 10)
 								{
-									if ($oAdmin_Form_Field_Changed->type != 10)
+									if (isset($oEntity->$fieldName))
 									{
-										if (isset($oEntity->$fieldName))
-										{
-											// Выведим значение свойства
-											$value = htmlspecialchars($oEntity->$fieldName);
-										}
-										elseif (method_exists($oEntity, $fieldName))
-										{
-											// Выполним функцию обратного вызова
-											$value = htmlspecialchars($oEntity->$fieldName());
-										}
-										else
-										{
-											$value = NULL;
-										}
+										// Выведим значение свойства
+										$value = htmlspecialchars($oEntity->$fieldName);
+									}
+									elseif (method_exists($oEntity, $fieldName))
+									{
+										// Выполним функцию обратного вызова
+										$value = htmlspecialchars($oEntity->$fieldName());
+									}
+									else
+									{
+										$value = NULL;
 									}
 
 									$element_name = "apply_check_{$quotedDatasetKey}_{$quotedEntityKey}_fv_{$oAdmin_Form_Field_Changed->id}";
@@ -406,11 +405,17 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 									switch ($oAdmin_Form_Field_Changed->type)
 									{
 										case 1: // Текст.
-											?><span id="<?php echo $element_name?>"<?php echo 	$oAdmin_Form_Field_Changed->editable ? ' class="editable"' : ''?>><?php
-											echo $this->applyFormat($value, $sFormat)?></span><?php
+											if (!is_null($value))
+											{
+												?><span id="<?php echo $element_name?>"<?php echo 	$oAdmin_Form_Field_Changed->editable ? ' class="editable"' : ''?>><?php
+												echo $this->applyFormat($value, $sFormat)?></span><?php
+											}
 										break;
 										case 2: // Поле ввода.
+											if (!is_null($value))
+											{
 											?><input type="text" name="<?php echo $element_name?>" id="<?php echo $element_name?>" value="<?php echo $value?>" onchange="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" onkeydown="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight()" class="form-control input-xs" /><?php
+											}
 										break;
 										case 3: // Checkbox.
 											?><label><input type="checkbox" name="<?php echo $element_name?>" id="<?php echo $element_name?>" <?php echo intval($value) ? 'checked="checked"' : ''?> onclick="$.setCheckbox('<?php echo $windowId?>', '<?php echo $sCheckSelector?>'); $('#' + $.getWindowId('<?php echo $windowId?>') + ' #row_<?php echo $escapedDatasetKey?>_<?php echo $escapedEntityKey?>').toggleHighlight();" value="1" /><span class="text"></span></label><?php
@@ -435,18 +440,22 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											}
 										break;
 										case 5: // Дата-время.
-											$value = $value == '0000-00-00 00:00:00' || $value == ''
-												? ''
-												: Core_Date::sql2datetime($value);
-											echo $this->applyFormat($value, $sFormat);
-
+											if (!is_null($value))
+											{
+												$value = $value == '0000-00-00 00:00:00' || $value == ''
+													? ''
+													: Core_Date::sql2datetime($value);
+												echo $this->applyFormat($value, $sFormat);
+											}
 										break;
 										case 6: // Дата.
-											$value = $value == '0000-00-00 00:00:00' || $value == ''
-												? ''
-												: Core_Date::sql2date($value);
-											echo $this->applyFormat($value, $sFormat);
-
+											if (!is_null($value))
+											{
+												$value = $value == '0000-00-00 00:00:00' || $value == ''
+													? ''
+													: Core_Date::sql2date($value);
+												echo $this->applyFormat($value, $sFormat);
+											}
 										break;
 										case 7: // Картинка-ссылка.
 											$link = $oAdmin_Form_Field_Changed->link;
@@ -599,7 +608,6 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											?>
 											</select>
 											<?php
-
 										break;
 										case 9: // Текст "AS IS"
 											if (mb_strlen($value) != 0)
@@ -610,171 +618,172 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 											{
 												?>&nbsp;<?php
 											}
-
-										break;
-										case 10: // Вычисляемое поле с помощью функции обратного вызова
-											if (method_exists($oEntity, $fieldName)
-												|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($fieldName)
-											)
-											{
-												// Выполним функцию обратного вызова
-												echo $oEntity->$fieldName($oAdmin_Form_Field_Changed, $this);
-											}
-											elseif (property_exists($oEntity, $fieldName))
-											{
-												// Выведим значение свойства
-												echo $oEntity->$fieldName;
-											}
 										break;
 										default: // Тип не определен.
 											?>&nbsp;<?php
 										break;
 									}
 								}
-								catch (Exception $e)
+								// Вычисляемое поле с помощью функции обратного вызова
+								else
 								{
-									Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
+									if (method_exists($oEntity, $fieldName)
+										|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($fieldName)
+									)
+									{
+										// Выполним функцию обратного вызова
+										echo $oEntity->$fieldName($oAdmin_Form_Field_Changed, $this);
+									}
+									elseif (property_exists($oEntity, $fieldName))
+									{
+										// Выведим значение свойства
+										echo $oEntity->$fieldName;
+									}
 								}
-
-								// Badges
-								$badgesMethodName = $fieldName . 'Badge';
-								if (method_exists($oEntity, $badgesMethodName)
-									|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($badgesMethodName)
-								)
-								{
-									// Выполним функцию обратного вызова
-									$oEntity->$badgesMethodName($oAdmin_Form_Field, $this);
-								}
-								?></td><?php
 							}
-
-							// Действия для строки в правом столбце
-							if ($this->_Admin_Form->show_operations
-							&& $this->_showOperations
-							|| $allow_filter && $this->_showFilter)
+							catch (Exception $e)
 							{
-								// Определяем ширину столбца для действий.
-								/*
-								$width = isset($this->form_params['actions_width'])
-									? strval($this->form_params['actions_width'])
-									: '10px'; // Минимальная ширина
-								*/
-								$sContents = '';
-
-								$oCore_Html_Entity_Ul = Core::factory('Core_Html_Entity_Ul')
-									->class('dropdown-menu pull-right');
-
-								?><td><?php
-
-								$sActionsFullView = $sActionsShortView = '';
-
-								$iActionsCount = 0;
-
-								// Подмена массива действий через событие
-								Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
-								$aActions = Core_Event::getLastReturn();
-
-								!is_array($aActions)
-									&& $aActions = $aAllowed_Admin_Form_Actions;
-
-								foreach ($aActions as $key => $o_Admin_Form_Action)
-								{
-									// Отображаем действие, только если разрешено.
-									if (!$o_Admin_Form_Action->single)
-									{
-										continue;
-									}
-
-									// Проверяем, привязано ли действие к определенному dataset'у.
-									if ($o_Admin_Form_Action->dataset != -1
-									&& $o_Admin_Form_Action->dataset != $datasetKey)
-									{
-										continue;
-									}
-
-									$iActionsCount++;
-
-									$Admin_Word_Value = $o_Admin_Form_Action->Admin_Word->getWordByLanguage($this->_Admin_Language->id);
-
-									$name = $Admin_Word_Value && strlen($Admin_Word_Value->name) > 0
-										? htmlspecialchars($Admin_Word_Value->name)
-										: '';
-
-									$href = $this->getAdminActionLoadHref($this->getPath(), $o_Admin_Form_Action->name, NULL, $escapedDatasetKey, $escapedEntityKey);
-
-									$onclick = $this->getAdminActionLoadAjax($this->getPath(), $o_Admin_Form_Action->name, NULL, $datasetKey, $entityKey);
-
-									// Добавляем установку метки для чекбокса и строки + добавлем уведомление, если необходимо
-									if ($o_Admin_Form_Action->confirm)
-									{
-										$onclick = "res = confirm('" .
-											htmlspecialchars(Core::_('Admin_Form.confirm_dialog', $name)) .
-											"'); if (!res) { $('#{$windowId} #row_{$escapedDatasetKey}_{$escapedEntityKey}').toggleHighlight(); } else {{$onclick}} return res;";
-									}
-
-									// Раскрашиваем кнопки с верификацией
-									/*
-									$sBtnClass = $o_Admin_Form_Action->confirm
-										?	$o_Admin_Form_Action->name == 'markDeleted'
-											?	' btn-danger' // удаление
-											:	' btn-warning' // верификация
-										: ' btn-info'; // без верификации
-										*/
-
-									/*
-									$actionClassName = '';
-
-									switch ($o_Admin_Form_Action->name)
-									{
-										case 'edit':
-											$actionClassName = 'pencil';
-											break;
-										case 'copy':
-											$actionClassName = 'copy';
-											break;
-										case 'markDeleted':
-											$actionClassName = 'times';
-											break;
-									}*/
-
-									$sActionsFullView .= '<a class="btn btn-xs btn-' . htmlspecialchars($o_Admin_Form_Action->color) .' " title="' . $name . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . '"></i></a>';
-
-									$sActionsShortView .= '<li><a title="' . $name . '" href="' . htmlspecialchars($href) . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . ' btn-sm btn-' . htmlspecialchars($o_Admin_Form_Action->color) . '"></i>' . $name . '</a></li>';
-								}
-
-								if ($iActionsCount)
-								{
-								?><div class="btn-group <?php echo $iActionsCount > 1 ? 'visible-md visible-lg' : ''?>">
-									<?php echo $sActionsFullView?>
-								</div><?php
-
-									if ($iActionsCount > 1)
-									{
-									?>
-									<div class="visible-xs visible-sm">
-										<div class="btn-group">
-												<button class="btn btn-palegreen btn-xs dropdown-toggle" data-toggle="dropdown" >
-												<i class="fa fa-bars"></i>
-											</button>
-											<ul class="dropdown-menu actions-dropdown-menu dropdown-menu-right" role="menu">
-											<?php echo $sActionsShortView?>
-											</ul>
-										</div>
-									</div><?php
-									}
-								}
-								?></td><?php
+								Core_Message::show('Caught exception: ' . $e->getMessage() . "\n", 'error');
 							}
-							?></tr><?php
+
+							// Badges
+							$badgesMethodName = $fieldName . 'Badge';
+							if (method_exists($oEntity, $badgesMethodName)
+								|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($badgesMethodName)
+							)
+							{
+								// Выполним функцию обратного вызова
+								$oEntity->$badgesMethodName($oAdmin_Form_Field, $this);
+							}
+							?></td><?php
+						}
+
+						// Действия для строки в правом столбце
+						if ($this->_Admin_Form->show_operations
+						&& $this->_showOperations
+						|| $allow_filter && $this->_showFilter)
+						{
+							// Определяем ширину столбца для действий.
+							/*
+							$width = isset($this->form_params['actions_width'])
+								? strval($this->form_params['actions_width'])
+								: '10px'; // Минимальная ширина
+							*/
+							$sContents = '';
+
+							$oCore_Html_Entity_Ul = Core::factory('Core_Html_Entity_Ul')
+								->class('dropdown-menu pull-right');
+
+							?><td><?php
+
+							$sActionsFullView = $sActionsShortView = '';
+
+							$iActionsCount = 0;
+
+							// Подмена массива действий через событие
+							Core_Event::notify('Admin_Form_Controller.onBeforeShowActions', $this, array($datasetKey, $oEntity, $aAllowed_Admin_Form_Actions));
+							$aActions = Core_Event::getLastReturn();
+
+							!is_array($aActions)
+								&& $aActions = $aAllowed_Admin_Form_Actions;
+
+							foreach ($aActions as $key => $o_Admin_Form_Action)
+							{
+								// Отображаем действие, только если разрешено.
+								if (!$o_Admin_Form_Action->single)
+								{
+									continue;
+								}
+
+								// Проверяем, привязано ли действие к определенному dataset'у.
+								if ($o_Admin_Form_Action->dataset != -1
+								&& $o_Admin_Form_Action->dataset != $datasetKey)
+								{
+									continue;
+								}
+
+								$iActionsCount++;
+
+								$Admin_Word_Value = $o_Admin_Form_Action->Admin_Word->getWordByLanguage($this->_Admin_Language->id);
+
+								$name = $Admin_Word_Value && strlen($Admin_Word_Value->name) > 0
+									? htmlspecialchars($Admin_Word_Value->name)
+									: '';
+
+								$href = $this->getAdminActionLoadHref($this->getPath(), $o_Admin_Form_Action->name, NULL, $escapedDatasetKey, $escapedEntityKey);
+
+								$onclick = $this->getAdminActionLoadAjax($this->getPath(), $o_Admin_Form_Action->name, NULL, $datasetKey, $entityKey);
+
+								// Добавляем установку метки для чекбокса и строки + добавлем уведомление, если необходимо
+								if ($o_Admin_Form_Action->confirm)
+								{
+									$onclick = "res = confirm('" .
+										htmlspecialchars(Core::_('Admin_Form.confirm_dialog', $name)) .
+										"'); if (!res) { $('#{$windowId} #row_{$escapedDatasetKey}_{$escapedEntityKey}').toggleHighlight(); } else {{$onclick}} return res;";
+								}
+
+								// Раскрашиваем кнопки с верификацией
+								/*
+								$sBtnClass = $o_Admin_Form_Action->confirm
+									?	$o_Admin_Form_Action->name == 'markDeleted'
+										?	' btn-danger' // удаление
+										:	' btn-warning' // верификация
+									: ' btn-info'; // без верификации
+									*/
+
+								/*
+								$actionClassName = '';
+
+								switch ($o_Admin_Form_Action->name)
+								{
+									case 'edit':
+										$actionClassName = 'pencil';
+										break;
+									case 'copy':
+										$actionClassName = 'copy';
+										break;
+									case 'markDeleted':
+										$actionClassName = 'times';
+										break;
+								}*/
+
+								$sActionsFullView .= '<a class="btn btn-xs btn-' . htmlspecialchars($o_Admin_Form_Action->color) .' " title="' . $name . '" href="' . $href . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . '"></i></a>';
+
+								$sActionsShortView .= '<li><a title="' . $name . '" href="' . htmlspecialchars($href) . '" onclick="' . $onclick .'"><i class="' . htmlspecialchars($o_Admin_Form_Action->icon) . ' btn-sm btn-' . htmlspecialchars($o_Admin_Form_Action->color) . '"></i>' . $name . '</a></li>';
+							}
+
+							if ($iActionsCount)
+							{
+							?><div class="btn-group <?php echo $iActionsCount > 1 ? 'visible-md visible-lg' : ''?>">
+								<?php echo $sActionsFullView?>
+							</div><?php
+
+								if ($iActionsCount > 1)
+								{
+								?>
+								<div class="visible-xs visible-sm">
+									<div class="btn-group">
+											<button class="btn btn-palegreen btn-xs dropdown-toggle" data-toggle="dropdown" >
+											<i class="fa fa-bars"></i>
+										</button>
+										<ul class="dropdown-menu actions-dropdown-menu dropdown-menu-right" role="menu">
+										<?php echo $sActionsShortView?>
+										</ul>
+									</div>
+								</div><?php
+								}
+							}
+							?></td><?php
+						}
+						?></tr><?php
 					}
 				}
 			}
-
 			?>
 			</table>
 		</div>
 		<?php
-		
+
 		Core_Event::notify('Admin_Form_Controller.onAfterShowContent', $this);
 
 		return $this;

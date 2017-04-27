@@ -6,7 +6,7 @@
  * @subpackage Benchmark
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Benchmark',
@@ -44,4 +44,14 @@ return array(
 
 	'compression' => 'Compression',
 	'compression_description' => 'Compresses the site pages transmitted to visitors speeding up site loading. Union, minify and compress CSS and Javascript.',
+	'speedUp' => 'Speed Up Performance',
+	'database' => 'Database',
+	'tableEngines' => 'Table Engines',
+	'severalEnginesMsg' => 'The database contains tables with different engines!',
+	'changeStorageEnginesTitle' => 'Setting the Storage Engine',
+	'engine' => 'Engine',
+	'count' => 'Count',
+	'chooseStorageEnginesMsg' => 'Select the storage engine for tables. Do not forget to backup your database!',
+	'convert' => 'Convert',
+	'convertedMsg' => 'Changed Storage Engines: %s.',
 );

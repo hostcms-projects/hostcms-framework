@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Shop_Delivery_Handler
 {
@@ -18,43 +18,43 @@ abstract class Shop_Delivery_Handler
 	 * @var object
 	 */
 	protected $_shopCompany = NULL;
-	
+
 	/**
 	 * customer country
 	 * @var object
 	 */
 	protected $_shopCountry = NULL;
-	
+
 	/**
 	 * customer location
 	 * @var object
 	 */
 	protected $_shopLocation = NULL;
-	
+
 	/**
 	 * customer city
 	 * @var object
 	 */
 	protected $_shopCity = NULL;
-	
+
 	/**
 	 * weight
 	 * @var string
 	 */
 	protected $_weight = NULL;
-	
+
 	/**
 	 * postcode
 	 * @var string
 	 */
 	protected $_postcode = NULL;
-	
+
 	/**
 	 * volume
 	 * @var float
 	 */
 	protected $_volume = NULL;
-	
+
 	/**
 	 * Set weight
 	 * @param string $fWeight weight
@@ -65,7 +65,7 @@ abstract class Shop_Delivery_Handler
 		$this->_weight = $fWeight;
 		return $this;
 	}
-	
+
 	/**
 	 * Set company
 	 * @param Shop_Company_Model $oShop_Company company
@@ -76,8 +76,8 @@ abstract class Shop_Delivery_Handler
 		$this->_shopCompany = $oShop_Company;
 		return $this;
 	}
-	
-	/** 
+
+	/**
 	 * Set postcode
 	 * @param string $sPostcode volume
 	 * @return self
@@ -87,8 +87,8 @@ abstract class Shop_Delivery_Handler
 		$this->_postcode = $sPostcode;
 		return $this;
 	}
-	
-	/** 
+
+	/**
 	 * Set volume
 	 * @param float $fVolume volume
 	 * @return self
@@ -98,7 +98,7 @@ abstract class Shop_Delivery_Handler
 		$this->_volume = $fVolume;
 		return $this;
 	}
-	
+
 	/**
 	 * Set country
 	 * @param int $iCountryID country ID
@@ -109,7 +109,7 @@ abstract class Shop_Delivery_Handler
 		$this->_shopCountry = Core_Entity::factory('Shop_Country')->find($iCountryID);
 		return $this;
 	}
-	
+
 	/**
 	 * Set location
 	 * @param int $iLocationID country ID
@@ -120,7 +120,7 @@ abstract class Shop_Delivery_Handler
 		$this->_shopLocation = Core_Entity::factory('Shop_Country_Location')->find($iLocationID);
 		return $this;
 	}
-	
+
 	/**
 	 * Set city
 	 * @param int $iCityID country ID
@@ -131,7 +131,7 @@ abstract class Shop_Delivery_Handler
 		$this->_shopCity = Core_Entity::factory('Shop_Country_Location_City')->find($iCityID);
 		return $this;
 	}
-	
+
 	/**
 	 * Build Shop_Delivery_Handler class
 	 * @param Shop_Delivery_Model $oShop_Delivery_Model shop delivery
@@ -147,7 +147,47 @@ abstract class Shop_Delivery_Handler
 		}
 		return NULL;
 	}
-	
+
+	/**
+	 * Call ->checkPaymentBeforeContent() on each shop's Shop_Delivery_Handler
+	 * @param Shop_Model $oShop
+	 */
+	static public function checkBeforeContent(Shop_Model $oShop)
+	{
+		self::_check($oShop, 'checkPaymentBeforeContent');
+	}
+
+	/**
+	 * Call ->checkPaymentAfterContent() on each shop's Shop_Delivery_Handler
+	 * @param Shop_Model $oShop
+	 */
+	static public function checkAfterContent(Shop_Model $oShop)
+	{
+		return self::_check($oShop, 'checkPaymentAfterContent');
+	}
+
+	/**
+	 * Protected method to call $methodName on each shop's Shop_Payment_System_Handlers
+	 */
+	static protected function _check(Shop_Model $oShop, $methodName)
+	{
+		$oShop_Deliveries = $oShop->Shop_Deliveries;
+		$oShop_Deliveries->queryBuilder()
+			->where('shop_deliveries.active', '=', 1)
+			->where('shop_deliveries.type', '=', 1);
+
+		$aShop_Deliveries = $oShop_Deliveries->findAll(FALSE);
+
+		foreach ($aShop_Deliveries as $oShop_Delivery)
+		{
+			$oHandler = self::factory($oShop_Delivery);
+			if ($oHandler && method_exists($oHandler, $methodName))
+			{
+				$oHandler->$methodName();
+			}
+		}
+	}
+
 	/**
 	 * Delivery
 	 * @var Shop_Delivery_Model
@@ -162,9 +202,24 @@ abstract class Shop_Delivery_Handler
 	{
 		$this->_Shop_Delivery_Model = $oShop_Delivery_Model;
 	}
-	
+
 	/**
 	 * Execute business logic
 	 */
 	abstract public function execute();
+
+	public function process($position)
+	{
+		$shopDeliveryInSession = $this->_Shop_Delivery_Model->id . '-' . $position;
+
+		if (isset($_SESSION['hostcmsOrder']['deliveries'][$shopDeliveryInSession]))
+		{
+			$aTmp = $_SESSION['hostcmsOrder']['deliveries'][$shopDeliveryInSession];
+
+			$_SESSION['hostcmsOrder']['shop_delivery_id'] = $aTmp['shop_delivery_id'];
+			$_SESSION['hostcmsOrder']['shop_delivery_price'] = $aTmp['price'];
+			$_SESSION['hostcmsOrder']['shop_delivery_rate'] = $aTmp['rate'];
+			$_SESSION['hostcmsOrder']['shop_delivery_name'] = $aTmp['name'];
+		}
+	}
 }

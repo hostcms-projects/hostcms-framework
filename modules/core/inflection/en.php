@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Inflection
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Inflection_En extends Core_Inflection
 {
@@ -179,7 +179,9 @@ class Core_Inflection_En extends Core_Inflection
 	 * Array of irregular form plural => singular
 	 * @var array
 	 */
-	static public $singularIrregular = array();
+	static public $singularIrregular = array(
+		'people' => 'person'
+	);
 
 	/**
 	 * Constructor.

@@ -11,6 +11,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - recommended(TRUE|FALSE) экспортировать рекомендованные товары, по умолчанию FALSE.
  * - checkAvailable(TRUE|FALSE) проверять остаток на складе, по умолчанию TRUE. Если FALSE, то товар будет выгружаться доступным назвисимо от остатка на складе.
+ * - checkRest(TRUE|FALSE) не экспортировать товары с нулевым остатком, по умолчанию FALSE. Если TRUE, то товар будет выгружаться только при наличии остатка на складе.
  * - deliveryOptions(TRUE|FALSE) условия доставки, по умолчанию TRUE. У самого магазина должно быть указано хотя бы одно условие доставки.
  * - type('offer'|'vendor.model'|'book'|'audiobook'|'artist.title'|'tour'|'event-ticket') тип товара, по умолчанию 'offer'
  * - onStep(3000) количество товаров, выбираемых запросом за 1 шаг, по умолчанию 500
@@ -54,6 +55,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		'modifications',
 		'recommended',
 		'checkAvailable',
+		'checkRest',
 		'deliveryOptions',
 		'type',
 		'onStep',
@@ -251,7 +253,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->itemsProperties = $this->modifications = $this->deliveryOptions
 			= $this->checkAvailable = TRUE;
 
-		$this->recommended = FALSE;
+		$this->recommended = $this->checkRest = FALSE;
 
 		$this->type = 'offer';
 		$this->onStep = 500;
@@ -324,6 +326,14 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			->where('shop_items.yandex_market', '=', 1)
 			//->where('shop_items.price', '>', 0)
 			->where('shop_items.modification_id', '=', 0);
+
+		if ($this->checkRest)
+		{
+			$oShop_Item->queryBuilder()
+				->join('shop_warehouse_items', 'shop_warehouse_items.shop_item_id', '=', 'shop_items.id')
+				->groupBy('shop_items.id')
+				->having(Core_QueryBuilder::expression('SUM(shop_warehouse_items.count)'), '>', 0);
+		}
 
 		Core_Event::notify(get_class($this) . '.onBeforeSelectShopItems', $this, array($oShop_Item));
 
@@ -436,7 +446,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		// Название магазина
 		$oShop = $this->getEntity();
 
-		$this->stdOut->write('<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n");
+		//$this->stdOut->write('<category id="0">' . Core_Str::xml(!empty($oShop->yandex_market_name) ? $oShop->yandex_market_name : $oShop->Site->name) . "</category>\n");
 
 		// Массив активных ID групп
 		$this->_aCategoriesId = array();
@@ -561,6 +571,14 @@ class Shop_Controller_YandexMarket extends Core_Controller
 								->orderBy('shop_items.id', 'ASC')
 								->offset($iModificationOffset)
 								->limit($this->onStep);
+
+							if ($this->checkRest)
+							{
+								$oModifications->queryBuilder()
+									->join('shop_warehouse_items', 'shop_warehouse_items.shop_item_id', '=', 'shop_items.id')
+									->groupBy('shop_items.id')
+									->having(Core_QueryBuilder::expression('SUM(shop_warehouse_items.count)'), '>', 0);
+							}
 
 							$aModifications = $oModifications->findAll(FALSE);
 

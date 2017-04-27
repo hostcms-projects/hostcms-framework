@@ -892,15 +892,15 @@ class Market_Controller extends Core_Servant_Properties
 				$aTmp[$object->id] = $object->name;
 			}*/
 
-			$oMainTab->add(
-				Admin_Form_Entity::factory('Div')->class('row')->add(
+			$oMainTab/*->add(
+				Admin_Form_Entity::factory('Div')->class('row')*/->add(
 					Admin_Form_Entity::factory('Select')
 						->name('category_id')
 						->value($this->category_id)
 						->onchange('changeCategory(this)')
 						->options($this->_aTmpOptions)
 						->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
-				)
+				// )
 			);
 
 			$sHtml = $this->getMarketItemsHtml();

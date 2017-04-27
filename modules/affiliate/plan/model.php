@@ -101,7 +101,7 @@ class Affiliate_Plan_Model extends Core_Entity
 
 		$oShopAffiliatePlan =	$this
 			->Shop_Affiliate_Plans
-			->getByShopId($oShop->id);
+			->getByShop_id($oShop->id);
 
 		if(is_null($oShopAffiliatePlan))
 		{
@@ -118,7 +118,7 @@ class Affiliate_Plan_Model extends Core_Entity
 
 		$oShopAffiliatePlan =	$this
 			->Shop_Affiliate_Plans
-			->getByShopId($oShop->id);
+			->getByShop_id($oShop->id);
 
 		if(!is_null($oShopAffiliatePlan))
 		{
@@ -137,7 +137,7 @@ class Affiliate_Plan_Model extends Core_Entity
 
 		$oShopAffiliatePlan = $oAffiliatePlan
 			->Shop_Affiliate_Plans
-			->getByShopId($oShop->id);
+			->getByShop_id($oShop->id);
 
 		if(is_null($oShopAffiliatePlan))
 		{

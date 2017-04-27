@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -70,19 +70,23 @@ class Shop_Price_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		// Добавляем группы пользователей сайта
 		$oMainTab->addAfter(
-				$oSiteUserGroupSelect, $this->getField('name')
-			);
+			$oSiteUserGroupSelect, $this->getField('name')
+		);
 
-		$oApplyForAll = Admin_Form_Entity::factory('Checkbox');
-		$oApplyForAll->name('apply_for_all')->caption(Core::_("Shop_Item.prices_add_form_apply_for_all"));
-		$oApplyForAll->value($object->id ? 0 : 1);
+		$oApplyForAll = Admin_Form_Entity::factory('Checkbox')
+			->name('apply_for_all')
+			->caption(Core::_("Shop_Item.prices_add_form_apply_for_all"))
+			->value($object->id ? 0 : 1);
+
 		$oMainTab->addAfter($oApplyForAll, $this->getField('percent'));
 
 		if (!is_null($object->id))
 		{
-			$oRecalculatePrice = Admin_Form_Entity::factory('Checkbox');
-			$oRecalculatePrice->name('recalculate_price')->caption(Core::_("Shop_Item.prices_add_form_recalculate"));
-			$oRecalculatePrice->value(1);
+			$oRecalculatePrice = Admin_Form_Entity::factory('Checkbox')
+				->name('recalculate_price')
+				->caption(Core::_("Shop_Item.prices_add_form_recalculate"))
+				->value(0);
+
 			$oMainTab->addAfter($oRecalculatePrice, $oApplyForAll);
 		}
 

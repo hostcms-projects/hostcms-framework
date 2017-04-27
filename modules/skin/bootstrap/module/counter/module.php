@@ -246,7 +246,6 @@ class Skin_Bootstrap_Module_Counter_Module extends Counter_Module
 						timeformat: "%d.%m.%Y",
 						//tickDecimals: 0,
 						color: gridbordercolor
-
 					},
 					yaxis: {
 						min: 0,

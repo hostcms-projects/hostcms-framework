@@ -23,7 +23,7 @@ class Benchmark_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2017-03-21';
+	public $date = '2017-04-18';
 
 	/**
 	 * Module name
@@ -42,7 +42,7 @@ class Benchmark_Module extends Core_Module
 			array(
 				'sorting' => 260,
 				'block' => 3,
-				'ico' => 'fa fa-trophy',
+				'ico' => 'fa fa-dashboard',
 				'name' => Core::_('benchmark.menu'),
 				'href' => "/admin/benchmark/index.php",
 				'onclick' => "$.adminLoad({path: '/admin/benchmark/index.php'}); return false"

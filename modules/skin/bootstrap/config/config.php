@@ -21,7 +21,7 @@ return array (
 		'tools' => array(
 			'ico' => 'fa fa-briefcase',
 			'caption' => Core::_('Skin_Bootstrap.admin_menu_tools'),
-			'modules' => array('filemanager', 'typograph', 'schedule'),
+			'modules' => array('filemanager', 'typograph', 'antispam', 'schedule'),
 		),
 		'seo' => array(
 			'ico' => 'fa fa-rocket',

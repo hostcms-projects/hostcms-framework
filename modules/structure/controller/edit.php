@@ -359,6 +359,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$aLibForDir[$oTmpLib->id] = '[' . $oTmpLib->id . '] ' . $oTmpLib->name;
 		}
 		$objectId = intval($this->_object->id);
+		
 		$Select_Lib = Admin_Form_Entity::factory('Select')
 			->name('lib_id')
 			->id('lib_id')

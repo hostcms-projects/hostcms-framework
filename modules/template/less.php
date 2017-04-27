@@ -1273,9 +1273,8 @@ class Template_Less {
 
 	protected function lib_luma($color) {
 	    $color = $this->coerceColor($color);
-	    return (0.2126 * $color[0] / 255) + (0.7152 * $color[1] / 255) + (0.0722 * $color[2] / 255);
+	    return (0.2126 * $color[1] / 255) + (0.7152 * $color[2] / 255) + (0.0722 * $color[3] / 255);
 	}
-
 
 	public function assertColor($value, $error = "expected color value") {
 		$color = $this->coerceColor($value);

@@ -379,17 +379,9 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oRecalcDeliveryPriceLink = Admin_Form_Entity::factory('Link');
 		$oRecalcDeliveryPriceLink
-			->divAttr(array('class' => 'large-link form-group col-lg-12 col-md-12 col-sm-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-3  margin-top-21'))
 			->a
 				->class('btn btn-default')
-				/*->href($this->_Admin_Form_Controller->getAdminActionLoadHref(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId, $additionalParams
-					)
-				)*/
-				/*->onclick($this->_Admin_Form_Controller->getAdminActionLoadAjax(
-						$sOrderPath, 'recalcDelivery', NULL, 0, $iOrderId, $additionalParams
-					)
-				)*/
 				->onclick(
 					$this->_Admin_Form_Controller->getAdminSendForm('recalcDelivery')
 				)
@@ -398,7 +390,16 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->icon
 				->class('fa fa-truck');
 
-		$oMainRow7->add($oRecalcDeliveryPriceLink);
+		$oMainRow6->add($oRecalcDeliveryPriceLink);
+
+		// Add checkbox
+		$oSendMailField = Admin_Form_Entity::factory('Checkbox')
+			->caption(Core::_('Shop_Order.send_mail'))
+			->value(0)
+			->name('send_mail')
+			->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
+
+		$oMainRow7->add($oSendMailField);
 
 		// Печать
 		$oPrintLink = Admin_Form_Entity::factory('Link');
@@ -649,6 +650,16 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					// Предыдущие данные о заказе до редактирования
 					'prev_order_row' => $order_row
 				));
+			}
+		}
+
+		if (Core_Array::get($this->_formValues, 'send_mail'))
+		{
+			try {
+				// Send mail about order
+				$this->_object->sendMail();
+			} catch (Exception $e) {
+				Core_Message::show($e->getMessage(), 'error');
 			}
 		}
 

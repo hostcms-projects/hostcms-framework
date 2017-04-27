@@ -1011,13 +1011,10 @@ class Informationsystem_Item_Model extends Core_Entity
 		$oSearch_Page->inner = 0;
 		$oSearch_Page->module_value_type = 2; // search_page_module_value_type
 		$oSearch_Page->module_value_id = $this->id; // search_page_module_value_id
-
-		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
-
-		//$oSearch_Page->save();
-
 		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
 
+		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
+		
 		return $oSearch_Page;
 	}
 

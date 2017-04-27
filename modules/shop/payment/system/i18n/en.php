@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Payment systems',
@@ -21,7 +21,7 @@ return array(
 	'shop_currency_id' => "<acronym title=\"Currency in which calculation in this payment system is performed\">Currency</acronym>",
 	'system_of_pay_edit_form_title' => "Edit payment system information",
 	'system_of_pay_add_form_title' => "Add payment system information",
-	'system_of_pay_add_form_handler' => "<acronym title=\"Sript of payment system\">Sript</acronym>",
+	'system_of_pay_add_form_handler' => "<acronym title=\"Handler code of payment system\">Handler code</acronym>",
 	'changeStatus_success' => "Activity has been changed",
 	'apply_success' => 'Action data updated successfully.',
 	'apply_error' => 'Error! Action data has not been modified.',

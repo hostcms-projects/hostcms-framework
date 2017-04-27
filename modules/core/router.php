@@ -28,7 +28,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Router
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Router
 {
@@ -41,12 +41,13 @@ class Core_Router
 	/**
 	 * Add route Core_Router_Route with name $routeName for URI with routing rules $uri
 	 * @param $routeName Name of route
-	 * @param $uri
+	 * @param $uri URI pattern
+	 * @param array $expressions list of expressions
 	 * @return Core_Router_Route
 	 */
-	static public function add($routeName, $uri = NULL)
+	static public function add($routeName, $uri = NULL, $expressions = array())
 	{
-		return self::$_routes[$routeName] = new Core_Router_Route($uri);
+		return self::$_routes[$routeName] = new Core_Router_Route($uri, $expressions);
 	}
 
 	/**

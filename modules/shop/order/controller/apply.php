@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Controller_Apply extends Admin_Form_Action_Controller_Type_Apply
 {
@@ -35,6 +35,12 @@ class Shop_Order_Controller_Apply extends Admin_Form_Action_Controller_Type_Appl
 					->shopOrderBeforeAction($oBefore)
 					->changedOrder('apply');
 			}
+		}
+
+		if ($this->_object->shop_order_status_id)
+		{
+			$this->_object->status_datetime = Core_Date::timestamp2sql(time());
+			$this->_object->save();
 		}
 
 		return $this;

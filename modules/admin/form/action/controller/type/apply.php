@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Admin_Form_Action_Controller_Type_Apply extends Admin_Form_Action_Controller
 {
@@ -56,7 +56,8 @@ class Admin_Form_Action_Controller_Type_Apply extends Admin_Form_Action_Controll
 					$this->_object->$columnName = $value;
 					$bChanged = TRUE;
 				}
-				else/*if (method_exists($this->_object, $columnName))*/
+				//else/*if (method_exists($this->_object, $columnName))*/
+				elseif (method_exists($this->_object, $columnName))
 				{
 					$this->_object->$columnName($value);
 					$bChanged = TRUE;

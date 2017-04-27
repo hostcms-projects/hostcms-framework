@@ -335,9 +335,10 @@ class Core_Session
 	/**
 	 * Set session maxlifetime
 	 * @param int $maxlifetime
+	 * @param boolean $overwrite Overwrite maximum lifetime, default FALSE
 	 * @return TRUE
 	 */
-	static public function setMaxLifeTime($maxlifetime)
+	static public function setMaxLifeTime($maxlifetime, $overwrite = FALSE)
 	{
 		self::$_maxlifetime = $maxlifetime;
 
@@ -349,11 +350,14 @@ class Core_Session
 		// Для уже запущенной сесии обновляем время жизни
 		if (self::$_started)
 		{
-			Core_QueryBuilder::update('sessions')
+			$oCore_QueryBuilder = Core_QueryBuilder::update('sessions')
 				->set('maxlifetime', $maxlifetime)
-				->where('id', '=', session_id())
-				->where('maxlifetime', '<', $maxlifetime)
-				->execute();
+				->where('id', '=', session_id());
+
+			!$overwrite
+				&& $oCore_QueryBuilder->where('maxlifetime', '<', $maxlifetime);
+
+			$oCore_QueryBuilder->execute();
 
 			// Set cookie with expiration date
 			//self::_setCookie();

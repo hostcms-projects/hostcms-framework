@@ -493,76 +493,89 @@ abstract class Shop_Payment_System_Handler
 				&& $this->_shopOrder->Siteuser->id
 		)
 		{
-			$fCurrencyCoefficient = $this->_shopOrder->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
-				? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
-					$this->_shopOrder->Shop_Currency,
-					$oShop->Shop_Currency
-				)
-				: 0;
-
-			// Остаток на счете пользователя в валюте магазина
-			$fSiteuserAmount = $this->_shopOrder->Siteuser->getTransactionsAmount($oShop);
-
-			// На счете есть средства
-			if ($fSiteuserAmount)
-			{
-				// Сумма заказа в валюте магазина
-				$fOrderAmount = $this->_shopOrder->getAmount() * $fCurrencyCoefficient;
-
-				// Сумма заказа меньше или равна средствам
-				$fBonusesAmount = $fSiteuserAmount > $fOrderAmount
-					? $fOrderAmount
-					: $fSiteuserAmount;
-
-				// Проведение транзакции по списанию предоплаты бонусами
-				$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');
-				$oShop_Siteuser_Transaction->shop_id = $oShop->id;
-				$oShop_Siteuser_Transaction->siteuser_id = $this->_shopOrder->Siteuser->id;
-				$oShop_Siteuser_Transaction->active = 1;
-
-				$oShop_Siteuser_Transaction->amount_base_currency =
-					$oShop_Siteuser_Transaction->amount = $fBonusesAmount * -1;
-
-				$oShop_Siteuser_Transaction->shop_currency_id = $this->_shopOrder->shop_currency_id;
-				$oShop_Siteuser_Transaction->shop_order_id = $this->_shopOrder->id;
-				$oShop_Siteuser_Transaction->type = 0;
-				$oShop_Siteuser_Transaction->description = Core::_('Shop_Bonus.paid_by_bonuses');
-				$oShop_Siteuser_Transaction->save();
-
-				// Списание оплаченной суммы из цены заказа
-				$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
-				$oShop_Order_Item->name = Core::_('Shop_Bonus.paid_by_bonuses');
-				$oShop_Order_Item->quantity = 1;
-				$oShop_Order_Item->rate = 0;
-				$oShop_Order_Item->price = $fBonusesAmount * -1;
-				$oShop_Order_Item->marking = '';
-				$oShop_Order_Item->type = 3; // 3 - Списание бонусов в счет оплаты счета
-				$this->_shopOrder->add($oShop_Order_Item);
-
-				// Опачена полная сумма
-				if ($fBonusesAmount == $fOrderAmount)
-				{
-					$oBefore = clone $this->_shopOrder;
-
-					$this->_shopOrder->paid();
-
-					// Установка XSL-шаблонов в соответствии с настройками в узле структуры
-					$this->setXSLs();
-
-					// Отправка писем клиенту и пользователю
-					$this->send();
-
-					ob_start();
-
-					$this
-						->shopOrderBeforeAction($oBefore)
-						->changedOrder('changeStatusPaid');
-					ob_get_clean();
-				}
-			}
+			$this->_applyBonuses();
 		}
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterProcessOrder', $this);
+
+		return $this;
+	}
+
+	/**
+	 * Apply bonuses, order amount decrease.
+	 * @return self
+	 */
+	protected function _applyBonuses()
+	{
+		$oShop = $this->_Shop_Payment_System_Model->Shop;
+
+		$fCurrencyCoefficient = $this->_shopOrder->Shop_Currency->id > 0 && $oShop->Shop_Currency->id > 0
+			? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+				$this->_shopOrder->Shop_Currency,
+				$oShop->Shop_Currency
+			)
+			: 0;
+
+		// Остаток на счете пользователя в валюте магазина
+		$fSiteuserAmount = $this->_shopOrder->Siteuser->getTransactionsAmount($oShop);
+
+		// На счете есть средства
+		if ($fSiteuserAmount)
+		{
+			// Сумма заказа в валюте магазина
+			$fOrderAmount = $this->_shopOrder->getAmount() * $fCurrencyCoefficient;
+
+			// Сумма заказа меньше или равна средствам
+			$fBonusesAmount = $fSiteuserAmount > $fOrderAmount
+				? $fOrderAmount
+				: $fSiteuserAmount;
+
+			// Проведение транзакции по списанию предоплаты бонусами
+			$oShop_Siteuser_Transaction = Core_Entity::factory('Shop_Siteuser_Transaction');
+			$oShop_Siteuser_Transaction->shop_id = $oShop->id;
+			$oShop_Siteuser_Transaction->siteuser_id = $this->_shopOrder->Siteuser->id;
+			$oShop_Siteuser_Transaction->active = 1;
+
+			$oShop_Siteuser_Transaction->amount_base_currency =
+				$oShop_Siteuser_Transaction->amount = $fBonusesAmount * -1;
+
+			$oShop_Siteuser_Transaction->shop_currency_id = $this->_shopOrder->shop_currency_id;
+			$oShop_Siteuser_Transaction->shop_order_id = $this->_shopOrder->id;
+			$oShop_Siteuser_Transaction->type = 0;
+			$oShop_Siteuser_Transaction->description = Core::_('Shop_Bonus.paid_by_bonuses');
+			$oShop_Siteuser_Transaction->save();
+
+			// Списание оплаченной суммы из цены заказа
+			$oShop_Order_Item = Core_Entity::factory('Shop_Order_Item');
+			$oShop_Order_Item->name = Core::_('Shop_Bonus.paid_by_bonuses');
+			$oShop_Order_Item->quantity = 1;
+			$oShop_Order_Item->rate = 0;
+			$oShop_Order_Item->price = $fBonusesAmount * -1;
+			$oShop_Order_Item->marking = '';
+			$oShop_Order_Item->type = 3; // 3 - Списание бонусов в счет оплаты счета
+			$this->_shopOrder->add($oShop_Order_Item);
+
+			// Опачена полная сумма
+			if ($fBonusesAmount == $fOrderAmount)
+			{
+				$oBefore = clone $this->_shopOrder;
+
+				$this->_shopOrder->paid();
+
+				// Установка XSL-шаблонов в соответствии с настройками в узле структуры
+				$this->setXSLs();
+
+				// Отправка писем клиенту и пользователю
+				$this->send();
+
+				ob_start();
+
+				$this
+					->shopOrderBeforeAction($oBefore)
+					->changedOrder('changeStatusPaid');
+				ob_get_clean();
+			}
+		}
 
 		return $this;
 	}
@@ -1238,6 +1251,42 @@ abstract class Shop_Payment_System_Handler
 	}
 
 	/**
+	 * Set Mail Subjects
+	 * @return self
+	 */
+	public function setMailSubjects()
+	{
+		$oShop = $this->getShopOrder()->Shop;
+
+		$date_str = Core_Date::sql2datetime($this->getShopOrder()->datetime);
+
+		// Изменение темы письма при оплате
+		if ($this->getShopOrder()->paid)
+		{
+			$this->adminMailSubject(
+				sprintf($oShop->confirm_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
+			);
+
+			$this->siteuserMailSubject(
+				sprintf($oShop->confirm_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
+			);
+		}
+		// Изменение темы письма при отмене заказа
+		elseif ($this->getShopOrder()->canceled)
+		{
+			$this->adminMailSubject(
+				sprintf($oShop->cancel_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
+			);
+
+			$this->siteuserMailSubject(
+				sprintf($oShop->cancel_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
+			);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Уведомление об операциях с заказом
 	 * @param string $mode режим изменения:
 	 * - apply - применение изменений заказа из списка заказа, включая изменение статуса
@@ -1255,33 +1304,7 @@ abstract class Shop_Payment_System_Handler
 			if ($this->getShopOrderBeforeAction()->paid != $this->getShopOrder()->paid
 				|| $this->getShopOrderBeforeAction()->canceled != $this->getShopOrder()->canceled)
 			{
-				$date_str = Core_Date::sql2datetime($this->getShopOrder()->datetime);
-
-				$oShop = $this->getShopOrder()->Shop;
-
-				// Изменение темы письма при оплате
-				if ($this->getShopOrder()->paid)
-				{
-
-					$this->adminMailSubject(
-						sprintf($oShop->confirm_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
-					);
-
-					$this->siteuserMailSubject(
-						sprintf($oShop->confirm_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
-					);
-				}
-				// Изменение темы письма при отмене заказа
-				elseif ($this->getShopOrder()->canceled)
-				{
-					$this->adminMailSubject(
-						sprintf($oShop->cancel_admin_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
-					);
-
-					$this->siteuserMailSubject(
-						sprintf($oShop->cancel_user_subject, $this->getShopOrder()->invoice, $oShop->name, $date_str)
-					);
-				}
+				$this->setMailSubjects();
 
 				// Установка XSL-шаблонов в соответствии с настройками в узле структуры
 				$this->setXSLs();

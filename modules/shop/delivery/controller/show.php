@@ -111,7 +111,7 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 						foreach ($aPrice as $key => $object)
 						{
-							if(!is_object($object))
+							if (!is_object($object))
 							{
 								$tmp = $object;
 								$object = new StdClass();
@@ -125,7 +125,7 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 							$_SESSION['hostcmsOrder']['deliveries'][$sIndex] = array(
 								'shop_delivery_id' => $oShop_Delivery->id,
 								'price' => $object->price,
-								'rate' => (isset($object->rate) ? intval($object->rate) : 0),
+								'rate' => isset($object->rate) ? intval($object->rate) : 0,
 								'name' => $object->description
 							);
 
@@ -133,13 +133,21 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 								->name('shop_delivery_condition')
 								->addAttribute('id', $sIndex . '#')
 								->addEntity(
-									Core::factory('Core_Xml_Entity')->name('shop_delivery_id')->value($oShop_Delivery->id)
+									Core::factory('Core_Xml_Entity')
+										->name('shop_delivery_id')
+										->value($oShop_Delivery->id)
 								)->addEntity(
-									Core::factory('Core_Xml_Entity')->name('shop_currency_id')->value($oShop_Delivery->Shop->shop_currency_id)
+									Core::factory('Core_Xml_Entity')
+										->name('shop_currency_id')
+										->value($oShop_Delivery->Shop->shop_currency_id)
 								)->addEntity(
-									Core::factory('Core_Xml_Entity')->name('price')->value($object->price)
+									Core::factory('Core_Xml_Entity')
+										->name('price')
+										->value($object->price)
 								)->addEntity(
-									Core::factory('Core_Xml_Entity')->name('description')->value($object->description)
+									Core::factory('Core_Xml_Entity')
+										->name('description')
+										->value($object->description)
 								);
 
 							$aShop_Delivery_Condition[] = $oShop_Delivery_Condition;
@@ -160,7 +168,7 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 			{
 				foreach ($aShop_Delivery_Condition as $oShop_Delivery_Condition)
 				{
-					if(!is_null($oShop_Delivery_Condition))
+					if (!is_null($oShop_Delivery_Condition))
 					{
 						$oShop_Delivery_Clone = clone $oShop_Delivery;
 
@@ -260,4 +268,5 @@ class Shop_Delivery_Controller_Show extends Core_Controller
 
 		return $this;
 	}
+
 }

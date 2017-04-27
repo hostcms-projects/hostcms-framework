@@ -154,6 +154,7 @@ class Core
 			'translate' => TRUE,
 			'chat' => TRUE,
 			'switchSelectToAutocomplete' => 100,
+			'backendSessionLifetime' => 14400
 		);
 	}
 

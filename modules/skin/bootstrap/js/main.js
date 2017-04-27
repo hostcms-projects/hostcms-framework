@@ -791,7 +791,7 @@ function isEmpty(str) {
 					var item = jQuery(this).css('display', 'none'),
 					jInput = jQuery('<input>').prop('type', 'text').on('blur', function() {
 						var input = jQuery(this), item = input.prev();
-						item.html(input.val()).css('display', '');
+						item.text(input.val()).css('display', '');
 						input.remove();
 						settings.save(item, settings);
 					}).on('keydown', function(e){

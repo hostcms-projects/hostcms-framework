@@ -10,7 +10,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Mail
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Mail_Imap extends Core_Servant_Properties
 {
@@ -416,14 +416,18 @@ class Core_Mail_Imap extends Core_Servant_Properties
 			$body = imap_fetchbody($this->_stream, $i + 1, $iStructurePartNumber + 1);
 			$body = $this->_bodyDecode($body, $aStructurePart['encoding']);
 
-			// Change encoding
+			// $aStructurePart encoding
 			$charset = isset($aStructurePart['charset']) && $aStructurePart['charset'] != ''
-				? $aStructurePart['charset'] : NULL;
+				? $aStructurePart['charset']
+				: NULL;
 
-			is_null($charset) && $charset = isset($aStructurePart['parameters']['charset']) && $aStructurePart['parameters']['charset'] != ''
-				? $aStructurePart['parameters']['charset'] : NULL;
+			is_null($charset) && $charset = isset($aStructurePart['parameters']['charset'])
+				&& $aStructurePart['parameters']['charset'] != ''
+					? $aStructurePart['parameters']['charset']
+					: NULL;
 
-			!is_null($charset) && $body = mb_convert_encoding($body, 'UTF-8', $charset);
+			!is_null($charset)
+				&& $body = mb_convert_encoding($body, 'UTF-8', $charset);
 
 			$partType = Core_Array::get($aStructurePart, 'type', 0);
 
@@ -436,6 +440,16 @@ class Core_Mail_Imap extends Core_Servant_Properties
 						// Можно добавить параметр с предпочтительной кодировкой
 						foreach ($aStructurePart['parts'] as $iPartNumber => $aPart)
 						{
+							// $aPart encoding
+							$partCharset = isset($aPart['charset']) && $aPart['charset'] != ''
+								? $aPart['charset']
+								: NULL;
+
+							is_null($partCharset) && $partCharset = isset($aPart['parameters']['charset'])
+								&& $aPart['parameters']['charset'] != ''
+									? $aPart['parameters']['charset']
+									: NULL;
+
 							/*
 							()Root Message Part (multipart/related)
 							(1) The text parts of the message (multipart/alternative)
@@ -447,9 +461,14 @@ class Core_Mail_Imap extends Core_Servant_Properties
 								($iPartNumber + 1) / 10
 							);
 
-							$this->_aMessages[$i]['multipart'][$aPart['subtype']] = $this->_bodyDecode(
+							$sPartBody = $this->_bodyDecode(
 								imap_fetchbody($this->_stream, $i + 1, $massageNumber), $aPart['encoding']
 							);
+
+							!is_null($partCharset)
+								&& $sPartBody = mb_convert_encoding($sPartBody, 'UTF-8', $partCharset);
+
+							$this->_aMessages[$i]['multipart'][$aPart['subtype']] = $sPartBody;
 						}
 
 						if (isset($this->_aMessages[$i]['multipart']['HTML']))

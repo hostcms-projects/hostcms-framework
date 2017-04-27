@@ -964,7 +964,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		*/
 		if ($this->importAction == 0
 			&& count((array)$this->_oSimpleXMLElement->Классификатор)
-			&& count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0)
+			&& count((array)$this->_oSimpleXMLElement->ПакетПредложений) == 0
+			&& count((array)$this->_oSimpleXMLElement->ИзмененияПакетаПредложений) == 0
+		)
 		{
 			Core_QueryBuilder::update('shop_groups')
 				->set('deleted', 1)
@@ -994,7 +996,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		)
 		{
 			// Файл import.xml
-			if (!isset($this->_oSimpleXMLElement->ПакетПредложений))
+			if (
+				!isset($this->_oSimpleXMLElement->ПакетПредложений)
+				&& !isset($this->_oSimpleXMLElement->ИзмененияПакетаПредложений)
+			)
 			{
 				$importPosition = Core_Array::getSession('importPosition', 0);
 
@@ -1177,6 +1182,11 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						}
 					}
 
+					if ($oShopItem->modification_id)
+					{
+						$oShopItem->shop_group_id = 0;
+					}
+
 					if ($oShopItem->id && $this->importAction == 1 && !is_null($oShopItem->name))
 					{
 						$oShopItem->save();
@@ -1327,14 +1337,21 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 				}
 			}
 			// Файл offers.xml
-			elseif (isset($this->_oSimpleXMLElement->ПакетПредложений) && !isset($this->_oSimpleXMLElement->Каталог))
+			elseif (
+				(isset($this->_oSimpleXMLElement->ПакетПредложений)
+					|| isset($this->_oSimpleXMLElement->ИзмененияПакетаПредложений)
+				)
+				&& !isset($this->_oSimpleXMLElement->Каталог)
+			)
 			{
 				$classifier = $this->_oSimpleXMLElement->Классификатор;
 
 				// Импортируем дополнительные свойства товаров
 				$this->_importProperties($classifier);
 
-				$packageOfProposals = $this->_oSimpleXMLElement->ПакетПредложений;
+				$packageOfProposals = isset($this->_oSimpleXMLElement->ПакетПредложений)
+					? $this->_oSimpleXMLElement->ПакетПредложений
+					: $this->_oSimpleXMLElement->ИзмененияПакетаПредложений;
 
 				// Обработка специальных цен
 				foreach ($this->xpath($packageOfProposals, 'ТипыЦен/ТипЦены') as $oPrice)
@@ -1964,7 +1981,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 	{
 		if (isset($oNode->БазоваяЕдиница))
 		{
-			$okei = strval($oNode->БазоваяЕдиница->attributes()->Код);
+			$okei = trim(strval($oNode->БазоваяЕдиница->attributes()->Код));
 
 			// Получаем по коду ОКЕЙ
 			$oShopMeasure = strlen($okei)
@@ -1974,7 +1991,10 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 			// Получаем по названию
 			if (is_null($oShopMeasure))
 			{
-				$sMeasure = strval($oNode->БазоваяЕдиница);
+				$sMeasure = trim(strval($oNode->БазоваяЕдиница));
+				$sMeasureFull = trim(strval($oNode->БазоваяЕдиница->attributes()->НаименованиеПолное));
+
+				$sMeasure == '' && $sMeasure = $sMeasureFull;
 
 				if ($sMeasure != '')
 				{
@@ -1983,8 +2003,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 					if (is_null($oShopMeasure))
 					{
 						$oShopMeasure = Core_Entity::factory('Shop_Measure');
-						$oShopMeasure->name = strval($sMeasure);
-						$oShopMeasure->description = strval($oNode->БазоваяЕдиница->attributes()->НаименованиеПолное);
+						$oShopMeasure->name = $sMeasure;
+						$oShopMeasure->description = $sMeasureFull;
 						$oShopMeasure->okei = $okei;
 						$oShopMeasure->save();
 					}

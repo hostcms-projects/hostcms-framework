@@ -397,7 +397,10 @@ abstract class Core_Mail
 
 		$sTo = !is_null($this->_recipientName)
 			? '=?UTF-8?B?' . base64_encode($this->_recipientName) . "?= <{$this->_to}>"
-			: "<{$this->_to}>";
+			: (strlen($this->_to)
+					? "<{$this->_to}>"
+					: ''
+			);
 
 		if (!isset($this->_headers['Reply-To']))
 		{

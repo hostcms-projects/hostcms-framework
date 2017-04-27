@@ -304,7 +304,7 @@ class Site_Alias_Model extends Core_Entity
 	public function nameBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
 		$this->name != '' && Core::factory('Core_Html_Entity_A')
-			->href('http://' . $this->name)
+			->href('http://' . $this->alias_name_without_mask)
 			->target('_blank')
 			->add(
 				Core::factory('Core_Html_Entity_I')

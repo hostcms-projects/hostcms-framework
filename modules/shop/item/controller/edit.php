@@ -79,8 +79,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdditionalTab
 					->add($oAdditionalRow1 = Admin_Form_Entity::factory('Div')->class('row'));
 
-				$oMainTab
-					->move($this->getField("apply_purchase_discount"), $oAdditionalRow1);
+				// $oMainTab
+					// ->move($this->getField("apply_purchase_discount"), $oAdditionalRow1);
 
 				$this->getField('image_small_height')
 					->divAttr(array('style' => 'display: none'));
@@ -648,22 +648,41 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				if (count($aWarehouses))
 				{
-					//$oMainTab->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
 					$oMainTab
-						->add($oWarehouseBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+						->add($oWarehouseBlock = Admin_Form_Entity::factory('Div')->class('well with-header shop-item-warehouses-list'));
 
 					$oWarehouseBlock
-						->add(Admin_Form_Entity::factory('Div')
+						->add($oHeaderDiv = Admin_Form_Entity::factory('Div')
 							->class('header bordered-pink')
 							->value(Core::_("Shop_Item.warehouse_header"))
-						)
-						->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+						);
+
+					if ($this->_object->id)
+					{
+						$oHeaderDiv
+							->add(Admin_Form_Entity::factory('A')
+								->value(Core::_("Shop_Item.show_all_warehouses"))
+								->class('pull-right')
+								->onclick('$.toggleWarehouses()')
+							);
+					}
 
 					foreach ($aWarehouses as $oWarehouse)
 					{
 						// Получаем количество товара на текущем складе
 						$oWarehouseItem =
 							$this->_object->Shop_Warehouse_Items->getByWarehouseId($oWarehouse->id);
+
+						$countItems = is_null($oWarehouseItem)
+							? (defined('DEFAULT_REST') ? DEFAULT_REST : 0)
+							: $oWarehouseItem->count;
+
+						$rowClass = !$this->_object->id || $countItems > 0
+							? 'row'
+							: 'row hidden';
+
+						$oWarehouseBlock
+							->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class($rowClass));
 
 						$oWarehouseCurrentRow
 							->add(
@@ -674,16 +693,21 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 							->add(
 								Admin_Form_Entity::factory('Input')
 									//->caption(Core::_("Shop_Item.warehouse_item_count", $oWarehouse->name))
-									->value(is_null($oWarehouseItem)
-										? (defined('DEFAULT_REST') ? DEFAULT_REST : 0)
-										: $oWarehouseItem->count
-									)
+									->value($countItems)
 									->name("warehouse_{$oWarehouse->id}")
-									->divAttr(array('class' => 'form-group col-xs-3 col-sm-4 col-lg-2'))
+									->divAttr(array('class' => 'form-group col-xs-3 col-sm-4 col-md-2'))
 							);
 
-						$oWarehouseBlock
-							->add($oWarehouseCurrentRow = Admin_Form_Entity::factory('Div')->class('row'));
+						if ($this->_object->id)
+						{
+							$oWarehouseCurrentRow
+								->add(Admin_Form_Entity::factory('Div')
+									->class('margin-top-10')
+									->value(htmlspecialchars(
+										$this->_object->Shop_Measure->name
+									))
+								);
+						}
 					}
 				}
 
@@ -708,8 +732,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainTab
 					->move($this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-sm-8')), $oMainRow8)
 					->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow8)
-					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9)
-					->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow9);
+					->move($this->getField('indexing')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow9)
+					->move($this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow9)
+					->move($this->getField('apply_purchase_discount')->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow9);
 
 				// Заполняем вкладку специальных цен
 				$aShop_Specialprices = $this->_object->Shop_Specialprices->findAll();

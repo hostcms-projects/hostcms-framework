@@ -816,8 +816,8 @@ class Template_Model extends Core_Entity
 				$this->save();
 
 				$this->saveTemplateFile(Core_Array::get($aBackup, 'template'));
-				$this->saveTemplateCssFile(Core_Array::get($aBackup, 'css'));
 				$this->saveTemplateLessFile(Core_Array::get($aBackup, 'less'));
+				$this->saveTemplateCssFile(Core_Array::get($aBackup, 'css'));
 				$this->saveTemplateJsFile(Core_Array::get($aBackup, 'js'));
 				$this->saveManifestFile(Core_Array::get($aBackup, 'manifest'));
 			}

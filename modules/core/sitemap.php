@@ -62,7 +62,8 @@ class Core_Sitemap extends Core_Servant_Properties
 		$this->_oSite = $oSite;
 
 		$this->_aSiteuserGroups = array(0, -1);
-		if (Core::moduleIsActive('siteuser'))
+		// Exclude close site pages
+		/*if (Core::moduleIsActive('siteuser'))
 		{
 			$oSiteuser = Core_Entity::factory('Siteuser')->getCurrent();
 
@@ -74,7 +75,7 @@ class Core_Sitemap extends Core_Servant_Properties
 					$this->_aSiteuserGroups[] = $oSiteuser_Group->id;
 				}
 			}
-		}
+		}*/
 
 		$this->rebuildTime = 14400; // 4 часа
 		$this->limit = 1000;

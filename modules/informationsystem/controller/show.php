@@ -60,7 +60,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Show extends Core_Controller
 {
@@ -1030,13 +1030,18 @@ class Informationsystem_Controller_Show extends Core_Controller
 					{
 						foreach ($aProperty_Values as $oProperty_Value)
 						{
-							isset($this->groupsProperties[$oProperty_Value->property_id]) && $oInformationsystem_Group->addEntity($oProperty_Value);
+							isset($this->groupsProperties[$oProperty_Value->property_id])
+								&& $oInformationsystem_Group->addEntity($oProperty_Value);
 						}
 					}
 					else
 					{
 						$oInformationsystem_Group->addEntities($aProperty_Values);
 					}
+				}
+				else
+				{
+					$oInformationsystem_Group->showXmlProperties(FALSE);
 				}
 
 				$parentObject->addEntity($oInformationsystem_Group);

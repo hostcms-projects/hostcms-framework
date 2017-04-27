@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Trash
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Trash_Dataset extends Admin_Form_Dataset
 {
@@ -94,6 +94,10 @@ class Trash_Dataset extends Admin_Form_Dataset
 
 		$queryBuilder = Core_QueryBuilder::select();
 
+		$aConfig = Core_Config::instance()->get('trash_config', array()) + array(
+			'maxExactCount' => 100000
+		);
+
 		foreach ($aTables as $key => $aTableRow)
 		{
 			$name = Core_Array::get($aTableRow, 'Name');
@@ -106,7 +110,7 @@ class Trash_Dataset extends Admin_Form_Dataset
 
 			if (isset($aColumns['deleted']))
 			{
-				if ($iRows < 100000 || $sEngine == 'MYISAM')
+				if ($iRows < $aConfig['maxExactCount'] || $sEngine == 'MYISAM')
 				{
 					$row = $queryBuilder
 						->clear()

@@ -282,7 +282,7 @@ class Core_Auth
 	 */
 	static public function adminSessionStart()
 	{
-		Core_Session::setMaxLifeTime(14400);
+		Core_Session::setMaxLifeTime(Core::$mainConfig['backendSessionLifetime'], TRUE);
 		Core_Session::start();
 	}
 

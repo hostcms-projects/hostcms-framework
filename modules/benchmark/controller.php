@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Benchmark
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк"(Hostmake LLC), http://www.hostcms.ru
  */
 class Benchmark_Controller
 {
@@ -300,7 +300,35 @@ class Benchmark_Controller
 		// Удаляем старые данные из таблицы статистики
 		Core_DataBase::instance()->setQueryType(3)
 			->query("DELETE LOW_PRIORITY QUICK FROM `benchmark_urls` WHERE `datetime` < '{$date_storage}' LIMIT 5000");
-			
+
 		return $this;
+	}
+
+	/**
+	 * Get DataBase Storage Engines
+	 * @return array
+	 */
+	static public function getStorageEngines()
+	{
+		$aResult = Core_DataBase::instance()->setQueryType(9)
+			->query("SHOW ENGINES")
+			->asAssoc()
+			->result();
+
+		return $aResult;
+	}
+
+	/**
+	 * Get list of tables
+	 * @return array
+	 */
+	static public function getTables()
+	{
+		$aResult = Core_DataBase::instance()->setQueryType(9)
+			->query("SHOW TABLE STATUS")
+			->asAssoc()
+			->result();
+
+		return $aResult;
 	}
 }

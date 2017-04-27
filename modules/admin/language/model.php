@@ -27,7 +27,8 @@ class Admin_Language_Model extends Core_Entity
 	 * @var array
 	 */
 	protected $_hasMany = array(
-		'admin_word_value' => array()
+		'admin_word_value' => array(),
+		'antispam_country_language' => array()
 	);
 
 	/**
@@ -126,6 +127,9 @@ class Admin_Language_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
 
 		$this->Admin_Word_Values->deleteAll(FALSE);
+
+		Core::moduleIsActive('antispam')
+			&& $this->Antispam_Country_Languages->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}

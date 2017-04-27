@@ -196,7 +196,7 @@ class Shop_Order_Model extends Core_Entity
 		if ($this->shop_payment_system_id)
 		{
 			$oShop_Payment_System_Handler = Shop_Payment_System_Handler::factory(
-				Core_Entity::factory('Shop_Payment_System', $this->shop_payment_system_id)
+				$this->Shop_Payment_System
 			);
 
 			if ($oShop_Payment_System_Handler)
@@ -264,7 +264,7 @@ class Shop_Order_Model extends Core_Entity
 	{
 		$quantity = 0;
 
-		$aOrderItems = $this->Shop_Order_Items->findAll();
+		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
 		foreach($aOrderItems as $oShop_Order_Item)
 		{
 			$quantity += $oShop_Order_Item->quantity;
@@ -303,7 +303,7 @@ class Shop_Order_Model extends Core_Entity
 	{
 		$weight = 0;
 
-		$aOrderItems = $this->Shop_Order_Items->findAll();
+		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
 		foreach($aOrderItems as $oShop_Order_Item)
 		{
 			$weight += $oShop_Order_Item->Shop_Item->weight * $oShop_Order_Item->quantity;
@@ -380,7 +380,7 @@ class Shop_Order_Model extends Core_Entity
 
 		$oShop_Controller = Shop_Controller::instance();
 
-		$aOrderItems = $this->Shop_Order_Items->findAll();
+		$aOrderItems = $this->Shop_Order_Items->findAll(FALSE);
 		$oShop = $this->Shop;
 
 		foreach ($aOrderItems as $oShop_Order_Item)
@@ -781,7 +781,7 @@ class Shop_Order_Model extends Core_Entity
 
 		if ($this->_showXmlItems)
 		{
-			$aShop_Order_Items = $this->Shop_Order_Items->findAll();
+			$aShop_Order_Items = $this->Shop_Order_Items->findAll(FALSE);
 			foreach ($aShop_Order_Items as $oShop_Order_Item)
 			{
 				$this->addEntity(
@@ -887,7 +887,7 @@ class Shop_Order_Model extends Core_Entity
 		$mode = $this->paid == 0 ? -1 : 1;
 
 		// Получаем список товаров заказа
-		$aShop_Order_Items = $this->Shop_Order_Items->findAll();
+		$aShop_Order_Items = $this->Shop_Order_Items->findAll(FALSE);
 		foreach ($aShop_Order_Items as $oShop_Order_Item)
 		{
 			$oShop_Item = $oShop_Order_Item->Shop_Item;
@@ -1071,7 +1071,7 @@ class Shop_Order_Model extends Core_Entity
 					// Не включать стоимость доставки в расчет вознаграждения, вычитаем из суммы заказа
 					if ($oAffiliate_Plan->include_delivery == 0)
 					{
-						$aShop_Order_Items = $this->Shop_Order_Items->findAll();
+						$aShop_Order_Items = $this->Shop_Order_Items->findAll(FALSE);
 						foreach ($aShop_Order_Items as $oShop_Order_Item)
 						{
 							// Товар является доставкой
@@ -1233,7 +1233,7 @@ class Shop_Order_Model extends Core_Entity
 		$newObject->invoice = $newObject->id;
 		$newObject->save();
 
-		$aShop_Order_Items = $this->Shop_Order_Items->findAll();
+		$aShop_Order_Items = $this->Shop_Order_Items->findAll(FALSE);
 		foreach($aShop_Order_Items as $oShop_Order_Item)
 		{
 			$newObject->add(clone $oShop_Order_Item);
@@ -1438,5 +1438,31 @@ class Shop_Order_Model extends Core_Entity
 			->value($count < 100 ? $count : '∞')
 			->title($count)
 			->execute();
+	}
+
+	/**
+	 * Send order e-mails
+	 * @return self
+	 */	
+	public function sendMail()
+	{
+		if ($this->shop_payment_system_id && $this->Shop_Order_items->getCount())
+		{
+			$oShop_Payment_System_Handler = Shop_Payment_System_Handler::factory(
+				$this->Shop_Payment_System
+			);
+
+			if ($oShop_Payment_System_Handler)
+			{
+				$oShop_Payment_System_Handler
+					->shopOrder($this)
+					->shopOrderBeforeAction(clone $this)
+					->setMailSubjects()
+					->setXSLs()
+					->send();
+			}
+		}
+		
+		return $this;
 	}
 }

@@ -189,7 +189,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 														if ($oCurrentAlias)
 														{
 															$href = ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id;
-															
+
 															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo htmlspecialchars($href)?>" target="_blank"><i class="fa fa-external-link"></i></a><?php
 														}
 													}
@@ -231,11 +231,12 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 		$oLast_Shop_Orders = Core_Entity::factory('Shop_Order');
 		$oLast_Shop_Orders
 			->queryBuilder()
+			->straightJoin()
 			->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
 			->where('shops.site_id', '=', CURRENT_SITE)
 			->clearOrderBy()
 			->orderBy('datetime', 'DESC')
-			->limit(4);
+			->limit(9);
 
 		$aLast_Shop_Orders = $oLast_Shop_Orders->findAll(FALSE);
 
@@ -262,7 +263,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 					// Arrays with default values
 					$aPaidAmount = $aPaid = $aOrderedAmount = $aOrdered;
 
-					$limit = 100;
+					$limit = 1000;
 					$offset = 0;
 
 					// Ordered
@@ -270,14 +271,15 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						$oShop_Orders = Core_Entity::factory('Shop_Order');
 						$oShop_Orders
 							->queryBuilder()
+							->straightJoin()
 							->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
 							->where('shops.site_id', '=', CURRENT_SITE)
 							->where('shop_orders.datetime', '>=', date('Y-m-d 00:00:00', $iBeginTimestamp))
-							->where('shop_orders.datetime', '<=', $sEndTimestamp)
+							//->where('shop_orders.datetime', '<=', $sEndTimestamp)
 							->offset($offset)
 							->limit($limit)
 							->clearOrderBy()
-							->orderBy('datetime', 'ASC');
+							->orderBy('id', 'ASC');
 
 						$aShop_Orders = $oShop_Orders->findAll(FALSE);
 
@@ -313,7 +315,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 							->offset($offset)
 							->limit($limit)
 							->clearOrderBy()
-							->orderBy('payment_datetime', 'ASC');
+							->orderBy('id', 'ASC');
 
 						$aShop_Orders = $oShop_Orders->findAll(FALSE);
 
@@ -423,6 +425,237 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 									</div>
 								</div>
 						</div>
+
+						<?php
+						$aConfig = Core::$config->get('shop_order_config') + array(
+							'indexMostOrderedDays' => 10,
+							'indexBrandDays' => 30,
+							'Pie3D' => array(
+								'E75B8D',
+								'FB6E52',
+								'FFCE55',
+								'A0D468',
+								'2DC3E8',
+								'6F85BF',
+								'CC324B',
+								'65B045',
+								'5DB2FF',
+								'FFF1A8',
+								'E46F61',
+								'008cd2'
+							),
+							'cutNames' => 20
+						);
+
+						$aColors = Core_Array::get(Core::$config->get('shop_order_config'), 'Pie3D', array());
+						$iCountColors = count($aColors);
+						$sWindowId = 'id_content';
+
+						$oMost_Ordered_Shop_Items = Core_Entity::factory('Shop_Order_Item');
+						$oMost_Ordered_Shop_Items
+							->queryBuilder()
+							->select(array(Core_QueryBuilder::expression('SUM(shop_order_items.quantity)'), 'sum'))
+							->join('shop_orders', 'shop_orders.id', '=', 'shop_order_items.shop_order_id')
+							->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
+							->where('shops.site_id', '=', CURRENT_SITE)
+							->where('shops.deleted', '=', 0)
+							->where('shop_order_items.type', '=', 0)
+							->where('shop_order_items.price', '>', 0)
+							->where('shop_orders.datetime', '>', date('Y-m-d 00:00:00', strtotime("-{$aConfig['indexMostOrderedDays']} day")))
+							->where('shop_orders.deleted', '=', 0)
+							->limit(10)
+							->groupBy('shop_order_items.shop_item_id')
+							->clearOrderBy()
+							->orderBy('sum', 'DESC');
+
+						$aMost_Ordered_Shop_Items = $oMost_Ordered_Shop_Items->findAll(FALSE);
+
+						$oBrand_Shop_Items = Core_Entity::factory('Shop_Order_Item');
+						$oBrand_Shop_Items
+							->queryBuilder()
+							->select(array(Core_QueryBuilder::expression('SUM(shop_order_items.quantity)'), 'sum'))
+							->join('shop_items', 'shop_items.id', '=', 'shop_order_items.shop_item_id')
+							->join('shop_orders', 'shop_orders.id', '=', 'shop_order_items.shop_order_id')
+							->join('shops', 'shops.id', '=', 'shop_orders.shop_id')
+							->where('shops.site_id', '=', CURRENT_SITE)
+							->where('shops.deleted', '=', 0)
+							->where('shop_order_items.shop_item_id', '!=', 0)
+							->where('shop_items.shop_producer_id', '!=', 0)
+							->where('shop_orders.datetime', '>', date('Y-m-d 00:00:00', strtotime("-{$aConfig['indexBrandDays']} day")))
+							->where('shop_orders.deleted', '=', 0)
+							->limit(10)
+							->groupBy('shop_items.shop_producer_id')
+							->clearOrderBy()
+							->orderBy('sum', 'DESC');
+
+						$aBrand_Shop_Items = $oBrand_Shop_Items->findAll(FALSE);
+
+						if (count($aMost_Ordered_Shop_Items) || count($aBrand_Shop_Items))
+						{
+							?>
+							<div class="row">
+								<?php
+								if (count($aMost_Ordered_Shop_Items))
+								{
+									?>
+									<div class="col-xs-12 col-md-6">
+										<div class="well padding-top-50">
+											<div class="header bg-azure"><?php echo Core::_('Shop_Order.most_ordered', $aConfig['indexMostOrderedDays'])?></div>
+											<div id="mostOrdered" class="chart"></div>
+										</div>
+
+										<script>
+										$(function() {
+											/* Most ordered items */
+											var mostOrderedDiagramData = [];
+
+											<?php
+											$i = 0;
+											foreach ($aMost_Ordered_Shop_Items as $key => $oShop_Order_Item)
+											{
+												?>
+												mostOrderedDiagramData.push(
+													{
+														label:'<?php echo Core_Str::escapeJavascriptVariable(htmlspecialchars(Core_Str::cut($oShop_Order_Item->name, $aConfig['cutNames'])))?>',
+														data:[<?php echo $oShop_Order_Item->sum?>],
+														color: '#<?php echo $aColors[$key % $iCountColors]?>'
+													}
+												);
+												<?php
+												$i++;
+											}
+											?>
+											var placeholderMostOrderedDiagram = $("#<?php echo $sWindowId?> #mostOrdered");
+
+											$.plot(placeholderMostOrderedDiagram, mostOrderedDiagramData, {
+												series: {
+													pie: {
+														show: true,
+														radius: 1,
+														innerRadius: 0.5,
+
+														label: {
+																show: true,
+																radius: 0,
+																formatter: function(label, series) {
+																				return "<div style='font-size:8pt;'>" + label + "</div>";
+																}
+														}
+													}
+												},
+												legend: {
+													labelFormatter: function (label, series) {
+														return label + ", " + series.data[0][1];
+													}
+												}
+												,
+												grid: {
+													hoverable: true,
+												}
+
+											});
+
+											placeholderMostOrderedDiagram.bind("plothover", function (event, pos, obj) {
+												if (!obj) {
+													return;
+												}
+
+												$("#<?php echo $sWindowId?> #mostOrdered span[id ^= 'pieLabel']").hide();
+												$("#<?php echo $sWindowId?> #mostOrdered span[id ^= 'pieLabel" + obj.seriesIndex + "']").show();
+											});
+
+											placeholderMostOrderedDiagram.resize(function(){$("#<?php echo $sWindowId?> #mostOrdered span[id ^= 'pieLabel']").hide();});
+
+											$("#<?php echo $sWindowId?> #mostOrdered span[id ^= 'pieLabel']").hide();
+										});
+										</script>
+									</div>
+									<?php
+								}
+
+								if (count($aBrand_Shop_Items))
+								{
+									?>
+									<div class="col-xs-12 col-md-6">
+										<div class="well padding-top-50">
+											<div class="header bg-palegreen"><?php echo Core::_('Shop_Order.popular_brands', $aConfig['indexBrandDays'])?></div>
+											<div id="countBrands" class="chart"></div>
+										</div>
+
+										<script>
+										$(function() {
+											/* Brands shop items */
+											var brandsDiagramData = [];
+
+											<?php
+											$i = 0;
+											foreach ($aBrand_Shop_Items as $key => $oShop_Order_Item)
+											{
+												?>
+												brandsDiagramData.push(
+													{
+														label:'<?php echo Core_Str::escapeJavascriptVariable(htmlspecialchars(Core_Str::cut($oShop_Order_Item->Shop_Item->Shop_Producer->name, $aConfig['cutNames'])))?>',
+														data:[<?php echo $oShop_Order_Item->sum?>],
+														color: '#<?php echo $aColors[$key % $iCountColors]?>'
+													}
+												);
+												<?php
+												$i++;
+											}
+											?>
+											var placeholderBrandsDiagram = $("#<?php echo $sWindowId?> #countBrands");
+
+											$.plot(placeholderBrandsDiagram, brandsDiagramData, {
+												series: {
+													pie: {
+														show: true,
+														radius: 1,
+														innerRadius: 0.5,
+
+														label: {
+																show: true,
+																radius: 0,
+																formatter: function(label, series) {
+																	return "<div style='font-size:8pt;'>" + label + "</div>";
+																}
+														}
+													}
+												},
+
+												legend: {
+													labelFormatter: function (label, series) {
+														return label + ", " + series.data[0][1];
+													}
+												}
+												,
+												grid: {
+													hoverable: true,
+												}
+
+											});
+
+											placeholderBrandsDiagram.bind("plothover", function (event, pos, obj) {
+												if (!obj) {
+													return;
+												}
+
+												$("#<?php echo $sWindowId?> #countBrands span[id ^= 'pieLabel']").hide();
+												$("#<?php echo $sWindowId?> #countBrands span[id ^= 'pieLabel" + obj.seriesIndex + "']").show();
+											});
+
+											placeholderBrandsDiagram.resize(function(){$("#<?php echo $sWindowId?> #countBrands span[id ^= 'pieLabel']").hide();});
+
+											$("#<?php echo $sWindowId?> #countBrands span[id ^= 'pieLabel']").hide();
+										});
+										</script>
+									</div>
+									<?php
+								}
+								?>
+							</div>
+							<?php
+						}
+						?>
 					</div>
 					<?php
 					}

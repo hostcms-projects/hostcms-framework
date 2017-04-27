@@ -1549,13 +1549,18 @@ class Shop_Controller_Show extends Core_Controller
 					{
 						foreach ($aProperty_Values as $oProperty_Value)
 						{
-							isset($this->groupsProperties[$oProperty_Value->property_id]) && $oShop_Group->addEntity($oProperty_Value);
+							isset($this->groupsProperties[$oProperty_Value->property_id])
+								&& $oShop_Group->addEntity($oProperty_Value);
 						}
 					}
 					else
 					{
 						$oShop_Group->addEntities($aProperty_Values);
 					}
+				}
+				else
+				{
+					$oShop_Group->showXmlProperties(FALSE);
 				}
 
 				$parentObject->addEntity($oShop_Group);

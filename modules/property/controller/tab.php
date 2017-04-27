@@ -265,13 +265,22 @@ class Property_Controller_Tab extends Core_Servant_Properties
 					switch ($oProperty->type)
 					{
 						case 0: // Int
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input')
+								->format(array('lib' => array(
+									'value' => 'integer'
+								)));
+						break;
+						case 11: // Float
+							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input')
+								->format(array('lib' => array(
+									'value' => 'decimal'
+								)));
+						break;
 						case 1: // String
 						case 10: // Hidden field
-						case 11: // Float
 						default:
 							$oAdmin_Form_Entity = Admin_Form_Entity::factory('Input');
 						break;
-
 						case 2: // File
 
 							$largeImage = array(
@@ -323,7 +332,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 								if (!isset($this->_cacheListOptions[$oProperty->list_id]))
 								{
 									$this->_cacheListOptions[$oProperty->list_id] = array(' … ');
-									
+
 									$aListItems = $oProperty->List->List_Items->getAllByActive(1, FALSE);
 									foreach ($aListItems as $oListItem)
 									{
@@ -790,6 +799,73 @@ class Property_Controller_Tab extends Core_Servant_Properties
 			);
 	}
 
+	static public function getShopItems(Shop_Item_Model $oShop_Item)
+	{
+		$oShop = $oShop_Item->Shop;
+
+		$offset = 0;
+		$limit = 1000;
+
+		switch ($oShop->items_sorting_direction)
+		{
+			case 1:
+				$items_sorting_direction = 'DESC';
+			break;
+			case 0:
+			default:
+				$items_sorting_direction = 'ASC';
+		}
+
+		$oShop_Item
+			->queryBuilder()
+			//->where('shop_items.modification_id', '=', 0)
+			->clearOrderBy()
+			->clearSelect()
+			->select('id', 'shortcut_id', 'modification_id', 'name');
+
+		// Определяем поле сортировки информационных элементов
+		switch ($oShop->items_sorting_field)
+		{
+			case 1:
+				$oShop_Item
+					->queryBuilder()
+					->orderBy('shop_items.name', $items_sorting_direction)
+					->orderBy('shop_items.sorting', $items_sorting_direction);
+				break;
+			case 2:
+				$oShop_Item
+					->queryBuilder()
+					->orderBy('shop_items.sorting', $items_sorting_direction)
+					->orderBy('shop_items.name', $items_sorting_direction);
+				break;
+			case 0:
+			default:
+				$oShop_Item
+					->queryBuilder()
+					->orderBy('shop_items.datetime', $items_sorting_direction)
+					->orderBy('shop_items.sorting', $items_sorting_direction);
+		}
+
+		$objects = array();
+
+		do {
+			$oShop_Item
+				->queryBuilder()
+				->offset($offset)
+				->limit($limit);
+
+			$aTmpObjects = $oShop_Item->findAll(FALSE);
+
+			count($aTmpObjects)
+				&& $objects = array_merge($objects, $aTmpObjects);
+
+			$offset += $limit;
+		}
+		while (count($aTmpObjects));
+
+		return $objects;
+	}
+
 	/**
 	 * Fill shops/items list
 	 * @param int $value shop_item_id
@@ -806,7 +882,10 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 		$group_id = $value == 0
 			? 0
-			: intval($Shop_Item->shop_group_id);
+			: ($Shop_Item->modification
+				? intval($Shop_Item->Modification->shop_group_id)
+				: intval($Shop_Item->shop_group_id)
+			);
 
 		$windowId = $this->_Admin_Form_Controller->getWindowId();
 
@@ -815,7 +894,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 		// Groups
 		$aOptions = Shop_Item_Controller_Edit::fillShopGroup($oProperty->shop_id, 0);
 		$oAdmin_Form_Entity_Shop_Groups
-			->value($Shop_Item->shop_group_id)
+			->value($group_id)
 			->options(array(' … ') + $aOptions)
 			->onchange("$.ajaxRequest({path: '/admin/shop/item/index.php', context: '{$oAdmin_Form_Entity_Shop_Items->id}', callBack: $.loadSelectOptionsCallback, action: 'loadShopItemList',additionalParams: 'shop_group_id=' + this.value + '&shop_id={$oProperty->shop_id}',windowId: '{$windowId}'}); return false");
 
@@ -832,45 +911,11 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 		if ($iCountItems < Core::$mainConfig['switchSelectToAutocomplete'])
 		{
-			// Remove `count` from select list
-			$oShop_Items->queryBuilder()
-				->clearSelect()
-				->select('shop_items.*');
+			$aShop_Items = self::getShopItems($oShop_Items);
 
-			switch ($oShop->items_sorting_direction)
-			{
-				case 1:
-					$items_sorting_direction = 'DESC';
-				break;
-				case 0:
-				default:
-					$items_sorting_direction = 'ASC';
-			}
-
-			// Определяем поле сортировки информационных элементов
-			switch ($oShop->items_sorting_field)
-			{
-				case 1:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.name', $items_sorting_direction)
-						->orderBy('shop_items.sorting', $items_sorting_direction);
-					break;
-				case 2:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.sorting', $items_sorting_direction)
-						->orderBy('shop_items.name', $items_sorting_direction);
-					break;
-				case 0:
-				default:
-					$oShop_Items
-						->queryBuilder()
-						->orderBy('shop_items.datetime', $items_sorting_direction)
-						->orderBy('shop_items.sorting', $items_sorting_direction);
-			}
-
-			$aShop_Items = $oShop_Items->findAll(FALSE);
+			$aConfig = Core_Config::instance()->get('property_config', array()) + array(
+				'select_modifications' => TRUE,
+			);
 
 			$aOptions = array(' … ');
 			foreach ($aShop_Items as $oShop_Item)
@@ -878,6 +923,25 @@ class Property_Controller_Tab extends Core_Servant_Properties
 				$aOptions[$oShop_Item->id] = !$oShop_Item->shortcut_id
 					? $oShop_Item->name
 					: $oShop_Item->Shop_Item->name;
+
+				// Shop Item's modifications
+				if ($aConfig['select_modifications'])
+				{
+					$oModifications = $oShop_Item->Modifications;
+
+					$oModifications
+						->queryBuilder()
+						->clearOrderBy()
+						->clearSelect()
+						->select('id', 'shortcut_id', 'name');
+
+					$aModifications = $oModifications->findAll(FALSE);
+
+					foreach ($aModifications as $oModification)
+					{
+						$aOptions[$oModification->id] = ' — ' . $oModification->name;
+					}
+				}
 			}
 
 			$oAdmin_Form_Entity_Shop_Items->options($aOptions);

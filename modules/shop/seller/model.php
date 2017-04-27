@@ -50,6 +50,14 @@ class Shop_Seller_Model extends Core_Entity
 	);
 
 	/**
+	 * List of Shortcodes tags
+	 * @var array
+	 */
+	protected $_shortcodeTags = array(
+		'description',
+	);
+
+	/**
 	 * Constructor.
 	 * @param int $id entity ID
 	 */

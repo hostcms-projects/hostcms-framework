@@ -35,7 +35,7 @@ class Shop_Model extends Core_Entity
 	 * Backend property
 	 * @var string
 	 */
-	public $img_transactions = NULL;
+	public $img_transactions = 0;
 
 	/**
 	 * Backend property

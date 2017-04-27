@@ -39,6 +39,7 @@ class Skin_Bootstrap extends Core_Skin
 			->addJs('/modules/skin/' . $this->_skinName . '/js/datetime/ru.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.time.js')
+			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.categories.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.tooltip.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.crosshair.js')
 			->addJs('/modules/skin/' . $this->_skinName . '/js/charts/flot/jquery.flot.resize.js')
@@ -399,57 +400,6 @@ class Skin_Bootstrap extends Core_Skin
 											$('.send-message textarea').on('keyup', { path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=79' }, $.chatSendMessage);
 
 											$.refreshChat({path: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oModule->id?>&type=80'});
-
-											<?php if (Core::moduleIsActive('search'))
-											{
-												$oSearchModule = Core_Entity::factory('Module')->getByPath('search');
-											?>
-											// Search
-											$('[class = searchinput]').autocomplete({
-												appendTo: '.sidebar-header-wrapper',
-												source: function(request, response) {
-
-													$.ajax({
-													  url: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oSearchModule->id?>&type=1&autocomplete=1',
-													  dataType: 'json',
-													  data: {
-														queryString: request.term
-													  },
-													  success: function( data ) {
-														response( data );
-													  }
-													});
-												},
-												minLength: 1,
-												create: function() {
-													$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
-														return $('<li></li>')
-															.data('item.autocomplete', item)
-															.append($('<i>').addClass(item.icon))
-															.append(
-																$('<a>')
-																	.attr('href', item.href)
-																	.attr('onclick', item.onclick)
-																	.text(item.label)
-															)
-															.appendTo(ul.addClass('searchhelper'));
-													}
-
-													$(this).prev('.ui-helper-hidden-accessible').remove();
-												},
-												select: function( event, ui ) {
-													var myClick = new Function(ui.item.onclick);
-													myClick();
-												},
-												open: function() {
-													$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
-												},
-												close: function() {
-													$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
-												}
-											});
-
-											<?php } ?>
 										});
 									</script>
 								</li>
@@ -557,6 +507,62 @@ class Skin_Bootstrap extends Core_Skin
 				<!-- Search Reports, Charts, Emails or Notifications -->
 				<!-- <div class="searchhelper"></div>-->
 			</div>
+			<?php if (Core::moduleIsActive('search'))
+			{
+				$oSearchModule = Core_Entity::factory('Module')->getByPath('search');
+				?>
+				<script type="text/javascript">
+				$(function(){
+					// Search
+					$('[class = searchinput]').autocomplete({
+						appendTo: '.sidebar-header-wrapper',
+						source: function(request, response) {
+
+							$.ajax({
+							  url: '/admin/index.php?ajaxWidgetLoad&moduleId=<?php echo $oSearchModule->id?>&type=1&autocomplete=1',
+							  dataType: 'json',
+							  data: {
+								queryString: request.term
+							  },
+							  success: function( data ) {
+								response( data );
+							  }
+							});
+						},
+						minLength: 1,
+						create: function() {
+							$(this).data('ui-autocomplete')._renderItem = function( ul, item ) {
+								return $('<li></li>')
+									.data('item.autocomplete', item)
+									.append($('<i>').addClass(item.icon))
+									.append(
+										$('<a>')
+											.attr('href', item.href)
+											.attr('onclick', item.onclick)
+											.text(item.label)
+									)
+									.appendTo(ul.addClass('searchhelper'));
+							}
+
+							$(this).prev('.ui-helper-hidden-accessible').remove();
+						},
+						select: function( event, ui ) {
+							var myClick = new Function(ui.item.onclick);
+							myClick();
+						},
+						open: function() {
+							$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+						},
+						close: function() {
+							$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+						}
+					});
+				});
+			</script>
+			<?php
+			}
+			?>
+
 			<!-- /Page Sidebar Header -->
 			<!-- Sidebar Menu -->
 			<ul class="nav sidebar-menu">
@@ -631,7 +637,7 @@ class Skin_Bootstrap extends Core_Skin
 												'ico' => 'fa-file-o'
 											);
 											?><li id="menu-<?php echo $oCore_Module->getModuleName()?>">
-												<a href="<?php echo $aMenu['href']?>" onclick="$.adminLoad({path: '<?php echo $aMenu['href']?>'}); return false">
+												<a href="<?php echo htmlspecialchars($aMenu['href'])?>" onclick="<?php echo htmlspecialchars($aMenu['onclick'])?>">
 													<i class="menu-icon <?php echo $aMenu['ico']?>"></i>
 													<span class="menu-text"><?php echo $aMenu['name']?></span>
 												</a>
@@ -662,7 +668,7 @@ class Skin_Bootstrap extends Core_Skin
 										'ico' => 'fa-file-o'
 									);
 									?><li>
-										<a href="<?php echo $aMenu['href']?>" onclick="$.adminLoad({path: '<?php echo $aMenu['href']?>'}); return false" class="menu-icon">
+										<a href="<?php echo htmlspecialchars($aMenu['href'])?>" onclick="<?php echo htmlspecialchars($aMenu['onclick'])?>" class="menu-icon">
 											<i class="menu-icon fa <?php echo $aMenu['ico']?>"></i>
 											<span class="menu-text"><?php echo $aMenu['name']?></span>
 										</a>

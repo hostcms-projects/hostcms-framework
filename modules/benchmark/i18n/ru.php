@@ -6,7 +6,7 @@
  * @subpackage Benchmark
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Оценка производительности',
@@ -44,4 +44,14 @@ return array(
 
 	'compression' => 'Компрессия страниц',
 	'compression_description' => 'Компрессия ускоряет загрузку страниц сайта, сжимает передаваемые посетителям страницы сайта, объединяет Javascript и CSS-файлы.',
+	'speedUp' => 'Повышение быстродействия',
+	'database' => 'База данных',
+	'tableEngines' => 'Типы таблиц в базе данных',
+	'severalEnginesMsg' => 'В базе данных содержатся таблицы разных типов!',
+	'changeStorageEnginesTitle' => 'Изменение системы хранения данных',
+	'engine' => 'Тип',
+	'count' => 'Кол-во',
+	'chooseStorageEnginesMsg' => 'Выберите систему хранения для таблиц. Не забудьте сделать резервную копию базы данных!',
+	'convert' => 'Преобразовать',
+	'convertedMsg' => 'Преобразованы таблицы: %s.',
 );
