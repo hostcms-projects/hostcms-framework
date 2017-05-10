@@ -1,4 +1,4 @@
-# hostcms-history
+# hostcms-framework
 
 Это модули бесплатной редакции системы управления контентом [HostCMS](http://www.hostcms.ru/hostcms/editions/free/) разложенные по версиям, начиная с самой первой, доступной для скачивания с официального сайта, версии 6.1.0.
 
@@ -15,5 +15,5 @@ if (HOSTCMS_UPDATE_NUMBER >= 153)
 Репозитарий может пригодиться разработчикам общедоступных модулей.
 
 Навигацию по различным версиям системы и исследование кода удобно осуществлять через метки и другие возможности Гитхаба, например:
-* [/modules/shop/item/model.php](https://github.com/maximzasorin/hostcms-history/blame/master/modules/shop/item/model.php) – аннотация модели товара по версиям
-* [/modules/shop/item/model.php@6.6.2](https://github.com/maximzasorin/hostcms-history/blob/6.6.2/modules/shop/item/model.php) – модель товара в версии 6.6.2
+* [/modules/shop/item/model.php](https://github.com/maximzasorin/hostcms-framework/blame/master/modules/shop/item/model.php) – аннотация модели товара по версиям
+* [/modules/shop/item/model.php@6.6.2](https://github.com/maximzasorin/hostcms-framework/blob/6.6.2/modules/shop/item/model.php) – модель товара в версии 6.6.2
