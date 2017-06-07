@@ -89,6 +89,7 @@ return array(
 	'table_field_iconv' => 'Iconv:',
 	'table_field_gd_version' => 'GD version:',
 	'table_field_pcre_version' => 'PCRE version:',
+	'table_field_mysql' => 'MySQL:',
 	'table_field_maximum_upload_data_size' => 'Maximum uploaded data size:',
 	'table_field_maximum_execution_time' => 'Maximum execution time:',
 	'table_field_disc_space' => 'Space available:',

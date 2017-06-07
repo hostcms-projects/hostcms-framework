@@ -526,5 +526,7 @@ class Core_Auth
 				unset($_SESSION[$sUnsetName]);
 			}
 		}
+
+		session_regenerate_id(TRUE);
 	}
 }

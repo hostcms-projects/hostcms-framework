@@ -138,7 +138,7 @@ class Skin_Bootstrap extends Core_Skin
 		?>
 		</script>
 
-		<script type="text/javascript" src="/admin/wysiwyg/jquery.tinymce.js"></script>
+		<script type="text/javascript" src="/admin/wysiwyg/jquery.tinymce.min.js"></script>
 		<?php
 		if ($this->_mode != 'install')
 		{
@@ -412,7 +412,11 @@ class Skin_Bootstrap extends Core_Skin
 											<img src="<?php echo $oUser->getImageHref()?>">
 										</div>
 										<section>
-											<h2><span class="profile"><span><?php echo htmlspecialchars($oUser->name . ' ' . $oUser->surname)?></span></span></h2>
+											<h2><span class="profile"><span><?php echo htmlspecialchars(
+												$oUser->name != '' || $oUser->surname != ''
+													? $oUser->name . ' ' . $oUser->surname
+													: $oUser->login
+												)?></span></span></h2>
 										</section>
 									</a>
 									<!--Login Area Dropdown-->

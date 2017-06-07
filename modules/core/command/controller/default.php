@@ -495,9 +495,16 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			->buildingPage(TRUE)
 			->execute();
 
-		$bLogged && Core_Page::instance()->addFrontendExecutionTimes(
-			Core::_('Core.time_page', Core::getmicrotime() - $fBeginTime)
-		);
+		if ($bLogged)
+		{
+			Core_Page::instance()->addFrontendExecutionTimes(
+				Core::_('Core.time_load_modules', Core::getLoadModuleTime())
+			);
+
+			Core_Page::instance()->addFrontendExecutionTimes(
+				Core::_('Core.time_page', Core::getmicrotime() - $fBeginTime)
+			);
+		}
 
 		!defined('CURRENT_VERSION') && define('CURRENT_VERSION', '6.0');
 

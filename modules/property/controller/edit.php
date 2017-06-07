@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Property
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -145,8 +145,8 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('type')
 					->value($this->_object->type)
 					->caption(Core::_('Property.type'))
-					->onchange("ShowPropertyRows('{$windowId}', this.options[this.selectedIndex].value)")
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->onchange("radiogroupOnChange('{$windowId}', $(this).val(), [0,1,2,3,4,5,6,7,8,9,10,11,12])")
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete($this->getField('property_dir_id'));
@@ -159,7 +159,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('property_dir_id')
 					->value($this->_object->property_dir_id)
 					->caption(Core::_('Property_Dir.parent_id'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$oMainRow2
 					->add($oSelect_Type)
@@ -179,7 +179,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('list_id')
 						->value($this->_object->list_id)
 						->caption(Core::_('Property.list_id'))
-						->divAttr(array('id' => 'list_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+						->divAttr(array('class' => 'form-group col-xs-12 hidden-0 hidden-1 hidden-2 hidden-4 hidden-5 hidden-6 hidden-7 hidden-8 hidden-9 hidden-10 hidden-11 hidden-12'));
 
 					$oMainRow3->add($oSelect_Lists);
 				}
@@ -198,8 +198,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('informationsystem_id')
 						->value($this->_object->informationsystem_id)
 						->caption(Core::_('Property.informationsystem_id'))
-						->divAttr(array('id' => 'informationsystem_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
-						;
+						->divAttr(array('class' => 'form-group col-xs-12 hidden-0 hidden-1 hidden-2 hidden-3 hidden-4 hidden-6 hidden-7 hidden-8 hidden-9 hidden-10 hidden-11 hidden-12'));
 
 					$oMainRow4->add($oSelect_Informationsystems);
 				}
@@ -218,19 +217,19 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->name('shop_id')
 						->value($this->_object->shop_id)
 						->caption(Core::_('Property.shop_id'))
-						->divAttr(array('id' => 'shop_id', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+						->divAttr(array('class' => 'form-group col-xs-12 hidden-0 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-7 hidden-8 hidden-9 hidden-10 hidden-11'));
 
 					$oMainRow5->add($oSelect_Shops);
 				}
 
 				$this->getField('description')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+					->divAttr(array('class' => 'form-group col-xs-12'))
 					->wysiwyg(TRUE);
 
 				$oMainTab->move($this->getField('description'), $oMainRow6);
 
 				$this->getField('default_value')
-					->divAttr(array('id' => 'default_value', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+					->divAttr(array('class' => 'form-group col-xs-12 hidden-2 hidden-5 hidden-7 hidden-8 hidden-9 hidden-12'));
 
 				$oMainTab->move($this->getField('default_value'), $oMainRow7);
 
@@ -238,7 +237,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->default_value)
 					->name('default_value_date')
 					->caption(Core::_('Property.default_value'))
-					->divAttr(array('id' => 'default_value_date', 'class' => 'form-group col-sm-6 col-md-4 col-lg-3'));
+					->divAttr(array('class' => 'form-group col-sm-6 col-md-4 col-lg-3 hidden-0 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-7 hidden-9 hidden-10 hidden-11 hidden-12'));
 
 				$oMainRow8->add($oDefault_Value_Date);
 
@@ -246,7 +245,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->default_value)
 					->name('default_value_datetime')
 					->caption(Core::_('Property.default_value'))
-					->divAttr(array('id' => 'default_value_datetime', 'class' => 'form-group col-sm-6 col-md-4 col-lg-3'));
+					->divAttr(array('class' => 'form-group col-sm-6 col-md-4 col-lg-3 hidden-0 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-7 hidden-8 hidden-10 hidden-11 hidden-12'));
 
 				$oMainRow9->add($oDefault_Value_DateTime);
 
@@ -254,12 +253,12 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->value($this->_object->default_value)
 					->caption(Core::_('Property.default_value'))
 					->name('default_value_checked')
-					->divAttr(array('id' => 'default_value_checked', 'class' => 'form-group col-sm-6 col-md-4 col-lg-4'));
+					->divAttr(array('class' => 'form-group col-sm-6 col-md-4 col-lg-4 hidden-0 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-8 hidden-9 hidden-10 hidden-11 hidden-12'));
 
 				$oMainRow10->add($oDefault_Value_Checkbox);
 
 				$this->getField('tag_name')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				// Для тегов проверка на длину только при редактировании.
 				!$bNewProperty && $this->getField('tag_name')->format(
@@ -270,7 +269,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					);
 
 				$this->getField('sorting')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$oMainTab
 					->move($this->getField('tag_name'), $oMainRow11)
@@ -288,19 +287,19 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				// Formats
 				$this->getField('image_large_max_width')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$this->getField('image_large_max_height')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$this->getField('image_small_max_width')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$this->getField('image_small_max_height')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$this->getField('hide_small_image')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-6 col-lg-6'));
+					->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 
 				$oMainTab
 					->move($this->getField('image_large_max_width'), $oMainRow13)
@@ -312,7 +311,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 				$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
 				$oAdmin_Form_Entity_Code->html(
-					"<script>ShowPropertyRows('{$windowId}', " . intval($this->_object->type) . ")</script>"
+					"<script>radiogroupOnChange('{$windowId}', " . intval($this->_object->type) . ", [0,1,2,3,4,5,6,7,8,9,10,11,12])</script>"
 				);
 
 				$oMainTab->add($oAdmin_Form_Entity_Code);
@@ -329,7 +328,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oAdditionalTab->delete($this->getField('parent_id'));
 
 				$this->getField('name')
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
@@ -341,7 +340,7 @@ class Property_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->name('parent_id')
 					->value($this->_object->parent_id)
 					->caption(Core::_('Property_Dir.parent_id'))
-					->divAttr(array('class' => 'form-group col-sm-12 col-md-12 col-lg-12'));
+					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$oMainRow2->add($oSelect_Dirs);
 

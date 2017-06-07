@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -30,7 +30,9 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			{
 				case 'template':
 					$object->template_id = intval(Core_Array::getGet('template_id', 0));
-					$object->template_dir_id = intval(Core_Array::getGet('template_dir_id', 0));
+					
+					!$object->template_id && 
+						$object->template_dir_id = intval(Core_Array::getGet('template_dir_id', 0));
 				break;
 				case 'template_dir':
 					$object->parent_id = intval(Core_Array::getGet('template_dir_id', 0));
@@ -87,21 +89,24 @@ class Template_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->addTabAfter($oLessCssTab, $oTemplateTab)
 					->addTabAfter($oJsTab, $oLessCssTab);
 
-				// Удаляем стандартный <input>
-				$oAdditionalTab->delete(
-					$this->getField('template_dir_id')
-				);
+				if (!$this->_object->template_id)
+				{
+					// Удаляем стандартный <input>
+					$oAdditionalTab->delete(
+						$this->getField('template_dir_id')
+					);
 
-				// Селектор с группой
-				$oSelect_Dirs
-					->options(
-						array(' … ') + $this->fillTemplateDir()
-					)
-					->name('template_dir_id')
-					->value($this->_object->template_dir_id)
-					->caption(Core::_('Template.template_dir_id'));
-
-				$oMainRow2->add($oSelect_Dirs);
+					// Селектор с группой
+					$oSelect_Dirs
+						->options(
+							array(' … ') + $this->fillTemplateDir()
+						)
+						->name('template_dir_id')
+						->value($this->_object->template_dir_id)
+						->caption(Core::_('Template.template_dir_id'));
+					
+					$oMainRow2->add($oSelect_Dirs);
+				}
 
 				// Удаляем стандартный <input>
 				$oAdditionalTab->delete(

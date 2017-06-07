@@ -158,7 +158,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->divAttr(array('class' => 'form-group col-xs-12'));
 
 				$this->addField($oAdditionalGroupsSelect);
-					
+
 				$oMainRow3->add($oAdditionalGroupsSelect);
 
 				$html2 = '
@@ -311,9 +311,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 
 							// load_small_image_caption - заголовок поля загрузки малого изображения
 							'caption' => Core::_('Informationsystem_Item.image_small'),
-
-							//'name' => 'small_' . $this->largeImage['name'],
-							//'id' => 'small_' . $this->largeImage['id'],
 
 							'show_params' => TRUE,
 
@@ -748,9 +745,6 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 						// load_small_image_caption - заголовок поля загрузки малого изображения
 						'caption' => Core::_('Informationsystem_Group.image_small'),
 
-						//'name' => 'small_' . $this->largeImage['name'],
-						//'id' => 'small_' . $this->largeImage['id'],
-
 						'show_params' => TRUE,
 
 						'preserve_aspect_ratio_checkbox_checked' => $oInformationsystem->preserve_aspect_ratio_group_small
@@ -1110,6 +1104,14 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			}
 		}
 
+		$aConfig = Core_Config::instance()->get('informationsystem_config', array()) + array(
+			'smallImagePrefix' => 'small_',
+			'itemLargeImage' => 'item_%d.%s',
+			'itemSmallImage' => 'small_item_%d.%s',
+			'groupLargeImage' => 'group_%d.%s',
+			'groupSmallImage' => 'small_group_%d.%s',
+		);
+
 		switch ($modelName)
 		{
 			case 'informationsystem_item':
@@ -1240,9 +1242,9 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					// Определяем расширение файла
 					$ext = Core_File::getExtension($aFileData['name']);
 
-					$large_image =
-						($modelName == 'informationsystem_item' ? 'information_items_' : 'information_groups_') .
-						$this->_object->id . '.' . $ext;
+					$large_image = $modelName == 'informationsystem_item'
+						? sprintf($aConfig['itemLargeImage'], $this->_object->id, $ext)
+						: sprintf($aConfig['groupLargeImage'], $this->_object->id, $ext);
 				}
 			}
 			else
@@ -1297,7 +1299,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					if ($create_large_image)
 					{
 						$large_image = $file_name;
-						$small_image = 'small_' . $large_image;
+						$small_image = $aConfig['smallImagePrefix'] . $large_image;
 					}
 					else
 					{
@@ -1308,24 +1310,21 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				{
 					// Определяем расширение файла
 					$ext = Core_File::getExtension($file_name);
-					//$small_image = 'small_information_groups_' . $this->_object->id . '.' . $ext;
 
-					$small_image =
-						($modelName == 'informationsystem_item' ? 'small_information_items_' : 'small_information_groups_') .
-						$this->_object->id . '.' . $ext;
-
+					$small_image = $modelName == 'informationsystem_item'
+						? sprintf($aConfig['itemSmallImage'], $this->_object->id, $ext)
+						: sprintf($aConfig['groupSmallImage'], $this->_object->id, $ext);
 				}
 			}
 			elseif ($create_small_image_from_large && $bLargeImageIsCorrect)
 			{
-				$small_image = 'small_' . $large_image;
+				$small_image = $aConfig['smallImagePrefix'] . $large_image;
 			}
 			// Тип загружаемого файла является недопустимым для загрузки файла
 			else
 			{
-				$this->addMessage(	Core_Message::get(		Core::_('Core.extension_does_not_allow', Core_File::getExtension($aSmallFileData['name'])),
-						'error'
-					)
+				$this->addMessage(
+					Core_Message::get(Core::_('Core.extension_does_not_allow', Core_File::getExtension($aSmallFileData['name'])), 'error')
 				);
 			}
 		}
@@ -1598,56 +1597,59 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 				$this->addSkipColumn('path');
 			}*/
 
-			$modelName = $this->_object->getModelName();
-
-			switch ($modelName)
+			if (strlen($path))
 			{
-				case 'informationsystem_item':
-					$informationsystem_group_id = Core_Array::getPost('informationsystem_group_id');
+				$modelName = $this->_object->getModelName();
 
-					$oSameInformationsystemItem = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Items->getByGroupIdAndPath($informationsystem_group_id, $path);
+				switch ($modelName)
+				{
+					case 'informationsystem_item':
+						$informationsystem_group_id = Core_Array::getPost('informationsystem_group_id');
 
-					if (!is_null($oSameInformationsystemItem) && $oSameInformationsystemItem->id != Core_Array::getPost('id'))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item'), 'error')
-						);
-						return TRUE;
-					}
+						$oSameInformationsystemItem = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Items->getByGroupIdAndPath($informationsystem_group_id, $path);
 
-					$oSameInformationsystemGroup = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Groups->getByParentIdAndPath($informationsystem_group_id, $path);
+						if (!is_null($oSameInformationsystemItem) && $oSameInformationsystemItem->id != Core_Array::getPost('id'))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item'), 'error')
+							);
+							return TRUE;
+						}
 
-					if (!is_null($oSameInformationsystemGroup))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item_URL') , 'error')
-						);
-						return TRUE;
-					}
-				break;
-				case 'informationsystem_group':
-					$parent_id = Core_Array::getPost('parent_id');
+						$oSameInformationsystemGroup = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Groups->getByParentIdAndPath($informationsystem_group_id, $path);
 
-					$oSameInformationsystemGroup = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Groups->getByParentIdAndPath($parent_id, $path);
+						if (!is_null($oSameInformationsystemGroup))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Informationsystem_Item.error_information_group_URL_item_URL') , 'error')
+							);
+							return TRUE;
+						}
+					break;
+					case 'informationsystem_group':
+						$parent_id = Core_Array::getPost('parent_id');
 
-					if (!is_null($oSameInformationsystemGroup) && $oSameInformationsystemGroup->id != Core_Array::getPost('id'))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Informationsystem_Group.error_URL_information_group'), 'error')
-						);
-						return TRUE;
-					}
+						$oSameInformationsystemGroup = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Groups->getByParentIdAndPath($parent_id, $path);
 
-					$oSameInformationsystemItem = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Items->getByGroupIdAndPath($parent_id, $path);
+						if (!is_null($oSameInformationsystemGroup) && $oSameInformationsystemGroup->id != Core_Array::getPost('id'))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Informationsystem_Group.error_URL_information_group'), 'error')
+							);
+							return TRUE;
+						}
 
-					if (!is_null($oSameInformationsystemItem))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Informationsystem_Group.error_information_group_URL_add_edit_URL'), 'error')
-						);
-						return TRUE;
-					}
-				break;
+						$oSameInformationsystemItem = Core_Entity::factory('Informationsystem', $informationsystem_id)->Informationsystem_Items->getByGroupIdAndPath($parent_id, $path);
+
+						if (!is_null($oSameInformationsystemItem))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Informationsystem_Group.error_information_group_URL_add_edit_URL'), 'error')
+							);
+							return TRUE;
+						}
+					break;
+				}
 			}
 		}
 

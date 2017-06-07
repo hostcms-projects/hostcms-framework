@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Status_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -33,7 +33,7 @@ class Shop_Order_Status_Controller_Edit extends Admin_Form_Action_Controller_Typ
 		$oMainTab
 			->move($this->getField('name'), $oMainRow1)
 			->move($this->getField('description'), $oMainRow2)
-			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6')), $oMainRow3);
+			->move($this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-md-6')), $oMainRow3);
 
 		$title = $this->_object->id
 			? Core::_('Shop_Order_Status.order_status_edit_form_title')

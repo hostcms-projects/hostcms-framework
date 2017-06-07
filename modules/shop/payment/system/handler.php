@@ -311,7 +311,12 @@ abstract class Shop_Payment_System_Handler
 						case 0: // Int
 						case 3: // List
 						case 5: // Information system
+						case 12: // Shop
 							$oProperty_Value->value(intval($value));
+							$oProperty_Value->save();
+						break;
+						case 11: // Float
+							$oProperty_Value->value(floatval($value));
 							$oProperty_Value->save();
 						break;
 						case 1: // String
@@ -703,6 +708,7 @@ abstract class Shop_Payment_System_Handler
 				$marking = '';
 
 				$shop_delivery_name = strval(Core_Array::get($this->_orderParams, 'shop_delivery_name', 0));
+
 				$this->_shopOrder->delivery_information = trim(
 					$this->_shopOrder->delivery_information . "\n" . $shop_delivery_name
 				);
@@ -780,10 +786,14 @@ abstract class Shop_Payment_System_Handler
 	/**
 	 * Prepare XML
 	 * @return Shop_Model
+	 * @hostcms-event Shop_Payment_System_Handler.onBeforePrepareXml
+	 * @hostcms-event Shop_Payment_System_Handler.onAfterPrepareXml
 	 */
 	protected function _prepareXml()
 	{
 		$oShop = $this->_shopOrder->Shop->clearEntities();
+
+		Core_Event::notify('Shop_Payment_System_Handler.onBeforePrepareXml', $this, array($oShop));
 
 		// Список свойств заказа
 		$oShop_Order_Property_List = Core_Entity::factory('Shop_Order_Property_List', $oShop->id);
@@ -827,6 +837,8 @@ abstract class Shop_Payment_System_Handler
 					->showXmlProperties(TRUE)
 					->showXmlSiteuser(TRUE)
 			);
+
+		Core_Event::notify('Shop_Payment_System_Handler.onAfterPrepareXml', $this, array($oShop));
 
 		return $oShop;
 	}

@@ -273,7 +273,7 @@ class Shop_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$oMainRow1->add(Admin_Form_Entity::factory('Select')
 					->name('shop_dir_id')
 					->caption(Core::_('Shop.shop_dir_id'))
-					->divAttr(array('class' => 'form-group col-lg-6'))
+					->divAttr(array('class' => 'form-group col-xs-12 col-lg-6'))
 					//->style("width: 320px")
 					->options(
 						array(' … ') + $this->_fillShopDir()

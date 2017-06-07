@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Siteuser_Transaction_Model extends Core_Entity
 {
@@ -138,5 +138,22 @@ class Shop_Siteuser_Transaction_Model extends Core_Entity
 		$this->shop_order_id && $this->addEntity($this->Shop_Order);
 
 		return parent::getXml();
+	}
+	
+	/**
+	 * Backend callback method. Get amount transactions until current
+	 * @return float
+	 */
+	public function adminTransactionTotalAmount()
+	{
+		$aTmp = Core_QueryBuilder::select(array('SUM(amount_base_currency)', 'amount'))
+			->from('shop_siteuser_transactions')
+			->where('shop_id', '=', $this->shop_id)
+			->where('siteuser_id', '=', $this->siteuser_id)
+			->where('active', '=', 1)
+			->where('id', '<=', $this->id)
+			->execute()->asAssoc()->current();
+
+		return round($aTmp['amount'], 2);
 	}
 }

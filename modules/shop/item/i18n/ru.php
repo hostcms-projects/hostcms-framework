@@ -132,7 +132,7 @@ return array(
 	'add_shop_item_shortcut_title' => "Ярлык для %s",
 	'shortcut_creation_window_caption' => "Создание ярлыка",
 	'show_item_comment_title' => "Список отзывов о товаре \"%s\"",
-	'show_comments_title' => 'Комментарии к товару "%s"',
+	'show_comments_title' => 'Отзывы к товару "%s"',
 	'show_tying_products_title' => "Сопутствующие товары товара \"%s\"",
 	'item_modification_title' => 'Модификации товара "%s"',
 	'item_modification_add_item' => 'Добавить',

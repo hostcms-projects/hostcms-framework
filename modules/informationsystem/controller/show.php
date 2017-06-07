@@ -23,6 +23,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - comments(TRUE|FALSE) показывать комментарии для выбранных информационных элементов, по умолчанию FALSE
  * - votes(TRUE|FALSE) показывать рейтинг элемента, по умолчанию TRUE
  * - tags(TRUE|FALSE) выводить метки
+ * - calculateCounts(TRUE|FALSE) вычислять общее количество информационных элементов и групп в корневой группе, по умолчанию FALSE
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным информационным элементом, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
  * - offset($offset) смещение, с которого выводить информационные элементы. По умолчанию 0
@@ -82,6 +83,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		'comments',
 		'votes',
 		'tags',
+		'calculateCounts',
 		'siteuser',
 		'siteuserProperties',
 		'offset',
@@ -183,9 +185,11 @@ class Informationsystem_Controller_Show extends Core_Controller
 		$this->limit = 10;
 		$this->group = $this->offset = $this->page = 0;
 		$this->item = NULL;
-		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
-			= $this->comments = $this->tags = $this->siteuserProperties = FALSE;
-		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList = $this->votes = $this->showPanel = $this->calculateTotal = TRUE;
+		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups = $this->comments
+			= $this->tags = $this->calculateCounts = $this->siteuserProperties = FALSE;
+
+		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
+			= $this->votes = $this->showPanel = $this->calculateTotal = TRUE;
 
 		$this->groupsMode = 'tree';
 		$this->part = 1;
@@ -445,6 +449,8 @@ class Informationsystem_Controller_Show extends Core_Controller
 		}
 
 		$oInformationsystem = $this->getEntity();
+
+		$oInformationsystem->showXmlCounts($this->calculateCounts);
 
 		$this->addEntity(
 			Core::factory('Core_Xml_Entity')
@@ -1197,6 +1203,7 @@ class Informationsystem_Controller_Show extends Core_Controller
 		}
 		else
 		{
+			// Edit
 			$sPath = '/admin/informationsystem/item/index.php';
 			$sAdditional = "hostcms[action]=edit&informationsystem_id={$oInformationsystem->id}&informationsystem_group_id={$this->group}&hostcms[checked][1][{$this->item}]=1";
 			$sTitle = Core::_('Informationsystem_Item.information_items_edit_form_title');
@@ -1214,6 +1221,43 @@ class Informationsystem_Controller_Show extends Core_Controller
 					)
 			);
 
+			// Folder
+			$sPath = '/admin/informationsystem/item/index.php';
+			$sAdditional = "&informationsystem_id={$oInformationsystem->id}&informationsystem_group_id={$this->group}";
+			$sTitle = Core::_('Informationsystem_Group.information_system_top_menu_groups');
+
+			$oXslSubPanel->add(
+				Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/admin/images/folder.gif')
+							->alt($sTitle)
+							->title($sTitle)
+					)
+			);
+
+			// Comments
+			$sPath = '/admin/informationsystem/item/comment/index.php';
+			$sAdditional = "informationsystem_item_id={$this->item}";
+			$sTitle = Core::_('Informationsystem_Item.show_all_comments_top_menu');
+
+			$oXslSubPanel->add(
+				Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/admin/images/comments.gif')
+							->alt($sTitle)
+							->title($sTitle)
+					)
+			);
+
+			// Delete
 			$sPath = '/admin/informationsystem/item/index.php';
 			$sAdditional = "hostcms[action]=markDeleted&informationsystem_id={$oInformationsystem->id}&informationsystem_group_id={$this->group}&hostcms[checked][1][{$this->item}]=1";
 			$sTitle = Core::_('Informationsystem_Item.markDeleted');

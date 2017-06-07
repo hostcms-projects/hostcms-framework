@@ -74,7 +74,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow11 = Admin_Form_Entity::factory('Div')->id('lib_properties'))
+			->add($oMainRow11 = Admin_Form_Entity::factory('Div')->id('lib_properties')->class('hidden-0 hidden-1 hidden-3'))
 			->add($oMainRow12 = Admin_Form_Entity::factory('Div')->class('row'))
 			;
 
@@ -100,7 +100,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->value($this->_object->parent_id)
 			->caption(Core::_('Structure.parent_id'))
 			->divAttr(array('style' => 'float: left'))
-			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		// Выбор меню
 		$aMenu = $this->_fillMenuList($this->_object->site_id);
@@ -112,7 +112,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('structure_menu_id')
 			->value($this->_object->structure_menu_id)
 			->caption(Core::_('Structure.structure_menu_id'))
-			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$this->getField('show')
 			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4 checkbox-margin-top'));
@@ -196,23 +196,23 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					3 => 'fa-link'
 				)
 			)
-			->onclick("SetViewStructure('{$windowId}', this.value, '{$this->_object->id}', '{$iLibDirId}', '{$iLibId}');");
+			->onchange("radiogroupOnChange('{$windowId}', $(this).val(), [0,1,2,3])");
 
 		// Статичный документ
 		$oAdditionalTab->delete($this->getField('document_id'));
 
 		$this->getField('url')
-			->divAttr(array('id' => 'url', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('class' => 'form-group col-lg-6 hidden-0 hidden-1 hidden-2'))
 			// clear standart url pattern
 			->format(array('lib' => array()));
 
 		// Checkboxes
 		$this->getField('active')
-			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 		$this->getField('indexing')
-			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 		$this->getField('https')
-			->divAttr(array('class' => 'form-group col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4'));
 
 		$oMainTab
 			->move($this->getField('active'), $oMainRow4)
@@ -228,9 +228,8 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$Select_DocumentDir = Admin_Form_Entity::factory('Select')
 			->name('document_dir_id')
-			->id('document_dir_id')
 			->caption(Core::_('Structure.document_dir_id'))
-			->divAttr(array('id' => 'document_dir', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('class' => 'form-group col-lg-6 hidden-1 hidden-2 hidden-3'))
 			->options(
 				array(' … ') + $Document_Controller_Edit->fillDocumentDir($this->_object->site_id)
 			)
@@ -240,7 +239,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$oMainRow6->add($Select_DocumentDir);
 
 		$aDocumentForDir = array(' … ');
-		// intval() because $oDocument->document_dir_id maybe NULL
+		// intval() because $oDocument->document_dir_id can be NULL
 		$aDocuments = Core_Entity::factory('Document_Dir', intval($oDocument->document_dir_id))
 			->Documents->getBySiteId($this->_object->site_id);
 
@@ -251,9 +250,8 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$Select_Document = Admin_Form_Entity::factory('Select')
 			->name('document_id')
-			->id('document_id')
 			->caption(Core::_('Structure.document_id'))
-			->divAttr(array('id' => 'document', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('class' => 'form-group col-lg-6 hidden-1 hidden-2 hidden-3'))
 			->options($aDocumentForDir)
 			->value($this->_object->document_id)
 			->onchange("$.ajaxRequest({path: '/admin/structure/index.php', context: '{$this->_formId}', callBack: $.loadDocumentText, additionalParams: 'loadDocumentText&document_id=' + this.value,windowId: '{$windowId}'}); return false");
@@ -268,17 +266,13 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					)
 					->class('input-group-addon bg-blue bordered-blue')
 					->value('<i class="fa fa-pencil"></i>')
-					//->onclick("return !($.openWindow && $.openWindow({width: '80%', path: '/admin/document/index.php', additionalParams: 'document_dir_id=' + $('#{$windowId} #document_dir_id').val() + '&hostcms[checked][1][' + $('#{$windowId} #document_id').val() + ']=1&hostcms[action]=edit', dialogClass: 'hostcms6'}));")
-					/*->onclick(
-						$this->_Admin_Form_Controller->getAdminActionLoadAjax('/admin/document/index.php', 'edit', NULL, 1, $this->_object->document_id, 'document_dir_id=' . intval($oDocument->document_dir_id))
-					)*/
 			);
 
 		$oMainRow7->add($Select_Document);
 
 		$oTextarea_Document_Text = Admin_Form_Entity::factory('Textarea')
 			->name('document_text')
-			->divAttr(array('id' => 'document_text', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-1 hidden-2 hidden-3'))
 			->caption(Core::_('Structure.document_text'))
 			->value($oDocument->text)
 			->wysiwyg(TRUE)
@@ -297,11 +291,10 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->options(
 				count($aTemplateOptions) ? $aTemplateOptions : array(' … ')
 			)
-			->id('template_id')
 			->name('template_id')
 			->value($template_id)
 			->caption(Core::_('Structure.template_id'))
-			->divAttr(array('class' => 'form-group col-xs-12 col-lg-6', 'id' => 'template_id'));
+			->divAttr(array('class' => 'form-group col-xs-12 col-lg-6 hidden-3'));
 
 		$oMainRow13->add($oSelect_Template_Id);
 
@@ -343,7 +336,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$Select_LibDir = Admin_Form_Entity::factory('Select')
 			->name('lib_dir_id')
 			->caption(Core::_('Structure.lib_dir_id'))
-			->divAttr(array('id' => 'lib_dir', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-lg-6 hidden-0 hidden-1 hidden-3'))
 			->options(
 				array(' … ') + $Lib_Controller_Edit->fillLibDir(0)
 			)
@@ -359,12 +352,12 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$aLibForDir[$oTmpLib->id] = '[' . $oTmpLib->id . '] ' . $oTmpLib->name;
 		}
 		$objectId = intval($this->_object->id);
-		
+
 		$Select_Lib = Admin_Form_Entity::factory('Select')
 			->name('lib_id')
 			->id('lib_id')
 			->caption(Core::_('Structure.lib_id'))
-			->divAttr(array('id' => 'lib', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('class' => 'form-group col-xs-12 col-lg-6 hidden-0 hidden-1 hidden-3'))
 			->options($aLibForDir)
 			->value($this->_object->lib_id)
 			->onchange("$.ajaxRequest({path: '/admin/structure/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")
@@ -406,7 +399,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oTextarea_Structure_Source
 			->name('structure_source')
-			->divAttr(array('id' => 'structure_source', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-0 hidden-2 hidden-3'))
 			->caption(Core::_('Structure.structure_source'))
 			->value($this->_object->getStructureFile())
 			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
@@ -415,7 +408,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$oTextarea_StructureConfig_Source = Admin_Form_Entity::factory('Textarea')
 			->name('structure_config_source')
-			->divAttr(array('id' => 'structure_config_source', 'class' => 'form-group col-sm-12 col-md-12 col-lg-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-0 hidden-2 hidden-3'))
 			->caption(Core::_('Structure.structure_config_source'))
 			->value($this->_object->getStructureConfigFile())
 			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
@@ -453,7 +446,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('changefreq')
 			->value($this->_object->changefreq)
 			->caption(Core::_('Structure.changefreq'))
-			->divAttr(array('class' => 'form-group col-xs-4 col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-4'));
 
 		$oSelect_priority = Admin_Form_Entity::factory('Select')
 			->options(
@@ -474,7 +467,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->name('priority')
 			->value($this->_object->priority)
 			->caption(Core::_('Structure.priority'))
-			->divAttr(array('class' => 'form-group col-xs-4 col-sm-4 col-md-4 col-lg-4'));
+			->divAttr(array('class' => 'form-group col-xs-4'));
 
 		$oSitemapTab
 			->add($oSitemapRow1 = Admin_Form_Entity::factory('Div')->class('row'))
@@ -498,16 +491,12 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$this->title($this->_object->id
 			? Core::_('Structure.edit_title')
-			: Core::_('Structure.add_title'));
-
-		ob_start();
-		Core::factory('Core_Html_Entity_Script')
-			->type("text/javascript")
-			->value("SetViewStructure('{$windowId}', '{$this->_object->type}')")
-			->execute();
+			: Core::_('Structure.add_title')
+		);
 
 		$oMainTab->add(
-			Admin_Form_Entity::factory('Code')->html(ob_get_clean())
+			Admin_Form_Entity::factory('Code')
+				->html("<script>radiogroupOnChange('{$windowId}', '{$this->_object->type}', [0,1,2,3])</script>")
 		);
 
 		return $this;
@@ -544,6 +533,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			$oDocument->template_id = $this->_formValues['template_id'];
 			$oDocument->text = $this->_formValues['document_text'];
+			$oDocument->datetime = Core_Date::timestamp2sql(time());
 			$oDocument->save();
 
 			$this->_object->document_id = $oDocument->id;

@@ -520,7 +520,7 @@ class Informationsystem_Item_Import_Csv_Controller extends Core_Servant_Properti
 								->queryBuilder()
 								->where('parent_id', '=', intval($this->_oCurrentGroup->id))
 								->where('informationsystem_id', '=', intval($this->_oCurrentInformationsystem->id))
-								->where('path', '=', $sData);
+								->where('path', 'LIKE', $sData);
 
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
@@ -930,7 +930,7 @@ class Informationsystem_Item_Import_Csv_Controller extends Core_Servant_Properti
 							{
 								$oTmpObject = $this->_oCurrentInformationsystem->Informationsystem_Items;
 								$oTmpObject->queryBuilder()
-									->where('path', '=', $sData)
+									->where('path', 'LIKE', $sData)
 									->where('informationsystem_group_id', '=', $this->_oCurrentGroup->id);
 
 								$oTmpObject = $oTmpObject->findAll(FALSE);

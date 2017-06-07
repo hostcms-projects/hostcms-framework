@@ -95,12 +95,7 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 				)
 			)
 			->name('apply_for_modifications')
-			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-xs-12'))
-		)
-		->add(Admin_Form_Entity::factory('Code')
-			->html("<script>$(function() {
-				$('#{$windowId} #import_types').buttonset();
-			});</script>")
+			->divAttr(array('class' => 'form-group col-xs-12'))
 		);
 
 		$title = $this->_object->id
@@ -119,9 +114,9 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 	 */
 	protected function _fillDiscounts($iShopId)
 	{
-		$aShop_Discounts = Core_Entity::factory('Shop', $iShopId)->Shop_Discounts->findAll(FALSE);
-
 		$aReturn = array(" … ");
+		
+		$aShop_Discounts = Core_Entity::factory('Shop', $iShopId)->Shop_Discounts->findAll(FALSE);
 		foreach($aShop_Discounts as $oShop_Discount)
 		{
 			$aReturn[$oShop_Discount->id] = $oShop_Discount->name;
@@ -137,9 +132,9 @@ class Shop_Item_Discount_Controller_Edit extends Admin_Form_Action_Controller_Ty
 	 */
 	protected function _fillBonuses($iShopId)
 	{
-		$aShop_Bonuses = Core_Entity::factory('Shop', $iShopId)->Shop_Bonuses->findAll(FALSE);
-
 		$aReturn = array(" … ");
+
+		$aShop_Bonuses = Core_Entity::factory('Shop', $iShopId)->Shop_Bonuses->findAll(FALSE);
 		foreach($aShop_Bonuses as $oShop_Bonus)
 		{
 			$aReturn[$oShop_Bonus->id] = $oShop_Bonus->name;

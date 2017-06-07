@@ -158,6 +158,13 @@ class Property_Value_Int_Model extends Core_Entity
 
 					Core_Event::notify($this->_modelName . '.onBeforeAddInformationsystemItem', $this, array($oInformationsystem_Item));
 
+					$oLastReturn = Core_Event::getLastReturn();
+
+					if (!is_null($oLastReturn))
+					{
+						$oInformationsystem_Item = $oLastReturn;
+					}
+
 					$this->addEntity($oInformationsystem_Item);
 				}
 			}
@@ -174,13 +181,23 @@ class Property_Value_Int_Model extends Core_Entity
 				$oShop_Item_Property_List = Core_Entity::factory('Shop_Item_Property_List', $this->Shop_Item->shop_id);
 
 				$aTmp = array();
-				$aItemProperties = $oShop_Item_Property_List->Properties->findAll();
+
+				//$aItemProperties = $oShop_Item_Property_List->Properties->findAll();
+				$aItemProperties = $oShop_Item_Property_List->getPropertiesForGroup($this->Shop_Item->shop_group_id);
 				foreach ($aItemProperties as $oItemProperty)
 				{
 					// Зацикленность через Св-во типа ИЭ/Товар, у которого св-во ИЭ/Товар
-					($oItemProperty->type != 12 && $oItemProperty->type != 5
+					if ($oItemProperty->type != 12 && $oItemProperty->type != 5
 						|| self::$aConfig['recursive_properties'] && $oItemProperty->shop_id != $oProperty->shop_id
-					) && $aTmp[] = $oItemProperty->id;
+					)
+					{
+						$oShop_Item_Property = $oItemProperty->Shop_Item_Property;
+
+						if ($oShop_Item_Property->show_in_item)
+						{
+							$aTmp[] = $oItemProperty->id;
+						}
+					}
 				}
 
 				$oShop_Item = $this->Shop_Item;
@@ -193,6 +210,13 @@ class Property_Value_Int_Model extends Core_Entity
 						->showXmlProperties(count($aTmp) ? $aTmp : FALSE);
 
 					Core_Event::notify($this->_modelName . '.onBeforeAddShopItem', $this, array($oShop_Item));
+
+					$oLastReturn = Core_Event::getLastReturn();
+
+					if (!is_null($oLastReturn))
+					{
+						$oShop_Item = $oLastReturn;
+					}
 
 					$this->addEntity($oShop_Item);
 				}

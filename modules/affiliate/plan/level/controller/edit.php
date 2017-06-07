@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -34,18 +34,18 @@ class Affiliate_Plan_Level_Controller_Edit extends Admin_Form_Action_Controller_
 			->add($oMainRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
-		$oMainTab->move($this->getField('level')->class('form-control')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow1);
+		$oMainTab->move($this->getField('level')->class('form-control')->divAttr(array('class' => 'form-group col-xs-3')), $oMainRow1);
 
-		$oMainTab->move($this->getField('percent')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow1);
+		$oMainTab->move($this->getField('percent')->divAttr(array('class' => 'form-group col-xs-3')), $oMainRow1);
 
 		$oMainTab->delete($this->getField('type'));
 
-		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow1);
+		$oMainTab->move($this->getField('value')->divAttr(array('class' => 'form-group col-xs-3')), $oMainRow1);
 
 		$oTypeField = Admin_Form_Entity::factory('Select');
 		$oTypeField
 			->name('type')
-			->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3'))
+			->divAttr(array('class' => 'form-group col-xs-3'))
 			->caption(Core::_('Affiliate_Plan_Level.type'))
 			->options(array(
 				Core::_('Affiliate_Plan_Level.form_edit_affiliate_values_type_percent'),

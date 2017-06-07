@@ -371,7 +371,7 @@ abstract class Core_Skin
 		?><link rel="stylesheet" type="text/css" href="/modules/skin/default/frontend/fontawesome/css/font-awesome.min.css?<?php echo $iTimestamp?>" /><?php
 		?><script src="/modules/skin/default/frontend/jquery.min.js"></script><?php
 		?><script src="/modules/skin/default/frontend/jquery-ui.min.js" type="text/javascript"></script><?php
-		?><script src="/admin/wysiwyg/jquery.tinymce.js" type="text/javascript"></script><?php
+		?><script src="/admin/wysiwyg/jquery.tinymce.min.js" type="text/javascript"></script><?php
 		?><script src="/modules/skin/bootstrap/js/colorpicker/jquery.minicolors.min.js" type="text/javascript"></script><?php
 		?><script src="/modules/skin/bootstrap/js/jquery.slimscroll.min.js" type="text/javascript"></script><?php
 		?><script src="/modules/skin/bootstrap/js/toastr/toastr.js" type="text/javascript"></script><?php

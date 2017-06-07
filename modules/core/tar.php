@@ -764,15 +764,10 @@ class Core_Tar
 		return true;
 
 		// Не включаемые в архив расширения файлов
-		if (defined('EXTENSION_NOT_IN_BACKUP'))
-		{
-			// Разбираем строку невключаемых расширений в массив
-			$extension_list = explode(' ', EXTENSION_NOT_IN_BACKUP);
-		}
-		else
-		{
-			$extension_list = array();
-		}
+		// Разбираем строку невключаемых расширений в массив
+		$extension_list = defined('EXTENSION_NOT_IN_BACKUP')
+			? explode(' ', EXTENSION_NOT_IN_BACKUP)
+			: array();
 
 		foreach ($p_list as $v_filename)
 		{

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Module
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -34,16 +34,16 @@ class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$this->getField('description')->divAttr(array('class' => 'form-group col-xs-12'));
 		$oMainTab->move($this->getField('active'), $oMainRow1);
 
-		$this->getField('active')->divAttr(array('class' => 'form-group col-lg-6 col-md-6'));
+		$this->getField('active')->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 		$oMainTab->move($this->getField('active'), $oMainRow1);
 
-		$this->getField('indexing')->divAttr(array('class' => 'form-group col-lg-6 col-md-6'));
+		$this->getField('indexing')->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 		$oMainTab->move($this->getField('indexing'), $oMainRow1);
 
-		$this->getField('path')->divAttr(array('class' => 'form-group col-lg-6 col-md-6'));
+		$this->getField('path')->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 		$oMainTab->move($this->getField('path'), $oMainRow1);
 
-		$this->getField('sorting')->divAttr(array('class' => 'form-group col-lg-6 col-md-6'));
+		$this->getField('sorting')->divAttr(array('class' => 'form-group col-xs-12 col-md-6'));
 		$oMainTab->move($this->getField('sorting'), $oMainRow1);
 
 		// Объект вкладки 'Настройки модуля'
@@ -80,7 +80,7 @@ class Module_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	protected function _applyObjectProperty()
 	{
-		$oldActive = $this->_object->active;
+		$oldActive = $this->_object->id && $this->_object->active;
 		parent::_applyObjectProperty();
 
 		if ($oldActive != $this->_object->active)

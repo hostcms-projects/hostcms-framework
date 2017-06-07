@@ -196,25 +196,31 @@ class Informationsystem_Item_Model extends Core_Entity
 			}
 		}
 
-		$aReturn = Property_Controller_Value::getPropertiesValues($aPropertiesId, $this->id, $bCache);
+		$aProperty_Values = Property_Controller_Value::getPropertiesValues($aPropertiesId, $this->id, $bCache);
 
 		// setHref()
-		foreach ($aReturn as $oProperty_Value)
+		foreach ($aProperty_Values as $oProperty_Value)
 		{
-			if ($oProperty_Value->Property->type == 2)
-			{
-				$oProperty_Value
-					->setHref($this->getItemHref())
-					->setDir($this->getItemPath());
-			}
+			$this->_preparePropertyValue($oProperty_Value);
 		}
 
-		if ($bCache)
-		{
-			$this->_propertyValues = $aReturn;
-		}
+		$bCache && $this->_propertyValues = $aProperty_Values;
 
-		return $aReturn;
+		return $aProperty_Values;
+	}
+
+	/**
+	 * Prepare Property Value
+	 * @param Property_Value_Model $oProperty_Value
+	 */
+	protected function _preparePropertyValue($oProperty_Value)
+	{
+		if ($oProperty_Value->Property->type == 2)
+		{
+			$oProperty_Value
+				->setHref($this->getItemHref())
+				->setDir($this->getItemPath());
+		}
 	}
 
 	/**
@@ -296,7 +302,7 @@ class Informationsystem_Item_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			//->clear()
-			->where('informationsystem_items.path', '=', $path)
+			->where('informationsystem_items.path', 'LIKE', $path)
 			->where('informationsystem_items.informationsystem_group_id', '=', $group_id)
 			->where('informationsystem_items.shortcut_id', '=', 0)
 			->clearOrderBy()
@@ -977,7 +983,19 @@ class Informationsystem_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ';
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ' . $oInformationsystem_Item->description . ' ' . $oInformationsystem_Item->text . ' ';
+					}
+				}
+			}
+			// Shop
+			elseif ($oPropertyValue->Property->type == 12 && Core::moduleIsActive('shop'))
+			{
+				if ($oPropertyValue->value != 0)
+				{
+					$oShop_Item = $oPropertyValue->Shop_Item;
+					if ($oShop_Item->id)
+					{
+						$oSearch_Page->text .= htmlspecialchars($oShop_Item->name) . ' ' . $oShop_Item->description . ' ' . $oShop_Item->text . ' ';
 					}
 				}
 			}
@@ -1014,7 +1032,7 @@ class Informationsystem_Item_Model extends Core_Entity
 		$oSearch_Page->siteuser_groups = array($this->getSiteuserGroupId());
 
 		Core_Event::notify($this->_modelName . '.onAfterIndexing', $this, array($oSearch_Page));
-		
+
 		return $oSearch_Page;
 	}
 
@@ -1338,27 +1356,44 @@ class Informationsystem_Item_Model extends Core_Entity
 			if (is_array($this->_showXmlProperties))
 			{
 				$aProperty_Values = Property_Controller_Value::getPropertiesValues($this->_showXmlProperties, $this->id);
+
 				foreach ($aProperty_Values as $oProperty_Value)
 				{
-					if ($oProperty_Value->Property->type == 2)
-					{
-						$oProperty_Value
-							->setHref($this->getItemHref())
-							->setDir($this->getItemPath());
-					}
-
-					/*isset($this->_showXmlProperties[$oProperty_Value->property_id]) && */$this->addEntity(
-						$oProperty_Value
-					);
+					$this->_preparePropertyValue($oProperty_Value);
 				}
 			}
 			else
 			{
 				$aProperty_Values = $this->getPropertyValues();
 				// Add all values
-				$this->addEntities($aProperty_Values);
+				//$this->addEntities($aProperty_Values);
+			}
+
+			$aListIDs = array();
+
+			foreach ($aProperty_Values as $oProperty_Value)
+			{
+				// List_Items
+				if ($oProperty_Value->Property->type == 3)
+				{
+					$aListIDs[] = $oProperty_Value->value;
+				}
+
+				$this->addEntity($oProperty_Value);
+			}
+
+			// Cache necessary List_Items
+			if (count($aListIDs))
+			{
+				$oList_Items = Core_Entity::factory('List_Item');
+				$oList_Items->queryBuilder()
+					->where('id', 'IN', $aListIDs)
+					->clearOrderBy();
+
+				$oList_Items->findAll(TRUE);
 			}
 		}
+
 		return parent::getXml();
 	}
 

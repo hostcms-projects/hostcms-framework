@@ -12,6 +12,8 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - perFile Count of nodes per one file
  * - defaultProtocol('http://') протокол по умочанию
  * - urlset(array('xmlns' => 'http://www.sitemaps.org/schemas/sitemap/0.9')) массив опций для urlset
+ * - fileName() схема построения имени файла, по умолчанию 'sitemap-%d.xml'
+ * - multipleFileName() схема построения имени файла внутри индекса, по умолчанию 'sitemap-%d-%d.xml'
  *
  * @package HostCMS
  * @subpackage Core
@@ -36,7 +38,9 @@ class Core_Sitemap extends Core_Servant_Properties
 		'urlset',
 		'limit',
 		'createIndex',
-		'perFile'
+		'perFile',
+		'fileName',
+		'multipleFileName'
 	);
 
 	/**
@@ -86,6 +90,9 @@ class Core_Sitemap extends Core_Servant_Properties
 		$this->urlset = array('xmlns' => 'http://www.sitemaps.org/schemas/sitemap/0.9');
 		
 		$this->defaultProtocol = 'http://';
+		
+		$this->fileName = 'sitemap-%d.xml';
+		$this->multipleFileName = 'sitemap-%d-%d.xml';
 	}
 
 	/**
@@ -666,7 +673,7 @@ class Core_Sitemap extends Core_Servant_Properties
 			$this->_inFile = 0;
 		}
 
-		$this->_aIndexedFiles[] = $filename = "sitemap-{$this->_oSite->id}-{$this->_countFile}.xml";
+		$this->_aIndexedFiles[] = $filename = sprintf($this->multipleFileName, $this->_oSite->id, $this->_countFile);
 
 		$this->_currentOut = new Core_Out_File();
 		//$this->_currentOut->filePath(CMS_FOLDER . $filename);
@@ -704,8 +711,8 @@ class Core_Sitemap extends Core_Servant_Properties
 		$content .= Core_Event::getLastReturn();
 
 		$content .= "<loc>{$loc}</loc>\n" .
-		"<changefreq>" . Core_Str::xml($sChangefreq) . "</changefreq>\n" .
-		"<priority>" . Core_Str::xml($priority) . "</priority>\n";
+		"<changefreq>" . $sChangefreq . "</changefreq>\n" .
+		"<priority>" . $priority . "</priority>\n";
 
 		Core_Event::notify('Core_Sitemap.onAfterAddNode', $this, array($entity));
 		$content .= Core_Event::getLastReturn();
@@ -725,7 +732,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	 */
 	protected function _getIndexFilePath()
 	{
-		return CMS_FOLDER . "sitemap-{$this->_oSite->id}.xml";
+		return CMS_FOLDER . sprintf($this->fileName, $this->_oSite->id);
 	}
 
 	public function createSitemapDir()
@@ -747,6 +754,4 @@ class Core_Sitemap extends Core_Servant_Properties
 	{
 		return '/hostcmsfiles/sitemap/';
 	}
-
-	
 }

@@ -476,7 +476,7 @@ class Structure_Model extends Core_Entity
 			->queryBuilder()
 			//->clear()
 			->where('active', '=', 1)
-			->where('path', '=', $path)
+			->where('path', 'LIKE', $path)
 			->where('parent_id', '=', $parent_id)
 			->limit(1);
 
@@ -902,7 +902,7 @@ class Structure_Model extends Core_Entity
 		$oSameStructures->queryBuilder()
 			->where('site_id', '=', $this->site_id)
 			->where('parent_id', '=', $this->parent_id)
-			->where('path', '=', $this->path)
+			->where('path', 'LIKE', $this->path)
 			->where('id', '!=', $this->id)
 			->limit(1);
 

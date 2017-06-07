@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Cache
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_Cache
 {
@@ -37,7 +37,8 @@ abstract class Core_Cache
 		'expire' => 86400,
 		'size' => 262144,
 		'active' => TRUE,
-		'tags' => TRUE
+		'tags' => TRUE,
+		'compress' => FALSE
 	);
 
 	/**
@@ -143,6 +144,11 @@ abstract class Core_Cache
 
 			$driver = $aConfig[$name]['driver'];
 			self::$instance[$name] = new $driver($aConfig[$name]);
+
+			/*if (!self::$instance[$name]->available())
+			{
+
+			}*/
 		}
 
 		return self::$instance[$name];

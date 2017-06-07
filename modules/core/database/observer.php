@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Database
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Database_Observer
 {
@@ -20,8 +20,7 @@ class Core_Database_Observer
 	 */
 	static public function onBeforeConnect($object, $args)
 	{
-		$oCore_Registry = Core_Registry::instance();
-		$oCore_Registry->set('Core_DataBase.onBeforeConnect', Core::getmicrotime());
+		Core_Registry::instance()->set('Core_DataBase.onBeforeConnect', Core::getmicrotime());
 	}
 
 	/**
@@ -46,8 +45,7 @@ class Core_Database_Observer
 	 */
 	static public function onBeforeSelectDb($object, $args)
 	{
-		$oCore_Registry = Core_Registry::instance();
-		$oCore_Registry->set('Core_DataBase.onBeforeSelectDb', Core::getmicrotime());
+		Core_Registry::instance()->set('Core_DataBase.onBeforeSelectDb', Core::getmicrotime());
 	}
 
 	/**
@@ -72,8 +70,7 @@ class Core_Database_Observer
 	 */
 	static public function onBeforeQuery($object, $args)
 	{
-		$oCore_Registry = Core_Registry::instance();
-		$oCore_Registry->set('Core_DataBase.onBeforeQuery', Core::getmicrotime());
+		Core_Registry::instance()->set('Core_DataBase.onBeforeQuery', Core::getmicrotime());
 	}
 
 	/**
@@ -104,7 +101,7 @@ class Core_Database_Observer
 				fclose($f_log);
 			}
 		}*/
-		
+
 		if (defined('ALLOW_SHOW_SQL') && ALLOW_SHOW_SQL && !defined('IS_ADMIN_PART'))
 		{
 			$queryLog = $oCore_Registry->get('Core_DataBase.queryLog', array());

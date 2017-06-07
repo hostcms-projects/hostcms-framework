@@ -882,7 +882,7 @@ class Property_Controller_Tab extends Core_Servant_Properties
 
 		$group_id = $value == 0
 			? 0
-			: ($Shop_Item->modification
+			: ($Shop_Item->modification_id
 				? intval($Shop_Item->Modification->shop_group_id)
 				: intval($Shop_Item->shop_group_id)
 			);

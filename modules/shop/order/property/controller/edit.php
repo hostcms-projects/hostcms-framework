@@ -9,18 +9,21 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 {
 	/**
-	 * Set object
-	 * @param object $object object
+	 * Prepare backend item's edit form
+	 *
 	 * @return self
+	 * @hostcms-event Shop_Order_Property_Controller_Edit.onAfterRedeclaredPrepareForm
 	 */
-	public function setObject($object)
+	protected function _prepareForm()
 	{
-		parent::setObject($object);
+		parent::_prepareForm();
+
+		$object = $this->_object;
 
 		$modelName = $this->_object->getModelName();
 
@@ -35,8 +38,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 			case 'property':
 
 				// Префикс
-				$oShopPrefixInput = Admin_Form_Entity::factory('Input');
-				$oShopPrefixInput
+				$oShopPrefixInput = Admin_Form_Entity::factory('Input')
 					->caption(Core::_('Shop_Order.prefix'))
 					->name('prefix')
 					->value($this->_object->Shop_Order_Property->prefix)
@@ -45,8 +47,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 				$oMainRow1->add($oShopPrefixInput);
 
 				// Способ отображения в фильтре
-				$oShopFilterSelect = Admin_Form_Entity::factory('Select');
-				$oShopFilterSelect
+				$oShopFilterSelect = Admin_Form_Entity::factory('Select')
 					->caption(Core::_('Shop_Order.display'))
 					->options(
 						array(0 => Core::_('Shop_Order.properties_show_kind_none'),
@@ -61,7 +62,7 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 					)
 					->name('display')
 					->value($this->_object->Shop_Order_Property->display)
-					->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3'));
+					->divAttr(array('class' => 'form-group col-xs-3'));
 
 				$oMainRow1->add($oShopFilterSelect);
 
@@ -70,6 +71,8 @@ class Shop_Order_Property_Controller_Edit extends Property_Controller_Edit
 			default:
 			break;
 		}
+
+		Core_Event::notify(get_class($this) . '.onAfterRedeclaredPrepareForm', $this, array($this->_object, $this->_Admin_Form_Controller));
 
 		return $this;
 	}

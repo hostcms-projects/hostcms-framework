@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 {
@@ -78,7 +78,7 @@ class Skin_Default_Admin_Form_Entity_Radiogroup extends Admin_Form_Entity_Input
 		}
 
 		?><div <?php echo implode(' ', $aDivAttr)?>><?php
-		
+
 		if ($this->buttonset)
 		{
 			$sButtonsetId = 'buttonset_' . Core_Array::get($aDivAttr, 'id');

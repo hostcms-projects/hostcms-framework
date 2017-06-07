@@ -52,8 +52,9 @@ class Antispam_Controller extends Core_Servant_Properties
 	{
 		$oAntispam_GeoIP_Controller = new Antispam_GeoIP_Controller();
 		$geoInit = $oAntispam_GeoIP_Controller->geoip_open(
-			CMS_FOLDER . 'modules/antispam/geoip/GeoIP.dat', GEOIP_STANDARD
+			CMS_FOLDER . 'modules/antispam/geoip/GeoIP.dat', $oAntispam_GeoIP_Controller->GEOIP_STANDARD
 		);
+
 		if (!is_null($geoInit))
 		{
 			$countryCode = $oAntispam_GeoIP_Controller->geoip_country_code_by_addr($geoInit, $this->ip);

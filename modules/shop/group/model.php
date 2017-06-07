@@ -231,12 +231,12 @@ class Shop_Group_Model extends Core_Entity
 	{
 		$this->queryBuilder()
 			//->clear()
-			->where('path', '=', $path)
+			->where('path', 'LIKE', $path)
 			->where('parent_id', '=', $parent_id)
 			->clearOrderBy()
 			->limit(1);
 
-		$aShop_Groups = $this->findAll();
+		$aShop_Groups = $this->findAll(FALSE);
 
 		return isset($aShop_Groups[0])
 			? $aShop_Groups[0]
@@ -551,17 +551,18 @@ class Shop_Group_Model extends Core_Entity
 	/**
 	 * Modify count of items in group
 	 * @param int $int value
+	 * @param boolean $self change items_count
 	 * @return self
 	 */
-	public function modifyCountItems($int = 1)
+	public function modifyCountItems($int = 1, $self = TRUE)
 	{
-		$this->items_count += $int;
+		$self && $this->items_count += $int;
 		$this->items_total_count += $int;
 		$this->save();
 
 		if ($this->parent_id != 0 /*&& $this->parent_id != $this->id*/ && !is_null($this->Shop_Group->id))
 		{
-			$this->Shop_Group->modifyCountItems($int);
+			$this->Shop_Group->modifyCountItems($int, FALSE);
 		}
 		return $this;
 	}
@@ -653,7 +654,19 @@ class Shop_Group_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name);
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ' . $oInformationsystem_Item->description . ' ' . $oInformationsystem_Item->text . ' ';
+					}
+				}
+			}
+			// Shop
+			elseif ($oPropertyValue->Property->type == 12 && Core::moduleIsActive('shop'))
+			{
+				if ($oPropertyValue->value != 0)
+				{
+					$oShop_Item = $oPropertyValue->Shop_Item;
+					if ($oShop_Item->id)
+					{
+						$oSearch_Page->text .= htmlspecialchars($oShop_Item->name) . ' ' . $oShop_Item->description . ' ' . $oShop_Item->text . ' ';
 					}
 				}
 			}

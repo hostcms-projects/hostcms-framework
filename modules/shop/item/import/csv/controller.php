@@ -736,9 +736,9 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						case 'shop_groups_id':
 							if (intval($sData))
 							{
-								$oTmpObject = Core_Entity::factory("Shop_Group")->find($sData);
+								$oTmpObject = $this->_oCurrentShop->Shop_Groups->getById($sData, FALSE);
 
-								if (!is_null($oTmpObject->id))
+								if (!is_null($oTmpObject))
 								{
 									$this->_oCurrentGroup = $oTmpObject;
 								}
@@ -843,12 +843,11 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						break;
 						// Путь группы товаров
 						case 'shop_groups_path':
-							$oTmpObject = Core_Entity::factory('Shop_Group');
+							$oTmpObject = $this->_oCurrentShop->Shop_Groups;
 							$oTmpObject
 								->queryBuilder()
 								->where('parent_id', '=', intval($this->_oCurrentGroup->id))
-								->where('shop_id', '=', intval($this->_oCurrentShop->id))
-								->where('path', '=', $sData);
+								->where('path', 'LIKE', $sData);
 
 							$oTmpObject = $oTmpObject->findAll(FALSE);
 
@@ -1295,8 +1294,8 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 						break;
 						// Идентификатор товара
 						case 'shop_items_catalog_item_id':
-							$oTmpObject = Core_Entity::factory("Shop_Item")->find($sData);
-							if (!is_null($oTmpObject->id))
+							$oTmpObject = $this->_oCurrentShop->Shop_Items->getById($sData, FALSE);
+							if (!is_null($oTmpObject))
 							{
 								//$this->_oCurrentItem->id = $oTmpObject->id;
 								$this->_oCurrentItem = $oTmpObject;
@@ -1413,7 +1412,7 @@ class Shop_Item_Import_Csv_Controller extends Core_Servant_Properties
 							{
 								$oTmpObject = $this->_oCurrentShop->Shop_Items;
 								$oTmpObject->queryBuilder()
-									->where('path', '=', $sData)
+									->where('path', 'LIKE', $sData)
 									->where('shop_group_id', '=', $this->_oCurrentGroup->id);
 
 								$oTmpObject = $oTmpObject->findAll(FALSE);

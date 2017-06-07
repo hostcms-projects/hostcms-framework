@@ -95,6 +95,7 @@ class Shop_Cart_Model extends Core_Entity
 	 * Get XML for entity and children entities
 	 * @return string
 	 * @hostcms-event shop_cart.onBeforeRedeclaredGetXml
+	 * @hostcms-event shop_cart.onBeforeAddShopItem
 	 */
 	public function getXml()
 	{
@@ -115,6 +116,8 @@ class Shop_Cart_Model extends Core_Entity
 				$oModification->showXmlProperties($this->_showXmlProperties)
 			);
 		}
+
+		Core_Event::notify($this->_modelName . '.onBeforeAddShopItem', $this, array($oShop_Item));
 
 		$this->clearXmlTags()
 			->addEntity($oShop_Item);

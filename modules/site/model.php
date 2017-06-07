@@ -539,7 +539,7 @@ class Site_Model extends Core_Entity
 			$aMatchAdvertisements = array();
 
 			// Цикл по баннерам
-			foreach($aAdvertisements as $oAdvertisement)
+			foreach ($aAdvertisements as $oAdvertisement)
 			{
 				// Копируем баннер
 				$oNewAdvertisement = $oAdvertisement->copy();
@@ -552,7 +552,7 @@ class Site_Model extends Core_Entity
 			$aAdvertisement_Groups = $this->Advertisement_Groups->findAll(FALSE);
 
 			// Цикл по группам баннеров
-			foreach($aAdvertisement_Groups as $oAdvertisement_Group)
+			foreach ($aAdvertisement_Groups as $oAdvertisement_Group)
 			{
 				// Копируем группу баннеров
 				$oNewAdvertisement_Group = $oAdvertisement_Group->copy();
@@ -564,7 +564,7 @@ class Site_Model extends Core_Entity
 				$aAdvertisement_Group_Lists = $oNewAdvertisement_Group->Advertisement_Group_Lists->findAll(FALSE);
 
 				// Цикл по связям группы баннеров с баннерами
-				foreach($aAdvertisement_Group_Lists as $oAdvertisement_Group_List)
+				foreach ($aAdvertisement_Group_Lists as $oAdvertisement_Group_List)
 				{
 					if (isset($aMatchAdvertisements[$oAdvertisement_Group_List->advertisement_id]))
 					{
@@ -585,7 +585,7 @@ class Site_Model extends Core_Entity
 		$aMatchDocument_Statuses = array();
 
 		// Цикл по статусам документов
-		foreach($aDocument_Statuses as $oDocument_Status)
+		foreach ($aDocument_Statuses as $oDocument_Status)
 		{
 			// Копируем статус документа
 			$oNewDocument_Status = $oDocument_Status->copy();
@@ -600,7 +600,7 @@ class Site_Model extends Core_Entity
 		$aMatchDocument_Dirs = array();
 
 		// Цикл по разделам документов
-		foreach($aDocument_Dirs as $oDocument_Dir)
+		foreach ($aDocument_Dirs as $oDocument_Dir)
 		{
 			// Копируем разделы документов
 			$oNewDocument_Dir = clone $oDocument_Dir;
@@ -613,7 +613,7 @@ class Site_Model extends Core_Entity
 		$aNewDocument_Dirs = $newObject->Document_Dirs->findAll(FALSE);
 
 		// В цикле заменяем идентификаторы родительских разделов
-		foreach($aNewDocument_Dirs as $oNewDocument_Dir)
+		foreach ($aNewDocument_Dirs as $oNewDocument_Dir)
 		{
 			if (isset($aMatchDocument_Dirs[$oNewDocument_Dir->parent_id]))
 			{
@@ -628,17 +628,17 @@ class Site_Model extends Core_Entity
 
 		$aMatch_Documents = array();
 
-		foreach($aDocuments as $oDocument)
+		foreach ($aDocuments as $oDocument)
 		{
 			//$oNewDocument = clone $oDocument;
 			$oNewDocument = $oDocument->copy();
 
-			if(isset($aMatchDocument_Dirs[$oNewDocument->document_dir_id]))
+			if (isset($aMatchDocument_Dirs[$oNewDocument->document_dir_id]))
 			{
 				$oNewDocument->document_dir_id = $aMatchDocument_Dirs[$oNewDocument->document_dir_id]->id;
 			}
 
-			if(isset($aMatchDocument_Statuses[$oNewDocument->document_status_id]))
+			if (isset($aMatchDocument_Statuses[$oNewDocument->document_status_id]))
 			{
 				$oNewDocument_Status = $aMatchDocument_Statuses[$oNewDocument->document_status_id];
 
@@ -658,7 +658,7 @@ class Site_Model extends Core_Entity
 		$aMatchStructure_Menus = array();
 
 		$aStructure_Menus = $this->Structure_Menus->findAll(FALSE);
-		foreach($aStructure_Menus as $oStructure_Menu)
+		foreach ($aStructure_Menus as $oStructure_Menu)
 		{
 			$oNewStructure_Menu = $oStructure_Menu->copy();
 			$newObject->add($oNewStructure_Menu);
@@ -671,7 +671,7 @@ class Site_Model extends Core_Entity
 		$aStructure_Properties = $this->Structure_Properties->findAll(FALSE);
 
 		$aMatchStructure_Properties = array();
-		foreach($aStructure_Properties as $oStructure_Property)
+		foreach ($aStructure_Properties as $oStructure_Property)
 		{
 			$oProperty = $oStructure_Property->Property;
 
@@ -690,7 +690,7 @@ class Site_Model extends Core_Entity
 		$aStructure_Property_Dirs = $this->Structure_Property_Dirs->findAll(FALSE);
 
 		$aMatchPropertyDirs = array();
-		foreach($aStructure_Property_Dirs as $oStructure_Property_Dir)
+		foreach ($aStructure_Property_Dirs as $oStructure_Property_Dir)
 		{
 			$oNewStructure_Property_Dir = clone $oStructure_Property_Dir;
 			$oProperty_Dir = $oStructure_Property_Dir->Property_Dir;
@@ -725,11 +725,11 @@ class Site_Model extends Core_Entity
 
 		// Обновляем значение родительской директории свойства
 		$aNewStructure_Properties = $newObject->Structure_Properties->findAll(FALSE);
-		foreach($aNewStructure_Properties as $oNewStructure_Property)
+		foreach ($aNewStructure_Properties as $oNewStructure_Property)
 		{
 			$oNewProperty = $oNewStructure_Property->Property;
 
-			if(isset($aMatchPropertyDirs[$oNewProperty->property_dir_id]))
+			if (isset($aMatchPropertyDirs[$oNewProperty->property_dir_id]))
 			{
 				$oNewProperty->property_dir_id = $aMatchPropertyDirs[$oNewProperty->property_dir_id]->id;
 				$oNewProperty->save();
@@ -738,7 +738,7 @@ class Site_Model extends Core_Entity
 
 		$aStructures = $this->Structures->findAll(FALSE);
 		$aMatchStructures = array();
-		foreach($aStructures as $oStructure)
+		foreach ($aStructures as $oStructure)
 		{
 			$oNewStructure = $oStructure->copy();
 			$oNewStructure->path = $oStructure->path;
@@ -799,7 +799,7 @@ class Site_Model extends Core_Entity
 			$aList_Dirs = $this->List_Dirs->findAll(FALSE);
 
 			$aMatchList_Dirs = array();
-			foreach($aList_Dirs as $oList_Dir)
+			foreach ($aList_Dirs as $oList_Dir)
 			{
 				$oNewList_Dir = clone $oList_Dir;
 
@@ -808,7 +808,7 @@ class Site_Model extends Core_Entity
 			}
 
 			$aNewList_Dirs = $newObject->List_Dirs->findAll(FALSE);
-			foreach($aNewList_Dirs as $oNewList_Dir)
+			foreach ($aNewList_Dirs as $oNewList_Dir)
 			{
 				if (isset($aMatchList_Dirs[$oNewList_Dir->parent_id]))
 				{
@@ -820,7 +820,7 @@ class Site_Model extends Core_Entity
 			$aLists = $this->Lists->findAll(FALSE);
 
 			$aMatchLists = array();
-			foreach($aLists as $oList)
+			foreach ($aLists as $oList)
 			{
 				$oNewList = $oList->copy();
 				if (isset($aMatchList_Dirs[$oNewList->list_dir_id]))
@@ -847,7 +847,7 @@ class Site_Model extends Core_Entity
 			// Получаем список групп опросов
 			$aPoll_Groups = $this->Poll_Groups->findAll(FALSE);
 
-			foreach($aPoll_Groups as $oPoll_Group)
+			foreach ($aPoll_Groups as $oPoll_Group)
 			{
 				$oNewPoll_Group = $oPoll_Group->copy();
 				$newObject->add($oNewPoll_Group);
@@ -861,7 +861,7 @@ class Site_Model extends Core_Entity
 			// Получаем список групп пользователей
 			$aSiteuser_Groups = $this->Siteuser_Groups->findAll(FALSE);
 
-			foreach($aSiteuser_Groups as $oSiteuser_Group)
+			foreach ($aSiteuser_Groups as $oSiteuser_Group)
 			{
 				$oNewSiteuser_Group = $oSiteuser_Group->copy();
 				$newObject->add($oNewSiteuser_Group);
@@ -873,7 +873,7 @@ class Site_Model extends Core_Entity
 			$aSiteuser_Properties = $this->Siteuser_Properties->findAll(FALSE);
 
 			$aMatchProperties = array();
-			foreach($aSiteuser_Properties as $oSiteuser_Property)
+			foreach ($aSiteuser_Properties as $oSiteuser_Property)
 			{
 				$oProperty = $oSiteuser_Property->Property;
 
@@ -892,7 +892,7 @@ class Site_Model extends Core_Entity
 			$aSiteuser_Property_Dirs = $this->Siteuser_Property_Dirs->findAll(FALSE);
 
 			$aMatchPropertyDirs = array();
-			foreach($aSiteuser_Property_Dirs as $oSiteuser_Property_Dir)
+			foreach ($aSiteuser_Property_Dirs as $oSiteuser_Property_Dir)
 			{
 				$oNewSiteuser_Property_Dir = clone $oSiteuser_Property_Dir;
 
@@ -928,11 +928,11 @@ class Site_Model extends Core_Entity
 
 			// Обновляем значение родительской директории свойств пользователей сайта
 			$aNewSiteuser_Properties = $newObject->Siteuser_Properties->findAll(FALSE);
-			foreach($aNewSiteuser_Properties as $oNewSiteuser_Property)
+			foreach ($aNewSiteuser_Properties as $oNewSiteuser_Property)
 			{
 				$oNewProperty = $oNewSiteuser_Property->Property;
 
-				if(isset($aMatchPropertyDirs[$oNewProperty->property_dir_id]))
+				if (isset($aMatchPropertyDirs[$oNewProperty->property_dir_id]))
 				{
 					$oNewProperty->property_dir_id = $aMatchPropertyDirs[$oNewProperty->property_dir_id]->id;
 					$oNewProperty->save();
@@ -944,7 +944,7 @@ class Site_Model extends Core_Entity
 
 			$aMatchSiteusers = array();
 
-			foreach($aSiteusers as $oSiteuser)
+			foreach ($aSiteusers as $oSiteuser)
 			{
 				$oNewSiteuser = $oSiteuser->copy();
 				$aMatchSiteusers[$oSiteuser->id] = $oNewSiteuser;
@@ -955,7 +955,7 @@ class Site_Model extends Core_Entity
 				$newObject->add($oNewSiteuser);
 
 				$aSiteuser_Identities = $oSiteuser->Siteuser_Identities->findAll(FALSE);
-				foreach($aSiteuser_Identities as $oSiteuser_Identity)
+				foreach ($aSiteuser_Identities as $oSiteuser_Identity)
 				{
 					$oNewSiteuser_Identity = $oSiteuser_Identity->copy();
 					$oNewSiteuser_Identity->siteuser_id = $oNewSiteuser->id;
@@ -977,11 +977,11 @@ class Site_Model extends Core_Entity
 			}
 
 			// Цикл по пользователям сайта
-			foreach($aSiteusers as $oSiteuser)
+			foreach ($aSiteusers as $oSiteuser)
 			{
 				$aSiteuser_Group_Lists = $oSiteuser->Siteuser_Group_Lists->findAll(FALSE);
 
-				foreach($aSiteuser_Group_Lists as $oSiteuser_Group_List)
+				foreach ($aSiteuser_Group_Lists as $oSiteuser_Group_List)
 				{
 					//$oNewSiteuser_Group_List = $oSiteuser_Group_List->copy();
 					$oNewSiteuser_Group_List = Core_Entity::factory('Siteuser_Group_List');
@@ -1000,7 +1000,7 @@ class Site_Model extends Core_Entity
 
 				$aSiteuser_Identity_Providers = $this->Siteuser_Identity_Providers->findAll(FALSE);
 
-				foreach($aSiteuser_Identity_Providers as $oSiteuser_Identity_Provider)
+				foreach ($aSiteuser_Identity_Providers as $oSiteuser_Identity_Provider)
 				{
 					$newObject->add($oSiteuser_Identity_Provider->copy());
 				}
@@ -1008,11 +1008,11 @@ class Site_Model extends Core_Entity
 
 			// В цикле по пользователям сайта, в котором копируем афиллиатов пользователей
 			/*
-			foreach($aSiteusers as $oSiteuser)
+			foreach ($aSiteusers as $oSiteuser)
 			{
 				$aSiteuser_Affiliates = $oSiteuser->Siteuser_Affiliates->findAll(FALSE);
 
-				foreach($aSiteuser_Affiliates as $oSiteuser_Affiliate)
+				foreach ($aSiteuser_Affiliates as $oSiteuser_Affiliate)
 				{
 					$aNewSiteuser_Affiliate = $oSiteuser_Affiliate->copy();
 
@@ -1039,7 +1039,7 @@ class Site_Model extends Core_Entity
 			$aInformationsystem_Dirs = $this->Informationsystem_Dirs->findAll(FALSE);
 			$aMatchInformationsystem_Dirs = array();
 
-			foreach($aInformationsystem_Dirs as $oInformationsystem_Dir)
+			foreach ($aInformationsystem_Dirs as $oInformationsystem_Dir)
 			{
 				$oNewInformationsystem_Dir = clone $oInformationsystem_Dir;
 				$newObject->add($oNewInformationsystem_Dir);
@@ -1049,9 +1049,9 @@ class Site_Model extends Core_Entity
 
 			// Получаем скопированные разделы информационных систем
 			$aNewInformationsystem_Dirs = $newObject->Informationsystem_Dirs->findAll(FALSE);
-			foreach($aNewInformationsystem_Dirs as $oNewInformationsystem_Dir)
+			foreach ($aNewInformationsystem_Dirs as $oNewInformationsystem_Dir)
 			{
-				if(isset($aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]))
+				if (isset($aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]))
 				{
 					$oNewInformationsystem_Dir->parent_id = $aMatchInformationsystem_Dirs[$oNewInformationsystem_Dir->parent_id]->id;
 
@@ -1063,7 +1063,7 @@ class Site_Model extends Core_Entity
 			$aInformationsystems = $this->Informationsystems->findAll(FALSE);
 
 			// Цикл по информационным системам, находящимся в корне разделов информационных систем
-			foreach($aInformationsystems as $oInformationsystem)
+			foreach ($aInformationsystems as $oInformationsystem)
 			{
 				$oNewInformationsystem = $oInformationsystem->copy();
 				if (isset($aMatchInformationsystem_Dirs[$oInformationsystem->informationsystem_dir_id]))
@@ -1095,7 +1095,7 @@ class Site_Model extends Core_Entity
 			$aShop_Dirs = $this->Shop_Dirs->findAll(FALSE);
 
 			$aMatchShop_Dirs = array();
-			foreach($aShop_Dirs as $oShop_Dir)
+			foreach ($aShop_Dirs as $oShop_Dir)
 			{
 				//$oNewShop_Dir = $oShop_Dir->copy();
 				$oNewShop_Dir = clone $oShop_Dir;
@@ -1110,7 +1110,7 @@ class Site_Model extends Core_Entity
 			$aShops = $oShops->findAll(FALSE);
 
 			// Цикл по магазинам, находящимся в корне разделов магазинов
-			foreach($aShops as $oShop)
+			foreach ($aShops as $oShop)
 			{
 				$oNewShop = $oShop->copy();
 
@@ -1141,7 +1141,7 @@ class Site_Model extends Core_Entity
 		{
 			$aForums = $this->Forums->findAll(FALSE);
 			$aMatchForums = array();
-			foreach($aForums as $oForum)
+			foreach ($aForums as $oForum)
 			{
 				$oNewForum = clone $oForum;
 				$newObject->add($oNewForum);
@@ -1149,21 +1149,21 @@ class Site_Model extends Core_Entity
 				$aMatchForums[$oForum->id] = $oNewForum;
 
 				$aForum_Groups = $oForum->Forum_Groups->findAll(FALSE);
-				foreach($aForum_Groups as $oForum_Group)
+				foreach ($aForum_Groups as $oForum_Group)
 				{
 					$oNewForum_Group = clone $oForum_Group;
 					$oNewForum->add($oNewForum_Group);
 
 					$aForum_Categories = $oForum_Group->Forum_Categories->findAll(FALSE);
 
-					foreach($aForum_Categories as $oForum_Category)
+					foreach ($aForum_Categories as $oForum_Category)
 					{
 						$oNewForum_Category = clone $oForum_Category;
 						$oNewForum_Group->add($oNewForum_Category);
 
 						$aForum_Category_Siteuser_Groups = $oForum_Category->Forum_Category_Siteuser_Groups->findAll(FALSE);
 
-						foreach($aForum_Category_Siteuser_Groups as $oForum_Category_Siteuser_Group)
+						foreach ($aForum_Category_Siteuser_Groups as $oForum_Category_Siteuser_Group)
 						{
 							$oNewForum_Category_Siteuser_Group = $oForum_Category_Siteuser_Group->copy();
 
@@ -1182,13 +1182,13 @@ class Site_Model extends Core_Entity
 		if (Core::moduleIsActive('seo'))
 		{
 			$aSeos = $this->Seos->findAll(FALSE);
-			foreach($aSeos as $oSeo)
+			foreach ($aSeos as $oSeo)
 			{
 				$newObject->add($oSeo->copy());
 			}
 
 			$aSeo_Queries = $this->Seo_Queries->findAll(FALSE);
-			foreach($aSeo_Queries as $oSeo_Query)
+			foreach ($aSeo_Queries as $oSeo_Query)
 			{
 				$newObject->add($oSeo_Query->copy());
 			}
@@ -1199,7 +1199,7 @@ class Site_Model extends Core_Entity
 			// Получаем список рассылок
 			$aMaillists = $this->Maillists->findAll(FALSE);
 
-			foreach($aMaillists as $oMaillist)
+			foreach ($aMaillists as $oMaillist)
 			{
 				// Копируем рассылку
 				$oNewMaillist = clone $oMaillist;
@@ -1208,7 +1208,7 @@ class Site_Model extends Core_Entity
 				// Получаем связи групп пользователей, которым доступна подписка
 				$aMaillist_Siteuser_Groups = $oMaillist->Maillist_Siteuser_Groups->findAll(FALSE);
 
-				foreach($aMaillist_Siteuser_Groups as $oMaillist_Siteuser_Group)
+				foreach ($aMaillist_Siteuser_Groups as $oMaillist_Siteuser_Group)
 				{
 					// Копируем связь группы пользователей с подпиской
 					$oNewMaillist_Siteuser_Group = $oMaillist_Siteuser_Group->copy();
@@ -1228,7 +1228,7 @@ class Site_Model extends Core_Entity
 
 			$aMatchHelpdesks = array();
 
-			foreach($aHelpdesks as $oHelpdesk)
+			foreach ($aHelpdesks as $oHelpdesk)
 			{
 				//$oNewHelpdesk = $oHelpdesk->copy();
 
@@ -1238,7 +1238,7 @@ class Site_Model extends Core_Entity
 
 				$aMatchHelpdesk_Categories = array();
 
-				foreach($aHelpdesk_Categories as $oHelpdesk_Category)
+				foreach ($aHelpdesk_Categories as $oHelpdesk_Category)
 				{
 					$oNewHelpdesk_Category = clone $oHelpdesk_Category;
 					$oNewHelpdesk->add($oNewHelpdesk_Category);
@@ -1248,7 +1248,7 @@ class Site_Model extends Core_Entity
 
 				$aNewHelpdesk_Categories = $oNewHelpdesk->Helpdesk_Categories->findAll(FALSE);
 
-				foreach($aNewHelpdesk_Categories as $oNewHelpdesk_Category)
+				foreach ($aNewHelpdesk_Categories as $oNewHelpdesk_Category)
 				{
 					if (isset($aMatchHelpdesk_Categories[$oNewHelpdesk_Category->parent_id]))
 					{
@@ -1261,7 +1261,7 @@ class Site_Model extends Core_Entity
 				$aMatchHelpdesk_Statuses = array();
 
 				$aHelpdesk_Statuses = $oHelpdesk->Helpdesk_Statuses->findAll(FALSE);
-				foreach($aHelpdesk_Statuses as $oHelpdesk_Status)
+				foreach ($aHelpdesk_Statuses as $oHelpdesk_Status)
 				{
 					$oNewHelpdesk_Status = $oHelpdesk_Status->copy();
 
@@ -1272,12 +1272,12 @@ class Site_Model extends Core_Entity
 					$aMatchHelpdesk_Statuses[$oHelpdesk_Status->id] = $oNewHelpdesk_Status;
 				}
 
-				if(isset($aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_reply_id]))
+				if (isset($aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_reply_id]))
 				{
 					$oNewHelpdesk->helpdesk_status_reply_id = $aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_reply_id]->id;
 				}
 
-				if(isset($aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_new_id]))
+				if (isset($aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_new_id]))
 				{
 					$oNewHelpdesk->helpdesk_status_new_id = $aMatchHelpdesk_Statuses[$oNewHelpdesk->helpdesk_status_new_id]->id;
 				}
@@ -1290,21 +1290,21 @@ class Site_Model extends Core_Entity
 
 				// Получаем список уровней критичности
 				$aHelpdesk_Criticality_Levels = $oHelpdesk->Helpdesk_Criticality_Levels->findAll(FALSE);
-				foreach($aHelpdesk_Criticality_Levels as $oHelpdesk_Criticality_Level)
+				foreach ($aHelpdesk_Criticality_Levels as $oHelpdesk_Criticality_Level)
 				{
 					$oNewHelpdesk->add($oHelpdesk_Criticality_Level->copy());
 				}
 
 				// Получаем список праздничных дней
 				$aHelpdesk_Holidays = $oHelpdesk->Helpdesk_Holidays->findAll(FALSE);
-				foreach($aHelpdesk_Holidays as $oHelpdesk_Holiday)
+				foreach ($aHelpdesk_Holidays as $oHelpdesk_Holiday)
 				{
 					$oNewHelpdesk->add($oHelpdesk_Holiday->copy());
 				}
 
 				// Получаем список рабочих часов
 				$aHelpdesk_Working_Hours = $oHelpdesk->Helpdesk_Working_Hours->findAll(FALSE);
-				foreach($aHelpdesk_Working_Hours as $oHelpdesk_Working_Hour)
+				foreach ($aHelpdesk_Working_Hours as $oHelpdesk_Working_Hour)
 				{
 					$oNewHelpdesk->add($oHelpdesk_Working_Hour->copy());
 				}
@@ -1320,7 +1320,7 @@ class Site_Model extends Core_Entity
 		}
 
 		$aSite_Aliases = $this->Site_Aliases->findAll(FALSE);
-		foreach($aSite_Aliases as $oSite_Alias)
+		foreach ($aSite_Aliases as $oSite_Alias)
 		{
 			$newObject->add($oSite_Alias->copy());
 		}
@@ -1332,7 +1332,7 @@ class Site_Model extends Core_Entity
 		$aMatchTemplate_Dirs = array();
 
 		// В цикле копируем разделы макетов сайта
-		foreach($aTemplate_Dirs as $oTemplate_Dir)
+		foreach ($aTemplate_Dirs as $oTemplate_Dir)
 		{
 			$oNewTemplate_Dir = clone $oTemplate_Dir;
 			$newObject->add($oNewTemplate_Dir);
@@ -1343,9 +1343,9 @@ class Site_Model extends Core_Entity
 		$aNewTemplate_Dirs = $newObject->Template_Dirs->findAll(FALSE);
 
 		// В цикле меняем идентификаторы родительских разделов на идентификаторы копий
-		foreach($aNewTemplate_Dirs as $oNewTemplate_Dir)
+		foreach ($aNewTemplate_Dirs as $oNewTemplate_Dir)
 		{
-			if(isset($aMatchTemplate_Dirs[$oNewTemplate_Dir->parent_id]))
+			if (isset($aMatchTemplate_Dirs[$oNewTemplate_Dir->parent_id]))
 			{
 				$oNewTemplate_Dir->parent_id = $aMatchTemplate_Dirs[$oNewTemplate_Dir->parent_id]->id;
 			}
@@ -1354,25 +1354,43 @@ class Site_Model extends Core_Entity
 		$aTemplates = $this->Templates->findAll(FALSE);
 
 		$aMatchTemplates = array();
-		foreach($aTemplates as $oTemplate)
+		foreach ($aTemplates as $oTemplate)
 		{
 			$oNewTemplate = clone $oTemplate;
 
 			$oNewTemplate->saveTemplateCssFile($oTemplate->loadTemplateCssFile());
 			$oNewTemplate->saveTemplateFile($oTemplate->loadTemplateFile());
 
-			if(isset($aMatchTemplate_Dirs[$oNewTemplate->template_dir_id]))
+			if (isset($aMatchTemplate_Dirs[$oNewTemplate->template_dir_id]))
 			{
 				$oNewTemplate->template_dir_id = $aMatchTemplate_Dirs[$oNewTemplate->template_dir_id]->id;
 			}
 
 			$newObject->add($oNewTemplate);
 
+			// Template_Sections
+			$aTemplate_Sections = $oTemplate->Template_Sections->findAll(FALSE);
+
+			foreach ($aTemplate_Sections as $oTemplate_Section)
+			{
+				$oNew_Template_Section = clone $oTemplate_Section;
+				$oNewTemplate->add($oNew_Template_Section);
+
+				// Template_Section_Libs
+				$aTemplate_Section_Libs = $oTemplate_Section->Template_Section_Libs->findAll(FALSE);
+
+				foreach ($aTemplate_Section_Libs as $oTemplate_Section_Lib)
+				{
+					$oNew_Template_Section_Lib = clone $oTemplate_Section_Lib;
+					$oNew_Template_Section->add($oNew_Template_Section_Lib);
+				}
+			}
+
 			$aMatchTemplates[$oTemplate->id] = $oNewTemplate;
 		}
 
 		$aNewTemplates = $newObject->Templates->findAll(FALSE);
-		foreach($aNewTemplates as $oNewTemplate)
+		foreach ($aNewTemplates as $oNewTemplate)
 		{
 			if (isset($aMatchTemplates[$oNewTemplate->template_id]))
 			{
@@ -1382,7 +1400,7 @@ class Site_Model extends Core_Entity
 		}
 
 		$aDocuments = $newObject->Documents->findAll(FALSE);
-		foreach($aDocuments as $oDocument)
+		foreach ($aDocuments as $oDocument)
 		{
 			if (isset($aMatchTemplates[$oDocument->template_id]))
 			{
@@ -1397,7 +1415,7 @@ class Site_Model extends Core_Entity
 			$aForms = $this->Forms->findAll(FALSE);
 
 			$aMatchForms = array();
-			foreach($aForms as $oForm)
+			foreach ($aForms as $oForm)
 			{
 				$oNewForm =	$oForm->copy();
 				$newObject->add($oNewForm);
@@ -1407,7 +1425,7 @@ class Site_Model extends Core_Entity
 				$oForm_Fields->queryBuilder()->where('type', '=', 6);
 
 				$aForm_Fields = $oForm_Fields->findAll(FALSE);
-				foreach($aForm_Fields as $oForm_Field)
+				foreach ($aForm_Fields as $oForm_Field)
 				{
 					if (isset($aMatchLists[$oForm_Field->list_id]))
 					{
@@ -1420,7 +1438,7 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		foreach($aStructures as $oStructure)
+		foreach ($aStructures as $oStructure)
 		{
 			if (isset($aMatchStructures[$oStructure->id]))
 			{
@@ -1428,34 +1446,35 @@ class Site_Model extends Core_Entity
 				{
 					$array = $oStructure->Lib->getDat($oStructure->id);
 
-					if (isset($array['informationsystemId']) && isset($aMatchInformationsystems[$array['informationsystemId']]))
+					if (is_array($array))
 					{
-						//echo "<br />array['informationsystemId'] =" . $array['informationsystemId'];
-						$array['informationsystemId'] = $aMatchInformationsystems[$array['informationsystemId']]->id;
-					}
+						if (isset($array['informationsystemId']) && isset($aMatchInformationsystems[$array['informationsystemId']]))
+						{
+							$array['informationsystemId'] = $aMatchInformationsystems[$array['informationsystemId']]->id;
+						}
 
-					if (isset($array['shopId']) && isset($aMatchShops[$array['shopId']]))
-					{
-						//echo "<br />array['shopId']=" . $array['shopId'];
-						$array['shopId'] = $aMatchShops[$array['shopId']]->id;
-					}
+						if (isset($array['shopId']) && isset($aMatchShops[$array['shopId']]))
+						{
+							$array['shopId'] = $aMatchShops[$array['shopId']]->id;
+						}
 
-					if (isset($array['helpdeskId']) && isset($aMatchHelpdesks[$array['helpdeskId']]))
-					{
-						$array['helpdeskId'] = $aMatchHelpdesks[$array['helpdeskId']]->id;
-					}
+						if (isset($array['helpdeskId']) && isset($aMatchHelpdesks[$array['helpdeskId']]))
+						{
+							$array['helpdeskId'] = $aMatchHelpdesks[$array['helpdeskId']]->id;
+						}
 
-					if (isset($array['forum_id']) && isset($aMatchForums[$array['forum_id']]))
-					{
-						$array['forum_id'] = $aMatchForums[$array['forum_id']]->id;
-					}
+						if (isset($array['forum_id']) && isset($aMatchForums[$array['forum_id']]))
+						{
+							$array['forum_id'] = $aMatchForums[$array['forum_id']]->id;
+						}
 
-					if (isset($array['form_id']) && isset($aMatchForms[$array['form_id']]))
-					{
-						$array['form_id'] = $aMatchForms[$array['form_id']]->id;
-					}
+						if (isset($array['form_id']) && isset($aMatchForms[$array['form_id']]))
+						{
+							$array['form_id'] = $aMatchForms[$array['form_id']]->id;
+						}
 
-					$aMatchStructures[$oStructure->id]->Lib->saveDatFile($array, $aMatchStructures[$oStructure->id]->id);
+						$aMatchStructures[$oStructure->id]->Lib->saveDatFile($array, $aMatchStructures[$oStructure->id]->id);
+					}
 				}
 			}
 		}
@@ -1467,24 +1486,24 @@ class Site_Model extends Core_Entity
 		unset($aMatchForms);
 
 		$aNewStructures = $newObject->Structures->findAll(FALSE);
-		foreach($aNewStructures as $oNewStructure)
+		foreach ($aNewStructures as $oNewStructure)
 		{
-			if(isset($aMatchStructures[$oNewStructure->parent_id]))
+			if (isset($aMatchStructures[$oNewStructure->parent_id]))
 			{
 				$oNewStructure->parent_id = $aMatchStructures[$oNewStructure->parent_id]->id;
 			}
 
-			if(isset($aMatchTemplates[$oNewStructure->template_id]))
+			if (isset($aMatchTemplates[$oNewStructure->template_id]))
 			{
 				$oNewStructure->template_id = $aMatchTemplates[$oNewStructure->template_id]->id;
 			}
 
-			if(isset($aMatch_Documents[$oNewStructure->document_id]))
+			if (isset($aMatch_Documents[$oNewStructure->document_id]))
 			{
 				$oNewStructure->document_id = $aMatch_Documents[$oNewStructure->document_id]->id;
 			}
 
-			if(isset($aMatchSiteuser_Groups[$oNewStructure->siteuser_group_id]))
+			if (isset($aMatchSiteuser_Groups[$oNewStructure->siteuser_group_id]))
 			{
 				$oNewStructure->siteuser_group_id = $aMatchSiteuser_Groups[$oNewStructure->siteuser_group_id]->id;
 			}
@@ -1500,7 +1519,7 @@ class Site_Model extends Core_Entity
 
 		// Users
 		$aUser_Groups = $this->User_Groups->findAll(FALSE);
-		foreach($aUser_Groups as $oUser_Group)
+		foreach ($aUser_Groups as $oUser_Group)
 		{
 			$newObject->add($oUser_Group->copy());
 		}

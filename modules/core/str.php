@@ -615,7 +615,7 @@ class Core_Str
 	}
 
 	/**
-	 * Conveert HEX color to RGB or RGBA
+	 * Convert HEX color to RGB or RGBA
 	 * @param string $hex HEX color, e.g. #B781AF or #FF0
 	 * @param float|NULL opacity between 0 and 1, e.g. 0.85
 	 */
@@ -660,5 +660,49 @@ class Core_Str
 		}
 
 		return $return;
+	}
+	
+	/**
+	 * Lighter HEX color 
+	 * @param string $hex HEX color, e.g. #B781AF or #FF0
+	 * @param float opacity between 0 and 1, e.g. 0.85
+	 */
+	static public function hex2lighter($hex, $opacity)
+	{
+		$default = '#FFF';
+
+		if (empty($hex))
+		{
+			return $default;
+		}
+
+		$hex = ltrim($hex, '#');
+
+		//Check if color has 6 or 3 characters and get values
+		if (strlen($hex) == 6)
+		{
+			$hex = str_split($hex, 2);
+		}
+		elseif(strlen($hex) == 3)
+		{
+			$hex = array($hex[0] . $hex[0], $hex[1] . $hex[1], $hex[2] . $hex[2]);
+		}
+		else
+		{
+			return $default;
+		}
+
+		// Convert hexadec to rgb
+		$rgb = array_map('hexdec', $hex);
+
+		foreach ($rgb as $key => $iColor)
+		{
+			$k = $iColor + floor((255 - $iColor) * $opacity);
+			$rgb[$key] = $k < 255 ? $k : 255;
+		}
+		
+		$rgb = array_map('dechex', $rgb);
+		
+		return '#' . implode('', $rgb);
 	}
 }

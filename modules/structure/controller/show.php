@@ -133,7 +133,7 @@ class Structure_Controller_Show extends Core_Controller
 		$this->showPanel = $this->cache = TRUE;
 
 		$this->currentStructureId = Core_Page::instance()->structure->id;
-		
+
 		$this->onStep = 500;
 	}
 
@@ -683,7 +683,7 @@ class Structure_Controller_Show extends Core_Controller
 		if ($this->showShopItems)
 		{
 			$this->_aShop_Items = array();
-			
+
 			$oCore_QueryBuilder_Select = Core_QueryBuilder::select(array('MAX(id)', 'max_id'));
 			$oCore_QueryBuilder_Select
 				->from('shop_items')
@@ -756,7 +756,7 @@ class Structure_Controller_Show extends Core_Controller
 				{
 					$this->_aShop_Items[$oShop_Item->shop_group_id][] = $oShop_Item;
 				}
-			
+
 				$iFrom += $this->onStep;
 			}
 			while ($iFrom < $maxId);

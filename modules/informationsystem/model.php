@@ -128,6 +128,23 @@ class Informationsystem_Model extends Core_Entity
 	}
 
 	/**
+	 * Calculate counts
+	 * @var boolean
+	 */
+	protected $_showXmlCounts = TRUE;
+
+	/**
+	 * Add comments XML to item
+	 * @param boolean $showXmlComments mode
+	 * @return self
+	 */
+	public function showXmlCounts($showXmlCounts = TRUE)
+	{
+		$this->_showXmlCounts = $showXmlCounts;
+		return $this;
+	}
+
+	/**
 	 * Get information system by structure id
 	 * @param int $structure_id structure id
 	 * @return Informationsystem|NULL
@@ -298,7 +315,7 @@ class Informationsystem_Model extends Core_Entity
 		$this->id = $primaryKey;
 
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
-		
+
 		// Fix bug with 'deleted' relations
 		$this->deleted = 0;
 		$this->save();
@@ -590,35 +607,37 @@ class Informationsystem_Model extends Core_Entity
 		$this->clearXmlTags()
 			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))
 			->addXmlTag('url', $this->Structure->getPath())
-			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0)
-			;
+			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0);
 
-		$oInformationsystem_Items = $this->Informationsystem_Items;
-		$oInformationsystem_Items->queryBuilder()
-			->where('informationsystem_items.informationsystem_group_id', '=', 0);
-		$iCountItems = $oInformationsystem_Items->getCount();
-
-		$aInformationsystem_Groups = $this->Informationsystem_Groups->getByParentId(0, FALSE);
-		$iCountGroups = count($aInformationsystem_Groups);
-
-		$array = array(
-			'items_count' => $iCountItems,
-			'items_total_count' => $iCountItems,
-			'subgroups_count' => $iCountGroups,
-			'subgroups_total_count' => $iCountGroups
-		);
-
-		foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
+		if ($this->_showXmlCounts)
 		{
-			$array['items_total_count'] += $oInformationsystem_Group->items_total_count;
-			$array['subgroups_total_count'] += $oInformationsystem_Group->subgroups_total_count;
-		}
+			$oInformationsystem_Items = $this->Informationsystem_Items;
+			$oInformationsystem_Items->queryBuilder()
+				->where('informationsystem_items.informationsystem_group_id', '=', 0);
+			$iCountItems = $oInformationsystem_Items->getCount();
 
-		$this
-			->addXmlTag('items_count', $array['items_count'])
-			->addXmlTag('items_total_count', $array['items_total_count'])
-			->addXmlTag('subgroups_count', $array['subgroups_count'])
-			->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
+			$aInformationsystem_Groups = $this->Informationsystem_Groups->getByParentId(0, FALSE);
+			$iCountGroups = count($aInformationsystem_Groups);
+
+			$array = array(
+				'items_count' => $iCountItems,
+				'items_total_count' => $iCountItems,
+				'subgroups_count' => $iCountGroups,
+				'subgroups_total_count' => $iCountGroups
+			);
+
+			foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
+			{
+				$array['items_total_count'] += $oInformationsystem_Group->items_total_count;
+				$array['subgroups_total_count'] += $oInformationsystem_Group->subgroups_total_count;
+			}
+
+			$this
+				->addXmlTag('items_count', $array['items_count'])
+				->addXmlTag('items_total_count', $array['items_total_count'])
+				->addXmlTag('subgroups_count', $array['subgroups_count'])
+				->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
+		}
 
 		return parent::getXml();
 	}

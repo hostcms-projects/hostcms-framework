@@ -121,14 +121,19 @@ class Update_Entity extends Core_Entity
 
 	/**
 	 * Install updates
+	 * @hostcms-event Update_Entity.onBeforeInstall
+	 * @hostcms-event Update_Entity.onAfterInstall
 	 */
 	public function install()
 	{
 		// Устанавливаем время выполнения
-		(!defined('DENY_INI_SET') || !DENY_INI_SET) && function_exists('set_time_limit') && ini_get('safe_mode') != 1 && @set_time_limit(3600);
+		(!defined('DENY_INI_SET') || !DENY_INI_SET)
+			&& function_exists('set_time_limit')
+			&& ini_get('safe_mode') != 1
+			&& @set_time_limit(3600);
 
 		// Удаляем gz-файлы
-		$wysiwyg_path = CMS_FOLDER . 'admin/wysiwyg/';
+		/*$wysiwyg_path = CMS_FOLDER . 'admin/wysiwyg/';
 
 		// Удаление gz-файлов с кэшем виз. редактора
 		if (is_dir($wysiwyg_path) && !is_link($wysiwyg_path))
@@ -153,8 +158,10 @@ class Update_Entity extends Core_Entity
 				}
 				closedir($dh);
 			}
-		}
+		}*/
 
+		Core_Event::notify(get_class($this) . '.onBeforeInstall', $this);
+		
 		$data = Update_Controller::instance()
 			->setUpdateOptions()
 			->getUpdate($this->id);
@@ -373,6 +380,8 @@ class Update_Entity extends Core_Entity
 			Core_Message::show(Core::_('Update.server_error_xml'), 'error');
 		}
 
+		Core_Event::notify(get_class($this) . '.onAfterInstall', $this);
+		
 		// Load new updates list
 		$this->loadUpdates();
 

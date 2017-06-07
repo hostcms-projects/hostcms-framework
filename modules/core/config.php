@@ -39,24 +39,6 @@ class Core_Config
 	}
 
 	/**
-	 * Get config path
-	 * @param string $name
-	 * @return string
-	 */
-	public function getPath($name)
-	{
-		$aConfig = explode('_', $name);
-		$sFileName = array_pop($aConfig);
-
-		$path = Core::$modulesPath;
-		$path .= implode(DIRECTORY_SEPARATOR, $aConfig) . DIRECTORY_SEPARATOR;
-		$path .= 'config' . DIRECTORY_SEPARATOR . $sFileName . '.php';
-		$path = Core_File::pathCorrection($path);
-
-		return $path;
-	}
-
-	/**
 	 * Correct config name
 	 * @param string $name
 	 * @return string
@@ -71,6 +53,13 @@ class Core_Config
 	 * @param string $name, e.g. 'Core_Myconfig'
 	 * @param mixed $defaultValue
 	 * @return mixed Config or NULL
+	 *
+	 * <code>
+	 * // Get config values + default values if necessary value does not exist
+	 * $aConfigValues = Core_Config::instance()->get('mymodule_config') + array('foo' => 'baz');
+	 *
+	 * echo $aConfigValues['foo'];
+	 * </code>
 	 */
 	public function get($name, $defaultValue = NULL)
 	{
@@ -86,6 +75,62 @@ class Core_Config
 		}
 
 		return $this->_values[$name];
+	}
+
+	/**
+	 * Set config value
+	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
+	 * @param array $value Config value, e.g. array('key' => 'value')
+	 * @return Core_Config
+	 *
+	 * <code>
+	 * Core_Config::instance()->set('mymodule_config', array('foo' => 'bar'));
+	 * </code>
+	 */
+	public function set($name, $value)
+	{
+		$this->_values[$name] = $value;
+
+		$path = $this->getPath($name);
+
+		// Create destination dir
+		Core_File::mkdir(dirname($path), CHMOD, TRUE);
+
+		$content = "<?php\n\nreturn " . $this->_toString($value) . ";";
+
+		Core_File::write($path, $content);
+
+		return $this;
+	}
+
+	/**
+	 * Replace config without changing config file
+	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
+	 * @param array $value Config value, e.g. array('key' => 'value')
+	 * @return Core_Config
+	 */
+	public function replace($name, $value)
+	{
+		$this->_values[$name] = $value;
+		return $this;
+	}
+
+	/**
+	 * Get config path
+	 * @param string $name
+	 * @return string
+	 */
+	public function getPath($name)
+	{
+		$aConfig = explode('_', $name);
+		$sFileName = array_pop($aConfig);
+
+		$path = Core::$modulesPath;
+		$path .= implode(DIRECTORY_SEPARATOR, $aConfig) . DIRECTORY_SEPARATOR;
+		$path .= 'config' . DIRECTORY_SEPARATOR . $sFileName . '.php';
+		$path = Core_File::pathCorrection($path);
+
+		return $path;
 	}
 
 	/**
@@ -114,39 +159,5 @@ class Core_Config
 				? "'" . str_replace("'", "\'", $value) . "'"
 				: $value;
 		}
-	}
-
-	/**
-	 * Set config value
-	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
-	 * @param array $value Config value, e.g. array('key' => 'value')
-	 * @return Core_Config
-	 */
-	public function set($name, $value)
-	{
-		$this->_values[$name] = $value;
-
-		$path = $this->getPath($name);
-
-		// Create destination dir
-		Core_File::mkdir(dirname($path), CHMOD, TRUE);
-
-		$content = "<?php\n\nreturn " . $this->_toString($value) . ";";
-
-		Core_File::write($path, $content);
-
-		return $this;
-	}
-	
-	/**
-	 * Replace config without changing config file
-	 * @param string $name Config name, e.g. 'Core_Myconfig' set modules/core/config/myconfig.php
-	 * @param array $value Config value, e.g. array('key' => 'value')
-	 * @return Core_Config
-	 */
-	public function replace($name, $value)
-	{
-		$this->_values[$name] = $value;
-		return $this;
 	}
 }

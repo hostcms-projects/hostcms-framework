@@ -52,9 +52,7 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->add($oMainRow5 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow6 = Admin_Form_Entity::factory('Div')->class('row'))
 			->add($oMainRow7 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow9 = Admin_Form_Entity::factory('Div')->class('row'))
-			->add($oMainRow10 = Admin_Form_Entity::factory('Div')->class('row'));
+			->add($oMainRow8 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$oViewTab
 			->add($oViewRow1 = Admin_Form_Entity::factory('Div')->class('row'))
@@ -156,14 +154,12 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 			->value($this->_object->type)
 			->caption(Core::_('Admin_Form_Field.type'))
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'))
-			->onchange("ShowRowsAdminForm('{$windowId}', this.options[this.selectedIndex].value)");
+			->onchange("radiogroupOnChange('{$windowId}', $(this).val(), [1,2,3,4,5,6,7,8,9,10])");
 
-		$oAdmin_Form_Entity_Code = Admin_Form_Entity::factory('Code');
-		$oAdmin_Form_Entity_Code->html(
-			"<script>ShowRowsAdminForm('{$windowId}', " . intval($this->_object->type) . ")</script>"
+		$oMainTab->add(
+			Admin_Form_Entity::factory('Code')
+				->html("<script>radiogroupOnChange('{$windowId}', " . intval($this->_object->type) . ", [1,2,3,4,5,6,7,8,9,10])</script>")
 		);
-
-		$oMainTab->add($oAdmin_Form_Entity_Code);
 
 		$oMainTab->delete($this->getField('type'));
 
@@ -173,44 +169,44 @@ class Admin_Form_Field_Controller_Edit extends Admin_Form_Action_Controller_Type
 		$oMainRow2->add($oSelect_Type);
 		$oMainTab->move($this->getField('format'), $oMainRow2);
 
-		$oMainTab->move($this->getField('allow_sorting'), $oMainRow3);
-		$oMainTab->move($this->getField('allow_filter'), $oMainRow4);
-		$oMainTab->move($this->getField('editable'), $oMainRow5);
+		$oMainTab->move($this->getField('allow_filter')->divAttr(array('class' => 'form-group col-xs-12 col-md-4')), $oMainRow7);
+		$oMainTab->move($this->getField('allow_sorting')->divAttr(array('class' => 'form-group col-xs-12 col-md-4')), $oMainRow7);
+		$oMainTab->move($this->getField('editable')->divAttr(array('class' => 'form-group col-xs-12 col-md-4')), $oMainRow7);
 
 		$this->getField('image')
-			->divAttr(array('id' => 'image', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-8 hidden-9 hidden-10'))
 			->rows(3);
 
 		$this->getField('link')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-1 hidden-2 hidden-3 hidden-5 hidden-6 hidden-8 hidden-9'))
 			->rows(2);
 
 		$this->getField('onclick')
-			->divAttr(array('id' => 'link', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-1 hidden-2 hidden-3 hidden-5 hidden-6 hidden-8 hidden-9'))
 			->rows(2);
 
 		$this->getField('list')
-			->divAttr(array('id' => 'list', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12 hidden-1 hidden-2 hidden-3 hidden-4 hidden-5 hidden-6 hidden-7 hidden-9 hidden-10'))
 			->rows(3);
 
 		$oMainTab
-			->move($this->getField('image'), $oMainRow6)
-			->move($this->getField('link'), $oMainRow7)
-			->move($this->getField('onclick'), $oMainRow8)
-			->move($this->getField('list'), $oMainRow9);
-
-		$oFilter_Type = Admin_Form_Entity::factory('Select')
-			->options(array(
-					0 => Core::_('Admin_Form_Field.filter_where'),
-					1 => Core::_('Admin_Form_Field.filter_having')
-			))
-			->name('filter_type')
-			->value($this->_object->filter_type)
-			->caption(Core::_('Admin_Form_Field.filter_type'))
-			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));
+			->move($this->getField('image'), $oMainRow3)
+			->move($this->getField('link'), $oMainRow4)
+			->move($this->getField('onclick'), $oMainRow5)
+			->move($this->getField('list'), $oMainRow6);
 
 		$oMainTab->delete($this->getField('filter_type'));
-		$oMainRow10->add($oFilter_Type);
+		$oMainRow8->add(
+			Admin_Form_Entity::factory('Select')
+				->options(array(
+					0 => Core::_('Admin_Form_Field.filter_where'),
+					1 => Core::_('Admin_Form_Field.filter_having')
+				))
+				->name('filter_type')
+				->value($this->_object->filter_type)
+				->caption(Core::_('Admin_Form_Field.filter_type'))
+				->divAttr(array('class' => 'form-group col-xs-12 col-md-4'))
+		);
 
 		$this->getField('class')
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-6'));

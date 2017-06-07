@@ -74,9 +74,10 @@ class Shop_Order_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			{
 				$oAdmin_Form_Entity_Input = Admin_Form_Entity::factory('Input')
 					->name('source_' . $sFieldName)
-					->divAttr(array('class' => 'form-group col-xs-4 col-sm-4'))
+					->divAttr(array('class' => 'form-group col-xs-4'))
 					->caption(Core::_('Source.' . $sFieldName))
 					->class('form-control input-group-input')
+					->disabled('disabled')
 					->value($oSource->$sFieldName);
 
 				$oTagRow1->add($oAdmin_Form_Entity_Input);

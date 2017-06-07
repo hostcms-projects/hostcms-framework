@@ -20,56 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-define("GEOIP_COUNTRY_BEGIN", 16776960);
-define("GEOIP_STATE_BEGIN_REV0", 16700000);
-define("GEOIP_STATE_BEGIN_REV1", 16000000);
-define("GEOIP_STANDARD", 0);
-define("GEOIP_MEMORY_CACHE", 1);
-define("GEOIP_SHARED_MEMORY", 2);
-define("STRUCTURE_INFO_MAX_SIZE", 20);
-define("DATABASE_INFO_MAX_SIZE", 100);
-define("GEOIP_COUNTRY_EDITION", 1);
-define("GEOIP_PROXY_EDITION", 8);
-define("GEOIP_ASNUM_EDITION", 9);
-define("GEOIP_NETSPEED_EDITION", 10);
-define("GEOIP_REGION_EDITION_REV0", 7);
-define("GEOIP_REGION_EDITION_REV1", 3);
-define("GEOIP_CITY_EDITION_REV0", 6);
-define("GEOIP_CITY_EDITION_REV1", 2);
-define("GEOIP_ORG_EDITION", 5);
-define("GEOIP_ISP_EDITION", 4);
-define("SEGMENT_RECORD_LENGTH", 3);
-define("STANDARD_RECORD_LENGTH", 3);
-define("ORG_RECORD_LENGTH", 4);
-define("MAX_RECORD_LENGTH", 4);
-define("MAX_ORG_RECORD_LENGTH", 300);
-define("GEOIP_SHM_KEY", 0x4f415401);
-define("US_OFFSET", 1);
-define("CANADA_OFFSET", 677);
-define("WORLD_OFFSET", 1353);
-define("FIPS_RANGE", 360);
-define("GEOIP_UNKNOWN_SPEED", 0);
-define("GEOIP_DIALUP_SPEED", 1);
-define("GEOIP_CABLEDSL_SPEED", 2);
-define("GEOIP_CORPORATE_SPEED", 3);
-define("GEOIP_DOMAIN_EDITION", 11);
-define("GEOIP_COUNTRY_EDITION_V6", 12);
-define("GEOIP_LOCATIONA_EDITION", 13);
-define("GEOIP_ACCURACYRADIUS_EDITION", 14);
-define("GEOIP_CITYCOMBINED_EDITION", 15);
-define("GEOIP_CITY_EDITION_REV1_V6", 30);
-define("GEOIP_CITY_EDITION_REV0_V6", 31);
-define("GEOIP_NETSPEED_EDITION_REV1", 32);
-define("GEOIP_NETSPEED_EDITION_REV1_V6", 33);
-define("GEOIP_USERTYPE_EDITION", 28);
-define("GEOIP_USERTYPE_EDITION_V6", 29);
-define("GEOIP_ASNUM_EDITION_V6", 21);
-define("GEOIP_ISP_EDITION_V6", 22);
-define("GEOIP_ORG_EDITION_V6", 23);
-define("GEOIP_DOMAIN_EDITION_V6", 24);
-
-define("CITYCOMBINED_FIXED_RECORD", 7);
-
 class Antispam_GeoIP_Controller
 {
     public $flags;
@@ -98,7 +48,50 @@ class Antispam_GeoIP_Controller
     public $GEOIP_CONTINENT_CODES = array(
         "--", "AS", "EU", "EU", "AS", "AS", "NA", "NA", "EU", "AS", "NA", "AF", "AN", "SA", "OC", "EU", "OC", "NA", "AS", "EU", "NA", "AS", "EU", "AF", "EU", "AS", "AF", "AF", "NA", "AS", "SA", "SA", "NA", "AS", "AN", "AF", "EU", "NA", "NA", "AS", "AF", "AF", "AF", "EU", "AF", "OC", "SA", "AF", "AS", "SA", "NA", "NA", "AF", "AS", "AS", "EU", "EU", "AF", "EU", "NA", "NA", "AF", "SA", "EU", "AF", "AF", "AF", "EU", "AF", "EU", "OC", "SA", "OC", "EU", "EU", "NA", "AF", "EU", "NA", "AS", "SA", "AF", "EU", "NA", "AF", "AF", "NA", "AF", "EU", "AN", "NA", "OC", "AF", "SA", "AS", "AN", "NA", "EU", "NA", "EU", "AS", "EU", "AS", "AS", "AS", "AS", "AS", "EU", "EU", "NA", "AS", "AS", "AF", "AS", "AS", "OC", "AF", "NA", "AS", "AS", "AS", "NA", "AS", "AS", "AS", "NA", "EU", "AS", "AF", "AF", "EU", "EU", "EU", "AF", "AF", "EU", "EU", "AF", "OC", "EU", "AF", "AS", "AS", "AS", "OC", "NA", "AF", "NA", "EU", "AF", "AS", "AF", "NA", "AS", "AF", "AF", "OC", "AF", "OC", "AF", "NA", "EU", "EU", "AS", "OC", "OC", "OC", "AS", "NA", "SA", "OC", "OC", "AS", "AS", "EU", "NA", "OC", "NA", "AS", "EU", "OC", "SA", "AS", "AF", "EU", "EU", "AF", "AS", "OC", "AF", "AF", "EU", "AS", "AF", "EU", "EU", "EU", "AF", "EU", "AF", "AF", "SA", "AF", "NA", "AS", "AF", "NA", "AF", "AN", "AF", "AS", "AS", "OC", "AS", "AF", "OC", "AS", "EU", "NA", "OC", "AS", "AF", "EU", "AF", "OC", "NA", "SA", "AS", "EU", "NA", "SA", "NA", "NA", "AS", "OC", "OC", "OC", "AS", "AF", "EU", "AF", "AF", "EU", "AF", "--", "--", "--", "EU", "EU", "EU", "EU", "NA", "NA", "NA", "AF", "--"
     );
-	
+
+	public $GEOIP_COUNTRY_BEGIN = 16776960;
+	public $GEOIP_STATE_BEGIN_REV0 = 16700000;
+	public $GEOIP_STATE_BEGIN_REV1 = 16000000;
+	public $GEOIP_STANDARD = 0;
+	public $GEOIP_MEMORY_CACHE = 1;
+	public $GEOIP_SHARED_MEMORY = 2;
+	public $STRUCTURE_INFO_MAX_SIZE = 20;
+	public $DATABASE_INFO_MAX_SIZE = 100;
+	public $GEOIP_COUNTRY_EDITION = 1;
+	public $GEOIP_PROXY_EDITION = 8;
+	public $GEOIP_ASNUM_EDITION = 9;
+	public $GEOIP_NETSPEED_EDITION = 10;
+	public $GEOIP_REGION_EDITION_REV0 = 7;
+	public $GEOIP_REGION_EDITION_REV1 = 3;
+	public $GEOIP_CITY_EDITION_REV0 = 6;
+	public $GEOIP_CITY_EDITION_REV1 = 2;
+	public $GEOIP_ORG_EDITION = 5;
+	public $GEOIP_ISP_EDITION = 4;
+	public $SEGMENT_RECORD_LENGTH = 3;
+	public $STANDARD_RECORD_LENGTH = 3;
+	public $ORG_RECORD_LENGTH = 4;
+	public $MAX_RECORD_LENGTH = 4;
+	public $MAX_ORG_RECORD_LENGTH = 300;
+	public $GEOIP_SHM_KEY = 0x4f415401;
+	public $US_OFFSET = 1;
+	public $CANADA_OFFSET = 677;
+	public $WORLD_OFFSET = 1353;
+	public $FIPS_RANGE = 360;
+	public $GEOIP_DOMAIN_EDITION = 11;
+	public $GEOIP_COUNTRY_EDITION_V6 = 12;
+	public $GEOIP_LOCATIONA_EDITION = 13;
+	public $GEOIP_ACCURACYRADIUS_EDITION = 14;
+	public $GEOIP_CITY_EDITION_REV1_V6 = 30;
+	public $GEOIP_CITY_EDITION_REV0_V6 = 31;
+	public $GEOIP_NETSPEED_EDITION_REV1 = 32;
+	public $GEOIP_NETSPEED_EDITION_REV1_V6 = 33;
+	public $GEOIP_USERTYPE_EDITION = 28;
+	public $GEOIP_USERTYPE_EDITION_V6 = 29;
+	public $GEOIP_ASNUM_EDITION_V6 = 21;
+	public $GEOIP_ISP_EDITION_V6 = 22;
+	public $GEOIP_ORG_EDITION_V6 = 23;
+	public $GEOIP_DOMAIN_EDITION_V6 = 24;
+
 	public function geoip_load_shared_mem($file)
 	{
 		$fp = fopen($file, "rb");
@@ -108,22 +101,22 @@ class Antispam_GeoIP_Controller
 		}
 		$s_array = fstat($fp);
 		$size = $s_array['size'];
-		if (($shmid = @shmop_open(GEOIP_SHM_KEY, "w", 0, 0))) {
+		if (($shmid = @shmop_open($this->GEOIP_SHM_KEY, "w", 0, 0))) {
 			shmop_delete($shmid);
 			shmop_close($shmid);
 		}
-		$shmid = shmop_open(GEOIP_SHM_KEY, "c", 0644, $size);
+		$shmid = shmop_open($this->GEOIP_SHM_KEY, "c", 0644, $size);
 		shmop_write($shmid, fread($fp, $size), 0);
 		shmop_close($shmid);
 	}
 
 	public function _setup_segments($gi)
 	{
-		$gi->databaseType = GEOIP_COUNTRY_EDITION;
-		$gi->record_length = STANDARD_RECORD_LENGTH;
-		if ($gi->flags & GEOIP_SHARED_MEMORY) {
+		$gi->databaseType = $this->GEOIP_COUNTRY_EDITION;
+		$gi->record_length = $this->STANDARD_RECORD_LENGTH;
+		if ($gi->flags & $this->GEOIP_SHARED_MEMORY) {
 			$offset = shmop_size($gi->shmid) - 3;
-			for ($i = 0; $i < STRUCTURE_INFO_MAX_SIZE; $i++) {
+			for ($i = 0; $i < $this->STRUCTURE_INFO_MAX_SIZE; $i++) {
 				$delim = shmop_read($gi->shmid, $offset, 3);
 				$offset += 3;
 				if ($delim == (chr(255) . chr(255) . chr(255))) {
@@ -133,42 +126,42 @@ class Antispam_GeoIP_Controller
 					}
 					$offset++;
 
-					if ($gi->databaseType == GEOIP_REGION_EDITION_REV0) {
-						$gi->databaseSegments = GEOIP_STATE_BEGIN_REV0;
-					} elseif ($gi->databaseType == GEOIP_REGION_EDITION_REV1) {
-						$gi->databaseSegments = GEOIP_STATE_BEGIN_REV1;
-					} elseif (($gi->databaseType == GEOIP_CITY_EDITION_REV0)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV1)
-						|| ($gi->databaseType == GEOIP_ORG_EDITION)
-						|| ($gi->databaseType == GEOIP_ORG_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_DOMAIN_EDITION)
-						|| ($gi->databaseType == GEOIP_DOMAIN_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_ISP_EDITION)
-						|| ($gi->databaseType == GEOIP_ISP_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_USERTYPE_EDITION)
-						|| ($gi->databaseType == GEOIP_USERTYPE_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_LOCATIONA_EDITION)
-						|| ($gi->databaseType == GEOIP_ACCURACYRADIUS_EDITION)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV0_V6)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV1_V6)
-						|| ($gi->databaseType == GEOIP_NETSPEED_EDITION_REV1)
-						|| ($gi->databaseType == GEOIP_NETSPEED_EDITION_REV1_V6)
-						|| ($gi->databaseType == GEOIP_ASNUM_EDITION)
-						|| ($gi->databaseType == GEOIP_ASNUM_EDITION_V6)
+					if ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV0) {
+						$gi->databaseSegments = $this->GEOIP_STATE_BEGIN_REV0;
+					} elseif ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV1) {
+						$gi->databaseSegments = $this->GEOIP_STATE_BEGIN_REV1;
+					} elseif (($gi->databaseType == $this->GEOIP_CITY_EDITION_REV0)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1)
+						|| ($gi->databaseType == $this->GEOIP_ORG_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ORG_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_ISP_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ISP_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_USERTYPE_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_USERTYPE_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_LOCATIONA_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ACCURACYRADIUS_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV0_V6)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1_V6)
+						|| ($gi->databaseType == $this->GEOIP_NETSPEED_EDITION_REV1)
+						|| ($gi->databaseType == $this->GEOIP_NETSPEED_EDITION_REV1_V6)
+						|| ($gi->databaseType == $this->GEOIP_ASNUM_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ASNUM_EDITION_V6)
 					) {
 						$gi->databaseSegments = 0;
-						$buf = shmop_read($gi->shmid, $offset, SEGMENT_RECORD_LENGTH);
-						for ($j = 0; $j < SEGMENT_RECORD_LENGTH; $j++) {
+						$buf = shmop_read($gi->shmid, $offset, $this->SEGMENT_RECORD_LENGTH);
+						for ($j = 0; $j < $this->SEGMENT_RECORD_LENGTH; $j++) {
 							$gi->databaseSegments += (ord($buf[$j]) << ($j * 8));
 						}
-						if (($gi->databaseType == GEOIP_ORG_EDITION)
-							|| ($gi->databaseType == GEOIP_ORG_EDITION_V6)
-							|| ($gi->databaseType == GEOIP_DOMAIN_EDITION)
-							|| ($gi->databaseType == GEOIP_DOMAIN_EDITION_V6)
-							|| ($gi->databaseType == GEOIP_ISP_EDITION)
-							|| ($gi->databaseType == GEOIP_ISP_EDITION_V6)
+						if (($gi->databaseType == $this->GEOIP_ORG_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_ORG_EDITION_V6)
+							|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION_V6)
+							|| ($gi->databaseType == $this->GEOIP_ISP_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_ISP_EDITION_V6)
 						) {
-							$gi->record_length = ORG_RECORD_LENGTH;
+							$gi->record_length = $this->ORG_RECORD_LENGTH;
 						}
 					}
 					break;
@@ -176,62 +169,62 @@ class Antispam_GeoIP_Controller
 					$offset -= 4;
 				}
 			}
-			if (($gi->databaseType == GEOIP_COUNTRY_EDITION) ||
-				($gi->databaseType == GEOIP_COUNTRY_EDITION_V6) ||
-				($gi->databaseType == GEOIP_PROXY_EDITION) ||
-				($gi->databaseType == GEOIP_NETSPEED_EDITION)
+			if (($gi->databaseType == $this->GEOIP_COUNTRY_EDITION) ||
+				($gi->databaseType == $this->GEOIP_COUNTRY_EDITION_V6) ||
+				($gi->databaseType == $this->GEOIP_PROXY_EDITION) ||
+				($gi->databaseType == $this->GEOIP_NETSPEED_EDITION)
 			) {
-				$gi->databaseSegments = GEOIP_COUNTRY_BEGIN;
+				$gi->databaseSegments = $this->GEOIP_COUNTRY_BEGIN;
 			}
 		} else {
 			$filepos = ftell($gi->filehandle);
 			fseek($gi->filehandle, -3, SEEK_END);
-			for ($i = 0; $i < STRUCTURE_INFO_MAX_SIZE; $i++) {
+			for ($i = 0; $i < $this->STRUCTURE_INFO_MAX_SIZE; $i++) {
 				$delim = fread($gi->filehandle, 3);
 				if ($delim == (chr(255) . chr(255) . chr(255))) {
 					$gi->databaseType = ord(fread($gi->filehandle, 1));
 					if ($gi->databaseType >= 106) {
 						$gi->databaseType -= 105;
 					}
-					if ($gi->databaseType == GEOIP_REGION_EDITION_REV0) {
-						$gi->databaseSegments = GEOIP_STATE_BEGIN_REV0;
-					} elseif ($gi->databaseType == GEOIP_REGION_EDITION_REV1) {
-						$gi->databaseSegments = GEOIP_STATE_BEGIN_REV1;
-					} elseif (($gi->databaseType == GEOIP_CITY_EDITION_REV0)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV1)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV0_V6)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV1_V6)
-						|| ($gi->databaseType == GEOIP_ORG_EDITION)
-						|| ($gi->databaseType == GEOIP_DOMAIN_EDITION)
-						|| ($gi->databaseType == GEOIP_ISP_EDITION)
-						|| ($gi->databaseType == GEOIP_ORG_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_DOMAIN_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_ISP_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_LOCATIONA_EDITION)
-						|| ($gi->databaseType == GEOIP_ACCURACYRADIUS_EDITION)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV0_V6)
-						|| ($gi->databaseType == GEOIP_CITY_EDITION_REV1_V6)
-						|| ($gi->databaseType == GEOIP_NETSPEED_EDITION_REV1)
-						|| ($gi->databaseType == GEOIP_NETSPEED_EDITION_REV1_V6)
-						|| ($gi->databaseType == GEOIP_USERTYPE_EDITION)
-						|| ($gi->databaseType == GEOIP_USERTYPE_EDITION_V6)
-						|| ($gi->databaseType == GEOIP_ASNUM_EDITION)
-						|| ($gi->databaseType == GEOIP_ASNUM_EDITION_V6)
+					if ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV0) {
+						$gi->databaseSegments = $this->GEOIP_STATE_BEGIN_REV0;
+					} elseif ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV1) {
+						$gi->databaseSegments = $this->GEOIP_STATE_BEGIN_REV1;
+					} elseif (($gi->databaseType == $this->GEOIP_CITY_EDITION_REV0)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV0_V6)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1_V6)
+						|| ($gi->databaseType == $this->GEOIP_ORG_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ISP_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ORG_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_ISP_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_LOCATIONA_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ACCURACYRADIUS_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV0_V6)
+						|| ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1_V6)
+						|| ($gi->databaseType == $this->GEOIP_NETSPEED_EDITION_REV1)
+						|| ($gi->databaseType == $this->GEOIP_NETSPEED_EDITION_REV1_V6)
+						|| ($gi->databaseType == $this->GEOIP_USERTYPE_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_USERTYPE_EDITION_V6)
+						|| ($gi->databaseType == $this->GEOIP_ASNUM_EDITION)
+						|| ($gi->databaseType == $this->GEOIP_ASNUM_EDITION_V6)
 					) {
 						$gi->databaseSegments = 0;
 
-						$buf = fread($gi->filehandle, SEGMENT_RECORD_LENGTH);
-						for ($j = 0; $j < SEGMENT_RECORD_LENGTH; $j++) {
+						$buf = fread($gi->filehandle, $this->SEGMENT_RECORD_LENGTH);
+						for ($j = 0; $j < $this->SEGMENT_RECORD_LENGTH; $j++) {
 							$gi->databaseSegments += (ord($buf[$j]) << ($j * 8));
 						}
-						if (($gi->databaseType == GEOIP_ORG_EDITION)
-							|| ($gi->databaseType == GEOIP_DOMAIN_EDITION)
-							|| ($gi->databaseType == GEOIP_ISP_EDITION)
-							|| ($gi->databaseType == GEOIP_ORG_EDITION_V6)
-							|| ($gi->databaseType == GEOIP_DOMAIN_EDITION_V6)
-							|| ($gi->databaseType == GEOIP_ISP_EDITION_V6)
+						if (($gi->databaseType == $this->GEOIP_ORG_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_ISP_EDITION)
+							|| ($gi->databaseType == $this->GEOIP_ORG_EDITION_V6)
+							|| ($gi->databaseType == $this->GEOIP_DOMAIN_EDITION_V6)
+							|| ($gi->databaseType == $this->GEOIP_ISP_EDITION_V6)
 						) {
-							$gi->record_length = ORG_RECORD_LENGTH;
+							$gi->record_length = $this->ORG_RECORD_LENGTH;
 						}
 					}
 					break;
@@ -239,12 +232,12 @@ class Antispam_GeoIP_Controller
 					fseek($gi->filehandle, -4, SEEK_CUR);
 				}
 			}
-			if (($gi->databaseType == GEOIP_COUNTRY_EDITION) ||
-				($gi->databaseType == GEOIP_COUNTRY_EDITION_V6) ||
-				($gi->databaseType == GEOIP_PROXY_EDITION) ||
-				($gi->databaseType == GEOIP_NETSPEED_EDITION)
+			if (($gi->databaseType == $this->GEOIP_COUNTRY_EDITION) ||
+				($gi->databaseType == $this->GEOIP_COUNTRY_EDITION_V6) ||
+				($gi->databaseType == $this->GEOIP_PROXY_EDITION) ||
+				($gi->databaseType == $this->GEOIP_NETSPEED_EDITION)
 			) {
-				$gi->databaseSegments = GEOIP_COUNTRY_BEGIN;
+				$gi->databaseSegments = $this->GEOIP_COUNTRY_BEGIN;
 			}
 			fseek($gi->filehandle, $filepos, SEEK_SET);
 		}
@@ -261,30 +254,25 @@ class Antispam_GeoIP_Controller
 
 	public function geoip_open($filename, $flags)
 	{
-		if (function_exists('shmop_open') && function_exists('GeoIP_record_by_addr'))
-		{
-			//$gi = new GeoIP;
-			$this->flags = $flags;
-			if ($this->flags & GEOIP_SHARED_MEMORY) {
-				$this->shmid = shmop_open(GEOIP_SHM_KEY, "a", 0, 0);
-			} else {
-				$this->filehandle = fopen($filename, "rb") or trigger_error("GeoIP API: Can not open $filename\n", E_USER_ERROR);
-				if ($this->flags & GEOIP_MEMORY_CACHE) {
-					$s_array = fstat($this->filehandle);
-					$this->memory_buffer = fread($this->filehandle, $s_array['size']);
-				}
+		// $gi = new GeoIP;
+		$this->flags = $flags;
+		if ($this->flags & $this->GEOIP_SHARED_MEMORY) {
+			$this->shmid = shmop_open($this->GEOIP_SHM_KEY, "a", 0, 0);
+		} else {
+			$this->filehandle = fopen($filename, "rb") or trigger_error("GeoIP API: Can not open $filename\n", E_USER_ERROR);
+			if ($this->flags & $this->GEOIP_MEMORY_CACHE) {
+				$s_array = fstat($this->filehandle);
+				$this->memory_buffer = fread($this->filehandle, $s_array['size']);
 			}
-
-			$gi = $this->_setup_segments($this);
-			return $gi;
 		}
-		
-		return NULL;	
+
+		$gi = $this->_setup_segments($this);
+		return $gi;
 	}
 
 	public function geoip_close($gi)
 	{
-		if ($gi->flags & GEOIP_SHARED_MEMORY) {
+		if ($gi->flags & $this->GEOIP_SHARED_MEMORY) {
 			return true;
 		}
 
@@ -352,13 +340,13 @@ class Antispam_GeoIP_Controller
 	public function geoip_country_id_by_addr_v6($gi, $addr)
 	{
 		$ipnum = inet_pton($addr);
-		return $this->_geoip_seek_country_v6($gi, $ipnum) - GEOIP_COUNTRY_BEGIN;
+		return $this->_geoip_seek_country_v6($gi, $ipnum) - $this->GEOIP_COUNTRY_BEGIN;
 	}
 
 	public function geoip_country_id_by_addr($gi, $addr)
 	{
 		$ipnum = ip2long($addr);
-		return $this->_geoip_seek_country($gi, $ipnum) - GEOIP_COUNTRY_BEGIN;
+		return $this->_geoip_seek_country($gi, $ipnum) - $this->GEOIP_COUNTRY_BEGIN;
 	}
 
 	public function geoip_country_code_by_addr_v6($gi, $addr)
@@ -372,7 +360,7 @@ class Antispam_GeoIP_Controller
 
 	public function geoip_country_code_by_addr($gi, $addr)
 	{
-		if ($gi->databaseType == GEOIP_CITY_EDITION_REV1) {
+		if ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1) {
 			$record = GeoIP_record_by_addr($gi, $addr);
 			if ($record) {
 				return $record->country_code;
@@ -397,7 +385,7 @@ class Antispam_GeoIP_Controller
 
 	public function geoip_country_name_by_addr($gi, $addr)
 	{
-		if ($gi->databaseType == GEOIP_CITY_EDITION_REV1) {
+		if ($gi->databaseType == $this->GEOIP_CITY_EDITION_REV1) {
 			$record = GeoIP_record_by_addr($gi, $addr);
 			return $record->country_name;
 		} else {
@@ -418,13 +406,13 @@ class Antispam_GeoIP_Controller
 
 		$offset = 0;
 		for ($depth = 127; $depth >= 0; --$depth) {
-			if ($gi->flags & GEOIP_MEMORY_CACHE) {
+			if ($gi->flags & $this->GEOIP_MEMORY_CACHE) {
 				$buf = $this->_safe_substr(
 					$gi->memory_buffer,
 					2 * $gi->record_length * $offset,
 					2 * $gi->record_length
 				);
-			} elseif ($gi->flags & GEOIP_SHARED_MEMORY) {
+			} elseif ($gi->flags & $this->GEOIP_SHARED_MEMORY) {
 				$buf = $this->_sharedMemRead($gi,
 					2 * $gi->record_length * $offset,
 					2 * $gi->record_length
@@ -464,13 +452,13 @@ class Antispam_GeoIP_Controller
 	{
 		$offset = 0;
 		for ($depth = 31; $depth >= 0; --$depth) {
-			if ($gi->flags & GEOIP_MEMORY_CACHE) {
+			if ($gi->flags & $this->GEOIP_MEMORY_CACHE) {
 				$buf = $this->_safe_substr(
 					$gi->memory_buffer,
 					2 * $gi->record_length * $offset,
 					2 * $gi->record_length
 				);
-			} elseif ($gi->flags & GEOIP_SHARED_MEMORY) {
+			} elseif ($gi->flags & $this->GEOIP_SHARED_MEMORY) {
 				$buf = $this->_sharedMemRead(
 					$gi,
 					2 * $gi->record_length * $offset,
@@ -506,11 +494,11 @@ class Antispam_GeoIP_Controller
 	public function _common_get_org($gi, $seek_org)
 	{
 		$record_pointer = $seek_org + (2 * $gi->record_length - 1) * $gi->databaseSegments;
-		if ($gi->flags & GEOIP_SHARED_MEMORY) {
-			$org_buf = $this->_sharedMemRead($gi, $record_pointer, MAX_ORG_RECORD_LENGTH);
+		if ($gi->flags & $this->GEOIP_SHARED_MEMORY) {
+			$org_buf = $this->_sharedMemRead($gi, $record_pointer, $this->MAX_ORG_RECORD_LENGTH);
 		} else {
 			fseek($gi->filehandle, $record_pointer, SEEK_SET);
-			$org_buf = fread($gi->filehandle, MAX_ORG_RECORD_LENGTH);
+			$org_buf = fread($gi->filehandle, $this->MAX_ORG_RECORD_LENGTH);
 		}
 		$org_buf = $this->_safe_substr($org_buf, 0, strpos($org_buf, "\0"));
 		return $org_buf;
@@ -559,8 +547,8 @@ class Antispam_GeoIP_Controller
 
 	public function _get_region($gi, $ipnum)
 	{
-		if ($gi->databaseType == GEOIP_REGION_EDITION_REV0) {
-			$seek_region = $this->_geoip_seek_country($gi, $ipnum) - GEOIP_STATE_BEGIN_REV0;
+		if ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV0) {
+			$seek_region = $this->_geoip_seek_country($gi, $ipnum) - $this->GEOIP_STATE_BEGIN_REV0;
 			if ($seek_region >= 1000) {
 				$country_code = "US";
 				$region = chr(($seek_region - 1000) / 26 + 65) . chr(($seek_region - 1000) % 26 + 65);
@@ -569,19 +557,19 @@ class Antispam_GeoIP_Controller
 				$region = "";
 			}
 			return array($country_code, $region);
-		} elseif ($gi->databaseType == GEOIP_REGION_EDITION_REV1) {
-			$seek_region = $this->_geoip_seek_country($gi, $ipnum) - GEOIP_STATE_BEGIN_REV1;
-			if ($seek_region < US_OFFSET) {
+		} elseif ($gi->databaseType == $this->GEOIP_REGION_EDITION_REV1) {
+			$seek_region = $this->_geoip_seek_country($gi, $ipnum) - $this->GEOIP_STATE_BEGIN_REV1;
+			if ($seek_region < $this->US_OFFSET) {
 				$country_code = "";
 				$region = "";
-			} elseif ($seek_region < CANADA_OFFSET) {
+			} elseif ($seek_region < $this->CANADA_OFFSET) {
 				$country_code = "US";
-				$region = chr(($seek_region - US_OFFSET) / 26 + 65) . chr(($seek_region - US_OFFSET) % 26 + 65);
-			} elseif ($seek_region < WORLD_OFFSET) {
+				$region = chr(($seek_region - $this->US_OFFSET) / 26 + 65) . chr(($seek_region - $this->US_OFFSET) % 26 + 65);
+			} elseif ($seek_region < $this->WORLD_OFFSET) {
 				$country_code = "CA";
-				$region = chr(($seek_region - CANADA_OFFSET) / 26 + 65) . chr(($seek_region - CANADA_OFFSET) % 26 + 65);
+				$region = chr(($seek_region - $this->CANADA_OFFSET) / 26 + 65) . chr(($seek_region - $this->CANADA_OFFSET) % 26 + 65);
 			} else {
-				$country_code = $gi->GEOIP_COUNTRY_CODES[(int) (($seek_region - WORLD_OFFSET) / FIPS_RANGE)];
+				$country_code = $gi->GEOIP_COUNTRY_CODES[(int) (($seek_region - $this->WORLD_OFFSET) / $this->FIPS_RANGE)];
 				$region = "";
 			}
 			return array($country_code, $region);

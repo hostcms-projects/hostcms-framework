@@ -1090,16 +1090,16 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						. $oSiteAlias->name
 						. $oShop->Structure->getPath()
 						. $this->_object->getPath();
+						
+					$this->getField('path')
+						->add(
+							Admin_Form_Entity::factory('A')
+								->target('_blank')
+								->href($sGroupUrl)
+								->class('input-group-addon bg-blue bordered-blue')
+								->value('<i class="fa fa-external-link"></i>')
+						);
 				}
-
-				$this->getField('path')
-					->add(
-						Admin_Form_Entity::factory('A')
-							->target('_blank')
-							->href($sGroupUrl)
-							->class('input-group-addon bg-blue bordered-blue')
-							->value('<i class="fa fa-external-link"></i>')
-				);
 
 				$oMainTab->move($this->getField('path'), $oMainRow3);
 
@@ -1186,6 +1186,14 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			: */ $this->_object->Shop;
 
 		$modelName = $this->_object->getModelName();
+
+		$aConfig = Core_Config::instance()->get('shop_config', array()) + array(
+			'smallImagePrefix' => 'small_',
+			'itemLargeImage' => 'item_%d.%s',
+			'itemSmallImage' => 'small_item_%d.%s',
+			'groupLargeImage' => 'group_%d.%s',
+			'groupSmallImage' => 'small_group_%d.%s',
+		);
 
 		switch ($modelName)
 		{
@@ -1571,10 +1579,9 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$ext = Core_File::getExtension($aFileData['name']);
 					//$large_image = 'information_groups_' . $this->_object->id . '.' . $ext;
 
-					$large_image =
-						($modelName == 'shop_item'
-							? 'shop_items_catalog_image'
-							: 'shop_group_image') . $this->_object->id . '.' . $ext;
+					$large_image = $modelName == 'shop_item'
+						? sprintf($aConfig['itemLargeImage'], $this->_object->id, $ext)
+						: sprintf($aConfig['groupLargeImage'], $this->_object->id, $ext);
 				}
 			}
 			else
@@ -1627,7 +1634,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					if ($create_large_image)
 					{
 						$large_image = $file_name;
-						$small_image = 'small_' . $large_image;
+						$small_image = $aConfig['smallImagePrefix'] . $large_image;
 					}
 					else
 					{
@@ -1639,16 +1646,15 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					// Определяем расширение файла
 					$ext = Core_File::getExtension($file_name);
 
-					$small_image =
-						($modelName == 'shop_item'
-							? 'small_shop_items_catalog_image'
-							: 'small_shop_group_image') . $this->_object->id . '.' . $ext;
+					$small_image = $modelName == 'shop_item'
+						? sprintf($aConfig['itemSmallImage'], $this->_object->id, $ext)
+						: sprintf($aConfig['groupSmallImage'], $this->_object->id, $ext);
 
 				}
 			}
 			elseif ($create_small_image_from_large && $bLargeImageIsCorrect)
 			{
-				$small_image = 'small_' . $large_image;
+				$small_image = $aConfig['smallImagePrefix'] . $large_image;
 			}
 			// Тип загружаемого файла является недопустимым для загрузки файла
 			else
@@ -1677,7 +1683,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 			if ($modelName == 'shop_group')
 			{
-			// Путь к создаваемому файлу большого изображения;
+				// Путь к создаваемому файлу большого изображения;
 				$param['large_image_target'] = !empty($large_image)
 					? $this->_object->getGroupPath() . $large_image
 					: '';
@@ -1834,56 +1840,65 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->addSkipColumn('path');
 			}*/
 
-			$modelName = $this->_object->getModelName();
-
-			switch ($modelName)
+			if (strlen($path))
 			{
-				case 'shop_item':
-					$shop_group_id = Core_Array::getPost('shop_group_id');
+				$modelName = $this->_object->getModelName();
 
-					$oSameShopItem = Core_Entity::factory('Shop', $shop_id)->Shop_Items->getByGroupIdAndPath($shop_group_id, $path);
+				switch ($modelName)
+				{
+					case 'shop_item':
+						$shop_group_id = Core_Array::getPost('shop_group_id');
 
-					if (!is_null($oSameShopItem) && $oSameShopItem->id != Core_Array::getPost('id'))
-					{
-						$this->addMessage(Core_Message::get(Core::_('Shop_Item.error_URL_shop_item'), 'error')
-						);
-						return TRUE;
-					}
+						$oSameShopItem = Core_Entity::factory('Shop', $shop_id)
+							->Shop_Items
+							->getByGroupIdAndPath($shop_group_id, $path);
 
-					$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)->Shop_Groups->getByParentIdAndPath($shop_group_id, $path);
+						if (!is_null($oSameShopItem) && $oSameShopItem->id != Core_Array::getPost('id'))
+						{
+							$this->addMessage(Core_Message::get(Core::_('Shop_Item.error_URL_shop_item'), 'error')
+							);
+							return TRUE;
+						}
 
-					if (!is_null($oSameShopGroup))
-					{
-						$this->addMessage(Core_Message::get(Core::_('Shop_Item.error_URL_isset_group') , 'error')
-						);
-						return TRUE;
-					}
-				break;
-				case 'shop_group':
-					$parent_id = Core_Array::getPost('parent_id');
+						$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)
+							->Shop_Groups
+							->getByParentIdAndPath($shop_group_id, $path);
 
-					$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)
-						->Shop_Groups
-						->getByParentIdAndPath($parent_id, $path);
+						if (!is_null($oSameShopGroup))
+						{
+							$this->addMessage(Core_Message::get(Core::_('Shop_Item.error_URL_isset_group') , 'error')
+							);
+							return TRUE;
+						}
+					break;
+					case 'shop_group':
+						$parent_id = Core_Array::getPost('parent_id');
 
-					if (!is_null($oSameShopGroup) && $oSameShopGroup->id != Core_Array::getPost('id'))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Shop_Group.error_URL_shop_group'), 'error')
-						);
-						return TRUE;
-					}
+						$oSameShopGroup = Core_Entity::factory('Shop', $shop_id)
+							->Shop_Groups
+							->getByParentIdAndPath($parent_id, $path);
 
-					$oSameShopItem = Core_Entity::factory('Shop', $shop_id)->Shop_Items->getByGroupIdAndPath($parent_id, $path);
+						if (!is_null($oSameShopGroup) && $oSameShopGroup->id != Core_Array::getPost('id'))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Shop_Group.error_URL_shop_group'), 'error')
+							);
+							return TRUE;
+						}
 
-					if (!is_null($oSameShopItem))
-					{
-						$this->addMessage(
-							Core_Message::get(Core::_('Shop_Group.error_URL_isset_item'), 'error')
-						);
-						return TRUE;
-					}
-				break;
+						$oSameShopItem = Core_Entity::factory('Shop', $shop_id)
+							->Shop_Items
+							->getByGroupIdAndPath($parent_id, $path);
+
+						if (!is_null($oSameShopItem))
+						{
+							$this->addMessage(
+								Core_Message::get(Core::_('Shop_Group.error_URL_isset_item'), 'error')
+							);
+							return TRUE;
+						}
+					break;
+				}
 			}
 		}
 
@@ -2180,63 +2195,32 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 	/**
 	 * Fill modifications list
-	 * @param Shop_Item_Model $oShopItem item
+	 * @param Shop_Item_Model $oShop_Item item
 	 * @return array
 	 */
-	protected function _fillModificationList($oShopItem)
+	protected function _fillModificationList($oShop_Item)
 	{
-		// Ограничение списка модификаций
-		$iModificationsLimit = 250;
-
 		$aReturnArray = array(' … ');
 
-		// Если это модификация - её основной товар в любом случае должен быть в списке
-		if ($oShopItem->modification_id)
-		{
-			$aReturnArray[$oShopItem->Modification->id] = $oShopItem->Modification->name;
-			$iModificationsLimit--;
-		}
+		$iShopGroupId = $oShop_Item->modification_id
+			? $oShop_Item->Modification->shop_group_id
+			: $oShop_Item->shop_group_id;
 
-		if (!$oShopItem->id)
-		{
-			if (intval(Core_Array::getGet('shop_item_id', 0)))
-			{
-				$oShopItemParent = Core_Entity::factory('Shop_Item', Core_Array::getGet('shop_item_id', 0));
-
-				$iShopId = $oShopItemParent->Shop->id;
-				$iShopGroupId = $oShopItemParent->Shop_Group->id;
-			}
-			else
-			{
-				$iShopId = intval(Core_Array::getGet('shop_id', 0));
-				$iShopGroupId = intval(Core_Array::getGet('shop_group_id', 0));
-			}
-		}
-		else
-		{
-			$iShopGroupId = $oShopItem->modification_id
-				? $oShopItem->Modification->Shop_Group->id
-				: $oShopItem->Shop_Group->id;
-
-			$iShopId = $oShopItem->Shop->id;
-		}
-
-		$oShopItemTemp = Core_Entity::factory('Shop_Item');
-
-		$oShopItemTemp
-			->queryBuilder()
-			// товары этой же группы
-			->where('shop_group_id', '=', (int)$iShopGroupId)
-			// этого же магазина
-			->where('shop_id', '=', (int)$iShopId)
-			// не модификации
+		$aTmp = Core_QueryBuilder::select('id', 'name')
+			->from('shop_items')
+			->where('shop_id', '=', $oShop_Item->shop_id)
+			->where('shop_group_id', '=', $iShopGroupId)
 			->where('modification_id', '=', 0)
-			->limit($iModificationsLimit);
+			->where('shortcut_id', '=', 0)
+			->where('deleted', '=', 0)
+			->clearOrderBy()
+			->orderBy('sorting')
+			->orderBy('name')
+			->execute()->asAssoc()->result();
 
-		$aShopItems = $oShopItemTemp->findAll(FALSE);
-		foreach ($aShopItems as $oShop_Item)
+		foreach ($aTmp as $aItem)
 		{
-			$oShop_Item->id != $oShopItem->id && $aReturnArray[$oShop_Item->id] = $oShop_Item->name;
+			$aReturnArray[$aItem['id']] = $aItem['name'];
 		}
 
 		return $aReturnArray;

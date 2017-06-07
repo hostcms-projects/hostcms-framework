@@ -89,6 +89,7 @@ return array(
 	'table_field_iconv' => 'Iconv:',
 	'table_field_gd_version' => 'Версия GD:',
 	'table_field_pcre_version' => 'Версия PCRE:',
+	'table_field_mysql' => 'MySQL:',
 	'table_field_maximum_upload_data_size' => 'Максимальный размер загружаемых данных:',
 	'table_field_maximum_execution_time' => 'Максимальное время исполнения:',
 	'table_field_disc_space' => 'Дисковое пространство:',
@@ -116,7 +117,7 @@ return array(
 	'create_database' => 'Создать базу данных',
 	'create_database_flag' => 'Не устанавливайте этот флажок, если база данных уже создана!',
 	'clear_database' => 'Очистить базу данных',
-	'clear_database_caution' => 'При очищении базы данных все данные из нее будут удалены!',
+	'clear_database_caution' => 'При очистке базы данных все данные из нее будут удалены!',
 
 	'action' => 'Действие',
 	'result' => 'Результат',

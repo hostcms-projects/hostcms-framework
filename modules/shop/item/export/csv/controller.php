@@ -570,6 +570,10 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 
 			$aShopGroupsId = array_merge(array($this->parentGroup), $oShop_Groups->getGroupChildrenId(FALSE));
 
+			Core_Log::instance()->clear()
+				->status(Core_Log::$MESSAGE)
+				->write('CSV export, groups count = ' . count($aShopGroupsId));
+
 			foreach ($aShopGroupsId as $iShopGroupId)
 			{
 				$aTmpArray = array();
@@ -582,10 +586,8 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					->where('modification_id', '=', 0)
 					->where('shortcut_id', '=', 0);
 
-				if ($this->producer)
-				{
-					$oShopItems->queryBuilder()->where('shop_producer_id', '=', $this->producer);
-				}
+				$this->producer
+					&& $oShopItems->queryBuilder()->where('shop_producer_id', '=', $this->producer);
 
 				if ($iShopGroupId != 0)
 				{
@@ -671,7 +673,7 @@ class Shop_Item_Export_Csv_Controller extends Core_Servant_Properties
 					+ count($this->_aSpecialPriceBase_Properties);
 
 				$offset = 0;
-				$limit = 100;
+				$limit = 500;
 
 				do {
 					$oShopItems

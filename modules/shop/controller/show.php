@@ -29,6 +29,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - comments(TRUE|FALSE) показывать комментарии для выбранных товаров, по умолчанию FALSE
  * - votes(TRUE|FALSE) показывать рейтинг элемента, по умолчанию TRUE
  * - tags(TRUE|FALSE) выводить метки
+ * - calculateCounts(TRUE|FALSE) вычислять общее количество информационных элементов и групп в корневой группе, по умолчанию FALSE
  * - siteuser(TRUE|FALSE) показывать данные о пользователе сайта, связанного с выбранным товаром, по умолчанию TRUE
  * - siteuserProperties(TRUE|FALSE) выводить значения дополнительных свойств пользователей сайта, по умолчанию FALSE
  * - bonuses(TRUE|FALSE) выводить бонусы для товаров, по умолчанию TRUE
@@ -106,6 +107,7 @@ class Shop_Controller_Show extends Core_Controller
 		'comments',
 		'votes',
 		'tags',
+		'calculateCounts',
 		'siteuser',
 		'siteuserProperties',
 		'bonuses',
@@ -225,8 +227,9 @@ class Shop_Controller_Show extends Core_Controller
 		$this->group = $this->offset = $this->page = 0;
 		$this->item = $this->producer = NULL;
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
-			= $this->comments = $this->tags = $this->siteuserProperties = $this->warehousesItems
-			= $this->taxes = $this->cart = $this->modifications = $this->modificationsList = $this->filterShortcuts = FALSE;
+			= $this->comments = $this->tags = $this->calculateCounts = $this->siteuserProperties
+			= $this->warehousesItems = $this->taxes = $this->cart = $this->modifications
+			= $this->modificationsList = $this->filterShortcuts = FALSE;
 
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
 			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed
@@ -710,6 +713,8 @@ class Shop_Controller_Show extends Core_Controller
 
 		$oShop = $this->getEntity();
 
+		$oShop->showXmlCounts($this->calculateCounts);
+		
 		$this->taxes && $oShop->showXmlTaxes(TRUE);
 
 		$this->addEntity(
@@ -1170,6 +1175,7 @@ class Shop_Controller_Show extends Core_Controller
 	/**
 	 * Set item's condition by shop_group_id
 	 * @return self
+	 * @hostcms-event Shop_Controller_Show.onBeforeSelectModifications
 	 */
 	protected function _groupCondition()
 	{
@@ -1200,6 +1206,8 @@ class Shop_Controller_Show extends Core_Controller
 			// Стандартные ограничения для товаров
 			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
 
+			Core_Event::notify(get_class($this) . '.onBeforeSelectModifications', $this, array($oCore_QueryBuilder_Select_Modifications));
+			
 			$this->_Shop_Items
 				->queryBuilder()
 				->setOr()
@@ -1718,6 +1726,7 @@ class Shop_Controller_Show extends Core_Controller
 		}
 		else
 		{
+			// Edit
 			$sPath = '/admin/shop/item/index.php';
 			$sAdditional = "hostcms[action]=edit&shop_id={$oShop->id}&shop_group_id={$this->group}&hostcms[checked][1][{$this->item}]=1";
 			$sTitle = Core::_('Shop_Item.items_catalog_edit_form_title');
@@ -1735,6 +1744,43 @@ class Shop_Controller_Show extends Core_Controller
 					)
 			);
 
+			// Folder
+			$sPath = '/admin/shop/item/index.php';
+			$sAdditional = "shop_id={$oShop->id}&shop_group_id={$this->group}";
+			$sTitle = Core::_('Shop_Group.links_groups');
+
+			$oXslSubPanel->add(
+				Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/admin/images/folder.gif')
+							->alt($sTitle)
+							->title($sTitle)
+					)
+			);
+
+			// Comments
+			$sPath = '/admin/shop/item/comment/index.php';
+			$sAdditional = "shop_item_id={$this->item}";
+			$sTitle = Core::_('Shop_Item.items_catalog_add_form_comment_link');
+
+			$oXslSubPanel->add(
+				Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/admin/images/comments.gif')
+							->alt($sTitle)
+							->title($sTitle)
+					)
+			);
+			
+			// Delete
 			$sPath = '/admin/shop/item/index.php';
 			$sAdditional = "hostcms[action]=markDeleted&shop_id={$oShop->id}&shop_group_id={$this->group}&hostcms[checked][1][{$this->item}]=1";
 			$sTitle = Core::_('Shop_Item.markDeleted');
@@ -1838,7 +1884,7 @@ class Shop_Controller_Show extends Core_Controller
 
 			// Стандартные ограничения для товаров
 			$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
-
+			
 			$oSubMinMaxQueryBuilder
 				->setOr()
 				->where('shop_items.shop_group_id', '=', 0)

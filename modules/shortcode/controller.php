@@ -8,7 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @package HostCMS 6\Shortcode
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shortcode_Controller
 {
@@ -36,7 +36,7 @@ class Shortcode_Controller
 	/**
 	 * Array of Shortcodes
 	 */
-	protected $_shortcodes = NULL;
+	protected $_shortcodes = array();
 
 	/**
 	 * Array of Shortcodes' names
@@ -108,7 +108,7 @@ defined(\'HOSTCMS\') || exit(\'HostCMS: access denied.\');
  * @package HostCMS 6\Shortcode
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 
 class Shortcode_List

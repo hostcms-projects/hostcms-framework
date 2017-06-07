@@ -65,14 +65,34 @@ class Template_Section_Model extends Core_Entity{
 		}
 
 		$this->id = $primaryKey;
-		
+
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredDelete', $this, array($primaryKey));
-		
+
 		$this->Template_Section_Libs->deleteAll(FALSE);
 
 		return parent::delete($primaryKey);
 	}
-	
+
+	/**
+	 * Copy object
+	 * @return Core_Entity
+	 */
+	public function copy()
+	{
+		$newObject = parent::copy();
+		$newObject->save();
+
+		$aTemplate_Section_Libs = $this->Template_Section_Libs->findAll(FALSE);
+
+		foreach ($aTemplate_Section_Libs as $oTemplate_Section_Lib)
+		{
+			$oNew_Template_Section_Lib = $oTemplate_Section_Lib->copy();
+			$newObject->add($oNew_Template_Section_Lib);
+		}
+
+		return $newObject;
+	}
+
 	/**
 	 * Backend callback method
 	 * @param Admin_Form_Field $oAdmin_Form_Field

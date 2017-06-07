@@ -146,40 +146,12 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 					'fa-file-code-o'
 				)
 			)
-			->divAttr(array('id' => 'import_types', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('class' => 'form-group col-xs-12'))
+			->onchange("radiogroupOnChange('{$windowId}', $(this).val(), [0,1])")
 			->value($this->_object->type)
 			->name('type');
 
 		$oMainRow1->add($oTypeRadio);
-
-		$oMainTab
-			->addAfter(
-				Admin_Form_Entity::factory('Code')
-					->html("<script>$(function() {
-					$('#{$windowId} #import_types').buttonset();
-					if(!{$this->_object->type})
-					{
-						$('#{$windowId} #code').hide();
-					}
-					else
-					{
-						$('#{$windowId} #code').show();
-					}
-
-					$('#{$windowId} #import_types input:radio').change(
-						function()
-						{
-							if(!($(this).val()%2))
-							{
-								$('#{$windowId} #code').hide();
-							}
-							else
-							{
-								$('#{$windowId} #code').show();
-							}
-						}
-					);
-				});</script>"), $oTypeRadio);
 
 		$oTextarea = Admin_Form_Entity::factory('Textarea');
 
@@ -189,12 +161,18 @@ class Shop_Delivery_Controller_Edit extends Admin_Form_Action_Controller_Type_Ed
 		$oTextarea->caption(Core::_('Shop_Delivery.handler'))
 			->name('code')
 			->value($this->_object->loadHandlerFile())
-			->divAttr(array('id' => 'code', 'class' => 'form-group col-xs-12'))
+			->divAttr(array('id' => 'code', 'class' => 'form-group col-xs-12 hidden-0'))
 			->rows(15)
 			->syntaxHighlighter(defined('SYNTAX_HIGHLIGHTING') ? SYNTAX_HIGHLIGHTING : TRUE)
 			->syntaxHighlighterOptions($oTmpOptions);
 
-		$oMainRow2->add($oTextarea);
+		$oMainRow2
+			->add($oTextarea)
+			->add(
+				Core::factory('Core_Html_Entity_Script')
+					->type("text/javascript")
+					->value("radiogroupOnChange('{$windowId}', {$this->_object->type}, [0,1])")
+			);
 
 		return $this;
 	}

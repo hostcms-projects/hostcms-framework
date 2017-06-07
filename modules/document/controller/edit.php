@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Document
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -22,21 +22,21 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	{
 		$modelName = $object->getModelName();
 
-		switch ($modelName)
+		if (!$object->id)
 		{
-			case 'document':
-				if (!$object->id)
-				{
+			switch ($modelName)
+			{
+				case 'document':
 					$object->document_dir_id = Core_Array::getGet('document_dir_id');
-				}
-			break;
-			case 'document_dir':
-				if (!$object->id)
-				{
+				break;
+				case 'document_dir':
 					$object->parent_id = Core_Array::getGet('document_dir_id');
-				}
-			break;
+				break;
+			}
 		}
+
+		$modelName == 'document' && $object->datetime(Core_Date::timestamp2sql(time()));
+		
 		return parent::setObject($object);
 	}
 

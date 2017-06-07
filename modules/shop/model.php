@@ -187,6 +187,23 @@ class Shop_Model extends Core_Entity
 	}
 
 	/**
+	 * Calculate counts
+	 * @var boolean
+	 */
+	protected $_showXmlCounts = TRUE;
+
+	/**
+	 * Add comments XML to item
+	 * @param boolean $showXmlComments mode
+	 * @return self
+	 */
+	public function showXmlCounts($showXmlCounts = TRUE)
+	{
+		$this->_showXmlCounts = $showXmlCounts;
+		return $this;
+	}
+
+	/**
 	 * Get shop by structure id.
 	 * @param int $structure_id
 	 * @return self|NULL
@@ -759,22 +776,9 @@ class Shop_Model extends Core_Entity
 	 */
 	public function adminTransactionAmount()
 	{
-		$siteuser_id = Core_Array::getGet('siteuser_id');
+		$siteuser_id = intval(Core_Array::getGet('siteuser_id'));
 
-		$aShop_Siteuser_Transactions = Core_Entity::factory('Siteuser', $siteuser_id)
-			->Shop_Siteuser_Transactions
-			->getByShop($this->id);
-
-		$amount = 0;
-		foreach ($aShop_Siteuser_Transactions as $oShop_Siteuser_Transaction)
-		{
-			if ($oShop_Siteuser_Transaction->active)
-			{
-				$amount += $oShop_Siteuser_Transaction->amount_base_currency;
-			}
-		}
-
-		return round($amount, 2);
+		return Core_Entity::factory('Siteuser', $siteuser_id)->getTransactionsAmount($this);
 	}
 
 	/**
@@ -827,32 +831,35 @@ class Shop_Model extends Core_Entity
 
 		$this->_showXmlTaxes && $this->addEntities(Core_Entity::factory('Shop_Tax')->findAll());
 
-		$oShop_Items = $this->Shop_Items;
-		$oShop_Items->queryBuilder()
-			->where('shop_items.shop_group_id', '=', 0);
-		$iCountItems = $oShop_Items->getCount();
-
-		$aShop_Groups = $this->Shop_Groups->getByParentId(0);
-		$iCountGroups = count($aShop_Groups);
-
-		$array = array(
-			'items_count' => $iCountItems,
-			'items_total_count' => $iCountItems,
-			'subgroups_count' => $iCountGroups,
-			'subgroups_total_count' => $iCountGroups
-		);
-
-		foreach ($aShop_Groups as $oShop_Group)
+		if ($this->_showXmlCounts)
 		{
-			$array['items_total_count'] += $oShop_Group->items_total_count;
-			$array['subgroups_total_count'] += $oShop_Group->subgroups_total_count;
-		}
+			$oShop_Items = $this->Shop_Items;
+			$oShop_Items->queryBuilder()
+				->where('shop_items.shop_group_id', '=', 0);
+			$iCountItems = $oShop_Items->getCount();
 
-		$this
-			->addXmlTag('items_count', $array['items_count'])
-			->addXmlTag('items_total_count', $array['items_total_count'])
-			->addXmlTag('subgroups_count', $array['subgroups_count'])
-			->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
+			$aShop_Groups = $this->Shop_Groups->getByParentId(0, FALSE);
+			$iCountGroups = count($aShop_Groups);
+
+			$array = array(
+				'items_count' => $iCountItems,
+				'items_total_count' => $iCountItems,
+				'subgroups_count' => $iCountGroups,
+				'subgroups_total_count' => $iCountGroups
+			);
+
+			foreach ($aShop_Groups as $oShop_Group)
+			{
+				$array['items_total_count'] += $oShop_Group->items_total_count;
+				$array['subgroups_total_count'] += $oShop_Group->subgroups_total_count;
+			}
+
+			$this
+				->addXmlTag('items_count', $array['items_count'])
+				->addXmlTag('items_total_count', $array['items_total_count'])
+				->addXmlTag('subgroups_count', $array['subgroups_count'])
+				->addXmlTag('subgroups_total_count', $array['subgroups_total_count']);
+		}
 
 		return parent::getXml();
 	}

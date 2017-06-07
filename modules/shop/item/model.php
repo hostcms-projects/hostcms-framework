@@ -305,17 +305,26 @@ class Shop_Item_Model extends Core_Entity
 		// setHref()
 		foreach ($aReturn as $oProperty_Value)
 		{
-			if ($oProperty_Value->Property->type == 2)
-			{
-				$oProperty_Value
-					->setHref($this->getItemHref())
-					->setDir($this->getItemPath());
-			}
+			$this->_preparePropertyValue($oProperty_Value);
 		}
 
 		$bCache && $this->_propertyValues = $aReturn;
 
 		return $aReturn;
+	}
+
+	/**
+	 * Prepare Property Value
+	 * @param Property_Value_Model $oProperty_Value
+	 */
+	protected function _preparePropertyValue($oProperty_Value)
+	{
+		if ($oProperty_Value->Property->type == 2)
+		{
+			$oProperty_Value
+				->setHref($this->getItemHref())
+				->setDir($this->getItemPath());
+		}
 	}
 
 	/**
@@ -1092,7 +1101,19 @@ class Shop_Item_Model extends Core_Entity
 					$oInformationsystem_Item = $oPropertyValue->Informationsystem_Item;
 					if ($oInformationsystem_Item->id)
 					{
-						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ';
+						$oSearch_Page->text .= htmlspecialchars($oInformationsystem_Item->name) . ' ' . $oInformationsystem_Item->description . ' ' . $oInformationsystem_Item->text . ' ';
+					}
+				}
+			}
+			// Shop
+			elseif ($oPropertyValue->Property->type == 12 && Core::moduleIsActive('shop'))
+			{
+				if ($oPropertyValue->value != 0)
+				{
+					$oShop_Item = $oPropertyValue->Shop_Item;
+					if ($oShop_Item->id)
+					{
+						$oSearch_Page->text .= htmlspecialchars($oShop_Item->name) . ' ' . $oShop_Item->description . ' ' . $oShop_Item->text . ' ';
 					}
 				}
 			}
@@ -1376,13 +1397,14 @@ class Shop_Item_Model extends Core_Entity
 	 * Get item by group id and path
 	 * @param int $group_id group id
 	 * @param string $path path
+	 * @param boolean $bCache cache mode
 	 * @return self|NULL
 	 */
 	public function getByGroupIdAndPath($group_id, $path)
 	{
 		$this->queryBuilder()
 			//->clear()
-			->where('path', '=', $path)
+			->where('path', 'LIKE', $path)
 			->where('shop_group_id', '=', $group_id)
 			->where('shortcut_id', '=', 0)
 			->clearOrderBy()
@@ -2071,23 +2093,38 @@ class Shop_Item_Model extends Core_Entity
 
 				foreach ($aProperty_Values as $oProperty_Value)
 				{
-					if ($oProperty_Value->Property->type == 2)
-					{
-						$oProperty_Value
-							->setHref($this->getItemHref())
-							->setDir($this->getItemPath());
-					}
-
-					/*isset($this->_showXmlProperties[$oProperty_Value->property_id]) && */$this->addEntity(
-						$oProperty_Value
-					);
+					$this->_preparePropertyValue($oProperty_Value);
 				}
 			}
 			else
 			{
 				$aProperty_Values = $this->getPropertyValues();
 				// Add all values
-				$this->addEntities($aProperty_Values);
+				//$this->addEntities($aProperty_Values);
+			}
+
+			$aListIDs = array();
+
+			foreach ($aProperty_Values as $oProperty_Value)
+			{
+				// List_Items
+				if ($oProperty_Value->Property->type == 3)
+				{
+					$aListIDs[] = $oProperty_Value->value;
+				}
+
+				$this->addEntity($oProperty_Value);
+			}
+
+			// Cache necessary List_Items
+			if (count($aListIDs))
+			{
+				$oList_Items = Core_Entity::factory('List_Item');
+				$oList_Items->queryBuilder()
+					->where('id', 'IN', $aListIDs)
+					->clearOrderBy();
+
+				$oList_Items->findAll(TRUE);
 			}
 		}
 

@@ -107,25 +107,6 @@ class Lib_Model extends Core_Entity
 		$oStructure = Core_Entity::factory('Structure', $structure_id);
 		$oStructure->options = json_encode($array);
 		$oStructure->save();
-
-		/*
-		$sLibDatFilePath = $this->getLibDatFilePath($structure_id);
-		Core_File::mkdir(dirname($sLibDatFilePath), CHMOD, TRUE);
-
-		foreach ($array as $key => $value)
-		{
-			if (strtolower($value) == "false")
-			{
-				$values[$key] = FALSE;
-			}
-			elseif (strtolower($value) == "true")
-			{
-				$values[$key] = TRUE;
-			}
-		}
-
-		$content = strval(serialize($array));
-		Core_File::write($sLibDatFilePath, $content);*/
 	}
 
 	/**

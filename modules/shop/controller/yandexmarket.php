@@ -8,6 +8,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * Доступные методы:
  *
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию TRUE.
+ * - outlets(TRUE|FALSE|array()) выводить данные рамках в программы «Забронировать на Маркете». По умолчанию FALSE. При указании массива данные будут выводиться только с указанных ID складов.
  * - modifications(TRUE|FALSE) экспортировать модификации, по умолчанию TRUE.
  * - recommended(TRUE|FALSE) экспортировать рекомендованные товары, по умолчанию FALSE.
  * - checkAvailable(TRUE|FALSE) проверять остаток на складе, по умолчанию TRUE. Если FALSE, то товар будет выгружаться доступным назвисимо от остатка на складе.
@@ -52,6 +53,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 */
 	protected $_allowedProperties = array(
 		'itemsProperties',
+		'outlets',
 		'modifications',
 		'recommended',
 		'checkAvailable',
@@ -253,8 +255,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		$this->itemsProperties = $this->modifications = $this->deliveryOptions
 			= $this->checkAvailable = TRUE;
 
-		$this->recommended = $this->checkRest = FALSE;
-
+		$this->recommended = $this->checkRest = $this->outlets = FALSE;
+		
 		$this->type = 'offer';
 		$this->onStep = 500;
 
@@ -575,6 +577,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 							if ($this->checkRest)
 							{
 								$oModifications->queryBuilder()
+									->select('shop_items.*')
 									->join('shop_warehouse_items', 'shop_warehouse_items.shop_item_id', '=', 'shop_items.id')
 									->groupBy('shop_items.id')
 									->having(Core_QueryBuilder::expression('SUM(shop_warehouse_items.count)'), '>', 0);
@@ -780,6 +783,26 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		$this->itemsProperties && $this->_addPropertyValue($oShop_Item);
 
+		// outlets
+		if ($this->outlets)
+		{
+			$aShop_Warehouse_Items = is_array($this->outlets) && count($this->outlets)
+				? $oShop_Item->Shop_Warehouse_Items->getAllByShop_warehouse_id($this->outlets, FALSE, 'IN')
+				: $oShop_Item->Shop_Warehouse_Items->findAll(FALSE);
+				
+			if (count($aShop_Warehouse_Items))
+			{
+				$this->stdOut->write('<outlets>' . "\n");
+				
+				foreach ($aShop_Warehouse_Items as $oShop_Warehouse_Item)
+				{
+					$this->stdOut->write('<outlet id="' . $oShop_Warehouse_Item->shop_warehouse_id . '" instock="' . intval($oShop_Warehouse_Item->count) . '" booking="true" />' . "\n");
+				}
+				
+				$this->stdOut->write('</outlets>' . "\n");
+			}
+		}
+		
 		Core_Event::notify(get_class($this) . '.onAfterOffer', $this, array($oShop_Item));
 
 		$this->stdOut->write('</offer>'. "\n");

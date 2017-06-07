@@ -498,7 +498,7 @@ class Market_Controller extends Core_Servant_Properties
 	{
 		$sFieldCaption = htmlspecialchars($aFieldsValue['Caption']);
 		$sFieldName = htmlspecialchars($aFieldsValue['Name']);
-		$sFieldValue = htmlspecialchars($aFieldsValue['Value']);
+		$sFieldValue = $aFieldsValue['Value'];
 		$sFieldType = strval($aFieldsValue['Type']);
 
 		switch ($sFieldType)
@@ -954,7 +954,7 @@ class Market_Controller extends Core_Servant_Properties
 					if (object && object.tagName == "SELECT")
 					{
 						category_id = parseInt(object.options[object.selectedIndex].value);
-						$.adminLoad({path: "/admin/market/index.php", windowId:"' . $sWindowId . '", additionalParams: "category_id=" + category_id});
+						$.adminLoad({path: "/admin/market/index.php", windowId:"' . $sWindowId . '", additionalParams: "category_id=" + category_id, current: 1});
 					}
 					return false;
 				}</script>')

@@ -33,8 +33,7 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 		parent::__construct();
 
 		$this->_adminPages = array(
-			1 => array('title' => Core::_('Shop.widget_title')),
-			2 => array('title' => 'undefined'),
+			1 => array('title' => 'undefined'),
 		);
 	}
 
@@ -56,20 +55,6 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 			case 1:
 				if ($ajax)
 				{
-					$this->_commentsContent();
-				}
-				else
-				{
-					?><div class="col-xs-12 col-sm-6" id="shopCommentsAdminPage" data-hostcmsurl="<?php echo htmlspecialchars($this->_path)?>">
-						<script type="text/javascript">
-						$.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopCommentsAdminPage') });
-						</script>
-					</div><?php
-				}
-			break;
-			case 2:
-				if ($ajax)
-				{
 					$this->_ordersContent();
 				}
 				else
@@ -84,146 +69,6 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 		}
 
 		return TRUE;
-	}
-
-	protected function _commentsContent()
-	{
-		$oUser = Core_Entity::factory('User')->getCurrent();
-
-		$oComments = Core_Entity::factory('Comment');
-		$oComments->queryBuilder()
-			->straightJoin()
-			->join('comment_shop_items', 'comments.id', '=', 'comment_shop_items.comment_id')
-			->join('shop_items', 'comment_shop_items.shop_item_id', '=', 'shop_items.id')
-			->join('shops', 'shop_items.shop_id', '=', 'shops.id')
-			->where('shop_items.deleted', '=', 0)
-			->where('shops.deleted', '=', 0)
-			->where('site_id', '=', CURRENT_SITE)
-			->clearOrderBy()
-			->orderBy('comments.datetime', 'DESC')
-			->limit(5);
-
-		// Права доступа пользователя к комментариям
-		if ($oUser->superuser == 0 && $oUser->only_access_my_own == 1)
-		{
-			$oComments
-				->queryBuilder()
-				->where('comments.user_id', '=', $oUser->id);
-		}
-
-		$aComments = $oComments->findAll(FALSE);
-
-		if (count($aComments))
-		{
-			?><div class="widget">
-				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<i class="widget-icon fa fa-comments themesecondary"></i>
-					<span class="widget-caption themesecondary"><?php echo Core::_('Shop.index_last_comments_shop')?></span>
-					<div class="widget-buttons">
-						<a data-toggle="maximize">
-							<i class="fa fa-expand gray"></i>
-						</a>
-						<a data-toggle="refresh" onclick="$(this).find('i').addClass('fa-spin'); $.widgetLoad({ path: '<?php echo $this->_path?>', context: $('#shopCommentsAdminPage'), 'button': $(this).find('i') });">
-							<i class="fa fa-refresh gray"></i>
-						</a>
-					</div>
-				</div>
-				<div class="widget-body">
-					<div class="widget-main no-padding">
-						<div class="task-container">
-							<ul class="tasks-list">
-							<?php
-							$masColorNames = array('yellow', 'orange', 'palegreen');
-							$color = 0;
-
-							$iComments_Admin_Form_Id = 52;
-							$oComments_Admin_Form = Core_Entity::factory('Admin_Form', $iComments_Admin_Form_Id);
-							$oComments_Admin_Form_Controller = Admin_Form_Controller::create($oComments_Admin_Form)
-								->window('id_content');
-							$sShopCommentsHref = '/admin/shop/item/comment/index.php';
-
-							foreach($aComments as $oComment)
-							{
-								$sEditHref = $oComments_Admin_Form_Controller->getAdminActionLoadHref($sShopCommentsHref, 'edit', NULL, 0, $oComment->id);
-								$sEditOnClick = $oComments_Admin_Form_Controller->getAdminActionLoadAjax($sShopCommentsHref, 'edit', NULL, 0, $oComment->id);
-
-								$sChangeActiveHref = $oComments_Admin_Form_Controller->getAdminActionLoadHref($sShopCommentsHref, 'changeActive', NULL, 0, $oComment->id);
-
-								$sMarkDeletedHref = $oComments_Admin_Form_Controller->getAdminActionLoadHref($sShopCommentsHref, 'markDeleted', NULL, 0, $oComment->id);
-
-								?>
-								<li class="task-item">
-									<div class="row">
-										<div class="col-xs-6">
-											<div class="task-state">
-												<span class="label label-<?php echo $masColorNames[$color == 3 ? $color = 0 : $color]; ++$color;?>">
-												<?php echo $oComment->subject != ''
-													? htmlspecialchars(Core_Str::cut($oComment->subject, 150))
-													: Core::_('Admin_Form.noSubject')?>
-												</span>
-											</div>
-										</div>
-										<div class="col-xs-6">
-											<div class="task-time"><?php echo Core_Date::sql2date($oComment->datetime)?></div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-xs-12">
-											<div class="task-body"><?php echo trim(htmlspecialchars(Core_Str::cut(strip_tags(html_entity_decode($oComment->text, ENT_COMPAT, 'UTF-8')), 150)))?></div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-xs-6">
-											<div class="task-creator pull-left">
-												<div class="btn-group pull-right">
-													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.change_active')?>" href="<?php echo $sChangeActiveHref?>" onclick="$.widgetRequest({path: '<?php echo $sChangeActiveHref?>', context: $('#shopCommentsAdminPage')}); return false"><i class="fa <?php echo $oComment->active ? "fa-dot-circle-o" : "fa-circle-o"?>"></i> </a>
-													<a href="<?php echo $sEditHref?>" onclick="<?php echo $sEditOnClick?>" class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.edit')?>"><i class="fa fa-pencil"></i> </a>
-													<a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.delete')?>" href="<?php echo $sMarkDeletedHref?>" onclick="res = confirm('<?php echo Core::_('Admin_Form.confirm_dialog', htmlspecialchars(Core::_('Admin_Form.msg_information_alt_delete')))?>'); if (res) { $.widgetRequest({path: '<?php echo $sMarkDeletedHref?>', context: $('#shopCommentsAdminPage')}); } return false"><i class="fa fa-times"></i></a>
-													<?php
-													if ($oComment->active)
-													{
-														$oStructure = $oComment->Shop_Item->Shop->Structure;
-
-														$oCurrentAlias = Core_Entity::factory('Site', CURRENT_SITE)->getCurrentAlias();
-
-														if ($oCurrentAlias)
-														{
-															$href = ($oStructure->https ? 'https://' : 'http://' ) . $oCurrentAlias->name . $oStructure->getPath() . $oComment->Shop_Item->getPath() . '#comment' . $oComment->id;
-
-															?><a class="btn btn-xs darkgray" title="<?php echo Core::_('Comment.view_comment')?>" href="<?php echo htmlspecialchars($href)?>" target="_blank"><i class="fa fa-external-link"></i></a><?php
-														}
-													}
-													?>
-												</div>
-											</div>
-										</div>
-										<div class="col-xs-6">
-											<div class="task-assignedto pull-right"><?php
-											if ($oComment->author != '')
-											{
-												?><i class="fa fa-user icon-separator"></i><?php echo htmlspecialchars($oComment->author);
-											}
-											?></div>
-										</div>
-									</div>
-								</li>
-							<?php
-							}
-							?>
-							</ul>
-							<div>
-								<a class="btn btn-info" onclick="$.adminLoad({path: '/admin/shop/item/comment/index.php'}); return false" href="/admin/shop/item/comment/index.php">
-									<i class="fa fa-comments"></i><?php echo Core::_('Shop.widget_other_comments')?>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<?php
-		}
-
-		return $this;
 	}
 
 	protected function _ordersContent()
@@ -286,7 +131,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						foreach ($aShop_Orders as $oShop_Order)
 						{
 							$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->datetime));
-							$aOrdered[$sDate]++;
+
+							isset($aOrdered[$sDate])
+								? $aOrdered[$sDate]++
+								: $aOrdered[$sDate] = 1;
 
 							$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
 								? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
@@ -294,7 +142,11 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 								)
 								: 0;
 
-							$aOrderedAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+							$fAmount = $oShop_Order->getAmount() * $fCurrencyCoefficient;
+
+							isset($aOrderedAmount[$sDate])
+								? $aOrderedAmount[$sDate] += $fAmount
+								: $aOrderedAmount[$sDate] = $fAmount;
 						}
 
 						$offset += $limit;
@@ -322,7 +174,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 						foreach ($aShop_Orders as $oShop_Order)
 						{
 							$sDate = date('Y-m-d', Core_Date::sql2timestamp($oShop_Order->payment_datetime));
-							$aPaid[$sDate]++;
+
+							isset($aPaid[$sDate])
+								? $aPaid[$sDate]++
+								: $aPaid[$sDate] = 1;
 
 							$fCurrencyCoefficient = $oShop_Order->Shop_Currency->id > 0 && $oDefault_Currency->id > 0
 								? Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
@@ -330,7 +185,10 @@ class Skin_Bootstrap_Module_Shop_Module extends Shop_Module
 								)
 								: 0;
 
-							$aPaidAmount[$sDate] += $oShop_Order->getAmount() * $fCurrencyCoefficient;
+							$fAmount = $oShop_Order->getAmount() * $fCurrencyCoefficient;
+							isset($aPaidAmount[$sDate])
+								? $aPaidAmount[$sDate] += $fAmount
+								: $aPaidAmount[$sDate] = $fAmount;
 						}
 
 						$offset += $limit;

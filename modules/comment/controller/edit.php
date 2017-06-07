@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -43,9 +43,12 @@ class Comment_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			->add($oMainRow4 = Admin_Form_Entity::factory('Div')->class('row'))
 		;
 
-		$this->getField('text')->wysiwyg(TRUE);
-		$oMainTab->move($this->getField('text')
-			->divAttr(array('class' => 'form-group col-xs-12')), $oMainRow1);
+		$this->getField('text')
+			->wysiwyg(TRUE)
+			->rows(10)
+			->divAttr(array('class' => 'form-group col-xs-12'));
+			
+		$oMainTab->move($this->getField('text'), $oMainRow1);
 
 		$oMainTab->move($this->getField('author')
 			->divAttr(array('class' => 'form-group col-xs-12 col-sm-4')), $oMainRow2);

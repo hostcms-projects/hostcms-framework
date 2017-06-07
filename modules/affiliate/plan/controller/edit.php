@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Affiliate
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -74,7 +74,7 @@ class Affiliate_Plan_Controller_Edit extends Admin_Form_Action_Controller_Type_E
 
 		$oMainTab->move($this->getField('active'), $oMainRow3);
 		$oMainRow4->add($oSiteUserGroupField);
-		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-lg-3 col-md-3 col-sm-3 col-xs-3')), $oMainRow5);
+		$oMainTab->move($this->getField('datetime')->divAttr(array('class' => 'form-group col-xs-3')), $oMainRow5);
 		$oMainTab->move($this->getField('min_count_of_items')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow6);
 		$oMainTab->move($this->getField('min_amount_of_items')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6')), $oMainRow6);
 		$oMainTab->move($this->getField('include_delivery'), $oMainRow7);

@@ -73,6 +73,12 @@ class Core
 	}
 
 	/**
+	 * User Logged
+	 * @var NULL|boolean
+	 */
+	static protected $_logged = NULL;
+
+	/**
 	 * Initialization
 	 * @return boolean
 	 */
@@ -87,6 +93,12 @@ class Core
 
 		self::setModulesPath();
 		self::registerCallbackFunction();
+
+		// Observers
+		Core_Event::attach('Core_DataBase.onBeforeConnect', array('Core_Database_Observer', 'onBeforeConnect'));
+		Core_Event::attach('Core_DataBase.onAfterConnect', array('Core_Database_Observer', 'onAfterConnect'));
+		Core_Event::attach('Core_DataBase.onBeforeSelectDb', array('Core_Database_Observer', 'onBeforeSelectDb'));
+		Core_Event::attach('Core_DataBase.onAfterSelectDb', array('Core_Database_Observer', 'onAfterSelectDb'));
 
 		mb_internal_encoding('UTF-8');
 
@@ -115,17 +127,13 @@ class Core
 		/* && !isset($_SESSION)*/
 		(isset($_REQUEST[session_name()]) || isset($_COOKIE[session_name()])) && Core_Session::start();
 
+		self::$_logged = Core_Auth::logged();
+
 		// Before _loadModuleList()
-		if (isset($_REQUEST['lng_value']) && Core_Auth::logged())
+		if (isset($_REQUEST['lng_value']) && self::$_logged)
 		{
 			Core_Auth::setCurrentLng($_REQUEST['lng_value']);
 		}
-
-		// Observers
-		Core_Event::attach('Core_DataBase.onBeforeConnect', array('Core_Database_Observer', 'onBeforeConnect'));
-		Core_Event::attach('Core_DataBase.onAfterConnect', array('Core_Database_Observer', 'onAfterConnect'));
-		Core_Event::attach('Core_DataBase.onBeforeSelectDb', array('Core_Database_Observer', 'onBeforeSelectDb'));
-		Core_Event::attach('Core_DataBase.onAfterSelectDb', array('Core_Database_Observer', 'onAfterSelectDb'));
 
 		self::_loadModuleList();
 
@@ -178,20 +186,32 @@ class Core
 	}
 
 	/**
+	 * Load Module Time
+	 */
+	static protected $_loadModuleTime = 0;
+
+	/**
+	 * Get Load Module Time
+	 * @return float
+	 */
+	static public function getLoadModuleTime()
+	{
+		return self::$_loadModuleTime;
+	}
+
+	/**
 	 * Load modules list
 	 * @hostcms-event Core.onBeforeLoadModuleList
 	 * @hostcms-event Core.onAfterLoadModuleList
 	 */
 	static protected function _loadModuleList()
 	{
-		$bLogged = Core_Auth::logged();
-		$bLogged && $fBeginTime = Core::getmicrotime();
+		self::$_logged && $fBeginTime = Core::getmicrotime();
 
 		Core_Event::notify('Core.onBeforeLoadModuleList');
 
 		// List of modules
 		$aModules = Core_Entity::factory('Module')->findAll();
-
 		foreach ($aModules as $oModule)
 		{
 			self::$modulesList[$oModule->path] = $oModule;
@@ -199,9 +219,10 @@ class Core
 
 		Core_Event::notify('Core.onAfterLoadModuleList');
 
-		$bLogged && Core_Page::instance()->addFrontendExecutionTimes(
+		/*self::$_logged && Core_Page::instance()->addFrontendExecutionTimes(
 			Core::_('Core.time_load_modules', Core::getmicrotime() - $fBeginTime)
-		);
+		);*/
+		self::$_logged && self::$_loadModuleTime += Core::getmicrotime() - $fBeginTime;
 	}
 
 	/**
@@ -398,6 +419,8 @@ class Core
 			return self::$_autoloadCache[$class];
 		}
 
+		self::$_logged && $fBeginTime = Core::getmicrotime();
+
 		// Cut _Model if check module available
 		$classCheck = substr($class, -6) == '_Model'
 			? strtolower(substr($class, 0, -6))
@@ -421,6 +444,9 @@ class Core
 		}
 
 		self::$_autoloadCache[$class] = $return;
+
+		self::$_logged && self::$_loadModuleTime += Core::getmicrotime() - $fBeginTime;
+
 		return $return;
 	}
 
@@ -480,7 +506,7 @@ class Core
 	 * Site LNG
 	 */
 	static protected $_lng = NULL;
-	
+
 	/**
 	 * Get Site Language
 	 * @return string
@@ -489,7 +515,7 @@ class Core
 	{
 		return self::$_lng;
 	}
-	
+
 	/**
 	 * Set Site Language
 	 * @param sting $lng
@@ -498,7 +524,7 @@ class Core
 	{
 		self::$_lng = $lng;
 	}
-	
+
 	/**
 	 * Initialize constants for site
 	 * @param Site_Model $oSite site

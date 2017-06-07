@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Template
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Template_Section_Lib_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -72,7 +72,7 @@ class Template_Section_Lib_Controller_Edit extends Admin_Form_Action_Controller_
 		$Select_LibDir = Admin_Form_Entity::factory('Select')
 			->name('lib_dir_id')
 			->caption(Core::_('Template_Section_Lib.lib_dir_id'))
-			->divAttr(array('id' => 'lib_dir', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('id' => 'lib_dir', 'class' => 'form-group col-xs-12 col-lg-6'))
 			->options(
 				array(' … ') + $Lib_Controller_Edit->fillLibDir(0)
 			)
@@ -92,7 +92,7 @@ class Template_Section_Lib_Controller_Edit extends Admin_Form_Action_Controller_
 			->name('lib_id')
 			->id('lib_id')
 			->caption(Core::_('Template_Section_Lib.lib_id'))
-			->divAttr(array('id' => 'lib', 'class' => 'form-group col-lg-6'))
+			->divAttr(array('id' => 'lib', 'class' => 'form-group col-xs-12 col-lg-6'))
 			->options($aLibForDir)
 			->value($this->_object->lib_id)
 			->onchange("$.ajaxRequest({path: '/admin/template/section/lib/index.php',context: 'lib_properties', callBack: $.loadDivContentAjaxCallback, objectId: {$objectId}, action: 'loadLibProperties',additionalParams: 'lib_id=' + this.value,windowId: '{$windowId}'}); return false")

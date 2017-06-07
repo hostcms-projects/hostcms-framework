@@ -3,15 +3,15 @@
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 /**
- * Install.
+ * Comment Module.
  *
  * @package HostCMS
- * @subpackage Install
+ * @subpackage Comment
  * @version 6.x
  * @author Hostmake LLC
  * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Install_Module extends Core_Module
+class Comment_Module extends Core_Module
 {
 	/**
 	 * Module version
@@ -24,4 +24,10 @@ class Install_Module extends Core_Module
 	 * @var date
 	 */
 	public $date = '2017-05-31';
+
+	/**
+	 * Module name
+	 * @var string
+	 */
+	protected $_moduleName = 'comment';
 }
