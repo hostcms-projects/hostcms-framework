@@ -1,0 +1,12 @@
+{
+    "name": "maximzasorin/hostcms-framework",
+    "authors": [
+        {
+            "name": "Maxim Zasorin",
+            "email": "maximzasorin@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": ["modules/"]
+    }
+}
