@@ -249,6 +249,7 @@ class Structure_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		$Select_Document = Admin_Form_Entity::factory('Select')
+			->id('document_id')
 			->name('document_id')
 			->caption(Core::_('Structure.document_id'))
 			->divAttr(array('class' => 'form-group col-lg-6 hidden-1 hidden-2 hidden-3'))

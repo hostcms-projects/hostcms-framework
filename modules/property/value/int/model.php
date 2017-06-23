@@ -152,7 +152,10 @@ class Property_Value_Int_Model extends Core_Entity
 				{
 					$oInformationsystem_Item->shortcut_id && $oInformationsystem_Item = $oInformationsystem_Item->Informationsystem_Item;
 
-					$oInformationsystem_Item
+					$oNew_Informationsystem_Item = clone $oInformationsystem_Item;
+					
+					$oNew_Informationsystem_Item
+						->id($oInformationsystem_Item->id)
 						->clearEntities()
 						->showXmlProperties(count($aTmp) ? $aTmp : FALSE);
 
@@ -162,10 +165,10 @@ class Property_Value_Int_Model extends Core_Entity
 
 					if (!is_null($oLastReturn))
 					{
-						$oInformationsystem_Item = $oLastReturn;
+						$oNew_Informationsystem_Item = $oLastReturn;
 					}
 
-					$this->addEntity($oInformationsystem_Item);
+					$this->addEntity($oNew_Informationsystem_Item);
 				}
 			}
 		}
@@ -205,7 +208,10 @@ class Property_Value_Int_Model extends Core_Entity
 				{
 					$oShop_Item->shortcut_id && $oShop_Item = $oShop_Item->Shop_Item;
 
-					$oShop_Item
+					$oNew_Shop_Item = clone $oShop_Item;
+					
+					$oNew_Shop_Item
+						->id($oShop_Item->id)
 						->clearEntities()
 						->showXmlProperties(count($aTmp) ? $aTmp : FALSE);
 
@@ -215,10 +221,10 @@ class Property_Value_Int_Model extends Core_Entity
 
 					if (!is_null($oLastReturn))
 					{
-						$oShop_Item = $oLastReturn;
+						$oNew_Shop_Item = $oLastReturn;
 					}
 
-					$this->addEntity($oShop_Item);
+					$this->addEntity($oNew_Shop_Item);
 				}
 			}
 		}

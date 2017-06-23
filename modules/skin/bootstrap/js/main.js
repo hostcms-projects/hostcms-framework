@@ -1003,15 +1003,17 @@ function cSelectFilter(windowId, sObjectId)
 	}
 }
 
-function radiogroupOnChange(windowId, value, values = [0, 1])
+function radiogroupOnChange(windowId, value, values)
 {
+	var values = values || [0, 1];
+
 	for (var x in values) {
 		if (value != values[x])
 		{
 			$("#"+windowId+" .hidden-"+values[x]).show();
 		}
 	}
-	
+
 	$("#"+windowId+" .hidden-"+value).hide();
 }
 

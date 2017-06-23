@@ -151,28 +151,41 @@ class Install_Controller
 	 * @param $targetInformationsystemItemId - идентификатор нового созданого ИЭ
 	 * @param $sourceInformationsystemId - идентификатор копируемой ИС
 	 * @param $sourceInformationsystemItemId - идентификатор копируемого ИЭ
+	 * @param string $fileName - имя большого файла изображения
+	 * @param string $smallFileName - имя малого файла изображения
 	 */
-	public function moveInformationsystemItemImage($targetInformationsystemItemId, $sourceInformationsystemId, $sourceInformationsystemItemId)
+	public function moveInformationsystemItemImage($targetInformationsystemItemId, $sourceInformationsystemId, $sourceInformationsystemItemId, $fileName = NULL, $smallFileName = NULL)
 	{
 		$oInformationsystem_Item = Core_Entity::factory('Informationsystem_Item', $targetInformationsystemItemId);
+
+		$sDir = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemItemId, 3) . "/item_{$sourceInformationsystemItemId}/";
+
+		if (is_null($fileName))
+		{
+			$information_item_image_from = $sDir . "information_items_{$sourceInformationsystemItemId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($information_item_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$information_item_image_from .= $ext;
+		}
+		else
+		{
+			$information_item_image_from = $sDir . $fileName;
+
+			$ext = '.' . Core_File::getExtension($fileName);
+		}
 
 		// Путь к директории хранения файлов информационного элемента
 		$item_dir = $oInformationsystem_Item->getItemPath();
 
-		$information_item_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemItemId, 3) . "/item_{$sourceInformationsystemItemId}/information_items_{$sourceInformationsystemItemId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($information_item_image_from);
-
-		if (!empty($ext))
-		{
-			$ext = '.' . $ext;
-		}
-		$information_item_image_from .= $ext;
-
 		if (is_file($information_item_image_from))
 		{
-			$information_item_image_to = $item_dir . "information_items_{$targetInformationsystemItemId}" . $ext;
+			$information_item_image_to = $item_dir . "item_{$targetInformationsystemItemId}" . $ext;
  			Core_File::copy($information_item_image_from, $information_item_image_to);
 
 			$oInformationsystem_Item->image_large = basename($information_item_image_to);
@@ -185,21 +198,29 @@ class Install_Controller
 			}
 		}
 
-		$information_item_small_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemItemId, 3) . "/item_{$sourceInformationsystemItemId}/small_information_items_{$sourceInformationsystemItemId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($information_item_small_image_from);
-
-		if (!empty($ext))
+		if (is_null($smallFileName))
 		{
-			$ext = '.' . $ext;
-		}
+			$information_item_small_image_from = $sDir . "small_information_items_{$sourceInformationsystemItemId}";
 
-		$information_item_small_image_from .= $ext;
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($information_item_small_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$information_item_small_image_from .= $ext;
+		}
+		else
+		{
+			$information_item_small_image_from = $sDir . $smallFileName;
+
+			$ext = '.' . Core_File::getExtension($smallFileName);
+		}
 
 		if (is_file($information_item_small_image_from))
 		{
-			$information_item_small_image_to = $item_dir . "small_information_items_{$targetInformationsystemItemId}" . $ext;
+			$information_item_small_image_to = $item_dir . "small_item_{$targetInformationsystemItemId}" . $ext;
 			Core_File::copy($information_item_small_image_from, $information_item_small_image_to);
 
 			$oInformationsystem_Item->image_small = basename($information_item_small_image_to);
@@ -221,52 +242,71 @@ class Install_Controller
 	 * @param $targetInformationsystemGroupId - идентификатор новой созданной ИГ
 	 * @param $sourceInformationsystemId - идентификатор копирумой ИС
 	 * @param $sourceInformationsystemGroupId - идентификатор копируемой ИГ
+	 * @param string $fileName - имя большого файла изображения
+	 * @param string $smallFileName - имя малого файла изображения
 	 */
-	public function moveInformationsystemGroupImage($targetInformationsystemGroupId, $sourceInformationsystemId, $sourceInformationsystemGroupId)
+	public function moveInformationsystemGroupImage($targetInformationsystemGroupId, $sourceInformationsystemId, $sourceInformationsystemGroupId, $fileName = NULL, $smallFileName = NULL)
 	{
-		//$InformationSystem = & singleton('InformationSystem');
-
 		$oInformationsystem_Group = Core_Entity::factory('Informationsystem_Group', $targetInformationsystemGroupId);
+
+		$sDir = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemGroupId, 3) . "/group_{$sourceInformationsystemGroupId}/";
+
+		if (is_null($fileName))
+		{
+			$information_group_image_from = $sDir . "information_groups_{$sourceInformationsystemGroupId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($information_group_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$information_group_image_from .= $ext;
+		}
+		else
+		{
+			$information_group_image_from = $sDir . $fileName;
+
+			$ext = '.' . Core_File::getExtension($fileName);
+		}
 
 		// Путь к директории хранения файлов информационной группы
 		$group_dir = $oInformationsystem_Group->getGroupPath();
 
-		$information_group_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemGroupId, 3) . "/group_{$sourceInformationsystemGroupId}/information_groups_{$sourceInformationsystemGroupId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($information_group_image_from);
-
-		if (!empty($ext))
-		{
-			$ext = '.' . $ext;
-		}
-		$information_group_image_from .= $ext;
-
 		if (is_file($information_group_image_from))
 		{
-			$information_group_image_to = $group_dir . "information_groups_{$targetInformationsystemGroupId}" . $ext;
+			$information_group_image_to = $group_dir . "group_{$targetInformationsystemGroupId}" . $ext;
 
  			Core_File::copy($information_group_image_from, $information_group_image_to);
 
-			//$param_item['information_items_image'] = basename($information_item_image_to);
 			$oInformationsystem_Group->image_large = basename($information_group_image_to);
 
 		}
 
-		$information_group_small_image_from = $this->getTemplatePath() . "tmp/upload/information_system_{$sourceInformationsystemId}/" . Core_File::getNestingDirPath($sourceInformationsystemGroupId, 3) . "/group_{$sourceInformationsystemGroupId}/small_information_groups_{$sourceInformationsystemGroupId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($information_group_small_image_from);
-
-		if (!empty($ext))
+		if (is_null($smallFileName))
 		{
-			$ext = '.' . $ext;
+			$information_group_small_image_from = $sDir . "small_information_groups_{$sourceInformationsystemGroupId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($information_group_small_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$information_group_small_image_from .= $ext;
 		}
-		$information_group_small_image_from .= $ext;
+		else
+		{
+			$information_group_small_image_from = $sDir . $smallFileName;
+
+			$ext = '.' . Core_File::getExtension($smallFileName);
+		}
 
 		if (is_file($information_group_small_image_from))
 		{
-			$information_group_small_image_to = $group_dir . "small_information_groups_{$targetInformationsystemGroupId}" . $ext;
+			$information_group_small_image_to = $group_dir . "small_group_{$targetInformationsystemGroupId}" . $ext;
 			Core_File::copy($information_group_small_image_from, $information_group_small_image_to);
 
 			$oInformationsystem_Group->image_small = basename($information_group_small_image_to);
@@ -411,28 +451,41 @@ class Install_Controller
 	 * @param $targetShopItemId - идентификатор нового созданого товара
 	 * @param $sourceShopId - идентификатор копируемого магазина
 	 * @param $sourceShopItemId - идентификатор копируемого товара
+	 * @param string $fileName - имя большого файла изображения
+	 * @param string $smallFileName - имя малого файла изображения
 	 */
-	public function moveShopItemImage($targetShopItemId, $sourceShopId, $sourceShopItemId)
+	public function moveShopItemImage($targetShopItemId, $sourceShopId, $sourceShopItemId, $fileName = NULL, $smallFileName = NULL)
 	{
 		$oShop_Item = Core_Entity::factory('Shop_Item', $targetShopItemId);
+
+		$sDir = $this->getTemplatePath() . "tmp/upload/shop_{$sourceShopId}/" . Core_File::getNestingDirPath($sourceShopItemId, 3) . "/item_{$sourceShopItemId}/";
+
+		if (is_null($fileName))
+		{
+			$shop_item_image_from = $sDir . "shop_items_catalog_image{$sourceShopItemId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($shop_item_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$shop_item_image_from .= $ext;
+		}
+		else
+		{
+			$shop_item_image_from = $sDir . $fileName;
+
+			$ext = '.' . Core_File::getExtension($fileName);
+		}
 
 		// Путь к директории хранения файлов товара
 		$item_dir = $oShop_Item->getItemPath();
 
-		$shop_item_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$sourceShopId}/" . Core_File::getNestingDirPath($sourceShopItemId, 3) . "/item_{$sourceShopItemId}/shop_items_catalog_image{$sourceShopItemId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($shop_item_image_from);
-
-		if (!empty($ext))
-		{
-			$ext = '.' . $ext;
-		}
-		$shop_item_image_from .= $ext;
-
 		if (is_file($shop_item_image_from))
 		{
-			$shop_item_image_to = $item_dir . "shop_items_catalog_image{$targetShopItemId}" . $ext;
+			$shop_item_image_to = $item_dir . "item_{$targetShopItemId}" . $ext;
 
  			Core_File::copy($shop_item_image_from, $shop_item_image_to);
 
@@ -446,21 +499,29 @@ class Install_Controller
 			}
 		}
 
-		$shop_item_small_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$sourceShopId}/" . Core_File::getNestingDirPath($sourceShopItemId, 3) . "/item_{$sourceShopItemId}/small_shop_items_catalog_image{$sourceShopItemId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($shop_item_small_image_from);
-
-		if (!empty($ext))
+		if (is_null($smallFileName))
 		{
-			$ext = '.' . $ext;
-		}
+			$shop_item_small_image_from = $sDir . "small_shop_items_catalog_image{$sourceShopItemId}";
 
-		$shop_item_small_image_from .= $ext;
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($shop_item_small_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$shop_item_small_image_from .= $ext;
+		}
+		else
+		{
+			$shop_item_small_image_from = $sDir . $smallFileName;
+
+			$ext = '.' . Core_File::getExtension($smallFileName);
+		}
 
 		if (is_file($shop_item_small_image_from))
 		{
-			$shop_item_small_image_to = $item_dir . "small_shop_items_catalog_image{$targetShopItemId}" . $ext;
+			$shop_item_small_image_to = $item_dir . "small_item_{$targetShopItemId}" . $ext;
 			Core_File::copy($shop_item_small_image_from, $shop_item_small_image_to);
 
 			$oShop_Item->image_small = basename($shop_item_small_image_to);
@@ -481,26 +542,40 @@ class Install_Controller
 	 * @param int $shopGroupId - идентификатор новой созданной группы магазина
 	 * @param int $copyShopId - идентификатор копирумого магазина
 	 * @param int $copyGroupId - идентификатор копируемой группы товаров
+	 * @param string $fileName - имя большого файла изображения
+	 * @param string $smallFileName - имя малого файла изображения
 	 */
-	public function moveShopGroupImage($shopGroupId, $copyShopId, $copyGroupId)
+	public function moveShopGroupImage($shopGroupId, $copyShopId, $copyGroupId, $fileName = NULL, $smallFileName = NULL)
 	{
 		$oShop_Group = Core_Entity::factory('Shop_Group', $shopGroupId);
-		$group_dir = $oShop_Group->getGroupPath();
 
-		$shop_group_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyGroupId, 3) . "/group_{$copyGroupId}/shop_group_image{$copyGroupId}";
+		$sDir = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyGroupId, 3) . "/group_{$copyGroupId}/";
 
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($shop_group_image_from);
-
-		if (!empty($ext))
+		if (is_null($fileName))
 		{
-			$ext = '.' . $ext;
+			$shop_group_image_from = $sDir . "shop_group_image{$copyGroupId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($shop_group_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$shop_group_image_from .= $ext;
 		}
-		$shop_group_image_from .= $ext;
+		else
+		{
+			$shop_group_image_from = $sDir . $fileName;
+
+			$ext = '.' . Core_File::getExtension($fileName);
+		}
+
+		$group_dir = $oShop_Group->getGroupPath();
 
 		if (is_file($shop_group_image_from))
 		{
-			$shop_group_image_to = $group_dir . "shop_group_image{$shopGroupId}" . $ext;
+			$shop_group_image_to = $group_dir . "group_{$shopGroupId}" . $ext;
 			Core_File::copy($shop_group_image_from, $shop_group_image_to);
 
 			$aImageSize = Core_Image::instance()->getImageSize($shop_group_image_to);
@@ -514,20 +589,29 @@ class Install_Controller
 			$oShop_Group->image_large = basename($shop_group_image_to);
 		}
 
-		$shop_group_small_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/" . Core_File::getNestingDirPath($copyGroupId, 3) . "/group_{$copyGroupId}/small_shop_group_image{$copyGroupId}";
-
-		// Получаем расширение файла
-		$ext = $this->getFileExtension($shop_group_small_image_from);
-
-		if (!empty($ext))
+		if (is_null($smallFileName))
 		{
-			$ext = '.' . $ext;
+			$shop_group_small_image_from = $sDir . "small_shop_group_image{$copyGroupId}";
+
+			// Получаем расширение файла
+			$ext = $this->getFileExtension($shop_group_small_image_from);
+
+			if (!empty($ext))
+			{
+				$ext = '.' . $ext;
+			}
+			$shop_group_small_image_from .= $ext;
 		}
-		$shop_group_small_image_from .= $ext;
+		else
+		{
+			$shop_group_small_image_from = $sDir . $smallFileName;
+
+			$ext = '.' . Core_File::getExtension($smallFileName);
+		}
 
 		if (is_file($shop_group_small_image_from))
 		{
-			$shop_group_small_image_to = $group_dir . "small_shop_group_image{$shopGroupId}" . $ext;
+			$shop_group_small_image_to = $group_dir . "small_group_{$shopGroupId}" . $ext;
 			Core_File::copy($shop_group_small_image_from, $shop_group_small_image_to);
 
 			$aImageSize = Core_Image::instance()->getImageSize($shop_group_small_image_to);
@@ -735,7 +819,7 @@ class Install_Controller
 			$small_file_path_from = $this->GetTemplatePath() . $dir_structure_from . 'structure_propertys_small_image_' . $copyStructurePropertyValueId;
 
 			// Получаем расширение файла
-			$ext = $this->GetFileExtension($small_file_path_from);
+			$ext = $this->getFileExtension($small_file_path_from);
 
 			if (!empty($ext))
 			{
@@ -777,5 +861,59 @@ class Install_Controller
 				$oValue->save();
 			}
 		}
+	}
+
+	/**
+	 * Копирование изображений для группы товаров
+	 *
+	 * @param int $shopProducerId - идентификатор нового созданного производителя
+	 * @param int $copyShopId - идентификатор копирумого магазина
+	 * @param int $copyProducerId - идентификатор копируемого производителя
+	 */
+	public function moveProducerImage($shopProducerId, $copyShopId, $copyProducerId)
+	{
+		$oShop_Producer = Core_Entity::factory('Shop_Producer', $shopProducerId);
+		$producer_dir = $oShop_Producer->getProducerPath();
+
+		$shop_producer_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/producers/shop_producer_image{$copyProducerId}";
+
+		// Получаем расширение файла
+		$ext = $this->getFileExtension($shop_producer_image_from);
+
+		if (!empty($ext))
+		{
+			$ext = '.' . $ext;
+		}
+		$shop_producer_image_from .= $ext;
+
+		if (is_file($shop_producer_image_from))
+		{
+			$shop_producer_image_to = $producer_dir . "shop_producer_image{$shopProducerId}" . $ext;
+			Core_File::copy($shop_producer_image_from, $shop_producer_image_to);
+
+			$oShop_Producer->image_large = basename($shop_producer_image_to);
+		}
+
+		$shop_producer_small_image_from = $this->getTemplatePath() . "tmp/upload/shop_{$copyShopId}/producers/small_shop_producer_image{$copyProducerId}";
+
+		// Получаем расширение файла
+		$ext = $this->getFileExtension($shop_producer_small_image_from);
+
+		if (!empty($ext))
+		{
+			$ext = '.' . $ext;
+		}
+		$shop_producer_small_image_from .= $ext;
+
+		if (is_file($shop_producer_small_image_from))
+		{
+			$shop_producer_small_image_to = $producer_dir . "small_shop_group_image{$shopProducerId}" . $ext;
+			Core_File::copy($shop_producer_small_image_from, $shop_producer_small_image_to);
+
+			$oShop_Producer->image_small = basename($shop_producer_small_image_to);
+		}
+
+		// Обновляем информацию о производителе после создания изображений
+		$oShop_Producer->save();
 	}
 }

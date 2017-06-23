@@ -573,7 +573,7 @@ class Core_Command_Controller_Default extends Core_Command_Controller
 			$sTmpContent = preg_replace($search, ' ', str_replace(array("\r", "\n"), ' ', $sContent));
 
 			$pattern_index = "(?<!noindex)(?<!display)(?<!visible)";
-			$pat = "#<a(?:[^>]{$pattern_index})*?href=[\"]?http://(?:www.)?hostcms.(?:ru|com)[/]?[\"]?(?:[^>]{$pattern_index})*?>(.{3,})</a>#si";
+			$pat = "#<a(?:[^>]{$pattern_index})*?href=[\"]?http://(?:www.)?hostcms.(?:ru|org)[/]?[\"]?(?:[^>]{$pattern_index})*?>(.{3,})</a>#si";
 
 			if (!Core_Auth::logged() && !preg_match_all($pat, $sTmpContent, $matches))
 			{

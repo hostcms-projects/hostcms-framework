@@ -1400,6 +1400,7 @@ class Shop_Order_Model extends Core_Entity
 						: $oShop_Order_Item->Shop_Item->guid
 					)
 			);
+			$oCurrentItemXml->addChild('Артикул', $oShop_Order_Item->marking);
 			$oCurrentItemXml->addChild('Наименование', $oShop_Order_Item->name);
 
 			$oShop_Measure = $oShop_Order_Item->Shop_Item->Shop_Measure;

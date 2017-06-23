@@ -314,7 +314,7 @@ class Core_File
 	 */
 	static public function write($fileName, $content, $chmod = CHMOD_FILE)
 	{
-		if (($handle = fopen($fileName, 'w')) && flock($handle, LOCK_EX))
+		if (($handle = @fopen($fileName, 'w')) && flock($handle, LOCK_EX))
 		{
 			if (fwrite($handle, $content) === FALSE)
 			{

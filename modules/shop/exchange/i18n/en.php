@@ -75,10 +75,11 @@ return array(
 	'item_guid' => "CommerceML product identifier",
 	'group_active' => "Group activity",
 
-	'siteuser_id' => "Идентификатор пользователя сайта",
-	'digital_item_name' => "Название электронного товара",
+	'siteuser_id' => "Siteuser ID",
+	'digital_item_name' => "Digital Item Name",
 	'item_yandex_market_sales_notes' => "Sales notes",
-	'item_parent_sop' => "Артикул родительского товара для сопутствующего товара",
+	'item_parent_associated' => "Associated item, Parent Item Marking",
+	'item_associated_markings' => "Associated item's margings",
 
 	'order_guid' => "Order GUID",
 	'order_number' => "Order number",

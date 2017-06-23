@@ -17,7 +17,7 @@ class Shop_Producer_Model extends Core_Entity
 	 * Backend property
 	 * @var int
 	 */
-	public $img=1;
+	public $img = 1;
 
 	/**
 	 * One-to-many or many-to-many relations
@@ -142,28 +142,6 @@ class Shop_Producer_Model extends Core_Entity
 	}
 
 	/**
-	 * Set large image sizes
-	 * @return self
-	 */
-	public function setLargeImageSizes()
-	{
-		$path = $this->getLargeFilePath();
-
-		if (is_file($path))
-		{
-			$aSizes = Core_Image::instance()->getImageSize($path);
-			if ($aSizes)
-			{
-				$this->image_large_width = $aSizes['width'];
-				$this->image_large_height = $aSizes['height'];
-				$this->save();
-			}
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Specify large image for producer
 	 * @param string $fileSourcePath source file
 	 * @param string $fileName target file name
@@ -177,28 +155,6 @@ class Shop_Producer_Model extends Core_Entity
 		$this->image_large = $fileName;
 		$this->save();
 		Core_File::upload($fileSourcePath, $this->getProducerPath() . $fileName);
-		$this->setLargeImageSizes();
-		return $this;
-	}
-
-	/**
-	 * Set small image sizes
-	 * @return self
-	 */
-	public function setSmallImageSizes()
-	{
-		$path = $this->getSmallFilePath();
-
-		if (is_file($path))
-		{
-			$aSizes = Core_Image::instance()->getImageSize($path);
-			if ($aSizes)
-			{
-				$this->image_small_width = $aSizes['width'];
-				$this->image_small_height = $aSizes['height'];
-				$this->save();
-			}
-		}
 
 		return $this;
 	}
@@ -268,7 +224,7 @@ class Shop_Producer_Model extends Core_Entity
 		$this->image_small = $fileName;
 		$this->save();
 		Core_File::upload($fileSourcePath, $this->getProducerPath() . $fileName);
-		$this->setSmallImageSizes();
+
 		return $this;
 	}
 
