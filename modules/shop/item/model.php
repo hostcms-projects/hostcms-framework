@@ -840,10 +840,10 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function move($iShopGroupId)
 	{
+		$oShop_Group = Core_Entity::factory('Shop_Group', $iShopGroupId);
+		
 		if ($this->shortcut_id)
 		{
-			$oShop_Group = Core_Entity::factory('Shop_Group', $iShopGroupId);
-
 			$oShop_Item = $oShop_Group->Shop_Items->getByShortcut_id($this->shortcut_id);
 
 			if (!is_null($oShop_Item))
@@ -852,9 +852,14 @@ class Shop_Item_Model extends Core_Entity
 			}
 		}
 
+		$this->Shop_Group->decCountItems();
+		
 		$this->shop_group_id = $iShopGroupId;
+		$this->save()->clearCache();
 
-		return $this->save()->clearCache();
+		$oShop_Group->incCountItems();
+
+		return $this;
 	}
 
 	/**
@@ -2116,15 +2121,18 @@ class Shop_Item_Model extends Core_Entity
 				$this->addEntity($oProperty_Value);
 			}
 
-			// Cache necessary List_Items
-			if (count($aListIDs))
+			if (Core::moduleIsActive('list'))
 			{
-				$oList_Items = Core_Entity::factory('List_Item');
-				$oList_Items->queryBuilder()
-					->where('id', 'IN', $aListIDs)
-					->clearOrderBy();
+				// Cache necessary List_Items
+				if (count($aListIDs))
+				{
+					$oList_Items = Core_Entity::factory('List_Item');
+					$oList_Items->queryBuilder()
+						->where('id', 'IN', $aListIDs)
+						->clearOrderBy();
 
-				$oList_Items->findAll(TRUE);
+					$oList_Items->findAll(TRUE);
+				}
 			}
 		}
 

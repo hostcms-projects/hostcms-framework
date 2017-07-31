@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Admin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2016 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Admin_View extends Core_Servant_Properties
 {
@@ -18,7 +18,7 @@ abstract class Admin_View extends Core_Servant_Properties
 		'module',
 		'message',
 		'content',
-		'pageSelector',
+		'pageSelector', 
 	);
 
 	protected $_children = array();

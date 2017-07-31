@@ -22,6 +22,7 @@ class Site_Model extends Core_Entity
 	/**
 	 * Backend property
 	 * @var int
+	 * @var int
 	 */
 	public $domains = 1;
 
@@ -64,8 +65,7 @@ class Site_Model extends Core_Entity
 		'poll_group' => array(),
 		'search_log' => array(),
 		'search_page' => array(),
-		'seo' => array(),
-		'seo_query' => array(),
+		'seo_site' => array(),
 		'shop' => array(),
 		'shop_dir' => array(),
 		'siteuser' => array(),
@@ -256,8 +256,7 @@ class Site_Model extends Core_Entity
 
 		if (Core::moduleIsActive('seo'))
 		{
-			$this->Seos->deleteAll(FALSE);
-			$this->Seo_Queries->deleteAll(FALSE);
+			$this->Seo_Sites->deleteAll(FALSE);
 		}
 
 		if (Core::moduleIsActive('shop'))
@@ -1179,20 +1178,14 @@ class Site_Model extends Core_Entity
 			}
 		}
 
-		if (Core::moduleIsActive('seo'))
+		/*if (Core::moduleIsActive('seo'))
 		{
-			$aSeos = $this->Seos->findAll(FALSE);
-			foreach ($aSeos as $oSeo)
+			$aSeo_Sites = $this->Seo_Sites->findAll(FALSE);
+			foreach ($aSeo_Sites as $oSeo_Site)
 			{
-				$newObject->add($oSeo->copy());
+				$newObject->add($oSeo_Site->copy());
 			}
-
-			$aSeo_Queries = $this->Seo_Queries->findAll(FALSE);
-			foreach ($aSeo_Queries as $oSeo_Query)
-			{
-				$newObject->add($oSeo_Query->copy());
-			}
-		}
+		}*/
 
 		if (Core::moduleIsActive('maillist'))
 		{
