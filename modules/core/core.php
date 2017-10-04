@@ -641,8 +641,9 @@ class Core
 	 */
 	static public function getmicrotime()
 	{
-		list($usec, $sec) = explode(' ', microtime());
-		return ((float)$usec + (float)$sec);
+		/*list($usec, $sec) = explode(' ', microtime());
+		return ((float)$usec + (float)$sec);*/
+		return microtime(TRUE);
 	}
 
 	/**
@@ -800,7 +801,8 @@ class Core
 		header('Content-Disposition: inline; filename="files.json"');
 		header('Vary: Accept');
 
-		if (strpos(Core_Array::get($_SERVER, 'HTTP_ACCEPT', ''), 'application/json') !== FALSE)
+		if (is_null(Core_Array::get($_SERVER, 'HTTP_ACCEPT'))
+			|| strpos(Core_Array::get($_SERVER, 'HTTP_ACCEPT', ''), 'application/json') !== FALSE)
 		{
 			header('Content-type: application/json; charset=utf-8');
 		}

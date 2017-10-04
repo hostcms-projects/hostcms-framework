@@ -127,6 +127,8 @@ class Shop_Item_Model extends Core_Entity
 		'item_associated' => array('through' => 'shop_item_associated', 'through_table_name' => 'shop_item_associated', 'model' => 'Shop_Item', 'dependent_key' => 'shop_item_associated_id'),
 		'shop_item_associated' => array(),
 		'shop_item_associated_second' => array('model' => 'Shop_Item_Associated', 'foreign_key' => 'shop_item_associated_id'),
+		'shop_item_set' => array(),
+		'shop_item_set_second' => array('model' => 'Shop_Item_Set', 'foreign_key' => 'shop_item_set_id'),
 		'shop_specialprice' => array(),
 		'shop_item_reserved' => array(),
 		'tag' => array('through' => 'tag_shop_item'),
@@ -644,6 +646,7 @@ class Shop_Item_Model extends Core_Entity
 	/**
 	 * Make url path
 	 * @return self
+	 * @hostcms-event shop_item.onAfterMakePath
 	 */
 	public function makePath()
 	{
@@ -672,6 +675,8 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$this->path = Core_Guid::get();
 		}
+
+		Core_Event::notify($this->_modelName . '.onAfterMakePath', $this);
 
 		return $this;
 	}
@@ -837,11 +842,14 @@ class Shop_Item_Model extends Core_Entity
 	 * Move item to another group
 	 * @param int $iShopGroupId target group id
 	 * @return Core_Entity
+	 * @hostcms-event shop_item.onBeforeMove
 	 */
 	public function move($iShopGroupId)
 	{
+		Core_Event::notify($this->_modelName . '.onBeforeMove', $this, array($iShopGroupId));
+
 		$oShop_Group = Core_Entity::factory('Shop_Group', $iShopGroupId);
-		
+
 		if ($this->shortcut_id)
 		{
 			$oShop_Item = $oShop_Group->Shop_Items->getByShortcut_id($this->shortcut_id);
@@ -852,12 +860,12 @@ class Shop_Item_Model extends Core_Entity
 			}
 		}
 
-		$this->Shop_Group->decCountItems();
-		
+		$this->shop_group_id && $this->Shop_Group->decCountItems();
+
 		$this->shop_group_id = $iShopGroupId;
 		$this->save()->clearCache();
 
-		$oShop_Group->incCountItems();
+		$iShopGroupId && $oShop_Group->incCountItems();
 
 		return $this;
 	}
@@ -1070,8 +1078,19 @@ class Shop_Item_Model extends Core_Entity
 
 		$oSearch_Page->title = $this->name;
 
+		// Set
+		if ($this->type == 3)
+		{
+			$aShop_Item_Sets = $this->Shop_Item_Sets->findAll(FALSE);
+
+			foreach ($aShop_Item_Sets as $oShop_Item_Set)
+			{
+				$oSearch_Page->text .= htmlspecialchars($oShop_Item_Set->Shop_Item->name) . ' ' . $oShop_Item_Set->Shop_Item->marking . ' ';
+			}
+		}
+
 		// комментарии к товару
-		$aComments = $this->Comments->findAll();
+		$aComments = $this->Comments->findAll(FALSE);
 		foreach ($aComments as $oComment)
 		{
 			$oSearch_Page->text .= htmlspecialchars($oComment->author) . ' ' . $oComment->text . ' ';
@@ -1079,7 +1098,7 @@ class Shop_Item_Model extends Core_Entity
 
 		if (Core::moduleIsActive('tag'))
 		{
-			$aTags = $this->Tags->findAll();
+			$aTags = $this->Tags->findAll(FALSE);
 			foreach ($aTags as $oTag)
 			{
 				$oSearch_Page->text .= htmlspecialchars($oTag->name) . ' ';
@@ -1367,6 +1386,12 @@ class Shop_Item_Model extends Core_Entity
 
 		// Удаляем данные по доставке товаров (Яндекс.Маркет)
 		$this->Shop_Item_Delivery_Options->deleteAll(FALSE);
+
+		// Удаляем данные о комплекте товаров
+		$this->Shop_Item_Sets->deleteAll(FALSE);
+
+		// Удаляем связи с ассоциированными товарами, обратная связь
+		$this->Shop_Item_Set_Seconds->deleteAll(FALSE);
 
 		// Удаляем директорию товара
 		$this->deleteDir();
@@ -1800,6 +1825,44 @@ class Shop_Item_Model extends Core_Entity
 		if ($this->type == 1)
 		{
 			$this->addXmlTag('digitals', $this->Shop_Item_Digitals->getCountDigitalItems());
+		}
+		// Sets
+		elseif ($this->type == 3)
+		{
+			$oSetEntity = Core::factory('Core_Xml_Entity')
+				->name('set');
+
+			$this->addEntity($oSetEntity);
+
+			$aForbiddenTags = $this->getForbiddenTags();
+
+			$aShop_Item_Sets = $this->Shop_Item_Sets->findAll();
+			foreach ($aShop_Item_Sets as $oShop_Item_Set)
+			{
+				$oShop_Item = Core_Entity::factory('Shop_Item', $oShop_Item_Set->shop_item_set_id);
+
+				$oShop_Item = $oShop_Item->shortcut_id
+					? $oShop_Item->Shop_Item
+					: $oShop_Item;
+
+				$oTmp_Shop_Item = clone $oShop_Item->clearEntities();
+
+				// Apply forbidden tags for sets
+				foreach ($aForbiddenTags as $tagName)
+				{
+					$oTmp_Shop_Item->addForbiddenTag($tagName);
+				}
+
+				$oSetEntity->addEntity(
+					$oTmp_Shop_Item
+						->id($oShop_Item->id)
+						->addEntity(
+						Core::factory('Core_Xml_Entity')
+							->name('count')
+							->value($oShop_Item_Set->count)
+					)
+				);
+			}
 		}
 
 		// Warehouses rest
@@ -2302,6 +2365,21 @@ class Shop_Item_Model extends Core_Entity
 	}
 
 	/**
+	 * Backend callback method
+	 * @param Admin_Form_Field $oAdmin_Form_Field
+	 * @param Admin_Form_Controller $oAdmin_Form_Controller
+	 * @return string
+	 */
+	public function adminPriceBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
+	{
+		$this->type == 3 && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-ico badge-purple white')
+			->style('padding-left: 1px;')
+			->value('<i class="fa fa-archive fa-fw"></i>')
+			->execute();
+	}
+
+	/**
 	 * Backup revision
 	 * @return self
 	 */
@@ -2436,5 +2514,54 @@ class Shop_Item_Model extends Core_Entity
 		{
 			return '<i class="fa fa-file-text-o"></i>';
 		}
+	}
+
+	/**
+	 * Recount set
+	 * @return self
+	 */
+	public function recountSet()
+	{
+		if ($this->shop_currency_id)
+		{
+			$aShop_Item_Sets = $this->Shop_Item_Sets->findAll(FALSE);
+
+			$Shop_Item_Controller = new Shop_Item_Controller();
+
+			$amount = 0;
+
+			foreach ($aShop_Item_Sets as $oShop_Item_Set)
+			{
+				$oTmp_Shop_Item = Core_Entity::factory('Shop_Item', $oShop_Item_Set->shop_item_set_id);
+
+				$oTmp_Shop_Item = $this->shortcut_id
+					? $oTmp_Shop_Item->Shop_Item
+					: $oTmp_Shop_Item;
+
+				if ($oTmp_Shop_Item->shop_currency_id)
+				{
+					$aPrice = $Shop_Item_Controller->getPrices($oTmp_Shop_Item);
+
+					$price = Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
+						$oTmp_Shop_Item->Shop_Currency,
+						$oTmp_Shop_Item->Shop->Shop_Currency) * $aPrice['price_discount'];
+
+					$amount += $price * $oShop_Item_Set->count;
+				}
+				else
+				{
+					throw new Core_Exception(Core::_('Shop_Item.shop_item_set_not_currency', $oTmp_Shop_Item->name));
+				}
+			}
+
+			$this->price = $amount;
+			$this->save();
+		}
+		else
+		{
+			throw new Core_Exception(Core::_('Shop_Item.shop_item_set_not_currency', $this->name));
+		}
+
+		return $this;
 	}
 }

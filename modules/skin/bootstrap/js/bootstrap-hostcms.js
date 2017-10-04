@@ -144,8 +144,7 @@
 			}
 		},
 		// Добавление новой заметки
-		addNote: function()
-		{
+		addNote: function() {
 			// add ajax '_'
 			var data = jQuery.getData({});
 
@@ -160,8 +159,7 @@
 			});
 		},
 		// Создание заметки по id и value
-		createNote: function(settings)
-		{
+		createNote: function(settings) {
 			settings = $.extend({
 				'id': null,
 				'value': ''
@@ -208,8 +206,7 @@
 			});
 		},
 		// Удаление заметки
-		destroyNote: function(jDiv)
-		{
+		destroyNote: function(jDiv) {
 			jQuery.ajax({
 				url: '/admin/index.php?' + 'ajaxNote&action=delete'
 					+ '&entity_id=' + jDiv.data('user-note-id'),
@@ -238,6 +235,134 @@
 		},
 		toggleWarehouses: function() {
 			$(".shop-item-warehouses-list .row:has(input[value ^= 0])").toggleClass('hidden');
+		},
+		filterToggleField: function(object)
+		{
+			var filterId = object.data('filter-field-id'),
+				filterFormGroup = $('#' + filterId);
+
+			filterFormGroup
+				// Hide/show filter value
+				.toggle()
+				// Clear filter value
+				.find("input,select,textarea").val('');
+
+			object.find('i').toggleClass('fa-check');
+		},
+		toggleFilter: function() {
+			$('.topFilter').toggle();
+			$('tr.admin_table_filter').toggleClass('disabled');
+		},
+		changeFilterStatus: function(settings) {
+			$.ajax({
+				url: settings.path,
+				data: {'_': Math.round(new Date().getTime()), changeFilterStatus: true, show: settings.show},
+				dataType: 'json',
+				type: 'POST'
+			});
+		},
+		changeFilterField: function(settings) {
+
+			var li = $(settings.context);
+
+			$.filterToggleField(li);
+
+			//path, filter, field, show
+			$.ajax({
+				url: settings.path,
+				data: {
+					'_': Math.round(new Date().getTime()),
+					changeFilterField: true,
+					tab: settings.tab,
+					field: settings.field,
+					show: +li.find('i').hasClass('fa-check')
+				},
+				dataType: 'json',
+				type: 'POST'
+			});
+		},
+		filterSaveAs: function(caption, object, additionalParams) {
+
+			bootbox.prompt(caption, function (result) {
+				if (result !== null) {
+
+					$.adminSendForm({
+						buttonObject: object,
+						additionalParams: additionalParams,
+						post: {
+							'hostcms[filterId]': $('#filterTabs li.active').data('filter-id'),
+							filterCaption: result,
+							saveFilterAs: true
+						}
+					});
+
+					/*$.loadingScreen('show');
+					//alert(object);
+
+					var FormNode = object.closest('form'),
+						data = { filterCaption: result, saveFilterAs: true },
+						path = FormNode.attr('action');
+
+					FormNode.ajaxSubmit({
+						data: data,
+						//context: jQuery('#'+settings.windowId),
+						url: path,
+						type: 'POST',
+						dataType: 'json',
+						cache: false,
+						success: function(data, status, jqXHR) {
+							alert(data.toSource());
+							$.loadingScreen('hide');
+						}
+					});*/
+				}
+			});
+		},
+		filterSave: function(object) {
+
+			$.loadingScreen('show');
+
+			var FormNode = object.closest('form'),
+				data = { saveFilter: true, filterId: FormNode.data('filter-id') },
+				path = FormNode.attr('action');
+
+			FormNode.ajaxSubmit({
+				data: data,
+				url: path,
+				type: 'POST',
+				dataType: 'json',
+				cache: false,
+				success: function(data, status, jqXHR) {
+					//alert(data.toSource());
+					$.loadingScreen('hide');
+				}
+			});
+		},
+		filterDelete: function(object) {
+
+			$.loadingScreen('show');
+
+			var FormNode = object.closest('form'),
+				filterId = FormNode.data('filter-id'),
+				data = { deleteFilter: true, filterId: filterId },
+				path = FormNode.attr('action');
+
+			FormNode.ajaxSubmit({
+				data: data,
+				//context: jQuery('#'+settings.windowId),
+				url: path,
+				type: 'POST',
+				dataType: 'json',
+				cache: false,
+				success: function(data, status, jqXHR) {
+					//alert(data.toSource());
+					$.loadingScreen('hide');
+				}
+			});
+
+			$('#filter-li-' + filterId).prev().find('a').tab('show');
+			$('#filter-' + filterId + ', #filter-li-' + filterId).remove();
+
 		},
 		/* -- CHAT -- */
 		chatGetUsersList: function(event)
@@ -1212,7 +1337,7 @@
 		{
 			var jProperies = jQuery('#' + windowId + ' #property_' + index),
 
-			//Объект окна настроек большого изображения
+			// Объект окна настроек большого изображения
 			oSpanFileSettings =  jProperies.find("span[id ^= 'file_large_settings_']");
 
 			// Закрываем окно настроек большого изображения
@@ -1221,7 +1346,7 @@
 				oSpanFileSettings.click();
 			}
 
-			//Объект окна настроек малого изображения
+			// Объект окна настроек малого изображения
 			oSpanFileSettings =  jProperies.find("span[id ^= 'file_small_settings_']");
 			// Закрываем окно настроек малого изображения
 			if (oSpanFileSettings.length && oSpanFileSettings.children('i').hasClass('fa-times'))
@@ -1233,7 +1358,7 @@
 			iRand = Math.floor(Math.random() * 999999);
 
 			jNewObject.insertAfter(
-				jQuery('#' + windowId).find('div[id="property_' + index + '"],div[id^="property_' + index + '_"]').eq(-1)
+				jQuery('#' + windowId).find('div.row[id="property_' + index + '"],div.row[id^="property_' + index + '_"]').eq(-1)
 			);
 
 			jNewObject.attr('id', 'property_' + index + '_' + iRand);
@@ -1294,7 +1419,84 @@
 			});
 		},
 		/* --- /CHAT --- */
+		selectSiteuser: function(settings)
+		{
+			settings = $.extend({
+				minimumInputLength: 1,
+				allowClear: true,
+				ajax: {
+					url: "/admin/siteuser/siteuser/index.php?siteuser",
+					dataType: "json",
+					type: "GET",
+					processResults: function (data) {
+						var aResults = [];
+						$.each(data, function (index, item) {
+							aResults.push({
+								"id": item.id,
+								"text": item.text
+							});
+						});
+						return {
+							results: aResults
+						};
+					}
+				}
+			}, settings);
+			
+			return this.each(function(){
+				jQuery(this).select2(settings);
+			});
+		},
+		autocompleteShopItem: function(shop_id, shop_currency_id, selectOption)
+		{
+			return this.each(function(){
+				 jQuery(this).autocomplete({
+					  source: function(request, response) {
+						$.ajax({
+						  url: '/admin/shop/index.php?autocomplete&shop_id=' + shop_id + '&shop_currency_id=' + shop_currency_id,
+						  dataType: 'json',
+						  data: {
+							queryString: request.term
+						  },
+						  success: function( data ) {
+							response( data );
+						  }
+						});
+					  },
+					  minLength: 1,
+					  create: function() {
+						$(this).data('ui-autocomplete')._renderItem = function(ul, item) {
+							return $('<li></li>')
+								.data('item.autocomplete', item)
+								.append($('<a>').text(item.label))
+								.append($('<span>').text(item.price_with_tax + ' ' + item.currency))
+								.append($('<span>').text(item.marking))
+								.appendTo(ul);
+						}
 
+						 $(this).prev('.ui-helper-hidden-accessible').remove();
+					  },
+					  /*select: function( event, ui ) {
+						$('<input type=\'hidden\' name=\'set_item_id[]\'/>')
+							.val(typeof ui.item.id !== 'undefined' ? ui.item.id : 0)
+							.insertAfter($('.set-item-table'));
+
+						$('.set-item-table > tbody').append(
+							$('<tr><td>' + ui.item.label + '</td><td>' + ui.item.marking + '</td><td><input class=\"set-item-count form-control\" name=\"set_count[]\" value=\"1.00\"/></td><td>' + ui.item.price_with_tax + ' ' + ui.item.currency + '</td><td></td></tr>')
+						);
+
+						ui.item.value = '';  // it will clear field
+					  },*/
+					  select: selectOption,
+					  open: function() {
+						$(this).removeClass('ui-corner-all').addClass('ui-corner-top');
+					  },
+					  close: function() {
+						$(this).removeClass('ui-corner-top').addClass('ui-corner-all');
+					  }
+				});
+			});
+		},
 		refreshEditor: function()
 		{
 			return this.each(function(){
@@ -1377,7 +1579,6 @@ $(function(){
 	$('body').on('touchend', '.page-sidebar.menu-compact .sidebar-menu .submenu > li', function(e) {
 		$(this).find('a').click();
 	});
-
 });
 
 var methods = {
