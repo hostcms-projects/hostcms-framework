@@ -1090,10 +1090,13 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		// комментарии к товару
-		$aComments = $this->Comments->findAll(FALSE);
-		foreach ($aComments as $oComment)
+		if (Core::moduleIsActive('comment'))
 		{
-			$oSearch_Page->text .= htmlspecialchars($oComment->author) . ' ' . $oComment->text . ' ';
+			$aComments = $this->Comments->findAll(FALSE);
+			foreach ($aComments as $oComment)
+			{
+				$oSearch_Page->text .= htmlspecialchars($oComment->author) . ' ' . $oComment->text . ' ';
+			}
 		}
 
 		if (Core::moduleIsActive('tag'))
@@ -1345,8 +1348,11 @@ class Shop_Item_Model extends Core_Entity
 		$this->Shop_Carts->deleteAll(FALSE);
 		$this->Shop_Favorites->deleteAll(FALSE);
 
-		// Удаляем комментарии
-		$this->Comments->deleteAll(FALSE);
+		if (Core::moduleIsActive('comment'))
+		{
+			// Удаляем комментарии
+			$this->Comments->deleteAll(FALSE);
+		}
 
 		// Удаляем связи с бонусами
 		$this->Shop_Item_Bonuses->deleteAll(FALSE);
@@ -1856,11 +1862,12 @@ class Shop_Item_Model extends Core_Entity
 				$oSetEntity->addEntity(
 					$oTmp_Shop_Item
 						->id($oShop_Item->id)
+						->showXmlAssociatedItems(FALSE)
 						->addEntity(
-						Core::factory('Core_Xml_Entity')
-							->name('count')
-							->value($oShop_Item_Set->count)
-					)
+							Core::factory('Core_Xml_Entity')
+								->name('count')
+								->value($oShop_Item_Set->count)
+						)
 				);
 			}
 		}
@@ -2077,7 +2084,7 @@ class Shop_Item_Model extends Core_Entity
 			}
 		}
 
-		if ($this->_showXmlComments)
+		if ($this->_showXmlComments && Core::moduleIsActive('comment'))
 		{
 			$this->_aComments = array();
 
@@ -2356,12 +2363,15 @@ class Shop_Item_Model extends Core_Entity
 	 */
 	public function reviewsBadge($oAdmin_Form_Field, $oAdmin_Form_Controller)
 	{
-		$count = $this->Comments->getCount();
-		$count && Core::factory('Core_Html_Entity_Span')
-			->class('badge badge-ico white')
-			->value($count < 100 ? $count : '∞')
-			->title($count)
-			->execute();
+		if (Core::moduleIsActive('comment'))
+		{
+			$count = $this->Comments->getCount();
+			$count && Core::factory('Core_Html_Entity_Span')
+				->class('badge badge-ico white')
+				->value($count < 100 ? $count : '∞')
+				->title($count)
+				->execute();
+		}
 	}
 
 	/**
@@ -2541,12 +2551,8 @@ class Shop_Item_Model extends Core_Entity
 				if ($oTmp_Shop_Item->shop_currency_id)
 				{
 					$aPrice = $Shop_Item_Controller->getPrices($oTmp_Shop_Item);
-
-					$price = Shop_Controller::instance()->getCurrencyCoefficientInShopCurrency(
-						$oTmp_Shop_Item->Shop_Currency,
-						$oTmp_Shop_Item->Shop->Shop_Currency) * $aPrice['price_discount'];
-
-					$amount += $price * $oShop_Item_Set->count;
+					
+					$amount += $aPrice['price_discount'] * $oShop_Item_Set->count;
 				}
 				else
 				{
