@@ -81,9 +81,10 @@ class Site_Model extends Core_Entity
 		'structure_menu' => array(),
 		'template' => array(),
 		'template_dir' => array(),
-		'user_module' => array(),
-		'user_group' => array(),
-		'user_group_action_access' => array(),
+		'company_department_action_access' => array(),
+		'company_department_module' => array(),
+		'company_site' => array(),
+		'company' => array('through' => 'company_site')
 	);
 
 	/**
@@ -123,7 +124,7 @@ class Site_Model extends Core_Entity
 		'error' => 'E_ALL',
 		'error404' => 0,
 		'error403' => 0,
-		'robots' => "User-Agent: *\nDisallow: /admin\nDisallow: /search\nDisallow: /templates\nDisallow: /hostcmsfiles\nDisallow: /captcha.php\nDisallow: /403\nDisallow: /404",
+		'robots' => "User-Agent: *\nDisallow: /admin\nDisallow: /search\nDisallow: /templates\nDisallow: /hostcmsfiles\nDisallow: /captcha.php\nDisallow: /403\nDisallow: /404\nAllow: /hostcmsfiles/css/*\nAllow: /hostcmsfiles/js/*",
 		'closed' => 0,
 		'safe_email' => 1,
 		'html_cache_use' => 0,
@@ -283,6 +284,13 @@ class Site_Model extends Core_Entity
 			$this->Forms->deleteAll(FALSE);
 		}
 
+		if (Core::moduleIsActive('company'))
+		{
+			$this->Company_Sites->deleteAll(FALSE);
+			$this->Company_Department_Action_Accesses->deleteAll(FALSE);
+			$this->Company_Department_Modules->deleteAll(FALSE);
+		}
+		
 		$this->Site_Aliases->deleteAll(FALSE);
 
 		$this->Structures->deleteAll(FALSE);
@@ -290,10 +298,6 @@ class Site_Model extends Core_Entity
 
 		$this->Templates->deleteAll(FALSE);
 		$this->Template_Dirs->deleteAll(FALSE);
-
-		$this->User_Groups->deleteAll(FALSE);
-		$this->User_Group_Action_Accesses->deleteAll(FALSE);
-		$this->User_Modules->deleteAll(FALSE);
 
 		// Удаление доп. св-в структуры сайта
 		$oStructure_Property_List = Core_Entity::factory('Structure_Property_List', $this->id);

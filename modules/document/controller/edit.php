@@ -36,7 +36,7 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		}
 
 		$modelName == 'document' && $object->datetime(Core_Date::timestamp2sql(time()));
-		
+
 		return parent::setObject($object);
 	}
 
@@ -200,29 +200,23 @@ class Document_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 	 */
 	protected function _applyObjectProperty()
 	{
-		parent::_applyObjectProperty();
-
 		$modelName = $this->_object->getModelName();
 
-		switch ($modelName)
+		if ($modelName == 'document')
 		{
-			case 'document':
-				$text = Core_Array::getPost('text');
+			// Backup revision
+			if (Core::moduleIsActive('revision') && $this->_object->id)
+			{
+				$this->_object->backupRevision();
+			}
 
-				if (Core::moduleIsActive('typograph') && Core_Array::getPost('use_typograph'))
-				{
-					$text = Typograph_Controller::instance()->process($text, Core_Array::getPost('use_trailing_punctuation'));
-				}
-
-				$this->_object->text = $text;
-
-				// Backup revision
-				if (Core::moduleIsActive('revision'))
-				{
-					$this->_object->backupRevision();
-				}
-			break;
+			if (Core::moduleIsActive('typograph') && Core_Array::getPost('use_typograph'))
+			{
+				$this->_formValues['text'] = Typograph_Controller::instance()->process($this->_formValues['text'], Core_Array::getPost('use_trailing_punctuation'));
+			}
 		}
+
+		parent::_applyObjectProperty();
 
 		Core_Event::notify(get_class($this) . '.onAfterRedeclaredApplyObjectProperty', $this, array($this->_Admin_Form_Controller));
 	}

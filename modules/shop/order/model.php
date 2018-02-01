@@ -831,11 +831,63 @@ class Shop_Order_Model extends Core_Entity
 
 			// Удалить зарезервированные товары
 			$this->deleteReservedItems();
+
+			// Уведомление о событии оплаты заказа
+			$this->_createNotification();
 		}
 
 		Core_Event::notify($this->_modelName . '.onAfterPaid', $this);
 
 		return $this->save();
+	}
+
+	/**
+	 * Create notification for subscribers
+	 * @return self
+	 */
+	protected function _createNotification()
+	{
+		$oModule = Core::$modulesList['shop'];
+
+		if ($oModule)
+		{
+			$oNotification_Subscribers = Core_Entity::factory('Notification_Subscriber');
+			$oNotification_Subscribers->queryBuilder()
+				->where('notification_subscribers.module_id', '=', $oModule->id)
+				->where('notification_subscribers.type', '=', 0)
+				->where('notification_subscribers.entity_id', '=', $this->Shop->id);
+
+			$aNotification_Subscribers = $oNotification_Subscribers->findAll(FALSE);
+			
+			if (count($aNotification_Subscribers))
+			{
+				$sCompany = strlen($this->company)
+					? $this->company
+					: trim($this->surname . ' ' . $this->name . ' ' . $this->patronymic);
+
+				$oNotification = Core_Entity::factory('Notification');
+				$oNotification
+					->title(sprintf(Core::_('Shop_Order.notification_paid_order'), $this->invoice))
+					->description(sprintf(Core::_('Shop_Order.notification_new_order_description'), $sCompany , $this->sum()))
+					->datetime(Core_Date::timestamp2sql(time()))
+					->module_id($oModule->id)
+					->type(2) // Оплаченный заказ
+					->entity_id($this->id)
+					->save();
+				
+				foreach ($aNotification_Subscribers as $oNotification_Subscriber)
+				{
+					// Связываем уведомление с сотрудником
+					$oNotification_User = Core_Entity::factory('Notification_User');
+					$oNotification_User
+						->notification_id($oNotification->id)
+						->user_id($oNotification_Subscriber->user_id)
+						->save();
+				}
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -1045,7 +1097,7 @@ class Shop_Order_Model extends Core_Entity
 					$oShop_Siteuser_Transaction->shop_currency_id = $this->shop_currency_id;
 					$oShop_Siteuser_Transaction->amount_base_currency = $fAmount * $fCurrencyCoefficient;
 					$oShop_Siteuser_Transaction->shop_order_id = $this->id;
-					$oShop_Siteuser_Transaction->type = 0;
+					$oShop_Siteuser_Transaction->type = 2;
 					$oShop_Siteuser_Transaction->description = Core::_('Shop_Bonus.bonus_transaction_name', $this->invoice);
 					$oShop_Siteuser_Transaction->save();
 				}
@@ -1535,6 +1587,12 @@ class Shop_Order_Model extends Core_Entity
 		{
 			?><div>
 				<b><?php echo Core::_('Shop_Order.order_card_email')?>:</b> <?php echo htmlspecialchars($this->email)?>
+			</div><?php
+		}
+		if ($this->shop_payment_system_id)
+		{
+			?><div>
+				<b><?php echo Core::_('Shop_Order.order_card_paymentsystem')?>:</b> <?php echo htmlspecialchars($this->Shop_Payment_System->name)?>
 			</div><?php
 		}
 		?>

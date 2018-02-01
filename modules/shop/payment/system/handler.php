@@ -377,6 +377,7 @@ abstract class Shop_Payment_System_Handler
 	 * Создание нового заказа на основе данных, указанных в orderParams
 	 * @hostcms-event Shop_Payment_System_Handler.onBeforeProcessOrder
 	 * @hostcms-event Shop_Payment_System_Handler.onAfterProcessOrder
+	 * @hostcms-event Shop_Payment_System_Handler.onAfterAddShopOrderItem
 	 */
 	protected function _processOrder()
 	{
@@ -464,6 +465,8 @@ abstract class Shop_Payment_System_Handler
 						$oShop_Item_Reserved->save();
 					}
 
+					Core_Event::notify('Shop_Payment_System_Handler.onAfterAddShopOrderItem', $this, array($oShop_Order_Item, $oShop_Cart));
+					
 					// Delete item from the cart
 					$Shop_Cart_Controller
 						->shop_item_id($oShop_Cart->shop_item_id)
@@ -501,9 +504,55 @@ abstract class Shop_Payment_System_Handler
 			$this->_applyBonuses();
 		}
 
+		// Уведомление о событии создания заказа
+		$this->_createNotification();
+
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterProcessOrder', $this);
 
 		return $this;
+	}
+
+	protected function _createNotification()
+	{
+		$oModule = Core::$modulesList['shop'];
+		
+		if ($oModule)
+		{
+			$oNotification_Subscribers = Core_Entity::factory('Notification_Subscriber');
+			$oNotification_Subscribers->queryBuilder()
+				->where('notification_subscribers.module_id', '=', $oModule->id)
+				->where('notification_subscribers.type', '=', 0)
+				->where('notification_subscribers.entity_id', '=', $this->_shopOrder->Shop->id);
+
+			$aNotification_Subscribers = $oNotification_Subscribers->findAll(FALSE);
+			
+			if (count($aNotification_Subscribers))
+			{
+				$sCompany = strlen($this->_shopOrder->company)
+					? $this->_shopOrder->company
+					: trim($this->_shopOrder->surname . ' ' . $this->_shopOrder->name . ' ' . $this->_shopOrder->patronymic);
+
+				$oNotification = Core_Entity::factory('Notification');
+				$oNotification
+					->title(sprintf(Core::_('Shop_Order.notification_new_order'), $this->_shopOrder->invoice))
+					->description(sprintf(Core::_('Shop_Order.notification_new_order_description'), $sCompany , $this->_shopOrder->sum()))
+					->datetime(Core_Date::timestamp2sql(time()))
+					->module_id($oModule->id)
+					->type(1) // Новый заказ
+					->entity_id($this->_shopOrder->id)
+					->save();
+				
+				foreach ($aNotification_Subscribers as $oNotification_Subscriber)
+				{
+					// Связываем уведомление с сотрудником
+					$oNotification_User = Core_Entity::factory('Notification_User');
+					$oNotification_User
+						->notification_id($oNotification->id)
+						->user_id($oNotification_Subscriber->user_id)
+						->save();
+				}
+			}
+		}
 	}
 
 	/**
@@ -1119,6 +1168,7 @@ abstract class Shop_Payment_System_Handler
 
 		$oCore_Mail
 			->from($from)
+			->senderName($oShop->name)
 			->header('Reply-To', $replyTo)
 			->subject($admin_subject)
 			->message($sInvoice)
@@ -1228,6 +1278,7 @@ abstract class Shop_Payment_System_Handler
 
 			$oCore_Mail
 				->from($from)
+				->senderName($oShop->name)
 				->to($to)
 				->subject($user_subject)
 				->message($sInvoice)

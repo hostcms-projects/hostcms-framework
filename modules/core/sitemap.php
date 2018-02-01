@@ -414,7 +414,7 @@ class Core_Sitemap extends Core_Servant_Properties
 				$aTags = $oTags->findAll(FALSE);
 				foreach ($aTags as $oTag)
 				{
-					$this->addNode($path . 'tag/' . $oTag->path . '/', $oStructure->changefreq, $oStructure->priority, $oTag);
+					$this->addNode($path . 'tag/' . rawurlencode($oTag->path) . '/', $oStructure->changefreq, $oStructure->priority, $oTag);
 				}
 
 				$iFrom += $this->limit;
@@ -585,7 +585,7 @@ class Core_Sitemap extends Core_Servant_Properties
 				$aTags = $oTags->findAll(FALSE);
 				foreach ($aTags as $oTag)
 				{
-					$this->addNode($path . 'tag/' . $oTag->path . '/', $oStructure->changefreq, $oStructure->priority, $oTag);
+					$this->addNode($path . 'tag/' . rawurlencode($oTag->path) . '/', $oStructure->changefreq, $oStructure->priority, $oTag);
 				}
 
 				$iFrom += $this->limit;
@@ -829,7 +829,7 @@ class Core_Sitemap extends Core_Servant_Properties
 	 */
 	protected function _getIndexFilePath()
 	{
-		return CMS_FOLDER . sprintf($this->fileName, $this->_oSite->id);
+		return CMS_FOLDER . 'hostcmsfiles' . DIRECTORY_SEPARATOR . 'sitemap' . DIRECTORY_SEPARATOR . sprintf($this->fileName, $this->_oSite->id);
 	}
 
 	public function createSitemapDir()

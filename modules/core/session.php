@@ -88,15 +88,14 @@ class Core_Session
 	{
 		if (!self::$_started)
 		{
-			$oCore_Session = new self();
-			session_set_save_handler(
-				array($oCore_Session, 'sessionOpen'),
-				array($oCore_Session, 'sessionClose'),
-				array($oCore_Session, 'sessionRead'),
-				array($oCore_Session, 'sessionWrite'),
-				array($oCore_Session, 'sessionDestroyer'),
-				array($oCore_Session, 'sessionGc')
-			);
+			// Destroy existing session started by session.auto_start
+			if (is_null(self::$_handler) && session_id())
+			{
+				session_unset();
+				session_destroy();
+			}
+
+			self::_setSessionHandler();
 
 			//$expires = self::getMaxLifeTime();
 			$expires = 31536000;
@@ -135,6 +134,29 @@ class Core_Session
 		}
 
 		return TRUE;
+	}
+
+	static protected $_handler = NULL;
+
+	/**
+	 * Registers session handler
+	 */
+	static protected function _setSessionHandler()
+	{
+		//if (is_null(self::$_handler))
+		//{
+			self::$_handler = TRUE;
+
+			$oCore_Session = new self();
+			session_set_save_handler(
+				array($oCore_Session, 'sessionOpen'),
+				array($oCore_Session, 'sessionClose'),
+				array($oCore_Session, 'sessionRead'),
+				array($oCore_Session, 'sessionWrite'),
+				array($oCore_Session, 'sessionDestroyer'),
+				array($oCore_Session, 'sessionGc')
+			);
+		//}
 	}
 
 	/**
@@ -342,7 +364,7 @@ class Core_Session
 	{
 		self::$_maxlifetime = $maxlifetime;
 
-		if (!defined('DENY_INI_SET') || !DENY_INI_SET)
+		if (!self::$_started && (!defined('DENY_INI_SET') || !DENY_INI_SET))
 		{
 			ini_set('session.gc_maxlifetime', $maxlifetime);
 		}

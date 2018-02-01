@@ -76,7 +76,8 @@ class Core_Router_Route
 	public function __construct($uriPattern = NULL, array $expressions = array())
 	{
 		// skip first '/'
-		$this->_uriPattern = ltrim($uriPattern, '/');
+		//$this->_uriPattern = ltrim($uriPattern, '/'); // 6.7.7
+		$this->_uriPattern = $uriPattern;
 
 		// If an opening parenthesis is followed by "?:", the subpattern does not do any capturing, and is not counted when computing the number of any subsequent capturing subpatterns.
 		// Subpattern will be indexed in the matches array by its normal numeric position and also by name
@@ -109,7 +110,7 @@ class Core_Router_Route
 	public function applyPattern($uri)
 	{
 		// skip first '/'
-		$uri = ltrim($uri, '/');
+		//$uri = ltrim($uri, '/'); // 6.7.7
 
 		$result = preg_match($this->_pregPattern, $uri, $matches);
 

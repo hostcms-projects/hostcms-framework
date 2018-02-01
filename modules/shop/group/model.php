@@ -174,11 +174,19 @@ class Shop_Group_Model extends Core_Entity
 		// setHref()
 		foreach ($aReturn as $oProperty_Value)
 		{
-			if ($oProperty_Value->Property->type == 2)
+			switch ($oProperty_Value->Property->type)
 			{
-				$oProperty_Value
-					->setHref($this->getGroupHref())
-					->setDir($this->getGroupPath());
+				case 2:
+					$oProperty_Value
+						->setHref($this->getGroupHref())
+						->setDir($this->getGroupPath());
+				break;
+				case 8:
+					$oProperty_Value->dateFormat($this->Shop->format_date);
+				break;
+				case 9:
+					$oProperty_Value->dateTimeFormat($this->Shop->format_datetime);
+				break;
 			}
 		}
 
@@ -1124,7 +1132,7 @@ class Shop_Group_Model extends Core_Entity
 				'seo_title' => $this->seo_title,
 				'seo_description' => $this->seo_description,
 				'seo_keywords' => $this->seo_keywords,
-				'informationsystem_id' => $this->shop_id,
+				'shop_id' => $this->shop_id,
 				'siteuser_group_id' => $this->siteuser_group_id,
 				'user_id' => $this->user_id
 			);

@@ -590,6 +590,16 @@ class Core_QueryBuilder_Select extends Core_QueryBuilder_Selection
 	}
 
 	/**
+	 * Clear GROUP BY list
+	 * @return Core_QueryBuilder_Select
+	 */
+	public function clearGroupBy()
+	{
+		$this->_groupBy = array();
+		return $this;
+	}
+	
+	/**
 	 * Clear
 	 * @return Core_QueryBuilder_Select
 	 */

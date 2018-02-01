@@ -11,37 +11,152 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Shop_Company_Model extends Core_Entity
+class Shop_Company_Model extends Company_Model
 {
 	/**
-	 * One-to-many or many-to-many relations
+	 * Model name, e.g. 'book' for 'Book_Model'
+	 * @var mixed
+	 */
+	protected $_modelName = 'shop_company';
+
+	/**
+	 * Table name, e.g. 'books' for 'Book_Model'
+	 * @var mixed
+	 */
+	protected $_tableName = 'companies';
+
+	/**
+	 * Name of the tag in XML
+	 * @var string
+	 */
+	protected $_tagName = 'shop_company';
+
+	/**
+	 * Forbidden tags. If list of tags is empty, all tags will show.
 	 * @var array
 	 */
-	protected $_hasMany = array(
-		'shop' => array()
+	protected $_forbiddenTags = array(
+		'~address',
+		'~phone',
+		'~fax',
+		'~site',
+		'~email'
 	);
 
 	/**
-	 * Belongs to relations
-	 * @var array
+	 * Get XML for entity and children entities
+	 * @return string
+	 * @hostcms-event shop_company.onBeforeRedeclaredGetXml
 	 */
-	protected $_belongsTo = array(
-		'user' => array()
-	);
-
-	/**
-	 * Constructor.
-	 * @param int $id entity ID
-	 */
-	public function __construct($id = NULL)
+	public function getXml()
 	{
-		parent::__construct($id);
+		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
-		if (is_null($id))
+		// Directory_Addresses
+		$aDirectory_Addresses = $this->Directory_Addresses->findAll();
+		if (isset($aDirectory_Addresses[0]))
 		{
-			$oUserCurrent = Core_Entity::factory('User', 0)->getCurrent();
-			$this->_preloadValues['user_id'] = is_null($oUserCurrent) ? 0 : $oUserCurrent->id;
-			$this->_preloadValues['guid'] = Core_Guid::get();
+			$aCompanyAddress = array(
+				$aDirectory_Addresses[0]->postcode,
+				$aDirectory_Addresses[0]->country,
+				$aDirectory_Addresses[0]->city,
+				$aDirectory_Addresses[0]->value
+			);
+
+			$aCompanyAddress = array_filter($aCompanyAddress, 'strlen');
+			$sFullCompanyAddress = implode(', ', $aCompanyAddress);
+
+			$this->addXmlTag('address', $sFullCompanyAddress);
 		}
+
+		// Directory_Phones
+		$aDirectory_Phones = $this->Directory_Phones->findAll();
+		if (isset($aDirectory_Phones[0]))
+		{
+			$this->addXmlTag('phone', $aDirectory_Phones[0]->value);
+		}
+
+		// Directory_Emails
+		$aDirectory_Emails = $this->Directory_Emails->findAll();
+		if (isset($aDirectory_Emails[0]))
+		{
+			$this->addXmlTag('email', $aDirectory_Emails[0]->value);
+		}
+
+		// Directory_Websites
+		$aDirectory_Websites = $this->Directory_Websites->findAll();
+		if (isset($aDirectory_Websites[0]))
+		{
+			$this->addXmlTag('site', $aDirectory_Websites[0]->value);
+		}
+
+		return parent::getXml();
+	}
+
+	static protected $_oldFields = array('address', 'phone', 'fax', 'site', 'email');
+
+	public function __get($property)
+	{
+		if (in_array($property, self::$_oldFields))
+		{
+			switch ($property)
+			{
+				case 'address':
+					// Directory_Addresses
+					$aDirectory_Addresses = $this->Directory_Addresses->findAll();
+					$return = isset($aDirectory_Addresses[0])
+						? $aDirectory_Addresses[0]->value
+						: '';
+				break;
+				case 'phone':
+					// Directory_Phones
+					$aDirectory_Phones = $this->Directory_Phones->findAll();
+					$return = isset($aDirectory_Phones[0])
+						? $aDirectory_Phones[0]->value
+						: '';
+				break;
+				case 'email':
+					// Directory_Emails
+					$aDirectory_Emails = $this->Directory_Emails->findAll();
+					$return = isset($aDirectory_Emails[0])
+						? $aDirectory_Emails[0]->value
+						: '';
+				break;
+				case 'site':
+					// Directory_Websites
+					$aDirectory_Websites = $this->Directory_Websites->findAll();
+					$return = isset($aDirectory_Websites[0])
+						? $aDirectory_Websites[0]->value
+						: '';
+				break;
+				default:
+					$return = NULL;
+			}
+
+			return $return;
+		}
+
+		return parent::__get($property);
+	}
+
+	public function __call($name, $arguments)
+	{
+		if (in_array($name, self::$_oldFields))
+		{
+			//$this->$name = $arguments[0];
+			return $this;
+		}
+
+		return parent::__call($name, $arguments);
+	}
+
+	public function __isset($property)
+	{
+		if (in_array($property, self::$_oldFields))
+		{
+			return TRUE;
+		}
+
+		return parent::__isset($property);
 	}
 }
