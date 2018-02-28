@@ -32,7 +32,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Rss_Show extends Core_Controller
 {
@@ -157,6 +157,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			->where('informationsystem_items.siteuser_group_id', 'IN', $aSiteuserGroups);
 
 		$this->group = $this->yandex = $this->turbo = FALSE;
+
 		$this->stripTags = $this->cache = TRUE;
 		$this->offset = 0;
 
@@ -271,6 +272,9 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			&& $this->_Core_Rss->xmlns('yandex', 'http://news.yandex.ru')
 			&& $this->_Core_Rss->xmlns('media', 'http://search.yahoo.com/mrss/');
 
+		$this->turbo
+			&& $this->_Core_Rss->xmlns('turbo', 'http://turbo.yandex.ru');
+
 		if (!is_null($this->tag) && Core::moduleIsActive('tag'))
 		{
 			$oTag = Core_Entity::factory('Tag')->getByPath($this->tag);
@@ -318,7 +322,7 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 		{
 			$attributes = array();
-			
+
 			$this->_currentItem = array();
 			$this->_currentItem['pubDate'] = date('r', Core_Date::sql2timestamp($oInformationsystem_Item->datetime));
 			$this->_currentItem['title'] = Core_Str::str2ncr(
@@ -334,12 +338,16 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 					: $oInformationsystem_Item->description)
 			);
 
+			$sAllowedTags = '<h1><p><br><ul><ol><b><strong><i><em><sup><sub><ins><del><small><big><pre><abbr><u><a><img><blockquote>';
+
+			$fullText = $this->stripTags
+					? strip_tags($oInformationsystem_Item->text, $sAllowedTags)
+					: $oInformationsystem_Item->text;
+
 			if ($this->yandex)
 			{
 				$this->_currentItem['yandex:full-text'] = Core_Str::str2ncr(
-					Core_Str::xml($this->stripTags
-						? strip_tags($oInformationsystem_Item->text)
-						: $oInformationsystem_Item->text)
+					Core_Str::xml($fullText)
 				);
 
 				if ($oInformationsystem_Item->Informationsystem_Group->id)
@@ -371,8 +379,31 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 				$this->_currentItem[] = $enclosure;
 			}
 
-			$this->turbo && $attributes['turbo'] = 'true';
-			
+			if ($this->turbo)
+			{
+				$attributes['turbo'] = 'true';
+
+				$turboContent = PHP_EOL . '<header>' . PHP_EOL;
+
+				if ($oInformationsystem_Item->image_large)
+				{
+					$turboContent .= '<figure>' . PHP_EOL .
+						'<img src="' . htmlspecialchars($sitePath . $oInformationsystem_Item->getLargeFileHref()) . '" />' . PHP_EOL .
+					'</figure>' . PHP_EOL;
+				}
+
+				$turboContent .= '<h1>' . $this->_currentItem['title'] . '</h1>' . PHP_EOL .
+					'</header>' . PHP_EOL .
+					'<h2>' . $this->_currentItem['title'] . '</h2>' . PHP_EOL .
+					$fullText . PHP_EOL;
+
+				$this->_currentItem[] = array(
+					'name' => 'turbo:content',
+					'value' => $turboContent,
+					'CDATA' => TRUE
+				);
+			}
+
 			Core_Event::notify(get_class($this) . '.onBeforeAddItem', $this, array($oInformationsystem_Item, $this->_currentItem));
 
 			$this->_Core_Rss->add('item', $this->_currentItem, $attributes);

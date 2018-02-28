@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Event
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -39,7 +39,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		$aTmpCompanies = array();
 
 		$aCompanies = $oSite->Companies->findAll();
-		foreach($aCompanies as $oCompany)
+		foreach ($aCompanies as $oCompany)
 		{
 			$aTmpCompanies[] = $oCompany->id;
 
@@ -54,11 +54,11 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$iCreatorUserId = 0;
 
-		if($this->_object->id)
+		if ($this->_object->id)
 		{
 			$aEventUsers = $this->_object->Event_Users->findAll();
 
-			foreach($aEventUsers as $oEventUser)
+			foreach ($aEventUsers as $oEventUser)
 			{
 				$aResponsibleEmployees[] = $oEventUser->user_id;
 
@@ -70,6 +70,9 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$aResponsibleEmployees[] = $oUser->id;
 			$iCreatorUserId = $oUser->id;
+			
+			$oEvent_Type = Core_Entity::factory('Event_Type')->getByDefault(1);
+			!is_null($oEvent_Type) && $this->_object->event_type_id = $oEvent_Type->id;
 		}
 
 		// Если сотрудник является участником дела, но не его создателем, то возможен только просмотр информации о деле.
@@ -304,7 +307,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						)
 				);
 
-				foreach($aEvent_Users as $oEvent_User)
+				foreach ($aEvent_Users as $oEvent_User)
 				{
 					$oUser = $oEvent_User->User;
 
@@ -488,7 +491,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 					on_resize_timecell_callback: function (id, start, end){
 
-						if(start > end)
+						if (start > end)
 						{
 							start = end;
 						}
@@ -739,7 +742,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 							"mousewheel": function(event) {
 
-								if(jTimeSlider.data("mouseover"))
+								if (jTimeSlider.data("mouseover"))
 								{
 									event.preventDefault();
 
@@ -915,7 +918,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$aEventTypes = Core_Entity::factory('Event_Type', 0)->findAll();
 
-		foreach($aEventTypes as $oEventType)
+		foreach ($aEventTypes as $oEventType)
 		{
 			$aMasEventTypes[$oEventType->id] = array(
 				'value' => $oEventType->name,
@@ -937,7 +940,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		$aEventGroups = Core_Entity::factory('Event_Group', 0)->findAll();
 
-		foreach($aEventGroups as $oEventGroup)
+		foreach ($aEventGroups as $oEventGroup)
 		{
 			$aMasEventGroups[$oEventGroup->id] = array('value' => $oEventGroup->name, 'color' => $oEventGroup->color);
 		}
@@ -959,7 +962,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			? Core_Entity::factory('Event_Status')->getAllByFinal(0)
 			: Core_Entity::factory('Event_Status')->findAll();
 
-		foreach($aEventStatuses as $oEventStatus)
+		foreach ($aEventStatuses as $oEventStatus)
 		{
 			$aMasEventStatuses[$oEventStatus->id] = array(
 				'value' => $oEventStatus->name,
@@ -1018,7 +1021,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					})
 					.select2({
 						placeholder: "",
-						allowClear: true,
+						//allowClear: true,
 						//multiple: true,
 						templateResult: $.templateResultItemResponsibleEmployees,
 						escapeMarkup: function(m) { return m; },
@@ -1035,15 +1038,24 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		// Массив установленных значений
 		$aEventCompaniesPeople = array();
 
-		if($this->_object->id)
+		$aExistSiteusers = array();
+
+		if ($this->_object->id)
 		{
 			$aEventSiteusers = $this->_object->Event_Siteusers->findAll();
 
-			foreach($aEventSiteusers as $oEventSiteuser)
+			foreach ($aEventSiteusers as $oEventSiteuser)
 			{
-				$aEventCompaniesPeople[] = $oEventSiteuser->siteuser_company_id
-					? ('company_' . $oEventSiteuser->siteuser_company_id)
-					: ('person_' . $oEventSiteuser->siteuser_person_id);
+				if ($oEventSiteuser->siteuser_company_id)
+				{
+					$aEventCompaniesPeople[] = 'company_' . $oEventSiteuser->siteuser_company_id;
+					$aExistSiteusers[] = $oEventSiteuser->Siteuser_Company->siteuser_id;
+				}
+				else
+				{
+					$aEventCompaniesPeople[] = 'person_' . $oEventSiteuser->siteuser_person_id;
+					$aExistSiteusers[] = $oEventSiteuser->Siteuser_Person->siteuser_id;
+				}
 			}
 		}
 
@@ -1051,35 +1063,34 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$aMasSiteusers = array();
 
-			$aSiteusers = $oSite->Siteusers->findAll();
-			foreach($aSiteusers as $oSiteuser)
+			if (count($aExistSiteusers))
 			{
-				$oOptgroupSiteuser = new stdClass();
-				$oOptgroupSiteuser->attributes = array('label' => $oSiteuser->login, 'class' => 'siteuser');
-
-				$aSiteuserCompanies = $oSiteuser->Siteuser_Companies->findAll();
-				// $aSiteuserCompanies = array();
-
-				foreach ($aSiteuserCompanies as $oSiteuserCompany)
+				$aSiteusers = $oSite->Siteusers->getAllById($aExistSiteusers, FALSE, 'IN');
+				foreach ($aSiteusers as $oSiteuser)
 				{
-					$oOptgroupSiteuser->children['company_' . $oSiteuserCompany->id] = array(
-						'value' => htmlspecialchars($oSiteuserCompany->name) . '%%%' . ($oSiteuserCompany->image ? $oSiteuserCompany->getImageFileHref() : ''),
-						'attr' => array('class' => 'siteuser-company')
-					);
-				}
+					$oOptgroupSiteuser = new stdClass();
+					$oOptgroupSiteuser->attributes = array('label' => $oSiteuser->login, 'class' => 'siteuser');
 
-				//$aSiteuserPersons = $oSiteuser->Siteuser_People->findAll();
-				$aSiteuserPeople = $oSiteuser->Siteuser_People->findAll();
-				// $aSiteuserPersons = array();
+					$aSiteuserCompanies = $oSiteuser->Siteuser_Companies->findAll();
+					foreach ($aSiteuserCompanies as $oSiteuserCompany)
+					{
+						$oOptgroupSiteuser->children['company_' . $oSiteuserCompany->id] = array(
+							'value' => htmlspecialchars($oSiteuserCompany->name) . '%%%' . ($oSiteuserCompany->image ? $oSiteuserCompany->getImageFileHref() : ''),
+							'attr' => array('class' => 'siteuser-company')
+						);
+					}
 
-				foreach ($aSiteuserPeople as $oSiteuserPerson)
-				{
-					$oOptgroupSiteuser->children['person_' . $oSiteuserPerson->id] = array(
-						'value' => htmlspecialchars($oSiteuserPerson->getFullName()) . '%%%' . ($oSiteuserPerson->image ? $oSiteuserPerson->getImageFileHref() : ''),
-						'attr' => array('class' => 'siteuser-person')
-					);
+					$aSiteuserPeople = $oSiteuser->Siteuser_People->findAll();
+					foreach ($aSiteuserPeople as $oSiteuserPerson)
+					{
+						$oOptgroupSiteuser->children['person_' . $oSiteuserPerson->id] = array(
+							'value' => htmlspecialchars($oSiteuserPerson->getFullName()) . '%%%' . ($oSiteuserPerson->image ? $oSiteuserPerson->getImageFileHref() : ''),
+							'attr' => array('class' => 'siteuser-person')
+						);
+					}
+
+					$aMasSiteusers[$oSiteuser->id] = $oOptgroupSiteuser;
 				}
-				$aMasSiteusers[$oSiteuser->id] = $oOptgroupSiteuser;
 			}
 
 			$oSelectSiteusers = Admin_Form_Entity::factory('Select')
@@ -1094,56 +1105,31 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			$oScriptSiteusers = Admin_Form_Entity::factory('Script')
 				->type("text/javascript")
 				->value('
-					// Формирование элементов выпадающего списка
-					function templateResultItemSiteusers(data, item){
-
-						var arraySelectItemParts = data.text.split("%%%"),
-							className = data.element && $(data.element).attr("class");
-
-						if (data.element && $(data.element).attr("style"))
-						{
-							// Добавляем стили для групп и элементов. Элементам только при показе выпадающего списка
-							($(data.element).is("optgroup") || $(data.element).is("option") && $(item).hasClass("select2-results__option")) && $(item).attr("style", $(data.element).attr("style"));
-						}
-
-						// Компания, отдел, ФИО сотрудника
-						var resultHtml = \'<span class="\' + className + \'">\' + arraySelectItemParts[0] + \'</span>\';
-
-						if (arraySelectItemParts[1])
-						{
-							resultHtml = \'<img src="\' + arraySelectItemParts[1] + \'" height="30px" class="margin-right-5">\' + resultHtml;
-						}
-
-						return resultHtml;
-					}
-
-					// Формирование результатов выбора
-					function templateSelectionItemSiteusers(data, item){
-
-						var arraySelectItemParts = data.text.split("%%%"),
-							className = data.element && $(data.element).attr("class");
-
-						// Компания, отдел, ФИО сотрудника
-						var resultHtml = \'<span class="\' + className + \'">\' + arraySelectItemParts[0] + \'</span>\';
-
-						// Устанавливает title для элемента
-						data.title = arraySelectItemParts[0];
-
-						if (arraySelectItemParts[1])
-						{
-							resultHtml = \'<img src="\' + arraySelectItemParts[1] + \'" height="30px" class="margin-top-5 margin-right-5">\' + resultHtml;
-						}
-
-						return resultHtml;
-					}
-
 					$("#event_siteuser_id").select2({
+						minimumInputLength: 1,
 						placeholder: "",
 						allowClear: true,
-						//multiple: true,
-						templateResult: templateResultItemSiteusers,
+						multiple: true,
+						ajax: {
+							url: "/admin/siteuser/index.php?loadEventSiteusers",
+							dataType: "json",
+							type: "GET",
+							processResults: function (data) {
+								var aResults = [];
+								$.each(data, function (index, item) {
+									aResults.push({
+										"id": item.id,
+										"text": item.text
+									});
+								});
+								return {
+									results: aResults
+								};
+							}
+						},
+						templateResult: $.templateResultItemSiteusers,
 						escapeMarkup: function(m) { return m; },
-						templateSelection: templateSelectionItemSiteusers,
+						templateSelection: $.templateSelectionItemSiteusers,
 						language: "' . Core_i18n::instance()->getLng() . '"
 					});'
 				);
@@ -1413,7 +1399,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 
 		// Замена загруженных ранее файлов на новые
 		$aEvent_Attachments = $this->_object->Event_Attachments->findAll();
-		foreach($aEvent_Attachments as $oEvent_Attachment)
+		foreach ($aEvent_Attachments as $oEvent_Attachment)
 		{
 			$aExistFile = Core_Array::getFiles("file_{$oEvent_Attachment->id}");
 
@@ -1447,7 +1433,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						->type("text/javascript")
 						->value("$(\"#{$windowId} #file:has(input\\[name='file\\[\\]'\\])\").eq(0).remove();");
 
-					if(intval($aFile['size']) > 0)
+					if (intval($aFile['size']) > 0)
 					{
 						$oEvent_Attachment = Core_Entity::factory('Event_Attachment');
 
@@ -1511,7 +1497,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->save();
 
 				// Связываем уведомление с сотрудниками
-				foreach($aNotificationEventExcludedUserId as $iUserId)
+				foreach ($aNotificationEventExcludedUserId as $iUserId)
 				{
 					Core_Entity::factory('Notification_User')
 						->notification_id($oNotification->id)
@@ -1534,7 +1520,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->save();
 
 				// Связываем уведомление с сотрудниками
-				foreach($aNotificationEventParticipantUserId as $iUserId)
+				foreach ($aNotificationEventParticipantUserId as $iUserId)
 				{
 					Core_Entity::factory('Notification_User')
 						->notification_id($oNotification->id)
@@ -1574,9 +1560,9 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			}
 		}
 
-		foreach($aEventSiteuserId as $key => $sEventSiteuserId)
+		foreach ($aEventSiteuserId as $key => $sEventSiteuserId)
 		{
-			if(!in_array($key, $aExcludeIndexes))
+			if (!in_array($key, $aExcludeIndexes))
 			{
 				$aTmp = explode('_', $sEventSiteuserId);
 
@@ -1634,8 +1620,8 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 						{
 							$bError = TRUE;
 
-							//foreach($aEventUserId as $key => $sEventUserId)
-							foreach($aEventUserId as $key => $iEventUserId)
+							//foreach ($aEventUserId as $key => $sEventUserId)
+							foreach ($aEventUserId as $key => $iEventUserId)
 							{
 								//$aTmp = explode('_', $sEventUserId);
 
@@ -1707,7 +1693,7 @@ class Event_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 		{
 			$aEvent_Users = $this->_object->Event_Users->findAll();
 
-			foreach($aEvent_Users as $oEvent_User)
+			foreach ($aEvent_Users as $oEvent_User)
 			{
 				// Идентификатор создателя дела
 				$oEvent_User->creator && $iCreatorUserId = $oEvent_User->user_id;

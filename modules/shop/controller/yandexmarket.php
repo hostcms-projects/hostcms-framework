@@ -46,7 +46,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_YandexMarket extends Core_Controller
 {
@@ -98,18 +98,6 @@ class Shop_Controller_YandexMarket extends Core_Controller
 	 * @var array
 	 */
 	protected $_aSiteuserGroups = array();
-
-	/**
-	 * List's offer tags
-	 * @var array
-	 */
-	public $aOfferTags = array(
-		'adult' => 'adult',
-		'cpa' => 'cpa',
-		'age-year' => 'age-year',
-		'age-month' => 'age-month',
-		'barcode' => 'barcode',
-	);
 
 	/**
 	 * List's vendor tags
@@ -781,6 +769,9 @@ class Shop_Controller_YandexMarket extends Core_Controller
 			$this->stdOut->write('<adult>true</adult>' . "\n");
 		}
 
+		/* cpa */
+		$this->stdOut->write('<cpa>' . $oShop_Item->cpa .  '</cpa>' . "\n");
+
 		/* rec */
 		if ($this->recommended)
 		{
@@ -1366,7 +1357,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		{
 			$oShop_Order = $this->createOrder($aResponse['order']);
 
-			if(!is_null($oShop_Order->id))
+			if (!is_null($oShop_Order->id))
 			{
 				$aAnswer['order'] = array(
 					"accepted" => TRUE,
@@ -1619,6 +1610,8 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		{
 			$this->stdOut->write('<adult>true</adult>' . "\n");
 		}
+
+		$this->stdOut->write('<cpa>' . $oShop->cpa . '</cpa>' . "\n");
 
 		/* Товары */
 		$this->_offers();

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Company
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Company_Model extends Core_Entity
 {
@@ -96,7 +96,7 @@ class Company_Model extends Core_Entity
 
 		if (count($aCompanyDepartments))
 		{
-			foreach($aCompanyDepartments as $oCompanyDepartment)
+			foreach ($aCompanyDepartments as $oCompanyDepartment)
 			{
 				$aCompanyDepartmentInfo = array();
 
@@ -110,13 +110,13 @@ class Company_Model extends Core_Entity
 
 				$aDepartmentUsers = $oDepartmentUsers->findAll();
 
-				foreach($aDepartmentUsers as $oDepartmentUser)
+				foreach ($aDepartmentUsers as $oDepartmentUser)
 				{
 					$aUserInfo = array();
 					$aUserInfo['user'] = $oDepartmentUser;
 
 					$aUserCompanyPosts = $oDepartmentUser->getCompanyPostsByDepartment($oCompanyDepartment->id);
-					foreach($aUserCompanyPosts as $oUserCompanyPost)
+					foreach ($aUserCompanyPosts as $oUserCompanyPost)
 					{
 						$aUserInfo['user_posts'][] = $oUserCompanyPost;
 					}
@@ -215,7 +215,7 @@ class Company_Model extends Core_Entity
 						<div class="title_users"><i class="fa fa-caret-down fa-fw"></i>' . Core::_('User.ua_link_users_site') . '</div>
 						<div class="list_users">';
 
-				foreach($aDepartment["users"] as $aUserInfo)
+				foreach ($aDepartment["users"] as $aUserInfo)
 				{
 					$oDeal_Template_Step_Access_User = $aUserInfo['user']->Deal_Template_Step_Access_Users->getByDeal_template_step_id($deal_template_step_id);
 
@@ -236,7 +236,7 @@ class Company_Model extends Core_Entity
 
 						$aCompanyPostName = array();
 
-						foreach($aCompany_Posts as $oCompany_Post)
+						foreach ($aCompany_Posts as $oCompany_Post)
 						{
 							$aCompanyPostName[] = htmlspecialchars($oCompany_Post->name);
 						}
@@ -293,7 +293,7 @@ class Company_Model extends Core_Entity
 
 						$aUserPosts = array();
 
-						foreach($aUserInfo['user_posts'] as $aPost)
+						foreach ($aUserInfo['user_posts'] as $aPost)
 						{
 							$aUserPosts[] = htmlspecialchars($aPost->name);
 						}
@@ -313,7 +313,7 @@ class Company_Model extends Core_Entity
 
 				echo "<div class=\"departments\">";
 
-				foreach($aDepartment["departments"] as $aDepartmentInfo)
+				foreach ($aDepartment["departments"] as $aDepartmentInfo)
 				{
 					$this->showDepartmentsAndUsers4DealTemplateStepAccess($deal_template_step_id, $aDepartmentInfo);
 				}
@@ -363,7 +363,7 @@ class Company_Model extends Core_Entity
 
 						//<div class="list_users" style="display: none">
 
-				foreach($aDepartment["users"] as $aUserInfo)
+				foreach ($aDepartment["users"] as $aUserInfo)
 				{
 					$aUserInfo['user']->showDealTemplateStepAccess($deal_template_step_id);
 				}
@@ -376,7 +376,7 @@ class Company_Model extends Core_Entity
 
 				echo "<div class=\"departments\" style=\"margin-left: 15px\">";
 
-				foreach($aDepartment["departments"] as $aDepartmentInfo)
+				foreach ($aDepartment["departments"] as $aDepartmentInfo)
 				{
 					$this->showDepartmentsAndUsers4DealTemplateStepAccess($deal_template_step_id, $aDepartmentInfo);
 				}
@@ -489,12 +489,12 @@ class Company_Model extends Core_Entity
 					$oCompanyDepartment = Core_Entity::factory('Company_Department', $childrenDepartment['id']);
 					$aDepartmentUsers = $oCompanyDepartment->Users->findAll();
 
-					foreach($aDepartmentUsers as $oDepartmentUser)
+					foreach ($aDepartmentUsers as $oDepartmentUser)
 					{
 						$aUserCompanyPosts = array();
 						$aObjectUserCompanyPosts = $oDepartmentUser->getCompanyPostsByDepartment($childrenDepartment['id']);
 
-						foreach($aObjectUserCompanyPosts as $oObjectUserCompanyPost)
+						foreach ($aObjectUserCompanyPosts as $oObjectUserCompanyPost)
 						{
 							$aUserCompanyPosts[] = $oObjectUserCompanyPost->name;
 						}

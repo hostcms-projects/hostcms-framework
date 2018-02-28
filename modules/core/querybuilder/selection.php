@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Querybuilder
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 {
@@ -598,6 +598,15 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 		return $this;
 	}
 
+	/**
+	 * Get WHERE
+	 * @return array
+	 */
+	public function getWhere()
+	{
+		return $this->_where;
+	}
+	
 	/**
 	 * Clear WHERE list
 	 * @return Core_QueryBuilder_Selection

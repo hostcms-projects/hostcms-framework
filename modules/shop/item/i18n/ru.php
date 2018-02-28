@@ -6,7 +6,7 @@
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Товары магазина',
@@ -95,6 +95,7 @@ return array(
 	'adminSetAssociated_success' => "Информация успешно изменена",
 	'adminUnsetAssociated_success' => "Информация успешно изменена",
 	'markDeleted_success' => "Информация о товаре успешно удалена!",
+	'markDeleted' => "Удалить товар",
 	'shortcut_success' => "Ярлык товара успешно добавлен",
 	'edit_success' => "Товар успешно добавлен!",
 	'copy_success' => "Товар успешно скопирован!",
@@ -274,18 +275,19 @@ return array(
 	'manufacturer_warranty' => '<acronym title="Товар имеет официальную гарантию производителя">Гарантия производителя</acronym>',
 	'country_of_origin' => '<acronym title="Страна, в которой товар был произведён">Страна производства</acronym>',
 	'apply_price_for_modification' => "<acronym title=\"Применяет основную цену и валюту товара для модификаций\">Применить основную цену для модификаций</acronym>",
-	'item_length'=>'Длина',
-	'item_width'=>'Ширина',
-	'item_height'=>'Высота',
+	'item_length' => 'Длина',
+	'item_width' => 'Ширина',
+	'item_height' => 'Высота',
 	'apply_purchase_discount' => 'Учитывать для скидки от суммы заказа',
 	'delivery' => 'Доставка',
 	'pickup' => 'Самовывоз',
 	'store' => 'В розничном магазине',
 	'adult' => 'Для взрослых',
-	'show_in_group'=>'Показывать свойство в группе',
-	'show_in_item'=>'Показывать свойство в товаре',
-	'add_value'=>'Добавить отсутствующие значения свойства по умолчанию у товаров',
-	'start_order_date'=>'Начальная дата',
+	'cpa' => 'Публиковать в «Заказ на Маркете»',
+	'show_in_group' => 'Показывать свойство в группе',
+	'show_in_item' => 'Показывать свойство в товаре',
+	'add_value' => 'Добавить отсутствующие значения свойства по умолчанию у товаров',
+	'start_order_date' => 'Начальная дата',
 	'stop_order_date' => 'Конечная дата',
 	'empty_shop' => 'Вы уверены, что хотите полностью очистить магазин?',
 	'root' => 'Корень магазина',
@@ -309,4 +311,5 @@ return array(
 	'shop_item_set_not_currency' => 'Остутствует указание валюты у товара "%s"',
 	'import_price_list_delay' => 'Задержка (в сек.)',
 	'create_modification_copy_warehouse_count' => 'Копировать остаток на складе',
+	'items_catalog_copy_form_title' => 'Копировать товар',
 );

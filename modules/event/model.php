@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Event
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Event_Model extends Core_Entity
 {
@@ -353,7 +353,7 @@ class Event_Model extends Core_Entity
 				->save();
 
 			// Связываем уведомление с ответственными сотрудниками
-			foreach($aEventUsers as $oEventUser)
+			foreach ($aEventUsers as $oEventUser)
 			{
 				Core_Entity::factory('Notification_User')
 					->notification_id($oNotification->id)
@@ -519,6 +519,7 @@ class Event_Model extends Core_Entity
 					->setUrl($oCalendar_Caldav_User->caldav_server)
 					->setUsername($oCalendar_Caldav_User->username)
 					->setPassword($oCalendar_Caldav_User->password)
+					->setData($oCalendar_Caldav_User->data)
 					->connect();
 
 				$aCalendars = $Calendar_Caldav_Controller->findCalendars();

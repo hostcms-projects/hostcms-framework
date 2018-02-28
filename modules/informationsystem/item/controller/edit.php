@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -641,6 +641,51 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					->add($oSeoRow2 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oSeoRow3 = Admin_Form_Entity::factory('Div')->class('row'));
 
+				$this->addTabAfter($oInformationsystemTabSeoTemplates = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem_Group.tab_seo_templates'))
+					->name('Seo_Templates'), $oInformationsystemTabSeo);
+
+				$oInformationsystemTabSeoTemplates
+					->add($oInformationsystemGroupBlock = Admin_Form_Entity::factory('Div')->class('well with-header'))
+					->add($oInformationsystemItemBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+
+				$oInformationsystemGroupBlock
+					->add($oInformationsystemGroupHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-darkorange')
+						->value(Core::_("Informationsystem_Group.seo_group_header"))
+					)
+					->add($oInformationsystemGroupBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemGroupBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemGroupBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oInformationsystemGroupHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Informationsystem_Controller::showGroupButton()
+					));
+
+				$oInformationsystemItemBlock
+					->add($oInformationsystemItemHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-palegreen')
+						->value(Core::_("Informationsystem_Group.seo_item_header"))
+					)
+					->add($oInformationsystemItemBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemItemBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemItemBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oInformationsystemItemHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Informationsystem_Controller::showItemButton()
+					));
+
+				// Seo templates
+				$oMainTab
+					->move($this->getField('seo_group_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow1)
+					->move($this->getField('seo_group_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow2)
+					->move($this->getField('seo_group_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow3)
+					->move($this->getField('seo_item_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow1)
+					->move($this->getField('seo_item_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow2)
+					->move($this->getField('seo_item_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow3);
+
 				// Name
 				$oMainTab
 					->move($this->getField('name'), $oMainRow1);
@@ -1096,7 +1141,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 					// Получаем список меток
 					$aTags = $oTags->findAll(FALSE);
 
-					foreach($aTags as $oTag)
+					foreach ($aTags as $oTag)
 					{
 						// Получаем хэш тэга
 						$array_tags = Core_Str::getHashes($oTag->name, array('hash_function' => 'crc32'));
@@ -1583,7 +1628,7 @@ class Informationsystem_Item_Controller_Edit extends Admin_Form_Action_Controlle
 			// Добавляем все директории от текущей до родителя.
 			do {
 				$aParentGroups[] = $aTmpGroup->name;
-			} while($aTmpGroup = $aTmpGroup->getParent());
+			} while ($aTmpGroup = $aTmpGroup->getParent());
 
 			$sParents = implode(' → ', array_reverse($aParentGroups));
 

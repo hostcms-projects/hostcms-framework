@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -84,6 +84,10 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->caption(Core::_('Informationsystem.information_systems_form_tab_4'))
 					->name('Image');
 
+				$oInformationsystemTabSeoTemplates = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Informationsystem.tab_seo_templates'))
+					->name('Seo_Templates');
+
 				$oInformationsystemTabSorting
 					->add($oSortingRow1 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oSortingRow2 = Admin_Form_Entity::factory('Div')->class('row'));
@@ -108,10 +112,43 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->add($oImageRow7 = Admin_Form_Entity::factory('Div')->class('row'))
 					->add($oImageRow8 = Admin_Form_Entity::factory('Div')->class('row'));
 
+				$oInformationsystemTabSeoTemplates
+					->add($oInformationsystemGroupBlock = Admin_Form_Entity::factory('Div')->class('well with-header'))
+					->add($oInformationsystemItemBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+
+				$oInformationsystemGroupBlock
+					->add($oInformationsystemGroupHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-darkorange')
+						->value(Core::_("Informationsystem.seo_group_header"))
+					)
+					->add($oInformationsystemGroupBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemGroupBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemGroupBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oInformationsystemGroupHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Informationsystem_Controller::showGroupButton()
+					));
+
+				$oInformationsystemItemBlock
+					->add($oInformationsystemItemHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-palegreen')
+						->value(Core::_("Informationsystem.seo_item_header"))
+					)
+					->add($oInformationsystemItemBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemItemBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oInformationsystemItemBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oInformationsystemItemHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Informationsystem_Controller::showItemButton()
+					));
+
 				$this
 					->addTabAfter($oInformationsystemTabSorting, $oMainTab)
 					->addTabAfter($oInformationsystemTabFormats, $oInformationsystemTabSorting)
-					->addTabAfter($oInformationsystemTabImage, $oInformationsystemTabFormats);
+					->addTabAfter($oInformationsystemTabSeoTemplates, $oInformationsystemTabFormats)
+					->addTabAfter($oInformationsystemTabImage, $oInformationsystemTabSeoTemplates);
 
 				$oAdditionalTab->delete($this->getField('informationsystem_dir_id'));
 
@@ -328,6 +365,16 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 					->move($this->getField('typograph_default_items'), $oFormatsRow7)
 					->move($this->getField('typograph_default_groups'), $oFormatsRow8);
 
+
+				// Seo templates
+				$oMainTab
+					->move($this->getField('seo_group_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow1)
+					->move($this->getField('seo_group_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow2)
+					->move($this->getField('seo_group_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemGroupBlockRow3)
+					->move($this->getField('seo_item_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow1)
+					->move($this->getField('seo_item_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow2)
+					->move($this->getField('seo_item_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oInformationsystemItemBlockRow3);
+
 				// Изображение
 				$oWatermarkFileField = Admin_Form_Entity::factory('File');
 
@@ -460,7 +507,7 @@ class Informationsystem_Controller_Edit extends Admin_Form_Action_Controller_Typ
 	{
 		parent::_applyObjectProperty();
 
-		if(
+		if (
 			// Поле файла существует
 			!is_null($aFileData = Core_Array::getFiles('watermark_file', NULL))
 			// и передан файл

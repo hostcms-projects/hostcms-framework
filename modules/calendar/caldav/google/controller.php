@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Calendar
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controller
 {
@@ -34,7 +34,7 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 		/*$this->_redirectUri = !is_null($oSite_Alias)
 			? 'http://' . $oSite_Alias->name . '/calendar-callback.php'
 			: NULL;*/
-			
+
 		$this->_redirectUri = 'https://demo2.hostcms.ru/calendar-callback.php';
 
 		return $this;
@@ -53,8 +53,8 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 			->add($oMainRow2 = Admin_Form_Entity::factory('Div')->class('row'));
 
 		$sRedirectUri = urlencode($this->_redirectUri);
-		$sClientId = strval($object->username);			
-			
+		$sClientId = strval($object->username);
+
 		$sText = Core::_('Calendar_Caldav.google', $sClientId, $sRedirectUri);
 
 		$sTextWell = "<div class=\"col-xs-12\"><div class=\"well bordered-left bordered-darkorange margin-top-10\">
@@ -73,12 +73,12 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 	public function applyObjectProperty($oCalendar_Caldav_User_Controller_Edit)
 	{
 		$object = $oCalendar_Caldav_User_Controller_Edit->getObject();
-		
+
 		// save
 		if (Core_Array::getGet('additionalSettings') == 1)
 		{
 			$data = Core_Array::getPost('data');
-			
+
 			$aParams = array(
 				'code' => $data,
 				'redirect_uri' => $this->_redirectUri,
@@ -86,8 +86,8 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 				'scope' => '',
 				'client_secret' => $this->_password,
 				'grant_type' => 'authorization_code'
-			);			
-			
+			);
+
 			$sJson = $this->getAccessToken($aParams);
 			$object->data = $sJson;
 			$object->save();
@@ -98,7 +98,7 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 			$oCalendar_Caldav_User_Controller_Edit->addContent('<script type="text/javascript">$.modalLoad({path: \'/admin/calendar/caldav/user/index.php\', action: \'edit\', operation: \'modal\', additionalParams: \'hostcms[checked][0][' . $object->id . ']=1&calendar_caldav_id=' . $object->calendar_caldav_id. '&additionalSettings=1\', windowId: \'id_content\'});</script>');
 		}
 	}
-	
+
 	/**
 	 * Get OAuth url
 	 * @return string
@@ -211,6 +211,7 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 						)
 					);
 					$this->_token->refresh_token = $sRefreshToken;
+					$this->_token->time = time();
 					$this->_data = json_encode($this->_token);
 				}
 			}
@@ -235,36 +236,44 @@ class Calendar_Caldav_Google_Controller extends Calendar_Caldav_Default_Controll
 
 		$sResponse = NULL;
 
-		$Core_Http = Core_Http::instance('curl')
-			->clear()
-			->method('OPTIONS')
-			->userAgent('CalDAV Client')
-			->url($this->_url)
-			->additionalHeader('Content-Type', 'text/plain')
-			->additionalHeader("Authorization", "Bearer {$AccessToken->access_token}")
-			->execute();
-
-		$aHeaders = $Core_Http->parseHeaders();
-
-		$sStatus = Core_Array::get($aHeaders, 'status');
-
-		$iStatusCode = $Core_Http->parseHttpStatusCode($sStatus);
-
-		switch ($iStatusCode)
+		if (isset($AccessToken->access_token))
 		{
-			case '':
-				$this->_errno = 0;
-				$this->_error = 'Can\'t reach server';
-			break;
-			default:
-				$this->_errno = $iStatusCode;
-				$this->_error = $sStatus;
-			break;
-			case 200:
-				$sResponse = $Core_Http->getBody();
+			$Core_Http = Core_Http::instance('curl')
+				->clear()
+				->method('OPTIONS')
+				->userAgent('CalDAV Client')
+				->url($this->_url)
+				->additionalHeader('Content-Type', 'text/plain')
+				->additionalHeader("Authorization", "Bearer {$AccessToken->access_token}")
+				->execute();
 
-				$this->_client = TRUE;
-			break;
+			$aHeaders = $Core_Http->parseHeaders();
+
+			$sStatus = Core_Array::get($aHeaders, 'status');
+
+			$iStatusCode = $Core_Http->parseHttpStatusCode($sStatus);
+
+			switch ($iStatusCode)
+			{
+				case '':
+					$this->_errno = 0;
+					$this->_error = 'Can\'t reach server';
+				break;
+				default:
+					$this->_errno = $iStatusCode;
+					$this->_error = $sStatus;
+				break;
+				case 200:
+					$sResponse = $Core_Http->getBody();
+
+					$this->_client = TRUE;
+				break;
+			}
+		}
+		else
+		{
+			$this->_errno = 0;
+			$this->_error = 'access_token does not exist.';
 		}
 
 		return $sResponse;

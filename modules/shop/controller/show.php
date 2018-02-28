@@ -83,7 +83,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Controller_Show extends Core_Controller
 {
@@ -491,6 +491,7 @@ class Shop_Controller_Show extends Core_Controller
 	/**
 	 * Add favorite goods
 	 * @return self
+	 * @hostcms-event Shop_Controller_Show.onBeforeAddFavoriteEntity
 	 */
 	protected function _addFavorite()
 	{
@@ -540,6 +541,8 @@ class Shop_Controller_Show extends Core_Controller
 
 					$this->itemsProperties && $oShop_Item->showXmlProperties($this->itemsProperties);
 					$this->bonuses && $oShop_Item->showXmlBonuses($this->bonuses);
+
+					Core_Event::notify(get_class($this) . '.onBeforeAddFavoriteEntity', $this, array($oShop_Item));
 
 					$oFavouriteEntity->addEntity($oShop_Item);
 				}
@@ -1308,6 +1311,14 @@ class Shop_Controller_Show extends Core_Controller
 		return $this;
 	}
 
+	protected $_seoGroupTitle = NULL;
+	protected $_seoGroupDescription = NULL;
+	protected $_seoGroupKeywords = NULL;
+
+	protected $_seoItemTitle = NULL;
+	protected $_seoItemDescription = NULL;
+	protected $_seoItemKeywords = NULL;
+
 	/**
 	 * Parse URL and set controller properties
 	 * @return self
@@ -1319,6 +1330,22 @@ class Shop_Controller_Show extends Core_Controller
 		Core_Event::notify(get_class($this) . '.onBeforeParseUrl', $this);
 
 		$oShop = $this->getEntity();
+
+		// Group: set shop's SEO templates
+		$oShop->seo_group_title_template != ''
+			&& $this->_seoGroupTitle = $oShop->seo_group_title_template;
+		$oShop->seo_group_description_template != ''
+			&& $this->_seoGroupDescription = $oShop->seo_group_description_template;
+		$oShop->seo_group_keywords_template != ''
+			&& $this->_seoGroupKeywords = $oShop->seo_group_keywords_template;
+
+		// Item: set shop's SEO templates
+		$oShop->seo_item_title_template != ''
+			&& $this->_seoItemTitle = $oShop->seo_item_title_template;
+		$oShop->seo_item_description_template != ''
+			&& $this->_seoItemDescription = $oShop->seo_item_description_template;
+		$oShop->seo_item_keywords_template != ''
+			&& $this->_seoItemKeywords = $oShop->seo_item_keywords_template;
 
 		$Core_Router_Route = new Core_Router_Route($this->pattern, $this->patternExpressions);
 		$this->patternParams = $matches = $Core_Router_Route->applyPattern(Core::$url['path']);
@@ -1393,6 +1420,22 @@ class Shop_Controller_Show extends Core_Controller
 					if (in_array($oShop_Group->getSiteuserGroupId(), $this->_aSiteuserGroups))
 					{
 						$this->group = $oShop_Group->id;
+
+						// Group: set shop's SEO templates
+						$oShop_Group->seo_group_title_template != ''
+							&& $this->_seoGroupTitle = $oShop_Group->seo_group_title_template;
+						$oShop_Group->seo_group_description_template != ''
+							&& $this->_seoGroupDescription = $oShop_Group->seo_group_description_template;
+						$oShop_Group->seo_group_keywords_template != ''
+							&& $this->_seoGroupKeywords = $oShop_Group->seo_group_keywords_template;
+
+						// Item: set shop's SEO templates
+						$oShop_Group->seo_item_title_template != ''
+							&& $this->_seoItemTitle = $oShop_Group->seo_item_title_template;
+						$oShop_Group->seo_item_description_template != ''
+							&& $this->_seoItemDescription = $oShop_Group->seo_item_description_template;
+						$oShop_Group->seo_item_keywords_template != ''
+							&& $this->_seoItemKeywords = $oShop_Group->seo_item_keywords_template;
 					}
 					else
 					{
@@ -1467,7 +1510,7 @@ class Shop_Controller_Show extends Core_Controller
 				}
 			}
 		}
-		elseif (is_null($path) && Core::$url['path'] != '/')
+		elseif (is_null($path))
 		{
 			return $this->error404();
 		}
@@ -1476,9 +1519,162 @@ class Shop_Controller_Show extends Core_Controller
 		//!$this->item && is_null($this->tag) && $this->forbidSelectModifications();
 		!$this->item && is_null($this->tag) && $this->_selectModifications = FALSE;
 
+		$seo_title = $seo_description = $seo_keywords = NULL;
+
+		// Apply SEO templates
+		if ($this->item)
+		{
+			$oShop_Item = Core_Entity::factory('Shop_Item', $this->item);
+
+			$oCore_Meta = new Core_Meta();
+			$oCore_Meta
+				->addObject('shop', $oShop)
+				->addObject('group', $oShop_Item->Shop_Group)
+				->addObject('item', $oShop_Item)
+				->addObject('this', $this);
+
+			// Title
+			if ($oShop_Item->seo_title != '')
+			{
+				$seo_title = $oShop_Item->seo_title;
+			}
+			elseif ($this->_seoItemTitle != '')
+			{
+				$seo_title = $oCore_Meta->apply($this->_seoItemTitle);
+			}
+			else
+			{
+				$seo_title = $oShop_Item->name;
+			}
+
+			// Description
+			if ($oShop_Item->seo_description != '')
+			{
+				$seo_description = $oShop_Item->seo_description;
+			}
+			elseif ($this->_seoItemDescription != '')
+			{
+				$seo_description = $oCore_Meta->apply($this->_seoItemDescription);
+			}
+			else
+			{
+				$seo_description = $oShop_Item->name;
+			}
+
+			// Keywords
+			if ($oShop_Item->seo_keywords != '')
+			{
+				$seo_keywords = $oShop_Item->seo_keywords ;
+			}
+			elseif ($this->_seoItemKeywords != '')
+			{
+				$seo_keywords = $oCore_Meta->apply($this->_seoItemKeywords);
+			}
+			else
+			{
+				$seo_keywords = $oShop_Item->name;
+			}
+		}
+		elseif ($this->group)
+		{
+			$oShop_Group = Core_Entity::factory('Shop_Group', $this->group);
+
+			$oCore_Meta = new Core_Meta();
+			$oCore_Meta
+				->addObject('shop', $oShop)
+				->addObject('group', $oShop_Group)
+				->addObject('this', $this);
+
+			// Title
+			if ($oShop_Group->seo_title != '')
+			{
+				$seo_title = $oShop_Group->seo_title;
+			}
+			elseif ($this->_seoGroupTitle != '')
+			{
+				$seo_title = $oCore_Meta->apply($this->_seoGroupTitle);
+			}
+			else
+			{
+				$seo_title = $oShop_Group->name;
+			}
+
+			// Description
+			if ($oShop_Group->seo_description != '')
+			{
+				$seo_description = $oShop_Group->seo_description;
+			}
+			elseif ($this->_seoGroupDescription != '')
+			{
+				$seo_description = $oCore_Meta->apply($this->_seoGroupDescription);
+			}
+			else
+			{
+				$seo_description = $oShop_Group->name;
+			}
+
+			// Keywords
+			if ($oShop_Group->seo_keywords != '')
+			{
+				$seo_keywords = $oShop_Group->seo_keywords ;
+			}
+			elseif ($this->_seoGroupKeywords != '')
+			{
+				$seo_keywords = $oCore_Meta->apply($this->_seoGroupKeywords);
+			}
+			else
+			{
+				$seo_keywords = $oShop_Group->name;
+			}
+		}
+		elseif (!is_null($this->tag) && Core::moduleIsActive('tag'))
+		{
+			$seo_title = $oTag->seo_title != ''
+				? $oTag->seo_title
+				: Core::_('Shop.tag', $oTag->name);
+
+			$seo_description = $oTag->seo_description != ''
+				? $oTag->seo_description
+				: $oTag->name;
+
+			$seo_keywords = $oTag->seo_keywords != ''
+				? $oTag->seo_keywords
+				: $oTag->name;
+		}
+		elseif (!is_null($this->producer))
+		{
+			$seo_title = $oShop_Producer->seo_title != ''
+				? $oShop_Producer->seo_title
+				: $oShop_Producer->name;
+
+			$seo_description = $oShop_Producer->seo_description != ''
+				? $oShop_Producer->seo_description
+				: $oShop_Producer->name;
+
+			$seo_keywords = $oShop_Producer->seo_keywords != ''
+				? $oShop_Producer->seo_keywords
+				: $oShop_Producer->name;
+		}
+
+		$seo_title != '' && Core_Page::instance()->title($seo_title);
+		$seo_description != '' && Core_Page::instance()->description($seo_description);
+		$seo_keywords != '' && Core_Page::instance()->keywords($seo_keywords);
+
 		Core_Event::notify(get_class($this) . '.onAfterParseUrl', $this);
 
 		return $this;
+	}
+
+	/**
+	 * Get page number with template $template
+	 * @param $template template, e.g. ", page %d"
+	 * @return string
+	 */
+	public function pageNumber($template = "%d")
+	{
+		return $this->page > 0
+			? sprintf($template, $this->page + 1)
+			: '';
 	}
 
 	/**
@@ -1592,7 +1788,7 @@ class Shop_Controller_Show extends Core_Controller
 				$this->applyGroupsForbiddenTags($oShop_Group);
 
 				$this->_aShop_Groups[$oShop_Group->parent_id][] = $oShop_Group;
-			} while($oShop_Group = $oShop_Group->getParent());
+			} while ($oShop_Group = $oShop_Group->getParent());
 		}
 
 		$this->_addGroupsByParentId(0, $this);
@@ -1769,8 +1965,9 @@ class Shop_Controller_Show extends Core_Controller
 			{
 				$oShop_Group = Core_Entity::factory('Shop_Group', $this->group);
 
+				// Edit
 				$sPath = '/admin/shop/item/index.php';
-				$sAdditional = "hostcms[action]=edit&shop_id={$oShop->id}&shop_group_id={$this->group}&hostcms[checked][0][{$this->group}]=1";
+				$sAdditional = "hostcms[action]=edit&shop_id={$oShop->id}&shop_group_id={$oShop_Group->parent_id}&hostcms[checked][0][{$this->group}]=1";
 				$sTitle = Core::_('Shop_Group.groups_edit_form_title');
 
 				$oXslSubPanel->add(
@@ -1781,6 +1978,24 @@ class Shop_Controller_Show extends Core_Controller
 							Core::factory('Core_Html_Entity_Img')
 								->width(16)->height(16)
 								->src('/admin/images/folder_edit.gif')
+								->alt($sTitle)
+								->title($sTitle)
+						)
+				);
+
+				// Delete
+				$sPath = '/admin/shop/item/index.php';
+				$sAdditional = "hostcms[action]=markDeleted&shop_id={$oShop->id}&shop_group_id={$oShop_Group->parent_id}&hostcms[checked][0][{$this->group}]=1";
+				$sTitle = Core::_('Shop_Group.markDeleted');
+
+				$oXslSubPanel->add(
+					Core::factory('Core_Html_Entity_A')
+						->href("{$sPath}?{$sAdditional}")
+						->onclick("res = confirm('" . Core::_('Admin_Form.msg_information_delete') . "'); if (res) { hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'});} return false")
+						->add(
+							Core::factory('Core_Html_Entity_Img')
+								->width(16)->height(16)
+								->src('/admin/images/delete.gif')
 								->alt($sTitle)
 								->title($sTitle)
 						)
@@ -1819,6 +2034,24 @@ class Shop_Controller_Show extends Core_Controller
 						Core::factory('Core_Html_Entity_Img')
 							->width(16)->height(16)
 							->src('/admin/images/edit.gif')
+							->alt($sTitle)
+							->title($sTitle)
+					)
+			);
+
+			// Copy
+			$sPath = '/admin/shop/item/index.php';
+			$sAdditional = "hostcms[action]=copy&shop_id={$oShop->id}&shop_group_id={$this->group}&hostcms[checked][1][{$this->item}]=1";
+			$sTitle = Core::_('Shop_Item.items_catalog_copy_form_title');
+
+			$oXslSubPanel->add(
+				Core::factory('Core_Html_Entity_A')
+					->href("{$sPath}?{$sAdditional}")
+					->onclick("hQuery.openWindow({path: '{$sPath}', additionalParams: '{$sAdditional}', dialogClass: 'hostcms6'}); return false")
+					->add(
+						Core::factory('Core_Html_Entity_Img')
+							->width(16)->height(16)
+							->src('/admin/images/copy.gif')
 							->alt($sTitle)
 							->title($sTitle)
 					)

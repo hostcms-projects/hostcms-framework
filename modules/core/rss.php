@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Core\Rss
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Core_Rss
 {
@@ -86,10 +86,20 @@ class Core_Rss
 
 			$aTmp = explode(':', $name);
 
+			$sTmpValue = !is_array($aSubitem['value']) ? $aSubitem['value'] : NULL;
+			$bCDATA = isset($aSubitem['CDATA']) && $aSubitem['CDATA'];
+
 			// if isset namespace
 			$newChild = isset($aTmp[1])
-				? $object->addChild($name, !is_array($aSubitem['value']) ? $aSubitem['value'] : NULL, $aTmp[0])
-				: $object->addChild($name, !is_array($aSubitem['value']) ? $aSubitem['value'] : NULL);
+				? $object->addChild($name, $bCDATA ? NULL : $sTmpValue, $aTmp[0])
+				: $object->addChild($name, $bCDATA ? NULL : $sTmpValue);
+
+			if ($bCDATA)
+			{
+				$domNewChild = dom_import_simplexml($newChild);
+				$domNewChildOwner = $domNewChild->ownerDocument;
+				$domNewChild->appendChild($domNewChildOwner->createCDATASection($sTmpValue));
+			}
 
 			if (isset($aSubitem['attributes']))
 			{

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Shop_Payment_System_Handler
 {
@@ -159,6 +159,9 @@ abstract class Shop_Payment_System_Handler
 			$this->_processOrder();
 
 			$_SESSION['last_order_id'] = $this->_shopOrder->id;
+			
+			// Уведомление о событии создания заказа
+			$this->_createNotification();
 		}
 		else
 		{
@@ -466,7 +469,7 @@ abstract class Shop_Payment_System_Handler
 					}
 
 					Core_Event::notify('Shop_Payment_System_Handler.onAfterAddShopOrderItem', $this, array($oShop_Order_Item, $oShop_Cart));
-					
+
 					// Delete item from the cart
 					$Shop_Cart_Controller
 						->shop_item_id($oShop_Cart->shop_item_id)
@@ -496,27 +499,27 @@ abstract class Shop_Payment_System_Handler
 
 		// Частичная оплата с лицевого счета
 		if (Core::moduleIsActive('siteuser')
-				&& isset($this->_orderParams['partial_payment_by_personal_account'])
-				&& $this->_orderParams['partial_payment_by_personal_account']
-				&& $this->_shopOrder->Siteuser->id
+			&& isset($this->_orderParams['partial_payment_by_personal_account'])
+			&& $this->_orderParams['partial_payment_by_personal_account']
+			&& $this->_shopOrder->Siteuser->id
 		)
 		{
 			$this->_applyBonuses();
 		}
-
-		// Уведомление о событии создания заказа
-		$this->_createNotification();
 
 		Core_Event::notify('Shop_Payment_System_Handler.onAfterProcessOrder', $this);
 
 		return $this;
 	}
 
+	/**
+	 * Create notification
+	 */
 	protected function _createNotification()
 	{
 		$oModule = Core::$modulesList['shop'];
-		
-		if ($oModule)
+
+		if ($oModule && Core::moduleIsActive('notification'))
 		{
 			$oNotification_Subscribers = Core_Entity::factory('Notification_Subscriber');
 			$oNotification_Subscribers->queryBuilder()
@@ -525,7 +528,7 @@ abstract class Shop_Payment_System_Handler
 				->where('notification_subscribers.entity_id', '=', $this->_shopOrder->Shop->id);
 
 			$aNotification_Subscribers = $oNotification_Subscribers->findAll(FALSE);
-			
+
 			if (count($aNotification_Subscribers))
 			{
 				$sCompany = strlen($this->_shopOrder->company)
@@ -541,7 +544,7 @@ abstract class Shop_Payment_System_Handler
 					->type(1) // Новый заказ
 					->entity_id($this->_shopOrder->id)
 					->save();
-				
+
 				foreach ($aNotification_Subscribers as $oNotification_Subscriber)
 				{
 					// Связываем уведомление с сотрудником
@@ -553,6 +556,8 @@ abstract class Shop_Payment_System_Handler
 				}
 			}
 		}
+		
+		return $this;
 	}
 
 	/**

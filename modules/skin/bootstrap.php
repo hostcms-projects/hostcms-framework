@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap extends Core_Skin
 {
@@ -787,7 +787,7 @@ class Skin_Bootstrap extends Core_Skin
 				);
 
 				$subItems = array();
-				foreach($aAdminMenu['modules'] as $sModulePath)
+				foreach ($aAdminMenu['modules'] as $sModulePath)
 				{
 					if (isset($aModuleList[$sModulePath]))
 					{
@@ -814,21 +814,26 @@ class Skin_Bootstrap extends Core_Skin
 							//$oCore_Module = Core_Module::factory($oModule->path);
 							$oCore_Module = Core_Array::get($aCore_Module, $oModule->path);
 
-							if ($oCore_Module && is_array($oCore_Module->menu))
+							if ($oCore_Module)
 							{
-								foreach ($oCore_Module->menu as $aMenu)
+								$aMenu = $oCore_Module->getMenu();
+								
+								if (is_array($aMenu))
 								{
-									$aMenu += array(
-										'sorting' => 0,
-										'block' => 0,
-										'ico' => 'fa-file-o'
-									);
-									?><li id="menu-<?php echo $oCore_Module->getModuleName()?>">
-										<a href="<?php echo htmlspecialchars($aMenu['href'])?>" onclick="<?php echo htmlspecialchars($aMenu['onclick'])?>">
-											<i class="menu-icon <?php echo $aMenu['ico']?>"></i>
-											<span class="menu-text"><?php echo $aMenu['name']?></span>
-										</a>
-									</li><?php
+									foreach ($aMenu as $aTmpMenu)
+									{
+										$aTmpMenu += array(
+											'sorting' => 0,
+											'block' => 0,
+											'ico' => 'fa-file-o'
+										);
+										?><li id="menu-<?php echo $oCore_Module->getModuleName()?>">
+											<a href="<?php echo htmlspecialchars($aTmpMenu['href'])?>" onclick="<?php echo htmlspecialchars($aTmpMenu['onclick'])?>">
+												<i class="menu-icon <?php echo $aTmpMenu['ico']?>"></i>
+												<span class="menu-text"><?php echo $aTmpMenu['name']?></span>
+											</a>
+										</li><?php
+									}
 								}
 							}
 						}
@@ -843,24 +848,29 @@ class Skin_Bootstrap extends Core_Skin
 				//$oCore_Module = Core_Module::factory($oModule->path);
 				$oCore_Module = Core_Array::get($aCore_Module, $oModule->path);
 
-				if ($oCore_Module && is_array($oCore_Module->menu))
+				if ($oCore_Module)
 				{
-					foreach ($oCore_Module->menu as $aMenu)
+					$aMenu = $oCore_Module->getMenu();
+					
+					if (is_array($aMenu))
 					{
-						if (isset($aMenu['name']))
+						foreach ($aMenu as $aTmpMenu)
 						{
-							$aMenu += array(
-								'sorting' => 0,
-								'block' => 0,
-								'ico' => 'fa-file-o'
-							);
-							?><li>
-								<a href="<?php echo htmlspecialchars($aMenu['href'])?>" onclick="<?php echo htmlspecialchars($aMenu['onclick'])?>" class="menu-icon">
-									<i class="menu-icon fa <?php echo $aMenu['ico']?>"></i>
-									<span class="menu-text"><?php echo $aMenu['name']?></span>
-								</a>
-							</li>
-							<?php
+							if (isset($aTmpMenu['name']))
+							{
+								$aTmpMenu += array(
+									'sorting' => 0,
+									'block' => 0,
+									'ico' => 'fa-file-o'
+								);
+								?><li>
+									<a href="<?php echo htmlspecialchars($aTmpMenu['href'])?>" onclick="<?php echo htmlspecialchars($aTmpMenu['onclick'])?>" class="menu-icon">
+										<i class="menu-icon fa <?php echo $aTmpMenu['ico']?>"></i>
+										<span class="menu-text"><?php echo $aTmpMenu['name']?></span>
+									</a>
+								</li>
+								<?php
+							}
 						}
 					}
 				}

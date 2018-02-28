@@ -9,21 +9,28 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Module
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Module_Model extends Core_Entity
 {
+	/**
+	 * One-to-many or many-to-many relations
+	 * @var array
+	 */
+	protected $_hasMany = array(
+		'company_department_module' => array(),
+		'notification' => array(),
+		'notification_subscriber' => array()
+	);
+
 	/**
 	 * Belongs to relations
 	 * @var array
 	 */
 	protected $_belongsTo = array(
-		'user' => array(),
-		'company_department_module' => array(),
-		'notification' => array(),
-		'notification_subscriber' => array(),
+		'user' => array()
 	);
-
+	
 	/**
 	 * Backend property
 	 * @var mixed

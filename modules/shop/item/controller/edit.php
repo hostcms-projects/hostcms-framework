@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 {
@@ -194,6 +194,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('pickup'), $oShopItemTabExportImport)
 					->move($this->getField('store'), $oShopItemTabExportImport)
 					->move($this->getField('adult'), $oShopItemTabExportImport)
+					->move($this->getField('cpa'), $oShopItemTabExportImport)
 					->move($this->getField('seo_title')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_description')->rows(3), $oShopItemTabSEO)
 					->move($this->getField('seo_keywords')->rows(3), $oShopItemTabSEO)
@@ -211,7 +212,8 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					->move($this->getField('delivery')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
 					->move($this->getField('pickup')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
 					->move($this->getField('store')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow5)
-					->move($this->getField('adult')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemTabExportImportRow6)
+					->move($this->getField('cpa')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow6)
+					->move($this->getField('adult')->divAttr(array('class' => 'form-group col-xs-12 col-sm-6 col-md-4')), $oShopItemTabExportImportRow6)
 				;
 
 				$oShop_Item_Delivery_Option_Controller_Tab = new Shop_Item_Delivery_Option_Controller_Tab($this->_Admin_Form_Controller);
@@ -542,7 +544,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$oShop_Item = Core_Entity::factory('Shop_Item')->getById($oShop_Item_Set->shop_item_set_id);
 
-					if(!is_null($oShop_Item))
+					if (!is_null($oShop_Item))
 					{
 						$oShop_Item = $oShop_Item->shortcut_id
 							? $oShop_Item->Shop_Item
@@ -1127,7 +1129,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				{
 					$oShop_Item = Core_Entity::factory('Shop_Item')->getById($oShop_Item_Associated->shop_item_associated_id);
 
-					if(!is_null($oShop_Item))
+					if (!is_null($oShop_Item))
 					{
 						$oShop_Item = $oShop_Item->shortcut_id
 							? $oShop_Item->Shop_Item
@@ -1270,6 +1272,51 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 				$this->addTabAfter($oShopGroupSeoTab = Admin_Form_Entity::factory('Tab')
 					->caption(Core::_('Shop_Group.tab_group_seo'))
 					->name('SEO'), $oShopGroupDescriptionTab);
+
+				$this->addTabAfter($oShopTabSeoTemplates = Admin_Form_Entity::factory('Tab')
+					->caption(Core::_('Shop_Group.tab_seo_templates'))
+					->name('Seo_Templates'), $oShopGroupSeoTab);
+
+				$oShopTabSeoTemplates
+					->add($oShopGroupBlock = Admin_Form_Entity::factory('Div')->class('well with-header'))
+					->add($oShopItemBlock = Admin_Form_Entity::factory('Div')->class('well with-header'));
+
+				$oShopGroupBlock
+					->add($oShopGroupHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-darkorange')
+						->value(Core::_("Shop_Group.seo_group_header"))
+					)
+					->add($oShopGroupBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopGroupBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopGroupBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oShopGroupHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Shop_Controller::showGroupButton()
+					));
+
+				$oShopItemBlock
+					->add($oShopItemHeaderDiv = Admin_Form_Entity::factory('Div')
+						->class('header bordered-palegreen')
+						->value(Core::_("Shop_Group.seo_item_header"))
+					)
+					->add($oShopItemBlockRow1 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopItemBlockRow2 = Admin_Form_Entity::factory('Div')->class('row'))
+					->add($oShopItemBlockRow3 = Admin_Form_Entity::factory('Div')->class('row'));
+
+				$oShopItemHeaderDiv
+					->add(Admin_Form_Entity::factory('Code')->html(
+						Shop_Controller::showItemButton()
+					));
+
+				// Seo templates
+				$oMainTab
+					->move($this->getField('seo_group_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopGroupBlockRow1)
+					->move($this->getField('seo_group_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopGroupBlockRow2)
+					->move($this->getField('seo_group_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopGroupBlockRow3)
+					->move($this->getField('seo_item_title_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemBlockRow1)
+					->move($this->getField('seo_item_description_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemBlockRow2)
+					->move($this->getField('seo_item_keywords_template')->divAttr(array('class' => 'form-group col-xs-12')), $oShopItemBlockRow3);
 
 				$this->addTabAfter($oShopGroupImportExportTab =
 					Admin_Form_Entity::factory('Tab')
@@ -1857,18 +1904,14 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 					$iWarehouseValue = Core_Array::getPost("warehouse_{$oShopWarehouse->id}", 0);
 
 					$oShopItemWarehouse = $this->_object->Shop_Warehouse_Items->getByWarehouseId($oShopWarehouse->id);
-
 					if (is_null($oShopItemWarehouse))
 					{
 						$oShopItemWarehouse = Core_Entity::factory('Shop_Warehouse_Item');
-
 						$oShopItemWarehouse->shop_warehouse_id = $oShopWarehouse->id;
-
 						$oShopItemWarehouse->shop_item_id = $this->_object->id;
 					}
 
 					$oShopItemWarehouse->count = $iWarehouseValue;
-
 					$oShopItemWarehouse->save();
 				}
 
@@ -2561,7 +2604,7 @@ class Shop_Item_Controller_Edit extends Admin_Form_Action_Controller_Type_Edit
 			// Добавляем все директории от текущей до родителя.
 			do {
 				$aParentGroups[] = $aTmpGroup->name;
-			} while($aTmpGroup = $aTmpGroup->getParent());
+			} while ($aTmpGroup = $aTmpGroup->getParent());
 
 			$sParents = implode(' → ', array_reverse($aParentGroups));
 

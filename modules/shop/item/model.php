@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Shop
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Shop_Item_Model extends Core_Entity
 {
@@ -400,7 +400,7 @@ class Shop_Item_Model extends Core_Entity
 		{
 			$oShop_Warehouse_Item = $oDefault_Warehouse->Shop_Warehouse_Items->getByShopItemId($this->id);
 
-			if(is_null($oShop_Warehouse_Item))
+			if (is_null($oShop_Warehouse_Item))
 			{
 				$oShop_Warehouse_Item = Core_Entity::factory('Shop_Warehouse_Item');
 				$oShop_Warehouse_Item->shop_warehouse_id = $oDefault_Warehouse->id;
@@ -465,7 +465,7 @@ class Shop_Item_Model extends Core_Entity
 	}*/
 
 	/**
-	 * Show item's currency
+	 * Get item's currency
 	 * @return string
 	 */
 	public function adminCurrency()
@@ -475,6 +475,39 @@ class Shop_Item_Model extends Core_Entity
 			: $this;
 
 		return htmlspecialchars($oShopItem->Shop_Currency->name);
+	}
+
+	/**
+	 * Get currency name
+	 * @return string
+	 */
+	public function currencyName()
+	{
+		return $this->shop_currency_id
+			? $this->Shop_Currency->name
+			: '';
+	}
+
+	/**
+	 * Get producer name
+	 * @return string
+	 */
+	public function producerName()
+	{
+		return $this->shop_producer_id
+			? $this->Shop_Producer->name
+			: '';
+	}
+
+	/**
+	 * Get seller name
+	 * @return string
+	 */
+	public function sellerName()
+	{
+		return $this->shop_seller_id
+			? $this->Shop_Seller->name
+			: '';
 	}
 
 	/**
@@ -774,7 +807,7 @@ class Shop_Item_Model extends Core_Entity
 		}
 
 		$aPropertyValues = $this->getPropertyValues(FALSE);
-		foreach($aPropertyValues as $oPropertyValue)
+		foreach ($aPropertyValues as $oPropertyValue)
 		{
 			$oNewPropertyValue = clone $oPropertyValue;
 			$oNewPropertyValue->entity_id = $newObject->id;
@@ -805,21 +838,21 @@ class Shop_Item_Model extends Core_Entity
 
 		// Получаем список цен для копируемого товара
 		$aShop_Item_Prices = $this->Shop_Item_Prices->findAll();
-		foreach($aShop_Item_Prices as $oShop_Item_Price)
+		foreach ($aShop_Item_Prices as $oShop_Item_Price)
 		{
 			$newObject->add(clone $oShop_Item_Price);
 		}
 
 		// Получаем список специальных цен для копируемого товара
 		$aShop_Specialprices = $this->Shop_Specialprices->findAll();
-		foreach($aShop_Specialprices as $oShop_Specialprice)
+		foreach ($aShop_Specialprices as $oShop_Specialprice)
 		{
 			$newObject->add(clone $oShop_Specialprice);
 		}
 
 		// Список модификаций товара
 		$aModifications = $this->Modifications->findAll();
-		foreach($aModifications as $oModification)
+		foreach ($aModifications as $oModification)
 		{
 			//$oNewModification = clone $oModification;
 
@@ -829,7 +862,7 @@ class Shop_Item_Model extends Core_Entity
 
 		// Список сопутствующих товаров копируемому товару
 		$aShop_Item_Associateds = $this->Shop_Item_Associateds->findAll();
-		foreach($aShop_Item_Associateds as $oShop_Item_Associated)
+		foreach ($aShop_Item_Associateds as $oShop_Item_Associated)
 		{
 			$newObject->add(clone $oShop_Item_Associated);
 		}
@@ -837,7 +870,7 @@ class Shop_Item_Model extends Core_Entity
 		if (Core::moduleIsActive('tag'))
 		{
 			$aTags = $this->Tags->findAll();
-			foreach($aTags as $oTag)
+			foreach ($aTags as $oTag)
 			{
 				$newObject->add($oTag);
 			}
@@ -1253,7 +1286,7 @@ class Shop_Item_Model extends Core_Entity
 		->Shop_Item_Associateds
 		->getByAssociatedId($this->id);
 
-		if(is_null($oShopAssociatedItem))
+		if (is_null($oShopAssociatedItem))
 		{
 			$oShopAssociatedItem = Core_Entity::factory('Shop_Item_Associated');
 			$oShopAssociatedItem->shop_item_associated_id = $this->id;
@@ -1274,7 +1307,7 @@ class Shop_Item_Model extends Core_Entity
 		->Shop_Item_Associateds
 		->getByAssociatedId($this->id);
 
-		if(!is_null($oShopAssociatedItem))
+		if (!is_null($oShopAssociatedItem))
 		{
 			$oShopAssociatedItem->delete();
 		}
@@ -1347,7 +1380,7 @@ class Shop_Item_Model extends Core_Entity
 
 		// Удаляем значения доп. свойств
 		$aPropertyValues = $this->getPropertyValues(FALSE);
-		foreach($aPropertyValues as $oPropertyValue)
+		foreach ($aPropertyValues as $oPropertyValue)
 		{
 			$oPropertyValue->Property->type == 2 && $oPropertyValue->setDir($this->getItemPath());
 			$oPropertyValue->delete();
@@ -1775,6 +1808,7 @@ class Shop_Item_Model extends Core_Entity
 	 * @return string
 	 * @hostcms-event shop_item.onBeforeRedeclaredGetXml
 	 * @hostcms-event shop_item.onBeforeShowXmlModifications
+	 * @hostcms-event shop_item.onBeforeSelectModifications
 	 * @hostcms-event shop_item.onBeforeAddModification
 	 * @hostcms-event shop_item.onBeforeSelectAssociatedItems
 	 * @hostcms-event shop_item.onBeforeAddAssociatedEntity
@@ -1982,6 +2016,7 @@ class Shop_Item_Model extends Core_Entity
 			$dateTime = Core_Date::timestamp2sql(time());
 			$oShop_Items_Modifications
 				->queryBuilder()
+				->where('shop_items.active', '=', 1)
 				->open()
 					->where('shop_items.start_datetime', '<', $dateTime)
 					->setOr()
@@ -1994,7 +2029,9 @@ class Shop_Item_Model extends Core_Entity
 					->where('shop_items.end_datetime', '=', '0000-00-00 00:00:00')
 				->close();
 
-			$aShop_Items_Modifications = $oShop_Items_Modifications->getAllByActive(1);
+			Core_Event::notify($this->_modelName . '.onBeforeSelectModifications', $this, array($oShop_Items_Modifications));
+
+			$aShop_Items_Modifications = $oShop_Items_Modifications->findAll();
 
 			if (count($aShop_Items_Modifications))
 			{
@@ -2562,7 +2599,7 @@ class Shop_Item_Model extends Core_Entity
 				if ($oTmp_Shop_Item->shop_currency_id)
 				{
 					$aPrice = $Shop_Item_Controller->getPrices($oTmp_Shop_Item);
-					
+
 					$amount += $aPrice['price_discount'] * $oShop_Item_Set->count;
 				}
 				else

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Bootstrap_Admin_View extends Admin_View
 {
@@ -79,8 +79,11 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 
 	public function showTitle()
 	{
-		$title = !is_null($this->module) && isset($this->module->menu[0])
-			? Core_Array::get($this->module->menu[0], 'name')
+		$title = !is_null($this->module)
+			&& method_exists($this->module, 'getMenu') // Убрать в обновлении 6.8.0
+			&& ($aMenu = $this->module->getMenu())
+			&& isset($aMenu[0])
+			? Core_Array::get($aMenu[0], 'name')
 			: $this->pageTitle;
 
 		// Заголовок
@@ -102,8 +105,11 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 			//$this->showH5($this->pageTitle, $this->module);
 			if (strlen($this->pageTitle))
 			{
-				$ico = !is_null($this->module) && isset($this->module->menu[0])
-					? Core_Array::get($this->module->menu[0], 'ico', 'fa-barcode')
+				$ico = !is_null($this->module)
+					&& method_exists($this->module, 'getMenu') // Убрать в обновлении 6.8.0
+					&& ($aMenu = $this->module->getMenu())
+					&& isset($aMenu[0])
+					? Core_Array::get($aMenu[0], 'ico', 'fa-barcode')
 					: 'fa-barcode';
 
 				?><h5 class="row-title before-pink"><i class="fa <?php echo htmlspecialchars($ico)?>"></i><?php echo htmlspecialchars(html_entity_decode($this->pageTitle, ENT_COMPAT, 'UTF-8'))?></h5><?php

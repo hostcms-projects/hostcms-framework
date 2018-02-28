@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Event
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Event_Siteuser_Model extends Core_Entity
 {
@@ -25,6 +25,8 @@ class Event_Siteuser_Model extends Core_Entity
 	 */
 	protected $_belongsTo = array(
 		'event' => array(),
-		'user' => array()
+		'user' => array(),
+		'siteuser_company' => array('foreign_key' => 'siteuser_company_id'),
+		'siteuser_person' => array('foreign_key' => 'siteuser_person_id')
 	);
 }

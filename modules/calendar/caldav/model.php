@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Calendar
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Calendar_Caldav_Model extends Core_Entity
 {
@@ -79,7 +79,7 @@ class Calendar_Caldav_Model extends Core_Entity
 
 				if (count($aCalendarEntities))
 				{
-					foreach($aCalendarEntities as $oEntity)
+					foreach ($aCalendarEntities as $oEntity)
 					{
 						$sContent = $this->_createICalendar($oEntity);
 
@@ -88,6 +88,7 @@ class Calendar_Caldav_Model extends Core_Entity
 				}
 			}
 
+			$oCalendar_Caldav_User->data = $Calendar_Caldav_Controller->getData();
 			$oCalendar_Caldav_User->synchronized_datetime = Core_Date::timestamp2sql(time());
 			$oCalendar_Caldav_User->save();
 		}

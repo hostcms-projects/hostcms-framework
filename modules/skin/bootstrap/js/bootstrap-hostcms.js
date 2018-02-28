@@ -95,7 +95,7 @@
 			// Change window id
 			data['hostcms[window]'] = jDivWin.attr('id');
 
-			console.log(data);
+			//console.log(data);
 
 			jQuery.ajax({
 				context: jDivWin,
@@ -237,6 +237,10 @@
 		},
 		toggleWarehouses: function() {
 			$(".shop-item-warehouses-list .row:has(input[value ^= 0])").toggleClass('hidden');
+		},
+		insertSeoTemplate: function(el, text) {
+			if (el == undefined) { return; }
+			el.insertAtCaret(text);
 		},
 		filterToggleField: function(object)
 		{
@@ -848,7 +852,7 @@
 						}
 					}
 				});
-			}, 5000);
+			}, 10000);
 
 			$("#chatbar").data("refreshMessagesListIntervalId", refreshMessagesListIntervalId);
 		},
@@ -889,7 +893,7 @@
 						}
 					},
 				});
-			}, 5000);
+			}, 10000);
 		},
 		refreshUserStatuses: function() {
 			setInterval(function () {
@@ -1421,6 +1425,7 @@
 				type: 'POST',
 				data: data,
 				dataType: 'json',
+				error: function(){},
 				success: function(resultData){
 					if (resultData['userId'] && resultData['userId'] == jNotificationsClockListBox.data('currentUserId'))
 					{
@@ -1459,7 +1464,7 @@
 
 			// Создаем slimscroll
 			jScrollNotificationClock.slimscroll({
-				height: $('.navbar-account #notificationsClockListBox .scroll-notifications-clock > ul li[id != 0]').length ? '220px' : '55px',
+				height: $('.navbar-account #notificationsClockListBox .scroll-notifications-clock > ul li[id != "notification-0"]').length ? '220px' : '55px',
 				//height: 'auto',
 				color: 'rgba(0, 0, 0, 0.3)',
 				size: '5px',
@@ -1545,7 +1550,7 @@
 				// Устанавливаем видимость кнопки очистки поля поиска (фильтрации) уведомлений
 				setVisibilityInputCleaningButton(jInputSearch, jButton);
 
-				if ($('#notificationsListBox .scroll-notifications li[id != 0]').length)
+				if ($('#notificationsListBox .scroll-notifications li[id != "notification-0"]').length)
 				{
 					$('.navbar-account #notificationsListBox .footer').show();
 
@@ -1715,6 +1720,8 @@
 			var jSlimScrollBar = $('#notificationsListBox .slimScrollBar'),
 				slimScrollBarData = !jSlimScrollBar.data() ? {'isMousedown': false} : jSlimScrollBar.data();
 
+			// console.log('jSlimScrollBar = ', jSlimScrollBar);
+
 			// Удаляем slimscroll
 			if ($('#notificationsListBox > .slimScrollDiv').length)
 			{
@@ -1724,14 +1731,15 @@
 
 			// Создаем slimscroll
 			$('#notificationsListBox .scroll-notifications').slimscroll({
-				height: $('.navbar-account #notificationsListBox .scroll-notifications > ul li[id != 0]').length ? '220px' : '55px',
+				height: $('.navbar-account #notificationsListBox .scroll-notifications > ul li[id != "notification-0"]').length ? '220px' : '55px',
 				//height: 'auto',
 				color: 'rgba(0, 0, 0, 0.3)',
 				size: '5px'
 			});
 
-			//	Добавляем новому .slimScrollBar данные от удаленного
-			jSlimScrollBar
+			// Добавляем новому .slimScrollBar данные от удаленного
+			//jSlimScrollBar
+			$('#notificationsListBox .slimScrollBar')
 				.data(slimScrollBarData)
 				.on({
 					'mousedown': function (){
@@ -1796,7 +1804,7 @@
 						'</div>\
 					</a>\
 				</li>')
-				.find('li#' + oNotification['id'] + ' span.description').html((oNotification['description'].length ? (oNotification['description'] + '<br/>') : '') /* oNotification['datetime']*/ );
+				.find('li#notification-' + oNotification['id'] + ' span.description').html((oNotification['description'].length ? (oNotification['description'] + '<br/>') : '') /* oNotification['datetime']*/ );
 
 			// Показываем всплывающее непрочитанное уведомление
 			!parseInt(oNotification['read']) && showAlertNotification && Notify(oNotification['title'], 'bottom-left', '5000', oNotification['notification']['background-color'], oNotification['notification']['ico'], true, soundEnabled);
@@ -1821,12 +1829,15 @@
 			data['lastNotificationId'] = jNotificationsListBox.data('lastNotificationId');
 			data['currentUserId'] = jNotificationsListBox.data('currentUserId');
 
+			//console.log("data['lastNotificationId'] = ", data['lastNotificationId']);
+
 			$.ajax({
 				//context: textarea,
 				url: '/admin/index.php?ajaxWidgetLoad&moduleId=' + jNotificationsListBox.data('moduleId') + '&type=0',
 				type: 'POST',
 				data: data,
 				dataType: 'json',
+				error: function(){},
 				success: function(resultData){
 					//var jNotificationsListBox = $('.navbar-account #notificationsListBox');
 
@@ -1835,6 +1846,8 @@
 						//&& (resultData['newNotifications'].length || resultData['unreadNotifications'].length)
 					)
 					{
+						//console.log('!!!!!!');
+
 						// Массив идентификаторов непрочитанных уведомлений в списке уведомлений
 						var unreadNotifications = [];
 
@@ -1842,12 +1855,14 @@
 							unreadNotifications.push($(this).attr('id'));
 						})
 
+						//console.log('unreadNotifications = ', unreadNotifications);
+
 						// Непрочитанные уведомления из БД
 						$.each(resultData['unreadNotifications'], function(index, notification ){
 
 							var searchIndex = -1;
 
-							if (~(searchIndex = unreadNotifications.indexOf(notification['id'])))
+							if (~(searchIndex = unreadNotifications.indexOf('notification-' + notification['id'])))
 							{
 								// Удаляем из массива уведомления, оставшиеся непрочитанными
 								unreadNotifications.splice(searchIndex, 1);
@@ -1894,10 +1909,13 @@
 						// В зависимости от наличия или отсутствия непрочитанных уведомлений добавляем или удаляем "wave in" для значка уведомлений
 						$('.navbar li#notifications > a').toggleClass('wave in', !!countUnreadNotifications);
 
+						//console.log('countUnreadNotifications = ', countUnreadNotifications);
+
 						//  Меняем значение баджа с числом непрочитанных уведомлений
 						$('.navbar li#notifications > a > span.badge')
 							.html(countUnreadNotifications)
 							.toggleClass('hidden', !countUnreadNotifications);
+
 
 						// Показываем значек корзины - очистки списка уведомлений.
 						/*
@@ -1925,7 +1943,7 @@
 					var notificationBox = $(this).parent('li.unread');
 						notificationBox.removeClass('unread');
 
-					masVisibleUnreadNotifications.push(notificationBox.attr('id'));
+					masVisibleUnreadNotifications.push(notificationBox.attr('id').split('notification-')[1]);
 				}
 			});
 
@@ -1959,7 +1977,7 @@
 
 		filterNotifications: function (jInputElement){
 
-			var jNotifications = $('#notificationsListBox .scroll-notifications li[id != 0]');
+			var jNotifications = $('#notificationsListBox .scroll-notifications li[id != "notification-0"]');
 
 			if (jNotifications.length)
 			{
@@ -1980,8 +1998,8 @@
 		},
 
 		clearNotifications: function (){
-			$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id!="notification-0"]').remove();
-			$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id="notification-0"]').show();
+			$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id != "notification-0"]').remove();
+			$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id = "notification-0"]').show();
 
 			// Нет непрочитанных уведомлений
 			$('.navbar li#notifications > a').removeClass('wave in');
@@ -2033,10 +2051,10 @@
 				)
 				.on(
 					{
-						'mouseenter': function (){ // Наведение крсора мыши на полосу прокрутки дел
+						'mouseenter': function (){ // Наведение курсора мыши на полосу прокрутки дел
 							$(this).css('width', (parseInt(sSlimscrollBarWidth) + 3) + 'px')
 						},
-						'mouseleave': function (){ // Уход крсора мыши с полосы прокрутки дел
+						'mouseleave': function (){ // Уход курсора мыши с полосы прокрутки дел
 							$(this).css('width', sSlimscrollBarWidth)
 						}
 					}, '.slimScrollBar'
@@ -2113,7 +2131,7 @@
 
 											var ajaxData = $.getData({});
 
-											ajaxData['eventId'] = jEventItem.prop('id');
+											ajaxData['eventId'] = jEventItem.prop('id').split('event-')[1];
 
 											$.ajax({
 												//context: textarea,
@@ -2126,7 +2144,7 @@
 													if (resultData['eventId'])
 													{
 														// Удаляем дело из списка
-														$('#eventsAdminPage .task-item[id = ' + resultData['eventId'] + ']').remove();
+														$('#eventsAdminPage .task-item[id = "event-' + resultData['eventId'] + '"]').remove();
 
 														// Запоминаем положение полосы прокрутки в виджете дел
 														//$('#eventsAdminPage').data('slimScrollBarTop', jEventsList.scrollTop() + 'px');
@@ -2135,7 +2153,7 @@
 														$('#eventsAdminPage [data-toggle="upload"]').click();
 
 														// Нет незавершенных дел
-														!jEventsList.find('.task-item[id != 0]:not(.mark-completed)').length && jEventsList.find('.task-item[id = 0]').toggleClass('hidden');
+														!jEventsList.find('.task-item[id != "event-0"]:not(.mark-completed)').length && jEventsList.find('.task-item[id = "event-0"]').toggleClass('hidden');
 													}
 												}
 											});
@@ -2500,8 +2518,8 @@
 			}
 		},
 
-		// Метод показа элементов (сотрудников) в списке select2
-		templateResultItemResponsibleEmployees: function (data, item){						
+		// Показ сотрудников в списке select2
+		templateResultItemResponsibleEmployees: function (data, item){
 
 			var arraySelectItemParts = data.text.split("%%%"),
 				className = data.element && $(data.element).attr("class");
@@ -2552,31 +2570,35 @@
 			// Удаляем часть с названием отдела
 			arraySelectItemParts[1] && delete(arraySelectItemParts[1]);
 
-			return resultHtml; //arraySelectItemParts.join(\'\');
+			return resultHtml;
 		},
 
-		// Метод формирования выбранных элементов (сотрудников) в select2
+		// Показ выбранных сотрудников в select2
 		templateSelectionItemResponsibleEmployees: function (data, item){
-			
-			console.log('!!!!!!!!!!');
-			//console.log('data = ', data);
 
 			var arraySelectItemParts = data.text.split("%%%"),
 				className = data.element && $(data.element).attr("class"),
 				//arraySelectItemIdParts = data.id.split("_"),
-				isCreator = false;
+				isCreator = false,
 
-			// Регулярное выражение для получения id select-а, на базе которого создан данный select2
-			var regExp = /select2-([-\w]+)-result-\w+-\d+?/g,
+				// Регулярное выражение для получения id select-а, на базе которого создан данный select2
+				regExp = /select2-([-\w]+)-result-\w+-\d+?/g,
 				myArray = regExp.exec(data._resultId);
-				
-			console.log('myArray = ', myArray);
 
 			if (myArray)
 			{
 				// Объект select, на базе которого создан данный select2
 				var selectControlElement = $("#" + myArray[1]),
-					templateSelectionOptions = selectControlElement.data("templateSelectionOptions");
+					templateSelectionOptions = selectControlElement.data("templateSelectionOptions"),
+					selectionSingle = selectControlElement.next('.select2-container').find('.select2-selection--single');
+
+				// Если не мультиселект, добавляем контейнеру выбранного элемента класс
+				if (selectionSingle.length)
+				{
+					selectionSingle.addClass('user-container');
+				}
+
+				//console.log('selectionSingle = ', selectionSingle);
 
 				// Убираем элемент удаления (крестик) для создателя дела
 				if (templateSelectionOptions && ~templateSelectionOptions.unavailableItems.indexOf(+data.id))
@@ -2621,6 +2643,49 @@
 			return resultHtml;
 		},
 
+		// Показ клиентов выпадающего списка select2
+		templateResultItemSiteusers: function (data, item){
+
+			var arraySelectItemParts = data.text.split("%%%"),
+				className = data.element && $(data.element).attr("class");
+
+			if (data.element && $(data.element).attr("style"))
+			{
+				// Добавляем стили для групп и элементов. Элементам только при показе выпадающего списка
+				($(data.element).is("optgroup") || $(data.element).is("option") && $(item).hasClass("select2-results__option")) && $(item).attr("style", $(data.element).attr("style"));
+			}
+
+			// Компания/ФИО клиента
+			var resultHtml = '<span class="' + className + '">' + arraySelectItemParts[0] + '</span>';
+
+			if (arraySelectItemParts[1])
+			{
+				resultHtml = '<img src="' + arraySelectItemParts[1] + '" height="30px" class="margin-right-5">' + resultHtml;
+			}
+
+			return resultHtml;
+		},
+
+		// Формирование результатов выбора клиентов в select2
+		templateSelectionItemSiteusers: function (data, item){
+
+			var arraySelectItemParts = data.text.split("%%%"),
+				className = data.element && $(data.element).attr("class");
+
+			// Компания/ФИО клиента
+			var resultHtml = '<span class="' + className + '">' + arraySelectItemParts[0] + '</span>';
+
+			// Устанавливает title для элемента
+			data.title = arraySelectItemParts[0];
+
+			if (arraySelectItemParts[1])
+			{
+				resultHtml = '<img src="' + arraySelectItemParts[1] + '" height="30px" class="margin-top-5 margin-right-5 margin-bottom-5">' + resultHtml;
+			}
+
+			return resultHtml;
+		},
+
 		dealsPrepare: function (){
 
 			$("body").popover({
@@ -2633,7 +2698,7 @@
 			});
 
 			$("body").on("click", ".deal_template_steps .deal_step", function (){
-							
+
 				// Идентификатор этапа сделки
 				var dealTemplateStepId = parseInt($(this).attr('id').split('deal_template_step_')[1]) || 0;
 
@@ -2641,12 +2706,12 @@
 				{
 					// Идентификатор сделки
 					var dealTemplateSteps = $(this).parent('.deal_template_steps'),
-						dealId = dealTemplateSteps.data('deal-id');					
-					
-					if (dealTemplateSteps.data('change-by-click'))
-					{
+						dealId = dealTemplateSteps.data('deal-id');
+											
+					if (dealTemplateSteps.data('change-by-click') && $(this).hasClass('available'))
+					{						
 						//$.adminLoad({path: '/admin/deal/step/index.php', action: 'changeStep', operation: 'changeStep', additionalParams: 'deal_template_id=' + $(this).parents('.deal-template-step-conversion').data('deal-template-id') + '&conversion_end_step_id=' + conversionEndStepId  + '&hostcms[checked][0][' + conversionStartStepId + ']=1', windowId: 'id_content'});
-						$('#id_content #row_0_' + dealId).toggleHighlight(); 
+						$('#id_content #row_0_' + dealId).toggleHighlight();
 						$.adminCheckObject({objectId: 'check_0_' + dealId, windowId: 'id_content'});
 						$.adminLoad({path: '/admin/deal/index.php', action: 'changeStep', operation: 'changeStep', additionalParams: 'dealStepId=' + dealTemplateStepId, windowId: 'id_content'});
 					}
@@ -2655,15 +2720,15 @@
 						if ($(this).hasClass('available') || $(this).hasClass('current'))
 						{
 							dealTemplateSteps.next('[name="deal_template_step_id"]').val(dealTemplateStepId);
-							
-							
+
+
 							dealTemplateSteps.children('.deal_step.clicked').each(function(){
-								
+
 								$(this).removeClass('clicked')
 							})
-							
-							$(this).hasClass('available') && $(this).addClass('clicked');							
-						}						
+
+							$(this).hasClass('available') && $(this).addClass('clicked');
+						}
 					}
 				}
 			});
@@ -2671,6 +2736,31 @@
 	});
 
 	jQuery.fn.extend({
+		insertAtCaret: function(newValue){
+		  return this.each(function(i) {
+			if (document.selection) {
+			  //For browsers like Internet Explorer
+			  this.focus();
+			  sel = document.selection.createRange();
+			  sel.text = newValue;
+			  this.focus();
+			}
+			else if (this.selectionStart || this.selectionStart == '0') {
+			  //For browsers like Firefox and Webkit based
+			  var startPos = this.selectionStart;
+			  var endPos = this.selectionEnd;
+			  var scrollTop = this.scrollTop;
+			  this.value = this.value.substring(0, startPos) + newValue + this.value.substring(endPos, this.value.length);
+			  this.focus();
+			  this.selectionStart = startPos + newValue.length;
+			  this.selectionEnd = startPos + newValue.length;
+			  this.scrollTop = scrollTop;
+			} else {
+			  this.value += newValue;
+			  this.focus();
+			}
+		  })
+		},
 		/* --- CHAT --- */
 		addChatBadge: function(count)
 		{

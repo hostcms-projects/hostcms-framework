@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Notification
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Notification_Module extends Core_Module{	/**
 	 * Module version
@@ -21,7 +21,7 @@ class Notification_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2017-12-25';
+	public $date = '2018-01-26';
 	/**
 	 * Module name
 	 * @var string
@@ -29,9 +29,22 @@ class Notification_Module extends Core_Module{	/**
 	protected $_moduleName = 'notification';
 
 	/**
-	 * Constructor.
-	 */	public function __construct()	{
-		parent::__construct();
-		$this->menu = array(			array(				'sorting' => 150,				'block' => 3,
-				'ico' => 'fa fa-warning',				'name' => Core::_('Notification.model_name'),				'href' => "/admin/notification/index.php",				'onclick' => "$.adminLoad({path: '/admin/notification/index.php'}); return false"			)		);	}
+	 * Get Module's Menu
+	 * @return array
+	 */
+	public function getMenu()
+	{
+		$this->menu = array(
+			array(
+				'sorting' => 150,
+				'block' => 3,
+				'ico' => 'fa fa-warning',
+				'name' => Core::_('Notification.model_name'),
+				'href' => "/admin/notification/index.php",
+				'onclick' => "$.adminLoad({path: '/admin/notification/index.php'}); return false"
+			)
+		);
+
+		return parent::getMenu();
+	}
 }

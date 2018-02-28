@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Calendar
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 abstract class Calendar_Caldav_Controller extends Core_Servant_Properties
 {
@@ -111,6 +111,14 @@ abstract class Calendar_Caldav_Controller extends Core_Servant_Properties
 		$this->_data = strval($sData);
 
 		return $this;
+	}
+	
+	/**
+	 * Get calendar data
+	 */
+	public function getData()
+	{
+		return $this->_data;
 	}
 
 	/**
