@@ -161,6 +161,8 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 		$this->stripTags = $this->cache = TRUE;
 		$this->offset = 0;
 
+		$this->channelEntities = array();
+
 		$this->_Core_Rss = new Core_Rss();
 	}
 
@@ -319,6 +321,18 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 			? $sProtocol . $oSiteAlias->name
 			: NULL;
 
+		if (Core::moduleIsActive('shortcode'))
+		{
+			$oShortcode_Controller = Shortcode_Controller::instance();
+			$iCountShortcodes = $oShortcode_Controller->getCount();
+		}
+		else
+		{
+			$iCountShortcodes = 0;
+		}
+
+		$sAllowedTags = '<h1><p><br><ul><ol><b><strong><i><em><sup><sub><ins><del><small><big><pre><abbr><u><a><img><blockquote>';
+
 		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 		{
 			$attributes = array();
@@ -332,17 +346,24 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 				)
 			);
 
+			$description = $oInformationsystem_Item->description;
+
+			$iCountShortcodes &&
+				$description = $oShortcode_Controller->applyShortcodes($description);
+
 			$this->_currentItem['description'] = Core_Str::str2ncr(
 				Core_Str::xml($this->stripTags
-					? strip_tags($oInformationsystem_Item->description)
-					: $oInformationsystem_Item->description)
+					? strip_tags($description)
+					: $description)
 			);
 
-			$sAllowedTags = '<h1><p><br><ul><ol><b><strong><i><em><sup><sub><ins><del><small><big><pre><abbr><u><a><img><blockquote>';
+			$fullText = $oInformationsystem_Item->text;
 
-			$fullText = $this->stripTags
-					? strip_tags($oInformationsystem_Item->text, $sAllowedTags)
-					: $oInformationsystem_Item->text;
+			$iCountShortcodes &&
+				$fullText = $oShortcode_Controller->applyShortcodes($fullText);
+
+			$this->stripTags
+				&& $fullText = strip_tags($fullText, $sAllowedTags);
 
 			if ($this->yandex)
 			{
@@ -352,7 +373,9 @@ class Informationsystem_Controller_Rss_Show extends Core_Controller
 
 				if ($oInformationsystem_Item->Informationsystem_Group->id)
 				{
-					$this->_currentItem['category'] = Core_Str::str2ncr(Core_Str::xml($oInformationsystem_Item->Informationsystem_Group->name));
+					$this->_currentItem['category'] = Core_Str::str2ncr(
+						Core_Str::xml($oInformationsystem_Item->Informationsystem_Group->name)
+					);
 				}
 			}
 

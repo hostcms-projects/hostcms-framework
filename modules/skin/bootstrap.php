@@ -817,7 +817,7 @@ class Skin_Bootstrap extends Core_Skin
 							if ($oCore_Module)
 							{
 								$aMenu = $oCore_Module->getMenu();
-								
+
 								if (is_array($aMenu))
 								{
 									foreach ($aMenu as $aTmpMenu)
@@ -851,7 +851,7 @@ class Skin_Bootstrap extends Core_Skin
 				if ($oCore_Module)
 				{
 					$aMenu = $oCore_Module->getMenu();
-					
+
 					if (is_array($aMenu))
 					{
 						foreach ($aMenu as $aTmpMenu)

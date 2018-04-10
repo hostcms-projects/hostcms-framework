@@ -6,7 +6,7 @@
  * @subpackage Event
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 return array(
 	'model_name' => 'Статусы дел',
@@ -19,6 +19,7 @@ return array(
 	'name' => '<acronym title="Название статуса дел">Название</acronym>',
 	'color' => '<acronym title="Цвет для обозначения статуса дел">Цвет</acronym>',
 	'description' => '<acronym title="Описание статуса дел">Описание</acronym>',
+	'sorting' => 'Порядок сортировки',
 	'final' => '<acronym title="Дело, для которого указан финальный статус, считается завершенным ">Финальный</acronym>',
 		
 	'edit_success'  => 'Информация о статусе дел изменена!',
@@ -27,6 +28,7 @@ return array(
 	'markDeleted_error' => 'Ошибка! Статус дел не удален!',
 	'delete_success' => 'Элемент удален!',
 	'undelete_success' => 'Элемент восстановлен!',
+	'apply_success' => "Информация успешно изменена",	
 
 	'changeFinal_success' => 'Финальный параметр статуса изменен'
 );

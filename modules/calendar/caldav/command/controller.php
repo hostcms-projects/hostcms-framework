@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Calendar
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Calendar_Caldav_Command_Controller extends Core_Command_Controller
 {
@@ -30,7 +30,7 @@ class Calendar_Caldav_Command_Controller extends Core_Command_Controller
 
 		$sCode = Core_Array::getRequest('code');
 
-		if (!is_null($sCode))
+		if (!is_null($sCode) && $oSite)
 		{
 			$oCore_Response
 				->status(200)

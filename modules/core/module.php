@@ -221,12 +221,12 @@ abstract class Core_Module
 	}
 
 	/**
-	 * Get List of Notification
+	 * Get Notification Design
 	 * @param int $type
 	 * @param int $entityId
 	 * @return array
 	 */
-	public function getNotifications($type, $entityId)
+	public function getNotificationDesign($type, $entityId)
 	{
 		return array(
 			'icon' => array(

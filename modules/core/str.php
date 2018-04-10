@@ -480,7 +480,7 @@ class Core_Str
 	{
 		return '<' . preg_replace(array('/javascript:[^"\']*/iu', '/(' . implode('|', self::$_aDisabledAttributes) . ')[ \t\n]*=[ \t\n]*["\'][^"\']*["\']/i', '/\s+/'), array('', '', ' '), stripslashes($matches[1])) . '>';
 	}
-	
+
 	/**
 	 * Удаление HTML-тегов вместе с атрибутами
 	 *
@@ -501,7 +501,7 @@ class Core_Str
 		else
 		{
 			self::$_aDisabledAttributes = $aDisabledAttributes;
-			
+
 			$result = preg_replace_callback('/<(.*?)>/iu', 'Core_Str::_stripTagsCallback', strip_tags($source, $allowedTags));
 		}
 
@@ -645,6 +645,20 @@ class Core_Str
 		if (mb_strlen($str))
 		{
 			$str = mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
+		}
+		return $str;
+	}
+
+	/**
+	 * lcfirst for utf-8 string
+	 * @param string $str source string
+	 * @return string
+	 */
+	static public function lcfirst($str)
+	{
+		if (mb_strlen($str))
+		{
+			$str = mb_strtolower(mb_substr($str, 0, 1)) . mb_substr($str, 1);
 		}
 		return $str;
 	}

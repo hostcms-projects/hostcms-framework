@@ -134,6 +134,7 @@ return array(
 	'schedule-searchIndexItem' => 'Index shop item',
 	'schedule-searchIndexGroup' => 'Index shop group',
 	'schedule-searchUnindexItem' => 'Unindex shop item',
+	'schedule-recountShop' => 'Recount shop groups and items',	
 	'order_admin_subject' => 'New order email subject',
 	'order_user_subject' => 'New order customer\'s email subject',
 	'confirm_admin_subject' => 'Paid order email subject',

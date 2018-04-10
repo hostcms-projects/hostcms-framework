@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Company
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Company_Controller_Show{
 	protected $_oCompany = NULL;
@@ -104,6 +104,10 @@ class Company_Controller_Show{
 																e.stopPropagation();
 															});
 
+															$('.control-buttons-wrapper', divCompanyStructure).on('mousedown touchstart', function(e){
+																e.stopPropagation();
+															});
+
 															//$('.dd-handle .btn', divCompanyStructure).on('mousedown  touchstart', function (e) {
 															$('.dd-handle [data-action]', divCompanyStructure).on('mousedown  touchstart', function (e) {
 																e.stopPropagation();
@@ -132,7 +136,7 @@ class Company_Controller_Show{
 																	{
 																		return currentParentDepartmentId;
 																	}
-																	else if(serializedCompanyStructure[i].children)
+																	else if (serializedCompanyStructure[i].children)
 																	{
 																		var parentDepartmentId = getParentIdByDepartmentId(serializedCompanyStructure[i].children, departmentId, serializedCompanyStructure[i].id);
 
@@ -341,7 +345,7 @@ class Company_Controller_Show{
 
 						if (count($aUsers))
 						{
-							foreach($aUsers as $oUser)
+							foreach ($aUsers as $oUser)
 							{
 								$aHeadIds[] = $oUser->id;
 
@@ -403,11 +407,11 @@ class Company_Controller_Show{
 									<div class="tickets-container no-padding">
 										<ul class="tickets-list">
 										<?php
-										foreach($aUsers as $oUser)
+										foreach ($aUsers as $oUser)
 										{
 											$aUser_Company_Posts = $oUser->getCompanyPostsByDepartment($oCompany_Department->id, FALSE);
 
-											foreach($aUser_Company_Posts as $oUser_Company_Post)
+											foreach ($aUser_Company_Posts as $oUser_Company_Post)
 											{
 											?>
 											<li class="ticket-item user" data-user-id="<?php echo $oUser->id?>" data-company-post-id="<?php echo $oUser_Company_Post->id?>">

@@ -370,6 +370,22 @@
 			$('#filter-' + filterId + ', #filter-li-' + filterId).remove();
 
 		},
+		sortableKanban: function(path) {
+			$('.kanban-board .kanban-list').sortable({
+				items: "> li",
+				connectWith: '.kanban-board .kanban-list',
+				placeholder: 'placeholder',
+				handle: ".drag-handle",
+				// containment: '.kanban-board',
+				receive: function (event, ui) {
+					$.ajax({
+						data: { id: ui.item[0].id, target_status_id: this.id },
+						type: "POST",
+						url: path,
+					});
+				}
+			}).disableSelection();
+		},
 		/* -- CHAT -- */
 		chatGetUsersList: function(event)
 		{
@@ -1412,6 +1428,29 @@
 				$.setEventsSlimScroll();
 			});
 		},
+		refreshEventsCallback: function(resultData)
+		{
+			var jNotificationsClockListBox = $('.navbar-account #notificationsClockListBox');
+
+			if (resultData['userId'] && resultData['userId'] == jNotificationsClockListBox.data('currentUserId'))
+			{
+				 // Есть новые дела
+				if (resultData['newEvents'].length)
+				{
+					var jEventUl = $('.navbar-account #notificationsClockListBox .scroll-notifications-clock > ul');
+
+					$('li[id!="event-0"]', jEventUl).remove();
+
+					// Удаление записи об отсутствии дел
+					$('li[id="event-0"]', jEventUl).hide();
+
+					$.each(resultData['newEvents'], function( index, event ){
+						// Добавляем дело в список
+						$.addEvent(event, jEventUl);
+					});
+				}
+			}
+		},
 		refreshEventsList: function (){
 			// add ajax '_'
 			var data = jQuery.getData({}),
@@ -1419,34 +1458,56 @@
 
 			data['currentUserId'] = jNotificationsClockListBox.data('currentUserId');
 
-			$.ajax({
-				//context: textarea,
-				url: '/admin/index.php?ajaxWidgetLoad&moduleId=' + jNotificationsClockListBox.data('moduleId') + '&type=4',
-				type: 'POST',
-				data: data,
-				dataType: 'json',
-				error: function(){},
-				success: function(resultData){
-					if (resultData['userId'] && resultData['userId'] == jNotificationsClockListBox.data('currentUserId'))
-					{
-						 // Есть новые дела
-						if (resultData['newEvents'].length)
-						{
-							var jEventUl = $('.navbar-account #notificationsClockListBox .scroll-notifications-clock > ul');
+			var bLocalStorage = typeof localStorage !== 'undefined',
+				bNeedsRequest = false;
 
-							$('li[id!="event-0"]', jEventUl).remove();
+			if (bLocalStorage)
+			{
+				var storage = localStorage.getItem('events'),
+					storageObj = JSON.parse(storage);
 
-							// Удаление записи об отсутствии дел
-							$('li[id="event-0"]', jEventUl).hide();
+				!storage && (storageObj = {expired_in: 0});
 
-							$.each(resultData['newEvents'], function( index, event ){
-								// Добавляем дело в список
-								$.addEvent(event, jEventUl);
-							});
-						}
-					}
+				if (Date.now() > storageObj['expired_in'])
+				{
+					storageObj['expired_in'] = Date.now() + 10000;
+
+					bNeedsRequest = true;
 				}
-			});
+				else
+				{
+					$.refreshEventsCallback(storageObj);
+				}
+			}
+			else
+			{
+				bNeedsRequest = true;
+			}
+
+			if (bNeedsRequest)
+			{
+				$.ajax({
+					url: '/admin/index.php?ajaxWidgetLoad&moduleId=' + jNotificationsClockListBox.data('moduleId') + '&type=4',
+					type: 'POST',
+					data: data,
+					dataType: 'json',
+					error: function(){},
+					success: [function(resultData){
+						if (bLocalStorage)
+						{
+							resultData['expired_in'] = storageObj['expired_in'];
+						}
+
+						try {
+							localStorage.setItem('events', JSON.stringify(resultData));
+						} catch (e) {
+							if (e == QUOTA_EXCEEDED_ERR) {
+								console.log('localStorage: QUOTA_EXCEEDED_ERR');
+							}
+						}
+					}, $.refreshEventsCallback]
+				});
+			}
 		},
 		// Добавление полосы прокрутки для списка дел
 		setEventsSlimScroll: function (){
@@ -1819,9 +1880,79 @@
 				 $.readNotifications();
 			}
 		},
+		refreshNotificationsCallback: function(resultData)
+		{
+			var jNotificationsListBox = $('.navbar-account #notificationsListBox');
+
+			// Есть уведомления для сотрудника
+			if (resultData['userId'] && resultData['userId'] == jNotificationsListBox.data('currentUserId'))
+			{
+				// Массив идентификаторов непрочитанных уведомлений в списке уведомлений
+				var unreadNotifications = [];
+
+				$('.navbar-account #notificationsListBox .scroll-notifications > ul li.unread').each(function (){
+					unreadNotifications.push($(this).attr('id'));
+				})
+
+				// Непрочитанные уведомления из БД
+				$.each(resultData['unreadNotifications'], function(index, notification ){
+
+					var searchIndex = -1;
+
+					if (~(searchIndex = unreadNotifications.indexOf('notification-' + notification['id'])))
+					{
+						// Удаляем из массива уведомления, оставшиеся непрочитанными
+						unreadNotifications.splice(searchIndex, 1);
+					}
+				});
+
+				// Отмечаем ранее непрочитанные уведомления как прочитанные в соответствии с данными из БД
+				$.each(unreadNotifications, function (index, value){
+
+					$('.navbar-account #notificationsListBox .scroll-notifications > ul li#' + value + '.unread').removeClass('unread');
+				});
+
+				 // Есть новые уведомления
+				if (resultData['newNotifications'].length)
+				{
+					// Удаление записи об отсутствии уведомлений
+					$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id="notification-0"]').hide();
+
+					$.each(resultData['newNotifications'], function( index, notification ){
+
+						// Добавляем уведомление в список
+						$.addNotification(notification, $('.navbar-account #notificationsListBox .scroll-notifications > ul'));
+					});
+
+					// Обновление идентификатора последнего загруженного уведомления
+					jNotificationsListBox.data('lastNotificationId', resultData['newNotifications'][resultData['newNotifications'].length-1]['id']);
+
+					// Создаем slimscroll для нового списка, если список уведомлений открыт и при этом пуст
+					if ($('.navbar li#notifications').hasClass('open')
+						&& !$('.navbar-account #notificationsListBox .scroll-notifications > ul li').length)
+					{
+						$.setNotificationsSlimScroll();
+					}
+
+					// Показываем значек корзины - очистки списка уведомлений
+					jNotificationsListBox.find('.footer .fa-trash-o').show();
+					jNotificationsListBox.find('.footer #notification-search').show();
+					jNotificationsListBox.find('.footer .glyphicon-search').show();
+				}
+
+				var countUnreadNotifications = $('.navbar-account #notificationsListBox .scroll-notifications > ul li.unread').length;
+
+				// В зависимости от наличия или отсутствия непрочитанных уведомлений добавляем или удаляем "wave in" для значка уведомлений
+				$('.navbar li#notifications > a').toggleClass('wave in', !!countUnreadNotifications);
+
+				//  Меняем значение баджа с числом непрочитанных уведомлений
+				$('.navbar li#notifications > a > span.badge')
+					.html(countUnreadNotifications)
+					.toggleClass('hidden', !countUnreadNotifications);
+			}
+		},
 		// Автоматическое обновление списка уведомлений
 		refreshNotificationsList: function() {
-
 			// add ajax '_'
 			var data = jQuery.getData({}),
 				jNotificationsListBox  = $('.navbar-account #notificationsListBox');
@@ -1829,105 +1960,56 @@
 			data['lastNotificationId'] = jNotificationsListBox.data('lastNotificationId');
 			data['currentUserId'] = jNotificationsListBox.data('currentUserId');
 
-			//console.log("data['lastNotificationId'] = ", data['lastNotificationId']);
+			var bLocalStorage = typeof localStorage !== 'undefined',
+				bNeedsRequest = false;
 
-			$.ajax({
-				//context: textarea,
-				url: '/admin/index.php?ajaxWidgetLoad&moduleId=' + jNotificationsListBox.data('moduleId') + '&type=0',
-				type: 'POST',
-				data: data,
-				dataType: 'json',
-				error: function(){},
-				success: function(resultData){
-					//var jNotificationsListBox = $('.navbar-account #notificationsListBox');
+			if (bLocalStorage)
+			{
+				var storage = localStorage.getItem('notifications'),
+					storageObj = JSON.parse(storage);
 
-					if (resultData['userId'] && resultData['userId'] == jNotificationsListBox.data('currentUserId')
-					// Есть уведомления для сотрудника
-						//&& (resultData['newNotifications'].length || resultData['unreadNotifications'].length)
-					)
-					{
-						//console.log('!!!!!!');
+				!storage && (storageObj = {expired_in: 0});
 
-						// Массив идентификаторов непрочитанных уведомлений в списке уведомлений
-						var unreadNotifications = [];
+				if (Date.now() > storageObj['expired_in'])
+				{
+					storageObj['expired_in'] = Date.now() + 10000;
+					bNeedsRequest = true;
+				}
+				else
+				{
+					$.refreshNotificationsCallback(storageObj);
+				}
+			}
+			else
+			{
+				bNeedsRequest = true;
+			}
 
-						$('.navbar-account #notificationsListBox .scroll-notifications > ul li.unread').each(function (){
-							unreadNotifications.push($(this).attr('id'));
-						})
-
-						//console.log('unreadNotifications = ', unreadNotifications);
-
-						// Непрочитанные уведомления из БД
-						$.each(resultData['unreadNotifications'], function(index, notification ){
-
-							var searchIndex = -1;
-
-							if (~(searchIndex = unreadNotifications.indexOf('notification-' + notification['id'])))
-							{
-								// Удаляем из массива уведомления, оставшиеся непрочитанными
-								unreadNotifications.splice(searchIndex, 1);
-							}
-						});
-
-						// Отмечаем ранее непрочитанные уведомления как прочитанные в соответствии с данными из БД
-						$.each(unreadNotifications, function (index, value){
-
-							$('.navbar-account #notificationsListBox .scroll-notifications > ul li#' + value + '.unread').removeClass('unread');
-						});
-
-						 // Есть новые уведомления
-						if (resultData['newNotifications'].length)
+			if (bNeedsRequest)
+			{
+				$.ajax({
+					//context: textarea,
+					url: '/admin/index.php?ajaxWidgetLoad&moduleId=' + jNotificationsListBox.data('moduleId') + '&type=0',
+					type: 'POST',
+					data: data,
+					dataType: 'json',
+					error: function(){},
+					success: [function(resultData){
+						if (bLocalStorage)
 						{
-							// Удаление записи об отсутствии уведомлений
-							$('.navbar-account #notificationsListBox .scroll-notifications > ul li[id="notification-0"]').hide();
-
-							$.each(resultData['newNotifications'], function( index, notification ){
-
-								// Добавляем уведомление в список
-								$.addNotification(notification, $('.navbar-account #notificationsListBox .scroll-notifications > ul'));
-							});
-
-							// Обновление идентификатора последнего загруженного уведомления
-							jNotificationsListBox.data('lastNotificationId', resultData['newNotifications'][resultData['newNotifications'].length-1]['id']);
-
-							// Создаем slimscroll для нового списка, если список уведомлений открыт и при этом пуст
-							if ($('.navbar li#notifications').hasClass('open')
-								&& !$('.navbar-account #notificationsListBox .scroll-notifications > ul li').length)
-							{
-								$.setNotificationsSlimScroll();
-							}
-
-							// Показываем значек корзины - очистки списка уведомлений
-
-							jNotificationsListBox.find('.footer .fa-trash-o').show();
-							jNotificationsListBox.find('.footer #notification-search').show();
-							jNotificationsListBox.find('.footer .glyphicon-search').show();
+							resultData['expired_in'] = storageObj['expired_in'];
 						}
 
-						var countUnreadNotifications = $('.navbar-account #notificationsListBox .scroll-notifications > ul li.unread').length;
-
-						// В зависимости от наличия или отсутствия непрочитанных уведомлений добавляем или удаляем "wave in" для значка уведомлений
-						$('.navbar li#notifications > a').toggleClass('wave in', !!countUnreadNotifications);
-
-						//console.log('countUnreadNotifications = ', countUnreadNotifications);
-
-						//  Меняем значение баджа с числом непрочитанных уведомлений
-						$('.navbar li#notifications > a > span.badge')
-							.html(countUnreadNotifications)
-							.toggleClass('hidden', !countUnreadNotifications);
-
-
-						// Показываем значек корзины - очистки списка уведомлений.
-						/*
-
-						jNotificationsListBox.find('.footer .fa-trash-o').show();
-
-						jNotificationsListBox.find('.footer #notification-search').show();
-						jNotificationsListBox.find('.footer .glyphicon-search').show();
-						*/
-					}
-				}
-			});
+						try {
+							localStorage.setItem('notifications', JSON.stringify(resultData));
+						} catch (e) {
+							if (e == QUOTA_EXCEEDED_ERR) {
+								console.log('localStorage: QUOTA_EXCEEDED_ERR');
+							}
+						}
+					}, $.refreshNotificationsCallback]
+				});
+			}
 		},
 		// Метод устанавливает уведомления прочитанными
 		readNotifications: function (wheelDelta, delta){
@@ -2646,6 +2728,11 @@
 		// Показ клиентов выпадающего списка select2
 		templateResultItemSiteusers: function (data, item){
 
+			if (!data.text)
+			{
+				return '';
+			}
+
 			var arraySelectItemParts = data.text.split("%%%"),
 				className = data.element && $(data.element).attr("class");
 
@@ -2688,49 +2775,55 @@
 
 		dealsPrepare: function (){
 
+		/*
 			$("body").popover({
 				container: "body",
-				selector: "button[id ^= \'deal_template_step_\']",
+				selector: "li[id ^= \'deal_template_step_\']",
 				placement: "bottom",
 				template: "<div class=\"popover\"><div class=\"arrow\"></div><div class=\"popover-content\"></div></div>",
 				html: true,
 				trigger: "hover"
-			});
+			});*/
 
-			$("body").on("click", ".deal_template_steps .deal_step", function (){
-
+			$("body").on("click", ".deal-steps li", function (){
 				// Идентификатор этапа сделки
 				var dealTemplateStepId = parseInt($(this).attr('id').split('deal_template_step_')[1]) || 0;
 
 				if (dealTemplateStepId)
 				{
 					// Идентификатор сделки
-					var dealTemplateSteps = $(this).parent('.deal_template_steps'),
+					var dealTemplateSteps = $(this).parent('.deal-steps'),
 						dealId = dealTemplateSteps.data('deal-id');
-											
-					if (dealTemplateSteps.data('change-by-click') && $(this).hasClass('available'))
-					{						
-						//$.adminLoad({path: '/admin/deal/step/index.php', action: 'changeStep', operation: 'changeStep', additionalParams: 'deal_template_id=' + $(this).parents('.deal-template-step-conversion').data('deal-template-id') + '&conversion_end_step_id=' + conversionEndStepId  + '&hostcms[checked][0][' + conversionStartStepId + ']=1', windowId: 'id_content'});
+
+					if (dealTemplateSteps.data('change-by-click') && $(this).children('a.available'))
+					{
 						$('#id_content #row_0_' + dealId).toggleHighlight();
 						$.adminCheckObject({objectId: 'check_0_' + dealId, windowId: 'id_content'});
 						$.adminLoad({path: '/admin/deal/index.php', action: 'changeStep', operation: 'changeStep', additionalParams: 'dealStepId=' + dealTemplateStepId, windowId: 'id_content'});
 					}
+					// При редактировании сделки
 					else
 					{
-						if ($(this).hasClass('available') || $(this).hasClass('current'))
+						if ($(this).children('a.available') || $(this).children('a.current'))
 						{
-							dealTemplateSteps.next('[name="deal_template_step_id"]').val(dealTemplateStepId);
+							dealTemplateSteps.parent('div').next('[name="deal_template_step_id"]').val(dealTemplateStepId);
 
+							$('a.current', dealTemplateSteps).each(function(){
+								$(this).removeClass('current')
+							});
 
-							dealTemplateSteps.children('.deal_step.clicked').each(function(){
-
-								$(this).removeClass('clicked')
-							})
-
-							$(this).hasClass('available') && $(this).addClass('clicked');
+							$(this).children('a.available') && $(this).children('a').addClass('current');
 						}
 					}
 				}
+			});
+
+			// console.log('11111111111');
+
+			//$('[id = "addDealEvent"]').on('click', function (){
+			$('[id = "addDealEvent1"]').on('click', function (){
+
+				// console.log('!!!!');
 			});
 		}
 	});
@@ -2779,7 +2872,7 @@
 				minimumInputLength: 1,
 				allowClear: true,
 				ajax: {
-					url: "/admin/siteuser/siteuser/index.php?siteuser",
+					url: "/admin/siteuser/index.php?siteuser",
 					dataType: "json",
 					type: "GET",
 					processResults: function (data) {

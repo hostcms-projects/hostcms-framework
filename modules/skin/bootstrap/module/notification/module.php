@@ -116,13 +116,11 @@ class Skin_Bootstrap_Module_Notification_Module extends Notification_Module
 					{
 						$aNotification = array(
 							'id' => $oNotification->id,
-							'title' => $oNotification->title,
-							'description' => $oNotification->description,
+							'title' => strval($oNotification->title), // NULL => ''
+							'description' => strval($oNotification->description), // NULL => ''
 							'datetime' => Core_Date::sql2datetime($oNotification->datetime),
 							'read' => $oNotification->read
 						);
-
-						//$oNotification_User = $oNotification->Notification_Users->getByUser_id($oCurrent_User->id);
 
 						$aNotificationDecorations = array();
 						if ($oNotification->module_id)
@@ -131,7 +129,7 @@ class Skin_Bootstrap_Module_Notification_Module extends Notification_Module
 
 							if (!is_null($oCore_Module))
 							{
-								$aNotificationDecorations = $oCore_Module->getNotifications($oNotification->type, $oNotification->entity_id);
+								$aNotificationDecorations = $oCore_Module->getNotificationDesign($oNotification->type, $oNotification->entity_id);
 
 								$aNotification['href'] = Core_Array::get($aNotificationDecorations, 'href');
 								$aNotification['onclick'] = "$(this).parents('li.open').click(); " . Core_Array::get($aNotificationDecorations, 'onclick');

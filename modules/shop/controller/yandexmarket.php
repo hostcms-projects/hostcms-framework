@@ -734,7 +734,7 @@ class Shop_Controller_YandexMarket extends Core_Controller
 		if (strlen($description))
 		{
 			$description = Core_Str::cutSentences(
-				html_entity_decode(strip_tags($description), ENT_COMPAT, 'UTF-8'), 175
+				html_entity_decode(strip_tags($description), ENT_COMPAT, 'UTF-8'), 3000
 			);
 
 			$this->stdOut->write('<description>' . Core_Str::xml($description) . '</description>'. "\n");
@@ -771,6 +771,12 @@ class Shop_Controller_YandexMarket extends Core_Controller
 
 		/* cpa */
 		$this->stdOut->write('<cpa>' . $oShop_Item->cpa .  '</cpa>' . "\n");
+
+		/* weight */
+		if ($oShop_Item->weight > 0)
+		{
+			$this->stdOut->write('<weight>' . $oShop_Item->weight .  '</weight>' . "\n");
+		}
 
 		/* rec */
 		if ($this->recommended)

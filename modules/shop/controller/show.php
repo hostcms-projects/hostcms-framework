@@ -19,6 +19,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * - item(123) идентификатор показываемого товара
  * - itemsProperties(TRUE|FALSE|array()) выводить значения дополнительных свойств товаров, по умолчанию FALSE. Может принимать массив с идентификаторами дополнительных свойств, значения которых необходимо вывести.
  * - itemsPropertiesList(TRUE|FALSE|array()) выводить список дополнительных свойств товаров, по умолчанию TRUE
+ * - itemsPropertiesListJustAvailable(TRUE|FALSE) выводить только доступные значения у свойства, по умолчанию FALSE
  * - itemsForbiddenTags(array('description')) массив тегов товаров, запрещенных к передаче в генерируемый XML
  * - warehouseMode('all'|'in-stock'|'in-stock-modification') режим вывода товаров:
 	'all' — все (по умолчанию),
@@ -101,6 +102,7 @@ class Shop_Controller_Show extends Core_Controller
 		'item',
 		'itemsProperties',
 		'itemsPropertiesList',
+		'itemsPropertiesListJustAvailable',
 		'itemsForbiddenTags',
 		'warehouseMode',
 		'parentItem',
@@ -234,7 +236,7 @@ class Shop_Controller_Show extends Core_Controller
 		$this->groupsProperties = $this->itemsProperties = $this->propertiesForGroups
 			= $this->comments = $this->tags = $this->calculateCounts = $this->siteuserProperties
 			= $this->warehousesItems = $this->taxes = $this->cart = $this->modifications
-			= $this->modificationsList = $this->filterShortcuts = FALSE;
+			= $this->modificationsList = $this->filterShortcuts = $this->itemsPropertiesListJustAvailable = FALSE;
 
 		$this->siteuser = $this->cache = $this->itemsPropertiesList = $this->groupsPropertiesList
 			= $this->bonuses = $this->comparing = $this->favorite = $this->viewed
@@ -1874,7 +1876,95 @@ class Shop_Controller_Show extends Core_Controller
 
 		if (isset($this->_aItem_Properties[$parent_id]))
 		{
-			$parentObject->addEntities($this->_aItem_Properties[$parent_id]);
+			foreach ($this->_aItem_Properties[$parent_id] as $oProperty)
+			{
+
+				if ($this->itemsPropertiesListJustAvailable
+					// 3 - List
+					&& $oProperty->type == 3 && $oProperty->list_id
+					// 0 - Hide; 1 - Input; 2,3,4 - Select
+					&& $oProperty->Shop_Item_Property->filter > 1)
+				{
+					$shop_group_id = intval($this->group);
+
+					$oCore_QueryBuilder_Select = Core_QueryBuilder::select('property_value_ints.value')
+						->from('property_value_ints')
+						->join('shop_items', 'shop_items.id', '=', 'property_value_ints.entity_id')
+						->open()
+						->where('shop_items.active', '=', 1)
+						->where('shop_items.modification_id', '=', 0)
+						->where('shop_items.shop_group_id', '=', $shop_group_id);
+
+					// Стандартные ограничения для товаров
+					$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select);
+
+					// Вывод модификаций на одном уровне в списке товаров
+					if ($this->modificationsList)
+					{
+						$oShop = $this->getEntity();
+
+						$oCore_QueryBuilder_Select_Modifications = Core_QueryBuilder::select('shop_items.id')
+							->from('shop_items')
+							->where('shop_items.shop_id', '=', $oShop->id)
+							->where('shop_items.deleted', '=', 0)
+							->where('shop_items.active', '=', 1)
+							->where('shop_items.shop_group_id', '=', $shop_group_id);
+
+						// Стандартные ограничения для товаров
+						$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Modifications);
+
+						Core_Event::notify(get_class($this) . '.onBeforeSelectModifications', $this, array($oCore_QueryBuilder_Select_Modifications));
+
+						$oCore_QueryBuilder_Select
+							->setOr()
+							->where('shop_items.shop_group_id', '=', 0)
+							->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Modifications);
+
+						// Совместное modificationsList + filterShortcuts
+						if ($this->filterShortcuts)
+						{
+							$oCore_QueryBuilder_Select_Shortcuts_For_Modifications = Core_QueryBuilder::select('shop_items.shortcut_id')
+								->from('shop_items')
+								->where('shop_items.shop_id', '=', $oShop->id)
+								->where('shop_items.deleted', '=', 0)
+								->where('shop_items.active', '=', 1)
+								->where('shop_items.shop_group_id', '=', $shop_group_id)
+								->where('shop_items.shortcut_id', '>', 0);
+
+							$oCore_QueryBuilder_Select
+								->setOr()
+								->where('shop_items.shop_group_id', '=', 0)
+								->where('shop_items.modification_id', 'IN', $oCore_QueryBuilder_Select_Shortcuts_For_Modifications);
+						}
+					}
+
+					if ($this->filterShortcuts)
+					{
+						$oCore_QueryBuilder_Select_Shortcuts = Core_QueryBuilder::select('shop_items.shortcut_id')
+							->from('shop_items')
+							->where('shop_items.deleted', '=', 0)
+							->where('shop_items.active', '=', 1)
+							->where('shop_items.shop_group_id', '=', $shop_group_id)
+							->where('shop_items.shortcut_id', '>', 0);
+
+						// Стандартные ограничения для товаров
+						$this->_applyItemConditionsQueryBuilder($oCore_QueryBuilder_Select_Shortcuts);
+
+						$oCore_QueryBuilder_Select
+							->setOr()
+							->where('shop_items.id', 'IN', $oCore_QueryBuilder_Select_Shortcuts);
+					}
+
+					$oCore_QueryBuilder_Select
+						->close()
+						->where('property_value_ints.property_id', '=', $oProperty->id)
+						->groupBy('property_value_ints.value');
+
+					$oProperty->limitListItems($oCore_QueryBuilder_Select);
+				}
+
+				$parentObject->addEntity($oProperty);
+			}
 		}
 
 		return $this;

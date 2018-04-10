@@ -917,14 +917,14 @@ class Shop_Model extends Core_Entity
 		$countShopGroups = $this->Shop_Groups->getCount();
 		$countShopGroups && Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
-			->value('<i class="fa fa-folder-o"></i> ' . $countShopGroups)
+			->value('<i class="fa fa-folder-open-o"></i> ' . $countShopGroups)
 			->title(Core::_('Shop.all_groups_count', $countShopGroups))
 			->execute();
 
 		$countShopItems = $this->Shop_Items->getCount();
 		$countShopItems && Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-hostcms badge-square')
-			->value('<i class="fa fa-file-text-o"></i> ' . $countShopItems)
+			->value('<i class="fa fa-file-o"></i> ' . $countShopItems)
 			->title(Core::_('Shop.all_items_count', $countShopItems))
 			->execute();
 	}

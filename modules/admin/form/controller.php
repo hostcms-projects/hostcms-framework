@@ -11,7 +11,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @author Hostmake LLC
  * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
-class Admin_Form_Controller
+abstract class Admin_Form_Controller
 {
 	/**
 	 * Use skin
@@ -77,7 +77,7 @@ class Admin_Form_Controller
 	 * 48 icons
 	 */
 	static protected $_icon = array('fa fa-address-book', 'fa fa-address-card', 'fa fa-barcode', 'fa fa-bars', 'fa fa-beer', 'fa fa-bell', 'fa fa-bicycle', 'fa fa-binoculars', 'fa fa-birthday-cake', 'fa fa-bolt', 'fa fa-book', 'fa fa-bookmark', 'fa fa-briefcase', 'fa fa-bullseye', 'fa fa-camera', 'fa fa-car', 'fa fa-certificate', 'fa fa-cloud', 'fa fa-code', 'fa fa-coffee', 'fa fa-cube', 'fa fa-dashboard', 'fa fa-database', 'fa fa-dot-circle-o', 'fa fa-flask', 'fa fa-futbol-o', 'fa fa-gift', 'fa fa-glass', 'fa fa-heart', 'fa fa-hourglass', 'fa fa-leaf', 'fa fa-location-arrow', 'fa fa-magic', 'fa fa-magnet', 'fa fa-paper-plane', 'fa fa-paw', 'fa fa-plane', 'fa fa-plug', 'fa fa-road', 'fa fa-rocket', 'fa fa-smile-o', 'fa fa-snowflake-o', 'fa fa-space-shuttle', 'fa fa-star', 'fa fa-thumbs-up', 'fa fa-tree', 'fa fa-trophy', 'fa fa-wrench');
-	
+
 	/**
 	 * Get Icon for object ID
 	 * @param int $id object ID
@@ -87,8 +87,8 @@ class Admin_Form_Controller
 	{
 		return self::$_icon[$id % 48];
 	}
-	
-	/** 
+
+	/**
 	 * Get background color class for object ID
 	 * @param int $id object ID
 	 * @return string
@@ -97,7 +97,7 @@ class Admin_Form_Controller
 	{
 		return 'bg-' . ($id % 20);
 	}
-	
+
 	/**
 	 * Add additional param
 	 * @param string $key param name
@@ -139,7 +139,6 @@ class Admin_Form_Controller
 			if (/*strpos(Core_Array::get($_SERVER, 'HTTP_USER_AGENT'), 'MSIE 8.0') === FALSE
 				&& */ini_get('zlib.output_compression') == 0)
 			{
-				// включаем сжатие буфера вывода
 				ob_start("ob_gzhandler");
 			}
 		}
@@ -183,7 +182,7 @@ class Admin_Form_Controller
 	 * @var Admin_Form_Setting_Model|NULL
 	 */
 	protected $_oAdmin_Form_Setting = NULL;
-	
+
 	/**
 	 * Apply form settings
 	 * @return self
@@ -477,9 +476,9 @@ class Admin_Form_Controller
 			if ($this->_oAdmin_Form_Setting)
 			{
 				$aFilter = $this->getFilterJson();
-				
+
 				$this
-					->filter(is_array($aFilter) ? $aFilter : array())
+					->filterSettings(is_array($aFilter) ? $aFilter : array())
 					->limit($this->_oAdmin_Form_Setting->on_page)
 					->current($this->_oAdmin_Form_Setting->page_number)
 					->sortingFieldId($this->_oAdmin_Form_Setting->order_field_id)
@@ -506,7 +505,7 @@ class Admin_Form_Controller
 			? json_decode($this->_oAdmin_Form_Setting->filter, TRUE)
 			: array();
 	}
-	
+
 	/**
 	 * Is showing operations necessary
 	 * @var boolean
@@ -577,6 +576,16 @@ class Admin_Form_Controller
 	{
 		$this->_showFilter = $showFilter;
 		return $this;
+	}
+	
+	/**
+	 * Get show filter of the form
+	 * @param boolean $showFilter mode
+	 * @return self
+	 */
+	public function getShowFilter()
+	{
+		return $this->_showFilter;
 	}
 
 	/**
@@ -767,17 +776,22 @@ class Admin_Form_Controller
 		return $this;
 	}
 
-	protected $_filter = array();
+	protected $_filterSettings = array();
 
 	/**
 	 * Set filter settings
-	 * @param array $filter
+	 * @param array $filterSettings
 	 * @return self
 	 */
-	public function filter($filter)
+	public function filterSettings(array $filterSettings)
 	{
-		$this->_filter = $filter;
+		$this->_filterSettings = $filterSettings;
 		return $this;
+	}
+	
+	public function getFilterSettings()
+	{
+		return $this->_filterSettings;
 	}
 
 	/**
@@ -1146,6 +1160,18 @@ class Admin_Form_Controller
 			}
 		}
 
+		// ---------------------------
+		/*$className = 'Skin_' . ucfirst(Core_Skin::instance()->getSkinName()) . '_' . __CLASS__ . '_' . 'List';
+
+		if (!class_exists($className))
+		{
+			throw new Core_Exception("Class '%className' does not exist",
+					array('%className' => $className));
+		}
+
+		$viewAdmin_Forb_Controller = new $className($this);*/
+		// ---------------------------
+
 		$this
 			->addMessage(ob_get_clean())
 			->addContent($this->_getForm())
@@ -1197,50 +1223,6 @@ class Admin_Form_Controller
 				$('#{$windowId} table .admin_table_filter :input').on('keydown', $.filterKeyDown);
 			})(jQuery);")
 			->execute();
-
-		return $this;
-	}
-
-	/**
-	 * Get form
-	 * @return string
-	 */
-	protected function _getForm()
-	{
-		ob_start();
-
-		$oAdmin_View = Admin_View::create();
-		$oAdmin_View
-			->children($this->_children)
-			->pageTitle($this->_pageTitle)
-			->module($this->_module);
-
-		ob_start();
-
-		$this
-			->showContent()
-			->showFooter();
-
-		$content = ob_get_clean();
-
-		$oAdmin_View
-			->content($content)
-			->message($this->getMessage())
-			->show();
-
-		$this->_applyEditable();
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Show form footer
-	 */
-	public function showFooter()
-	{
-		$this
-			->bottomActions()
-			->pageNavigation();
 
 		return $this;
 	}
@@ -1360,7 +1342,7 @@ class Admin_Form_Controller
 		$this->_filterId = strval($filterId);
 		return $this;
 	}
-	
+
 	/**
 	 * Backend callback method
 	 * @param string $path path
@@ -1669,7 +1651,7 @@ class Admin_Form_Controller
 	/**
 	 * Отображает поле фильтра (верхнего или основного)
 	 */
-	protected function _showFilterField($oAdmin_Form_Field, $filterPrefix, $tabName = NULL)
+	public function showFilterField($oAdmin_Form_Field, $filterPrefix, $tabName = NULL)
 	{
 		if (is_null($tabName))
 		{
@@ -1677,15 +1659,15 @@ class Admin_Form_Controller
 		}
 		else
 		{
-			$aTabs = Core_Array::get($this->_filter, 'tabs', array());
-			
+			$aTabs = Core_Array::get($this->_filterSettings, 'tabs', array());
+
 			$bHide = isset($aTabs[$tabName]['fields'][$oAdmin_Form_Field->name]['show'])
 				&& $aTabs[$tabName]['fields'][$oAdmin_Form_Field->name]['show'] == 0;
-			
+
 			$bMain = $tabName === 'main';
 
 			$bCurrent = $this->_filterId === $tabName || $this->_filterId === '' && $bMain;
-			
+
 			// Значение вначале берется из POST, если его там нет, то из данных в JSON
 			$value = !$bHide
 				? (isset($_POST['topFilter_' . $oAdmin_Form_Field->id]) && $bCurrent
@@ -1754,7 +1736,7 @@ class Admin_Form_Controller
 					$date_to = htmlspecialchars($date_to);
 
 					$divClass = is_null($tabName) ? 'col-xs-12' : 'col-xs-6 col-sm-4';
-					
+
 					?><div class="row">
 						<div class="date <?php echo $divClass?>">
 							<input name="<?php echo $filterPrefix?>from_<?php echo $oAdmin_Form_Field->id?>" id="<?php echo $tabName . $filterPrefix?>from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" class="form-control input-sm" type="text"/>
@@ -1779,7 +1761,7 @@ class Admin_Form_Controller
 					$date_to = htmlspecialchars($date_to);
 
 					$divClass = is_null($tabName) ? 'col-xs-12' : 'col-xs-6 col-sm-4 col-md-3';
-					
+
 					?><div class="row">
 						<div class="date <?php echo $divClass?>">
 							<input type="text" name="<?php echo $filterPrefix?>from_<?php echo $oAdmin_Form_Field->id?>" id="<?php echo $tabName . $filterPrefix?>from_<?php echo $oAdmin_Form_Field->id?>" value="<?php echo $date_from?>" class="form-control input-sm" />
@@ -1830,16 +1812,16 @@ class Admin_Form_Controller
 				break;
 			}
 		}
-		
+
 		return $this;
 	}
-	
+
 	public function isCallable($oEntity, $fieldName)
 	{
 		return method_exists($oEntity, $fieldName)
 			|| method_exists($oEntity, 'isCallable') && $oEntity->isCallable($fieldName);
 	}
-	
+
 	/**
 	 * Set dataset conditions
 	 * @return self
@@ -1887,7 +1869,7 @@ class Admin_Form_Controller
 				{
 					$oAdmin_Form_Field_Changed = $this->_changeField($oTmpAdmin_Form_Dataset, $oAdmin_Form_Field_Changed);
 				}
-									
+
 				if ($oAdmin_Form_Field_Changed->allow_filter)
 				{
 					// Если имя поля counter_pages.date, то остается date
@@ -1898,7 +1880,7 @@ class Admin_Form_Controller
 						? 'admin_form_filter_'
 						// Top Filter
 						: 'topFilter_';
-					
+
 					$sFilterValue = Core_Array::get($this->request, "{$filterPrefix}{$oAdmin_Form_Field_Changed->id}", NULL);
 
 					// Функция обратного вызова для значения в фильтре
@@ -2198,4 +2180,6 @@ class Admin_Form_Controller
 
 		return $oAdmin_Form_Field_Changed;
 	}
+	
+	abstract protected function _getForm();
 }

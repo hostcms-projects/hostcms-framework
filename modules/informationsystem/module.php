@@ -23,7 +23,7 @@ class Informationsystem_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2018-01-26';
+	public $date = '2018-03-02';
 
 	/**
 	 * Module name
@@ -39,6 +39,7 @@ class Informationsystem_Module extends Core_Module
 		0 => 'searchIndexItem',
 		1 => 'searchIndexGroup',
 		2 => 'searchUnindexItem',
+		3 => 'recountInformationsystem',
 	);
 
 	/**
@@ -60,7 +61,7 @@ class Informationsystem_Module extends Core_Module
 
 		return parent::getMenu();
 	}
-	
+
 	/**
 	 * Функция обратного вызова для поисковой индексации
 	 *
@@ -271,7 +272,7 @@ class Informationsystem_Module extends Core_Module
 
 						$oInformationsystem_Item->informationsystem_group_id
 							&& $oSearch_Page->addEntity($oInformationsystem_Item->Informationsystem_Group);
-							
+
 						Core_Event::notify(get_class($this) . '.searchCallback', $this, array($oSearch_Page, $oInformationsystem_Item));
 
 						$oSearch_Page->addEntity($oInformationsystem_Item);
@@ -318,9 +319,9 @@ class Informationsystem_Module extends Core_Module
 					if (!is_null($oInformationsystem_Item->id))
 					{
 						$additionalParams = "informationsystem_id={$oInformationsystem_Item->Informationsystem->id}&informationsystem_group_id={$oInformationsystem_Item->informationsystem_group_id}";
-						
+
 						$href = $oAdmin_Form_Controller->getAdminActionLoadHref($sPath, 'edit', NULL, 1, $oInformationsystem_Item->id, $additionalParams);
-	
+
 						$onclick = $oAdmin_Form_Controller->getAdminActionLoadAjax($sPath, 'edit', NULL, 1, $oInformationsystem_Item->id, $additionalParams);
 					}
 				break;
@@ -357,6 +358,10 @@ class Informationsystem_Module extends Core_Module
 				// Unindex item
 				case 2:
 					Core_Entity::factory('Informationsystem_Item', $entityId)->unindex()->clearCache();
+				break;
+				// Recount informationsystem
+				case 3:
+					Core_Entity::factory('Informationsystem', $entityId)->recount();
 				break;
 			}
 		}

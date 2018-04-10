@@ -9,10 +9,54 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Skin
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 {
+	/**
+	 * Get form
+	 * @return string
+	 */
+	protected function _getForm()
+	{
+		ob_start();
+
+		$oAdmin_View = Admin_View::create();
+		$oAdmin_View
+			->children($this->_children)
+			->pageTitle($this->_pageTitle)
+			->module($this->_module);
+
+		ob_start();
+
+		$this
+			->showContent()
+			->showFooter();
+
+		$content = ob_get_clean();
+
+		$oAdmin_View
+			->content($content)
+			->message($this->getMessage())
+			->show();
+
+		$this->_applyEditable();
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Show form footer
+	 */
+	public function showFooter()
+	{
+		$this
+			->bottomActions()
+			->pageNavigation();
+
+		return $this;
+	}
+
 	/**
 	 * Show form content in administration center
 	 * @return self
@@ -525,7 +569,7 @@ class Skin_Default_Admin_Form_Controller extends Admin_Form_Controller
 										{
 											$src = $value_array[$value];
 										}
-										elseif(isset($value_array['']))
+										elseif (isset($value_array['']))
 										{
 											$src = $value_array[''];
 										}

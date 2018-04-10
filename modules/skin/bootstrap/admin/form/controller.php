@@ -28,8 +28,8 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 			{
 				$this->_oAdmin_Form_Setting->filter = json_encode(
 					array('show' => intval(Core_Array::getPost('show')))
-						+ (is_array($this->_filter)
-							? $this->_filter
+						+ (is_array($this->_filterSettings)
+							? $this->_filterSettings
 							: array())
 				);
 				$this->_oAdmin_Form_Setting->save();
@@ -49,7 +49,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		{
 			if ($this->_oAdmin_Form_Setting)
 			{
-				$tabs = Core_Array::get($this->_filter, 'tabs', array());
+				$tabs = Core_Array::get($this->_filterSettings, 'tabs', array());
 
 				// Main Tab should be first
 				if (!isset($tabs['main']))
@@ -63,9 +63,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 
 				$tabs[$tab]['fields'][$field]['show'] = $show;
 
-				$this->_filter['tabs'] = $tabs;
+				$this->_filterSettings['tabs'] = $tabs;
 
-				$this->_oAdmin_Form_Setting->filter = json_encode($this->_filter);
+				$this->_oAdmin_Form_Setting->filter = json_encode($this->_filterSettings);
 				$this->_oAdmin_Form_Setting->save();
 
 				$aJSON = array('message' => 'OK');
@@ -83,7 +83,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		{
 			if ($this->_oAdmin_Form_Setting)
 			{
-				$tabs = Core_Array::get($this->_filter, 'tabs', array());
+				$tabs = Core_Array::get($this->_filterSettings, 'tabs', array());
 
 				// Main Tab should be first
 				if (!isset($tabs['main']))
@@ -124,9 +124,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 				{
 					$tabs[] = $aNewTab;
 
-					$this->_filter['tabs'] = $tabs;
+					$this->_filterSettings['tabs'] = $tabs;
 
-					$this->_oAdmin_Form_Setting->filter = json_encode($this->_filter);
+					$this->_oAdmin_Form_Setting->filter = json_encode($this->_filterSettings);
 					$this->_oAdmin_Form_Setting->save();
 
 					end($tabs);
@@ -152,7 +152,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		{
 			if ($this->_oAdmin_Form_Setting)
 			{
-				$tabs = Core_Array::get($this->_filter, 'tabs', array());
+				$tabs = Core_Array::get($this->_filterSettings, 'tabs', array());
 
 				// _filterId
 				$tabName = Core_Array::getPost('filterId');
@@ -178,9 +178,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 					}
 				}
 
-				$this->_filter['tabs'] = $tabs;
+				$this->_filterSettings['tabs'] = $tabs;
 
-				$this->_oAdmin_Form_Setting->filter = json_encode($this->_filter);
+				$this->_oAdmin_Form_Setting->filter = json_encode($this->_filterSettings);
 				$this->_oAdmin_Form_Setting->save();
 
 				end($tabs);
@@ -199,7 +199,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		{
 			if ($this->_oAdmin_Form_Setting)
 			{
-				$tabs = Core_Array::get($this->_filter, 'tabs', array());
+				$tabs = Core_Array::get($this->_filterSettings, 'tabs', array());
 
 				$tabName = Core_Array::getPost('filterId');
 
@@ -207,9 +207,9 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 				{
 					unset($tabs[$tabName]);
 
-					$this->_filter['tabs'] = $tabs;
+					$this->_filterSettings['tabs'] = $tabs;
 
-					$this->_oAdmin_Form_Setting->filter = json_encode($this->_filter);
+					$this->_oAdmin_Form_Setting->filter = json_encode($this->_filterSettings);
 					$this->_oAdmin_Form_Setting->save();
 				}
 
@@ -250,12 +250,11 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		{
 			$aHide = array();
 			$path = Core_Str::escapeJavascriptVariable($this->_path);
-			$aTabs = Core_Array::get($this->_filter, 'tabs', array());
+			$aTabs = Core_Array::get($this->_filterSettings, 'tabs', array());
 			?>
 			<div class="tabbable topFilter" style="display: none;">
 				<ul class="nav nav-tabs tabs-flat" id="filterTabs">
 					<?php
-					//print_r($aTabs);
 					!isset($aTabs['main']) && $aTabs['main'] = array();
 
 					foreach ($aTabs as $tabName => $aTab)
@@ -343,7 +342,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 													</label>
 													<div class="col-sm-10">
 														<?php
-														$this->_showFilterField($oAdmin_Form_Field_Changed, $filterPrefix, $tabName);
+														$this->showFilterField($oAdmin_Form_Field_Changed, $filterPrefix, $tabName);
 														?>
 													</div>
 												</div><?php
@@ -559,7 +558,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 					if ($oAdmin_Form_Field_Changed->allow_filter)
 					{
 						$filterPrefix = 'admin_form_filter_';
-						$this->_showFilterField($oAdmin_Form_Field_Changed, $filterPrefix);
+						$this->showFilterField($oAdmin_Form_Field_Changed, $filterPrefix);
 					}
 					else
 					{
@@ -776,9 +775,18 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 														if (isset($str_explode[2])
 															&& trim($value) == $mIndex)
 														{
-															$alt_array[$mIndex] = $title_array[$mIndex] = trim($str_explode[2]);
+															$sTmp = trim($str_explode[2]);
+
+															$lngAltName = 'Admin_Form.' . $sTmp;
+															if (Core_I18n::instance()->check($lngAltName))
+															{
+																$sTmp = Core::_($lngAltName);
+															}
+
+															$alt_array[$mIndex] = $title_array[$mIndex] = $sTmp;
 														}
 
+														// ICO
 														isset($str_explode[3])
 															&& $ico_array[$mIndex] = $str_explode[3];
 													}
@@ -1070,7 +1078,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 		</div>
 		<?php
 
-		if (Core_Array::get($this->_filter, 'show'))
+		if (Core_Array::get($this->_filterSettings, 'show'))
 		{
 			?><script>$.toggleFilter();</script><?php
 		}
@@ -1192,7 +1200,7 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 						->class('fa fa-filter no-margin')
 				);
 
-			$iFilters = count(Core_Array::get($this->_filter, 'tabs', array()));
+			$iFilters = count(Core_Array::get($this->_filterSettings, 'tabs', array()));
 
 			if ($iFilters > 1)
 			{
@@ -1221,16 +1229,47 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 	}
 
 	/**
+	 * Show children elements
+	 * @return self
+	 */
+	public function showFormMenus()
+	{
+		// Связанные с формой элементы (меню, строка навигации и т.д.)
+		foreach ($this->_children as $oAdmin_Form_Entity)
+		{
+			if ($oAdmin_Form_Entity instanceof Skin_Bootstrap_Admin_Form_Entity_Menus)
+			{
+				$oAdmin_Form_Entity->execute();
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Get form
 	 * @return string
 	 */
 	protected function _getForm()
 	{
-		$oAdmin_View = Admin_View::create();
-		$oAdmin_View
-			->children($this->_children)
+		$oAdmin_View = Admin_View::create()
 			->pageTitle($this->_pageTitle)
 			->module($this->_module);
+
+		$aAdminFormControllerChildren = array();
+
+		foreach ($this->_children as $oAdmin_Form_Entity)
+		{
+			if ($oAdmin_Form_Entity instanceof Skin_Bootstrap_Admin_Form_Entity_Breadcrumbs
+				|| $oAdmin_Form_Entity instanceof Skin_Bootstrap_Admin_Form_Entity_Menus)
+			{
+				$oAdmin_View->addChild($oAdmin_Form_Entity);
+			}
+			else
+			{
+				$aAdminFormControllerChildren[] = $oAdmin_Form_Entity;
+			}
+		}
 
 		// Is filter necessary
 		$aAdmin_Form_Fields = $this->_Admin_Form->Admin_Form_Fields->findAll();
@@ -1250,12 +1289,22 @@ class Skin_Bootstrap_Admin_Form_Controller extends Admin_Form_Controller
 			}
 		}
 
-		ob_start();
-		$this->_pageSelector();
-		$oAdmin_View->pageSelector(ob_get_clean());
-
 		// При показе формы могут быть добавлены сообщения в message, поэтому message показывается уже после отработки формы
 		ob_start();
+		?>
+		<div class="table-toolbar">
+			<?php $this->showFormMenus()?>
+			<div class="table-toolbar-right pull-right">
+				<?php echo $this->_pageSelector()?>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<?php
+		foreach ($aAdminFormControllerChildren as $oAdmin_Form_Entity)
+		{
+			$oAdmin_Form_Entity->execute();
+		}
+
 		$this->showContent();
 		$this->showFooter();
 		$content = ob_get_clean();

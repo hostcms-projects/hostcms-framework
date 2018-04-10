@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Notification
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Notification_Model extends Core_Entity
 {
@@ -64,7 +64,7 @@ class Notification_Model extends Core_Entity
 	{
 		if ($this->module_id && ($oCore_Module = $this->Module->Core_Module) && !is_null($oCore_Module))
 		{
-			$aNotificationDecorations = $oCore_Module->getNotifications($this->type, $this->entity_id);
+			$aNotificationDecorations = $oCore_Module->getNotificationDesign($this->type, $this->entity_id);
 
 			$aNotification['icon'] = Core_Array::get($aNotificationDecorations, 'icon');
 
@@ -90,7 +90,7 @@ class Notification_Model extends Core_Entity
 
 		if ($this->module_id && ($oCore_Module = $this->Module->Core_Module) && !is_null($oCore_Module))
 		{
-			$aNotificationDecorations = $oCore_Module->getNotifications($this->type, $this->entity_id);
+			$aNotificationDecorations = $oCore_Module->getNotificationDesign($this->type, $this->entity_id);
 
 			$href = Core_Array::get($aNotificationDecorations, 'href');
 			$onclick = Core_Array::get($aNotificationDecorations, 'onclick');

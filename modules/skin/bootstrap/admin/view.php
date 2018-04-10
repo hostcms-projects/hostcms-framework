@@ -44,7 +44,7 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 	 * Show children elements
 	 * @return self
 	 */
-	public function showFormMenus()
+	/*public function showFormMenus()
 	{
 		// Связанные с формой элементы (меню, строка навигации и т.д.)
 		foreach ($this->_children as $oAdmin_Form_Entity)
@@ -56,7 +56,7 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 		}
 
 		return $this;
-	}
+	}*/
 
 	/**
 	 * Show children elements
@@ -118,21 +118,6 @@ class Skin_Bootstrap_Admin_View extends Admin_View
 			<div id="id_message"><?php echo $this->message?></div>
 			<div class="widget">
 				<div class="widget-body">
-					<div class="table-toolbar">
-						<?php $this->showFormMenus()?>
-						<?php
-						if (strlen($this->pageSelector))
-						{
-						?>
-						<div class="table-toolbar-right pull-right">
-							<?php echo $this->pageSelector?>
-						</div>
-						<?php
-						}
-						?>
-						<div class="clear"></div>
-					</div>
-
 					<?php $this->showChildren()?>
 
 					<?php echo $this->content?>

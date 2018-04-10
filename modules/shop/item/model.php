@@ -62,6 +62,12 @@ class Shop_Item_Model extends Core_Entity
 	public $absolute_price = NULL;
 
 	/**
+	 * Callback property_id
+	 * @var string
+	 */
+	public $adminRest = NULL;
+
+	/**
 	 * Triggered by calling isset() or empty() on inaccessible properties
 	 * @param string $property property name
 	 * @return boolean
@@ -390,7 +396,8 @@ class Shop_Item_Model extends Core_Entity
 		// Get value
 		if (is_null($value) || is_object($value))
 		{
-			return $this->getRest();
+			//return $this->getRest();
+			return $this->adminRest;
 		}
 
 		// Save value for default warehouse
@@ -884,6 +891,7 @@ class Shop_Item_Model extends Core_Entity
 	 * @param int $iShopGroupId target group id
 	 * @return Core_Entity
 	 * @hostcms-event shop_item.onBeforeMove
+	 * @hostcms-event shop_item.onAfterMove
 	 */
 	public function move($iShopGroupId)
 	{
@@ -907,6 +915,8 @@ class Shop_Item_Model extends Core_Entity
 		$this->save()->clearCache();
 
 		$iShopGroupId && $oShop_Group->incCountItems();
+
+		Core_Event::notify($this->_modelName . '.onAfterMove', $this);
 
 		return $this;
 	}
@@ -1812,6 +1822,7 @@ class Shop_Item_Model extends Core_Entity
 	 * @hostcms-event shop_item.onBeforeAddModification
 	 * @hostcms-event shop_item.onBeforeSelectAssociatedItems
 	 * @hostcms-event shop_item.onBeforeAddAssociatedEntity
+	 * @hostcms-event shop_item.onBeforeSelectShopWarehouseItems
 	 */
 	public function getXml()
 	{
@@ -1870,7 +1881,14 @@ class Shop_Item_Model extends Core_Entity
 
 		$this->_showXmlTags && Core::moduleIsActive('tag') && $this->addEntities($this->Tags->findAll());
 
-		$this->_showXmlWarehousesItems && $this->addEntities($this->Shop_Warehouse_Items->findAll());
+		if ($this->_showXmlWarehousesItems)
+		{
+			$oShop_Warehouse_Items = $this->Shop_Warehouse_Items;
+
+			Core_Event::notify($this->_modelName . '.onBeforeSelectShopWarehouseItems', $this, array($oShop_Warehouse_Items));
+
+			$this->addEntities($oShop_Warehouse_Items->findAll());
+		}
 
 		// Digital item
 		if ($this->type == 1)

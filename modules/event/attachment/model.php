@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Events
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Event_Attachment_Model extends Core_Entity
 {
@@ -62,12 +62,15 @@ class Event_Attachment_Model extends Core_Entity
 	}
 
 	/**
-	 * Delete earlie uploaded file and set new file name
+	 * Save attachment file
+	 * @param string $fileSourcePath source path
 	 * @param string $fileName file name
 	 * @return self
 	 */
-	protected function _upload($fileName)
+	public function saveFile($fileSourcePath, $fileName)
 	{
+		//$this->_upload($fileName);
+
 		$fileName = Core_File::filenameCorrection($fileName);
 		$this->Event->createDir();
 
@@ -81,35 +84,9 @@ class Event_Attachment_Model extends Core_Entity
 
 		$this->file_name = $fileName;
 		$this->file_path = $this->id . '.' . Core_File::getExtension($fileName);
-
-		return $this->save();
-	}
-
-	/**
-	 * Save attachment file
-	 * @param string $fileSourcePath source path
-	 * @param string $fileName file name
-	 * @return self
-	 */
-	public function saveFile($fileSourcePath, $fileName)
-	{
-		$this->_upload($fileName);
+		$this->save();
 
 		Core_File::upload($fileSourcePath, $this->Event->getPath() . $this->file_path);
-		return $this;
-	}
-
-	/**
-	 * Upload attachment file
-	 * @param string $fileContent file content
-	 * @param string $fileName file name
-	 * @return self
-	 */
-	public function upload($fileContent, $fileName)
-	{
-		$this->_upload($fileName);
-
-		Core_File::write($this->Event->getPath() . $this->file_path, $fileContent);
 		return $this;
 	}
 

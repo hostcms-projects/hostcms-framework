@@ -325,15 +325,18 @@ abstract class Core_QueryBuilder_Selection extends Core_QueryBuilder_Statement
 						$sql .= ' ' . $operator;
 					}
 
-					if (count($aWhere) == 3 && !is_null($aWhere[1]))
+					if (!is_null($aWhere))
 					{
-						list($column, $expression, $value) = $aWhere;
-						$sql .= ' ' . $this->_buildWhere($column, $expression, $value);
-					}
-					else
-					{
-						list($column) = $aWhere;
-						$sql .= ' ' . (is_object($column) ? $column->build() : $column);
+						if (count($aWhere) == 3 && !is_null($aWhere[1]))
+						{
+							list($column, $expression, $value) = $aWhere;
+							$sql .= ' ' . $this->_buildWhere($column, $expression, $value);
+						}
+						else
+						{
+							list($column) = $aWhere;
+							$sql .= ' ' . (is_object($column) ? $column->build() : $column);
+						}
 					}
 				}
 			}

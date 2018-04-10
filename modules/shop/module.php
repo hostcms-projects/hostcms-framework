@@ -23,7 +23,7 @@ class Shop_Module extends Core_Module
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2018-01-26';
+	public $date = '2018-03-02';
 
 	/**
 	 * Module name
@@ -39,6 +39,7 @@ class Shop_Module extends Core_Module
 		0 => 'searchIndexItem',
 		1 => 'searchIndexGroup',
 		2 => 'searchUnindexItem',
+		3 => 'recountShop',
 	);
 
 	/**
@@ -452,17 +453,21 @@ class Shop_Module extends Core_Module
 				case 2:
 					Core_Entity::factory('Shop_Item', $entityId)->unindex()->clearCache();
 				break;
+				// Recount shop
+				case 3:
+					Core_Entity::factory('Shop', $entityId)->recount();
+				break;				
 			}
 		}
 	}
 
 	/**
-	 * Get List of Notification
+	 * Get Notification Design
 	 * @param int $type
 	 * @param int $entityId
 	 * @return array
 	 */
-	public function getNotifications($type, $entityId)
+	public function getNotificationDesign($type, $entityId)
 	{
 		// Идентификатор формы "Оформленные заказы"
 		$iAdmin_Form_Id = 75;

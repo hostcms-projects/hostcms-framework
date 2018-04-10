@@ -88,8 +88,10 @@ class Directory_Address_Model extends Core_Entity
 	{
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
-		$this->clearXmlTags()
-			->addXmlTag('name', htmlspecialchars($this->Directory_Address_Type->name));
+		$this->clearXmlTags();
+		
+		$this->directory_address_type_id
+			&& $this->addXmlTag('name', htmlspecialchars($this->Directory_Address_Type->name));
 
 		return parent::getXml();
 	}

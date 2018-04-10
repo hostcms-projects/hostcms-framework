@@ -82,7 +82,7 @@ class Event_Model extends Core_Entity
 			// Список статусов дел
 			$aEvent_Statuses = Core_Entity::factory('Event_Status')->findAll();
 
-			$aMasEventStatuses = array();
+			$aMasEventStatuses = array('value' => Core::_('Event.notStatus'), 'color' => '#aebec4');
 
 			foreach ($aEvent_Statuses as $oEvent_Status)
 			{

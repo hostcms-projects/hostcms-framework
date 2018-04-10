@@ -21,7 +21,7 @@ class Event_Module extends Core_Module{	/**
 	 * Module date
 	 * @var date
 	 */
-	public $date = '2018-01-26';
+	public $date = '2018-03-02';
 
 	/**
 	 * Module name
@@ -50,23 +50,13 @@ class Event_Module extends Core_Module{	/**
 	}
 
 	/**
-	 * Get List of Notification
+	 * Get Notification Design
 	 * @param int $type
 	 * @param int $entityId
 	 * @return array
 	 */
-	public function getNotifications($type, $entityId)
+	public function getNotificationDesign($type, $entityId)
 	{
-		// Идентификатор формы "Дела"
-		$iAdmin_Form_Id = 220;
-		$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
-
-		// Контроллер формы
-		$oAdmin_Form_Controller = Admin_Form_Controller::create($oAdmin_Form);
-		$oAdmin_Form_Controller
-			->path('/admin/event/index.php')
-			->window('id_content');
-
 		switch ($type)
 		{
 			case 100: // Напоминание о событии
@@ -93,7 +83,7 @@ class Event_Module extends Core_Module{	/**
 				'background-color' => $sNotificationColor
 			),
 			'href' => "/admin/event/index.php?hostcms[action]=edit&hostcms[operation]=&hostcms[current]=1&hostcms[checked][0][" . $entityId . "]=1",
-			// $(this).parents('li.open').click(); 
+			// $(this).parents('li.open').click();
 			'onclick' => "$.adminLoad({path: '/admin/event/index.php?hostcms[action]=edit&hostcms[operation]=&hostcms[current]=1&hostcms[checked][0][" . $entityId . "]=1'}); return false",
 			'extra' => array(
 				'icons' => array(),
@@ -247,16 +237,11 @@ class Event_Module extends Core_Module{	/**
 
 			if (!is_null($oEvent->finish) && $oEvent->finish != '0000-00-00 00:00:00')
 			{
-				if ($oEvent->all_day)
-				{
+				$oTmpEvent->end = $oEvent->all_day
 					// Добавляем минуту потому как при показе в FullCalerndar события, продолжительностью весь день,
 					// в качестве конечной даты используется начало суток, следующих за завершающим днем события
-					$oTmpEvent->end = date('Y-m-dT00:00:00', Core_Date::sql2timestamp($oEvent->finish) + 60);
-				}
-				else
-				{
-					$oTmpEvent->end = date('c', Core_Date::sql2timestamp($oEvent->finish));
-				}
+					? date('Y-m-dT00:00:00', Core_Date::sql2timestamp($oEvent->finish) + 60)
+					: date('c', Core_Date::sql2timestamp($oEvent->finish));
 			}
 
 			$aReturnEvents[] = $oTmpEvent;
@@ -398,7 +383,7 @@ class Event_Module extends Core_Module{	/**
 		$oAdmin_Form = Core_Entity::factory('Admin_Form', $iAdmin_Form_Id);
 
 		$hostcmsParams = Core_Array::getRequest('hostcms');
-		
+
 		$windowId = !is_null($hostcmsParams) && isset($hostcmsParams['window']) && !empty($hostcmsParams['window'])
 			? $hostcmsParams['window']
 			: 'id_content';

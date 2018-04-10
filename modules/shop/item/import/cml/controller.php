@@ -429,7 +429,7 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 		{
 			// целое число
 			case 0:
-				$changedValue = Shop_Controller::instance()->convertPrice($value);
+				$changedValue = intval(Shop_Controller::instance()->convertPrice($value));
 			break;
 			// Файл
 			case 2:
@@ -1180,7 +1180,8 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 						continue;
 					}
 
-					$this->_checkUpdateField('marking') && $oShopItem->marking = strval($oXmlItem->Артикул);
+					$this->_checkUpdateField('marking') && strval($oXmlItem->Артикул) != ''
+						&& $oShopItem->marking = strval($oXmlItem->Артикул);
 						/*? strval($oXmlItem->Артикул)
 						: (strlen(strval($oXmlItem->Штрихкод))
 							? strval($oXmlItem->Штрихкод)
@@ -1527,7 +1528,9 @@ class Shop_Item_Import_Cml_Controller extends Core_Servant_Properties
 							$oShopItem = $oModificationItem;
 
 							// Для модификации обновляется название и артикул
-							$this->_checkUpdateField('marking') && $oShopItem->marking = strval($oProposal->Артикул);
+							$this->_checkUpdateField('marking') && strval($oProposal->Артикул) != ''
+								&& $oShopItem->marking = strval($oProposal->Артикул);
+							
 							$this->_checkUpdateField('name') && $oShopItem->name = strval($oProposal->Наименование);
 						}
 

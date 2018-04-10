@@ -100,6 +100,20 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	}
 
 	/**
+	 * Remove skiping column
+	 * @param string $column column name
+	 * @return self
+	 */
+	public function removeSkipColumn($column)
+	{
+		if (isset($this->skipColumns[$column]))
+		{
+			unset($this->skipColumns[$column]);
+		}
+		return $this;
+	}
+
+	/**
 	 * Get model's key list
 	 * Получение списка ключей модели (PK и FK)
 	 * @return self
@@ -551,7 +565,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 					{
 						$oAdmin_Form_Entity_For_Column
 							->caption(Core::_('User.backend-field-caption'))
-							->divAttr(array('class' => 'form-group col-xs-6 col-sm-3'));
+							->divAttr(array('class' => 'form-group col-xs-6 col-sm-4'));
 
 						if ($this->_object->user_id && Core::moduleIsActive('user'))
 						{
@@ -559,7 +573,8 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 
 							$oUserLink = Admin_Form_Entity::factory('Link');
 							$oUserLink
-								->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-6 col-sm-3'))
+								// ->divAttr(array('class' => 'large-link checkbox-margin-top form-group col-xs-6 col-sm-3'))
+								->divAttr(array('class' => 'input-group-addon user-link'))
 								->a
 									->class('btn btn-labeled btn-sky')
 									->href($this->_Admin_Form_Controller->getAdminActionLoadHref('/admin/user/index.php', 'edit', NULL, 0, $oUser->id, ''))
@@ -570,7 +585,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 								->icon
 									->class('btn-label fa fa-user');
 
-							$oEntity_Row->add($oUserLink);
+							$oAdmin_Form_Entity_For_Column->add($oUserLink);
 						}
 					}
 				}
@@ -585,13 +600,13 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 	}
 
 	protected $_return = NULL;
-	
+
 	public function setReturn($return)
 	{
 		$this->_return = $return;
 		return $this;
 	}
-	
+
 	/**
 	 * Executes the business logic.
 	 * @param mixed $operation Operation for action
@@ -698,7 +713,7 @@ class Admin_Form_Action_Controller_Type_Edit extends Admin_Form_Action_Controlle
 				$this->addContent('<script type="text/javascript">/*setTimeout(function() {*/ $(\'#' . $windowId . '\').parents(\'.bootbox\').remove(); /*}, 300);*/</script>');
 
 				$this->_return = TRUE;
-			break;			
+			break;
 			default:
 				$this->_applyObjectProperty();
 				$this->_return = FALSE; // Показываем форму

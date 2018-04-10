@@ -70,7 +70,11 @@ abstract class Core_Image
 	static public function exifImagetype($filename)
 	{
 		// Uploaded file doesn't have extension
-		if (is_uploaded_file($filename) || Core_File::isValidExtension($filename, Core_File::$resizeExtensions))
+		if (is_uploaded_file($filename)
+			|| Core_File::isValidExtension($filename, Core_File::$resizeExtensions)
+			|| strpos($filename, CMS_FOLDER . TMP_DIR) === 0
+			|| in_array(Core_File::getExtension($filename), array('tmp', 'dat'))
+		)
 		{
 			if (function_exists('exif_imagetype'))
 			{

@@ -9,7 +9,7 @@ defined('HOSTCMS') || exit('HostCMS: access denied.');
  * @subpackage Informationsystem
  * @version 6.x
  * @author Hostmake LLC
- * @copyright © 2005-2017 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
+ * @copyright © 2005-2018 ООО "Хостмэйк" (Hostmake LLC), http://www.hostcms.ru
  */
 class Informationsystem_Model extends Core_Entity
 {
@@ -239,14 +239,14 @@ class Informationsystem_Model extends Core_Entity
 	{
 		// Удаляем директории информационных групп
 		$aInformationsystem_Groups = $this->Informationsystem_Groups->findAll(FALSE);
-		foreach($aInformationsystem_Groups as $oInformationsystem_Group)
+		foreach ($aInformationsystem_Groups as $oInformationsystem_Group)
 		{
 			$oInformationsystem_Group->deleteDir();
 		}
 
 		// Удаляем директории информационных элементов
 		$aInformationsystem_Items = $this->Informationsystem_Items->findAll(FALSE);
-		foreach($aInformationsystem_Items as $oInformationsystem_Item)
+		foreach ($aInformationsystem_Items as $oInformationsystem_Item)
 		{
 			$oInformationsystem_Item->deleteDir();
 		}
@@ -370,7 +370,7 @@ class Informationsystem_Model extends Core_Entity
 		$oProperty_Dir = $oInformationsystem_Item_Property_List->Property_Dirs;
 		$aProperty_Dirs = $oProperty_Dir->findAll();
 		$aMatchProperty_Dirs = array();
-		foreach($aProperty_Dirs as $oProperty_Dir)
+		foreach ($aProperty_Dirs as $oProperty_Dir)
 		{
 			$oNewProperty_Dir = clone $oProperty_Dir;
 			$oNewObject_Informationsystem_Item_Property_List->add($oNewProperty_Dir);
@@ -379,7 +379,7 @@ class Informationsystem_Model extends Core_Entity
 		}
 
 		$oNewProperty_Dirs = $oNewObject_Informationsystem_Item_Property_List->Property_Dirs->findAll();
-		foreach($oNewProperty_Dirs as $oNewProperty_Dir)
+		foreach ($oNewProperty_Dirs as $oNewProperty_Dir)
 		{
 			if (isset($aMatchProperty_Dirs[$oNewProperty_Dir->parent_id]))
 			{
@@ -390,14 +390,14 @@ class Informationsystem_Model extends Core_Entity
 
 		$oProperty = $oInformationsystem_Item_Property_List->Properties;
 		$aProperties = $oProperty->findAll();
-		foreach($aProperties as $oProperty)
+		foreach ($aProperties as $oProperty)
 		{
 			$oNewProperty = clone $oProperty;
 			$oNewObject_Informationsystem_Item_Property_List->add($oNewProperty);
 		}
 
 		$oNewProperties = $oNewObject_Informationsystem_Item_Property_List->Properties->findAll();
-		foreach($oNewProperties as $oNewProperty)
+		foreach ($oNewProperties as $oNewProperty)
 		{
 			if (isset($aMatchProperty_Dirs[$oNewProperty->property_dir_id]))
 			{
@@ -415,7 +415,7 @@ class Informationsystem_Model extends Core_Entity
 		$aProperty_Dirs = $oProperty_Dir->findAll();
 
 		$aMatchProperty_Dirs = array();
-		foreach($aProperty_Dirs as $oProperty_Dir)
+		foreach ($aProperty_Dirs as $oProperty_Dir)
 		{
 			$oNewProperty_Dir = clone $oProperty_Dir;
 
@@ -426,7 +426,7 @@ class Informationsystem_Model extends Core_Entity
 
 		$oNewProperty_Dirs = $oNewObject_Informationsystem_Group_Property_List->Property_Dirs->findAll();
 
-		foreach($oNewProperty_Dirs as $oNewProperty_Dir)
+		foreach ($oNewProperty_Dirs as $oNewProperty_Dir)
 		{
 			if (isset($aMatchProperty_Dirs[$oNewProperty_Dir->parent_id]))
 			{
@@ -438,14 +438,14 @@ class Informationsystem_Model extends Core_Entity
 		$oProperty = $oInformationsystem_Group_Property_List->Properties;
 		$aProperties = $oProperty->findAll();
 
-		foreach($aProperties as $oProperty)
+		foreach ($aProperties as $oProperty)
 		{
 			$oNewProperty = clone $oProperty;
 			$oNewObject_Informationsystem_Group_Property_List->add($oNewProperty);
 		}
 
 		$oNewProperties = $oNewObject_Informationsystem_Group_Property_List->Properties->findAll();
-		foreach($oNewProperties as $oNewProperty)
+		foreach ($oNewProperties as $oNewProperty)
 		{
 			if (isset($aMatchProperty_Dirs[$oNewProperty->property_dir_id]))
 			{
@@ -479,7 +479,7 @@ class Informationsystem_Model extends Core_Entity
 			->where('informationsystem_groups.deleted', '=', 0);
 
 		$aInformationsystem_Groups = $queryBuilder->execute()->asAssoc()->result();
-		foreach($aInformationsystem_Groups as $aInformationsystem_Group)
+		foreach ($aInformationsystem_Groups as $aInformationsystem_Group)
 		{
 			$this->_groupsTree[$aInformationsystem_Group['parent_id']][] = $aInformationsystem_Group['id'];
 		}
@@ -494,7 +494,7 @@ class Informationsystem_Model extends Core_Entity
 			->groupBy('parent_id');
 
 		$aInformationsystem_Groups = $queryBuilder->execute()->asAssoc()->result();
-		foreach($aInformationsystem_Groups as $aInformationsystem_Group)
+		foreach ($aInformationsystem_Groups as $aInformationsystem_Group)
 		{
 			$this->_cacheGroups[$aInformationsystem_Group['parent_id']] = $aInformationsystem_Group['count'];
 		}
@@ -519,7 +519,7 @@ class Informationsystem_Model extends Core_Entity
 
 		$aInformationsystem_Items = $queryBuilder->execute()->asAssoc()->result();
 
-		foreach($aInformationsystem_Items as $Informationsystem_Item)
+		foreach ($aInformationsystem_Items as $Informationsystem_Item)
 		{
 			$this->_cacheItems[$Informationsystem_Item['informationsystem_group_id']] = $Informationsystem_Item['count'];
 		}
@@ -562,7 +562,7 @@ class Informationsystem_Model extends Core_Entity
 
 		if (isset($this->_groupsTree[$parent_id]))
 		{
-			foreach($this->_groupsTree[$parent_id] as $groupId)
+			foreach ($this->_groupsTree[$parent_id] as $groupId)
 			{
 				$aTmp = $this->_callSubgroup($groupId);
 				$return['subgroups_total'] += $aTmp['subgroups_total'];
@@ -605,7 +605,7 @@ class Informationsystem_Model extends Core_Entity
 		Core_Event::notify($this->_modelName . '.onBeforeRedeclaredGetXml', $this);
 
 		$this->clearXmlTags()
-			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'HTTP_HOST'))
+			->addXmlTag('http', '//' . Core_Array::get($_SERVER, 'SERVER_NAME'))
 			->addXmlTag('url', $this->Structure->getPath())
 			->addXmlTag('captcha_id', $this->use_captcha ? Core_Captcha::getCaptchaId() : 0);
 
@@ -653,6 +653,20 @@ class Informationsystem_Model extends Core_Entity
 		!$this->structure_id && Core::factory('Core_Html_Entity_Span')
 			->class('badge badge-darkorange badge-ico white')
 			->add(Core::factory('Core_Html_Entity_I')->class('fa fa-chain-broken'))
+			->execute();
+
+		$countInformationsystemGroups = $this->Informationsystem_Groups->getCount();
+		$countInformationsystemGroups && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-hostcms badge-square')
+			->value('<i class="fa fa-folder-open-o"></i> ' . $countInformationsystemGroups)
+			->title(Core::_('Informationsystem.all_groups_count', $countInformationsystemGroups))
+			->execute();
+
+		$countInformationsystemItems = $this->Informationsystem_Items->getCount();
+		$countInformationsystemItems && Core::factory('Core_Html_Entity_Span')
+			->class('badge badge-hostcms badge-square')
+			->value('<i class="fa fa-file-o"></i> ' . $countInformationsystemItems)
+			->title(Core::_('Informationsystem.all_items_count', $countInformationsystemItems))
 			->execute();
 	}
 }
